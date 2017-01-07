@@ -118,7 +118,7 @@
 
   
 (defun cotd-main () 
-  (setf *msg-box-window-height* (* +default-font-h+ 10))
+  (setf *msg-box-window-height* (* +default-font-h+ 8))
   (setf *random-state* (make-random-state t))
   (sdl:with-init ()
     (setf *window-width* (+ 200 50 (+ 30 (* +glyph-w+ *max-x-view*))) 
@@ -133,9 +133,9 @@
     (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 +glyph-w+ +glyph-h+))
     
     
-    (format t "path = ~A~%" (sdl:create-path "data/font3.bmp" *current-dir*))
+    (format t "path = ~A~%" (sdl:create-path "data/font4.bmp" *current-dir*))
     
-    (setf *glyph-front* (sdl:load-image (sdl:create-path "data/font3.bmp" *current-dir*) 
+    (setf *glyph-front* (sdl:load-image (sdl:create-path "data/font4.bmp" *current-dir*) 
 					:color-key sdl:*white*))
     (setf *glyph-temp* (sdl:create-surface +glyph-w+ +glyph-h+ :color-key sdl:*black*))
  

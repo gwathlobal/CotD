@@ -107,8 +107,9 @@
     world))
 
 (defun create-mobs-from-template (level mob-template-list)
-  (loop for (mob-type-id x y) in mob-template-list do
-    (add-mob-to-level-list level (make-instance 'mob :mob-type mob-type-id :x x :y y))))
+  (loop for (mob-type-id x y) in mob-template-list 
+        do
+           (add-mob-to-level-list level (make-instance 'mob :mob-type mob-type-id :x x :y y))))
 
 (defun create-test-world (world)
   (let (

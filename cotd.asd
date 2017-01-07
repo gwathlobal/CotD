@@ -22,7 +22,7 @@
      (:file "abilities" :depends-on ("globals"))
      (:file "terrain" :depends-on ("globals"))
      (:file "lvl-features" :depends-on ("globals"))
-     (:file "base-methods" :depends-on ("astar" "message-box" "mobs" "world" "abilities" "terrain" "lvl-features"))
+     (:file "base-methods" :depends-on ("message-box" "mobs" "world" "abilities" "terrain" "lvl-features"))
      (:file "level-city" :depends-on ("base-methods"))
      (:file "level-test" :depends-on ("base-methods"))
      (:file "dungeon-creation" :depends-on ("level-test" "level-city"))

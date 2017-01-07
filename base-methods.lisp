@@ -1,6 +1,7 @@
 (in-package :cotd)
 
 (defun get-distance (sx sy tx ty)
+  (declare (type fixnum sx sy tx ty))
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)))))
 
 (defun find-free-id (hash-table)
@@ -106,16 +107,16 @@
                                                         (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
                                                           (setf exit-result 'exit)
                                                           (return))
-                                                        (when (and (get-mob-* (level *world*) dx dy) 
-                                                                   (not (eq (get-mob-* (level *world*) dx dy) mob))
-                                                                   )
-                                                          (pushnew (id (get-mob-* (level *world*) dx dy)) (visible-mobs mob)))
-                                                        
+                                                        (when (and (= dx (x vmob)) (= dy (y vmob)))
+                                                          (pushnew (id vmob) (visible-mobs mob))
+                                                          )
+                                                                                                                
                                                         (when (> r (cur-sight mob))
                                                           (setf exit-result 'exit)
                                                           (return))
                                                         )
-                                                      exit-result)))))
+                                                      exit-result)))
+           ))
     )
   )
 

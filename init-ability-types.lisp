@@ -279,7 +279,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-call-for-help+ :name "Summon ally" :descr "Invoke hellish powers to summon one ally to your place. Remember that you may call but nobody is obliged to answer." 
-                                 :cost 0 :spd (truncate +normal-ap+ 3) :passive nil
+                                 :cost 1 :spd (truncate +normal-ap+ 3) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))

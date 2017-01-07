@@ -250,7 +250,7 @@
     (translate-build-to-template x y build-template template-level)
     )
   (list (list +mob-type-man+ 4 5)
-        (list +mob-type-woman+ 5 1)))
+        (list +mob-type-woman+ 4 1)))
 
 (defun level-city-place-lake-1 (x y template-level)
   (let ((build-template (list ",```````,,"

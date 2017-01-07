@@ -166,7 +166,7 @@
     ;; attack the nearest hostile mob
     (when nearest-target
       (format t "AI-FUNCTION: Enemy found ~A [~A]~%" (name nearest-target) (id nearest-target))
-      (let ((path))
+      (let ((path nil))
        
         (setf path (a-star (list (x mob) (y mob)) (list (x nearest-target) (y nearest-target)) 
                            #'(lambda (dx dy) 
@@ -183,36 +183,39 @@
         ))
     
     ;; move to some random passable terrain 
-    (unless (path mob)
-      (let ((rx (- (+ 10 (x mob))
-                   (1+ (random 20)))) 
-            (ry (- (+ 10 (y mob))
-                   (1+ (random 20))))
-            (path))
-        (declare (type integer rx ry))
-        
-        (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
-                        (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
-                        (and (get-mob-* (level *world*) rx ry)
-                             (not (eq (get-mob-* (level *world*) rx ry) mob))))
-              do
-                 (setf rx (- (+ 10 (x mob))
-                             (1+ (random 20))))
-                 (setf ry (- (+ 10 (y mob))
-                             (1+ (random 20)))))
-        (format t "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry)
-        (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
-                           #'(lambda (dx dy) 
-                               ;; checking for impassable objects
-                               (check-move-for-ai mob dx dy)
-                               )))
-       
-        (pop path)
-        (format t "AI-FUNCTION: Mob goes to (~A ~A)~%" rx ry)
-	(format t "AI-FUNCTION: Set mob path - ~A~%" path)
-	(setf (path mob) path)
-        
-        ))
+    ;; a hack to easy the strain of pathfinding during the first turns - if you are human and there are more than 100 of you, do not pathfind
+    ;(when (not (and (mob-ability-p mob +mob-abil-human+) (> (total-humans *world*) 10)))
+      (unless (path mob)
+        (let ((rx (- (+ 10 (x mob))
+                     (1+ (random 20)))) 
+              (ry (- (+ 10 (y mob))
+                     (1+ (random 20))))
+              (path nil))
+          (declare (type integer rx ry))
+          
+          (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                          (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
+                          (and (get-mob-* (level *world*) rx ry)
+                               (not (eq (get-mob-* (level *world*) rx ry) mob))))
+                do
+                   (setf rx (- (+ 10 (x mob))
+                               (1+ (random 20))))
+                   (setf ry (- (+ 10 (y mob))
+                               (1+ (random 20)))))
+          (format t "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry)
+          (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
+                             #'(lambda (dx dy) 
+                                 ;; checking for impassable objects
+                                 (check-move-for-ai mob dx dy)
+                                 )))
+          
+          (pop path)
+          (format t "AI-FUNCTION: Mob goes to (~A ~A)~%" rx ry)
+          (format t "AI-FUNCTION: Set mob path - ~A~%" path)
+          (setf (path mob) path)
+          
+          ))
+    ;)
     
     ;; call for reinforcements if there is enemy in sight and hp < 50%
     (when (and nearest-target
@@ -307,6 +310,7 @@
 
 (defmethod ai-function ((player player))
   (format t "~%AI-FUnction Player~%")
+  (format t "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
   
   (update-visible-area (level *world*) (x player) (y player))
   (when (typep *current-window* 'cell-window)
@@ -370,4 +374,5 @@
   ;; pester the player until it makes some meaningful action that can trigger the event chain
   (loop while (<= (action-delay player) 0) do
     (setf (can-move-if-possessed player) nil)
-    (get-input-player)))
+    (get-input-player))
+  (setf *time-at-end-of-player-turn* (get-internal-real-time)))

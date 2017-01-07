@@ -8,6 +8,8 @@
 (declaim (ftype (function (mob) fixnum) faction))
 (declaim (ftype (function (mob) list) path))
 
+(defvar *time-at-end-of-player-turn* 0)
+
 (defparameter *max-x-level* 100)
 (defparameter *max-y-level* 100)
 (defparameter *max-x-view* 25)

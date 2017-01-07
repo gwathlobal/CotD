@@ -5,8 +5,8 @@
 ;(defparameter +glyph-w+ 8)
 ;(defparameter +glyph-h+ 16)
 
-(defparameter +glyph-w+ 10)
-(defparameter +glyph-h+ 10)
+(defparameter +glyph-w+ 15)
+(defparameter +glyph-h+ 15)
 
 (defvar *quit-func* 0)
 (defparameter *current-window* nil)
