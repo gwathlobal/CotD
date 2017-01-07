@@ -24,7 +24,7 @@ GENERAL TIPS
  - Your enemies are able to hide their true appearence, so observe and learn their tactics to avoid nasty surprises.
  - "Friendly fire" is allowed, so do not get in the way of your more powerfull allies.
  - Your resource is power. You can stockpile it to get a "level up" or spend it on your abilities.
- - You gain power when killing enemies proportional to their strength. Besides each party has other special ways to gain power.
+ - You gain power proportional to the strength of killed enemies. Besides each party has other special ways to gain power.
 
 --------------------
 NOTE
@@ -46,7 +46,7 @@ TIPS FOR THE LEGIONS OF HELL
 
  - The Legions of Hell are represented with three units: Imp, Demon and Archdemon.
  - You start as a puny Imp who is no match for an Angel. Run or summon help when confronted by one.
- - Imps and demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this tactict of a coward and can not possess anybody.
+ - Imps and demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this tactic of a coward and can not possess anybody.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them - you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it way prove fatal in some situations.
  - Your strength is an ability to summon allies to yourself to gang up on your enemy. 

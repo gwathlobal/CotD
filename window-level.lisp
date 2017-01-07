@@ -78,7 +78,8 @@
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func *current-window*)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
-			;;------------------
+                        
+                        ;;------------------
 			;; moving - arrows
 			(when (or (sdl:key= key :sdl-key-pageup) (sdl:key= key :sdl-key-kp9))
                           (if (can-move-if-possessed *player*)
@@ -135,52 +136,15 @@
                             )
                           (setf (meaningful-action win) t))
 			;;------------------
-			;; going downstairs - . + Shift
-			;;(when (and (sdl:key= key :sdl-key-period) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
-			;;  (when (check-way-up/down (get-level-by-z *world* (z *player*)) (x *player*) (y *player*) 1) 
-			;;    ;;(print-visible-message (x *player*) (y *player*) (level *player*) (format nil "Descending downstairs to level ~A~%" (1+ (z *player*))))
-			;;    (teleport-to-level *player* (get-level-by-z *world* (1+ (z *player*))))))
-			;;------------------
-			;; going upstairs - , + Shift
-			;;(when (and (sdl:key= key :sdl-key-comma) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
-			;;  (when (check-way-up/down (get-level-by-z *world* (z *player*)) (x *player*) (y *player*) -1)
-			;;    ;;(print-visible-message (x *player*) (y *player*) (level *player*) (format nil "Ascending upstairs to level ~A~%" (1- (z *player*))))
-			;;    (teleport-to-level *player* (get-level-by-z *world* (1- (z *player*))))))
-			;;------------------
-			;; inventory mode - i
-			;;(when (and (sdl:key= key :sdl-key-i) (= mod 0))
-			;;  (setf *current-window* (make-instance 'inventory-window :return-to *current-window*)))
-			;;------------------
 			;; character mode - Shift + 2
 			(when (and (sdl:key= key :sdl-key-2) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
 			  (setf *current-window* (make-instance 'character-window :return-to *current-window*)))
-			;;------------------
-			;; pick item - p
-			;;(when (and (sdl:key= key :sdl-key-p) (= mod 0))
-			;;  ;; count the number of items and containers at the grid-cell
-			;;  (let ((line-list nil)
-			;;	(item-list (get-items-* (get-level-by-z *world* (z *player*)) (x *player*) (y *player*))))
-			;;    (dolist (item item-list)
-			;;      (setf line-list (append line-list (list (get-small-descr item)))))
-			;;    
-			;;    ;; a single item - just pick it up
-			;;    (when (= (length item-list) 1)
-			;;      (format t "Picking up~%")
-			;;      (pick-item (nth 0 item-list) *player*))
-			;;    ;; a several items - show selection window
-			;;    (when (> (length item-list) 1)
-			;;      (setf *current-window* (make-instance 'select-obj-window 
-			;;					    :return-to *current-window* 
-			;;					    :obj-list item-list
-			;;					    :enter-func #'(lambda (cur-sel)
-			;;							    (pick-item (nth cur-sel item-list) *player*)
-			;;							    (setf *current-window* win))
-			;;					    :line-list line-list
-			;;					    :prompt-list (list (list #'(lambda (cur-sel) 
-			;;									 t)
-			;;								     "[Enter] Take [Escape] Cancel") 
-			;;							       ))))
-			;;    ))
+                        ;;------------------
+			;; help screen - ?
+			(when (or (sdl:key= key :sdl-key-question)
+                                  (and (sdl:key= key :sdl-key-slash) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                  (and (sdl:key= key :sdl-key-7) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)))
+			  (setf *current-window* (make-instance 'help-window :return-to *current-window*)))		
                         ;;------------------
 			;; select abilities - a
                         (when (and (sdl:key= key :sdl-key-a))

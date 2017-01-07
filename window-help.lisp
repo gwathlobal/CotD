@@ -43,6 +43,7 @@
     (format str "Shift + 2                      - Character screen~%")
     (format str "a                              - Invoke ability~%")
     (format str "l                              - Look mode~%")
+    (format str "?                              - Help~%")
     
     (write-text str (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20)))))
 
