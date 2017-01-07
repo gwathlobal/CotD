@@ -133,9 +133,9 @@
     (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 +glyph-w+ +glyph-h+))
     
     
-    (format t "path = ~A~%" (sdl:create-path "data/font4.bmp" *current-dir*))
+    (format t "path = ~A~%" (sdl:create-path "data/font_large.bmp" *current-dir*))
     
-    (setf *glyph-front* (sdl:load-image (sdl:create-path "data/font4.bmp" *current-dir*) 
+    (setf *glyph-front* (sdl:load-image (sdl:create-path "data/font_large.bmp" *current-dir*) 
 					:color-key sdl:*white*))
     (setf *glyph-temp* (sdl:create-surface +glyph-w+ +glyph-h+ :color-key sdl:*black*))
  

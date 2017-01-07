@@ -47,6 +47,7 @@
 (defconstant +mob-type-clerk+ 10)
 (defconstant +mob-type-criminal+ 11)
 (defconstant +mob-type-policeman+ 12)
+(defconstant +mob-type-priest+ 13)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -108,6 +109,9 @@
 (defconstant +terrain-floor-dirt+ 6)
 (defconstant +terrain-wall-window+ 7)
 (defconstant +terrain-floor-dirt-bright+ 8)
+(defconstant +terrain-floor-chair+ 9)
+(defconstant +terrain-floor-table+ 10)
+(defconstant +terrain-floor-bed+ 11)
 
 (defparameter *faction-table* (make-hash-table))
 (defparameter *ability-types* (make-hash-table))

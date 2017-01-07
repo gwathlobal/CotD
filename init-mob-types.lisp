@@ -73,6 +73,15 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        ))
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-priest+ 
+                                       :name "Priest"
+                                       :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :faction +faction-type-humans+
+                                       :weapon (list "Cross" 0 0 +normal-ap+) :base-dodge 20
+                                       :strength 0
+                                       :abil-can-be-blessed t :abil-purging-touch t :abil-detect-evil t :abil-human t
+                                       ))
+
 
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
