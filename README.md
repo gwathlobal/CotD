@@ -16,4 +16,4 @@ Jan 08, 2017 v1.0.1
 
 DOWNLOADS
 
-Head to the the [Releases](https://github.com/gwathlobal/CotD/tree/master/releases) directory and grab the latest binary for your platform
+Head to the the [Releases](https://github.com/gwathlobal/CotD/releases) directory and grab the latest binary for your platform
