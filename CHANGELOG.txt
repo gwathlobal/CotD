@@ -1,7 +1,9 @@
 CHANGELOG
 
 
-v1.0.1
+--------------------
+Jan 08, 2017 v1.0.1
+
 - Fixed lags during the first 20 turns
 - Added access to help via '?' from the game screen (not only main menu)
 - Added large tiles
