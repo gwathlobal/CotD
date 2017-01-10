@@ -157,11 +157,11 @@
 
 (defun level-city-place-house-1 (x y template-level)
   (let ((build-template (list "#-#####"
-                              "#t..b.#"
+                              "#t..bc#"
                               "#h....#"
                               "#####.#"
                               "-ht...#"
-                              "#.....#"
+                              "#....c#"
                               "###.###")))
     
     (translate-build-to-template x y build-template template-level)
@@ -172,8 +172,8 @@
 
 (defun level-city-place-house-2 (x y template-level)
   (let ((build-template (list "#######"
-                              "#....b#"
-                              "#..#..#"
+                              "#c...b#"
+                              "#..#.c#"
                               "...#..-"
                               "#.t#..#"
                               "-.h#ht#"
@@ -190,7 +190,7 @@
                               "#..#..#"
                               "-..#..."
                               "#b.#..#"
-                              "#.....#"
+                              "#c...c#"
                               "#######")))
     (translate-build-to-template x y build-template template-level)
     )
@@ -200,11 +200,11 @@
 
 (defun level-city-place-house-4 (x y template-level)
   (let ((build-template (list "###.###"
-                              "#....h#"
+                              "#c...h#"
                               "#....t-"
                               "#.#####"
                               "#....h#"
-                              "#.b..t#"
+                              "#cb..t#"
                               "#####-#")))
     
     (translate-build-to-template x y build-template template-level)
@@ -219,7 +219,7 @@
                               ",#```......```#,"
                               ",#```......```#,"
                               ",##-###..###-##,"
-                              ",#...#....#...#,"
+                              ",#...#c..c#...#,"
                               ",#ht........th#,"
                               ",###-##--##-###,"
                               ",,,,,,,,,,,,,,,,")))
@@ -278,9 +278,9 @@
   (let ((build-template (list ",,,,,,,,,,,,,,,,,"
                               ",#######.#######,"
                               ",#.....-.#.....#,"
-                              ",#.....-.#ht.-.#,"
+                              ",#.....-.#htc-.#,"
                               ",#.....-.#####.#,"
-                              ",#.....-.#ht.-.#,"
+                              ",#.....-.#htc-.#,"
                               ",#.....-.#.....#,"
                               ",#.....-.#####.#,"
                               ",#.....-.......#,"
@@ -317,7 +317,7 @@
                               "````#hhh.hhh#``T`"
                               ",```-.......-````"
                               ",####hhh.hhh####,"
-                              ",-.h#.......#h.-,"
+                              ",-ch#.......#hc-,"
                               ",#.............#,"
                               ",##-#-#.#.#-#-##,"
                               ",,,,,,,,,,,,,,,,,")))
@@ -348,6 +348,7 @@
                ((char= c #\h) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-chair+))
                ((char= c #\t) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-table+))
                ((char= c #\b) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bed+))
+               ((char= c #\c) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-cabinet+))
                )
              (incf x1)
           )))

@@ -16,4 +16,5 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-chair+ :glyph-idx 100 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Chair"))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-table+ :glyph-idx 101 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Table" :trait-blocks-move t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bed+ :glyph-idx 102 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Bed" :trait-blocks-move t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-cabinet+ :glyph-idx 103 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Cabinet" :trait-blocks-move t))
 
