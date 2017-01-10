@@ -11,7 +11,7 @@
   "Drawing a glyph from 'font.bmp' at a certain point of the surface."
   (declare (type fixnum x y n) (type sdl:color front-color back-color))
   ;; select a rectangle with the glyph to be drawn
-  (sdl:set-cell-* (* n +glyph-w+) 0 +glyph-w+ +glyph-h+ :surface *glyph-front* :index 0)
+  (sdl:set-cell-* (* n *glyph-w*) 0 *glyph-w* *glyph-h* :surface *glyph-front* :index 0)
   
   ;; fill the temporary surface with the desired color of the glyph
   ;; draw the glyph to the temporary surface
@@ -26,8 +26,8 @@
   
   (setf (sdl:x *temp-rect*) x)
   (setf (sdl:y *temp-rect*) y)
-  (setf (sdl:width *temp-rect*) +glyph-w+)
-  (setf (sdl:height *temp-rect*) +glyph-h+)
+  (setf (sdl:width *temp-rect*) *glyph-w*)
+  (setf (sdl:height *temp-rect*) *glyph-h*)
   (sdl:fill-surface back-color :surface surface :template *temp-rect*)
   
   (sdl:draw-surface-at-* *glyph-temp* x y :surface surface))
@@ -63,8 +63,8 @@
 	 (dotimes (y max-y)
 	   (declare (type fixnum y))
 	   ;; calculate the coordinates where to draw the glyph
-	   (setq x1 (+ (* x +glyph-w+) +glyph-w+))
-	   (setq y1 (+ (* y +glyph-h+) +glyph-h+))
+	   (setq x1 (+ (* x *glyph-w*) *glyph-w*))
+	   (setq y1 (+ (* y *glyph-h*) *glyph-h*))
 	   ;; select the object, the glyph of which shall be drawn
 	   (setf single-memo (aref array (+ sx x) (+ sy y)))
 	   ;;(when (and (eql (get-single-memo-visible single-memo) nil) 

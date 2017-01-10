@@ -118,27 +118,55 @@
 
   
 (defun cotd-main () 
+  (in-package :cotd)
   (setf *msg-box-window-height* (* +default-font-h+ 8))
   (setf *random-state* (make-random-state t))
+  
+  
+  
   (sdl:with-init ()
-    (setf *window-width* (+ 200 50 (+ 30 (* +glyph-w+ *max-x-view*))) 
-          *window-height* (+ 30 (* +glyph-h+ *max-y-view*) *msg-box-window-height*))
-    (sdl:window *window-width* *window-height*
-		
-		:title-caption "The City of the Damned"
-		:icon-caption "The City of the Damned")
-    (sdl:enable-key-repeat nil nil)
-    (sdl:enable-unicode)
     
-    (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 +glyph-w+ +glyph-h+))
+    (let ((tiles-path))
     
-    
-    (format t "path = ~A~%" (sdl:create-path "data/font_large.bmp" *current-dir*))
-    
-    (setf *glyph-front* (sdl:load-image (sdl:create-path "data/font_large.bmp" *current-dir*) 
-					:color-key sdl:*white*))
-    (setf *glyph-temp* (sdl:create-surface +glyph-w+ +glyph-h+ :color-key sdl:*black*))
- 
+      ;; create default options
+      (setf *options* (make-options :tiles 'large))
+      
+      ;; get options from file if possible
+      (if (probe-file (merge-pathnames "options.cfg" *current-dir*))
+        (progn
+          (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :input)
+            (loop for s-expr = (read file nil) 
+                  while s-expr do
+                    (read-options s-expr *options*))))   
+        (progn 
+          (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
+            (format file ";; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\" or \"small\"~%(tiles large)")))
+        )
+      
+      ;; set parameters depending on options
+      (cond
+        ((equal (options-tiles *options*) 'small) (setf *glyph-w* 10 *glyph-h* 10 tiles-path "data/font_small.bmp"))
+        (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
+      
+      (setf *window-width* (+ 200 50 (+ 30 (* *glyph-w* *max-x-view*))) 
+            *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height*))
+      
+      (sdl:window *window-width* *window-height*
+                  :title-caption "The City of the Damned"
+                  :icon-caption "The City of the Damned")
+      (sdl:enable-key-repeat nil nil)
+      (sdl:enable-unicode)
+      
+      (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
+      
+      
+      (format t "path = ~A~%" (sdl:create-path tiles-path *current-dir*))
+      
+      (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
+                                          :color-key sdl:*white*))
+      (setf *glyph-temp* (sdl:create-surface *glyph-w* *glyph-h* :color-key sdl:*black*))
+      )
+  
     (tagbody
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (let ((join-heavens (main-menu)))

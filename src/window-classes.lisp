@@ -2,11 +2,9 @@
 
 (defconstant +default-font-w+ 6)
 (defconstant +default-font-h+ 13)
-;(defparameter +glyph-w+ 8)
-;(defparameter +glyph-h+ 16)
 
-(defparameter +glyph-w+ 15)
-(defparameter +glyph-h+ 15)
+(defparameter *glyph-w* 15)
+(defparameter *glyph-h* 15)
 
 (defvar *quit-func* 0)
 (defparameter *current-window* nil)
@@ -27,7 +25,3 @@
 (defgeneric get-input (win key mod unicode))
 
 (defgeneric run-window (win))
-
-
-
-(defparameter *off-y-command-line* (+ +glyph-h+ (* *max-y-view* +glyph-h+) +glyph-h+ *msg-box-window-height* +glyph-h+))

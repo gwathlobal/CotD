@@ -9,7 +9,7 @@
 
 (defsystem cotd  
   :name "The City of the Damned"
-  :description "A cold-themed roguelike."  
+  :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
   :version "0.1"  
   :author "Gwathlobal"    
   :depends-on (lispbuilder-sdl)
@@ -17,6 +17,7 @@
     ((:file "astar")
      (:file "message-box")
      (:file "globals")
+     (:file "options")
      (:file "world" :depends-on ("globals"))
      (:file "mobs" :depends-on ("globals"))
      (:file "abilities" :depends-on ("globals"))

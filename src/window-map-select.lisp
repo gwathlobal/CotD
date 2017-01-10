@@ -39,8 +39,8 @@
      (multiple-value-bind (sx sy max-x max-y) (calculate-start-coord (view-x *player*) (view-y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
        (setf (max-x win) max-x (max-y win) max-y)
        ;; calculate the coordinates where to draw the rectangle
-       (setf x1 (+ (* (- (view-x *player*) sx) +glyph-w+) +glyph-w+))
-       (setf y1 (+ (* (- (view-y *player*) sy) +glyph-h+) +glyph-h+))
+       (setf x1 (+ (* (- (view-x *player*) sx) *glyph-w*) *glyph-w*))
+       (setf y1 (+ (* (- (view-y *player*) sy) *glyph-h*) *glyph-h*))
        ;;(format t "VIEW X,Y = (~A, ~A); sx, sy = (~A, ~A); x1 , y1 = (~A, ~A)~%" (view-x *player*) (view-y *player*) sx sy x1 y1)
        ;; adjust color depending on the target
        (if (and (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) 
@@ -50,17 +50,17 @@
        
        
        ;; draw the rectangle
-       (sdl:with-rectangle (l-rect (sdl:rectangle :x x1 :y y1 :w 1 :h +glyph-h+))
+       (sdl:with-rectangle (l-rect (sdl:rectangle :x x1 :y y1 :w 1 :h *glyph-h*))
 	 (sdl:fill-surface color :template l-rect))
-       (sdl:with-rectangle (r-rect (sdl:rectangle :x (+ x1 (1- +glyph-w+)) :y y1 :w 1 :h +glyph-h+))
+       (sdl:with-rectangle (r-rect (sdl:rectangle :x (+ x1 (1- *glyph-w*)) :y y1 :w 1 :h *glyph-h*))
 	 (sdl:fill-surface color :template r-rect))
-       (sdl:with-rectangle (t-rect (sdl:rectangle :x x1 :y y1 :w +glyph-w+ :h 1))
+       (sdl:with-rectangle (t-rect (sdl:rectangle :x x1 :y y1 :w *glyph-w* :h 1))
 	 (sdl:fill-surface color :template t-rect))
-       (sdl:with-rectangle (b-rect (sdl:rectangle :x x1 :y (+ y1 (1- +glyph-h+)) :w +glyph-w+ :h 1))
+       (sdl:with-rectangle (b-rect (sdl:rectangle :x x1 :y (+ y1 (1- *glyph-h*)) :w *glyph-w* :h 1))
 	 (sdl:fill-surface color :template b-rect))))
   
   ;; drawing a list of objects in the grid-cell instead of a message box
-  (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x +glyph-w+ :y (+ 20 (* +glyph-h+ *max-y-view*)) :w (+ 250 (+ 10 (* +glyph-w+ *max-x-view*))) :h *msg-box-window-height*))
+  (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x *glyph-w* :y (+ 20 (* *glyph-h* *max-y-view*)) :w (+ 250 (+ 10 (* *glyph-w* *max-x-view*))) :h *msg-box-window-height*))
     (sdl:fill-surface sdl:*black* :template obj-list-rect))
   (let ((str (create-string)) (feature-list))
     (when (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
@@ -73,10 +73,10 @@
 	(format str "~%~A [~A]" (get-current-mob-name (get-mob-* (level *world*) (view-x *player*) (view-y *player*))) (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
       )
     (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-	(write-text str (sdl:rectangle :x +glyph-w+ :y (+ 20 (* +glyph-h+ *max-y-view*)) :w (+ 200 (+ 10 (* +glyph-w+ *max-x-view*))) :h (- *msg-box-window-height* (* 2 +default-font-h+))))))
+	(write-text str (sdl:rectangle :x *glyph-w* :y (+ 20 (* *glyph-h* *max-y-view*)) :w (+ 200 (+ 10 (* *glyph-w* *max-x-view*))) :h (- *msg-box-window-height* (* 2 +default-font-h+))))))
   
   ;; drawing the propmt line
-  (let ((x +glyph-w+) (y (+ 20 (* +glyph-h+ *max-y-view*) (- *msg-box-window-height* +default-font-h+))) (w (+ 200 (+ 10 (* +glyph-w+ *max-x-view*)))) (h +default-font-h+))
+  (let ((x *glyph-w*) (y (+ 20 (* *glyph-h* *max-y-view*) (- *msg-box-window-height* +default-font-h+))) (w (+ 200 (+ 10 (* *glyph-w* *max-x-view*)))) (h +default-font-h+))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
       (let ((font (sdl:initialise-default-font sdl:*font-6x13*)))

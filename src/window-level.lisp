@@ -20,7 +20,7 @@
 (defun show-char-properties (x y meaningful-action)
   (let* ((font (sdl:initialise-default-font sdl:*font-6x13*)) (str)
          (str-lines))
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* +glyph-h+ *max-y-view*)))
+    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
       (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%Power: ~A/~A~%~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
@@ -60,8 +60,8 @@
     
   (update-map-area)
     
-  (show-char-properties (+ 20 (* +glyph-w+ *max-x-view*)) 10 (meaningful-action win))
-  (show-small-message-box +glyph-w+ (+ 20 (* +glyph-h+ *max-y-view*)) (+ 250 (+ 10 (* +glyph-w+ *max-x-view*))))
+  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (meaningful-action win))
+  (show-small-message-box *glyph-w* (+ 20 (* *glyph-h* *max-y-view*)) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
     
   (sdl:update-display)
   
