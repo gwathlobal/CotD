@@ -111,7 +111,7 @@
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-demon+
                                        :weapon (list "Claws" 3 4 +normal-ap+) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.8))
                                        :strength 1
-                                       :abil-can-possess 1 :abil-unholy t :abil-demon t
+                                       :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t
                                        :ai-horde t))
 
@@ -121,7 +121,7 @@
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-archdemon+
                                        :weapon (list "Claws" 4 7 +normal-ap+) :base-dodge 25
                                        :strength 3
-                                       :abil-can-possess 2 :abil-unholy t :abil-demon t
+                                       :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archdemon+
@@ -130,7 +130,7 @@
                                        :faction +faction-type-demons+
                                        :weapon (list "Chains of Shattering" 5 10 +normal-ap+) :base-dodge 20
                                        :strength 4
-                                       :abil-unholy t :abil-demon t
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t))
 
 

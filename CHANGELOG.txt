@@ -3,6 +3,7 @@ CHANGELOG
 
 v1.0.2
 
+- Removed ability to attack members of you own faction (except demons). You can still attack allied faction though.
 - Introduced a new terrain type: Cabinet. Added it to appropriate buildings. 
 
 --------------------

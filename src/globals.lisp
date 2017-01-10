@@ -76,6 +76,7 @@
 (defconstant +mob-abil-lifesteal+ 15)
 (defconstant +mob-abil-call-for-help+ 16)
 (defconstant +mob-abil-answer-the-call+ 17)
+(defconstant +mob-abil-loves-infighting+ 18)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -111,7 +112,6 @@
 (defconstant +terrain-floor-dirt-bright+ 8)
 (defconstant +terrain-floor-chair+ 9)
 (defconstant +terrain-floor-table+ 10)
-(defconstant +terrain-floor-bed+ 11)
 (defconstant +terrain-floor-bed+ 11)
 (defconstant +terrain-floor-cabinet+ 12)
 

@@ -55,6 +55,7 @@
    ;;   :abil-lifesteal - +mob-abil-lifesteal+
    ;;   :abil-call-for-help - +mob-abil-call-for-help+
    ;;   :abil-answer-the-call - +mob-abil-answer-the-call+
+   ;;   :abil-loves-infighting - +mob-abil-loves-infighting+   
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> <dmg min> <dmg max> <attack speed>)
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
@@ -66,7 +67,8 @@
 (defmethod initialize-instance :after ((mob-type mob-type) &key ai-coward ai-horde ai-wants-bless 
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
-                                                                abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call)
+                                                                abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
+                                                                abil-loves-infighting)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -110,6 +112,8 @@
     (setf (gethash +mob-abil-call-for-help+ (abilities mob-type)) t))
   (when abil-answer-the-call
     (setf (gethash +mob-abil-answer-the-call+ (abilities mob-type)) t))
+  (when abil-loves-infighting
+    (setf (gethash +mob-abil-loves-infighting+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

@@ -215,10 +215,12 @@
       (progn 
         (format t "ON-BUMP: ~A [~A] bumped into ~A [~A]~%" (name actor) (id actor) (name target) (id target))
         
-        ;; if they are allied - do nothing
-        ;(when (get-faction-relation (faction actor) (faction target))
-        ;  (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
-        ;  (return-from on-bump t))
+        ;; if they are of the same faction and do not like infighting - do nothing
+        (when (and (= (faction actor) (faction target))
+                   (not (mob-ability-p actor +mob-abil-loves-infighting+)))
+          (format t "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target))
+          (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
+          (return-from on-bump t))
         
         (let ((abil-list nil))
           ;; collect all passive non-final on-touch abilities
@@ -317,6 +319,9 @@
               ;; apply damage
               (setf cur-dmg (+ (random (- (1+ (get-weapon-dmg-max attacker)) (get-weapon-dmg-min attacker))) 
                                (get-weapon-dmg-min attacker)))
+              
+              (when (= (faction attacker) (faction target))
+                (setf cur-dmg (get-weapon-dmg-min attacker)))
               
               (when (< cur-dmg 0) (setf cur-dmg 0))
               (decf (cur-hp target) cur-dmg)

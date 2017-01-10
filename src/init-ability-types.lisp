@@ -7,7 +7,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 (let ((heal-pwr (+ (* 4 (mob-ability-p actor +mob-abil-heal-self+))
-                                                                   (random (* 4 (mob-ability-p actor +mob-abil-heal-self+))))))
+                                                                   (random (* 3 (mob-ability-p actor +mob-abil-heal-self+))))))
                                                   (when (> (+ (cur-hp actor) heal-pwr)
                                                            (max-hp actor))
                                                     (setf heal-pwr (- (max-hp actor) (cur-hp actor))))
@@ -384,3 +384,10 @@
                                                       (if (mob-effect-p actor +mob-effect-called-for-help+)
                                                         t
                                                         nil))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-loves-infighting+ :name "Loves infighting" :descr "You do not mind attacking your own kin." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
