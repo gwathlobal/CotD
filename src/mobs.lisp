@@ -314,10 +314,14 @@
     (let ((name-pick-n))
       (if (mob-ability-p mob +mob-abil-angel+)
         (progn
+          (unless *cur-angel-names*
+            (return-from set-name nil))
           (setf name-pick-n (random (length *cur-angel-names*)))
           (setf (name mob) (nth name-pick-n *cur-angel-names*))
           (setf *cur-angel-names* (remove (nth name-pick-n *cur-angel-names*) *cur-angel-names*)))
         (progn
+          (unless *cur-demon-names*
+            (return-from set-name nil))
           (setf name-pick-n (random (length *cur-demon-names*)))
           (setf (name mob) (nth name-pick-n *cur-demon-names*))
           (setf *cur-demon-names* (remove (nth name-pick-n *cur-demon-names*) *cur-demon-names*))))

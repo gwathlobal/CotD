@@ -28,14 +28,13 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect))
     
-    (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-      (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%Power: ~A/~A~%~%~A~%~A"
+    (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%Power: ~A/~A~%~%~A~%~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
                         (cur-fp *player*) (max-fp *player*)
                         (get-weapon-descr-line *player*)
                         (get-mob-stats-line *player*))
-                  (sdl:rectangle :x x :y y :w (- (truncate *window-width* 2) 20) :h h) :color sdl:*white*))
+                (sdl:rectangle :x x :y y :w (- (truncate *window-width* 2) 20) :h h) :color sdl:*white*)
     
     (show-char-effects *player* (+ (truncate *window-width* 2) 10) y h)
     )
@@ -70,13 +69,12 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect))
     
-    (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-      (write-text (format nil "~A~%~%~A" 
+    (write-text (format nil "~A~%~%~A" 
                           (descr ability)
                           (if (passive ability)
                             "Passive."
                             (format nil "Cost: ~A pwr  Time units: ~A" (cost ability) (spd ability))))
-                  (sdl:rectangle :x x :y y :w w :h h) :color sdl:*white*))
+                  (sdl:rectangle :x x :y y :w w :h h) :color sdl:*white*)
     )
 
   (sdl:update-display))

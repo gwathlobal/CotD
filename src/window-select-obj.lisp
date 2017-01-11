@@ -18,9 +18,9 @@
     ;; find the descr height
     (when (descr-list win)
       (sdl:with-rectangle (rect (sdl:rectangle :x x :y y :w (- w 8) :h 600))
-	(let ((font (sdl:initialise-default-font sdl:*font-6x13*)) (first-descr t) (new-descr-h 0))
+	(let ((first-descr t) (new-descr-h 0))
 	  (loop for descr in (descr-list win) do
-	       (setf new-descr-h (+ 2 (* 13 (write-text descr rect :count-only t :font font))))
+	       (setf new-descr-h (+ 2 (* 13 (write-text descr rect :count-only t))))
 	       (when first-descr 
 		 (setf descr-h new-descr-h)
 		 (setf first-descr nil))
@@ -58,16 +58,15 @@
     ;; drawing descriptions
     (when (descr-list win)
       (sdl:with-rectangle (rect (sdl:rectangle :x (+ x 4) :y (- (+ y h) 17 descr-h) :w (- w 8) :h descr-h))
-	(let ((font (sdl:initialise-default-font sdl:*font-6x13*)))
-	  (write-text (nth (cur-sel win) (descr-list win)) rect :color sdl:*white* :font font))))
+        (write-text (nth (cur-sel win) (descr-list win)) rect :color sdl:*white*)))
 
-    (let ((font (sdl:initialise-default-font sdl:*font-6x13*)) (str ""))
+    (let ((str ""))
       ;; choose the prompt
       (loop for prompt in (prompt-list win) do
 	   (when (funcall (first prompt) (cur-sel win))
 	     (setf str (second prompt))
 	     (loop-finish)))
-      (sdl:draw-string-solid-* str (+ x 5) (- (+ y h) (sdl:char-height font) 2) :color sdl:*white* :font font))
+      (sdl:draw-string-solid-* str (+ x 5) (- (+ y h) (sdl:char-height sdl:*default-font*) 2) :color sdl:*white*))
     (sdl:update-display)))
 
 (defmethod run-window ((win select-obj-window))

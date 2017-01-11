@@ -3,6 +3,7 @@ CHANGELOG
 
 v1.0.2
 
+- Added option to choose tiles to options.cfg
 - Added options.cfg where you can specify various game options. For now, you can only choose the size of tiles
 - Removed ability to attack members of you own faction (except demons). You can still attack allied faction though.
 - Introduced a new terrain type: Cabinet. Added it to appropriate buildings. 

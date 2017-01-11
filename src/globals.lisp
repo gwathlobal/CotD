@@ -34,7 +34,7 @@
 ;; MOB-TEMPLATE Constants
 ;;-------------------- 
 
-(defconstant +base-accuracy+ 75)
+(defconstant +base-accuracy+ 100)
 
 (defconstant +mob-type-player+ 0)
 (defconstant +mob-type-human+ 1)

@@ -72,17 +72,15 @@
       (when (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
 	(format str "~%~A [~A]" (get-current-mob-name (get-mob-* (level *world*) (view-x *player*) (view-y *player*))) (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
       )
-    (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-	(write-text str (sdl:rectangle :x *glyph-w* :y (+ 20 (* *glyph-h* *max-y-view*)) :w (+ 200 (+ 10 (* *glyph-w* *max-x-view*))) :h (- *msg-box-window-height* (* 2 +default-font-h+))))))
+    (write-text str (sdl:rectangle :x *glyph-w* :y (+ 20 (* *glyph-h* *max-y-view*)) :w (+ 200 (+ 10 (* *glyph-w* *max-x-view*))) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height))))))
   
   ;; drawing the propmt line
-  (let ((x *glyph-w*) (y (+ 20 (* *glyph-h* *max-y-view*) (- *msg-box-window-height* +default-font-h+))) (w (+ 200 (+ 10 (* *glyph-w* *max-x-view*)))) (h +default-font-h+))
+  (let ((x *glyph-w*) (y (+ 20 (* *glyph-h* *max-y-view*) (- *msg-box-window-height* (sdl:get-font-height)))) (w (+ 200 (+ 10 (* *glyph-w* *max-x-view*)))) (h (sdl:get-font-height)))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (let ((font (sdl:initialise-default-font sdl:*font-6x13*)))
-	(if (cur-tab win)
-	    (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white* :font font)
-	    (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white* :font font)))
+      (if (cur-tab win)
+        (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white*)
+        (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white*))
       (sdl:update-display))))
 
 (defmethod run-window ((win map-select-window))

@@ -1,13 +1,12 @@
 (in-package :cotd)
 
 (defun show-char-effects (mob x y h)
-  (let ((font (sdl:initialise-default-font sdl:*font-6x13*)))
-    (loop for effect being the hash-key in (effects mob)
-          with y1 = y    
-          do
-             (when (> (+ y1 (sdl:get-font-height :font font)) (+ y h))
-               (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
-               (loop-finish))
+  (loop for effect being the hash-key in (effects mob)
+        with y1 = y    
+        do
+           (when (> (+ y1 (sdl:get-font-height)) (+ y h))
+             (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
+             (loop-finish))
              (cond
                ((= effect +mob-effect-possessed+) (sdl:draw-string-solid-* "Possession" x y1 :color sdl:*red*))
                ((= effect +mob-effect-blessed+) (sdl:draw-string-solid-* "Blessed" x y1 :color sdl:*red*))
@@ -15,10 +14,10 @@
                ((= effect +mob-effect-divine-consealed+) (sdl:draw-string-solid-* "Consealed" x y1 :color sdl:*cyan*))
                ((= effect +mob-effect-calling-for-help+) (sdl:draw-string-solid-* "Summoning" x y1 :color sdl:*green*))
                ((= effect +mob-effect-called-for-help+) (sdl:draw-string-solid-* "Called" x y1 :color sdl:*green*)))
-             (incf y1 (sdl:get-font-height :font font)))))
+             (incf y1 (sdl:get-font-height))))
 
 (defun show-char-properties (x y meaningful-action)
-  (let* ((font (sdl:initialise-default-font sdl:*font-6x13*)) (str)
+  (let* ((str)
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
@@ -32,23 +31,22 @@
                         (total-angels *world*)
                         (total-demons *world*)                     
                       ))
-      (setf str-lines (write-text  str a-rect  :font font :color sdl:*white*)))
-    (show-char-effects *player* x (+ y (* (sdl:get-font-height :font font) (1+ str-lines))) 52)
+      (setf str-lines (write-text  str a-rect :color sdl:*white*)))
+    (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) 52)
     (sdl:draw-string-solid-* (format nil "Time ~A"  *global-game-time*)
-                                     x (+ y 237) :font font :color (if meaningful-action
-                                                   sdl:*red*
-                                                   sdl:*white*))
+                                     x (+ y 237) :color (if meaningful-action
+                                                          sdl:*red*
+                                                          sdl:*white*))
     ))
 
 (defun show-small-message-box (x y w &optional (h *msg-box-window-height*))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
-    (sdl:fill-surface sdl:*black* :template a-rect))
-  (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-    (let ((max-lines (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :count-only t)))
-      (when (> (message-list-length) 0)
-      	(write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h 13) max-lines)
-                                                                                         (- max-lines (truncate h 13))
-                                                                                         0))))))
+    (sdl:fill-surface sdl:*black* :template a-rect)) 
+  (let ((max-lines (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :count-only t)))
+    (when (> (message-list-length) 0)
+      (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h 13) max-lines)
+                                                                                       (- max-lines (truncate h 13))
+                                                                                       0)))))
 
 (defun update-screen (win)
   

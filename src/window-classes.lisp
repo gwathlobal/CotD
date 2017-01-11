@@ -1,7 +1,7 @@
 (in-package :cotd)
 
-(defconstant +default-font-w+ 6)
-(defconstant +default-font-h+ 13)
+;(defconstant +default-font-w+ 6)
+;(defconstant +default-font-h+ 13)
 
 (defparameter *glyph-w* 15)
 (defparameter *glyph-h* 15)
@@ -9,7 +9,7 @@
 (defvar *quit-func* 0)
 (defparameter *current-window* nil)
 (defparameter *rects-to-update* ())
-(defparameter *msg-box-window-height* (* +default-font-h+ 10))
+(defvar *msg-box-window-height*)
 (defvar *game-over-func*)
 
 (defclass window ()

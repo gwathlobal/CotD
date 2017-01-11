@@ -9,8 +9,8 @@
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
     (sdl:fill-surface sdl:*black* :template a-rect))
   
-  (let ((font (sdl:initialise-default-font sdl:*font-6x13*)) (str "City of the Damned"))
-    (sdl:draw-string-solid-* str (- (truncate *window-width* 2) (truncate (* (sdl:char-width font) (length str)) 2)) 10 :color sdl:*white* :font font))
+  (let ((str "City of the Damned"))
+    (sdl:draw-string-solid-* str (- (truncate *window-width* 2) (truncate (* (sdl:char-width sdl:*default-font*) (length str)) 2)) 10 :color sdl:*white*))
   
   ;; drawing selection list
   (let ((cur-str) (color-list nil))

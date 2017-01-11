@@ -119,11 +119,7 @@
   
 (defun cotd-main () 
   (in-package :cotd)
-  (setf *msg-box-window-height* (* +default-font-h+ 8))
-  (setf *random-state* (make-random-state t))
-  
-  
-  
+    
   (sdl:with-init ()
     
     (let ((tiles-path))
@@ -140,14 +136,24 @@
                     (read-options s-expr *options*))))   
         (progn 
           (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
-            (format file ";; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\" or \"small\"~%(tiles large)")))
+            (format file "~%;; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\" or \"small\"~%(tiles large)~%")
+            (format file "~%;; FONT: Changes the size of text font~%;; Format (font <font type>)~%;; <font type> can be (without quotes) \"font-6x13\" or \"font-8x13\"~%(font font-6x13)")))
         )
       
       ;; set parameters depending on options
+      ;; tiles
       (cond
         ((equal (options-tiles *options*) 'small) (setf *glyph-w* 10 *glyph-h* 10 tiles-path "data/font_small.bmp"))
         (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
+      ;; font
+      (cond
+        ((equal (options-font *options*) 'font-8x13) (sdl:initialise-default-font sdl:*font-8x13*))
+        (t (sdl:initialise-default-font sdl:*font-6x13*)))
       
+
+      (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
+      (setf *random-state* (make-random-state t))
+
       (setf *window-width* (+ 200 50 (+ 30 (* *glyph-w* *max-x-view*))) 
             *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height*))
       

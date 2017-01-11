@@ -105,7 +105,7 @@
   (unless str-list
     (return-from draw-selection-list nil))
   
-  (let* ((font (sdl:initialise-default-font sdl:*font-6x13*)) (color) (str)
+  (let* ((color) (str)
 	 (list-start (* (truncate cur-str str-per-page) str-per-page))
 	 (list-end (if (> (+ list-start str-per-page) (length str-list)) (length str-list) (+ list-start str-per-page))))
     ;; from the start of the current page (determined previously) to the end of the page (or end of list whichever is less)
@@ -115,10 +115,10 @@
       (if (eql color-list nil)
 	  (setf color sdl:*white*)
 	  (setf color (nth (+ i list-start) color-list)))
-      (sdl:draw-string-solid-* str (+ x (sdl:char-width font) *sel-x-offset*) (+ y (* i (+ (sdl:char-height font) *sel-y-offset*))) :font font :color color))
+      (sdl:draw-string-solid-* str (+ x (sdl:char-width sdl:*default-font*) *sel-x-offset*) (+ y (* i (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))) :color color))
     ;; draw a scroll bar when necessary
     (when (> (length str-list) str-per-page)
-      (sdl:draw-string-solid-* "*" x (+ y (* (+ (sdl:char-height font) *sel-y-offset*) (truncate (* (/ cur-str (length str-list)) str-per-page)))) :font font :color sdl:*white*))))
+      (sdl:draw-string-solid-* "*" x (+ y (* (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*) (truncate (* (/ cur-str (length str-list)) str-per-page)))) :color sdl:*white*))))
 
 (defun draw-multiline-selection-list (item-list cur-item x y w h &optional (color-list ()))
   (unless item-list
@@ -128,8 +128,7 @@
     (let ((screen-list ()) (start-item) (is-more-than-one-screen nil))
       ;; assign numbers of screens to the items pertaining to them
       (let ((screen-i 0) (item-h) (is-first t))
-	(sdl:initialise-default-font sdl:*font-6x13*)
-	(dotimes (i (length item-list))
+        (dotimes (i (length item-list))
 	  (setf item-h (* 13 (write-text (nth i item-list) rect :count-only t)))
 	  
 	  (if (or (> (sdl:height rect) item-h) (and is-first (<= (sdl:height rect) item-h)))
@@ -162,8 +161,7 @@
       
       ;; draw the screen found
       (let ((str) (item-h) (color))
-	(sdl:initialise-default-font sdl:*font-6x13*)
-	(setf (sdl:y rect) y)
+        (setf (sdl:y rect) y)
 	(setf (sdl:height rect) h)
 	;; yes, ugly hack but I was being lazy and did not want to investigate how to create a 'while' statement
 	;; iterate through all items until we get to the starting one
