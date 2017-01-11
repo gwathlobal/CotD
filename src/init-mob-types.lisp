@@ -86,7 +86,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
                                        :name "Angel"
-                                       :glyph-idx 65 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 20 :max-fp 16
+                                       :glyph-idx 65 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 16 :max-fp 16
                                        :faction +faction-type-angels+ :evolve-mob-id +mob-type-archangel+
                                        :weapon (list "Flaming sword" 3 6 +normal-ap+) :base-dodge 25
                                        :strength 2
@@ -96,7 +96,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archangel+
                                        :name "Archangel"
-                                       :glyph-idx 33 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 40 :max-fp 16
+                                       :glyph-idx 33 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 35 :max-fp 16
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" 5 9 +normal-ap+) :base-dodge 25
                                        :strength 4
