@@ -12,6 +12,8 @@
 (defconstant +level-template-city-park-2+ 9)
 (defconstant +level-template-city-prison-1+ 10)
 (defconstant +level-template-city-church-1+ 11)
+(defconstant +level-template-city-warehouse-1+ 12)
+(defconstant +level-template-city-library-1+ 13)
 
 
 (defparameter *level-grid-size* 5)
@@ -28,7 +30,9 @@
                                                          '(10 . 10)
                                                          '(8 . 8)
                                                          '(17 . 17)
-                                                         '(17 . 17)))
+                                                         '(17 . 17)
+                                                         '(18 . 18)
+                                                         '(18 . 10)))
 
 (defparameter *level-grid-building-dimensions* (list '(0 . 0)
                                                      '(0 . 0)
@@ -41,7 +45,9 @@
                                                      '(3 . 3)
                                                      '(2 . 2)
                                                      '(4 . 4)
-                                                     '(4 . 4)))
+                                                     '(4 . 4)
+                                                     '(4 . 4)
+                                                     '(4 . 3)))
 
 (defun create-template-city (max-x max-y entrance)
   (declare (ignore entrance))
@@ -77,7 +83,9 @@
                                        +level-template-city-park-1+ +level-template-city-park-2+
                                        +level-template-city-lake-1+
                                        +level-template-city-prison-1+
-                                       +level-template-city-church-1+)
+                                       +level-template-city-church-1+
+                                       +level-template-city-warehouse-1+
+                                       +level-template-city-library-1+)
             with build-picked = nil
             with build-cur-list = nil
             do
@@ -139,7 +147,9 @@
                  ((= build-type-id +level-template-city-park-2+) (setf building-mobs (level-city-place-park-2 (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) template-level)))
                  ((= build-type-id +level-template-city-lake-1+) (setf building-mobs (level-city-place-lake-1 (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) template-level)))
                  ((= build-type-id +level-template-city-prison-1+) (setf building-mobs (level-city-place-prison-1 (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) template-level)))
-                 ((= build-type-id +level-template-city-church-1+) (setf building-mobs (level-city-place-church-1 (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) template-level))))
+                 ((= build-type-id +level-template-city-church-1+) (setf building-mobs (level-city-place-church-1 (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) template-level)))
+                 ((= build-type-id +level-template-city-warehouse-1+) (setf building-mobs (level-city-place-warehouse-1 (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) template-level)))
+                 ((= build-type-id +level-template-city-library-1+) (setf building-mobs (level-city-place-library-1 (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) template-level))))
              
              ;; add mobs to the mob-list
              (when building-mobs
@@ -332,6 +342,56 @@
         (list +mob-type-man+ 10 11)
         (list +mob-type-woman+ 6 11)))
 
+(defun level-city-place-warehouse-1 (x y template-level)
+  (let ((build-template (list "##-#####..#####-##"
+                              "#................#"
+                              "#..CCCCCCCCCCCC..#"
+                              "#..############..#"
+                              "#..CCCCCCCCCCCC..#"
+                              "-................-"
+                              "#..CCCCCCCCCCCC..#"
+                              "#..############..#"
+                              ".................."
+                              ".................."
+                              "#..############..#"
+                              "#..CCCCCCCCCCCC..#"
+                              "-................-"
+                              "#..CCCCCCCCCCCC..#"
+                              "#..############..#"
+                              "#..CCCCCCCCCCCC..#"
+                              "#................#"
+                              "##-#####..#####-##")))
+    
+    (translate-build-to-template x y build-template template-level)
+    )
+  (list (list +mob-type-man+ 1 1)
+        (list +mob-type-man+ 16 1)
+        (list +mob-type-man+ 1 16)
+        (list +mob-type-man+ 16 16)
+        ))
+
+(defun level-city-place-library-1 (x y template-level)
+  (let ((build-template (list "##-####-###-###-##"
+                              "#.h..#...........#"
+                              "-.t.....B..B..B..-"
+                              "#....#..B..B..B..#"
+                              "##..##..B..B..B..#"
+                              "`````-..B..B..B..-"
+                              "`````#..B..B..B..#"
+                              "`T```#..B..B..B..#"
+                              "`````-..B..B..B..-"
+                              ",``T`#...........#"
+                              ",,```##-###-###-##"
+                             )))
+    
+    (translate-build-to-template x y build-template template-level)
+    )
+  (list (list +mob-type-man+ 2 1)
+        (list +mob-type-woman+ 9 5)
+        (list +mob-type-woman+ 12 7)
+        (list +mob-type-woman+ 15 9)
+        ))
+
 (defun translate-build-to-template (x y build-template template-level)
   (loop for y1 from 0 below (length build-template) do
     (loop for c across (nth y1 build-template) 
@@ -349,6 +409,8 @@
                ((char= c #\t) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-table+))
                ((char= c #\b) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bed+))
                ((char= c #\c) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-cabinet+))
+               ((char= c #\C) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-crate+))
+               ((char= c #\B) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bookshelf+))
                )
              (incf x1)
           )))

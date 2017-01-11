@@ -1,8 +1,5 @@
 (in-package :cotd)
 
-;(defconstant +default-font-w+ 6)
-;(defconstant +default-font-h+ 13)
-
 (defparameter *glyph-w* 15)
 (defparameter *glyph-h* 15)
 

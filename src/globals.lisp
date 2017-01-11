@@ -116,6 +116,8 @@
 (defconstant +terrain-floor-table+ 10)
 (defconstant +terrain-floor-bed+ 11)
 (defconstant +terrain-floor-cabinet+ 12)
+(defconstant +terrain-floor-crate+ 13)
+(defconstant +terrain-floor-bookshelf+ 14)
 
 (defparameter *faction-table* (make-hash-table))
 (defparameter *ability-types* (make-hash-table))
