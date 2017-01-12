@@ -16,3 +16,7 @@ Jan 12, 2017 v1.0.2
 DOWNLOADS
 
 Head to the the [Releases](https://github.com/gwathlobal/CotD/releases) directory and grab the latest binary for your platform
+
+COMPILING
+
+Refer to [COMPILING.txt](https://github.com/gwathlobal/CotD/blob/master/COMPILING.txt) to learn how to set up Common Lisp and compile the game for Windows.
