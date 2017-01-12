@@ -131,4 +131,4 @@ In Lisp command prompt (SBCL or Emacs SLIME), enter the following commands one a
 (asdf:oos 'asdf:load-op :cotd)
 (cotd:cotd-main)
 
-The first one load the game to Lisp. The seconf won runs the game.
+The first one loads the game to Lisp. The second one runs the game.
