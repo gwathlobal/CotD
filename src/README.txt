@@ -9,14 +9,13 @@ The Legions of Hell invaded the City with the intention to slay its inhabitants.
 This is a simple fast-paced coffeebreak roguelike inspired by as 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.0.1
+LATEST CHANGES v1.0.2
 
- - Fixed lags during the first 20 turns
- - Added access to help via '?' from the game screen (not only main menu)
- - Added large tiles
- - Added a new building to the city generator: Church
- - Added new human unit types: Priest. Priests can not be possessed and are able to detect evil
- - Introduced new terrain types: Chair, Table and Bed. Added them to appropriate buildings
+ - Added new buildings to the city generator: Warehouse, Library
+ - Added option to choose tiles to options.cfg
+ - Added options.cfg where you can specify various game options. For now, you can only choose the size of tiles
+ - Removed ability to attack members of you own faction (except demons). You can still attack allied faction though.
+ - Introduced new terrain types: Cabinet, Crate, Bookshelf. Added it to appropriate buildings. 
 
 --------------------
 FEATURES

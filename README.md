@@ -5,14 +5,13 @@ Its is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-Jan 08, 2017 v1.0.1
+Jan 12, 2017 v1.0.2
 
-- Fixed lags during the first 20 turns
-- Added access to help via '?' from the game screen (not only main menu)
-- Added large tiles
-- Added a new building to the city generator: Church
-- Added new human unit types: Priest. Priests can not be possessed and are able to detect evil
-- Introduced new terrain types: Chair, Table and Bed. Added them to appropriate buildings
+- Added new buildings to the city generator: Warehouse, Library
+- Added option to choose tiles to options.cfg
+- Added options.cfg where you can specify various game options. For now, you can only choose the size of tiles
+- Removed ability to attack members of you own faction (except demons). You can still attack allied faction though.
+- Introduced new terrain types: Cabinet, Crate, Bookshelf. Added it to appropriate buildings. 
 
 DOWNLOADS
 
