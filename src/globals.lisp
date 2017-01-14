@@ -7,6 +7,7 @@
 (declaim (ftype (function (mob) fixnum) max-hp))
 (declaim (ftype (function (mob) fixnum) faction))
 (declaim (ftype (function (mob) list) path))
+(declaim (ftype (function (fixnum fixnum fixnum fixnum) single-float) get-distance))
 
 (defvar *time-at-end-of-player-turn* 0)
 

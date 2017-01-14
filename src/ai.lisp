@@ -77,6 +77,8 @@
   ;; calculate a list of hostile & allied mobs
   (let ((hostile-mobs nil)
         (allied-mobs nil)
+        (nearest-enemy nil)
+        (nearest-ally nil)
         (nearest-target nil))
     (loop 
       for mob-id of-type fixnum in (visible-mobs mob)
@@ -90,23 +92,33 @@
                   
          (if (get-faction-relation (faction mob) (faction vis-mob-type))
            (progn
-             (pushnew mob-id allied-mobs))
+             (pushnew mob-id allied-mobs)
+             ;; find the nearest allied mob
+             (unless nearest-ally
+               (setf nearest-ally (get-mob-by-id mob-id)))
+             (when (< (get-distance (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)) (x mob) (y mob))
+                      (get-distance (x nearest-ally) (y nearest-ally) (x mob) (y mob)))
+               (setf nearest-ally (get-mob-by-id mob-id)))
+             )
            (progn
              (pushnew mob-id hostile-mobs)
              
              ;; find the nearest hostile mob
-             (unless nearest-target
-               (setf nearest-target (get-mob-by-id mob-id)))
+             (unless nearest-enemy
+               (setf nearest-enemy (get-mob-by-id mob-id)))
              (when (< (get-distance (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)) (x mob) (y mob))
-                      (get-distance (x nearest-target) (y nearest-target) (x mob) (y mob)))
-               (setf nearest-target (get-mob-by-id mob-id)))
+                      (get-distance (x nearest-enemy) (y nearest-enemy) (x mob) (y mob)))
+               (setf nearest-enemy (get-mob-by-id mob-id)))
              )))
+
+    ;; by default, the target is the enemy
+    (setf nearest-target nearest-enemy)
     
     ;; if the mob is coward, move away from the nearest enemy
-    (when (and nearest-target (mob-ai-coward-p mob))
+    (when (and nearest-enemy (mob-ai-coward-p mob))
       (logger (format nil "AI-FUNCTION: ~A [~A] is a coward with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
       
-      (ai-mob-flee mob nearest-target)      
+      (ai-mob-flee mob nearest-enemy)      
       (return-from ai-function)
       )
     
@@ -126,7 +138,7 @@
 
         (when (< ally-str enemy-str)
           ;; allied strength is less - flee
-          (ai-mob-flee mob nearest-target)
+          (ai-mob-flee mob nearest-enemy)
           (return-from ai-function)))
       )
     
@@ -152,20 +164,20 @@
                         (get-distance (x nearest-ally) (y nearest-ally) (x mob) (y mob)))
                  (setf nearest-ally (get-mob-by-id mob-id))))
           ) 
-        (logger (format nil "AI-FUNCTION: ~A [~A] wants to give blessings. Nearest ally ~A [~A]~%" (name mob) (id mob) (if nearest-ally (name nearest-ally) nil) (if nearest-ally (id nearest-ally) nil)))
+        (logger (format nil "AI-FUNCTION: ~A [~A] wants to give blessings. Nearest unblessed ally ~A [~A]~%" (name mob) (id mob) (if nearest-ally (name nearest-ally) nil) (if nearest-ally (id nearest-ally) nil)))
         (when (or (and nearest-ally
-                       (not nearest-target))
+                       (not nearest-enemy))
                   (and nearest-ally
-                       nearest-target
+                       nearest-enemy
                        (< (get-distance (x mob) (y mob) (x nearest-ally) (y nearest-ally))
-                          (get-distance (x mob) (y mob) (x nearest-target) (y nearest-target)))))
+                          (get-distance (x mob) (y mob) (x nearest-enemy) (y nearest-enemy)))))
           (logger (format nil "AI-FUNCTION: ~A [~A] changed target ~A [~A].~%" (name mob) (id mob) (name nearest-ally) (id nearest-ally)))
           (setf nearest-target nearest-ally))
         ))
     
-    ;; attack the nearest hostile mob
+    ;; got to the nearest target
     (when nearest-target
-      (logger (format nil "AI-FUNCTION: Enemy found ~A [~A]~%" (name nearest-target) (id nearest-target)))
+      (logger (format nil "AI-FUNCTION: Target found ~A [~A]~%" (name nearest-target) (id nearest-target)))
       (let ((path nil))
        
         (setf path (a-star (list (x mob) (y mob)) (list (x nearest-target) (y nearest-target)) 
@@ -218,7 +230,7 @@
     ;)
     
     ;; call for reinforcements if there is enemy in sight and hp < 50%
-    (when (and nearest-target
+    (when (and nearest-enemy
                (< (/ (cur-hp mob) (max-hp mob)) 
                   0.5)
                (mob-ability-p mob +mob-abil-call-for-help+)
@@ -228,7 +240,7 @@
       (return-from ai-function))
     
     ;; answer the call if there is no enemy in sight
-    (unless nearest-target
+    (unless nearest-enemy
       (when (and (mob-ability-p mob +mob-abil-answer-the-call+)
                  (can-invoke-ability mob mob +mob-abil-answer-the-call+))
         (logger (format nil "AI-FUNCTION: ~A [~A] decides to answer the call for help~%" (name mob) (id mob)))
@@ -310,7 +322,9 @@
 
 (defmethod ai-function ((player player))
   (logger (format nil "~%AI-FUnction Player~%"))
-  (logger (format nil "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
+  ;(logger (format nil "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
+
+  (format t "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
   
   (update-visible-area (level *world*) (x player) (y player))
   
