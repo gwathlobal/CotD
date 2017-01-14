@@ -2,6 +2,7 @@ CHANGELOG
 
 
 v1.0.3
+- The City now has maximum 1 church, 1 warehouse, 1 prison and 1 library
 - Fixed bug with the time label becoming red while it's still player's turn
 
 --------------------

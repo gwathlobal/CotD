@@ -67,8 +67,14 @@
          (feature-list)
          (mob-list nil)
          (build-list nil)
+         (max-building-types (make-hash-table))
          )
-    
+
+    ;; set up maximum building types for this kind of map
+    (setf (gethash +level-template-city-church-1+ max-building-types) 1)
+    (setf (gethash +level-template-city-warehouse-1+ max-building-types) 1)
+    (setf (gethash +level-template-city-library-1+ max-building-types) 1)
+    (setf (gethash +level-template-city-prison-1+ max-building-types) 1)
     
     ;; all grid cells along the borders are reserved, while everything inised is free for claiming
     (loop for y from 1 below (1- reserv-max-y) do
@@ -92,23 +98,34 @@
                ;; copy the list of available buildings 
                (setf build-cur-list (copy-list build-id-list))
                
-               ;; randomly pick a building and remove it from the list if it does not fit
+               ;; randomly pick a building and remove it from the list if it does not fit or the maximum number of this buildings have been reached
                ;; until we find a building that fits or nothing is left 
-               (setf build-picked (nth (random (length build-cur-list)) build-cur-list))
-               (loop until (or (eq build-cur-list nil)
-                               (level-city-can-place-build-on-grid build-picked x y reserved-level))
+               (loop initially (setf build-picked (nth (random (length build-cur-list)) build-cur-list))
+                               (setf build-cur-list (remove build-picked build-cur-list))
+                     until (or (and (gethash build-picked max-building-types)
+                                    (> (gethash build-picked max-building-types) 0)
+                                    (level-city-can-place-build-on-grid build-picked x y reserved-level))
+                               (and (not (gethash build-picked max-building-types))
+                                    (level-city-can-place-build-on-grid build-picked x y reserved-level)))
                      do
-                     (setf build-cur-list (remove build-picked build-cur-list))
-                     (when build-cur-list 
-                       (setf build-picked (nth (random (length build-cur-list)) build-cur-list))))
+                        (unless build-cur-list
+                          (setf build-picked nil)
+                          (loop-finish))
+                        (setf build-picked (nth (random (length build-cur-list)) build-cur-list))
+                        (setf build-cur-list (remove build-picked build-cur-list))
+                        )
                
-               ;;  check again if the last picked building is able to occupy all its tiles
-               (when (level-city-can-place-build-on-grid build-picked x y reserved-level)
+               ;;  check if there was a building picked
+               (when build-picked
                  ;; if yes, add the building to the building list
                  (setf build-list (append build-list (list (list build-picked x y))))
                  
                  ;; reserve the tiles for the building
                  (level-city-reserve-build-on-grid build-picked x y reserved-level)
+
+                 ;; decrease the maximum available number of buildings of this type
+                 (when (gethash build-picked max-building-types)
+                   (decf (gethash build-picked max-building-types)))
                  )
                ;;(format t "(X,Y) = ~A, ~A~%" x y)
                ;;(print-reserved-level reserved-level)
