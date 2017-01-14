@@ -20,14 +20,14 @@
       (sdl:with-rectangle (rect (sdl:rectangle :x x :y y :w (- w 8) :h 600))
 	(let ((first-descr t) (new-descr-h 0))
 	  (loop for descr in (descr-list win) do
-	       (setf new-descr-h (+ 2 (* 13 (write-text descr rect :count-only t))))
+	       (setf new-descr-h (+ 2 (* (sdl:char-height sdl:*default-font*) (write-text descr rect :count-only t))))
 	       (when first-descr 
 		 (setf descr-h new-descr-h)
 		 (setf first-descr nil))
 	       (when (> new-descr-h descr-h) (setf descr-h new-descr-h))))))
 
     ;; define the height of the window depending on the length of the object array
-    (setf y (- (truncate *window-height* 2) (truncate (+ (* 13 (length (obj-list win))) descr-h) 2)))
+    (setf y (- (truncate *window-height* 2) (truncate (+ (* (sdl:char-height sdl:*default-font*) (length (obj-list win))) descr-h) 2)))
     (setf h (+ 19 (* 13 (length (obj-list win))) descr-h))
 
     ;; drawing a large rectangle in white
@@ -57,15 +57,15 @@
 
     ;; drawing descriptions
     (when (descr-list win)
-      (sdl:with-rectangle (rect (sdl:rectangle :x (+ x 4) :y (- (+ y h) 17 descr-h) :w (- w 8) :h descr-h))
+      (sdl:with-rectangle (rect (sdl:rectangle :x (+ x 4) :y (- (+ y h) 16 descr-h) :w (- w 8) :h descr-h))
         (write-text (nth (cur-sel win) (descr-list win)) rect :color sdl:*white*)))
 
-    (let ((str ""))
+    (let ((str))
       ;; choose the prompt
-      (loop for prompt in (prompt-list win) do
-	   (when (funcall (first prompt) (cur-sel win))
-	     (setf str (second prompt))
-	     (loop-finish)))
+      (if (prompt-list win)
+        (setf str (funcall (nth (cur-sel win) (prompt-list win)) (cur-sel win)))
+        (setf str "[Esc] Escape"))
+      
       (sdl:draw-string-solid-* str (+ x 5) (- (+ y h) (sdl:char-height sdl:*default-font*) 2) :color sdl:*white*))
     (sdl:update-display)))
 

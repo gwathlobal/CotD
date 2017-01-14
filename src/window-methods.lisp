@@ -234,11 +234,3 @@
 	 (incf cur-line))
     cur-line))
 
-;;(defun print-effects-list (effects-container x y str-per-page &optional (show-full-info nil))
-;;  (let ((effect-list ()) (color-list ()))
-;;    (dolist (effect (effects effects-container))
-;;      (if (and (identified effect) show-full-info)
-;;	  (setf effect-list (append effect-list (list (get-effect-line effect))))
-;;	  (setf effect-list (append effect-list (list (name effect)))))
-;;      (setf color-list (append color-list (list (effect-template-color (get-effect-template (effect-template effect))))))
-;;      (draw-selection-list effect-list 0 str-per-page x y color-list))))

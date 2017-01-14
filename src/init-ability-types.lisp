@@ -22,7 +22,7 @@
                                                         t))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-conseal-divine+ :name "Conseal divinity" :descr "Disguise yourself as a human." 
+                                 :id +mob-abil-conseal-divine+ :name "Conseal divinity" :descr "Disguise yourself as a human. Divine abilities do not work while in human form." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -30,7 +30,7 @@
                                                 (set-mob-effect actor +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id actor) +mob-type-human+)
                                                 (print-visible-message (x actor) (y actor) (level *world*) 
-                                                                       (format nil "~A invokes divine powers to disguise himself as a human.~%" (name actor))))
+                                                                       (format nil "~A invokes divine powers to disguise itself as a human.~%" (name actor))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-divine-consealed+)
@@ -96,7 +96,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures." 
+                                 :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures. Possessed creatures may sometimes revolt. Higher-ranking demons are better at supressing the victim's willpower." 
                                  :passive t :cost 0 :spd +normal-ap+ 
                                  :final t :on-touch t
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -122,8 +122,6 @@
                                                                (not (mob-effect-p target +mob-effect-blessed+))
                                                                (not (mob-effect-p actor +mob-effect-possessed+))
                                                                (not (mob-effect-p target +mob-effect-possessed+))
-                                                               ;;(eq (slave-mob-id actor) nil)
-                                                               ;;(eq (master-mob-id target) nil)
                                                                )
                                                         t
                                                         nil))))

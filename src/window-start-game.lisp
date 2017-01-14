@@ -8,9 +8,12 @@
 (defmethod make-output ((win start-game-window))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
     (sdl:fill-surface sdl:*black* :template a-rect))
+
+  (sdl:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
+
+  (sdl:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 30 (sdl:char-height sdl:*default-font*)) :justify :right :color sdl:*white*)
+    
   
-  (let ((str "City of the Damned"))
-    (sdl:draw-string-solid-* str (- (truncate *window-width* 2) (truncate (* (sdl:char-width sdl:*default-font*) (length str)) 2)) 10 :color sdl:*white*))
   
   ;; drawing selection list
   (let ((cur-str) (color-list nil))
@@ -22,7 +25,10 @@
       (if (= i cur-str) 
         (setf color-list (append color-list (list sdl:*yellow*)))
         (setf color-list (append color-list (list sdl:*white*)))))
-    (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 10) color-list))
+    (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 30 20 (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) color-list))
+
+  (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Esc] Exit game")
+                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))
 

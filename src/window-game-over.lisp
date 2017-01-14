@@ -69,7 +69,10 @@
     
     (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 9 (sdl:get-font-height)))))
 
-  (show-small-message-box 6 (+ 40 (* 9 (sdl:get-font-height))) *window-width* (- *window-height* 40 (* 9 (sdl:get-font-height))))
+  (show-small-message-box 6 (+ 40 (* 9 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 9 (sdl:get-font-height))))
+
+  (sdl:draw-string-solid-* (format nil "[Esc] Exit game")
+                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))
 

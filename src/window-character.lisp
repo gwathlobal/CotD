@@ -43,7 +43,7 @@
   (let ((x 10)
         (y (+ (truncate *window-height* 2) 5))
         (w (- (truncate *window-width* 2) 20))
-        (h (- (truncate *window-height* 2) 10)))
+        (h (- (truncate *window-height* 2) 10 10 (sdl:char-height sdl:*default-font*))))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect))
     
@@ -64,7 +64,7 @@
   (let ((x (+ (truncate *window-width* 2) 10))
         (y (+ (truncate *window-height* 2) 5))
         (w (- (truncate *window-width* 2) 20))
-        (h (- (truncate *window-height* 2) 10))
+        (h (- (truncate *window-height* 2) 10 10 (sdl:char-height sdl:*default-font*)))
         (ability (get-ability-type-by-id (nth (cur-sel win) (get-mob-all-abilities *player*)))))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect))
@@ -77,6 +77,9 @@
                   (sdl:rectangle :x x :y y :w w :h h) :color sdl:*white*)
     )
 
+  (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [Esc] Exit")
+                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+  
   (sdl:update-display))
 
 (defmethod run-window ((win character-window))

@@ -93,7 +93,8 @@
   ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-imp+ :z (z *player*) :x (+ (x *player*) 6) :y (- (y *player*) 3)))
   ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-imp+ :z (z *player*) :x (+ (x *player*) 7) :y (- (y *player*) 3)))
   ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-archdemon+ :z (z *player*) :x (- (x *player*) 3) :y (+ (y *player*) 0)))
-    
+
+  (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%"))
   )  
 
 (defun main-menu ()

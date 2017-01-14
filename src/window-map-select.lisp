@@ -70,7 +70,7 @@
       (dolist (feature feature-list)
 	(format str ", ~A" (name feature)))
       (when (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
-	(format str "~%~A [~A]" (get-current-mob-name (get-mob-* (level *world*) (view-x *player*) (view-y *player*))) (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
+	(format str "~%~A" (get-current-mob-name (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
       )
     (write-text str (sdl:rectangle :x *glyph-w* :y (+ 20 (* *glyph-h* *max-y-view*)) :w (+ 200 (+ 10 (* *glyph-w* *max-x-view*))) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height))))))
   

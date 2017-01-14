@@ -150,6 +150,8 @@
 			;; select abilities - a
                         (when (and (sdl:key= key :sdl-key-a))
                           (let ((abil-name-list nil)
+                                (abil-descr-list nil)
+                                (abil-prompt-list nil)
                                 (mob-abilities (get-mob-all-abilities *player*)))
                             
                             ;; filter ability list to leave only non passive and applicable
@@ -164,11 +166,29 @@
                                       (loop
                                         for ability-type-id in mob-abilities
                                         collect (name (get-ability-type-by-id ability-type-id))))
+
+                                ;; populate the ability description list
+                                (setf abil-descr-list
+                                      (loop
+                                        for ability-type-id in mob-abilities
+                                        collect (if (abil-applic-cost-p ability-type-id *player*)
+                                                  (format nil "Cost: ~A. TU: ~A." (cost (get-ability-type-by-id ability-type-id)) (spd (get-ability-type-by-id ability-type-id)))
+                                                  (format nil "Cost: ~A. Insufficient power!" (cost (get-ability-type-by-id ability-type-id))))))
+
+                                ;; populate the ability prompt list
+                                (setf abil-prompt-list
+                                      (loop
+                                        for ability-type-id in mob-abilities
+                                        collect #'(lambda (cur-sel)
+                                                    (if (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
+                                                      "[Enter] Invoke  [Escape] Cancel"
+                                                      "[Escape] Cancel"))))
                                 
                                 ;; display the window with the list
                                 (setf *current-window* (make-instance 'select-obj-window 
                                                                       :return-to *current-window* 
                                                                       :obj-list abil-name-list
+                                                                      :descr-list abil-descr-list
                                                                       :enter-func #'(lambda (cur-sel)
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
@@ -176,11 +196,7 @@
                                                                                         )
                                                                                         )
                                                                       :line-list abil-name-list
-                                                                      :prompt-list (list (list #'(lambda (cur-sel)
-                                                                                                   (declare (ignore cur-sel))
-                                                                                                   t)
-                                                                                               "[Enter] Invoke [Escape] Cancel") 
-                                                                                         ))))
+                                                                      :prompt-list abil-prompt-list)))
                               (progn
                                 ;; no abilites - display a message
                                 (add-message (format nil "You have no abilities to invoke.~%"))
@@ -195,45 +211,7 @@
 								:exec-func #'(lambda ()
 									       nil)))
 			  (make-output *current-window*))
-			;;------------------
-			;; fire mode - f
-			;;(when (and (sdl:key= key :sdl-key-f) (= mod 0))
-			;;  (if (ranged *player*)
-			;;      (progn (setf *current-window* (make-instance 'map-select-window 
-			;;						   :return-to *current-window*
-			;;						   :cmd-str (format nil "[Enter] Fire ")
-			;;						   :exec-func #'(lambda ()
-			;;								  (when (get-mob-* (get-level-by-z *world* (z *player*)) (view-x *player*) (view-y *player*))
-			;;								    (shoot-target *player* (get-mob-* (get-level-by-z *world* (z *player*)) (view-x *player*) (view-y *player*)))
-			;;								    (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
-			;;								    (setf *current-window* (return-to *current-window*))))))
-			;;	     (make-output *current-window*))
-			;;      (progn (add-message (format nil "Can't switch into firing mode: no ranged weapons.~%")))))
-			;;------------------
-			;; use feature - u
-			;;(when (and (sdl:key= key :sdl-key-u) (= mod 0))
-			;;  (let ((feature-list (get-features-* (get-level-by-z *world* (z *player*)) (x *player*) (y *player*)))
-			;;	(line-list))
-			;;    (setf feature-list (remove-if #'(lambda (item) (if (func item) nil t)) feature-list))
-			;;    (when feature-list
-			;;      (if (> (length feature-list) 1)
-			;;	  (progn
-			;;	    (dolist (feature feature-list)
-			;;	      (setf line-list (append line-list (list (name feature)))))
-			;;	    (setf *current-window* (make-instance 'select-obj-window 
-			;;						  :return-to *current-window* 
-			;;						  :obj-list feature-list
-			;;						  :enter-func #'(lambda (cur-sel)
-			;;								  (funcall (func (nth cur-sel feature-list)))
-			;;								  (setf *current-window* win))
-			;;						  :line-list line-list
-			;;						  :prompt-list (list (list #'(lambda (cur-sel) 
-			;;									       t)
-			;;									   "[Enter] Use [Escape] Cancel") 
-			;;								     ))))
-			;;	  (progn
-			;;	    (funcall (func (nth 0 feature-list))))))))
-			      
+			
 			
 			(make-output *current-window*)
 			(go exit-loop)

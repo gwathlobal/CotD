@@ -8,12 +8,13 @@
 
 (defclass help-window (window)
   ((cur-page :initform +win-help-page-menu+ :accessor cur-page)
+   (cur-str :initform 0 :accessor cur-str)
    (cur-sel :initform 0 :accessor cur-sel)
    (menu-items :initform (list "Overview" "Keybindings" "Credits") :accessor menu-items)
    ))
 
-(defun show-help-overview ()
-  (let ((str (create-string)))
+(defun show-help-overview (win)
+  (let ((str (create-string)) (max-str) (rect))
     (format str "THE PLOT~%")
     (format str "The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain. ")
     (format str "Choose your side and join the fray!~%~%")
@@ -32,11 +33,29 @@
     (format str " - You start as a puny Imp who is no match for an Angel.~%")
     (format str " - Kill humans to gain power. Beware of blessed ones.~%")
     (format str " - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.~%~%")
-    
-    (write-text str (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20)))))
 
-(defun show-help-keybindings ()
-  (let ((str (create-string)))
+    (setf rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
+
+    ;; calculate the maximum number of lines
+    (setf max-str (write-text str rect :count-only t))
+    
+    (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
+      (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
+
+    (when (< (cur-str win) 0)
+      (setf (cur-str win) 0))
+    
+    (write-text str rect :start-line (cur-str win))
+
+    (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
+                                                          "[Up/Down] Scroll text  "
+                                                          ""))
+                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+    
+    (sdl:free rect)))
+
+(defun show-help-keybindings (win )
+  (let ((str (create-string)) (max-str) (rect))
     (format str "Arrow keys,                    - Movement~%")
     (format str "Page Up, Page Down, Home, End,~%")
     (format str "Numpad keys~%")
@@ -45,15 +64,51 @@
     (format str "l                              - Look mode~%")
     (format str "?                              - Help~%")
     
-    (write-text str (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20)))))
+    (setf rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
 
-(defun show-help-credits ()
-  (let ((str (create-string)))
+    ;; calculate the maximum number of lines
+    (setf max-str (write-text str rect :count-only t))
+    
+    (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
+      (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
+
+    (when (< (cur-str win) 0)
+      (setf (cur-str win) 0))
+    
+    (write-text str rect :start-line (cur-str win))
+
+    (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
+                                                          "[Up/Down] Scroll text  "
+                                                          ""))
+                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+    
+    (sdl:free rect)))
+
+(defun show-help-credits (win)
+  (let ((str (create-string)) (max-str) (rect))
     (format str "Created by Gwathlobal using Common Lisp~%")
     (format str "Inspired by a 7DRL \"City of the Condemned\" by Tapio~%~%")
     (format str "Feel free to email bugs and suggestions to gwathlobal@yandex.ru")
         
-    (write-text str (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20)))))
+    (setf rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
+
+    ;; calculate the maximum number of lines
+    (setf max-str (write-text str rect :count-only t))
+    
+    (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
+      (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
+
+    (when (< (cur-str win) 0)
+      (setf (cur-str win) 0))
+    
+    (write-text str rect :start-line (cur-str win))
+
+    (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
+                                                          "[Up/Down] Scroll text  "
+                                                          ""))
+                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+    
+    (sdl:free rect)))
 
 (defmethod make-output ((win help-window))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
@@ -63,15 +118,15 @@
     ;; draw overview page
     ((= (cur-page win) +win-help-page-overview+) 
      (sdl:draw-string-solid-* "OVERVIEW" (truncate *window-width* 2) 0 :justify :center)
-     (show-help-overview))
+     (show-help-overview win))
     ;; draw keybindings page
     ((= (cur-page win) +win-help-page-keybindings+) 
      (sdl:draw-string-solid-* "KEYBINDINGS" (truncate *window-width* 2) 0 :justify :center)
-     (show-help-keybindings))
+     (show-help-keybindings win))
     ;; draw credits page
     ((= (cur-page win) +win-help-page-credits+) 
      (sdl:draw-string-solid-* "CREDITS" (truncate *window-width* 2) 0 :justify :center)
-     (show-help-credits))
+     (show-help-credits win))
     (t ;; draw the menu
      (sdl:draw-string-solid-* "HELP" (truncate *window-width* 2) 0 :justify :center)
      (let ((cur-str) (color-list nil))
@@ -80,8 +135,13 @@
          (if (= i cur-str) 
            (setf color-list (append color-list (list sdl:*yellow*)))
            (setf color-list (append color-list (list sdl:*white*)))))
-       (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 10) color-list)))
+       (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 10) color-list))
+
+     (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Esc] Exit")
+                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*))))
     )
+
+  
   
   (sdl:update-display))
 
@@ -90,11 +150,22 @@
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
-			
-			(setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
-                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win))))
+
+                        (when (= (cur-page win) +win-help-page-menu+)
+                          (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
+                          (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win)))))
                         
                         (cond
+                          ((and (sdl:key= key :sdl-key-up) (= mod 0))
+                           (when (or (= (cur-page win) +win-help-page-overview+)
+                                     (= (cur-page win) +win-help-page-keybindings+)
+                                     (= (cur-page win) +win-help-page-credits+))
+                             (decf (cur-str win))))
+                           ((and (sdl:key= key :sdl-key-down) (= mod 0))
+                            (when (or (= (cur-page win) +win-help-page-overview+)
+                                      (= (cur-page win) +win-help-page-keybindings+)
+                                      (= (cur-page win) +win-help-page-credits+))
+                              (incf (cur-str win))))
 			  ;; escape - quit
 			  ((sdl:key= key :sdl-key-escape) 
                            (if (= (cur-page win) +win-help-page-menu+)
@@ -107,6 +178,7 @@
                            
                            (when (= (cur-page win) +win-help-page-menu+)
                              (logger (format nil "CURPAGE ~A ,NEXT PAGE ~A~%" (cur-page win) (1+ (cur-sel win))))
+                             (setf (cur-str win) 0)
                              (setf (cur-page win) (1+ (cur-sel win))))
 			   (go exit-func)))
 			(go exit-func))
