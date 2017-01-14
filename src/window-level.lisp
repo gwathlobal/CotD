@@ -1,5 +1,8 @@
 (in-package :cotd)
 
+(defclass cell-window (window)
+  ((shoot-mode :initform :single :accessor shoot-mode)))
+
 (defun show-char-effects (mob x y h)
   (loop for effect being the hash-key in (effects mob)
         with y1 = y    
@@ -16,7 +19,7 @@
                ((= effect +mob-effect-called-for-help+) (sdl:draw-string-solid-* "Called" x y1 :color sdl:*green*)))
              (incf y1 (sdl:get-font-height))))
 
-(defun show-char-properties (x y meaningful-action)
+(defun show-char-properties (x y)
   (let* ((str)
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* *glyph-h* *max-y-view*)))
@@ -34,7 +37,7 @@
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
     (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) 52)
     (sdl:draw-string-solid-* (format nil "Time ~A"  *global-game-time*)
-                                     x (+ y 237) :color (if meaningful-action
+                                     x (+ y 237) :color (if (not (zerop (action-delay *player*)))
                                                           sdl:*red*
                                                           sdl:*white*))
     ))
@@ -48,7 +51,7 @@
                                                                                        (- max-lines (truncate h 13))
                                                                                        0)))))
 
-(defun update-screen (win)
+(defun update-screen ()
   
   ;; filling the background with tiles
   
@@ -58,7 +61,7 @@
     
   (update-map-area)
     
-  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (meaningful-action win))
+  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10)
   (show-small-message-box *glyph-w* (+ 20 (* *glyph-h* *max-y-view*)) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
     
   (sdl:update-display)
@@ -67,7 +70,7 @@
 
 (defmethod make-output ((win cell-window))
   
-  (update-screen win)
+  (update-screen)
   )
 
 (defmethod run-window ((win cell-window))
@@ -76,7 +79,7 @@
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func *current-window*)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
-                        
+                        (declare (ignore unicode))
                         ;;------------------
 			;; moving - arrows
 			(when (or (sdl:key= key :sdl-key-pageup) (sdl:key= key :sdl-key-kp9))
@@ -84,55 +87,55 @@
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 9)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 8)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (or (sdl:key= key :sdl-key-home) (sdl:key= key :sdl-key-kp7))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 7)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (or (sdl:key= key :sdl-key-right) (sdl:key= key :sdl-key-kp6))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 6)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (sdl:key= key :sdl-key-kp5)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 5)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (or (sdl:key= key :sdl-key-left) (sdl:key= key :sdl-key-kp4))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 4)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (or (sdl:key= key :sdl-key-pagedown) (sdl:key= key :sdl-key-kp3))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 3)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 2)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			(when (or (sdl:key= key :sdl-key-end) (sdl:key= key :sdl-key-kp1))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 1)
                             )
-                          (setf (meaningful-action win) t))
+                          )
 			;;------------------
 			;; character mode - Shift + 2
 			(when (and (sdl:key= key :sdl-key-2) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
@@ -170,10 +173,11 @@
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (setf *current-window* win)
-                                                                                        (setf (meaningful-action win) t))
+                                                                                        )
                                                                                         )
                                                                       :line-list abil-name-list
-                                                                      :prompt-list (list (list #'(lambda (cur-sel) 
+                                                                      :prompt-list (list (list #'(lambda (cur-sel)
+                                                                                                   (declare (ignore cur-sel))
                                                                                                    t)
                                                                                                "[Enter] Invoke [Escape] Cancel") 
                                                                                          ))))

@@ -13,10 +13,6 @@
   ((return-to :initarg :return-to :initform *current-window* :accessor return-to)
    (quit-func :initform *quit-func* :accessor quit-func)))
 
-(defclass cell-window (window)
-  ((shoot-mode :initform :single :accessor shoot-mode)
-   (meaningful-action :initform nil :accessor meaningful-action)))
-
 (defgeneric make-output (win))
 
 (defgeneric get-input (win key mod unicode))

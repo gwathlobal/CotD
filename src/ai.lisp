@@ -313,8 +313,7 @@
   (format t "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
   
   (update-visible-area (level *world*) (x player) (y player))
-  (when (typep *current-window* 'cell-window)
-    (setf (meaningful-action *current-window*) nil))
+  
   (make-output *current-window*)
   
   
