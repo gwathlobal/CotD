@@ -10,7 +10,7 @@
        (when (check-win *world*)
          (funcall *game-won-func*))
        
-       ;;(format t "[T:~A] GLOBAL-TICK~%" *global-game-time*)
+       ;;(logger (format nil "[T:~A] GLOBAL-TICK~%" *global-game-time*))
        
        (loop for mob being the hash-values in *mobs-hash* do
          (unless (check-dead mob)
@@ -18,7 +18,7 @@
            (if (> (action-delay mob) 0)
              (decf (action-delay mob))
              (progn
-               ;;(format t "[T:~A] TICK~%" *global-game-time*)
+               ;;(logger (format nil "[T:~A] TICK~%" *global-game-time*))
                
                 (ai-function mob)))
            (when (= (mod *global-game-time* +normal-ap+) 0)
@@ -166,7 +166,7 @@
       (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
       
       
-      (format t "path = ~A~%" (sdl:create-path tiles-path *current-dir*))
+      (logger (format nil "path = ~A~%" (sdl:create-path tiles-path *current-dir*)))
       
       (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
                                           :color-key sdl:*white*))
@@ -198,6 +198,7 @@
   
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
+  (setf *cotd-release* t)
 
   (sdl:with-init ()  
     (cotd-main))
@@ -217,7 +218,8 @@
 
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
-
+  (setf *cotd-release* t)
+  
   (sdl:with-init ()  
     (cotd-main))
   (sb-ext:exit))

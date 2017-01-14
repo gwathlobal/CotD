@@ -106,7 +106,7 @@
 			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
                            
                            (when (= (cur-page win) +win-help-page-menu+)
-                             (format t "CURPAGE ~A ,NEXT PAGE ~A~%" (cur-page win) (1+ (cur-sel win)))
+                             (logger (format nil "CURPAGE ~A ,NEXT PAGE ~A~%" (cur-page win) (1+ (cur-sel win))))
                              (setf (cur-page win) (1+ (cur-sel win))))
 			   (go exit-func)))
 			(go exit-func))

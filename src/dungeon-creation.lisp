@@ -46,7 +46,7 @@
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure*)
 
-    (format t "Creating actual level ~A~%" 0)
+    (logger (format nil "Creating actual level ~A~%" 0))
     (setf  (level world) (create-level-from-template result-template)) 
                         
       
@@ -56,7 +56,7 @@
       
     
     (dolist (feature feature-list)
-	(format t "Feature to be placed: ~A~%" (name feature))
+	(logger (format nil "Feature to be placed: ~A~%" (name feature)))
 	(add-feature-to-level-list (level world) feature))
     
     (create-mobs-from-template (level world) mob-template-result)
@@ -132,7 +132,7 @@
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure*)
 
-    (format t "Creating actual level ~A~%" 0)
+    (logger (format nil "Creating actual level ~A~%" 0))
     (setf  (level world) (create-level-from-template result-template)) 
                         
       
@@ -142,7 +142,7 @@
       
     
     (dolist (feature feature-list)
-	(format t "Feature to be placed: ~A~%" (name feature))
+	(logger (format nil "Feature to be placed: ~A~%" (name feature)))
 	(add-feature-to-level-list (level world) feature))
     
     world))

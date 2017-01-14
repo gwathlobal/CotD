@@ -11,7 +11,7 @@
 
 (defmethod make-output ((win select-obj-window))
   (let ((x (- (truncate *window-width* 2) 150)) (y (- (truncate *window-height* 2) 50)) (w 300) (h 65) (descr-h 0))
-    (format t "SELECT OBJ WINDOW~%")
+    (logger (format nil "SELECT OBJ WINDOW~%"))
     ;; adjusting the object selection
     (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (obj-list win))))
 

@@ -14,7 +14,8 @@
   :author "Gwathlobal"    
   :depends-on (lispbuilder-sdl)
   :components
-    ((:file "astar")
+    ((:file "logger")
+     (:file "astar")
      (:file "message-box")
      (:file "globals")
      (:file "options")

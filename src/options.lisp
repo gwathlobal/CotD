@@ -8,7 +8,7 @@
   )
 
 (defun read-options (s-expr options)
-  (format t "READ-OPTIONS: S-EXPR = ~A~%" s-expr)
+  (logger (format nil "READ-OPTIONS: S-EXPR = ~A~%" s-expr))
   (unless (typep s-expr 'list)
     (return-from read-options nil))
   
@@ -19,9 +19,9 @@
   )
 
 (defun set-options-tiles (s-expr options)
-  (format t "SET-OPTIONS-TILES: S-EXPR = ~A~%" s-expr)
+  (logger (format nil "SET-OPTIONS-TILES: S-EXPR = ~A~%" s-expr))
   (setf (options-tiles options) (second s-expr)))
 
 (defun set-options-font (s-expr options)
-  (format t "SET-OPTIONS-FONT: S-EXPR = ~A~%" s-expr)
+  (logger (format nil "SET-OPTIONS-FONT: S-EXPR = ~A~%" s-expr))
   (setf (options-font options) (second s-expr)))

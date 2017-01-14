@@ -52,7 +52,7 @@
 (defun create-template-city (max-x max-y entrance)
   (declare (ignore entrance))
   
-  (format t "CREATE-TEMPLATE-CITY~%")
+  (logger (format nil "CREATE-TEMPLATE-CITY~%"))
 
   (setf max-x *max-x-level*)
   (setf max-y *max-y-level*)
@@ -449,8 +449,8 @@
     ))
 
 (defun print-reserved-level (reserved-level)
-  (format t "RESERVED-LEVEL:~%")
+  (logger (format nil "RESERVED-LEVEL:~%"))
   (loop for y from 0 below (array-dimension reserved-level 1) do
     (loop for x from 0 below (array-dimension reserved-level 0) do
-      (format t "~2@A " (aref reserved-level x y)))
-    (format t "~%")))
+      (logger (format nil "~2@A " (aref reserved-level x y))))
+    (logger (format nil "~%"))))

@@ -152,7 +152,7 @@
   (when (eq mob *player*)
     (setf (view-x *player*) (x *player*))
     (setf (view-y *player*) (y *player*)))
-  (format t "UPDATE-VISIBLE-MOBS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-mobs mob))
+  (logger (format nil "UPDATE-VISIBLE-MOBS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-mobs mob)))
   )
 
 
@@ -194,7 +194,7 @@
            )
           ;; bumped into a mob
 	  ((typep check-result 'mob) 
-           (format t "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result)) 
+           (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result))) 
            (on-bump check-result mob))
 	  )))))
 
@@ -213,12 +213,12 @@
       (progn
         (make-act actor (move-spd (get-mob-type-by-id (mob-type actor)))))
       (progn 
-        (format t "ON-BUMP: ~A [~A] bumped into ~A [~A]~%" (name actor) (id actor) (name target) (id target))
+        (logger (format nil "ON-BUMP: ~A [~A] bumped into ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
         
         ;; if they are of the same faction and do not like infighting - do nothing
         (when (and (= (faction actor) (faction target))
                    (not (mob-ability-p actor +mob-abil-loves-infighting+)))
-          (format t "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target))
+          (logger (format nil "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target)))
           (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
           (return-from on-bump t))
         
@@ -262,9 +262,9 @@
         )))
                      
 (defun mob-depossess-target (actor)
-  (format t "MOB-DEPOSSESS-TARGET: Master ~A [~A], slave [~A]~%" (name actor) (id actor) (slave-mob-id actor))
+  (logger (format nil "MOB-DEPOSSESS-TARGET: Master ~A [~A], slave [~A]~%" (name actor) (id actor) (slave-mob-id actor)))
   (let ((target (get-mob-by-id (slave-mob-id actor))))
-    (format t "MOB-DEPOSSESS-TARGET: ~A [~A] releases its possession of ~A [~A]~%" (name actor) (id actor) (name target) (id target))
+    (logger (format nil "MOB-DEPOSSESS-TARGET: ~A [~A] releases its possession of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
     (setf (x target) (x actor) (y target) (y actor))
     (add-mob-to-level-list (level *world*) target)
     
@@ -289,7 +289,7 @@
 
 
 (defun melee-target (attacker target)
-  (format t "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target))
+  (logger (format nil "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target)))
   ;; no weapons - no attack
   (unless (weapon attacker) (return-from melee-target nil))
   (multiple-value-bind (dx dy) (x-y-dir (1+ (random 9)))
@@ -381,7 +381,7 @@
                      (mob-ability-p mob +mob-abil-human+))
                 (and (mob-ability-p killer +mob-abil-demon+)
                      (mob-ability-p mob +mob-abil-demon+)))
-        (format t "MAKE-DEAD: ~A [~A] Real mob strength to be transferred to the killer ~A [~A] is ~A~%" (name mob) (id mob) (name killer) (id killer) (strength (get-mob-type-by-id (mob-type mob))))
+        (logger (format nil "MAKE-DEAD: ~A [~A] Real mob strength to be transferred to the killer ~A [~A] is ~A~%" (name mob) (id mob) (name killer) (id killer) (strength (get-mob-type-by-id (mob-type mob)))))
         (incf (cur-fp killer) (1+ (strength (get-mob-type-by-id (mob-type mob))))))
       
       (if (gethash (mob-type mob) (stat-kills killer))
@@ -674,7 +674,7 @@
     (update-visible-area-all level x y)
     (update-visible-area-normal level x y))
   
-  (format t "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*))
+  (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))
   )
 
 

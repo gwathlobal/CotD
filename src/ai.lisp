@@ -29,7 +29,7 @@
   (unless nearest-enemy
     (return-from ai-mob-flee nil))
   
-  (format t "AI-FUNCTION: ~A [~A] tries to flee away from ~A [~A].~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy))
+  (logger (format nil "AI-FUNCTION: ~A [~A] tries to flee away from ~A [~A].~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy)))
   
   (let ((step-x 0) 
         (step-y 0))
@@ -41,23 +41,23 @@
     
     ;; if can't move away - try any random direction
     (when (<= (action-delay mob) 0)
-      (format t "AI-FUNCTION: ~A [~A] could not flee. Try to move randomly.~%" (name mob) (id mob))
+      (logger (format nil "AI-FUNCTION: ~A [~A] could not flee. Try to move randomly.~%" (name mob) (id mob)))
       (ai-mob-random-dir mob))
     ))
 
 (defun ai-mob-random-dir (mob)
   (loop while (<= (action-delay mob) 0) do
     (let ((dir (+ (random 9) 1)))
-      (format t "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob))
+      (logger (format nil "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob)))
       (move-mob mob dir))))
 
 (defmethod ai-function ((mob mob))
   (declare (optimize (speed 3)))
-  (format t "~%AI-Function Computer ~A [~A]~%" (name mob) (id mob))
+  (logger (format nil "~%AI-Function Computer ~A [~A]~%" (name mob) (id mob)))
   
   ;; skip and invoke the master AI
   (when (master-mob-id mob)
-    (format t "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A], skipping its turn.~%" (name mob) (id mob) (name (get-mob-by-id (master-mob-id mob))) (master-mob-id mob))
+    (logger (format nil "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A], skipping its turn.~%" (name mob) (id mob) (name (get-mob-by-id (master-mob-id mob))) (master-mob-id mob)))
     (make-act mob +normal-ap+)
     (return-from ai-function nil))
   
@@ -66,7 +66,7 @@
   ;; if the mob possesses smb, there is a chance that the slave will revolt and move randomly
   (when (and (slave-mob-id mob)
              (zerop (random (* *possessed-revolt-chance* (mob-ability-p mob +mob-abil-can-possess+)))))
-    (format t "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)  )
+    (logger (format nil "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)))
     (print-visible-message (x mob) (y mob) (level *world*) 
                            (format nil "~A revolts against ~A.~%" (name (get-mob-by-id (slave-mob-id mob))) (name mob)))
     (setf (path mob) nil)
@@ -104,7 +104,7 @@
     
     ;; if the mob is coward, move away from the nearest enemy
     (when (and nearest-target (mob-ai-coward-p mob))
-      (format t "AI-FUNCTION: ~A [~A] is a coward with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target))
+      (logger (format nil "AI-FUNCTION: ~A [~A] is a coward with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
       
       (ai-mob-flee mob nearest-target)      
       (return-from ai-function)
@@ -122,7 +122,7 @@
         (dolist (enemy-id hostile-mobs)
           (incf enemy-str (strength (get-mob-type-by-id (face-mob-type-id (get-mob-by-id enemy-id))))))
       
-        (format t "AI-FUNCTION: ~A [~A] has horde behavior. Ally vs. Enemy strength is ~A vs ~A.~%" (name mob) (id mob) ally-str enemy-str)
+        (logger (format nil "AI-FUNCTION: ~A [~A] has horde behavior. Ally vs. Enemy strength is ~A vs ~A.~%" (name mob) (id mob) ally-str enemy-str))
 
         (when (< ally-str enemy-str)
           ;; allied strength is less - flee
@@ -152,20 +152,20 @@
                         (get-distance (x nearest-ally) (y nearest-ally) (x mob) (y mob)))
                  (setf nearest-ally (get-mob-by-id mob-id))))
           ) 
-        (format t "AI-FUNCTION: ~A [~A] wants to give blessings. Nearest ally ~A [~A]~%" (name mob) (id mob) (if nearest-ally (name nearest-ally) nil) (if nearest-ally (id nearest-ally) nil))
+        (logger (format nil "AI-FUNCTION: ~A [~A] wants to give blessings. Nearest ally ~A [~A]~%" (name mob) (id mob) (if nearest-ally (name nearest-ally) nil) (if nearest-ally (id nearest-ally) nil)))
         (when (or (and nearest-ally
                        (not nearest-target))
                   (and nearest-ally
                        nearest-target
                        (< (get-distance (x mob) (y mob) (x nearest-ally) (y nearest-ally))
                           (get-distance (x mob) (y mob) (x nearest-target) (y nearest-target)))))
-          (format t "AI-FUNCTION: ~A [~A] changed target ~A [~A].~%" (name mob) (id mob) (name nearest-ally) (id nearest-ally))
+          (logger (format nil "AI-FUNCTION: ~A [~A] changed target ~A [~A].~%" (name mob) (id mob) (name nearest-ally) (id nearest-ally)))
           (setf nearest-target nearest-ally))
         ))
     
     ;; attack the nearest hostile mob
     (when nearest-target
-      (format t "AI-FUNCTION: Enemy found ~A [~A]~%" (name nearest-target) (id nearest-target))
+      (logger (format nil "AI-FUNCTION: Enemy found ~A [~A]~%" (name nearest-target) (id nearest-target)))
       (let ((path nil))
        
         (setf path (a-star (list (x mob) (y mob)) (list (x nearest-target) (y nearest-target)) 
@@ -174,8 +174,8 @@
                                (check-move-for-ai mob dx dy)
                                )))
         
-        (format t "AI-FUNCTION: Mob - (~A ~A) Target - (~A ~A)~%" (x mob) (y mob) (x nearest-target) (y nearest-target))
-	(format t "AI-FUNCTION: Set mob path - ~A~%" path)
+        (logger (format nil "AI-FUNCTION: Mob - (~A ~A) Target - (~A ~A)~%" (x mob) (y mob) (x nearest-target) (y nearest-target)))
+	(logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
         (pop path)
         
 	(setf (path mob) path)
@@ -202,7 +202,7 @@
                                (1+ (random 20))))
                    (setf ry (- (+ 10 (y mob))
                                (1+ (random 20)))))
-          (format t "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry)
+          (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
           (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
                              #'(lambda (dx dy) 
                                  ;; checking for impassable objects
@@ -210,8 +210,8 @@
                                  )))
           
           (pop path)
-          (format t "AI-FUNCTION: Mob goes to (~A ~A)~%" rx ry)
-          (format t "AI-FUNCTION: Set mob path - ~A~%" path)
+          (logger (format nil "AI-FUNCTION: Mob goes to (~A ~A)~%" rx ry))
+          (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
           (setf (path mob) path)
           
           ))
@@ -223,7 +223,7 @@
                   0.5)
                (mob-ability-p mob +mob-abil-call-for-help+)
                (can-invoke-ability mob mob +mob-abil-call-for-help+))
-      (format t "AI-FUNCTION: ~A [~A] decides to call for help~%" (name mob) (id mob))
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to call for help~%" (name mob) (id mob)))
       (mob-invoke-ability mob mob +mob-abil-call-for-help+)
       (return-from ai-function))
     
@@ -231,7 +231,7 @@
     (unless nearest-target
       (when (and (mob-ability-p mob +mob-abil-answer-the-call+)
                  (can-invoke-ability mob mob +mob-abil-answer-the-call+))
-        (format t "AI-FUNCTION: ~A [~A] decides to answer the call for help~%" (name mob) (id mob))
+        (logger (format nil "AI-FUNCTION: ~A [~A] decides to answer the call for help~%" (name mob) (id mob)))
         (mob-invoke-ability mob mob +mob-abil-answer-the-call+)
         (return-from ai-function))
       )
@@ -241,7 +241,7 @@
                   0.5)
                (mob-ability-p mob +mob-abil-heal-self+))
       (when (can-invoke-ability mob mob +mob-abil-heal-self+)
-        (format t "AI-FUNCTION: ~A [~A] decides to heal itself~%" (name mob) (id mob))
+        (logger (format nil "AI-FUNCTION: ~A [~A] decides to heal itself~%" (name mob) (id mob)))
         (mob-invoke-ability mob mob +mob-abil-heal-self+)
         (return-from ai-function))
       
@@ -250,7 +250,7 @@
                  (mob-ability-p mob +mob-abil-reveal-divine+)
                  (can-invoke-ability mob mob +mob-abil-reveal-divine+)
                  (abil-applic-cost-p +mob-abil-heal-self+ mob))
-        (format t "AI-FUNCTION: ~A [~A] decides to reveal itself, in order to heal~%" (name mob) (id mob))
+        (logger (format nil "AI-FUNCTION: ~A [~A] decides to reveal itself, in order to heal~%" (name mob) (id mob)))
         (mob-invoke-ability mob mob +mob-abil-reveal-divine+)
         (return-from ai-function)
         )
@@ -265,7 +265,7 @@
       (when (and (> (length (path mob)) 3)
                  (mob-ability-p mob +mob-abil-conseal-divine+)
                  (can-invoke-ability mob mob +mob-abil-conseal-divine+))
-        (format t "AI-FUNCTION: ~A [~A] decides to conseal its divinity~%" (name mob) (id mob))
+        (logger (format nil "AI-FUNCTION: ~A [~A] decides to conseal its divinity~%" (name mob) (id mob)))
         (mob-invoke-ability mob mob +mob-abil-conseal-divine+)
         (return-from ai-function))
 
@@ -273,13 +273,13 @@
       (when (and (<= (length (path mob)) 1)
                  (mob-ability-p mob +mob-abil-reveal-divine+)
                  (can-invoke-ability mob mob +mob-abil-reveal-divine+))
-        (format t "AI-FUNCTION: ~A [~A] decides to reveal its divinity~%" (name mob) (id mob))
+        (logger (format nil "AI-FUNCTION: ~A [~A] decides to reveal its divinity~%" (name mob) (id mob)))
         (mob-invoke-ability mob mob +mob-abil-reveal-divine+)
         (return-from ai-function))
       
       (let ((step) (step-x) (step-y))
         
-        (format t "AI-FUNCTION: Move mob along the path - ~A~%" (path mob))
+        (logger (format nil "AI-FUNCTION: Move mob along the path - ~A~%" (path mob)))
         (setf step (pop (path mob)))
         
         ;; if there is suddenly an obstacle, make the path recalculation
@@ -287,12 +287,12 @@
 	(setf step-y (- (second step) (y mob)))
 	
         (unless (check-move-on-level mob (first step) (second step))
-          (format t "AI-FUNCTION: Can't move to target - (~A ~A)~%" (first step) (second step))
+          (logger (format nil "AI-FUNCTION: Can't move to target - (~A ~A)~%" (first step) (second step)))
           (setf (path mob) nil)
           (return-from ai-function))
         
         (unless (x-y-into-dir step-x step-y)
-          (format t "AI-FUNCTION: Wrong direction supplied (~A ~A)~%" (first step) (second step))
+          (logger (format nil "AI-FUNCTION: Wrong direction supplied (~A ~A)~%" (first step) (second step)))
           (setf (path mob) nil)
           (return-from ai-function))
         
@@ -309,8 +309,8 @@
   
 
 (defmethod ai-function ((player player))
-  (format t "~%AI-FUnction Player~%")
-  (format t "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  (logger (format nil "~%AI-FUnction Player~%"))
+  (logger (format nil "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
   
   (update-visible-area (level *world*) (x player) (y player))
   
@@ -321,9 +321,9 @@
 
   ;; if possessed & unable to revolt - wait till the player makes a meaningful action
   ;; then skip and invoke the master AI
-  (format t "AI-FUNCTION: MASTER ID ~A, SLAVE ID ~A~%" (master-mob-id player) (slave-mob-id player))
+  (logger (format nil "AI-FUNCTION: MASTER ID ~A, SLAVE ID ~A~%" (master-mob-id player) (slave-mob-id player)))
   (when (master-mob-id player)
-    (format t "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player))
+    (logger (format nil "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
     
     (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player))))
     
@@ -333,7 +333,7 @@
         
     (if (zerop (random (* *possessed-revolt-chance* (mob-ability-p (get-mob-by-id (master-mob-id player)) +mob-abil-can-possess+))))
       (progn
-        (format t "AI-FUNCTION: ~A [~A] revolts against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player))
+        (logger (format nil "AI-FUNCTION: ~A [~A] revolts against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
         
         (print-visible-message (x player) (y player) (level *world*) 
                                (format nil "~A revolts against ~A.~%" (name player) (name (get-mob-by-id (master-mob-id player))) ))
@@ -343,13 +343,13 @@
         (return-from ai-function nil)
         )
       (progn
-        (format t "AI-FUNCTION: ~A [~A] was unable to revolt against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player))
+        (logger (format nil "AI-FUNCTION: ~A [~A] was unable to revolt against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
                 
         (ai-function (get-mob-by-id (master-mob-id player)))
-        (format t "~%WE ARE HERE ~A~%" player)
+        
         (when (master-mob-id player)
           (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player)))))
-        (format t "~%WE ARE HERE NOW ~A~%" player)
+        
         (make-act player +normal-ap+)
         (return-from ai-function nil)))
     )
@@ -358,7 +358,7 @@
   ;; wait for a meaningful action and move randomly instead 
   (when (slave-mob-id player)
     (when (zerop (random (* *possessed-revolt-chance* (mob-ability-p player +mob-abil-can-possess+))))
-      (format t "AI-FUNCTION: ~A [~A] possesses ~A [~A], but the slave revolts.~%" (name player) (id player) (name (get-mob-by-id (slave-mob-id player))) (slave-mob-id player))
+      (logger (format nil "AI-FUNCTION: ~A [~A] possesses ~A [~A], but the slave revolts.~%" (name player) (id player) (name (get-mob-by-id (slave-mob-id player))) (slave-mob-id player)))
       (setf (can-move-if-possessed player) t)
       (loop while (can-move-if-possessed player) do
         (get-input-player))

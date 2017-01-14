@@ -3,7 +3,7 @@
 (defun create-template-test-city (max-x max-y entrance)
   (declare (ignore entrance))
   
-  (format t "CREATE-TEMPLATE-TEST-CITY~%")
+  (logger (format nil "CREATE-TEMPLATE-TEST-CITY~%"))
 
   (setf max-x *max-x-level*)
   (setf max-y *max-y-level*)

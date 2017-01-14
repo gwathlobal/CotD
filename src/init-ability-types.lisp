@@ -102,7 +102,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
-                                                (format t "MOB-POSSESS-TARGET: ~A [~A] possesses ~A [~A]~%" (name actor) (id actor) (name target) (id target))
+                                                (logger (format nil "MOB-POSSESS-TARGET: ~A [~A] possesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
                                                 (setf (x actor) (x target) (y actor) (y target))
                                                 (remove-mob-from-level-list (level *world*) target)
                                                                                                 
@@ -136,7 +136,7 @@
                                                 (declare (ignore ability-type))
                                                 
                                                 (melee-target actor target)
-                                                (format t "INSIDE PURGING TOUCH: ~A, (check-dead target) ~A~%" (name target) (check-dead target))
+                                                (logger (format nil "INSIDE PURGING TOUCH: ~A, (check-dead target) ~A~%" (name target) (check-dead target)))
                                                 (when (check-dead target)
                                                   (incf (cur-fp actor))
                                                   (mob-depossess-target target))
@@ -156,7 +156,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
-                                                (format t "MOB-BLESS-TARGET: ~A [~A] blesses ~A [~A]~%" (name actor) (id actor) (name target) (id target))
+                                                (logger (format nil "MOB-BLESS-TARGET: ~A [~A] blesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
                                                 (set-mob-effect target +mob-effect-blessed+)
                                                 (incf (total-blessed *world*))
@@ -189,7 +189,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
-                                                (format t "MOB-CONSUME-BLESSING-ON-TARGET: ~A [~A] is scorched by blessing of ~A [~A]~%" (name actor) (id actor) (name target) (id target))
+                                                (logger (format nil "MOB-CONSUME-BLESSING-ON-TARGET: ~A [~A] is scorched by blessing of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
                                                 (let ((cur-dmg))
                                                   (rem-mob-effect target +mob-effect-blessed+)
@@ -259,7 +259,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
-                                                (format t "MOB-LIFESTEAL: ~A [~A] steals life from the dead ~A [~A]~%" (name actor) (id actor) (name target) (id target))
+                                                (logger (format nil "MOB-LIFESTEAL: ~A [~A] steals life from the dead ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
                                                 (let ((heal-pwr))
                                                   (setf heal-pwr (* 2 (1+ (strength target))))
@@ -284,7 +284,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
-                                                (format t "MOB-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor))
+                                                (logger (format nil "MOB-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor)))
                                                 
                                                 (let ((allies-list))
                                                   ;; collect all allies that are able to answer the call within the 40 cell radius
@@ -298,7 +298,7 @@
                                                   
                                                   ;; remove all allies that are visible to you so that only distant ones could answer 
                                                   (setf allies-list (remove-if #'(lambda (e) (member e (visible-mobs actor))) allies-list))
-                                                  (format t "MOB-CALL-FOR-HELP: The following allies might answer the call ~A~%" allies-list)
+                                                  (logger (format nil "MOB-CALL-FOR-HELP: The following allies might answer the call ~A~%" allies-list))
                                                   
                                                   ;; place the effect of "called for help" on the allies in the final list 
                                                   (loop for ally-mob-id in allies-list 
@@ -323,7 +323,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (format t "MOB-ANSWER-THE-CALL: ~A [~A] answers the call~%" (name actor) (id actor))
+                                                (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] answers the call~%" (name actor) (id actor)))
                                                 
                                                 (let ((allies-list))
                                                   ;; find all allies that called for help with 40 cell radius
@@ -339,7 +339,7 @@
                                                       (let ((called-ally (get-mob-by-id (first allies-list)))
                                                             (fx nil) (fy nil))
                                                         ;; if anyone found, find a free place around the caller
-                                                        (format t "MOB-ANSWER-THE-CALL: ~A [~A] finds the caller ~A [~A]~%" (name actor) (id actor) (name called-ally) (id called-ally))
+                                                        (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the caller ~A [~A]~%" (name actor) (id actor) (name called-ally) (id called-ally)))
                                                         (check-surroundings (x called-ally) (y called-ally) nil #'(lambda (x y)
                                                                                                                     (when (and (not (get-mob-* (level *world*) x y))
                                                                                                                                (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
@@ -347,7 +347,7 @@
                                                         (if (and fx fy)
                                                           ;; free place found
                                                           (progn
-                                                            (format t "MOB-ANSWER-THE-CALL: ~A [~A] finds the place to teleport (~A, ~A)~%" (name actor) (id actor) fx fy)
+                                                            (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the place to teleport (~A, ~A)~%" (name actor) (id actor) fx fy))
                                                             (print-visible-message (x actor) (y actor) (level *world*) 
                                                                                    (format nil "~A disappeares in thin air.~%" (name actor)))
                                                             ;; teleport the caster to the caller
@@ -363,7 +363,7 @@
                                                             (incf (stat-calls called-ally))
                                                             )
                                                           (progn
-                                                            (format t "MOB-ANSWER-THE-CALL: ~A [~A] unable to the place to teleport~%" (name actor) (id actor))
+                                                            (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] unable to the place to teleport~%" (name actor) (id actor)))
                                                             (print-visible-message (x actor) (y actor) (level *world*) 
                                                                                    (format nil "~A blinks for a second, but remains in place.~%" (name actor)))
                                                             ;; no free place found - just remove the status from the called and the caller
@@ -373,7 +373,7 @@
                                                         ))
                                                     (progn
                                                       ;; if none found, simply remove the "answer the call" status
-                                                      (format t "MOB-ANSWER-THE-CALL: ~A [~A] is unable to find the caller ~%" (name actor) (id actor))
+                                                      (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] is unable to find the caller ~%" (name actor) (id actor)))
                                                       (print-visible-message (x actor) (y actor) (level *world*) 
                                                                              (format nil "~A blinks for a second, but remains in place.~%" (name actor)))
                                                       (rem-mob-effect actor +mob-effect-called-for-help+)

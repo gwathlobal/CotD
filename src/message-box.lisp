@@ -5,7 +5,7 @@
 (defvar *message-box* (make-list 0))
 
 (defun add-message (str)
-  (format t "ADD-MESSAGE: ~A~%" str)
+  (logger (format nil "ADD-MESSAGE: ~A~%" str))
   (let ((line (make-hash-table)))
     (setf (gethash :string line) str)
     (setf *message-box* (append *message-box* (list line)))))
