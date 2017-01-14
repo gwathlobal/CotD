@@ -21,18 +21,18 @@
 ;; dimensions may not exceed (- *level-grid-size* 2), as 1 from each side must be free so that building do not stand immediately adjacent to each other
 (defparameter *level-template-building-dimensions* (list '(0 . 0)
                                                          '(0 . 0)
-                                                         '(7 . 7)
-                                                         '(7 . 7)
-                                                         '(7 . 7)
-                                                         '(7 . 7)
+                                                         '(9 . 9)
+                                                         '(9 . 9)
+                                                         '(9 . 9)
+                                                         '(9 . 9)
                                                          '(16 . 9)
-                                                         '(8 . 8)
                                                          '(10 . 10)
-                                                         '(8 . 8)
+                                                         '(10 . 10)
+                                                         '(10 . 10)
                                                          '(17 . 17)
                                                          '(17 . 17)
-                                                         '(18 . 18)
-                                                         '(18 . 10)))
+                                                         '(20 . 20)
+                                                         '(20 . 12)))
 
 (defparameter *level-grid-building-dimensions* (list '(0 . 0)
                                                      '(0 . 0)
@@ -91,7 +91,8 @@
                                        +level-template-city-prison-1+
                                        +level-template-city-church-1+
                                        +level-template-city-warehouse-1+
-                                       +level-template-city-library-1+)
+                                       +level-template-city-library-1+
+                                       )
             with build-picked = nil
             with build-cur-list = nil
             do
@@ -150,8 +151,8 @@
              ;; find a random position within the grid on the template level so that the building does not violate the grid boundaries
              (multiple-value-bind (adx ady) (level-city-get-actual-building-dimensions build-type-id)
                (multiple-value-bind (gdx gdy) (level-city-get-grid-building-dimensions build-type-id)
-                 (setf px (1+ (random (- (1- (* *level-grid-size* gdx)) adx))))
-                 (setf py (1+ (random (- (1- (* *level-grid-size* gdy)) ady))))))
+                 (setf px (random (1+ (- (* *level-grid-size* gdx) adx))))
+                 (setf py (random (1+ (- (* *level-grid-size* gdy) ady))))))
              
              ;; place the actual building
              (cond 
@@ -183,28 +184,32 @@
 
 
 (defun level-city-place-house-1 (x y template-level)
-  (let ((build-template (list "#-#####"
-                              "#t..bc#"
-                              "#h....#"
-                              "#####.#"
-                              "-ht...#"
-                              "#....c#"
-                              "###.###")))
+  (let ((build-template (list ",,,,,,,,,"
+                              ",#-#####,"
+                              ",#t..bc#,"
+                              ",#h....#,"
+                              ",#####.#,"
+                              ",-ht...#,"
+                              ",#....c#,"
+                              ",###.###,"
+                              ",,,,,,,,,")))
     
     (translate-build-to-template x y build-template template-level)
     )
-  (list (list +mob-type-man+ 3 4)
+  (list (list +mob-type-man+ 4 5)
         (list +mob-type-woman+ 3 2)
         (list +mob-type-child+ 5 3)))
 
 (defun level-city-place-house-2 (x y template-level)
-  (let ((build-template (list "#######"
-                              "#c...b#"
-                              "#..#.c#"
-                              "...#..-"
-                              "#.t#..#"
-                              "-.h#ht#"
-                              "#######")))
+  (let ((build-template (list ",,,,,,,,,"
+                              ",#######,"
+                              ",#c...b#,"
+                              ",#..#.c#,"
+                              ",...#..-,"
+                              ",#.t#..#,"
+                              ",-.h#ht#,"
+                              ",#######,"
+                              ",,,,,,,,,")))
     (translate-build-to-template x y build-template template-level)
     )
   (list (list +mob-type-man+ 2 3)
@@ -212,32 +217,36 @@
         (list +mob-type-child+ 5 4)))
 
 (defun level-city-place-house-3 (x y template-level)
-  (let ((build-template (list "#######"
-                              "#ht#ht-"
-                              "#..#..#"
-                              "-..#..."
-                              "#b.#..#"
-                              "#c...c#"
-                              "#######")))
+  (let ((build-template (list ",,,,,,,,,"
+                              ",#######,"
+                              ",#ht#ht-,"
+                              ",#..#..#,"
+                              ",-..#...,"
+                              ",#b.#..#,"
+                              ",#c...c#,"
+                              ",#######,"
+                              ",,,,,,,,,")))
     (translate-build-to-template x y build-template template-level)
     )
-  (list (list +mob-type-man+ 4 4)
-        (list +mob-type-woman+ 1 2)
+  (list (list +mob-type-man+ 5 4)
+        (list +mob-type-woman+ 2 2)
         (list +mob-type-child+ 2 4)))
 
 (defun level-city-place-house-4 (x y template-level)
-  (let ((build-template (list "###.###"
-                              "#c...h#"
-                              "#....t-"
-                              "#.#####"
-                              "#....h#"
-                              "#cb..t#"
-                              "#####-#")))
+  (let ((build-template (list ",,,,,,,,,"
+                              ",###.###,"
+                              ",#c...h#,"
+                              ",#....t-,"
+                              ",#.#####,"
+                              ",#....h#,"
+                              ",#cb..t#,"
+                              ",#####-#,"
+                              ",,,,,,,,,")))
     
     (translate-build-to-template x y build-template template-level)
     )
   (list (list +mob-type-man+ 4 2)
-        (list +mob-type-woman+ 3 4)
+        (list +mob-type-woman+ 2 4)
         (list +mob-type-child+ 4 5)))
 
 (defun level-city-place-townhall (x y template-level)
@@ -258,13 +267,16 @@
         (list +mob-type-clerk+ 12 5)))
 
 (defun level-city-place-park-1 (x y template-level)
-  (let ((build-template (list "```,```,"
-                              "`T```T``"
-                              "``````T`"
-                              "``T`````"
-                              ",````T``"
-                              ",`T````,"
-                              ",```,,,,")))
+  (let ((build-template (list ",,```,,```"
+                              "```T````T`"
+                              "`T```T````"
+                              "``````T`,,"
+                              "``T`````,,"
+                              ",````T````"
+                              ",`T`````T`"
+                              ",``````````"
+                              ",,`T``T`,,"
+                              ",,``````,,")))
     
     (translate-build-to-template x y build-template template-level)
     )
@@ -272,17 +284,20 @@
         (list +mob-type-woman+ 7 4)))
 
 (defun level-city-place-park-2 (x y template-level)
-  (let ((build-template (list "```,```,"
-                              "`T```T`,"
-                              "```T````"
-                              "`T````T`"
-                              "````T```"
-                              ",`T```T`"
-                              ",```,```")))
+  (let ((build-template (list ",,```,```,"
+                              "```T```T`,"
+                              "`T```T````"
+                              "```T````T`"
+                              "`T````T```"
+                              "````T```,,"
+                              ",`T```T`,,"
+                              ",`````````"
+                              ",`T`T`,`T`"
+                              ",`````,```")))
     
     (translate-build-to-template x y build-template template-level)
     )
-  (list (list +mob-type-man+ 4 5)
+  (list (list +mob-type-man+ 4 6)
         (list +mob-type-woman+ 4 1)))
 
 (defun level-city-place-lake-1 (x y template-level)
@@ -360,53 +375,57 @@
         (list +mob-type-woman+ 6 11)))
 
 (defun level-city-place-warehouse-1 (x y template-level)
-  (let ((build-template (list "##-#####..#####-##"
-                              "#................#"
-                              "#..CCCCCCCCCCCC..#"
-                              "#..############..#"
-                              "#..CCCCCCCCCCCC..#"
-                              "-................-"
-                              "#..CCCCCCCCCCCC..#"
-                              "#..############..#"
-                              ".................."
-                              ".................."
-                              "#..############..#"
-                              "#..CCCCCCCCCCCC..#"
-                              "-................-"
-                              "#..CCCCCCCCCCCC..#"
-                              "#..############..#"
-                              "#..CCCCCCCCCCCC..#"
-                              "#................#"
-                              "##-#####..#####-##")))
+  (let ((build-template (list ",,,,,,,,,,,,,,,,,,,,"
+                              ",##-#####..#####-##,"
+                              ",#................#,"
+                              ",#..CCCCCCCCCCCC..#,"
+                              ",#..############..#,"
+                              ",#..CCCCCCCCCCCC..#,"
+                              ",-................-,"
+                              ",#..CCCCCCCCCCCC..#,"
+                              ",#..############..#,"
+                              ",..................,"
+                              ",..................,"
+                              ",#..############..#,"
+                              ",#..CCCCCCCCCCCC..#,"
+                              ",-................-,"
+                              ",#..CCCCCCCCCCCC..#,"
+                              ",#..############..#,"
+                              ",#..CCCCCCCCCCCC..#,"
+                              ",#................#,"
+                              ",##-#####..#####-##,"
+                              ",,,,,,,,,,,,,,,,,,,,")))
     
     (translate-build-to-template x y build-template template-level)
     )
-  (list (list +mob-type-man+ 1 1)
-        (list +mob-type-man+ 16 1)
-        (list +mob-type-man+ 1 16)
-        (list +mob-type-man+ 16 16)
+  (list (list +mob-type-man+ 2 2)
+        (list +mob-type-man+ 17 2)
+        (list +mob-type-man+ 2 17)
+        (list +mob-type-man+ 17 17)
         ))
 
 (defun level-city-place-library-1 (x y template-level)
-  (let ((build-template (list "##-####-###-###-##"
-                              "#.h..#...........#"
-                              "-.t.....B..B..B..-"
-                              "#....#..B..B..B..#"
-                              "##..##..B..B..B..#"
-                              "`````-..B..B..B..-"
-                              "`````#..B..B..B..#"
-                              "`T```#..B..B..B..#"
-                              "`````-..B..B..B..-"
-                              ",``T`#...........#"
-                              ",,```##-###-###-##"
+  (let ((build-template (list ",,,,,,,,,,,,,,,,,,,,"
+                              ",##-####-###-###-##,"
+                              ",#.h..#...........#,"
+                              ",-.t.....B..B..B..-,"
+                              ",#....#..B..B..B..#,"
+                              ",##..##..B..B..B..#,"
+                              ",`````-..B..B..B..-,"
+                              ",`````#..B..B..B..#,"
+                              ",`T```#..B..B..B..#,"
+                              ",`````-..B..B..B..-,"
+                              ",,``T`#...........#,"
+                              ",,,```##-###-###-##,"
+                              ",,,,,,,,,,,,,,,,,,,,"
                              )))
     
     (translate-build-to-template x y build-template template-level)
     )
-  (list (list +mob-type-man+ 2 1)
-        (list +mob-type-woman+ 9 5)
-        (list +mob-type-woman+ 12 7)
-        (list +mob-type-woman+ 15 9)
+  (list (list +mob-type-man+ 3 2)
+        (list +mob-type-woman+ 10 6)
+        (list +mob-type-woman+ 13 8)
+        (list +mob-type-woman+ 16 10)
         ))
 
 (defun translate-build-to-template (x y build-template template-level)
