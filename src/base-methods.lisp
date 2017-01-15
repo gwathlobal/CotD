@@ -49,31 +49,7 @@
   (when (get-single-memo-visibility (get-memo-* level x y))
     (add-message str)))
 
-(defun update-visible-mobs-normal-1 (mob)
-  (draw-fov (x mob) (y mob) (cur-sight mob) #'(lambda (dx dy)
-                                         (let ((terrain) (exit-result t))
-                                           (block nil
-                                             (when (or (< dx 0) (>= dx *max-x-level*)
-                                                       (< dy 0) (>= dy *max-y-level*))
-                                               (setf exit-result 'exit)
-					       (return))
-					 
-                                             ;; checking for impassable objects
-                                             (setf terrain (get-terrain-* (level *world*) dx dy))
-                                             (unless terrain
-                                               (setf exit-result 'exit)
-					       (return))
-					     (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
-					       (setf exit-result 'exit)
-					       (return))
-                                             (when (and (get-mob-* (level *world*) dx dy) 
-                                                        (not (eq (get-mob-* (level *world*) dx dy) mob))
-                                                        )
-                                               (pushnew (id (get-mob-* (level *world*) dx dy)) (visible-mobs mob)))
-					     )
-					   exit-result))))
-
-(defun update-visible-mobs-normal-2 (mob)
+(defun update-visible-mobs-normal (mob)
   (loop 
     for mob-id in (mob-id-list (level *world*))
     with vmob = nil
@@ -120,19 +96,6 @@
     )
   )
 
-(defun update-visible-mobs-normal (mob)
-  (loop 
-    for mob-id in (mob-id-list (level *world*))
-    with vmob = nil
-    do
-       (setf vmob (get-mob-by-id mob-id))
-       (when (and (not (check-dead vmob))
-                  (not (eq mob vmob))
-                  (<= (get-distance (x mob) (y mob) (x vmob) (y vmob)) (cur-sight mob)))
-         (pushnew mob-id (visible-mobs mob)))
-    )
-  )
-
 (defun update-visible-mobs-all (mob)
   (loop 
     for mob-id in (mob-id-list (level *world*))
@@ -146,7 +109,7 @@
   
   (if (mob-ability-p mob +mob-abil-see-all+)
     (update-visible-mobs-all mob)
-    (update-visible-mobs-normal-2 mob))
+    (update-visible-mobs-normal mob))
   
   
   (when (eq mob *player*)
@@ -200,12 +163,6 @@
 
 (defun make-act (mob speed)
   ;;(format t "MAKE-ACT: ~A SPD ~A~%" (name mob) speed)
-  (when (mob-effect-p mob +mob-effect-reveal-true-form+)
-    (set-mob-effect mob +mob-effect-reveal-true-form+ (1- (mob-effect-p mob +mob-effect-reveal-true-form+)))
-    (when (zerop (mob-effect-p mob +mob-effect-reveal-true-form+))
-      (rem-mob-effect mob +mob-effect-reveal-true-form+)
-      (when (slave-mob-id mob)
-        (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))))
   (incf (action-delay mob) speed))
 
 (defmethod on-bump ((target mob) (actor mob))
@@ -316,6 +273,16 @@
   (logger (format nil "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target)))
   ;; no weapons - no attack
   (unless (weapon attacker) (return-from melee-target nil))
+
+  ;; target under protection of divine shield - consume the shield and quit
+  (when (mob-effect-p target +mob-effect-divine-shield+)
+    (print-visible-message (x attacker) (y attacker) (level *world*) 
+                           (format nil "~A attacks ~A, but can not harm ~A.~%" (name attacker) (name target) (name target)))
+    (rem-mob-effect target +mob-effect-divine-shield+)
+    (make-act attacker (att-spd attacker))
+    (return-from melee-target nil)
+    )
+  
   (multiple-value-bind (dx dy) (x-y-dir (1+ (random 9)))
     (let* ((cur-dmg) (dodge-chance) (failed-dodge nil) 
 	   (x (+ dx (x target))) (y (+ dy (y target)))
@@ -455,6 +422,7 @@
   (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)
+  (adjust-accuracy mob)
   
   (when (mob-effect-p mob +mob-effect-possessed+)
     (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
@@ -471,12 +439,27 @@
 (defgeneric on-tick (mob))
 
 (defmethod on-tick ((mob mob))
-  (adjust-attack-speed mob)
-  (adjust-dodge mob)
-  (adjust-armor mob)
+  
       
   (when (< (cur-fp mob) 0)
     (setf (cur-fp mob) 0))
+
+  (when (mob-effect-p mob +mob-effect-reveal-true-form+)
+    (set-mob-effect mob +mob-effect-reveal-true-form+ (1- (mob-effect-p mob +mob-effect-reveal-true-form+)))
+    (when (zerop (mob-effect-p mob +mob-effect-reveal-true-form+))
+      (rem-mob-effect mob +mob-effect-reveal-true-form+)
+      (when (slave-mob-id mob)
+        (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))))
+
+  (when (mob-effect-p mob +mob-effect-divine-shield+)
+    (set-mob-effect mob +mob-effect-divine-shield+ (1- (mob-effect-p mob +mob-effect-divine-shield+)))
+    (when (zerop (mob-effect-p mob +mob-effect-divine-shield+))
+      (rem-mob-effect mob +mob-effect-divine-shield+)))
+
+  (when (mob-effect-p mob +mob-effect-cursed+)
+    (set-mob-effect mob +mob-effect-cursed+ (1- (mob-effect-p mob +mob-effect-cursed+)))
+    (when (zerop (mob-effect-p mob +mob-effect-cursed+))
+      (rem-mob-effect mob +mob-effect-cursed+)))
   
   (when (mob-effect-p mob +mob-effect-called-for-help+)
     (if (= (mob-effect-p mob +mob-effect-called-for-help+) 2)
@@ -486,6 +469,11 @@
     (if (= (mob-effect-p mob +mob-effect-calling-for-help+) 2)
       (set-mob-effect mob +mob-effect-calling-for-help+ 1)
       (rem-mob-effect mob +mob-effect-calling-for-help+)))
+
+  (adjust-attack-speed mob)
+  (adjust-dodge mob)
+  (adjust-armor mob)
+  (adjust-accuracy mob)
   
   (when (and (evolve-into mob)
              (>= (cur-fp mob) (max-fp mob)))

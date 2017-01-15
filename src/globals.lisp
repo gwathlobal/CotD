@@ -51,6 +51,7 @@
 (defconstant +mob-type-criminal+ 11)
 (defconstant +mob-type-policeman+ 12)
 (defconstant +mob-type-priest+ 13)
+(defconstant +mob-type-satanist+ 14)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -81,7 +82,10 @@
 (defconstant +mob-abil-call-for-help+ 16)
 (defconstant +mob-abil-answer-the-call+ 17)
 (defconstant +mob-abil-loves-infighting+ 18)
-(defconstant +mob-abil-prayer+ 19)
+(defconstant +mob-abil-prayer-bless+ 19)
+(defconstant +mob-abil-free-call+ 20)
+(defconstant +mob-abil-prayer-shield+ 21)
+(defconstant +mob-abil-curse+ 22)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -89,6 +93,8 @@
 (defconstant +mob-effect-divine-consealed+ 3)
 (defconstant +mob-effect-calling-for-help+ 4)
 (defconstant +mob-effect-called-for-help+ 5)
+(defconstant +mob-effect-divine-shield+ 6)
+(defconstant +mob-effect-cursed+ 7)
 
 ;;--------------------
 ;; FEATURE-TYPE Constants

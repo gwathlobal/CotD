@@ -13,6 +13,7 @@
 (defconstant +building-type-church+ 6)
 (defconstant +building-type-library+ 7)
 (defconstant +building-type-warehouse+ 8)
+(defconstant +building-type-satanists+ 9)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -37,6 +38,7 @@
 (defconstant +building-city-townhall-2+ 17)
 (defconstant +building-city-townhall-3+ 18)
 (defconstant +building-city-townhall-4+ 19)
+(defconstant +building-city-satan-lair-1+ 20)
 
 (defparameter *level-grid-size* 5)
 

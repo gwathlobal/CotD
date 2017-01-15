@@ -30,6 +30,7 @@
    
     ;; set up maximum building types for this kind of map
     (setf (gethash +building-type-church+ max-building-types) 1)
+    (setf (gethash +building-type-satanists+ max-building-types) 1)
     (setf (gethash +building-type-warehouse+ max-building-types) 1)
     (setf (gethash +building-type-library+ max-building-types) 1)
     (setf (gethash +building-type-prison+ max-building-types) 1)
@@ -37,6 +38,7 @@
 
     ;; set up reserved building types for this kind of map
     (setf (gethash +building-type-church+ reserved-building-types) 1)
+    (setf (gethash +building-type-satanists+ reserved-building-types) 1)
     (setf (gethash +building-type-warehouse+ reserved-building-types) 1)
     (setf (gethash +building-type-library+ reserved-building-types) 1)
     (setf (gethash +building-type-prison+ reserved-building-types) 1)
@@ -155,8 +157,10 @@
           with px = 0
           with py = 0
           with building-mobs = nil
+          with building-features = nil
           do
              (setf building-mobs nil)
+             (setf building-features nil)
              
              ;; find a random position within the grid on the template level so that the building does not violate the grid boundaries
              (destructuring-bind (adx . ady) (building-act-dim (get-building-type build-type-id))
@@ -166,9 +170,9 @@
              
              ;; place the actual building
              (when (building-func (get-building-type build-type-id))
-               (setf building-mobs (funcall (building-func (get-building-type build-type-id))
-                                            (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py)
-                                            template-level)))
+               (multiple-value-setq (building-mobs building-features) (funcall (building-func (get-building-type build-type-id))
+                                                                               (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py)
+                                                                               template-level)))
 
              ;;(logger (format nil "CREATE-TEMPLATE-CITY: Building type ~A, mob list ~A~%" build-type-id building-mobs))
              ;; add mobs to the mob-list
@@ -176,6 +180,12 @@
                (loop for (mob-id lx ly) in building-mobs do
                  (pushnew (list mob-id (+ (* gx *level-grid-size*) px lx) (+ (* gy *level-grid-size*) py ly)) 
                           mob-list)))
+
+             ;; add features to the feature list
+             (when building-features
+               (loop for (feature-id lx ly) in building-features do
+                 (pushnew (list feature-id (+ (* gx *level-grid-size*) px lx) (+ (* gy *level-grid-size*) py ly)) 
+                          feature-list)))
           )
                
     (values template-level feature-list mob-list)

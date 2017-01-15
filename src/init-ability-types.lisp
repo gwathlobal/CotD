@@ -120,6 +120,7 @@
                                                       (if (and (mob-ability-p actor +mob-abil-can-possess+)
                                                                (mob-ability-p target +mob-abil-possessable+)
                                                                (not (mob-effect-p target +mob-effect-blessed+))
+                                                               (not (mob-effect-p target +mob-effect-divine-shield+))
                                                                (not (mob-effect-p actor +mob-effect-possessed+))
                                                                (not (mob-effect-p target +mob-effect-possessed+))
                                                                )
@@ -370,22 +371,22 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-prayer+ :name "Prayer" :descr "Pray to God for help." 
+                                 :id +mob-abil-prayer-bless+ :name "Prayer" :descr "Pray to God for help." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (logger (format nil "MOB-PRAYER: ~A [~A] prays~%" (name actor) (id actor)))
+                                                (logger (format nil "MOB-PRAYER-BLESS: ~A [~A] prays for smiting~%" (name actor) (id actor)))
 
                                                 (print-visible-message (x actor) (y actor) (level *world*) 
                                                                        (format nil "~A starts to pray. " (name actor)))
 
                                                 (let ((enemy-list nil))
-                                                  (if (zerop (random 4))
+                                                  (if (zerop (random 3))
                                                     (progn
                                                       
-                                                      ;; 1/4th chance to do anything
+                                                      ;; 1/3th chance to do anything
                                                       
                                                       ;; collect all unholy enemies in sight
                                                       (setf enemy-list (loop for enemy-mob-id in (visible-mobs actor)
@@ -393,12 +394,12 @@
                                                                                        (mob-ability-p (get-mob-by-id enemy-mob-id) +mob-abil-unholy+))
                                                                                collect enemy-mob-id))
                                                       
-                                                      (logger (format nil "MOB-PRAYER: ~A [~A] affects the following enemies ~A with the prayer~%" (name actor) (id actor) enemy-list))
+                                                      (logger (format nil "MOB-PRAYER-BLESS: ~A [~A] affects the following enemies ~A with the prayer~%" (name actor) (id actor) enemy-list))
                                                       
                                                       ;; reveal all enemies and burn them like they are blessed
                                                       (loop for enemy-mob-id in enemy-list
                                                             do
-                                                               (logger (format nil "MOB-PRAYER: ~A [~A] affects the enemie2 ~A~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
+                                                               (logger (format nil "MOB-PRAYER-BLESS: ~A [~A] affects the enemy ~A~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
                                                                (when (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-possessed+)
                                                                  (unless (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+)
                                                                    (print-visible-message (x actor) (y actor) (level *world*) 
@@ -406,7 +407,6 @@
                                                                  (setf (face-mob-type-id (get-mob-by-id enemy-mob-id)) (mob-type (get-mob-by-id enemy-mob-id)))
                                                                  (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+ 5))
                                                                (mob-burn-blessing actor (get-mob-by-id enemy-mob-id)))
-
                                                       (unless enemy-list
                                                         (print-visible-message (x actor) (y actor) (level *world*) 
                                                                                (format nil "~%")))
@@ -417,6 +417,156 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-prayer+)
+                                                      (if (mob-ability-p actor +mob-abil-prayer-bless+)
+                                                        t
+                                                        nil))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-free-call+ :name "Summon ally" :descr "Invoke hellish powers to summon one ally to your place. Remember that you may call but nobody is obliged to answer." 
+                                 :cost 0 :spd (truncate +normal-ap+ 3) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                
+                                                (logger (format nil "MOB-FREE-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor)))
+                                                
+                                                (let ((allies-list))
+                                                  ;; collect all allies that are able to answer the call within the whole map
+                                                  (setf allies-list (loop for ally-mob-id in (mob-id-list (level *world*))
+                                                                          when (and (not (eq actor (get-mob-by-id ally-mob-id)))
+                                                                                    (get-faction-relation (faction actor) (faction (get-mob-by-id ally-mob-id)))
+                                                                                    (mob-ability-p (get-mob-by-id ally-mob-id) +mob-abil-free-call+)
+                                                                                    )
+                                                                            collect ally-mob-id))
+                                                  
+                                                  ;; remove all allies that are visible to you so that only distant ones could answer 
+                                                  (setf allies-list (remove-if #'(lambda (e) (member e (visible-mobs actor))) allies-list))
+                                                  (logger (format nil "MOB-FREE-CALL-FOR-HELP: The following allies might answer the call ~A~%" allies-list))
+                                                  
+                                                  ;; place the effect of "called for help" on the allies in the final list 
+                                                  (loop for ally-mob-id in allies-list 
+                                                        do
+                                                           (set-mob-effect (get-mob-by-id ally-mob-id) +mob-effect-called-for-help+ 2))
+                                                  
+                                                  (set-mob-effect actor +mob-effect-calling-for-help+ 2)
+                                                  (decf (cur-fp actor) (cost ability-type))
+                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                         (format nil "~A murmurs some incantations.~%" (name actor))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-effect-p actor +mob-effect-calling-for-help+)
+                                                        nil
+                                                        t))))
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-prayer-shield+ :name "Prayer" :descr "Pray to God for help." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                
+                                                (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] prays for shielding~%" (name actor) (id actor)))
+
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A starts to pray. " (name actor)))
+
+                                                (let ((ally-list nil))
+                                                  (if (zerop (random 3))
+                                                    (progn
+                                                      
+                                                      ;; 1/3th chance to do anything
+                                                      
+                                                      ;; collect all allies in sight
+                                                      (setf ally-list (loop for ally-mob-id in (visible-mobs actor)
+                                                                             when (get-faction-relation (faction actor) (faction (get-mob-by-id ally-mob-id)))
+                                                                               collect ally-mob-id))
+                                                      ;; do not forget self
+                                                      (pushnew (id actor) ally-list)
+                                                      
+                                                      (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the following allies ~A with the prayer~%" (name actor) (id actor) ally-list))
+                                                      
+                                                      ;; grant all allies invulnerability for 5 turns
+                                                      (loop for ally-mob-id in ally-list
+                                                            do
+                                                               (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the ally ~A~%" (name actor) (id actor) (get-mob-by-id ally-mob-id)))
+                                                               (set-mob-effect (get-mob-by-id ally-mob-id) +mob-effect-divine-shield+ 5)
+                                                               (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                      (format nil "~A is granted divine shield. " (name (get-mob-by-id ally-mob-id))))
+                                                            )
+
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~%"))
+                                                      )
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~%")))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-prayer-shield+)
+                                                        t
+                                                        nil))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-curse+ :name "Curse" :descr "Curse the enemy with diabolical incantations." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                
+                                                (logger (format nil "MOB-CURSE: ~A [~A] incants the curses~%" (name actor) (id actor)))
+
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A laughs and curses maniacally. " (name actor)))
+
+                                                (let ((enemy-list nil))
+                                                  (if (zerop (random 3))
+                                                    (progn
+                                                      
+                                                      ;; 1/3th chance to do anything
+                                                      
+                                                      ;; collect all unholy enemies in sight
+                                                      (setf enemy-list (loop for enemy-mob-id in (visible-mobs actor)
+                                                                             when (not (get-faction-relation (faction actor) (faction (get-mob-by-id enemy-mob-id))))
+                                                                               collect enemy-mob-id))
+                                                      
+                                                      (logger (format nil "MOB-CURSE: ~A [~A] affects the following enemies ~A with the curse~%" (name actor) (id actor) enemy-list))
+                                                      
+                                                      ;; place a curse on them for 5 turns
+                                                      (loop for enemy-mob-id in enemy-list
+                                                            with protected = nil
+                                                            do
+                                                               (setf protected nil)
+                                                               ;; divine shield and blessings also grant one-time protection from curses
+                                                               (when (and (not protected) (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-blessed+))
+                                                                 (rem-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-blessed+)
+                                                                 (setf protected t))
+
+                                                               (when (and (not protected) (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-divine-shield+))
+                                                                 (rem-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-divine-shield+)
+                                                                 (setf protected t))
+
+                                                               (if protected
+                                                                 (progn
+                                                                   (logger (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name (get-mob-by-id enemy-mob-id)) (id (get-mob-by-id enemy-mob-id))))
+                                                                   (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                          (format nil "~A's curse removed divine protection from ~A. " (name actor) (name (get-mob-by-id enemy-mob-id))))
+                                                                   )
+                                                                 (progn
+                                                                   (logger (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
+                                                                   (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-cursed+ 5)
+                                                                   (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                      (format nil "~A is cursed. " (name (get-mob-by-id enemy-mob-id))))))
+                                                            )
+
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~%")))
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~%")))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-curse+)
                                                         t
                                                         nil))))

@@ -62,7 +62,7 @@
                                        :weapon (list "Knife" 0 2 +normal-ap+) :base-dodge 25
                                        :strength 0
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
-                                       ))
+                             ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-policeman+ 
                                        :name "Police officer"
@@ -71,7 +71,7 @@
                                        :weapon (list "Police baton" 0 2 +normal-ap+) :base-dodge 25
                                        :strength 0
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
-                                       ))
+                             ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-priest+ 
                                        :name "Priest"
@@ -79,9 +79,17 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Cross" 0 0 +normal-ap+) :base-dodge 20
                                        :strength 0
-                                       :abil-can-be-blessed t :abil-detect-evil t :abil-prayer t :abil-human t
+                                       :abil-can-be-blessed t :abil-detect-evil t :abil-prayer-bless t :abil-prayer-shield t :abil-human t
                                        :ai-stop t
-                                       ))
+                             ))
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 
+                                       :name "Satanist"
+                                       :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 5
+                                       :faction +faction-type-demons+
+                                       :weapon (list "Burning touch" 2 3 +normal-ap+) :base-dodge 20
+                                       :strength 0
+                                       :abil-detect-good t :abil-human t :abil-unholy t :abil-call-for-help t :abil-free-call t :abil-curse t
+                             ))
 
 
 

@@ -16,9 +16,10 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 4 5)
-                                                  (list +mob-type-woman+ 3 2)
-                                                  (list +mob-type-child+ 5 3)))))
+                                            (values (list (list +mob-type-man+ 4 5)
+                                                          (list +mob-type-woman+ 3 2)
+                                                          (list +mob-type-child+ 5 3))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-house-2+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y template-level)
@@ -33,9 +34,10 @@
                                                                         ",,,,,,,,,")))
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 2 3)
-                                                  (list +mob-type-woman+ 4 2)
-                                                  (list +mob-type-child+ 5 4)))))
+                                            (values (list (list +mob-type-man+ 2 3)
+                                                          (list +mob-type-woman+ 4 2)
+                                                          (list +mob-type-child+ 5 4))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-house-3+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y template-level)
@@ -50,9 +52,10 @@
                                                                         ",,,,,,,,,")))
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 5 4)
-                                                  (list +mob-type-woman+ 2 2)
-                                                  (list +mob-type-child+ 2 4)))))
+                                            (values (list (list +mob-type-man+ 5 4)
+                                                          (list +mob-type-woman+ 2 2)
+                                                          (list +mob-type-child+ 2 4))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-house-4+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y template-level)
@@ -68,9 +71,10 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 4 2)
-                                                  (list +mob-type-woman+ 2 4)
-                                                  (list +mob-type-child+ 4 5)))))
+                                            (values (list (list +mob-type-man+ 4 2)
+                                                          (list +mob-type-woman+ 2 4)
+                                                          (list +mob-type-child+ 4 5))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-townhall-1+ :grid-dim '(4 . 2) :act-dim '(16 . 9) :type +building-type-townhall+
                                   :func #'(lambda (x y template-level)
@@ -86,9 +90,10 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-clerk+ 3 5)
-                                                  (list +mob-type-clerk+ 7 6)
-                                                  (list +mob-type-clerk+ 12 5)))))
+                                            (values (list (list +mob-type-clerk+ 3 5)
+                                                          (list +mob-type-clerk+ 7 6)
+                                                          (list +mob-type-clerk+ 12 5))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-townhall-2+ :grid-dim '(4 . 2) :act-dim '(16 . 9) :type +building-type-townhall+
                                   :func #'(lambda (x y template-level)
@@ -104,9 +109,10 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-clerk+ 3 3)
-                                                  (list +mob-type-clerk+ 12 3)
-                                                  (list +mob-type-clerk+ 8 2)))))
+                                            (values (list (list +mob-type-clerk+ 3 3)
+                                                          (list +mob-type-clerk+ 12 3)
+                                                          (list +mob-type-clerk+ 8 2))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-townhall-3+ :grid-dim '(2 . 4) :act-dim '(9 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y template-level)
@@ -130,9 +136,10 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-clerk+ 2 2)
-                                                  (list +mob-type-clerk+ 2 13)
-                                                  (list +mob-type-clerk+ 2 8)))))
+                                            (values (list (list +mob-type-clerk+ 2 2)
+                                                          (list +mob-type-clerk+ 2 13)
+                                                          (list +mob-type-clerk+ 2 8))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-townhall-4+ :grid-dim '(2 . 4) :act-dim '(9 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y template-level)
@@ -155,9 +162,10 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-clerk+ 5 2)
-                                                  (list +mob-type-clerk+ 5 13)
-                                                  (list +mob-type-clerk+ 5 8)))))
+                                            (values (list (list +mob-type-clerk+ 5 2)
+                                                          (list +mob-type-clerk+ 5 13)
+                                                          (list +mob-type-clerk+ 5 8))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-park-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
                                   :func #'(lambda (x y template-level)
@@ -174,8 +182,9 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 2 1)
-                                                  (list +mob-type-woman+ 7 4)))))
+                                            (values (list (list +mob-type-man+ 2 1)
+                                                          (list +mob-type-woman+ 7 4))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-park-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
                                   :func #'(lambda (x y template-level)
@@ -192,8 +201,9 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 4 6)
-                                                  (list +mob-type-woman+ 4 1)))))
+                                            (values (list (list +mob-type-man+ 4 6)
+                                                          (list +mob-type-woman+ 4 1))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-park-3+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
                                   :func #'(lambda (x y template-level)
@@ -225,15 +235,16 @@
                                                                           (setf (aref template-level x y) +terrain-floor-grass+))))))
                                             
                                             ;; find a place to position citizens
-                                            (loop repeat 2
-                                                  collect (loop with rx = (random 10)
-                                                            with ry = (random 10)
-                                                            until (not (= (aref template-level (+ x rx) (+ y ry)) +terrain-tree-birch+))
-                                                            finally (return (list +mob-type-man+ rx ry))
-                                                            do
-                                                               (setf rx (random 10))
-                                                               (setf ry (random 10))
-                                                                ))
+                                            (values (loop repeat 2
+                                                          collect (loop with rx = (random 10)
+                                                                        with ry = (random 10)
+                                                                        until (not (= (aref template-level (+ x rx) (+ y ry)) +terrain-tree-birch+))
+                                                                        finally (return (list +mob-type-man+ rx ry))
+                                                                        do
+                                                                           (setf rx (random 10))
+                                                                           (setf ry (random 10))
+                                                                        ))
+                                                    nil)
                                             
                                             
                                             )))
@@ -267,7 +278,7 @@
                                                                       #'(lambda (x y)
                                                                           (setf (aref template-level x y) +terrain-floor-grass+))))))
                                             
-                                            nil
+                                            (values nil nil)
                                             )))
 
 (set-building-type (make-building :id +building-city-lake-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
@@ -285,7 +296,7 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            nil)))
+                                            (values nil nil))))
 
 (set-building-type (make-building :id +building-city-lake-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
                                   :func #'(lambda (x y template-level)
@@ -302,7 +313,7 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            nil)))
+                                            (values nil nil))))
 
 (set-building-type (make-building :id +building-city-prison-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-prison+
                                   :func #'(lambda (x y template-level)
@@ -326,13 +337,14 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-criminal+ 2 14)
-                                                  (list +mob-type-criminal+ 5 14)
-                                                  (list +mob-type-criminal+ 8 14)
-                                                  (list +mob-type-criminal+ 11 14)
-                                                  (list +mob-type-policeman+ 10 2)
-                                                  (list +mob-type-policeman+ 10 6)
-                                                  (list +mob-type-policeman+ 8 9)))))
+                                            (values (list (list +mob-type-criminal+ 2 14)
+                                                          (list +mob-type-criminal+ 5 14)
+                                                          (list +mob-type-criminal+ 8 14)
+                                                          (list +mob-type-criminal+ 11 14)
+                                                          (list +mob-type-policeman+ 10 2)
+                                                          (list +mob-type-policeman+ 10 6)
+                                                          (list +mob-type-policeman+ 8 9))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-church-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-church+
                                   :func #'(lambda (x y template-level)
@@ -356,13 +368,14 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-priest+ 8 2)
-                                                  (list +mob-type-priest+ 3 4)
-                                                  (list +mob-type-priest+ 12 4)
-                                                  (list +mob-type-man+ 6 7)
-                                                  (list +mob-type-woman+ 10 7)
-                                                  (list +mob-type-man+ 10 11)
-                                                  (list +mob-type-woman+ 6 11)))))
+                                            (values (list (list +mob-type-priest+ 8 2)
+                                                          (list +mob-type-priest+ 3 4)
+                                                          (list +mob-type-priest+ 12 4)
+                                                          (list +mob-type-man+ 6 7)
+                                                          (list +mob-type-woman+ 10 7)
+                                                          (list +mob-type-man+ 10 11)
+                                                          (list +mob-type-woman+ 6 11))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-warehouse-1+ :grid-dim '(4 . 4) :act-dim '(20 . 20) :type +building-type-warehouse+
                                   :func #'(lambda (x y template-level)
@@ -389,11 +402,11 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 2 2)
-                                                  (list +mob-type-man+ 17 2)
-                                                  (list +mob-type-man+ 2 17)
-                                                  (list +mob-type-man+ 17 17)
-                                                  ))))
+                                            (values (list (list +mob-type-man+ 2 2)
+                                                          (list +mob-type-man+ 17 2)
+                                                          (list +mob-type-man+ 2 17)
+                                                          (list +mob-type-man+ 17 17))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-library-1+ :grid-dim '(4 . 3) :act-dim '(20 . 12) :type +building-type-library+
                                   :func #'(lambda (x y template-level)
@@ -414,15 +427,70 @@
                                               
                                               (translate-build-to-template x y build-template template-level)
                                               )
-                                            (list (list +mob-type-man+ 3 2)
-                                                  (list +mob-type-woman+ 10 6)
-                                                  (list +mob-type-woman+ 13 8)
-                                                  (list +mob-type-woman+ 16 10)
-                                                  ))))
+                                            (values (list (list +mob-type-man+ 3 2)
+                                                          (list +mob-type-woman+ 10 6)
+                                                          (list +mob-type-woman+ 13 8)
+                                                          (list +mob-type-woman+ 16 10))
+                                                    nil))))
 
-
-
-
-
-
-
+(set-building-type (make-building :id +building-city-satan-lair-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-satanists+
+                                  :func #'(lambda (x y template-level)
+                                            (let ((build-template (list ",,,,,,,,,,,,,,,,,"
+                                                                        ",##-##-##-##..##,"
+                                                                        ",#bh#bh#bh#....#,"
+                                                                        ",-t.#t.#t.#....-,"
+                                                                        ",##.##.##.#....#,"
+                                                                        ",-.............-,"
+                                                                        ",#.###########.#,"
+                                                                        ",#.###########.#,"
+                                                                        ",#.#####.#####.#,"
+                                                                        ",#.####...####.#,"
+                                                                        ",#.##.......##.#,"
+                                                                        ",#.####...####.#,"
+                                                                        ",#.#####.#####.#,"
+                                                                        ",#.#####.#####.#,"
+                                                                        ",#.............#,"
+                                                                        ",###############,"
+                                                                        ",,,,,,,,,,,,,,,,,")))
+                                              
+                                              (translate-build-to-template x y build-template template-level)
+                                              )
+                                            (values (list (list +mob-type-satanist+ 3 2)
+                                                          (list +mob-type-satanist+ 6 2)
+                                                          (list +mob-type-satanist+ 9 2)
+                                                          (list +mob-type-satanist+ 8 10))
+                                                    (list (list +feature-blood-stain+ 8 10)
+                                                          (list +feature-blood-stain+ 8 8)
+                                                          (list +feature-blood-stain+ 6 10)
+                                                          (list +feature-blood-fresh+ 8 7)
+                                                          (list +feature-blood-fresh+ 9 7)
+                                                          (list +feature-blood-old+ 7 7)
+                                                          (list +feature-blood-old+ 7 8)
+                                                          (list +feature-blood-fresh+ 6 9)
+                                                          (list +feature-blood-fresh+ 9 8)
+                                                          (list +feature-blood-fresh+ 6 8)
+                                                          (list +feature-blood-stain+ 10 10)
+                                                          (list +feature-blood-old+ 9 10)
+                                                          (list +feature-blood-fresh+ 7 10)
+                                                          (list +feature-blood-old+ 8 11)
+                                                          (list +feature-blood-fresh+ 8 9)
+                                                          (list +feature-blood-old+ 9 11)
+                                                          (list +feature-blood-old+ 7 11)
+                                                          (list +feature-blood-fresh+ 9 9)
+                                                          (list +feature-blood-old+ 7 9)
+                                                          (list +feature-blood-fresh+ 5 10)
+                                                          (list +feature-blood-old+ 11 10)
+                                                          (list +feature-blood-old+ 12 10)
+                                                          (list +feature-blood-fresh+ 11 11)
+                                                          (list +feature-blood-fresh+ 11 9)
+                                                          (list +feature-blood-fresh+ 10 9)
+                                                          (list +feature-blood-old+ 10 11)
+                                                          (list +feature-blood-old+ 4 10)
+                                                          (list +feature-blood-fresh+ 5 9)
+                                                          (list +feature-blood-fresh+ 6 9)
+                                                          (list +feature-blood-fresh+ 6 11)
+                                                          (list +feature-blood-old+ 5 9)
+                                                          (list +feature-blood-fresh+ 8 12)
+                                                          (list +feature-blood-fresh+ 7 12)
+                                                          (list +feature-blood-fresh+ 9 12)
+                                                          (list +feature-blood-old+ 9 13))))))
