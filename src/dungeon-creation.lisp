@@ -22,9 +22,7 @@
 
 (defun create-world (world menu-result)
   
-  (let (
-	(feature-list)
-        (mob-template-result)
+  (let ((mob-template-result)
         (feature-template-result)
 	
 	(result-template) 
@@ -50,12 +48,8 @@
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure*)
-      
-    
-    (dolist (feature feature-list)
-	(logger (format nil "Feature to be placed: ~A~%" (name feature)))
-	(add-feature-to-level-list (level world) feature))
-    
+
+    (create-features-from-template (level world) feature-template-result)
     (create-mobs-from-template (level world) mob-template-result)
 
     ;; if test level is used, place mobs through a special test function and quit
@@ -112,6 +106,11 @@
   (loop for (mob-type-id x y) in mob-template-list 
         do
            (add-mob-to-level-list level (make-instance 'mob :mob-type mob-type-id :x x :y y))))
+
+(defun create-features-from-template (level feature-template-list)
+  (loop for (feature-type-id x y) in feature-template-list 
+        do
+           (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y))))
 
 (defun create-test-world (world)
   (let (

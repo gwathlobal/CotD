@@ -248,6 +248,25 @@
       (logger (format nil "AI-FUNCTION: ~A [~A] decides to call for help~%" (name mob) (id mob)))
       (mob-invoke-ability mob mob +mob-abil-call-for-help+)
       (return-from ai-function))
+
+    ;; for satanists: call for reinforcements whenever there is a threatening enemy in sight and there still demons out there
+    (when (and nearest-enemy
+               (not (zerop (strength nearest-enemy)))
+               (mob-ability-p mob +mob-abil-free-call+)
+               (can-invoke-ability mob mob +mob-abil-free-call+)
+               (> (total-demons *world*) 0))
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to call for help~%" (name mob) (id mob)))
+      (mob-invoke-ability mob mob +mob-abil-free-call+)
+      (return-from ai-function))
+
+    ;; for satanists: if able to curse - do it
+    (when (and (mob-ability-p mob +mob-abil-curse+)
+               (can-invoke-ability mob mob +mob-abil-curse+)
+               nearest-enemy
+               (zerop (random 3)))
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to curse~%" (name mob) (id mob)))
+      (mob-invoke-ability mob mob +mob-abil-curse+)
+      (return-from ai-function))
     
     ;; answer the call if there is no enemy in sight
     (unless nearest-enemy
@@ -279,12 +298,19 @@
       )
 
     ;; if able to pray - do it
-    (when (and (mob-ability-p mob +mob-abil-prayer+)
-               (can-invoke-ability mob mob +mob-abil-prayer+)
+    (when (and (mob-ability-p mob +mob-abil-prayer-bless+)
+               (can-invoke-ability mob mob +mob-abil-prayer-bless+)
                (or nearest-enemy
                    (zerop (random 5))))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to pray~%" (name mob) (id mob)))
-      (mob-invoke-ability mob mob +mob-abil-prayer+)
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to pray for smiting~%" (name mob) (id mob)))
+      (mob-invoke-ability mob mob +mob-abil-prayer-bless+)
+      (return-from ai-function))
+    
+    (when (and (mob-ability-p mob +mob-abil-prayer-shield+)
+               (can-invoke-ability mob mob +mob-abil-prayer-shield+)
+               (zerop (random 3)))
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to pray for shielding~%" (name mob) (id mob)))
+      (mob-invoke-ability mob mob +mob-abil-prayer-shield+)
       (return-from ai-function))
     
     ;; if the mob has its path set - move along it

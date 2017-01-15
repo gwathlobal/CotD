@@ -57,7 +57,10 @@
    ;;   :abil-call-for-help - +mob-abil-call-for-help+
    ;;   :abil-answer-the-call - +mob-abil-answer-the-call+
    ;;   :abil-loves-infighting - +mob-abil-loves-infighting+
-   ;;   :abil-prayer - +mob-abil-prayer+   
+   ;;   :abil-prayer-bless - +mob-abil-prayer-bless+
+   ;;   :abil-free-call - +mob-abil-free-call+
+   ;;   :abil-prayer-shield - +mob-abil-prayer-shield+
+   ;;   :abil-curse - +mob-abil-curse+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> <dmg min> <dmg max> <attack speed>)
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
@@ -70,7 +73,7 @@
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
-                                                                abil-loves-infighting abil-prayer)
+                                                                abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -118,8 +121,14 @@
     (setf (gethash +mob-abil-answer-the-call+ (abilities mob-type)) t))
   (when abil-loves-infighting
     (setf (gethash +mob-abil-loves-infighting+ (abilities mob-type)) t))
-  (when abil-prayer
-    (setf (gethash +mob-abil-prayer+ (abilities mob-type)) t))
+  (when abil-prayer-bless
+    (setf (gethash +mob-abil-prayer-bless+ (abilities mob-type)) t))
+  (when abil-free-call
+    (setf (gethash +mob-abil-free-call+ (abilities mob-type)) t))
+  (when abil-prayer-shield
+    (setf (gethash +mob-abil-prayer-shield+ (abilities mob-type)) t))
+  (when abil-curse
+    (setf (gethash +mob-abil-curse+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -197,6 +206,7 @@
   (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)
+  (adjust-accuracy mob)
 
   ;; setting up name
   (set-name mob)
@@ -286,6 +296,12 @@
   (let ((armor 0))
     (setf armor (base-armor (get-mob-type-by-id (mob-type mob-obj))))
     (setf (cur-armor mob-obj) armor)))
+
+(defun adjust-accuracy (mob)
+  (let ((accuracy +base-accuracy+))
+    (when (mob-effect-p mob +mob-effect-cursed+)
+      (setf accuracy 75))
+    (setf (accuracy mob) accuracy)))
 
 (defmethod get-weapon-name ((mob mob))
   (get-weapon-name (get-mob-type-by-id (mob-type mob))))
