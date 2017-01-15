@@ -92,6 +92,7 @@
   (run-window *current-window*))
 
 (defun get-text-input (str key mod unicode)
+  (declare (ignore key mod))
   (when (> unicode 0)
     (vector-push-extend (code-char unicode) str))
   str)

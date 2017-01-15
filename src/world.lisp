@@ -94,6 +94,36 @@
    (total-humans :initform 0 :accessor total-humans)
    (total-demons :initform 0 :accessor total-demons)
    (total-angels :initform 0 :accessor total-angels)
-   (total-blessed :initform 0 :accessor total-blessed)))
+   (total-blessed :initform 0 :accessor total-blessed)
+
+   (game-events :initform () :accessor game-events)))
   
+(defclass world-for-angels (world)
+  ())
+
+(defclass world-for-demons (world)
+  ())
+
+(defclass world-for-humans (world)
+  ())
+
+(defmethod initialize-instance :after ((world world) &key)
+  (pushnew +game-event-lose-game+ (game-events world))
+  )
+
+(defmethod initialize-instance :after ((world world-for-angels) &key)
+  (pushnew +game-event-lose-game+ (game-events world))
+  (pushnew +game-event-win-for-angels+ (game-events world))
+  )
+
+(defmethod initialize-instance :after ((world world-for-demons) &key)
+  (pushnew +game-event-lose-game+ (game-events world))
+  (pushnew +game-event-win-for-demons+ (game-events world))
+  )
+
+(defmethod initialize-instance :after ((world world-for-humans) &key)
+  (pushnew +game-event-lose-game+ (game-events world))
+  (pushnew +game-event-win-for-humans+ (game-events world))
+  )
+
 

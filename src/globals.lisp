@@ -1,12 +1,6 @@
 (in-package :cotd)
 
 (declaim (type fixnum *max-x-level* *max-y-level*))
-(declaim (ftype (function (mob) fixnum) x))
-(declaim (ftype (function (mob) fixnum) y))
-(declaim (ftype (function (mob) fixnum) cur-hp))
-(declaim (ftype (function (mob) fixnum) max-hp))
-(declaim (ftype (function (mob) fixnum) faction))
-(declaim (ftype (function (mob) list) path))
 (declaim (ftype (function (fixnum fixnum fixnum fixnum) single-float) get-distance))
 
 (defvar *time-at-end-of-player-turn* 0)
@@ -103,7 +97,6 @@
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
 (defconstant +feature-blood-stain+ 2)
-(defconstant +feature-final-altar+ 3)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -141,8 +134,6 @@
 
 (defvar *global-game-time* 0)
 
-(defvar *game-over-func*)
-(defvar *game-won-func*)
 (defvar *update-screen-closure*)
 (defvar *cur-progress-bar*)
 (defvar *max-progress-bar*)

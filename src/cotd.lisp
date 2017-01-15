@@ -3,29 +3,28 @@
 (defun game-loop ()
   "Main game loop"
   (loop do
-     
-       (when (check-lose *world*)
-	 (funcall *game-over-func*))
-       
-       (when (check-win *world*)
-         (funcall *game-won-func*))
-       
-       ;;(logger (format nil "[T:~A] GLOBAL-TICK~%" *global-game-time*))
-       
-       (loop for mob being the hash-values in *mobs-hash* do
-         (unless (check-dead mob)
-           
-           (if (> (action-delay mob) 0)
-             (decf (action-delay mob))
-             (progn
-               ;;(logger (format nil "[T:~A] TICK~%" *global-game-time*))
-               
-                (ai-function mob)))
-           (when (= (mod *global-game-time* +normal-ap+) 0)
-             (on-tick mob))))
-       
-       (incf *global-game-time*)
-        ))
+
+    ;; check all available game events
+    (loop for game-event-id in (game-events *world*)
+          for game-event = (get-game-event-by-id game-event-id)
+          when (and (not (disabled game-event))
+                    (funcall (on-check game-event) *world*))
+            do
+               (funcall (on-trigger game-event) *world*))
+    
+    ;; iterate through all the mobs
+    ;; those who are not dead and have the delay of 0 can make a move
+    (loop for mob being the hash-values in *mobs-hash* do
+      (unless (check-dead mob)
+        
+        (if (> (action-delay mob) 0)
+          (decf (action-delay mob))
+          (progn
+            (ai-function mob)))
+        (when (= (mod *global-game-time* +normal-ap+) 0)
+          (on-tick mob))))
+    
+    (incf *global-game-time*)))
   
 (defun init-game (menu-result)
   (clrhash *mobs-hash*)

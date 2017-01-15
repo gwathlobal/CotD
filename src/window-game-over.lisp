@@ -4,37 +4,6 @@
 (defconstant +game-over-demons-won+ 1)
 (defconstant +game-over-angels-won+ 2)
 
-(setf *game-over-func*
-      #'(lambda ()
-	  (add-message (create-string "~%"))
-	  (add-message (create-string "You are dead.~%"))
-	  (setf *current-window* (make-instance 'cell-window))
-          (update-visible-area (level *world*) (x *player*) (y *player*))
-	  (make-output *current-window*)
-	  (sdl:with-events ()
-	    (:quit-event () (funcall (quit-func *current-window*)) t)
-	    (:key-down-event () 
-                             (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-player-dead+))
-                             (make-output *current-window*)
-                             (run-window *current-window*))
-	    (:video-expose-event () (make-output *current-window*)))))
-
-(setf *game-won-func*
-      #'(lambda ()
-	  (add-message (format nil "~%"))
-	  (add-message (format nil "Congratulations! You have won the game!~%"))
-	  (setf *current-window* (make-instance 'cell-window))
-	  (make-output *current-window*)
-	  (sdl:with-events ()
-	    (:quit-event () (funcall (quit-func *current-window*)) t)
-	    (:key-down-event () 
-                             (setf *current-window* (make-instance 'final-stats-window :game-over-type (if (subtypep (type-of *world*) 'world-for-angels)
-                                                                                                         +game-over-angels-won+
-                                                                                                         +game-over-demons-won+)))
-                             (make-output *current-window*)
-                             (run-window *current-window*))
-	    (:video-expose-event () (make-output *current-window*)))))
-
 (defclass final-stats-window (window)
   ((game-over-type :initarg :game-over-type :accessor game-over-type)))
 
