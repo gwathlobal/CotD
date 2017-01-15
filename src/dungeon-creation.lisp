@@ -1,9 +1,5 @@
 (in-package :cotd)
 
-(defparameter *dungeon-loot-lvled-table* (make-hash-table))
-(defparameter *dungeon-mobs-lvled-table* (make-hash-table))
-(defparameter *dungeon-dung-lvled-table* (make-hash-table))
-
 (defun create-level ()
   (let ((level))
     (setf level (make-instance 'level))
@@ -24,7 +20,7 @@
 
 
 
-(defun create-world (world)
+(defun create-world (world menu-result)
   
   (let (
 	(feature-list)
@@ -38,9 +34,10 @@
     (setf *cur-progress-bar* 0)
     (funcall *update-screen-closure*)
 
-    
-
-    (multiple-value-setq (result-template feature-template-result mob-template-result) (create-template-city *max-x-level* *max-y-level* nil))
+    ;; if test level is used, create a special test level
+    (if (or (eql menu-result 'test-level) (eql menu-result 'test-level-all-see))
+      (multiple-value-setq (result-template feature-template-result mob-template-result) (create-template-test-city *max-x-level* *max-y-level* nil))
+      (multiple-value-setq (result-template feature-template-result mob-template-result) (create-template-city *max-x-level* *max-y-level* nil)))
         
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
@@ -60,6 +57,11 @@
 	(add-feature-to-level-list (level world) feature))
     
     (create-mobs-from-template (level world) mob-template-result)
+
+    ;; if test level is used, place mobs through a special test function and quit
+    (when (or (eql menu-result 'test-level) (eql menu-result 'test-level-all-see))
+      (test-level-place-mobs (level world))
+      (return-from create-world world))
     
     ;; populate the world with demons
     (loop repeat (truncate (total-humans world) 4)

@@ -27,7 +27,7 @@
        (incf *global-game-time*)
         ))
   
-(defun init-game (join-heaven)
+(defun init-game (menu-result)
   (clrhash *mobs-hash*)
   (clrhash *lvl-features*)
   
@@ -39,81 +39,95 @@
 
   (setf *update-screen-closure* #'(lambda () (make-output *current-window*)
 				    ))
- 
-  (if join-heaven
-    (progn
-      (setf *world* (make-instance 'world-for-angels)) 
-      (setf *player* (make-instance 'player :mob-type +mob-type-angel+)))
-    (progn
-      (setf *world* (make-instance 'world-for-demons)) 
-      (setf *player* (make-instance 'player :mob-type +mob-type-imp+))))
-  
-  (create-world *world*)
 
-  (if join-heaven
-    (progn
-      (loop with x = (random *max-x-level*)
-            with y = (random *max-y-level*)
-            until (and (not (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10))))
-                       (not (get-mob-* (level *world*) x y))
-                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
-            finally (setf (x *player*) x (y *player*) y)
-                    (add-mob-to-level-list (level *world*) *player*)
-            do
-               (setf x (random *max-x-level*))
-               (setf y (random *max-y-level*))))
-    (progn
-      (loop with x = (random *max-x-level*)
-            with y = (random *max-y-level*)
-            until (and (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10)))
-                       (not (get-mob-* (level *world*) x y))
-                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
-            finally (setf (x *player*) x (y *player*) y)
-                    (add-mob-to-level-list (level *world*) *player*)
-            do
-               (setf x (random *max-x-level*))
-               (setf y (random *max-y-level*)))))
-   
+  (cond
+    ((or (eql menu-result 'city-all-see) (eql menu-result 'test-level-all-see)) (progn
+                                                                                  (setf *world* (make-instance 'world))
+                                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-player+))))
+    ((eql menu-result 'test-level) (progn
+                                     (setf *world* (make-instance 'world))
+                                     (setf *player* (make-instance 'player :mob-type +mob-type-human+))))
+    ((eql menu-result 'join-heavens) (progn
+                                      (setf *world* (make-instance 'world-for-angels)) 
+                                      (setf *player* (make-instance 'player :mob-type +mob-type-angel+))))
+    ((eql menu-result 'join-hell) (progn
+                                    (setf *world* (make-instance 'world-for-demons)) 
+                                    (setf *player* (make-instance 'player :mob-type +mob-type-imp+)))))
+  
+  (create-world *world* menu-result)
+
+  (cond
+    ((eql menu-result 'join-heavens) (loop with x = (random *max-x-level*)
+                                           with y = (random *max-y-level*)
+                                           until (and (not (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10))))
+                                                      (not (get-mob-* (level *world*) x y))
+                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
+                                           finally (setf (x *player*) x (y *player*) y)
+                                                   (add-mob-to-level-list (level *world*) *player*)
+                                           do
+                                              (setf x (random *max-x-level*))
+                                              (setf y (random *max-y-level*))))
+    ((eql menu-result 'join-hell) (loop with x = (random *max-x-level*)
+                                        with y = (random *max-y-level*)
+                                        until (and (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10)))
+                                                   (not (get-mob-* (level *world*) x y))
+                                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
+                                        finally (setf (x *player*) x (y *player*) y)
+                                                (add-mob-to-level-list (level *world*) *player*)
+                                        do
+                                           (setf x (random *max-x-level*))
+                                           (setf y (random *max-y-level*))))
+    ((eql menu-result 'city-all-see) (progn (setf (x *player*) 1 (y *player*) 1)
+                                            (add-mob-to-level-list (level *world*) *player*))))
+  
   (setf (name *player*) "Player")
-  
-  ;setf (x *player*) 45 (y *player*) 15)
-  ;(let ((priest (make-instance 'mob :mob-type +mob-type-priest+ :x (+ (x *player*) 6) :y (- (y *player*) 0)))
-  ;      (demon (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 3) :y (+ (y *player*) 0))))
-  ;  (setf (cur-hp demon) 1)
-  ;  ;(set-mob-effect criminal +mob-effect-blessed+)
-  ;  (add-mob-to-level-list (level *world*) priest)
-  ;  (add-mob-to-level-list (level *world*) demon)
-  ;  )
-  
-  
-  ;(add-mob-to-level-list (level *world*) (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 6) :y (- (y *player*) 0)))
-  ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-demon+ :z (z *player*) :x (- (x *player*) 3) :y (- (y *player*) 6)))
-  ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-angel+ :z (z *player*) :x (- (x *player*) 3) :y (- (y *player*) 3)))
-  ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-angel+ :z (z *player*) :x (- (x *player*) 6) :y (- (y *player*) 3)))
-  ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-archangel+ :z (z *player*) :x (+ (x *player*) 6) :y (+ (y *player*) 3)))
-  ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-imp+ :z (z *player*) :x (+ (x *player*) 6) :y (- (y *player*) 3)))
-  ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-imp+ :z (z *player*) :x (+ (x *player*) 7) :y (- (y *player*) 3)))
-  ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-archdemon+ :z (z *player*) :x (- (x *player*) 3) :y (+ (y *player*) 0)))
 
   (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%"))
   )  
 
 (defun main-menu ()
+
+  (if *cotd-release*
+    (progn
+      (setf *current-window* (make-instance 'start-game-window 
+                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Help" "Exit")
+                                            :menu-funcs (list #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (return-from main-menu 'join-heavens))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (return-from main-menu 'join-hell))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (setf *current-window* (make-instance 'help-window)))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (funcall *quit-func*))))))
+    (progn
+      (setf *current-window* (make-instance 'start-game-window 
+                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "City with all-seeing" "Test level" "Test level with all-seeing" "Help" "Exit")
+                                            :menu-funcs (list #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (return-from main-menu 'join-heavens))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (return-from main-menu 'join-hell))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (return-from main-menu 'city-all-see))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (return-from main-menu 'test-level))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (return-from main-menu 'test-level-all-see))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (setf *current-window* (make-instance 'help-window)))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (funcall *quit-func*)))))))
   
-  (setf *current-window* (make-instance 'start-game-window 
-                                        :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Help" "Exit")
-                                        :menu-funcs (list #'(lambda (n) 
-                                                              (declare (ignore n))
-                                                              (return-from main-menu t))
-                                                          #'(lambda (n) 
-                                                              (declare (ignore n))
-                                                              (return-from main-menu nil))
-                                                           #'(lambda (n) 
-                                                              (declare (ignore n))
-                                                              (setf *current-window* (make-instance 'help-window)))
-                                                          #'(lambda (n) 
-                                                              (declare (ignore n))
-                                                              (funcall *quit-func*)))))
   (make-output *current-window*)
   (loop while t do
     (run-window *current-window*)))
@@ -177,8 +191,8 @@
   
     (tagbody
        (setf *quit-func* #'(lambda () (go exit-tag)))
-       (let ((join-heavens (main-menu)))
-         (init-game join-heavens))
+       (let ((menu-result (main-menu)))
+         (init-game menu-result))
        (setf *current-window* (make-instance 'cell-window))
        (make-output *current-window*)
        ;; the game loop
@@ -201,6 +215,7 @@
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
+  (setf *debug-level* nil)
 
   (sdl:with-init ()  
     (cotd-main))
@@ -221,6 +236,7 @@
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
+  (setf *debug-level* nil)
   
   (sdl:with-init ()  
     (cotd-main))

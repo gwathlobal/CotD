@@ -53,3 +53,14 @@
     
     (values template-level feature-list nil)
     ))
+
+(defun test-level-place-mobs (level)
+  (setf (x *player*) 45 (y *player*) 15)
+  (add-mob-to-level-list level *player*)
+  (let ((priest (make-instance 'mob :mob-type +mob-type-priest+ :x (+ (x *player*) 6) :y (- (y *player*) 0)))
+        (demon (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 3) :y (+ (y *player*) 0))))
+    (setf (cur-hp demon) 1)
+    ;(set-mob-effect criminal +mob-effect-blessed+)
+    (add-mob-to-level-list level priest)
+    (add-mob-to-level-list level demon)
+    ))

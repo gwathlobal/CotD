@@ -31,14 +31,9 @@ GENERAL TIPS
  - You can side either with Angels or with Demons. Though mankind is allied with angels, it is mainly stuck in the conflict between the parties.
  - You are not alone and should not be able to overcome all obstacles by yourself, some enemies will require aid of your allies.
  - Your enemies are able to hide their true appearence, so observe and learn their tactics to avoid nasty surprises.
- - "Friendly fire" is allowed, so do not get in the way of your more powerfull allies.
+ - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.
  - Your resource is power. You can stockpile it to get a "level up" or spend it on your abilities.
  - You gain power proportional to the strength of killed enemies. Besides each party has other special ways to gain power.
-
---------------------
-NOTE
-
- - The game is known to freeze sometimes for several seconds after you make a move, especially in the beginning. This is due to pathfinding calculations happening for more than 100 actors. Once their numbers naturally dwindle these delays become unnoticeable.
 
 --------------------
 TIPS FOR THE HEAVENLY FORCES
@@ -47,7 +42,7 @@ TIPS FOR THE HEAVENLY FORCES
  - You start as an Angel who can easily dispatch lowly Imps. 
  - You can bless humans to gain power.
  - You are able to hide you divinity and disguise yourself as a human to lure enemies to you.
- - Your strength is an ability to heal yourself when needed.
+ - Your strength is the ability to heal yourself when needed.
  - To win, kill all demons or ascend beyond Archangel. Survival of mankind is not required.
  
 -------------------- 
@@ -55,10 +50,11 @@ TIPS FOR THE LEGIONS OF HELL
 
  - The Legions of Hell are represented with three units: Imp, Demon and Archdemon.
  - You start as a puny Imp who is no match for an Angel. Run or summon help when confronted by one.
- - Imps and demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this tactic of a coward and can not possess anybody.
+ - Imps and demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them - you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it way prove fatal in some situations.
- - Your strength is an ability to summon allies to yourself to gang up on your enemy. 
+ - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
+ - Remeber, "friendly fire" is allowed for your faction. Be cautions when walking side by side your "friends".
  - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
 
 --------------------
