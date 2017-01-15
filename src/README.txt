@@ -66,6 +66,8 @@ KEYBINDINGS
  Shift + 2                      - Character screen
  a                              - Invoke ability
  l                              - Look mode
+ m                              - View messages
+ ?                              - Help
  
 --------------------
 CREDITS

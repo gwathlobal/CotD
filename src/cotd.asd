@@ -37,6 +37,7 @@
      (:file "window-classes")
      (:file "window-methods" :depends-on ("window-classes" "base-methods"))
      (:file "window-start-game" :depends-on ("window-methods"))
+     (:file "window-messages" :depends-on ("window-methods"))
      (:file "window-level" :depends-on ("window-methods"))
      (:file "window-map-select" :depends-on ("window-level"))
      (:file "window-loading" :depends-on ("window-methods"))

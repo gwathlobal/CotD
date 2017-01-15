@@ -61,6 +61,7 @@
     (format str "Shift + 2                      - Character screen~%")
     (format str "a                              - Invoke ability~%")
     (format str "l                              - Look mode~%")
+    (format str "m                              - View messages~%")
     (format str "?                              - Help~%")
     
     (setf rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))

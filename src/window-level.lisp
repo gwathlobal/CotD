@@ -47,8 +47,8 @@
     (sdl:fill-surface sdl:*black* :template a-rect)) 
   (let ((max-lines (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :count-only t)))
     (when (> (message-list-length) 0)
-      (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h 13) max-lines)
-                                                                                       (- max-lines (truncate h 13))
+      (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
+                                                                                       (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
                                                                                        0)))))
 
 (defun update-screen ()
@@ -210,6 +210,13 @@
 								:cmd-str ""
 								:exec-func #'(lambda ()
 									       nil)))
+			  (make-output *current-window*))
+                        ;;------------------
+			;; view messages - m
+                        (when (and (sdl:key= key :sdl-key-m) (= mod 0))
+			  (setf *current-window* (make-instance 'message-window 
+								:return-to *current-window*))
+								
 			  (make-output *current-window*))
 			
 			
