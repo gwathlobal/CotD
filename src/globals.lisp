@@ -60,6 +60,7 @@
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)
 (defconstant +ai-pref-wants-bless+ 2)
+(defconstant +ai-pref-stop+ 3)
 
 (defconstant +mob-abil-heal-self+ 0)
 (defconstant +mob-abil-conseal-divine+ 1)
@@ -80,6 +81,7 @@
 (defconstant +mob-abil-call-for-help+ 16)
 (defconstant +mob-abil-answer-the-call+ 17)
 (defconstant +mob-abil-loves-infighting+ 18)
+(defconstant +mob-abil-prayer+ 19)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

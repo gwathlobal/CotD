@@ -33,6 +33,7 @@
    ;;   :ai-coward - mob will flee if there are enemies in sight
    ;;   :ai-horde  - mob will attack only if the relative strength of allies in sight is more than the relative strength of enemies, otherwise it will flee
    ;;   :ai-wants-bless - mob will get to the nearest ally and bless it
+   ;;   :ai-stop   - mob will stop all movement whenever it see an enemy
       
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The following keys may be used in make-instance
@@ -55,7 +56,8 @@
    ;;   :abil-lifesteal - +mob-abil-lifesteal+
    ;;   :abil-call-for-help - +mob-abil-call-for-help+
    ;;   :abil-answer-the-call - +mob-abil-answer-the-call+
-   ;;   :abil-loves-infighting - +mob-abil-loves-infighting+   
+   ;;   :abil-loves-infighting - +mob-abil-loves-infighting+
+   ;;   :abil-prayer - +mob-abil-prayer+   
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> <dmg min> <dmg max> <attack speed>)
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
@@ -64,17 +66,19 @@
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)
    ))
 
-(defmethod initialize-instance :after ((mob-type mob-type) &key ai-coward ai-horde ai-wants-bless 
+(defmethod initialize-instance :after ((mob-type mob-type) &key ai-coward ai-horde ai-wants-bless ai-stop
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
-                                                                abil-loves-infighting)
+                                                                abil-loves-infighting abil-prayer)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
     (setf (gethash +ai-pref-horde+ (ai-prefs mob-type)) t))
   (when ai-wants-bless
     (setf (gethash +ai-pref-wants-bless+ (ai-prefs mob-type)) t))
+  (when ai-stop
+    (setf (gethash +ai-pref-stop+ (ai-prefs mob-type)) t))
 
   (when abil-can-possess
     (setf (gethash +mob-abil-can-possess+ (abilities mob-type)) abil-can-possess))
@@ -114,6 +118,8 @@
     (setf (gethash +mob-abil-answer-the-call+ (abilities mob-type)) t))
   (when abil-loves-infighting
     (setf (gethash +mob-abil-loves-infighting+ (abilities mob-type)) t))
+  (when abil-prayer
+    (setf (gethash +mob-abil-prayer+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -215,7 +221,7 @@
 
 (defgeneric mob-ai-wants-bless-p (mob))
 
-
+(defgeneric mob-ai-stop-p (mob))
 
 (defmethod faction ((mob mob))
   (faction (get-mob-type-by-id (mob-type mob))))
@@ -243,6 +249,9 @@
 
 (defmethod mob-ai-wants-bless-p ((mob mob))
   (gethash +ai-pref-wants-bless+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+
+(defmethod mob-ai-stop-p ((mob mob))
+  (gethash +ai-pref-stop+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
 
 (defun mob-effect-p (mob effect-id)
   (gethash effect-id (effects mob)))

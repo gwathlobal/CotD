@@ -174,6 +174,14 @@
           (logger (format nil "AI-FUNCTION: ~A [~A] changed target ~A [~A].~%" (name mob) (id mob) (name nearest-ally) (id nearest-ally)))
           (setf nearest-target nearest-ally))
         ))
+
+    ;; if the mob wants to stop when enemy is in sight, set target to nil
+    (when (mob-ai-stop-p mob)
+      (when nearest-enemy
+        (logger (format nil "AI-FUNCTION: ~A [~A] stop when seeing ~A [~A].~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy)))
+        (setf nearest-target nil)
+        ))
+    
     
     ;; got to the nearest target
     (when nearest-target
@@ -229,12 +237,14 @@
           ))
     ;)
     
-    ;; call for reinforcements if there is enemy in sight and hp < 50%
+    ;; call for reinforcements if there is a threatening enemy in sight and hp < 50% and you are not the last one
     (when (and nearest-enemy
+               (not (zerop (strength nearest-enemy)))
                (< (/ (cur-hp mob) (max-hp mob)) 
                   0.5)
                (mob-ability-p mob +mob-abil-call-for-help+)
-               (can-invoke-ability mob mob +mob-abil-call-for-help+))
+               (can-invoke-ability mob mob +mob-abil-call-for-help+)
+               (> (total-demons *world*) 1))
       (logger (format nil "AI-FUNCTION: ~A [~A] decides to call for help~%" (name mob) (id mob)))
       (mob-invoke-ability mob mob +mob-abil-call-for-help+)
       (return-from ai-function))
@@ -267,7 +277,15 @@
         (return-from ai-function)
         )
       )
-    
+
+    ;; if able to pray - do it
+    (when (and (mob-ability-p mob +mob-abil-prayer+)
+               (can-invoke-ability mob mob +mob-abil-prayer+)
+               (or nearest-enemy
+                   (zerop (random 5))))
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to pray~%" (name mob) (id mob)))
+      (mob-invoke-ability mob mob +mob-abil-prayer+)
+      (return-from ai-function))
     
     ;; if the mob has its path set - move along it
     (when (path mob)

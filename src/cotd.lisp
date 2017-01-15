@@ -76,15 +76,16 @@
    
   (setf (name *player*) "Player")
   
-  ;(let ((criminal (make-instance 'mob :mob-type +mob-type-criminal+ :z (z *player*) :x (+ (x *player*) 3) :y (- (y *player*) 0))))
-  ;      (demon (make-instance 'mob :mob-type +mob-type-imp+ :z (z *player*) :x (- (x *player*) 3) :y (+ (y *player*) 0))))
+  ;setf (x *player*) 45 (y *player*) 15)
+  ;(let ((priest (make-instance 'mob :mob-type +mob-type-priest+ :x (+ (x *player*) 6) :y (- (y *player*) 0)))
+  ;      (demon (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 3) :y (+ (y *player*) 0))))
   ;  (setf (cur-hp demon) 1)
-  ;  (set-mob-effect criminal +mob-effect-blessed+)
-  ;  (add-mob-to-level-list (level *world*) criminal)
+  ;  ;(set-mob-effect criminal +mob-effect-blessed+)
+  ;  (add-mob-to-level-list (level *world*) priest)
   ;  (add-mob-to-level-list (level *world*) demon)
   ;  )
   
-  ;(setf (x *player*) 45 (y *player*) 15)
+  
   ;(add-mob-to-level-list (level *world*) (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 6) :y (- (y *player*) 0)))
   ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-demon+ :z (z *player*) :x (- (x *player*) 3) :y (- (y *player*) 6)))
   ;(add-mob-to-level-list (get-level-by-z *world* (z *player*)) (make-instance 'mob :mob-type +mob-type-angel+ :z (z *player*) :x (- (x *player*) 3) :y (- (y *player*) 3)))

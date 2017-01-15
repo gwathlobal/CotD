@@ -3,6 +3,7 @@ CHANGELOG
 
 v1.0.3
 
+- Priests can now pray. Prayers may sometimes lead to smiting all enemies in priest's sight for minor damage
 - Upgraded city generation and added variety to some bulding types
 - The City now has maximum 1 church, 1 warehouse, 1 prison and 1 library
 - Fixed bug with the time label becoming red while it's still player's turn

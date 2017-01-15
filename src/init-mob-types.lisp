@@ -79,7 +79,8 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Cross" 0 0 +normal-ap+) :base-dodge 20
                                        :strength 0
-                                       :abil-can-be-blessed t :abil-purging-touch t :abil-detect-evil t :abil-human t
+                                       :abil-can-be-blessed t :abil-detect-evil t :abil-prayer t :abil-human t
+                                       :ai-stop t
                                        ))
 
 

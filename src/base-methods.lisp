@@ -281,6 +281,30 @@
   
     ))
 
+(defun mob-burn-blessing (actor target)
+  (let ((cur-dmg))
+    (setf cur-dmg (1+ (random 2)))
+    (decf (cur-hp target) cur-dmg)
+    ;; place a blood spattering
+    (when (> cur-dmg 0)
+      (let ((dir (1+ (random 9))))
+        (multiple-value-bind (dx dy) (x-y-dir dir) 				
+          (when (> 50 (random 100))
+            (add-feature-to-level-list (level *world*) 
+                                       (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy)))))))
+    
+    
+    (print-visible-message (x target) (y target) (level *world*) 
+                           (format nil "~A is scorched by ~A for ~A damage. " (name target) (name actor) cur-dmg))
+    (when (check-dead target)
+      (when (mob-effect-p target +mob-effect-possessed+)
+        (mob-depossess-target target))
+      
+      (make-dead target :splatter t :msg t :msg-newline nil :killer actor)
+      )
+    (print-visible-message (x target) (y target) (level *world*) (format nil "~%"))
+    ))
+
 (defun mob-invoke-ability (actor target ability-type-id)
   (when (can-invoke-ability actor target ability-type-id)
     (let ((ability-type (get-ability-type-by-id ability-type-id)))

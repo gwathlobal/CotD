@@ -189,31 +189,10 @@
 
                                                 (logger (format nil "MOB-CONSUME-BLESSING-ON-TARGET: ~A [~A] is scorched by blessing of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
-                                                (let ((cur-dmg))
-                                                  (rem-mob-effect target +mob-effect-blessed+)
-                                                  (decf (total-blessed *world*))
-                                                  
-                                                  (setf cur-dmg (1+ (random 2)))
-                                                  (decf (cur-hp actor) cur-dmg)
-                                                  ;; place a blood spattering
-                                                  (when (> cur-dmg 0)
-                                                    (let ((dir (1+ (random 9))))
-                                                      (multiple-value-bind (dx dy) (x-y-dir dir) 				
-                                                        (when (> 50 (random 100))
-                                                          (add-feature-to-level-list (level *world*) 
-                                                                                     (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x actor) dx) :y (+ (y actor) dy)))))))
-                                                  
-                                                  
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
-                                                                         (format nil "~A is scorched by ~A for ~A damage. " (name actor) (name target) cur-dmg))
-                                                  (when (check-dead actor)
-                                                    (when (mob-effect-p actor +mob-effect-possessed+)
-                                                      (mob-depossess-target actor))
-                                                    
-                                                    (make-dead actor :splatter t :msg t :msg-newline nil)
-                                                    )
-                                                  (print-visible-message (x actor) (y actor) (level *world*) (format nil "~%"))
-                                                  )
+                                                (rem-mob-effect target +mob-effect-blessed+)
+                                                (decf (total-blessed *world*))
+
+                                                (mob-burn-blessing target actor)
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
@@ -389,3 +368,55 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-prayer+ :name "Prayer" :descr "Pray to God for help." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                
+                                                (logger (format nil "MOB-PRAYER: ~A [~A] prays~%" (name actor) (id actor)))
+
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A starts to pray. " (name actor)))
+
+                                                (let ((enemy-list nil))
+                                                  (if (zerop (random 4))
+                                                    (progn
+                                                      
+                                                      ;; 1/4th chance to do anything
+                                                      
+                                                      ;; collect all unholy enemies in sight
+                                                      (setf enemy-list (loop for enemy-mob-id in (visible-mobs actor)
+                                                                             when (and (not (get-faction-relation (faction actor) (faction (get-mob-by-id enemy-mob-id))))
+                                                                                       (mob-ability-p (get-mob-by-id enemy-mob-id) +mob-abil-unholy+))
+                                                                               collect enemy-mob-id))
+                                                      
+                                                      (logger (format nil "MOB-PRAYER: ~A [~A] affects the following enemies ~A with the prayer~%" (name actor) (id actor) enemy-list))
+                                                      
+                                                      ;; reveal all enemies and burn them like they are blessed
+                                                      (loop for enemy-mob-id in enemy-list
+                                                            do
+                                                               (logger (format nil "MOB-PRAYER: ~A [~A] affects the enemie2 ~A~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
+                                                               (when (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-possessed+)
+                                                                 (unless (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+)
+                                                                   (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                          (format nil "~A reveals the true form of ~A. " (name actor) (get-qualified-name (get-mob-by-id enemy-mob-id)))))
+                                                                 (setf (face-mob-type-id (get-mob-by-id enemy-mob-id)) (mob-type (get-mob-by-id enemy-mob-id)))
+                                                                 (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+ 5))
+                                                               (mob-burn-blessing actor (get-mob-by-id enemy-mob-id)))
+
+                                                      (unless enemy-list
+                                                        (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                               (format nil "~%")))
+                                                      )
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~%")))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-prayer+)
+                                                        t
+                                                        nil))))
