@@ -312,6 +312,21 @@
       (logger (format nil "AI-FUNCTION: ~A [~A] decides to pray for shielding~%" (name mob) (id mob)))
       (mob-invoke-ability mob mob +mob-abil-prayer-shield+)
       (return-from ai-function))
+
+    ;; soldiers: if there is an enemy in sight, shoot it
+    (when (and nearest-enemy
+               (mob-ability-p mob +mob-abil-shoot+)
+               (can-invoke-ability mob mob +mob-abil-shoot+))
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to shoot ~A [~A]~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy)))
+      (mob-invoke-ability mob nearest-enemy +mob-abil-shoot+)
+      (return-from ai-function))
+
+    ;; soldiers: if you can reload - do it
+    (when (and (mob-ability-p mob +mob-abil-reload+)
+               (can-invoke-ability mob mob +mob-abil-reload+))
+      (logger (format nil "AI-FUNCTION: ~A [~A] decides to reload~%" (name mob) (id mob)))
+      (mob-invoke-ability mob mob +mob-abil-reload+)
+      (return-from ai-function))
     
     ;; if the mob has its path set - move along it
     (when (path mob)

@@ -570,3 +570,48 @@
                                                       (if (mob-ability-p actor +mob-abil-curse+)
                                                         t
                                                         nil))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-shoot+ :name "Shoot" :descr "Shoot your deadly rifle." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+
+                                                (logger (format nil "MOB-SHOOT: ~A [~A] shoots his rifle at ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (mob-shoot-target actor target)
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-shoot+)
+                                                        t
+                                                        nil))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-reload+ :name "Reload" :descr "Reload your deadly rifle." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                
+                                                (logger (format nil "MOB-RELOAD: ~A [~A] reloads his rifle~%" (name actor) (id actor)))
+
+                                                (setf (cur-fp actor) (max-fp actor))
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A reloads his rifle.~%" (name actor)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-shoot+)
+                                                               (zerop (cur-fp actor)))
+                                                        t
+                                                        nil))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-keen-senses+ :name "Keen senses" :descr "When confronted by the supernatural, you can see through its illusions." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

@@ -91,6 +91,14 @@
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-call-for-help t :abil-free-call t :abil-curse t
                              ))
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-soldier+ 
+                                       :name "Soldier"
+                                       :glyph-idx 32 :glyph-color sdl:*green* :back-color sdl:*black* :max-hp 8 :max-fp 1
+                                       :faction +faction-type-military+
+                                       :weapon (list "Rifle" 1 2 +normal-ap+) :base-dodge 25
+                                       :strength 0
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-shoot t :abil-reload t :abil-keen-senses t
+                             ))
 
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
@@ -143,6 +151,7 @@
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t))
 
 
-(set-faction-relations +faction-type-humans+ (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-demons+ nil))
-(set-faction-relations +faction-type-angels+ (cons +faction-type-angels+ t) (cons +faction-type-humans+ t) (cons +faction-type-demons+ nil))
-(set-faction-relations +faction-type-demons+ (cons +faction-type-demons+ t) (cons +faction-type-angels+ nil) (cons +faction-type-humans+ nil))
+(set-faction-relations +faction-type-humans+ (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-demons+ nil) (cons +faction-type-military+ t))
+(set-faction-relations +faction-type-angels+ (cons +faction-type-angels+ t) (cons +faction-type-humans+ t) (cons +faction-type-demons+ nil) (cons +faction-type-military+ nil))
+(set-faction-relations +faction-type-demons+ (cons +faction-type-demons+ t) (cons +faction-type-angels+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-military+ nil))
+(set-faction-relations +faction-type-military+ (cons +faction-type-military+ t) (cons +faction-type-demons+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-humans+ t))

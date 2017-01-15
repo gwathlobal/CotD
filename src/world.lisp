@@ -85,7 +85,9 @@
 ;;----------------------
 
 (defclass world ()
-  ((level :initform nil :accessor level :type level)
+  ((game-time :initform 0 :accessor game-time)
+   
+   (level :initform nil :accessor level :type level)
    
    (initial-humans :initform 0 :accessor initial-humans)
    (initial-demons :initform 0 :accessor initial-demons)
@@ -114,16 +116,19 @@
 (defmethod initialize-instance :after ((world world-for-angels) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-angels+ (game-events world))
+  (pushnew +game-event-military-arrive+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-demons) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-demons+ (game-events world))
+  (pushnew +game-event-military-arrive+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-humans) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-humans+ (game-events world))
+  (pushnew +game-event-military-arrive+ (game-events world))
   )
 
 

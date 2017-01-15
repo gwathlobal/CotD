@@ -21,16 +21,16 @@
           (decf (action-delay mob))
           (progn
             (ai-function mob)))
-        (when (= (mod *global-game-time* +normal-ap+) 0)
+        (when (= (mod (game-time *world*) +normal-ap+) 0)
           (on-tick mob))))
     
-    (incf *global-game-time*)))
+    (incf (game-time *world*))))
   
 (defun init-game (menu-result)
   (clrhash *mobs-hash*)
   (clrhash *lvl-features*)
   
-  (setf *global-game-time* 0)
+  (setf (game-time *world*) 0)
   (setf *message-box* nil)
   
   (setf *cur-angel-names* (copy-list *init-angel-names*))

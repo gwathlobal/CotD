@@ -3,6 +3,7 @@ CHANGELOG
 
 v1.0.3
 
+- Added Soldiers to the city. Soldiers arrive to help humans after some time, are opposed to both angels and demons and will shoot them on sight
 - Added Satanists to the city. They are allied with demons and are able to call them for free and curse enemies with inaccuracy
 - Added a new command 'm' to view the full message log
 - Priests can now pray. Prayers may sometimes lead to smiting all enemies in priest's sight for minor damage or granting all allies divine protection. Divine protection prevents the next attck or harmful effect from application

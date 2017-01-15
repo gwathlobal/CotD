@@ -262,6 +262,35 @@
     (print-visible-message (x target) (y target) (level *world*) (format nil "~%"))
     ))
 
+(defun mob-shoot-target (actor target)
+  (let ((cur-dmg))
+    (setf cur-dmg (+ 2 (random 3)))
+    (decf (cur-hp target) cur-dmg)
+    ;; place a blood spattering
+    (if (> (accuracy actor) (random 100))
+      (progn
+        (when (> cur-dmg 0)
+          (let ((dir (1+ (random 9))))
+            (multiple-value-bind (dx dy) (x-y-dir dir) 				
+              (add-feature-to-level-list (level *world*) 
+                                         (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy))))))
+        
+        (print-visible-message (x target) (y target) (level *world*) 
+                               (format nil "~A shoots ~A for ~A damage. " (name actor) (name target) cur-dmg))
+        (when (check-dead target)
+          (make-dead target :splatter t :msg t :msg-newline nil :killer actor)
+          
+          (when (mob-effect-p target +mob-effect-possessed+)
+            (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+            (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil))
+          )
+        (print-visible-message (x target) (y target) (level *world*) (format nil "~%")))
+      (progn
+        (print-visible-message (x target) (y target) (level *world*) 
+                               (format nil "~A shoots ~A, but misses.~%" (name target) (name actor)))
+        ))
+    ))
+
 (defun mob-invoke-ability (actor target ability-type-id)
   (when (can-invoke-ability actor target ability-type-id)
     (let ((ability-type (get-ability-type-by-id ability-type-id)))
@@ -282,6 +311,20 @@
     (make-act attacker (att-spd attacker))
     (return-from melee-target nil)
     )
+
+  ;; if the target has keen senses - destroy the illusions
+  (when (mob-ability-p target +mob-abil-keen-senses+)
+    (when (mob-effect-p attacker +mob-effect-divine-consealed+)
+      (rem-mob-effect attacker +mob-effect-divine-consealed+)
+      (setf (face-mob-type-id attacker) (mob-type attacker))
+      (print-visible-message (x attacker) (y attacker) (level *world*) 
+                             (format nil "~A reveals the true form of ~A. " (name target) (get-qualified-name attacker))))
+    (when (mob-effect-p attacker +mob-effect-possessed+)
+      (unless (mob-effect-p attacker +mob-effect-reveal-true-form+)
+        (print-visible-message (x attacker) (y attacker) (level *world*) 
+                               (format nil "~A reveals the true form of ~A. " (name target) (get-qualified-name attacker))))
+      (setf (face-mob-type-id attacker) (mob-type attacker))
+      (set-mob-effect attacker +mob-effect-reveal-true-form+ 5)))
   
   (multiple-value-bind (dx dy) (x-y-dir (1+ (random 9)))
     (let* ((cur-dmg) (dodge-chance) (failed-dodge nil) 

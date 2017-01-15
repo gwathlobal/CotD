@@ -38,7 +38,7 @@
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
     (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) 52)
-    (sdl:draw-string-solid-* (format nil "Time ~A"  *global-game-time*)
+    (sdl:draw-string-solid-* (format nil "Time ~A"  (game-time *world*))
                                      x (+ y 237) :color (if (not (zerop (action-delay *player*)))
                                                           sdl:*red*
                                                           sdl:*white*))

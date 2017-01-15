@@ -61,6 +61,9 @@
    ;;   :abil-free-call - +mob-abil-free-call+
    ;;   :abil-prayer-shield - +mob-abil-prayer-shield+
    ;;   :abil-curse - +mob-abil-curse+
+   ;;   :abil-shoot - +mob-abil-shoot+
+   ;;   :abil-reload - +mob-abil-reload+
+   ;;   :abil-keen-senses - +mob-abil-keen-senses+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> <dmg min> <dmg max> <attack speed>)
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
@@ -73,7 +76,8 @@
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
-                                                                abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse)
+                                                                abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
+                                                                abil-shoot abil-reload abil-keen-senses)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -129,6 +133,12 @@
     (setf (gethash +mob-abil-prayer-shield+ (abilities mob-type)) t))
   (when abil-curse
     (setf (gethash +mob-abil-curse+ (abilities mob-type)) t))
+  (when abil-shoot
+    (setf (gethash +mob-abil-shoot+ (abilities mob-type)) t))
+  (when abil-reload
+    (setf (gethash +mob-abil-reload+ (abilities mob-type)) t))
+  (when abil-keen-senses
+    (setf (gethash +mob-abil-keen-senses+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

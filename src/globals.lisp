@@ -46,11 +46,13 @@
 (defconstant +mob-type-policeman+ 12)
 (defconstant +mob-type-priest+ 13)
 (defconstant +mob-type-satanist+ 14)
+(defconstant +mob-type-soldier+ 15)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
 (defconstant +faction-type-angels+ 2)
 (defconstant +faction-type-demons+ 3)
+(defconstant +faction-type-military+ 4)
 
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)
@@ -80,6 +82,9 @@
 (defconstant +mob-abil-free-call+ 20)
 (defconstant +mob-abil-prayer-shield+ 21)
 (defconstant +mob-abil-curse+ 22)
+(defconstant +mob-abil-shoot+ 23)
+(defconstant +mob-abil-reload+ 24)
+(defconstant +mob-abil-keen-senses+ 25)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -132,11 +137,10 @@
 (defparameter *world* nil)
 (defparameter *player* nil)
 
-(defvar *global-game-time* 0)
-
 (defvar *update-screen-closure*)
 (defvar *cur-progress-bar*)
 (defvar *max-progress-bar*)
+
 (defparameter *current-dir* (asdf:system-source-directory :cotd))
 
 (defconstant +normal-ap+ 10)
