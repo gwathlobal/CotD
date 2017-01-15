@@ -23,7 +23,7 @@
       )
     )
     
-  (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [Esc] Exit")
+  (sdl:draw-string-solid-* (format nil "[Up/Down] Scroll text  [Esc] Exit")
                            10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))

@@ -215,7 +215,6 @@
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
-  (setf *debug-level* nil)
 
   (sdl:with-init ()  
     (cotd-main))
@@ -236,7 +235,6 @@
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
-  (setf *debug-level* nil)
   
   (sdl:with-init ()  
     (cotd-main))
