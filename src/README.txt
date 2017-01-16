@@ -36,7 +36,7 @@ GENERAL TIPS
  - You gain power proportional to the strength of killed enemies. Besides each party has other special ways to gain power.
 
 --------------------
-TIPS FOR THE HEAVENLY FORCES
+THE HEAVENLY FORCES
 
  - The Heavenly Forces are represented with two units: Angel and Archangel.
  - You start as an Angel who can easily dispatch lowly Imps. 
@@ -46,7 +46,7 @@ TIPS FOR THE HEAVENLY FORCES
  - To win, kill all demons or ascend beyond Archangel. Survival of mankind is not required.
  
 -------------------- 
-TIPS FOR THE LEGIONS OF HELL
+THE LEGIONS OF HELL
 
  - The Legions of Hell are represented with three units: Imp, Demon and Archdemon.
  - You start as a puny Imp who is no match for an Angel. Run or summon help when confronted by one.
@@ -56,6 +56,15 @@ TIPS FOR THE LEGIONS OF HELL
  - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
  - Remeber, "friendly fire" is allowed for your faction. Be cautions when walking side by side your "friends".
  - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
+
+--------------------
+HUMANS
+
+ - Humans are generally weak and frail.
+ - Citizens of the City will try to flee whenever there is an enemy in sight.
+ - Priests are immune to possession and will preach to smite their foes or grant allies divine shield. Smiting applies minor damage to all enemies in sight, while divine shield gives a one-time protection from any harm.
+ - Satanists are allied with demons and are opposed to angels and the citizens of the City. They have are able to call demons to them for free and curse all enemies in sight with inaccuracy.
+ - Soldiers arrive towards the end of the battle for the City. They are allied with the citizens but oppose both angels and demons. They are armed with single-shot rifles and need to reload every other turn. But their numbers and the ability to apply damage at range can make short work of any supernatural being. Though they can not see through illusions, any disguise will be removed when they are attacked in melee.
 
 --------------------
 KEYBINDINGS
