@@ -30,7 +30,6 @@
   (clrhash *mobs-hash*)
   (clrhash *lvl-features*)
   
-  (setf (game-time *world*) 0)
   (setf *message-box* nil)
   
   (setf *cur-angel-names* (copy-list *init-angel-names*))
