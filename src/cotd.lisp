@@ -244,6 +244,10 @@
                    :quiet t :script t :init-function #'cotd-exec  
 		   :executable t))
 
-#+sbcl
+#+(and sbcl windows) 
 (defun make-exec ()
-  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t :application-type :gui))
+  (sb-ext:save-lisp-and-die "cotd.exe" :toplevel #'cotd-exec :executable t :application-type :gui))
+
+#+(and sbcl unix) 
+(defun make-exec ()
+  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t))
