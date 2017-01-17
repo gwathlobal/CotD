@@ -1,8 +1,10 @@
 CHANGELOG
 
 
-v1.0.3
+--------------------
+Jan 17, 2017 v1.0.3
 
+- Linux 32-bit binary packages added
 - Added Soldiers to the city. Soldiers arrive to help humans towards the end of the battle, are opposed to both angels and demons and will shoot them if they see their true form
 - Added Satanists to the city. They are allied with demons and are able to call them for free and curse enemies with inaccuracy
 - Added a new command 'm' to view the full message log

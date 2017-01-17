@@ -1,7 +1,7 @@
 CITY OF THE DAMNED
 
 City of the Damned is a simple fast-paced coffeebreak roguelike inspired by as 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
-Its is written in Common Lisp using SDL.
+It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
