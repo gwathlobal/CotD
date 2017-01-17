@@ -1,0 +1,5 @@
+City of the Damned depends on the following libraries:
+ - SDL 1.2 
+ - zlib
+ 
+You may need to install them manually using your distribution's package manager, if they are not already pre-installed.
