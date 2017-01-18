@@ -1,0 +1,8 @@
+Arrow keys,                    - Movement
+Page Up, Page Down, Home, End,
+Numpad keys
+Shift + 2                      - Character screen
+a                              - Invoke ability
+l                              - Look mode
+m                              - View messages
+?                              - Help
