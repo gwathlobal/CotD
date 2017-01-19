@@ -4,10 +4,10 @@
 (defparameter *glyph-h* 15)
 
 (defvar *quit-func* 0)
+(defvar *start-func* 0)
 (defparameter *current-window* nil)
 (defparameter *rects-to-update* ())
 (defvar *msg-box-window-height*)
-(defvar *game-over-func*)
 
 (defclass window ()
   ((return-to :initarg :return-to :initform *current-window* :accessor return-to)

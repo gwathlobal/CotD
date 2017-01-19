@@ -189,6 +189,8 @@
   
     (tagbody
        (setf *quit-func* #'(lambda () (go exit-tag)))
+       (setf *start-func* #'(lambda () (go start-tag)))
+       start-tag
        (let ((menu-result (main-menu)))
          (init-game menu-result))
        (setf *current-window* (make-instance 'cell-window))

@@ -1,6 +1,10 @@
 CHANGELOG
 
 
+v1.0.4
+
+- Added an option to go to main menu from the game over screen
+
 --------------------
 Jan 17, 2017 v1.0.3
 

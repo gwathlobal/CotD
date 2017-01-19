@@ -40,7 +40,7 @@
 
   (show-small-message-box 6 (+ 40 (* 9 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 9 (sdl:get-font-height))))
 
-  (sdl:draw-string-solid-* (format nil "[Esc] Exit game")
+  (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] Exit game")
                            10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))
@@ -50,10 +50,14 @@
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
+                        (declare (ignore mod unicode))
                         (cond
 			  ;; escape - quit
 			  ((sdl:key= key :sdl-key-escape) 
-			    (funcall (quit-func *current-window*)))
+                           (funcall (quit-func *current-window*)))
+                          ;; m - main menu
+                          ((sdl:key= key :sdl-key-m) 
+                           (funcall *start-func*))
                           )
                         )
        (:video-expose-event () (make-output *current-window*)))
