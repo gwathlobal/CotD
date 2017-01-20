@@ -54,21 +54,29 @@
     (add-message str)))
 
 (defun update-visible-mobs-normal (mob)
+  (declare (optimize (speed 3)))
   (loop 
     for mob-id in (mob-id-list (level *world*))
-    with vmob = nil
+    for vmob = (get-mob-by-id mob-id)
+    for mx of-type fixnum = (x vmob)
+    for my of-type fixnum = (y vmob)
+    for mcs of-type fixnum = (cur-sight mob)
+    for mid of-type fixnum = (id vmob)
+    for mx_ of-type fixnum = (x mob)
+    for my_ of-type fixnum = (y mob)
     do
-       (setf vmob (get-mob-by-id mob-id))
+       
        ;(format t "LOS ~A dist ~A to (~A, ~A) vs sight ~A~%" (name mob) (get-distance (x mob) (y mob) (x vmob) (y mob)) (x vmob) (y vmob) (cur-sight mob))
        (when (and (not (check-dead vmob))
                   (not (eq mob vmob))
-                  (<= (get-distance (x mob) (y mob) (x vmob) (y mob)) (cur-sight mob)))
+                  (<= (get-distance mx_ my_ mx my) mcs))
          (let ((r 0))
-                      
+           (declare (type fixnum r))
            ;;(format t "LOS ~A (~A, ~A) to (~A, ~A)~%" (name mob) (x mob) (y mob) (x vmob) (y vmob))
            
            
            (line-of-sight (x mob) (y mob) (x vmob) (y vmob) #'(lambda (dx dy)
+                                                                (declare (type fixnum dx dy))
                                                     (let ((terrain) (exit-result t))
                                                       (block nil
                                                         (when (or (< dx 0) (>= dx *max-x-level*)
@@ -87,11 +95,11 @@
                                                         (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
                                                           (setf exit-result 'exit)
                                                           (return))
-                                                        (when (and (= dx (x vmob)) (= dy (y vmob)))
-                                                          (pushnew (id vmob) (visible-mobs mob))
+                                                        (when (and (= dx mx) (= dy my))
+                                                          (pushnew mid (visible-mobs mob))
                                                           )
                                                                                                                 
-                                                        (when (> r (cur-sight mob))
+                                                        (when (> r mcs)
                                                           (setf exit-result 'exit)
                                                           (return))
                                                         )
@@ -580,13 +588,20 @@
     (line-of-sight cx cy (+ cx (round (* r (cos (* i (/ pi 180)))))) (- cy (round (* r (sin (* i (/ pi 180 )))))) func)))
 
 (defun line-of-sight (sx sy tx ty func)
+  (declare (optimize (speed 3))
+           (type fixnum sx sy tx ty)
+           (type function func))
+  
   ;; stop at once if the starting point = target point
   (when (and (= sx tx) (= sy ty))
     (funcall func sx sy)
     (return-from line-of-sight nil))
  
    (let ((x 0) (y 0) (nx (1+ (abs (- sx tx)))) (ny (1+ (abs (- sy ty))))
-	(px 1) (py 1) (slope) (ix) (iy))
+         (px 1) (py 1) (slope 0) (ix 0) (iy 0))
+     (declare (type fixnum x y nx ny px py ix iy)
+              (type rational slope))
+     
     ;; determine the direction where to draw the line
     (cond
       ((> sx tx) (setf ix -1))

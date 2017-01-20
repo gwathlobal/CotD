@@ -195,7 +195,7 @@
                                )))
         
         (logger (format nil "AI-FUNCTION: Mob - (~A ~A) Target - (~A ~A)~%" (x mob) (y mob) (x nearest-target) (y nearest-target)))
-	(logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
+        (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
         (pop path)
         
 	(setf (path mob) path)
@@ -211,7 +211,7 @@
               (ry (- (+ 10 (y mob))
                      (1+ (random 20))))
               (path nil))
-          (declare (type integer rx ry))
+          (declare (type fixnum rx ry))
           
           (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
                           (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
