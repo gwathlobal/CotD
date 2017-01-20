@@ -3,6 +3,9 @@
 (defgeneric ai-function (mob))
 
 (defun check-move-for-ai (mob dx dy)
+  (declare (optimize (speed 3))
+           (type fixnum dx dy)
+           (ignore mob))
   ;; cant move beyond level borders 
   (when (or (< dx 0) (< dy 0) (>= dx *max-x-level*) (>= dy *max-y-level*)) (return-from check-move-for-ai nil))
   
@@ -11,16 +14,16 @@
     (return-from check-move-for-ai nil))
   
   ;; checking for mobs
-  (let ((target (get-mob-* (level *world*) dx dy)))
-    (cond
+  ;(let ((target (get-mob-* (level *world*) dx dy)))
+  ;  (cond
       ;; if self - can move
-      ((eq mob target) (return-from check-move-for-ai t))
+  ;    ((eq mob target) (return-from check-move-for-ai t))
       ;; allied faction & does not give blessings - need to go around
       ;((and target
       ;      (get-faction-relation (faction mob) (faction target))
       ;      (not (mob-ai-wants-bless-p mob))) (return-from check-move-for-ai nil))
       ;; otherwise (enemies, etc) - can move
-      (t (return-from check-move-for-ai t))))
+  ;    (t (return-from check-move-for-ai t))))
   )
 
 
