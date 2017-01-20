@@ -14,7 +14,7 @@
     
     ;; iterate through all the mobs
     ;; those who are not dead and have the delay of 0 can make a move
-    (loop for mob being the hash-values in *mobs-hash* do
+    (loop for mob across *mobs* do
       (unless (check-dead mob)
         
         (if (> (action-delay mob) 0)
@@ -27,8 +27,8 @@
     (incf (game-time *world*))))
   
 (defun init-game (menu-result)
-  (clrhash *mobs-hash*)
-  (clrhash *lvl-features*)
+  (setf *mobs* (make-array (list 0) :adjustable t))
+  (setf *lvl-features* (make-array (list 0) :adjustable t))
   
   (setf *message-box* nil)
   

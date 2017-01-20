@@ -203,8 +203,10 @@
    ))
 
 (defmethod initialize-instance :after ((mob mob) &key)
-  (setf (id mob) (find-free-id *mobs-hash*))
-  (setf (gethash (id mob) *mobs-hash*) mob)
+  (setf (id mob) (find-free-id *mobs*))
+  (setf (aref *mobs* (id mob)) mob)
+  
+  
   
   (setf (cur-hp mob) (max-hp mob))
   (setf (cur-fp mob) 0)
@@ -233,7 +235,7 @@
   )
 
 (defun get-mob-by-id (mob-id)
-  (gethash mob-id *mobs-hash*))
+  (aref *mobs* mob-id))
 
 (defgeneric mob-ai-coward-p (mob))
 

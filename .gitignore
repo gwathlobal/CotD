@@ -1,3 +1,5 @@
 *.exe
 *.dll
 *.cfg
+cotd
+performance.txt

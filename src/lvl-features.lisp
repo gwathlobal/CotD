@@ -31,11 +31,11 @@
 
 (defmethod initialize-instance :after ((feature feature) &key)
   (setf (id feature) (find-free-id *lvl-features*))
-  (setf (gethash (id feature) *lvl-features*) feature)
+  (setf (aref *lvl-features* (id feature)) feature)
   )
 
 (defun get-feature-by-id (feature-id)
-  (gethash feature-id *lvl-features*))
+  (aref *lvl-features* feature-id))
 
 (defmethod name ((feature feature))
   (name (get-feature-type-by-id (feature-type feature))))

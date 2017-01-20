@@ -4,9 +4,13 @@
   (declare (type fixnum sx sy tx ty))
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)))))
 
-(defun find-free-id (hash-table)
-  (do ((id 0 (+ id 1)))
-      ((eql (gethash id hash-table) nil) id)))
+(defun find-free-id (array)
+  (loop for i from 0 below (length array)
+        unless (aref array i)
+          do (return-from find-free-id i))
+  (adjust-array array (list (1+ (length array))))
+  (1- (length array)))
+
 
 (defun x-y-into-dir (x y)
   (let ((xy (list x y)))

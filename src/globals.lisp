@@ -131,8 +131,8 @@
 (defparameter *feature-types* (make-hash-table))
 (defparameter *terrain-types* (make-hash-table))
 (defparameter *mob-types* (make-hash-table))
-(defparameter *lvl-features* (make-hash-table))
-(defparameter *mobs-hash* (make-hash-table))
+(defparameter *lvl-features* (make-array (list 0) :adjustable t))
+(defparameter *mobs* (make-array (list 0) :adjustable t))
 
 (defparameter *world* nil)
 (defparameter *player* nil)
