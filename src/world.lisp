@@ -98,7 +98,10 @@
    (total-angels :initform 0 :accessor total-angels)
    (total-blessed :initform 0 :accessor total-blessed)
 
-   (game-events :initform () :accessor game-events)))
+   (game-events :initform () :accessor game-events)
+
+   (cur-mob-path :initform 0 :accessor cur-mob-path)
+   ))
   
 (defclass world-for-angels (world)
   ())

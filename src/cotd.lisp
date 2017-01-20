@@ -23,7 +23,7 @@
             (ai-function mob)))
         (when (= (mod (game-time *world*) +normal-ap+) 0)
           (on-tick mob))))
-    
+    (setf (cur-mob-path *world*) 0)
     (incf (game-time *world*))))
   
 (defun init-game (menu-result)

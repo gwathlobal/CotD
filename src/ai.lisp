@@ -12,7 +12,8 @@
   ;; checking for terrain obstacle
   (when (get-terrain-type-trait (get-terrain-* (level *world*) dx dy) +terrain-trait-blocks-move+) 
     (return-from check-move-for-ai nil))
-  
+
+  t
   ;; checking for mobs
   ;(let ((target (get-mob-* (level *world*) dx dy)))
   ;  (cond
