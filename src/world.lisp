@@ -101,6 +101,8 @@
    (game-events :initform () :accessor game-events)
 
    (cur-mob-path :initform 0 :accessor cur-mob-path)
+   (path-lock :initform (bt:make-lock) :accessor path-lock)
+   (path-cv :initform (bt:make-condition-variable) :accessor path-cv)
    ))
   
 (defclass world-for-angels (world)

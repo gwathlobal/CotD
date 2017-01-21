@@ -12,7 +12,7 @@
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
   :version "0.1"  
   :author "Gwathlobal"    
-  :depends-on (lispbuilder-sdl)
+  :depends-on (lispbuilder-sdl bordeaux-threads)
   :components
     ((:file "logger")
      (:file "astar")

@@ -219,58 +219,24 @@
 								
 			  (make-output *current-window*))
 			
-			
+			(if (> (action-delay *player*) 0)
+                          (setf (idle-calcing win) :npc-turn)
+                          (if (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
+                            (setf (idle-calcing win) :in-progress)
+                            (setf (idle-calcing win) :done)))
+                        
 			(make-output *current-window*)
 			(go exit-loop)
                         )
        (:idle () (update-swank)
               
-              
               (if (> (action-delay *player*) 0)
                 (setf (idle-calcing win) :npc-turn)
-                (setf (idle-calcing win) :done))
+                (if (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
+                  (setf (idle-calcing win) :in-progress)
+                  (setf (idle-calcing win) :done)))
 
-              ;(format t "IDLE ~A, ~A~%" (idle-calcing win) (action-delay *player*))
-              
-              (when (and (< (cur-mob-path *world*) (length *mobs*)) (<= (action-delay *player*) 0))
-                (setf (idle-calcing win) :in-progress)
-                
-                (when (and (not (dead= (get-mob-by-id (cur-mob-path *world*))))
-                           (not (path (get-mob-by-id (cur-mob-path *world*)))))
-                  
-                  (let* ((mob (get-mob-by-id (cur-mob-path *world*)))
-                         (rx (- (+ 10 (x mob))
-                                (1+ (random 20)))) 
-                         (ry (- (+ 10 (y mob))
-                                (1+ (random 20))))
-                         (path nil))
-                    (declare (type fixnum rx ry))
-                    (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
-                                    (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
-                                    (and (get-mob-* (level *world*) rx ry)
-                                         (not (eq (get-mob-* (level *world*) rx ry) mob))))
-                          do
-                             (setf rx (- (+ 10 (x mob))
-                                         (1+ (random 20))))
-                             (setf ry (- (+ 10 (y mob))
-                                         (1+ (random 20)))))
-                    (logger (format nil "IDLE: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
-                    (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
-                                       #'(lambda (dx dy) 
-                                           ;; checking for impassable objects
-                                           (check-move-for-ai mob dx dy)
-                                           )))
-                    
-                    (pop path)
-                    (logger (format nil "IDLE: Mob goes to (~A ~A)~%" rx ry))
-                    (logger (format nil "IDLE: Set mob path - ~A~%" path))
-                    (setf (path mob) path)
-                    
-                    )
-                  )
-                (incf (cur-mob-path *world*))
-                )
-              (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237))
+              (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
               )
               
        (:video-expose-event () (make-output *current-window*)))
@@ -287,9 +253,13 @@
                  (when connection
                    (swank::handle-requests connection t)))))
 
-(defun show-time-label (idle-calcing x y)
+(defun show-time-label (idle-calcing x y &optional (update nil))
   (sdl:draw-string-solid-* (format nil "Time ~A"  (game-time *world*))
                            x y :color (cond ((eql idle-calcing :done) sdl:*white*)
                                             ((eql idle-calcing :in-progress) sdl:*yellow*)
                                             ((eql idle-calcing :npc-turn) sdl:*red*)))
-  (sdl:update-display))
+  (when update
+    (sdl:update-display)))
+
+
+

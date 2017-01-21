@@ -23,6 +23,9 @@
             (ai-function mob)))
         (when (= (mod (game-time *world*) +normal-ap+) 0)
           (on-tick mob))))
+    
+    (bt:with-lock-held ((path-lock *world*))
+      (bt:condition-notify (path-cv *world*)))
     (setf (cur-mob-path *world*) 0)
     (incf (game-time *world*))))
   
@@ -186,16 +189,29 @@
                                           :color-key sdl:*white*))
       (setf *glyph-temp* (sdl:create-surface *glyph-w* *glyph-h* :color-key sdl:*black*))
       )
-  
+
+    (setf *path-thread* nil)
+    
     (tagbody
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (let ((menu-result (main-menu)))
          (init-game menu-result))
+
+       ;; initialize thread, that will calculate random-movement paths while the system waits for player input
+       (let ((out *standard-output*))
+         (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
+           (t ()
+             (logger "MAIN: This system does not support multithreading!~%"))))
+       (bt:condition-notify (path-cv *world*))
+       
        (setf *current-window* (make-instance 'cell-window))
        (make-output *current-window*)
        ;; the game loop
        (game-loop)
-       exit-tag nil))
+     exit-tag
+       ;; destroy the thread once the game is about to be exited
+       (when (and *path-thread* (bt:thread-alive-p *path-thread*)) (bt:destroy-thread *path-thread*))
+     nil))
 )
 
 #+clisp

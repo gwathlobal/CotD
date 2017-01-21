@@ -145,3 +145,10 @@
 
 (defconstant +normal-ap+ 10)
 (defparameter *possessed-revolt-chance* 12)
+
+
+;;---------------------------
+;; Multithreading parameters
+;;--------------------------- 
+
+(defparameter *path-thread* nil)
