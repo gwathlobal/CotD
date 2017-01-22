@@ -26,6 +26,7 @@
    
    (max-hp :initform 1 :initarg :max-hp :accessor max-hp)
    (max-fp :initform 1 :initarg :max-fp :accessor max-fp)
+   (max-ap :initform +normal-ap+ :initarg :max-ap :accessor max-ap)
 
    (strength :initform 0 :initarg :strength :accessor strength) ;; relative mob strength for AI to assess its chances
    (ai-prefs :initform (make-hash-table) :accessor ai-prefs)
@@ -142,10 +143,12 @@
   )
 
 (defun get-mob-type-by-id (mob-type-id)
-  (gethash mob-type-id *mob-types*))
+  (aref *mob-types* mob-type-id))
 
 (defun set-mob-type (mob-type)
-  (setf (gethash (mob-type mob-type) *mob-types*) mob-type))
+  (when (>= (mob-type mob-type) (length *mob-types*))
+    (adjust-array *mob-types* (list (1+ (mob-type mob-type)))))
+  (setf (aref *mob-types* (mob-type mob-type)) mob-type))
 
 (defmethod get-weapon-name ((mob-type mob-type))
   (nth 0 (weapon mob-type)))
@@ -174,7 +177,8 @@
    (y :initarg :y :initform 0 :accessor y :type fixnum)
    
    (dead= :initform nil :accessor dead=)
-   (action-delay :initform 0 :accessor action-delay :type fixnum)
+   (cur-ap :initform +normal-ap+ :accessor cur-ap :type fixnum)
+   (made-turn :initform nil :accessor made-turn)
    
    (cur-hp :initform 0 :initarg :cur-hp :accessor cur-hp)
    (cur-fp :initform 0 :initarg :cur-fp :accessor cur-fp)
@@ -211,6 +215,7 @@
   (setf (cur-hp mob) (max-hp mob))
   (setf (cur-fp mob) 0)
   (setf (cur-sight mob) (base-sight mob))
+  (setf (cur-ap mob) (max-ap mob))
   
   (setf (face-mob-type-id mob) (mob-type mob))
   
@@ -253,6 +258,9 @@
 
 (defmethod max-fp ((mob mob))
   (max-fp (get-mob-type-by-id (mob-type mob))))
+
+(defmethod max-ap ((mob mob))
+  (max-ap (get-mob-type-by-id (mob-type mob))))
 
 (defmethod base-sight ((mob mob))
   (base-sight (get-mob-type-by-id (mob-type mob))))

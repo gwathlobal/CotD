@@ -2,32 +2,40 @@
 
 (defun game-loop ()
   "Main game loop"
-  (loop do
-
-    ;; check all available game events
-    (loop for game-event-id in (game-events *world*)
-          for game-event = (get-game-event-by-id game-event-id)
-          when (and (not (disabled game-event))
-                    (funcall (on-check game-event) *world*))
-            do
-               (funcall (on-trigger game-event) *world*))
-    
-    ;; iterate through all the mobs
-    ;; those who are not dead and have the delay of 0 can make a move
-    (loop for mob across *mobs* do
-      (unless (check-dead mob)
-        
-        (if (> (action-delay mob) 0)
-          (decf (action-delay mob))
-          (progn
-            (ai-function mob)))
-        (when (= (mod (game-time *world*) +normal-ap+) 0)
-          (on-tick mob))))
-    
-    (bt:with-lock-held ((path-lock *world*))
-      (bt:condition-notify (path-cv *world*)))
-    (setf (cur-mob-path *world*) 0)
-    (incf (game-time *world*))))
+  (loop with turn-finished = t
+        do
+           (setf turn-finished t)
+           
+           ;; check all available game events
+           (loop for game-event-id in (game-events *world*)
+                 for game-event = (get-game-event-by-id game-event-id)
+                 when (and (not (disabled game-event))
+                           (funcall (on-check game-event) *world*))
+                   do
+                      (funcall (on-trigger game-event) *world*))
+           
+           ;; iterate through all the mobs
+           ;; those who are not dead and have cur-ap > 0 can make a move
+           (loop for mob across *mobs* do
+             ;(format t "MOB ~A [~A] check-dead = ~A, cur-ap = ~A~%" (name mob) (id mob) (check-dead mob) (cur-ap mob))
+             (unless (check-dead mob)    
+               (when (> (cur-ap mob) 0)
+                 (setf turn-finished nil)
+                 (setf (made-turn mob) nil)
+                 (ai-function mob))))
+           ;(format t "ALL MOBS DONE~%")
+           
+           (bt:with-lock-held ((path-lock *world*))
+             (bt:condition-notify (path-cv *world*)))
+           (setf (cur-mob-path *world*) 0)
+           
+           (when turn-finished
+             (loop for mob across *mobs* do
+               (unless (check-dead mob)
+                 (on-tick mob)))
+             ;(incf (game-time *world*))
+             ))
+  )
   
 (defun init-game (menu-result)
   (setf *mobs* (make-array (list 0) :adjustable t))

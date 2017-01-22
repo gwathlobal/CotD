@@ -16,10 +16,12 @@
 
 
 (defun set-terrain-type (terrain-type)
-  (setf (gethash (id terrain-type) *terrain-types*) terrain-type))
+  (when (>= (id terrain-type) (length *terrain-types*))
+    (adjust-array *terrain-types* (list (1+ (id terrain-type)))))
+  (setf (aref *terrain-types* (id terrain-type)) terrain-type))
 
 (defun get-terrain-type-by-id (terrain-type-id)
-  (gethash terrain-type-id *terrain-types*))
+  (aref *terrain-types* terrain-type-id))
 
 (defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision)
   

@@ -193,6 +193,8 @@
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (setf *current-window* win)
+                                                                                        (set-idle-calcing win)
+                                                                                        (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
                                                                                         )
                                                                                         )
                                                                       :line-list abil-name-list
@@ -219,24 +221,17 @@
 								
 			  (make-output *current-window*))
 			
-			(if (> (action-delay *player*) 0)
-                          (setf (idle-calcing win) :npc-turn)
-                          (if (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
-                            (setf (idle-calcing win) :in-progress)
-                            (setf (idle-calcing win) :done)))
+			(set-idle-calcing win)
+
                         
 			(make-output *current-window*)
 			(go exit-loop)
                         )
-       (:idle () (update-swank)
+       (:idle () #+swank(update-swank)
               
-              (if (> (action-delay *player*) 0)
-                (setf (idle-calcing win) :npc-turn)
-                (if (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
-                  (setf (idle-calcing win) :in-progress)
-                  (setf (idle-calcing win) :done)))
+                 (set-idle-calcing win)
 
-              (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
               )
               
        (:video-expose-event () (make-output *current-window*)))
@@ -247,6 +242,7 @@
   "Helper macro that we can use to allow us to continue from an error. Remember to hit C in slime or pick the restart so errors don't kill the app."
   `(restart-case (progn ,@body) (continue () :report "Continue")))
 
+#+swank
 (defun update-swank ()
        "Called from within the main loop, this keep the lisp repl working while the game runs"
   (continuable (let ((connection (or swank::*emacs-connection* (swank::default-connection))))
@@ -261,5 +257,11 @@
   (when update
     (sdl:update-display)))
 
+(defun set-idle-calcing (win)
+  (if (made-turn *player*)
+    (setf (idle-calcing win) :npc-turn)
+    (if (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
+      (setf (idle-calcing win) :in-progress)
+      (setf (idle-calcing win) :done))))
 
 

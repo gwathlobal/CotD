@@ -5,8 +5,8 @@
 
 (defvar *time-at-end-of-player-turn* 0)
 
-(defparameter *max-x-level* 100)
-(defparameter *max-y-level* 100)
+(defparameter *max-x-level* 300)
+(defparameter *max-y-level* 300)
 (defparameter *max-x-view* 25)
 (defparameter *max-y-view* 25)
 
@@ -127,10 +127,12 @@
 (defconstant +terrain-floor-bookshelf+ 14)
 
 (defparameter *faction-table* (make-hash-table))
-(defparameter *ability-types* (make-hash-table))
-(defparameter *feature-types* (make-hash-table))
-(defparameter *terrain-types* (make-hash-table))
-(defparameter *mob-types* (make-hash-table))
+
+(defparameter *ability-types* (make-array (list 0) :adjustable t))
+(defparameter *feature-types* (make-array (list 0) :adjustable t))
+(defparameter *terrain-types* (make-array (list 0) :adjustable t))
+(defparameter *mob-types* (make-array (list 0) :adjustable t))
+
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))
 

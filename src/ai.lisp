@@ -41,19 +41,17 @@
     (setf (path mob) nil)
     (setf step-x (if (> (x nearest-enemy) (x mob)) -1 1))
     (setf step-y (if (> (y nearest-enemy) (y mob)) -1 1))
-    (move-mob mob (x-y-into-dir step-x step-y))
     
     ;; if can't move away - try any random direction
-    (when (<= (action-delay mob) 0)
+    (unless (move-mob mob (x-y-into-dir step-x step-y))
       (logger (format nil "AI-FUNCTION: ~A [~A] could not flee. Try to move randomly.~%" (name mob) (id mob)))
       (ai-mob-random-dir mob))
     ))
 
 (defun ai-mob-random-dir (mob)
-  (loop while (<= (action-delay mob) 0) do
-    (let ((dir (+ (random 9) 1)))
-      (logger (format nil "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob)))
-      (move-mob mob dir))))
+  (logger (format nil "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob)))
+  (loop for dir = (+ (random 9) 1)
+        until (move-mob mob dir)))
 
 (defmethod ai-function ((mob mob))
   (declare (optimize (speed 3)))
@@ -448,7 +446,7 @@
   
   ;; player is able to move freely
   ;; pester the player until it makes some meaningful action that can trigger the event chain
-  (loop while (<= (action-delay player) 0) do
+  (loop until (made-turn player) do
     (setf (can-move-if-possessed player) nil)
     (get-input-player))
   (setf *time-at-end-of-player-turn* (get-internal-real-time)))
@@ -457,7 +455,7 @@
 (defun thread-path-loop (stream)
   (loop while t do
     (bt:with-lock-held ((path-lock *world*))      
-      (if (and (< (cur-mob-path *world*) (length (mob-id-list (level *world*)))) (<= (action-delay *player*) 0))
+      (if (and (< (cur-mob-path *world*) (length (mob-id-list (level *world*)))) (not (made-turn *player*)))
         (progn
           (when (and (not (dead= (get-mob-by-id (cur-mob-path *world*))))
                      (not (path (get-mob-by-id (cur-mob-path *world*)))))
@@ -491,9 +489,11 @@
               (setf (path mob) path) 
               )
             )
-          (incf (cur-mob-path *world*)))
+          (incf (cur-mob-path *world*))
+          (logger (format nil "THREAD: cur-mob-path - ~A~%" (cur-mob-path *world*)) stream))
         (progn
           (logger (format nil "THREAD: Done calculating paths~%~%") stream)
+          (setf (cur-mob-path *world*) (length (mob-id-list (level *world*))))
           (bt:condition-wait (path-cv *world*) (path-lock *world*)))
         
         ))))
