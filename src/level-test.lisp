@@ -57,7 +57,7 @@
 (defun test-level-place-mobs (level)
   (setf (x *player*) 45 (y *player*) 15)
   (add-mob-to-level-list level *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-woman+ :x (+ (x *player*) 5) :y (- (y *player*) 0)))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-man+ :x (+ (x *player*) 5) :y (- (y *player*) 0)))
         (demon (make-instance 'mob :mob-type +mob-type-woman+ :x (+ (x *player*) 4) :y (+ (y *player*) 0))))
     ;(setf (cur-hp demon) 1)
     (set-mob-effect *player* +mob-effect-divine-shield+ 100)

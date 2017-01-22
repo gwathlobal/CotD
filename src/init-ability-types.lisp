@@ -103,8 +103,9 @@
                                                 (declare (ignore ability-type))
                                                 
                                                 (logger (format nil "MOB-POSSESS-TARGET: ~A [~A] possesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
-                                                (setf (x actor) (x target) (y actor) (y target))
+                                                
                                                 (remove-mob-from-level-list (level *world*) target)
+                                                (set-mob-location actor (x target) (y target))
                                                                                                 
                                                 (setf (master-mob-id target) (id actor))
                                                 (setf (slave-mob-id actor) (id target))
@@ -329,7 +330,8 @@
                                                             (print-visible-message (x actor) (y actor) (level *world*) 
                                                                                    (format nil "~A disappeares in thin air.~%" (name actor)))
                                                             ;; teleport the caster to the caller
-                                                            (setf (x actor) fx (y actor) fy)
+                                                            (set-mob-location actor fx fy)
+                                                            ;(setf (x actor) fx (y actor) fy)
                                                             (print-visible-message (x actor) (y actor) (level *world*) 
                                                                                    (format nil "~A answers the call of ~A.~%" (name actor) (name called-ally)))
                                                             ;; remove the calling for help status from the called and the caller
