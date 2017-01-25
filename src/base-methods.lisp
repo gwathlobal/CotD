@@ -60,15 +60,10 @@
     (return-from check-move-on-level 'obstacle))
   ;; checking for mobs
   ;(format t "Obstacle = ~%")
-  (dolist (mob-id (mob-id-list (level *world*)))
-    
-    (when (and (= dx (x (get-mob-by-id mob-id))) 
-               (= dy (y (get-mob-by-id mob-id)))
-	       (if (slave-mob-id (get-mob-by-id mob-id))
-                 (/= (id mob) (slave-mob-id (get-mob-by-id mob-id)))
-                 t))
-      (return-from check-move-on-level (get-mob-by-id mob-id)))
-    )
+  (when (and (get-mob-* (level *world*) dx dy)
+             (not (eq (get-mob-* (level *world*) dx dy) mob)))
+    (return-from check-move-on-level (get-mob-* (level *world*) dx dy)))
+  
   ;; all checks passed - can move freely
   (return-from check-move-on-level t))
 
