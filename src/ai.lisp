@@ -14,17 +14,6 @@
     (return-from check-move-for-ai nil))
 
   t
-  ;; checking for mobs
-  ;(let ((target (get-mob-* (level *world*) dx dy)))
-  ;  (cond
-      ;; if self - can move
-  ;    ((eq mob target) (return-from check-move-for-ai t))
-      ;; allied faction & does not give blessings - need to go around
-      ;((and target
-      ;      (get-faction-relation (faction mob) (faction target))
-      ;      (not (mob-ai-wants-bless-p mob))) (return-from check-move-for-ai nil))
-      ;; otherwise (enemies, etc) - can move
-  ;    (t (return-from check-move-for-ai t))))
   )
 
 
@@ -69,8 +58,10 @@
   (when (and (slave-mob-id mob)
              (zerop (random (* *possessed-revolt-chance* (mob-ability-p mob +mob-abil-can-possess+)))))
     (logger (format nil "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)))
-    (print-visible-message (x mob) (y mob) (level *world*) 
-                           (format nil "~A revolts against ~A.~%" (name (get-mob-by-id (slave-mob-id mob))) (name mob)))
+    (when (or (mob-effect-p mob +mob-effect-reveal-true-form+)
+              (get-faction-relation (faction mob) (faction *player*)))
+      (print-visible-message (x mob) (y mob) (level *world*) 
+                             (format nil "~A revolts against ~A.~%" (name (get-mob-by-id (slave-mob-id mob))) (name mob))))
     (setf (path mob) nil)
     (ai-mob-random-dir mob)
     (return-from ai-function nil)
