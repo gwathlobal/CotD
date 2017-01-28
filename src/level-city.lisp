@@ -4,9 +4,7 @@
 
 
 
-
-(defun create-template-city (max-x max-y entrance)
-  (declare (ignore entrance))
+(defun create-template-city (max-x max-y city-type)
   
   (logger (format nil "CREATE-TEMPLATE-CITY~%"))
 
@@ -29,22 +27,14 @@
 
    
     ;; set up maximum building types for this kind of map
-    (setf (gethash +building-type-church+ max-building-types) 1)
-    (setf (gethash +building-type-satanists+ max-building-types) 1)
-    (setf (gethash +building-type-warehouse+ max-building-types) 1)
-    (setf (gethash +building-type-library+ max-building-types) 1)
-    (setf (gethash +building-type-prison+ max-building-types) 1)
-    (setf (gethash +building-type-lake+ max-building-types) 4)
+    (when (city-type-return-max-buildings city-type)
+      (setf max-building-types (funcall (city-type-return-max-buildings city-type))))
 
     ;; set up reserved building types for this kind of map
-    (setf (gethash +building-type-church+ reserved-building-types) 1)
-    (setf (gethash +building-type-satanists+ reserved-building-types) 1)
-    (setf (gethash +building-type-warehouse+ reserved-building-types) 1)
-    (setf (gethash +building-type-library+ reserved-building-types) 1)
-    (setf (gethash +building-type-prison+ reserved-building-types) 1)
-    (setf (gethash +building-type-lake+ reserved-building-types) 2)
+    (when (city-type-return-reserv-buildings city-type)
+      (setf reserved-building-types (funcall (city-type-return-reserv-buildings city-type))))
     
-    ;; all grid cells along the borders are reserved, while everything inised is free for claiming
+    ;; all grid cells along the borders are reserved, while everything inside is free for claiming
     (loop for y from 1 below (1- reserv-max-y) do
       (loop for x from 1 below (1- reserv-max-x) do
         (setf (aref reserved-level x y) +building-city-free+)))
@@ -187,7 +177,11 @@
                  (pushnew (list feature-id (+ (* gx *level-grid-size*) px lx) (+ (* gy *level-grid-size*) py ly)) 
                           feature-list)))
           )
-               
+
+    ;; apply the post-processing function of the city type, if any
+    (when (city-type-post-processing-func city-type)
+      (setf template-level (funcall (city-type-post-processing-func city-type) template-level)))
+    
     (values template-level feature-list mob-list)
     ))
 

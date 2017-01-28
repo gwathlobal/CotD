@@ -5,8 +5,8 @@
 
 (defvar *time-at-end-of-player-turn* 0)
 
-(defparameter *max-x-level* 300)
-(defparameter *max-y-level* 300)
+(defparameter *max-x-level* 100)
+(defparameter *max-y-level* 100)
 (defparameter *max-x-view* 25)
 (defparameter *max-y-view* 25)
 
@@ -125,6 +125,11 @@
 (defconstant +terrain-floor-cabinet+ 12)
 (defconstant +terrain-floor-crate+ 13)
 (defconstant +terrain-floor-bookshelf+ 14)
+(defconstant +terrain-border-floor-snow+ 15)
+(defconstant +terrain-floor-snow+ 16)
+(defconstant +terrain-floor-snow-prints+ 17)
+(defconstant +terrain-tree-birch-snow+ 18)
+(defconstant +terrain-water-ice+ 19)
 
 (defparameter *faction-table* (make-hash-table))
 

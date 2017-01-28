@@ -68,9 +68,13 @@
   (return-from check-move-on-level t))
 
 (defun set-mob-location (mob x y)
+  (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
+    (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob)))
   (setf (aref (mobs (level *world*)) (x mob) (y mob)) nil)
   (setf (x mob) x (y mob) y)
-  (setf (aref (mobs (level *world*)) x y) (id mob)))
+  (setf (aref (mobs (level *world*)) x y) (id mob))
+  (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
+    (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob))))
 
 (defun move-mob (mob dir)
   ;;(format t "MOVE-MOB: inside ~A~%" dir)
@@ -85,8 +89,7 @@
 	  ((eq check-result t)
 
            (set-mob-location mob x y)
-           ;(setf (x mob) x (y mob) y)
-	   
+           
 	   (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
            (return-from move-mob t)
            )
@@ -104,7 +107,7 @@
   (decf (cur-ap mob) speed)
   (setf (made-turn mob) t)
   (when (eq mob *player*)
-    (incf (game-time *world*) speed)))
+    (incf (player-game-time *world*) speed)))
 
 (defmethod on-bump ((target mob) (actor mob))
   (if (eql target actor)

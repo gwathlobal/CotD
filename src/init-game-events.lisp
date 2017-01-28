@@ -86,11 +86,11 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-military-arrive+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (= (game-time world) 2200)
+                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived!"))
+                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived!~%"))
                                                            
                                                            ;; find a suitable place for the military along the map borders
                                                            ;; four groups are created - north, south, east and west
@@ -116,4 +116,18 @@
                                                                        do
                                                                           (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-soldier+ :x sx :y (+ sy y)))))
                                                              ))
-                                                           ))
+                               ))
+
+(set-game-event (make-instance 'game-event :id +game-event-snow-falls+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (loop repeat (sqrt (* (array-dimension (terrain (level world)) 0) (array-dimension (terrain (level world)) 1)))
+                                                                 for x = (random (array-dimension (terrain (level world)) 0))
+                                                                 for y = (random (array-dimension (terrain (level world)) 1))
+                                                                 when (= (get-terrain-* (level world) x y) +terrain-floor-snow-prints+)
+                                                                   do
+                                                                      (logger (format nil "GAME-EVENT: Snow falls at (~A ~A)~%" x y))
+                                                                      (set-terrain-* (level world) x y +terrain-floor-snow+))
+                                                           )))

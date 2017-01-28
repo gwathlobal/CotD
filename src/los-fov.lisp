@@ -158,7 +158,7 @@
   (dotimes (x1 *max-x-level*)
     (dotimes (y1 *max-y-level*)
       (if (get-single-memo-revealed (get-memo-* level x1 y1))
-        (set-single-memo-* level x1 y1 :glyph-color (sdl:color :r 100 :g 100 :b 100) :visibility nil)
+        (set-single-memo-* level x1 y1 :glyph-color (sdl:color :r 50 :g 50 :b 50) :visibility nil)
         (set-single-memo-* level x1 y1 :visibility nil))
       ))
 

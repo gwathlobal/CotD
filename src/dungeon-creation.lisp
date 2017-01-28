@@ -36,7 +36,12 @@
     ;; if test level is used, create a special test level
     (if (or (eql menu-result 'test-level) (eql menu-result 'test-level-all-see))
       (multiple-value-setq (result-template feature-template-result mob-template-result) (create-template-test-city *max-x-level* *max-y-level* nil))
-      (multiple-value-setq (result-template feature-template-result mob-template-result) (create-template-city *max-x-level* *max-y-level* nil)))
+      (progn
+        (let* ((city-type-list (get-all-city-types))
+               (cur-city-type-id))
+          (setf cur-city-type-id (nth (random (length city-type-list)) city-type-list))
+          
+          (multiple-value-setq (result-template feature-template-result mob-template-result) (create-template-city *max-x-level* *max-y-level* (get-city-type-by-id cur-city-type-id))))))
         
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)

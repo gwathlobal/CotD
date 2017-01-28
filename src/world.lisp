@@ -96,7 +96,9 @@
 ;;----------------------
 
 (defclass world ()
-  ((game-time :initform 0 :accessor game-time)
+  ((player-game-time :initform 0 :accessor player-game-time)
+   (real-game-time :initform 0 :accessor real-game-time)
+   (turn-finished :initform nil :accessor turn-finished)
    
    (level :initform nil :accessor level :type level)
    
@@ -127,24 +129,28 @@
 
 (defmethod initialize-instance :after ((world world) &key)
   (pushnew +game-event-lose-game+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-angels) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-angels+ (game-events world))
   (pushnew +game-event-military-arrive+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-demons) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-demons+ (game-events world))
   (pushnew +game-event-military-arrive+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-humans) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-humans+ (game-events world))
   (pushnew +game-event-military-arrive+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 

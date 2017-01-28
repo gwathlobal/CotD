@@ -13,6 +13,8 @@
                            (funcall (on-check game-event) *world*))
                    do
                       (funcall (on-trigger game-event) *world*))
+
+           (setf (turn-finished *world*) nil)
            
            ;; iterate through all the mobs
            ;; those who are not dead and have cur-ap > 0 can make a move
@@ -30,6 +32,8 @@
            (setf (cur-mob-path *world*) 0)
            
            (when turn-finished
+             (incf (real-game-time *world*))
+             (setf (turn-finished *world*) t)
              (loop for mob across *mobs* do
                (unless (check-dead mob)
                  (on-tick mob)))

@@ -9,6 +9,7 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name terrain" :initarg :name :accessor name)
+   (on-step :initform nil :initarg :on-step :accessor on-step)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-move - +terrain-trait-blocks-move+
    ;; :trait-blocks-vision - +terrain-trait-blocks-vision+
