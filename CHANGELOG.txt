@@ -5,6 +5,7 @@ v1.0.4
 - Made help articles be read from files
 - Added snow terrain
 - Added an option to go to main menu from the game over screen
+- Added rivers to the city generator
 
 --------------------
 Jan 17, 2017 v1.0.3

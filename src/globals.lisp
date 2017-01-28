@@ -130,6 +130,8 @@
 (defconstant +terrain-floor-snow-prints+ 17)
 (defconstant +terrain-tree-birch-snow+ 18)
 (defconstant +terrain-water-ice+ 19)
+(defconstant +terrain-water-river+ 20)
+(defconstant +terrain-floor-bridge+ 21)
 
 (defparameter *faction-table* (make-hash-table))
 

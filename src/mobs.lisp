@@ -67,7 +67,7 @@
    ;;   :abil-keen-senses - +mob-abil-keen-senses+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> <dmg min> <dmg max> <attack speed>)
-   (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
+   (base-sight :initform 8 :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)

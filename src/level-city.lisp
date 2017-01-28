@@ -39,6 +39,10 @@
       (loop for x from 1 below (1- reserv-max-x) do
         (setf (aref reserved-level x y) +building-city-free+)))
 
+    (when (city-type-process-reserve-func city-type)
+      (format t "BUILD-LIST ~A~%" (funcall (city-type-process-reserve-func city-type) reserved-level))
+      (setf build-list (append build-list (funcall (city-type-process-reserve-func city-type) reserved-level))))
+        
     ;; make reservations from reserved buildings on the grid level
     (loop for gen-building-type-id being the hash-key in reserved-building-types do
       (loop repeat (gethash gen-building-type-id reserved-building-types)

@@ -39,6 +39,8 @@
 (defconstant +building-city-townhall-3+ 18)
 (defconstant +building-city-townhall-4+ 19)
 (defconstant +building-city-satan-lair-1+ 20)
+(defconstant +building-city-river+ 21)
+(defconstant +building-city-bridge+ 22)
 
 (defparameter *level-grid-size* 5)
 

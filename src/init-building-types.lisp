@@ -176,7 +176,7 @@
                                                                         "``T`````,,"
                                                                         ",````T````"
                                                                         ",`T`````T`"
-                                                                        ",``````````"
+                                                                        ",`````````"
                                                                         ",,`T``T`,,"
                                                                         ",,``````,,")))
                                               
@@ -494,3 +494,19 @@
                                                           (list +feature-blood-fresh+ 7 12)
                                                           (list +feature-blood-fresh+ 9 12)
                                                           (list +feature-blood-old+ 9 13))))))
+
+(set-building-type (make-building :id +building-city-river+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for x1 from 0 below 5 do
+                                              (loop for y1 from 0 below 5 do
+                                                (setf (aref template-level (+ x x1) (+ y y1)) +terrain-water-river+)))
+                                            (values nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-bridge+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for x1 from 0 below 5 do
+                                              (loop for y1 from 0 below 5 do
+                                                (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bridge+)))
+                                            (values nil
+                                                    nil))))
