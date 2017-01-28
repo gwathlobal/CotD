@@ -11,109 +11,42 @@
    (cur-str :initform 0 :accessor cur-str)
    (cur-sel :initform 0 :accessor cur-sel)
    (menu-items :initform (list "Overview" "Keybindings" "Credits") :accessor menu-items)
+   (help-txt :initform (help-window-populate-txt) :accessor help-txt)
    ))
 
-(defun show-help-overview (win)
-  (let ((str (create-string)) (max-str) (rect))
-    (format str "THE PLOT~%")
-    (format str "The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain. ")
-    (format str "Choose your side and join the fray!~%~%")
-    (format str "GENERAL TIPS~%")
-    (format str " - You are not alone here - there are allies that can help.~%")
-    (format str " - Your enemies are able to hide their true appearence, so observe and learn their tactics to avoid nasty surprises.~%")
-    (format str " - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.~%")
-    (format str " - Angels and demons gain power when killing each other proportional to the strength of the slain adversary.~%")
-    (format str " - Stockpile power to get promoted or spend it on available abilities.~%~%")
-    (format str "THE HEAVENLY FORCES~%")
-    (format str " - You start as an Angel who can easily dispatch lowly Imps.~%")
-    (format str " - Bless humans to gain power.~%")
-    (format str " - To win, kill all demons or ascend beyond Archangel. Survival of mankind is not required.~%~%")
-    (format str "THE LEGIONS OF HELL~%")
-    (format str " - You start as a puny Imp who is no match for an Angel.~%")
-    (format str " - Kill humans to gain power. Beware of blessed ones.~%")
-    (format str " - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.~%~%")
-    (format str "HUMANS~%")
-    (format str " - Humans are frail and week. Citizens of the City will try to flee whenever they see an enemy.~%")
-    (format str " - Priests will preach to smite their foes or grant allies divine shield. Smiting applies minor damage to all enemies in sight, while divine shield gives a one-time protection from any harm.~%")
-    (format str " - Satanists are allied with demons. They have are able to call demons to them for free and curse all enemies in sight with inaccuracy.~%")
-    (format str " - Soldiers arrive towards the end of the battle for the City. They are allied with the citizens but oppose both angels and demons. They are armed with single-shot rifles and need to reload every other turn. But their numbers and the ability to apply damage at range can make short work of any supernatural being.~%")
+(defun help-window-populate-txt ()
+  (let ((file-list (list "help/overview.txt" "help/keybindings.txt" "help/credits.txt"))
+        (get-txt-func #'(lambda (filename)
+                          (with-open-file (file (merge-pathnames filename *current-dir*) :direction :input :if-does-not-exist nil)
+                            (when file 
+                              (loop for line = (read-line file nil)
+                                    with str = (create-string "")
+                                    while line do (format str "~A" line)
+                                    finally (return str)))))))
+    (append (list nil) (map 'list get-txt-func file-list)))
+  )
 
-    (setf rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
+(defun show-help-text (win txt-n)
+  (let ((str (nth txt-n (help-txt win)))
+        (max-str))
 
-    ;; calculate the maximum number of lines
-    (setf max-str (write-text str rect :count-only t))
-    
-    (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
-      (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
-
-    (when (< (cur-str win) 0)
-      (setf (cur-str win) 0))
-    
-    (write-text str rect :start-line (cur-str win))
-
-    (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
-                                                          "[Up/Down] Scroll text  "
-                                                          ""))
-                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
-    
-    (sdl:free rect)))
-
-(defun show-help-keybindings (win )
-  (let ((str (create-string)) (max-str) (rect))
-    (format str "Arrow keys,                    - Movement~%")
-    (format str "Page Up, Page Down, Home, End,~%")
-    (format str "Numpad keys~%")
-    (format str "Shift + 2                      - Character screen~%")
-    (format str "a                              - Invoke ability~%")
-    (format str "l                              - Look mode~%")
-    (format str "m                              - View messages~%")
-    (format str "?                              - Help~%")
-    
-    (setf rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
-
-    ;; calculate the maximum number of lines
-    (setf max-str (write-text str rect :count-only t))
-    
-    (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
-      (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
-
-    (when (< (cur-str win) 0)
-      (setf (cur-str win) 0))
-    
-    (write-text str rect :start-line (cur-str win))
-
-    (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
-                                                          "[Up/Down] Scroll text  "
-                                                          ""))
-                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
-    
-    (sdl:free rect)))
-
-(defun show-help-credits (win)
-  (let ((str (create-string)) (max-str) (rect))
-    (format str "Created by Gwathlobal using Common Lisp~%")
-    (format str "Inspired by a 7DRL \"City of the Condemned\" by Tapio~%~%")
-    (format str "Feel free to email bugs and suggestions to gwathlobal@yandex.ru")
-        
-    (setf rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
-
-    ;; calculate the maximum number of lines
-    (setf max-str (write-text str rect :count-only t))
-    
-    (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
-      (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
-
-    (when (< (cur-str win) 0)
-      (setf (cur-str win) 0))
-    
-    (write-text str rect :start-line (cur-str win))
-
-    (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
-                                                          "[Up/Down] Scroll text  "
-                                                          ""))
-                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
-    
-    (sdl:free rect)))
+    (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
+      ;; calculate the maximum number of lines
+      (setf max-str (write-text str rect :count-only t))
+      
+      (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
+        (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
+      
+      (when (< (cur-str win) 0)
+        (setf (cur-str win) 0))
+      
+      (write-text str rect :start-line (cur-str win))
+      
+      (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
+                                                            "[Up/Down] Scroll text  "
+                                                            ""))
+                               10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+      )))
 
 (defmethod make-output ((win help-window))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
@@ -123,15 +56,15 @@
     ;; draw overview page
     ((= (cur-page win) +win-help-page-overview+) 
      (sdl:draw-string-solid-* "OVERVIEW" (truncate *window-width* 2) 0 :justify :center)
-     (show-help-overview win))
+     (show-help-text win +win-help-page-overview+))
     ;; draw keybindings page
     ((= (cur-page win) +win-help-page-keybindings+) 
      (sdl:draw-string-solid-* "KEYBINDINGS" (truncate *window-width* 2) 0 :justify :center)
-     (show-help-keybindings win))
+     (show-help-text win +win-help-page-keybindings+))
     ;; draw credits page
     ((= (cur-page win) +win-help-page-credits+) 
      (sdl:draw-string-solid-* "CREDITS" (truncate *window-width* 2) 0 :justify :center)
-     (show-help-credits win))
+     (show-help-text win +win-help-page-credits+))
     (t ;; draw the menu
      (sdl:draw-string-solid-* "HELP" (truncate *window-width* 2) 0 :justify :center)
      (let ((cur-str) (color-list nil))

@@ -7,15 +7,18 @@
 (defclass level ()
   ((terrain :initform nil :accessor terrain :type simple-array) ; of type int, which is a idx of terrain-type
    (memo :initform nil :accessor memo :type simple-array) ; of type list containing (idx of glyph, color of glyph, color of background, visibility flag, revealed flag)
+   (mobs :initform nil :accessor mobs :type simple-array) ; of type int, which is the id of a mob
    (mob-id-list :initarg :mob-id-list :initform (make-list 0) :accessor mob-id-list)
    (feature-id-list :initarg :feature-id-list :initform (make-list 0) :accessor feature-id-list)
    ))
    
 (defun add-mob-to-level-list (level mob)
-  (pushnew (id mob) (mob-id-list level)))
+  (pushnew (id mob) (mob-id-list level))
+  (setf (aref (mobs level) (x mob) (y mob)) (id mob)))
 
 (defun remove-mob-from-level-list (level mob)
-  (setf (mob-id-list level) (remove (id mob) (mob-id-list level))))
+  (setf (mob-id-list level) (remove (id mob) (mob-id-list level)))
+  (setf (aref (mobs level) (x mob) (y mob)) nil))
 
 (defun add-feature-to-level-list (level feature)
   (pushnew (id feature) (feature-id-list level)))
@@ -41,13 +44,21 @@
 	(setf feature-list (append feature-list (list feature)))))
     feature-list))
 
+;(defun get-mob-* (level x y)
+;  (let ((mob))
+;    (dolist (mob-id (mob-id-list level))
+;      (setf mob (get-mob-by-id mob-id))
+;      (when (and (= (x mob) x) (= (y mob) y))
+;	(return-from get-mob-* mob))))
+;  nil)
+
 (defun get-mob-* (level x y)
-  (let ((mob))
-    (dolist (mob-id (mob-id-list level))
-      (setf mob (get-mob-by-id mob-id))
-      (when (and (= (x mob) x) (= (y mob) y))
-	(return-from get-mob-* mob))))
-  nil)
+  (when (or (< x 0) (>= x *max-x-level*)
+            (< y 0) (>= y *max-y-level*))
+    (return-from get-mob-* nil))
+  (if (aref (mobs level) x y)
+    (get-mob-by-id (aref (mobs level) x y))
+    nil))
 
 (defun get-memo-* (level x y)
   (aref (memo level) x y))
@@ -85,7 +96,9 @@
 ;;----------------------
 
 (defclass world ()
-  ((game-time :initform 0 :accessor game-time)
+  ((player-game-time :initform 0 :accessor player-game-time)
+   (real-game-time :initform 0 :accessor real-game-time)
+   (turn-finished :initform nil :accessor turn-finished)
    
    (level :initform nil :accessor level :type level)
    
@@ -98,7 +111,12 @@
    (total-angels :initform 0 :accessor total-angels)
    (total-blessed :initform 0 :accessor total-blessed)
 
-   (game-events :initform () :accessor game-events)))
+   (game-events :initform () :accessor game-events)
+
+   (cur-mob-path :initform 0 :accessor cur-mob-path)
+   (path-lock :initform (bt:make-lock) :accessor path-lock)
+   (path-cv :initform (bt:make-condition-variable) :accessor path-cv)
+   ))
   
 (defclass world-for-angels (world)
   ())
@@ -111,24 +129,28 @@
 
 (defmethod initialize-instance :after ((world world) &key)
   (pushnew +game-event-lose-game+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-angels) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-angels+ (game-events world))
   (pushnew +game-event-military-arrive+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-demons) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-demons+ (game-events world))
   (pushnew +game-event-military-arrive+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-humans) &key)
   (pushnew +game-event-lose-game+ (game-events world))
   (pushnew +game-event-win-for-humans+ (game-events world))
   (pushnew +game-event-military-arrive+ (game-events world))
+  (pushnew +game-event-snow-falls+ (game-events world))
   )
 
 

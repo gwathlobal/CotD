@@ -64,7 +64,7 @@
      exit-func (make-output *current-window*)))
 
 (defun find-mob-with-max-kills ()
-  (loop for mob being the hash-values in *mobs-hash*
+  (loop for mob across *mobs*
         with mob-found = nil
         finally (return mob-found)
         do
@@ -74,7 +74,7 @@
              (setf mob-found mob))))
 
 (defun find-mob-with-max-blesses ()
-  (loop for mob being the hash-values in *mobs-hash*
+  (loop for mob across *mobs*
         with mob-found = nil
         finally (return mob-found)
         do
@@ -84,7 +84,7 @@
              (setf mob-found mob))))
 
 (defun find-mob-with-max-calls ()
-  (loop for mob being the hash-values in *mobs-hash*
+  (loop for mob across *mobs*
         with mob-found = nil
         finally (return mob-found)
         do
@@ -94,7 +94,7 @@
              (setf mob-found mob))))
 
 (defun find-mob-with-max-answers ()
-  (loop for mob being the hash-values in *mobs-hash*
+  (loop for mob across *mobs*
         with mob-found = nil
         finally (return mob-found)
         do
@@ -104,7 +104,7 @@
              (setf mob-found mob))))
 
 (defun find-mob-with-max-friendly-kills ()
-  (loop for mob being the hash-values in *mobs-hash*
+  (loop for mob across *mobs*
         with mob-found = nil
         finally (return mob-found)
         do

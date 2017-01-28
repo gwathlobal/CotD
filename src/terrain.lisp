@@ -9,6 +9,7 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name terrain" :initarg :name :accessor name)
+   (on-step :initform nil :initarg :on-step :accessor on-step)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-move - +terrain-trait-blocks-move+
    ;; :trait-blocks-vision - +terrain-trait-blocks-vision+
@@ -16,10 +17,12 @@
 
 
 (defun set-terrain-type (terrain-type)
-  (setf (gethash (id terrain-type) *terrain-types*) terrain-type))
+  (when (>= (id terrain-type) (length *terrain-types*))
+    (adjust-array *terrain-types* (list (1+ (id terrain-type)))))
+  (setf (aref *terrain-types* (id terrain-type)) terrain-type))
 
 (defun get-terrain-type-by-id (terrain-type-id)
-  (gethash terrain-type-id *terrain-types*))
+  (aref *terrain-types* terrain-type-id))
 
 (defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision)
   

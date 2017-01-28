@@ -2,33 +2,48 @@
 
 (defun game-loop ()
   "Main game loop"
-  (loop do
+  (loop with turn-finished = t
+        do
+           (setf turn-finished t)
+           
+           ;; check all available game events
+           (loop for game-event-id in (game-events *world*)
+                 for game-event = (get-game-event-by-id game-event-id)
+                 when (and (not (disabled game-event))
+                           (funcall (on-check game-event) *world*))
+                   do
+                      (funcall (on-trigger game-event) *world*))
 
-    ;; check all available game events
-    (loop for game-event-id in (game-events *world*)
-          for game-event = (get-game-event-by-id game-event-id)
-          when (and (not (disabled game-event))
-                    (funcall (on-check game-event) *world*))
-            do
-               (funcall (on-trigger game-event) *world*))
-    
-    ;; iterate through all the mobs
-    ;; those who are not dead and have the delay of 0 can make a move
-    (loop for mob being the hash-values in *mobs-hash* do
-      (unless (check-dead mob)
-        
-        (if (> (action-delay mob) 0)
-          (decf (action-delay mob))
-          (progn
-            (ai-function mob)))
-        (when (= (mod (game-time *world*) +normal-ap+) 0)
-          (on-tick mob))))
-    
-    (incf (game-time *world*))))
+           (setf (turn-finished *world*) nil)
+           
+           ;; iterate through all the mobs
+           ;; those who are not dead and have cur-ap > 0 can make a move
+           (loop for mob across *mobs* do
+             ;(format t "MOB ~A [~A] check-dead = ~A, cur-ap = ~A~%" (name mob) (id mob) (check-dead mob) (cur-ap mob))
+             (unless (check-dead mob)    
+               (when (> (cur-ap mob) 0)
+                 (setf turn-finished nil)
+                 (setf (made-turn mob) nil)
+                 (ai-function mob))))
+           ;(format t "ALL MOBS DONE~%")
+           
+           (bt:with-lock-held ((path-lock *world*))
+             (bt:condition-notify (path-cv *world*)))
+           (setf (cur-mob-path *world*) 0)
+           
+           (when turn-finished
+             (incf (real-game-time *world*))
+             (setf (turn-finished *world*) t)
+             (loop for mob across *mobs* do
+               (unless (check-dead mob)
+                 (on-tick mob)))
+             ;(incf (game-time *world*))
+             ))
+  )
   
 (defun init-game (menu-result)
-  (clrhash *mobs-hash*)
-  (clrhash *lvl-features*)
+  (setf *mobs* (make-array (list 0) :adjustable t))
+  (setf *lvl-features* (make-array (list 0) :adjustable t))
   
   (setf *message-box* nil)
   
@@ -44,7 +59,7 @@
                                                                                   (setf *player* (make-instance 'player :mob-type +mob-type-player+))))
     ((eql menu-result 'test-level) (progn
                                      (setf *world* (make-instance 'world))
-                                     (setf *player* (make-instance 'player :mob-type +mob-type-human+))))
+                                     (setf *player* (make-instance 'player :mob-type +mob-type-angel+))))
     ((eql menu-result 'join-heavens) (progn
                                       (setf *world* (make-instance 'world-for-angels)) 
                                       (setf *player* (make-instance 'player :mob-type +mob-type-angel+))))
@@ -186,18 +201,31 @@
                                           :color-key sdl:*white*))
       (setf *glyph-temp* (sdl:create-surface *glyph-w* *glyph-h* :color-key sdl:*black*))
       )
-  
+
+    (setf *path-thread* nil)
+    
     (tagbody
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (setf *start-func* #'(lambda () (go start-tag)))
        start-tag
        (let ((menu-result (main-menu)))
          (init-game menu-result))
+
+       ;; initialize thread, that will calculate random-movement paths while the system waits for player input
+       (let ((out *standard-output*))
+         (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
+           (t ()
+             (logger "MAIN: This system does not support multithreading!~%"))))
+       (bt:condition-notify (path-cv *world*))
+       
        (setf *current-window* (make-instance 'cell-window))
        (make-output *current-window*)
        ;; the game loop
        (game-loop)
-       exit-tag nil))
+     exit-tag
+       ;; destroy the thread once the game is about to be exited
+       (when (and *path-thread* (bt:thread-alive-p *path-thread*)) (bt:destroy-thread *path-thread*))
+     nil))
 )
 
 #+clisp

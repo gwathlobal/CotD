@@ -2,7 +2,7 @@
 
 (defvar *cotd-release* nil)
 
-(defun logger (string)
+(defun logger (string &optional (stream *standard-output*))
   (if *cotd-release*
     nil
-    (format t string)))
+    (format stream string)))

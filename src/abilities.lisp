@@ -19,10 +19,12 @@
    ))
 
 (defun set-ability-type (ability-type)
-  (setf (gethash (id ability-type) *ability-types*) ability-type))
+  (when (>= (id ability-type) (length *ability-types*))
+    (adjust-array *ability-types* (list (1+ (id ability-type)))))
+  (setf (aref *ability-types* (id ability-type)) ability-type))
 
 (defun get-ability-type-by-id (ability-type-id)
-  (gethash ability-type-id *ability-types*)) 
+  (aref *ability-types* ability-type-id)) 
 
 (defun can-invoke-ability (actor target ability-type-id)
   ;;(format t "CAN-INVOKE-ABILITY: (cur-fp mob) ~A, (cost (get-ability-type-by-id ability-type-id)) ~A, (abil-applicable-p (get-ability-type-by-id ability-type-id) mob) ~A~%" 

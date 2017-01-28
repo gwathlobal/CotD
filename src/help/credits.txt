@@ -1,0 +1,4 @@
+Created by Gwathlobal using Common Lisp
+Inspired by a 7DRL "City of the Condemned" by Tapio
+
+Feel free to email bugs and suggestions to gwathlobal@yandex.ru

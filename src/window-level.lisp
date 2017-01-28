@@ -1,7 +1,11 @@
 (in-package :cotd)
 
 (defclass cell-window (window)
-  ((shoot-mode :initform :single :accessor shoot-mode)))
+  ((shoot-mode :initform :single :accessor shoot-mode)
+   (idle-calcing :initform :done :accessor idle-calcing) ; :done - background pathfinding calculation finished
+                                                         ; :in-progress - background pathfinding calculation in progress
+                                                         ; :npc-turn - it is not players turn
+   ))
 
 (defun show-char-effects (mob x y h)
   (loop for effect being the hash-key in (effects mob)
@@ -21,7 +25,7 @@
                ((= effect +mob-effect-cursed+) (sdl:draw-string-solid-* "Cursed" x y1 :color (sdl:color :r 139 :g 69 :b 19))))
              (incf y1 (sdl:get-font-height))))
 
-(defun show-char-properties (x y)
+(defun show-char-properties (x y idle-calcing)
   (let* ((str)
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* *glyph-h* *max-y-view*)))
@@ -38,10 +42,7 @@
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
     (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) 52)
-    (sdl:draw-string-solid-* (format nil "Time ~A"  (game-time *world*))
-                                     x (+ y 237) :color (if (not (zerop (action-delay *player*)))
-                                                          sdl:*red*
-                                                          sdl:*white*))
+    (show-time-label idle-calcing x (+ y 237))
     ))
 
 (defun show-small-message-box (x y w &optional (h *msg-box-window-height*))
@@ -53,17 +54,14 @@
                                                                                        (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
                                                                                        0)))))
 
-(defun update-screen ()
+(defun update-screen (win)
   
-  ;; filling the background with tiles
-  
+  ;; filling the background with black rectangle
   (fill-background-tiles)
-  
-  ;;(update-visible-area (get-level-by-z *world* (z *player*)) (x *player*) (y *player*))
-    
+   
   (update-map-area)
     
-  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10)
+  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   (show-small-message-box *glyph-w* (+ 20 (* *glyph-h* *max-y-view*)) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
     
   (sdl:update-display)
@@ -72,7 +70,7 @@
 
 (defmethod make-output ((win cell-window))
   
-  (update-screen)
+  (update-screen win)
   )
 
 (defmethod run-window ((win cell-window))
@@ -195,6 +193,8 @@
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (setf *current-window* win)
+                                                                                        (set-idle-calcing win)
+                                                                                        (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
                                                                                         )
                                                                                         )
                                                                       :line-list abil-name-list
@@ -221,10 +221,47 @@
 								
 			  (make-output *current-window*))
 			
-			
+			(set-idle-calcing win)
+
+                        
 			(make-output *current-window*)
 			(go exit-loop)
                         )
+       (:idle () #+swank(update-swank)
+              
+                 (set-idle-calcing win)
+
+                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+              )
+              
        (:video-expose-event () (make-output *current-window*)))
     exit-loop)
   nil)
+
+(defmacro continuable (&body body)
+  "Helper macro that we can use to allow us to continue from an error. Remember to hit C in slime or pick the restart so errors don't kill the app."
+  `(restart-case (progn ,@body) (continue () :report "Continue")))
+
+#+swank
+(defun update-swank ()
+       "Called from within the main loop, this keep the lisp repl working while the game runs"
+  (continuable (let ((connection (or swank::*emacs-connection* (swank::default-connection))))
+                 (when connection
+                   (swank::handle-requests connection t)))))
+
+(defun show-time-label (idle-calcing x y &optional (update nil))
+  (sdl:draw-string-solid-* (format nil "Time ~A"  (player-game-time *world*))
+                           x y :color (cond ((eql idle-calcing :done) sdl:*white*)
+                                            ((eql idle-calcing :in-progress) sdl:*yellow*)
+                                            ((eql idle-calcing :npc-turn) sdl:*red*)))
+  (when update
+    (sdl:update-display)))
+
+(defun set-idle-calcing (win)
+  (if (made-turn *player*)
+    (setf (idle-calcing win) :npc-turn)
+    (if (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
+      (setf (idle-calcing win) :in-progress)
+      (setf (idle-calcing win) :done))))
+
+

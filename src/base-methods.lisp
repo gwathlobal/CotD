@@ -1,12 +1,14 @@
 (in-package :cotd)
 
-(defun get-distance (sx sy tx ty)
-  (declare (type fixnum sx sy tx ty))
-  (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)))))
 
-(defun find-free-id (hash-table)
-  (do ((id 0 (+ id 1)))
-      ((eql (gethash id hash-table) nil) id)))
+
+(defun find-free-id (array)
+  (loop for i from 0 below (length array)
+        unless (aref array i)
+          do (return-from find-free-id i))
+  (adjust-array array (list (1+ (length array))))
+  (1- (length array)))
+
 
 (defun x-y-into-dir (x y)
   (let ((xy (list x y)))
@@ -49,76 +51,6 @@
   (when (get-single-memo-visibility (get-memo-* level x y))
     (add-message str)))
 
-(defun update-visible-mobs-normal (mob)
-  (loop 
-    for mob-id in (mob-id-list (level *world*))
-    with vmob = nil
-    do
-       (setf vmob (get-mob-by-id mob-id))
-       ;(format t "LOS ~A dist ~A to (~A, ~A) vs sight ~A~%" (name mob) (get-distance (x mob) (y mob) (x vmob) (y mob)) (x vmob) (y vmob) (cur-sight mob))
-       (when (and (not (check-dead vmob))
-                  (not (eq mob vmob))
-                  (<= (get-distance (x mob) (y mob) (x vmob) (y mob)) (cur-sight mob)))
-         (let ((r 0))
-                      
-           ;;(format t "LOS ~A (~A, ~A) to (~A, ~A)~%" (name mob) (x mob) (y mob) (x vmob) (y vmob))
-           
-           
-           (line-of-sight (x mob) (y mob) (x vmob) (y vmob) #'(lambda (dx dy)
-                                                    (let ((terrain) (exit-result t))
-                                                      (block nil
-                                                        (when (or (< dx 0) (>= dx *max-x-level*)
-                                                                  (< dy 0) (>= dy *max-y-level*))
-                                                          (setf exit-result 'exit)
-                                                          (return))
-                                                        
-                                                        (incf r)
-                                                        
-                                                        
-                                                        ;; checking for impassable objects
-                                                        (setf terrain (get-terrain-* (level *world*) dx dy))
-                                                        (unless terrain
-                                                          (setf exit-result 'exit)
-                                                          (return))
-                                                        (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
-                                                          (setf exit-result 'exit)
-                                                          (return))
-                                                        (when (and (= dx (x vmob)) (= dy (y vmob)))
-                                                          (pushnew (id vmob) (visible-mobs mob))
-                                                          )
-                                                                                                                
-                                                        (when (> r (cur-sight mob))
-                                                          (setf exit-result 'exit)
-                                                          (return))
-                                                        )
-                                                      exit-result)))
-           ))
-    )
-  )
-
-(defun update-visible-mobs-all (mob)
-  (loop 
-    for mob-id in (mob-id-list (level *world*))
-    do
-       (when (/= mob-id (id mob))
-         (pushnew mob-id (visible-mobs mob)))))
-
-(defun update-visible-mobs (mob)
-  (setf (visible-mobs mob) nil)
-  
-  
-  (if (mob-ability-p mob +mob-abil-see-all+)
-    (update-visible-mobs-all mob)
-    (update-visible-mobs-normal mob))
-  
-  
-  (when (eq mob *player*)
-    (setf (view-x *player*) (x *player*))
-    (setf (view-y *player*) (y *player*)))
-  (logger (format nil "UPDATE-VISIBLE-MOBS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-mobs mob)))
-  )
-
-
 (defun check-move-on-level (mob dx dy)
   ;;(format t "CHECK-MOVE-ON-LEVEL: inside~%")
   ;; trying to move beyound the level border 
@@ -128,17 +60,21 @@
     (return-from check-move-on-level 'obstacle))
   ;; checking for mobs
   ;(format t "Obstacle = ~%")
-  (dolist (mob-id (mob-id-list (level *world*)))
-    
-    (when (and (= dx (x (get-mob-by-id mob-id))) 
-               (= dy (y (get-mob-by-id mob-id)))
-	       (if (slave-mob-id (get-mob-by-id mob-id))
-                 (/= (id mob) (slave-mob-id (get-mob-by-id mob-id)))
-                 t))
-      (return-from check-move-on-level (get-mob-by-id mob-id)))
-    )
+  (when (and (get-mob-* (level *world*) dx dy)
+             (not (eq (get-mob-* (level *world*) dx dy) mob)))
+    (return-from check-move-on-level (get-mob-* (level *world*) dx dy)))
+  
   ;; all checks passed - can move freely
   (return-from check-move-on-level t))
+
+(defun set-mob-location (mob x y)
+  (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
+    (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob)))
+  (setf (aref (mobs (level *world*)) (x mob) (y mob)) nil)
+  (setf (x mob) x (y mob) y)
+  (setf (aref (mobs (level *world*)) x y) (id mob))
+  (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
+    (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob))))
 
 (defun move-mob (mob dir)
   ;;(format t "MOVE-MOB: inside ~A~%" dir)
@@ -151,19 +87,27 @@
 	(cond
 	  ;; all clear - move freely
 	  ((eq check-result t)
-           (setf (x mob) x (y mob) y)
-	   
+
+           (set-mob-location mob x y)
+           
 	   (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
+           (return-from move-mob t)
            )
           ;; bumped into a mob
 	  ((typep check-result 'mob) 
            (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result))) 
-           (on-bump check-result mob))
-	  )))))
+           (on-bump check-result mob)
+           (return-from move-mob t))
+	  ))))
+  nil)
 
 (defun make-act (mob speed)
   ;;(format t "MAKE-ACT: ~A SPD ~A~%" (name mob) speed)
-  (incf (action-delay mob) speed))
+  (when (zerop speed) (return-from make-act nil))
+  (decf (cur-ap mob) speed)
+  (setf (made-turn mob) t)
+  (when (eq mob *player*)
+    (incf (player-game-time *world*) speed)))
 
 (defmethod on-bump ((target mob) (actor mob))
   (if (eql target actor)
@@ -340,7 +284,8 @@
                    (eq check-result t))
             ;; target dodged
             (progn
-              (setf (x target) x (y target) y)
+              (set-mob-location target x y)
+              ;(setf (x target) x (y target) y)
               (print-visible-message (x attacker) (y attacker) (level *world*) 
                                      (format nil "~A attacks ~A, but ~A evades the attack. " (name attacker) (name target) (name target))))
             ;; target did not dodge
@@ -482,7 +427,9 @@
 (defgeneric on-tick (mob))
 
 (defmethod on-tick ((mob mob))
-  
+
+  ;; increase cur-ap by max-ap
+  (incf (cur-ap mob) (max-ap mob))
       
   (when (< (cur-fp mob) 0)
     (setf (cur-fp mob) 0))
@@ -569,168 +516,6 @@
      (get-qualified-name mob))
     ;; in all other cases see current appearence name
     (t (name (get-mob-type-by-id (face-mob-type-id mob))))))
-
-(defun draw-fov (cx cy r func)
-  (funcall func cx cy)
-  (loop for i from 0 to 360 by 1 do
-    (line-of-sight cx cy (+ cx (round (* r (cos (* i (/ pi 180)))))) (- cy (round (* r (sin (* i (/ pi 180 )))))) func)))
-
-(defun line-of-sight (sx sy tx ty func)
-  ;; stop at once if the starting point = target point
-  (when (and (= sx tx) (= sy ty))
-    (funcall func sx sy)
-    (return-from line-of-sight nil))
- 
-   (let ((x 0) (y 0) (nx (1+ (abs (- sx tx)))) (ny (1+ (abs (- sy ty))))
-	(px 1) (py 1) (slope) (ix) (iy))
-    ;; determine the direction where to draw the line
-    (cond
-      ((> sx tx) (setf ix -1))
-      ((= sx tx) (setf ix 0))
-      (t (setf ix 1)))
-    (cond
-      ((> sy ty) (setf iy -1))
-      ((= sy ty) (setf iy 0))
-      (t (setf iy 1)))
-    (if (>= nx ny) (setf slope (/ nx ny)) (setf slope (/ ny nx)))
-    
-    (if (>= nx ny)
-	(progn (loop while (< (abs x) nx) do
-		    (when (>= (abs x) (round (* slope py)))
-		      (incf y iy)
-		      (incf py))
-		    
-		    (when (eql (funcall func (+ sx x) (+ sy y)) 'exit) ;(format t "RET!~%") 
-		      (return-from line-of-sight nil))
-		    
-		    (incf x ix)
-		    ))
-	(progn (loop while (< (abs y) ny) do
-		    (when (>= (abs y) (round (* slope px)))
-		      (incf x ix)
-		      (incf px))
-		    
-		    (when (eql (funcall func (+ sx x) (+ sy y)) 'exit) ;(format t "RET!~%") 
-			  (return-from line-of-sight nil))
-		    
-		    (incf y iy)
-		    ))))
-  t)
-
-(defun update-visible-area-normal (level x y)
-  (draw-fov x y (cur-sight *player*) #'(lambda (dx dy)
-                                         (let ((terrain) (exit-result t))
-                                           (block nil
-                                             (when (or (< dx 0) (>= dx *max-x-level*)
-                                                       (< dy 0) (>= dy *max-y-level*))
-                                               (setf exit-result 'exit)
-					       (return))
-					 (when (<= (get-distance x y dx dy) (cur-sight *player*))
-                                           ;; drawing terrain
-                                           (set-single-memo-* level dx dy 
-                                                              :glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) dx dy)))
-                                                              :glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) dx dy)))
-                                                              :back-color (back-color (get-terrain-type-by-id (aref (terrain level) dx dy)))
-                                                              :visibility t
-                                                              :revealed t)
-                                           		
-                                           ;; then feature, if any
-                                           (when (get-features-* level dx dy)
-                                             (let ((ftr (first (last (get-features-* level dx dy)))))
-                                               
-                                               (set-single-memo-* level 
-                                                                  (x ftr) (y ftr) 
-                                                                  :glyph-idx (if (glyph-idx (get-feature-type-by-id (feature-type ftr)))
-                                                                               (glyph-idx (get-feature-type-by-id (feature-type ftr)))
-                                                                               (get-single-memo-glyph-idx (get-memo-* level (x ftr) (y ftr))))
-                                                                  :glyph-color (if (glyph-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                 (glyph-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                 (get-single-memo-glyph-color (get-memo-* level (x ftr) (y ftr))))
-                                                                  :back-color (if (back-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                (back-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                (get-single-memo-back-color (get-memo-* level (x ftr) (y ftr))))
-                                                                  :visibility t
-                                                                  :revealed t)))
-                                           ;; then mob, if any
-                                           (when (get-mob-* level dx dy)
-                                             (let ((vmob (get-mob-* level dx dy)))
-                                               (set-single-memo-* level 
-                                                                  (x vmob) (y vmob) 
-                                                                  :glyph-idx (get-current-mob-glyph-idx vmob)
-                                                                  :glyph-color (get-current-mob-glyph-color vmob)
-                                                                  :back-color (get-current-mob-back-color vmob)
-                                                                  :visibility t
-                                                                  :revealed t))
-                                             ))
-					 ;; checking for impassable objects
-					 					   	
-					     (setf terrain (get-terrain-* level dx dy))
-                                             (unless terrain
-                                               (setf exit-result 'exit)
-					       (return))
-					     (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
-                                               (setf exit-result 'exit)
-					       (return))
-                                             (when (and (get-mob-* level dx dy) 
-                                                        (not (eq (get-mob-* level dx dy) *player*))
-                                                        (get-single-memo-visibility (get-memo-* level dx dy)))
-                                               (pushnew (id (get-mob-* level dx dy)) (visible-mobs *player*)))
-					     )
-					   exit-result))))
-
-(defun update-visible-area-all (level x y)
-  (declare (ignore x y))
-  ;; update visible area
-  (dotimes (x1 *max-x-level*)
-    (dotimes (y1 *max-y-level*)
-      (set-single-memo-* level x1 y1 
-			 :glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) x1 y1)))
-			 :glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) x1 y1)))
-			 :back-color (back-color (get-terrain-type-by-id (aref (terrain level) x1 y1)))
-			 :visibility t)
-      ))
-  (dolist (feature-id (feature-id-list level))
-    (set-single-memo-* level 
-		       (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)) 
-		       :glyph-idx (if (glyph-idx (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				      (glyph-idx (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				      (get-single-memo-glyph-idx (get-memo-* level (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)))))
-		       :glyph-color (if (glyph-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-					(glyph-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-					(get-single-memo-glyph-color (get-memo-* level (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)))))
-		       :back-color (if (back-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				       (back-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				       (get-single-memo-back-color (get-memo-* level (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)))))
-		       :visibility t))
-  
-  (dolist (mob-id (mob-id-list level))
-    ;;(format t "MOB NAME ~A, MOB ID ~A, MOB X ~A, MOB Y ~A~%" (name (get-mob-by-id mob-id)) mob-id (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)))
-    (set-single-memo-* level 
-		       (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)) 
-		       :glyph-idx (get-current-mob-glyph-idx (get-mob-by-id mob-id))
-		       :glyph-color (get-current-mob-glyph-color (get-mob-by-id mob-id))
-		       :back-color (get-current-mob-back-color (get-mob-by-id mob-id))
-		       :visibility t)
-
-    ))
-
-(defun update-visible-area (level x y)
-  ;; make the the whole level invisible
-  (dotimes (x1 *max-x-level*)
-    (dotimes (y1 *max-y-level*)
-      (if (get-single-memo-revealed (get-memo-* level x1 y1))
-        (set-single-memo-* level x1 y1 :glyph-color (sdl:color :r 100 :g 100 :b 100) :visibility nil)
-        (set-single-memo-* level x1 y1 :visibility nil))
-      ))
-
-  
-  (setf (visible-mobs *player*) nil)
-  (if (mob-ability-p *player* +mob-abil-see-all+)
-    (update-visible-area-all level x y)
-    (update-visible-area-normal level x y))
-  
-  (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))
-  )
 
 
 (defgeneric on-bump (target actor))

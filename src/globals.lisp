@@ -125,14 +125,21 @@
 (defconstant +terrain-floor-cabinet+ 12)
 (defconstant +terrain-floor-crate+ 13)
 (defconstant +terrain-floor-bookshelf+ 14)
+(defconstant +terrain-border-floor-snow+ 15)
+(defconstant +terrain-floor-snow+ 16)
+(defconstant +terrain-floor-snow-prints+ 17)
+(defconstant +terrain-tree-birch-snow+ 18)
+(defconstant +terrain-water-ice+ 19)
 
 (defparameter *faction-table* (make-hash-table))
-(defparameter *ability-types* (make-hash-table))
-(defparameter *feature-types* (make-hash-table))
-(defparameter *terrain-types* (make-hash-table))
-(defparameter *mob-types* (make-hash-table))
-(defparameter *lvl-features* (make-hash-table))
-(defparameter *mobs-hash* (make-hash-table))
+
+(defparameter *ability-types* (make-array (list 0) :adjustable t))
+(defparameter *feature-types* (make-array (list 0) :adjustable t))
+(defparameter *terrain-types* (make-array (list 0) :adjustable t))
+(defparameter *mob-types* (make-array (list 0) :adjustable t))
+
+(defparameter *lvl-features* (make-array (list 0) :adjustable t))
+(defparameter *mobs* (make-array (list 0) :adjustable t))
 
 (defparameter *world* nil)
 (defparameter *player* nil)
@@ -145,3 +152,10 @@
 
 (defconstant +normal-ap+ 10)
 (defparameter *possessed-revolt-chance* 12)
+
+
+;;---------------------------
+;; Multithreading parameters
+;;--------------------------- 
+
+(defparameter *path-thread* nil)

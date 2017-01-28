@@ -203,7 +203,7 @@
 	   ((eql (char-code (aref txt read-pos)) (char-code #\Space)) (when (eql was-letter t) (setf cur-pos (incf read-pos) word-length (- read-pos start-pos)) (return-from outer nil)))  
 	   ((eql (char-code (aref txt read-pos)) 13)
 	    (setf eol t cur-pos read-pos word-length (- read-pos start-pos)) 
-	    (when (and (< read-pos (1- txt-length)) (eql (char-code (aref txt (1+ read-pos))) 10))
+            (when (< read-pos (1- txt-length))
 	      (incf cur-pos))
 	    (return-from outer nil))
 	   ((eql (char-code (aref txt read-pos)) 10) (setf eol t cur-pos (1+ read-pos) word-length (- read-pos start-pos)) (return-from outer nil))

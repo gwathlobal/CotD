@@ -12,7 +12,7 @@
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
   :version "0.1"  
   :author "Gwathlobal"    
-  :depends-on (lispbuilder-sdl)
+  :depends-on (lispbuilder-sdl bordeaux-threads)
   :components
     ((:file "logger")
      (:file "astar")
@@ -25,10 +25,13 @@
      (:file "abilities" :depends-on ("globals"))
      (:file "terrain" :depends-on ("globals"))
      (:file "lvl-features" :depends-on ("globals"))
-     (:file "base-methods" :depends-on ("message-box" "mobs" "world" "abilities" "terrain" "lvl-features"))
+     (:file "los-fov" :depends-on ("globals" "world" "mobs"))
+     (:file "base-methods" :depends-on ("message-box" "mobs" "world" "abilities" "terrain" "lvl-features" "los-fov"))
      (:file "buildings" :depends-on ("globals"))
      (:file "init-building-types" :depends-on ("buildings"))
-     (:file "level-city" :depends-on ("init-building-types"))
+     (:file "cities" :depends-on ("buildings"))
+     (:file "init-city-types" :depends-on ("cities"))
+     (:file "level-city" :depends-on ("init-building-types" "init-city-types"))
      (:file "level-test" :depends-on ("base-methods"))
      (:file "dungeon-creation" :depends-on ("level-test" "level-city"))
      (:file "init-mob-types" :depends-on ("base-methods"))

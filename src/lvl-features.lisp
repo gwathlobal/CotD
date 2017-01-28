@@ -13,10 +13,12 @@
    (func :initform nil :initarg :func :accessor func)))
 
 (defun get-feature-type-by-id (feature-type-id)
-  (gethash feature-type-id *feature-types*))
+  (aref *feature-types* feature-type-id))
 
 (defun set-feature-type (feature-type)
-  (setf (gethash (id feature-type) *feature-types*) feature-type))
+  (when (>= (id feature-type) (length *feature-types*))
+    (adjust-array *feature-types* (list (1+ (id feature-type)))))
+  (setf (aref *feature-types* (id feature-type)) feature-type))
 
 ;;--------------------
 ;; FEATURE
@@ -31,11 +33,11 @@
 
 (defmethod initialize-instance :after ((feature feature) &key)
   (setf (id feature) (find-free-id *lvl-features*))
-  (setf (gethash (id feature) *lvl-features*) feature)
+  (setf (aref *lvl-features* (id feature)) feature)
   )
 
 (defun get-feature-by-id (feature-id)
-  (gethash feature-id *lvl-features*))
+  (aref *lvl-features* feature-id))
 
 (defmethod name ((feature feature))
   (name (get-feature-type-by-id (feature-type feature))))

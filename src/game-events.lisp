@@ -7,6 +7,7 @@
 (defconstant +game-event-win-for-humans+ 2)
 (defconstant +game-event-lose-game+ 3)
 (defconstant +game-event-military-arrive+ 4)
+(defconstant +game-event-snow-falls+ 5)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

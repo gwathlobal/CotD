@@ -3,24 +3,28 @@
 (defgeneric ai-function (mob))
 
 (defun check-move-for-ai (mob dx dy)
+  (declare (optimize (speed 3))
+           (type fixnum dx dy)
+           (ignore mob))
   ;; cant move beyond level borders 
   (when (or (< dx 0) (< dy 0) (>= dx *max-x-level*) (>= dy *max-y-level*)) (return-from check-move-for-ai nil))
   
   ;; checking for terrain obstacle
   (when (get-terrain-type-trait (get-terrain-* (level *world*) dx dy) +terrain-trait-blocks-move+) 
     (return-from check-move-for-ai nil))
-  
+
+  t
   ;; checking for mobs
-  (let ((target (get-mob-* (level *world*) dx dy)))
-    (cond
+  ;(let ((target (get-mob-* (level *world*) dx dy)))
+  ;  (cond
       ;; if self - can move
-      ((eq mob target) (return-from check-move-for-ai t))
+  ;    ((eq mob target) (return-from check-move-for-ai t))
       ;; allied faction & does not give blessings - need to go around
       ;((and target
       ;      (get-faction-relation (faction mob) (faction target))
       ;      (not (mob-ai-wants-bless-p mob))) (return-from check-move-for-ai nil))
       ;; otherwise (enemies, etc) - can move
-      (t (return-from check-move-for-ai t))))
+  ;    (t (return-from check-move-for-ai t))))
   )
 
 
@@ -37,19 +41,17 @@
     (setf (path mob) nil)
     (setf step-x (if (> (x nearest-enemy) (x mob)) -1 1))
     (setf step-y (if (> (y nearest-enemy) (y mob)) -1 1))
-    (move-mob mob (x-y-into-dir step-x step-y))
     
     ;; if can't move away - try any random direction
-    (when (<= (action-delay mob) 0)
+    (unless (move-mob mob (x-y-into-dir step-x step-y))
       (logger (format nil "AI-FUNCTION: ~A [~A] could not flee. Try to move randomly.~%" (name mob) (id mob)))
       (ai-mob-random-dir mob))
     ))
 
 (defun ai-mob-random-dir (mob)
-  (loop while (<= (action-delay mob) 0) do
-    (let ((dir (+ (random 9) 1)))
-      (logger (format nil "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob)))
-      (move-mob mob dir))))
+  (logger (format nil "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob)))
+  (loop for dir = (+ (random 9) 1)
+        until (move-mob mob dir)))
 
 (defmethod ai-function ((mob mob))
   (declare (optimize (speed 3)))
@@ -195,7 +197,7 @@
                                )))
         
         (logger (format nil "AI-FUNCTION: Mob - (~A ~A) Target - (~A ~A)~%" (x mob) (y mob) (x nearest-target) (y nearest-target)))
-	(logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
+        (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
         (pop path)
         
 	(setf (path mob) path)
@@ -211,7 +213,7 @@
               (ry (- (+ 10 (y mob))
                      (1+ (random 20))))
               (path nil))
-          (declare (type integer rx ry))
+          (declare (type fixnum rx ry))
           
           (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
                           (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
@@ -444,7 +446,54 @@
   
   ;; player is able to move freely
   ;; pester the player until it makes some meaningful action that can trigger the event chain
-  (loop while (<= (action-delay player) 0) do
+  (loop until (made-turn player) do
     (setf (can-move-if-possessed player) nil)
     (get-input-player))
   (setf *time-at-end-of-player-turn* (get-internal-real-time)))
+
+
+(defun thread-path-loop (stream)
+  (loop while t do
+    (bt:with-lock-held ((path-lock *world*))      
+      (if (and (< (cur-mob-path *world*) (length (mob-id-list (level *world*)))) (not (made-turn *player*)))
+        (progn
+          (when (and (not (dead= (get-mob-by-id (cur-mob-path *world*))))
+                     (not (path (get-mob-by-id (cur-mob-path *world*)))))
+            (logger (format nil "~%THREAD: Mob ~A [~A] calculates paths~%" (name (get-mob-by-id (cur-mob-path *world*))) (id (get-mob-by-id (cur-mob-path *world*)))) stream)
+            (let* ((mob (get-mob-by-id (cur-mob-path *world*)))
+                   (rx (- (+ 10 (x mob))
+                          (1+ (random 20)))) 
+                   (ry (- (+ 10 (y mob))
+                          (1+ (random 20))))
+                   (path nil))
+              (declare (type fixnum rx ry))
+              (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                              (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
+                              (and (get-mob-* (level *world*) rx ry)
+                                   (not (eq (get-mob-* (level *world*) rx ry) mob))))
+                    do
+                       (setf rx (- (+ 10 (x mob))
+                                   (1+ (random 20))))
+                       (setf ry (- (+ 10 (y mob))
+                                   (1+ (random 20)))))
+              (logger (format nil "THREAD: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry) stream)
+              (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
+                                 #'(lambda (dx dy) 
+                                     ;; checking for impassable objects
+                                     (check-move-for-ai mob dx dy)
+                                     )))
+              
+              (pop path)
+              (logger (format nil "THREAD: Mob goes to (~A ~A)~%" rx ry) stream)
+              (logger (format nil "THREAD: Set mob path - ~A~%" path) stream)
+              (setf (path mob) path) 
+              )
+            )
+          (incf (cur-mob-path *world*))
+          (logger (format nil "THREAD: cur-mob-path - ~A~%" (cur-mob-path *world*)) stream))
+        (progn
+          (logger (format nil "THREAD: Done calculating paths~%~%") stream)
+          (setf (cur-mob-path *world*) (length (mob-id-list (level *world*))))
+          (bt:condition-wait (path-cv *world*) (path-lock *world*)))
+        
+        ))))
