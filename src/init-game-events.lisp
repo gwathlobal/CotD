@@ -93,12 +93,13 @@
                                                            (logger (format nil "GAME-EVENT: Cavalry has arrived!~%"))
                                                            
                                                            ;; find a suitable place for the military along the map borders
-                                                           ;; four groups are created - north, south, east and west
+                                                           ;; four groups are created - north-east, south-east, north-west and south-west
                                                            ;; place the units
-                                                           (let ((placement-list-horiz (list (cons (- (truncate *max-x-level* 2) 3) 1)                      ;; north
-                                                                                             (cons (- (truncate *max-x-level* 2) 3) (- *max-y-level* 2))))  ;; south
-                                                                 (placement-list-vert (list (cons 1 (- (truncate *max-y-level* 2) 3))                       ;; east
-                                                                                            (cons (- *max-x-level* 2) (- (truncate *max-y-level* 2) 3)))))  ;; west 
+                                                           (let ((placement-list-horiz (list (cons 1 1)                                        ;; north-east
+                                                                                             (cons 1 (- *max-y-level* 2))                      ;; south-east
+                                                                                             (cons (- *max-x-level* 15) 1)                     ;; north-west
+                                                                                             (cons (- *max-x-level* 15) (- *max-y-level* 2)))) ;; south-west 
+                                                                 )
 
                                                              ;; place for north and south horizontally
                                                              (loop for (sx . sy) in placement-list-horiz do
@@ -107,14 +108,7 @@
                                                                                (not (get-terrain-type-trait (get-terrain-* (level world) (+ sx x) sy) +terrain-trait-blocks-move+)))
                                                                        do
                                                                           (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-soldier+ :x (+ sx x) :y sy))))
-
-                                                             ;; place for east and west vertically
-                                                             (loop for (sx . sy) in placement-list-vert do
-                                                               (loop for y from 0 to 9
-                                                                     when (and (not (get-mob-* (level world) sx (+ sy y)))
-                                                                               (not (get-terrain-type-trait (get-terrain-* (level world) sx (+ sy y)) +terrain-trait-blocks-move+)))
-                                                                       do
-                                                                          (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-soldier+ :x sx :y (+ sy y)))))
+                                                             
                                                              ))
                                ))
 

@@ -59,7 +59,7 @@
                                                                                   (setf *player* (make-instance 'player :mob-type +mob-type-player+))))
     ((eql menu-result 'test-level) (progn
                                      (setf *world* (make-instance 'world))
-                                     (setf *player* (make-instance 'player :mob-type +mob-type-angel+))))
+                                     (setf *player* (make-instance 'player :mob-type +mob-type-archdemon+))))
     ((eql menu-result 'join-heavens) (progn
                                       (setf *world* (make-instance 'world-for-angels)) 
                                       (setf *player* (make-instance 'player :mob-type +mob-type-angel+))))

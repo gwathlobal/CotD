@@ -209,6 +209,11 @@
 (defun mob-shoot-target (actor target)
   (let ((cur-dmg))
     (setf cur-dmg (+ 2 (random 3)))
+
+    ;; reduce damage by the amount of armor
+    (decf cur-dmg (cur-armor target))
+
+    (when (< cur-dmg 0) (setf cur-dmg 0))
     (decf (cur-hp target) cur-dmg)
     ;; place a blood spattering
     (if (> (accuracy actor) (random 100))
@@ -301,6 +306,9 @@
               
               (when (= (faction attacker) (faction target))
                 (setf cur-dmg (get-weapon-dmg-min attacker)))
+
+              ;; reduce damage by the amount of armor
+              (decf cur-dmg (cur-armor target))
               
               (when (< cur-dmg 0) (setf cur-dmg 0))
               (decf (cur-hp target) cur-dmg)
@@ -521,32 +529,37 @@
 (defgeneric on-bump (target actor))
 
 (defun sense-evil ()
-  ;(setf (sense-evil-id *player*) nil)
-  
-  (setf (sense-evil-id *player*) (id (loop for mob-id in (mob-id-list (level *world*))
-                                           for mob = (get-mob-by-id mob-id)
-                                           with nearest-mob = nil
-                                           when (and (not (check-dead mob))
-                                                     (mob-ability-p mob +mob-abil-demon+))
-                                             do
-                                                (unless nearest-mob (setf nearest-mob mob))
-                                                (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
-                                                         (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
-                                                  (setf nearest-mob mob))
-                                           finally (return nearest-mob)))))
+  (setf (sense-evil-id *player*) nil)
+  (let ((nearest-enemy))
+    (setf nearest-enemy (loop for mob-id in (mob-id-list (level *world*))
+                              for mob = (get-mob-by-id mob-id)
+                              with nearest-mob = nil
+                              when (and (not (check-dead mob))
+                                        (mob-ability-p mob +mob-abil-demon+))
+                                do
+                                   (unless nearest-mob (setf nearest-mob mob))
+                                   (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
+                                            (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
+                                     (setf nearest-mob mob))
+                              finally (return nearest-mob)))
+    (when nearest-enemy
+      (setf (sense-evil-id *player*) (id nearest-enemy)))))
 
 (defun sense-good ()
-  (setf (sense-good-id *player*) (id (loop for mob-id in (mob-id-list (level *world*))
-                                           for mob = (get-mob-by-id mob-id)
-                                           with nearest-mob = nil
-                                           when (and (not (check-dead mob))
-                                                     (mob-ability-p mob +mob-abil-angel+))
-                                             do
-                                                (unless nearest-mob (setf nearest-mob mob))
-                                                (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
-                                                         (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
-                                                  (setf nearest-mob mob))
-                                           finally (return nearest-mob)))))
+  (let ((nearest-enemy))
+    (setf nearest-enemy (loop for mob-id in (mob-id-list (level *world*))
+                              for mob = (get-mob-by-id mob-id)
+                              with nearest-mob = nil
+                              when (and (not (check-dead mob))
+                                        (mob-ability-p mob +mob-abil-angel+))
+                                do
+                                   (unless nearest-mob (setf nearest-mob mob))
+                                   (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
+                                            (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
+                                     (setf nearest-mob mob))
+                              finally (return nearest-mob)))
+    (when nearest-enemy
+      (setf (sense-good-id *player*) (id nearest-enemy)))))
 
 
 

@@ -145,7 +145,7 @@
                                        :name "Archdemon"
                                        :glyph-idx 36 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 40 :max-fp 16
                                        :faction +faction-type-demons+
-                                       :weapon (list "Chains of Shattering" 5 10 +normal-ap+) :base-dodge 20
+                                       :weapon (list "Chains of Shattering" 5 10 +normal-ap+) :base-dodge 20 :base-armor 1
                                        :strength 4
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t))
