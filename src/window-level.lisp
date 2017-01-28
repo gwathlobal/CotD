@@ -30,7 +30,7 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%Power: ~A/~A~%~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%Power: ~A/~A~%~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~%~A~%"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
                         (cur-fp *player*) (max-fp *player*)
@@ -38,7 +38,8 @@
                         (total-humans *world*)
                         (total-blessed *world*)
                         (total-angels *world*)
-                        (total-demons *world*)                     
+                        (total-demons *world*)
+                        (sense-good-evil-str)
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
     (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) 52)
@@ -53,6 +54,28 @@
       (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
                                                                                        (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
                                                                                        0)))))
+
+(defun sense-good-evil-str ()
+  (let ((str (create-string)))
+    (when (sense-evil-id *player*)
+      (format str "Sense evil: ~A~%" (general-direction-str (x *player*) (y *player*) (x (get-mob-by-id (sense-evil-id *player*))) (y (get-mob-by-id (sense-evil-id *player*))))))
+    (when (sense-good-id *player*)
+      (format str "Sense good: ~A~%" (general-direction-str (x *player*) (y *player*) (x (get-mob-by-id (sense-good-id *player*))) (y (get-mob-by-id (sense-good-id *player*))))))
+    str))
+
+(defun general-direction-str (sx sy tx ty)
+  (let ((a (round (* (atan (- sy ty) (- sx tx)) (/ 180 pi))))
+        (result))
+    (cond
+      ((and (> a 22.5) (<= a 67.5)) (setf result "NW"))
+      ((and (> a 67.5) (<= a 112.5)) (setf result "N"))
+      ((and (> a 112.5) (<= a 157.5)) (setf result "NE"))
+      ((and (< a -22.5) (>= a -67.5)) (setf result "SW"))
+      ((and (< a -67.5) (>= a -112.5)) (setf result "S"))
+      ((and (< a -112.5) (>= a -157.5)) (setf result "SE"))
+      ((or (> a 157.5) (< a -157.5)) (setf result "E"))
+      ((or (> a -22.5) (<= a 22.5)) (setf result "W")))
+    result))
 
 (defun update-screen (win)
   

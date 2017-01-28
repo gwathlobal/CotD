@@ -212,10 +212,10 @@
          (init-game menu-result))
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
-       ;(let ((out *standard-output*))
-       ;  (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
-       ;    (t ()
-       ;      (logger "MAIN: This system does not support multithreading!~%"))))
+       (let ((out *standard-output*))
+         (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
+           (t ()
+             (logger "MAIN: This system does not support multithreading!~%"))))
        (bt:condition-notify (path-cv *world*))
        
        (setf *current-window* (make-instance 'cell-window))

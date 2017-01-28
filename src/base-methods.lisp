@@ -520,6 +520,33 @@
 
 (defgeneric on-bump (target actor))
 
+(defun sense-evil ()
+  ;(setf (sense-evil-id *player*) nil)
+  
+  (setf (sense-evil-id *player*) (id (loop for mob-id in (mob-id-list (level *world*))
+                                           for mob = (get-mob-by-id mob-id)
+                                           with nearest-mob = nil
+                                           when (and (not (check-dead mob))
+                                                     (mob-ability-p mob +mob-abil-demon+))
+                                             do
+                                                (unless nearest-mob (setf nearest-mob mob))
+                                                (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
+                                                         (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
+                                                  (setf nearest-mob mob))
+                                           finally (return nearest-mob)))))
+
+(defun sense-good ()
+  (setf (sense-good-id *player*) (id (loop for mob-id in (mob-id-list (level *world*))
+                                           for mob = (get-mob-by-id mob-id)
+                                           with nearest-mob = nil
+                                           when (and (not (check-dead mob))
+                                                     (mob-ability-p mob +mob-abil-angel+))
+                                             do
+                                                (unless nearest-mob (setf nearest-mob mob))
+                                                (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
+                                                         (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
+                                                  (setf nearest-mob mob))
+                                           finally (return nearest-mob)))))
 
 
 

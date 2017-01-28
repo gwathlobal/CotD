@@ -54,7 +54,7 @@
                                                         nil))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-detect-good+ :name "Detect good" :descr "You are able to reveal the true form of divine beings when you touch them." 
+                                 :id +mob-abil-detect-good+ :name "Detect good" :descr "You are able to reveal the true form of divine beings when you touch them. You can also sense the general direction to the nearest diving being." 
                                  :passive t :cost 0 :spd 0 
                                  :final nil :on-touch t
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -71,7 +71,7 @@
                                                         nil))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-detect-evil+ :name "Detect evil" :descr "You are able to reveal the true form of demonic beings when you touch them." 
+                                 :id +mob-abil-detect-evil+ :name "Detect evil" :descr "You are able to reveal the true form of demonic beings when you touch them. You can also sense the general direction to the nearest demonic being." 
                                  :passive t :cost 0 :spd 0 
                                  :final nil :on-touch t
                                  :on-invoke #'(lambda (ability-type actor target)

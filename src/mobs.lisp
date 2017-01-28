@@ -380,6 +380,8 @@
   ((name :initform "Player" :initarg :name :accessor name)
    (view-x :initform 0 :accessor view-x)
    (view-y :initform 0 :accessor view-y)
+   (sense-evil-id :initform nil :accessor sense-evil-id)
+   (sense-good-id :initform nil :accessor sense-good-id)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)))
  
 ;;---------------------- 

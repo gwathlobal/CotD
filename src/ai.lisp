@@ -388,11 +388,14 @@
   (format t "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
   
   (update-visible-area (level *world*) (x player) (y player))
+
+  ;; find the nearest enemy
+  (when (mob-ability-p *player* +mob-abil-detect-good+)
+    (sense-good))
+  (when (mob-ability-p *player* +mob-abil-detect-evil+)
+    (sense-evil))
   
-  (make-output *current-window*)
-  
-  
-  
+  (make-output *current-window*) 
 
   ;; if possessed & unable to revolt - wait till the player makes a meaningful action
   ;; then skip and invoke the master AI
