@@ -1,10 +1,6 @@
 (in-package :cotd)
 
-
-
-
-
-(defun create-template-city (max-x max-y city-type)
+(defun create-template-city (max-x max-y set-max-buildings-func set-reserved-buildings-func process-reserved-buildings-func)
   
   (logger (format nil "CREATE-TEMPLATE-CITY~%"))
 
@@ -27,21 +23,21 @@
 
    
     ;; set up maximum building types for this kind of map
-    (when (city-type-return-max-buildings city-type)
-      (setf max-building-types (funcall (city-type-return-max-buildings city-type))))
+    (when set-max-buildings-func
+      (setf max-building-types (funcall set-max-buildings-func)))
 
     ;; set up reserved building types for this kind of map
-    (when (city-type-return-reserv-buildings city-type)
-      (setf reserved-building-types (funcall (city-type-return-reserv-buildings city-type))))
+    (when set-reserved-buildings-func
+      (setf reserved-building-types (funcall set-reserved-buildings-func)))
     
     ;; all grid cells along the borders are reserved, while everything inside is free for claiming
     (loop for y from 1 below (1- reserv-max-y) do
       (loop for x from 1 below (1- reserv-max-x) do
         (setf (aref reserved-level x y) +building-city-free+)))
 
-    (when (city-type-process-reserve-func city-type)
-      (format t "BUILD-LIST ~A~%" (funcall (city-type-process-reserve-func city-type) reserved-level))
-      (setf build-list (append build-list (funcall (city-type-process-reserve-func city-type) reserved-level))))
+    ;; apply building reservations specify to this city type
+    (when process-reserved-buildings-func
+      (setf build-list (append build-list (funcall process-reserved-buildings-func reserved-level))))
         
     ;; make reservations from reserved buildings on the grid level
     (loop for gen-building-type-id being the hash-key in reserved-building-types do
@@ -168,7 +164,7 @@
                                                                                (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py)
                                                                                template-level)))
 
-             ;;(logger (format nil "CREATE-TEMPLATE-CITY: Building type ~A, mob list ~A~%" build-type-id building-mobs))
+             ;(logger (format nil "CREATE-TEMPLATE-CITY: Building type ~A, mob list ~A~%" build-type-id building-mobs))
              ;; add mobs to the mob-list
              (when building-mobs
                (loop for (mob-id lx ly) in building-mobs do
@@ -181,37 +177,8 @@
                  (pushnew (list feature-id (+ (* gx *level-grid-size*) px lx) (+ (* gy *level-grid-size*) py ly)) 
                           feature-list)))
           )
-
-    ;; apply the post-processing function of the city type, if any
-    (when (city-type-post-processing-func city-type)
-      (setf template-level (funcall (city-type-post-processing-func city-type) template-level)))
     
     (values template-level feature-list mob-list)
-    ))
-
-
-(defun level-city-can-place-build-on-grid (template-building-id gx gy reserved-level)
-  (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
-    ;; if the staring point of the building + its dimensions) is more than level dimensions - fail
-    (when (or (> (+ gx dx) (array-dimension reserved-level 0))
-              (> (+ gy dy) (array-dimension reserved-level 1)))
-      (return-from level-city-can-place-build-on-grid nil))
-    
-    ;; if any of the grid tiles that the building is going to occupy are already reserved - fail
-    (loop for y1 from 0 below dy do
-      (loop for x1 from 0 below dx do
-        (when (/= (aref reserved-level (+ gx x1) (+ gy y1)) +building-city-free+)
-          (return-from level-city-can-place-build-on-grid nil))
-            ))
-    ;; all checks done - success
-    t
-    ))
-
-(defun level-city-reserve-build-on-grid (template-building-id gx gy reserved-level)
-  (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
-    (loop for y1 from 0 below dy do
-      (loop for x1 from 0 below dx do
-        (setf (aref reserved-level (+ gx x1) (+ gy y1)) template-building-id)))
     ))
 
 (defun print-reserved-level (reserved-level)

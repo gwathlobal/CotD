@@ -132,6 +132,8 @@
 (defconstant +terrain-water-ice+ 19)
 (defconstant +terrain-water-river+ 20)
 (defconstant +terrain-floor-bridge+ 21)
+(defconstant +terrain-floor-pier+ 22)
+(defconstant +terrain-water-sea+ 23)
 
 (defparameter *faction-table* (make-hash-table))
 

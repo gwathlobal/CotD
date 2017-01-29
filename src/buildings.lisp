@@ -41,6 +41,10 @@
 (defconstant +building-city-satan-lair-1+ 20)
 (defconstant +building-city-river+ 21)
 (defconstant +building-city-bridge+ 22)
+(defconstant +building-city-pier+ 23)
+(defconstant +building-city-sea+ 24)
+(defconstant +building-city-warehouse-port-1+ 25)
+(defconstant +building-city-warehouse-port-2+ 26)
 
 (defparameter *level-grid-size* 5)
 
@@ -100,3 +104,27 @@
                )
              (incf x1)
           )))
+
+(defun level-city-reserve-build-on-grid (template-building-id gx gy reserved-level)
+  (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
+    (loop for y1 from 0 below dy do
+      (loop for x1 from 0 below dx do
+        (setf (aref reserved-level (+ gx x1) (+ gy y1)) template-building-id)))
+    ))
+
+(defun level-city-can-place-build-on-grid (template-building-id gx gy reserved-level)
+  (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
+    ;; if the staring point of the building + its dimensions) is more than level dimensions - fail
+    (when (or (> (+ gx dx) (array-dimension reserved-level 0))
+              (> (+ gy dy) (array-dimension reserved-level 1)))
+      (return-from level-city-can-place-build-on-grid nil))
+    
+    ;; if any of the grid tiles that the building is going to occupy are already reserved - fail
+    (loop for y1 from 0 below dy do
+      (loop for x1 from 0 below dx do
+        (when (/= (aref reserved-level (+ gx x1) (+ gy y1)) +building-city-free+)
+          (return-from level-city-can-place-build-on-grid nil))
+            ))
+    ;; all checks done - success
+    t
+    ))

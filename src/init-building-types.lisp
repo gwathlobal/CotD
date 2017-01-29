@@ -510,3 +510,55 @@
                                                 (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bridge+)))
                                             (values nil
                                                     nil))))
+
+(set-building-type (make-building :id +building-city-pier+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for x1 from 0 below 5 do
+                                              (loop for y1 from 0 below 5 do
+                                                (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-pier+)))
+                                            (values nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-sea+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for x1 from 0 below 5 do
+                                              (loop for y1 from 0 below 5 do
+                                                (setf (aref template-level (+ x x1) (+ y y1)) +terrain-water-sea+)))
+                                            (values nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-warehouse-port-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (let ((build-template (list ",,,,,,,,,,"
+                                                                        ",########,"
+                                                                        ",#CCCCCC#,"
+                                                                        ",.......,"
+                                                                        ",#.CCCC.#,"
+                                                                        ",#.CCCC.#,"
+                                                                        ",........,"
+                                                                        ",#CCCCCC#,"
+                                                                        ",########,"
+                                                                        ",,,,,,,,,,")))
+                                              (translate-build-to-template x y build-template template-level)
+                                              )
+                                            (values (list (list +mob-type-man+ 3 3)
+                                                          (list +mob-type-man+ 6 6))
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-warehouse-port-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (let ((build-template (list ",,,,,,,,,,"
+                                                                        ",##.##.##,"
+                                                                        ",#C....C#,"
+                                                                        ",#C.CC.C#,"
+                                                                        ",#C.CC.C#,"
+                                                                        ",#C.CC.C#,"
+                                                                        ",#C.CC.C#,"
+                                                                        ",#C....C#,"
+                                                                        ",##.##.##,"
+                                                                        ",,,,,,,,,,")))
+                                              (translate-build-to-template x y build-template template-level)
+                                              )
+                                            (values (list (list +mob-type-man+ 3 6)
+                                                          (list +mob-type-man+ 6 3))
+                                                    nil))))

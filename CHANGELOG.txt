@@ -7,6 +7,7 @@ v1.0.4
 - Added an option to go to main menu from the game over screen
 - Added rivers to the city generator
 - Added indication of the general direction to the nearest angel/demon
+- Added sea ports to the city generator
 
 --------------------
 Jan 17, 2017 v1.0.3

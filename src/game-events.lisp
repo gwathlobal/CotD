@@ -8,6 +8,10 @@
 (defconstant +game-event-lose-game+ 3)
 (defconstant +game-event-military-arrive+ 4)
 (defconstant +game-event-snow-falls+ 5)
+(defconstant +game-event-military-arrive-port-n+ 6)
+(defconstant +game-event-military-arrive-port-s+ 7)
+(defconstant +game-event-military-arrive-port-e+ 8)
+(defconstant +game-event-military-arrive-port-w+ 9)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

@@ -125,3 +125,99 @@
                                                                       (logger (format nil "GAME-EVENT: Snow falls at (~A ~A)~%" x y))
                                                                       (set-terrain-* (level world) x y +terrain-floor-snow+))
                                                            )))
+
+(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-n+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the northern piers!~%"))
+
+                                                           ;; find the suitable place on the northern piers for the military
+                                                           ;; place the units until the total number is reached
+                                                           (loop for y from 0 below *max-y-level*
+                                                                 with max-units = 40
+                                                                 do
+                                                                    (loop for x from 0 below *max-x-level* 
+                                                                          when (and (not (get-mob-* (level world) x y))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                            do
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-soldier+ :x x :y y))
+                                                                               (decf max-units)
+                                                                               (when (zerop max-units) (loop-finish)))
+                                                                    (when (zerop max-units) (loop-finish)))
+                                                           )
+                               ))
+
+(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-s+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the southern piers!~%"))
+
+                                                           ;; find the suitable place on the southern piers for the military
+                                                           ;; place the units until the total number is reached
+                                                           (loop for y from (1- *max-y-level*) downto 0
+                                                                 with max-units = 40
+                                                                 do
+                                                                    (loop for x from 0 below *max-x-level* 
+                                                                          when (and (not (get-mob-* (level world) x y))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                            do
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-soldier+ :x x :y y))
+                                                                               (decf max-units)
+                                                                               (when (zerop max-units) (loop-finish)))
+                                                                    (when (zerop max-units) (loop-finish)))
+                                                           )
+                               ))
+
+(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-w+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the western piers!~%"))
+
+                                                           ;; find the suitable place on the western piers for the military
+                                                           ;; place the units until the total number is reached
+                                                           (loop for x from 0 below *max-x-level*
+                                                                 with max-units = 40
+                                                                 do
+                                                                    (loop for y from 0 below *max-y-level* 
+                                                                          when (and (not (get-mob-* (level world) x y))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                            do
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-soldier+ :x x :y y))
+                                                                               (decf max-units)
+                                                                               (when (zerop max-units) (loop-finish)))
+                                                                    (when (zerop max-units) (loop-finish)))
+                                                           )
+                               ))
+
+(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-e+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the eastern piers!~%"))
+
+                                                           ;; find the suitable place on the eastern piers for the military
+                                                           ;; place the units until the total number is reached
+                                                           (loop for x from (1- *max-x-level*) downto 0 
+                                                                 with max-units = 40
+                                                                 do
+                                                                    (loop for y from 0 below *max-y-level* 
+                                                                          when (and (not (get-mob-* (level world) x y))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                            do
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-soldier+ :x x :y y))
+                                                                               (decf max-units)
+                                                                               (when (zerop max-units) (loop-finish)))
+                                                                    (when (zerop max-units) (loop-finish)))
+                                                           )
+                               ))

@@ -29,3 +29,5 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-ice+ :glyph-idx 94 :glyph-color (sdl:color :r 0 :g 100 :b 255) :back-color sdl:*black* :name "Ice"))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-river+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "River" :trait-blocks-move t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bridge+ :glyph-idx 96 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :name "Bridge"))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-pier+ :glyph-idx 96 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :name "Pier"))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-water-sea+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "Sea" :trait-blocks-move t))

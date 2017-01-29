@@ -128,8 +128,8 @@
   ())
 
 (defmethod initialize-instance :after ((world world) &key)
-  (pushnew +game-event-lose-game+ (game-events world))
-  (pushnew +game-event-snow-falls+ (game-events world))
+  ;(pushnew +game-event-lose-game+ (game-events world))
+  ;(pushnew +game-event-snow-falls+ (game-events world))
   )
 
 (defmethod initialize-instance :after ((world world-for-angels) &key)

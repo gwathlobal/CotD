@@ -53,46 +53,10 @@
   (setf *update-screen-closure* #'(lambda () (make-output *current-window*)
 				    ))
 
-  (cond
-    ((or (eql menu-result 'city-all-see) (eql menu-result 'test-level-all-see)) (progn
-                                                                                  (setf *world* (make-instance 'world))
-                                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-player+))))
-    ((eql menu-result 'test-level) (progn
-                                     (setf *world* (make-instance 'world))
-                                     (setf *player* (make-instance 'player :mob-type +mob-type-archdemon+))))
-    ((eql menu-result 'join-heavens) (progn
-                                      (setf *world* (make-instance 'world-for-angels)) 
-                                      (setf *player* (make-instance 'player :mob-type +mob-type-angel+))))
-    ((eql menu-result 'join-hell) (progn
-                                    (setf *world* (make-instance 'world-for-demons)) 
-                                    (setf *player* (make-instance 'player :mob-type +mob-type-imp+)))))
+  (setf *world* (make-instance 'world))
   
   (create-world *world* menu-result)
 
-  (cond
-    ((eql menu-result 'join-heavens) (loop with x = (random *max-x-level*)
-                                           with y = (random *max-y-level*)
-                                           until (and (not (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10))))
-                                                      (not (get-mob-* (level *world*) x y))
-                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
-                                           finally (setf (x *player*) x (y *player*) y)
-                                                   (add-mob-to-level-list (level *world*) *player*)
-                                           do
-                                              (setf x (random *max-x-level*))
-                                              (setf y (random *max-y-level*))))
-    ((eql menu-result 'join-hell) (loop with x = (random *max-x-level*)
-                                        with y = (random *max-y-level*)
-                                        until (and (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10)))
-                                                   (not (get-mob-* (level *world*) x y))
-                                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
-                                        finally (setf (x *player*) x (y *player*) y)
-                                                (add-mob-to-level-list (level *world*) *player*)
-                                        do
-                                           (setf x (random *max-x-level*))
-                                           (setf y (random *max-y-level*))))
-    ((eql menu-result 'city-all-see) (progn (setf (x *player*) 1 (y *player*) 1)
-                                            (add-mob-to-level-list (level *world*) *player*))))
-  
   (setf (name *player*) "Player")
 
   (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%"))
@@ -118,7 +82,7 @@
                                                                   (funcall *quit-func*))))))
     (progn
       (setf *current-window* (make-instance 'start-game-window 
-                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "City with all-seeing" "Test level" "Test level with all-seeing" "Help" "Exit")
+                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "City with all-seeing" "Test level" "Help" "Exit")
                                             :menu-funcs (list #'(lambda (n) 
                                                                   (declare (ignore n))
                                                                   (return-from main-menu 'join-heavens))
@@ -131,9 +95,6 @@
                                                               #'(lambda (n) 
                                                                   (declare (ignore n))
                                                                   (return-from main-menu 'test-level))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (return-from main-menu 'test-level-all-see))
                                                               #'(lambda (n) 
                                                                   (declare (ignore n))
                                                                   (setf *current-window* (make-instance 'help-window)))
