@@ -13,11 +13,11 @@ LATEST CHANGES v1.0.4
 
 - Made help articles be read from files
 - Added snow terrain
-- Added an option to go to main menu from the game over screen
+- Added an option to go to the main menu from the game over screen
 - Added rivers to the city generator
 - Added indication of the general direction to the nearest angel/demon
 - Added sea ports to the city generator
-- Added an option to customize the curremt scenario by choosing city layout, weather and player faction
+- Added an option to customize the current scenario by choosing city layout, weather and player faction
 
 --------------------
 FEATURES
