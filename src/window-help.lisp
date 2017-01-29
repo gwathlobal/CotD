@@ -84,41 +84,37 @@
   (sdl:update-display))
 
 (defmethod run-window ((win help-window))
-  (tagbody
-     (sdl:with-events ()
-       (:quit-event () (funcall (quit-func win)) t)
-       (:key-down-event (:key key :mod mod :unicode unicode)
-
+  (sdl:with-events ()
+    (:quit-event () (funcall (quit-func win)) t)
+    (:key-down-event (:key key :mod mod :unicode unicode)
+                     
+                     (when (= (cur-page win) +win-help-page-menu+)
+                       (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
+                       (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win)))))
+                     
+                     (cond
+                       ((and (sdl:key= key :sdl-key-up) (= mod 0))
+                        (when (or (= (cur-page win) +win-help-page-overview+)
+                                  (= (cur-page win) +win-help-page-keybindings+)
+                                  (= (cur-page win) +win-help-page-credits+))
+                          (decf (cur-str win))))
+                       ((and (sdl:key= key :sdl-key-down) (= mod 0))
+                        (when (or (= (cur-page win) +win-help-page-overview+)
+                                  (= (cur-page win) +win-help-page-keybindings+)
+                                  (= (cur-page win) +win-help-page-credits+))
+                          (incf (cur-str win))))
+                       ;; escape - quit
+                       ((sdl:key= key :sdl-key-escape) 
+                        (if (= (cur-page win) +win-help-page-menu+)
+                          (progn 
+                            (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
+                          (progn
+                            (setf (cur-page win) +win-help-page-menu+))))
+                       ;; enter - select
+                       ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
                         (when (= (cur-page win) +win-help-page-menu+)
-                          (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
-                          (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win)))))
-                        
-                        (cond
-                          ((and (sdl:key= key :sdl-key-up) (= mod 0))
-                           (when (or (= (cur-page win) +win-help-page-overview+)
-                                     (= (cur-page win) +win-help-page-keybindings+)
-                                     (= (cur-page win) +win-help-page-credits+))
-                             (decf (cur-str win))))
-                           ((and (sdl:key= key :sdl-key-down) (= mod 0))
-                            (when (or (= (cur-page win) +win-help-page-overview+)
-                                      (= (cur-page win) +win-help-page-keybindings+)
-                                      (= (cur-page win) +win-help-page-credits+))
-                              (incf (cur-str win))))
-			  ;; escape - quit
-			  ((sdl:key= key :sdl-key-escape) 
-                           (if (= (cur-page win) +win-help-page-menu+)
-                             (progn 
-                               (setf *current-window* (return-to win)) (go exit-func))
-                             (progn
-                               (setf (cur-page win) +win-help-page-menu+))))
-			  ;; enter - select
-			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-                           
-                           (when (= (cur-page win) +win-help-page-menu+)
-                             (logger (format nil "CURPAGE ~A ,NEXT PAGE ~A~%" (cur-page win) (1+ (cur-sel win))))
-                             (setf (cur-str win) 0)
-                             (setf (cur-page win) (1+ (cur-sel win))))
-			   (go exit-func)))
-			(go exit-func))
-       (:video-expose-event () (make-output *current-window*)))
-     exit-func (make-output *current-window*)))
+                          (setf (cur-str win) 0)
+                          (setf (cur-page win) (1+ (cur-sel win))))
+                        ))
+                     (make-output *current-window*))
+    (:video-expose-event () (make-output *current-window*))))

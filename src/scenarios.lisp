@@ -27,8 +27,10 @@
 
 (defstruct (scenario-feature (:conc-name sf-))
   (id)
+  (name)
   (type)
   (debug nil :type boolean)
+  (disabled nil :type boolean)
   (func nil))
 
 (defun set-scenario-feature (scenario-feature)
@@ -42,10 +44,12 @@
 (defun get-all-scenario-features-by-type (scenario-feature-type-id &optional (include-debug t))
   (loop for sf across *scenario-features*
         when (or (and (= (sf-type sf) scenario-feature-type-id)
-                      include-debug)
+                      include-debug
+                      (not (sf-disabled sf)))
                  (and (= (sf-type sf) scenario-feature-type-id)
                       (not include-debug)
-                      (not (sf-debug sf))))
+                      (not (sf-debug sf))
+                      (not (sf-disabled sf))))
           collect (sf-id sf)))
 
 ;;---------------------------------

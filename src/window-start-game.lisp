@@ -33,7 +33,6 @@
   (sdl:update-display))
 
 (defmethod run-window ((win start-game-window))
-  (tagbody
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
@@ -49,7 +48,6 @@
 			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
                            (when (and (menu-funcs win) (nth (cur-sel win) (menu-funcs win)))
                              (funcall (nth (cur-sel win) (menu-funcs win)) (cur-sel win)))
-			   (go exit-func)))
-			(go exit-func))
-       (:video-expose-event () (make-output *current-window*)))
-     exit-func (make-output *current-window*)))
+                           ))
+			(make-output *current-window*))
+       (:video-expose-event () (make-output *current-window*))))

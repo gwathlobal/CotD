@@ -14,16 +14,16 @@
     
     (values layout-func post-processing-func-list mob-func-list game-event-list)))
 
-(defun create-world (world menu-result)
+(defun create-world (world layout-id weather-id faction-id)
   
   (let ((mob-template-result)
         (feature-template-result)
 	
 	(result-template)
 
-        (weather)
-        (city-layout)
-        (player-faction)
+        (weather (get-scenario-feature-by-id weather-id))
+        (city-layout (get-scenario-feature-by-id layout-id))
+        (player-faction (get-scenario-feature-by-id faction-id))
 
         (layout-func)
         (post-processing-func-list)
@@ -34,33 +34,6 @@
     (setf *max-progress-bar* 2)
     (setf *cur-progress-bar* 0)
     (funcall *update-screen-closure*)
-
-    (cond
-      ((eql menu-result 'test-level) (progn (setf weather (get-scenario-feature-by-id +weather-type-clear+))
-                                            (setf city-layout (get-scenario-feature-by-id +city-layout-test+))
-                                            (setf player-faction (get-scenario-feature-by-id +player-faction-test+))))
-
-      ((eql menu-result 'city-all-see) (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                             (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-                                         
-                                         (setf weather (get-scenario-feature-by-id (nth (random (length weather-types)) weather-types))) ;; TODO
-                                         (setf city-layout (get-scenario-feature-by-id (nth (random (length city-layouts)) city-layouts))) ;; TODO
-                                         (setf player-faction (get-scenario-feature-by-id +player-faction-player+))))
-      
-      ((eql menu-result 'join-heavens) (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                             (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-                                         
-                                         (setf weather (get-scenario-feature-by-id (nth (random (length weather-types)) weather-types))) ;; TODO
-                                         (setf city-layout (get-scenario-feature-by-id (nth (random (length city-layouts)) city-layouts))) ;; TODO
-                                         (setf player-faction (get-scenario-feature-by-id +player-faction-angels+))))
-      
-      ((eql menu-result 'join-hell) (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                      (setf weather (get-scenario-feature-by-id (nth (random (length weather-types)) weather-types))) ;; TODO
-                                      (setf city-layout (get-scenario-feature-by-id (nth (random (length city-layouts)) city-layouts))) ;; TODO
-                                      (setf player-faction (get-scenario-feature-by-id +player-faction-demons+))))
-      )
 
     (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (return-scenario-functions weather city-layout player-faction))
 
