@@ -265,12 +265,12 @@
   "Helper macro that we can use to allow us to continue from an error. Remember to hit C in slime or pick the restart so errors don't kill the app."
   `(restart-case (progn ,@body) (continue () :report "Continue")))
 
-#+swank
-(defun update-swank ()
-       "Called from within the main loop, this keep the lisp repl working while the game runs"
-  (continuable (let ((connection (or swank::*emacs-connection* (swank::default-connection))))
-                 (when connection
-                   (swank::handle-requests connection t)))))
+
+#+swank(defun update-swank ()
+         "Called from within the main loop, this keep the lisp repl working while the game runs"
+         (continuable (let ((connection (or swank::*emacs-connection* (swank::default-connection))))
+                        (when connection
+                          (swank::handle-requests connection t)))))
 
 (defun show-time-label (idle-calcing x y &optional (update nil))
   (sdl:draw-string-solid-* (format nil "Time ~A"  (player-game-time *world*))

@@ -5,16 +5,15 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-Jan 17, 2017 v1.0.3
+Jan 29, 2017 v1.0.4
 
-- Linux 32-bit binary packages added
-- Added Soldiers to the city. Soldiers arrive to help humans towards the end of the battle, are opposed to both angels and demons and will shoot them if they see their true form
-- Added Satanists to the city. They are allied with demons and are able to call them for free and curse enemies with inaccuracy
-- Added a new command 'm' to view the full message log
-- Priests can now pray. Prayers may sometimes lead to smiting all enemies in priest's sight for minor damage or granting all allies divine protection. Divine protection prevents the next attck or harmful effect from application
-- Upgraded city generation and added variety to some bulding types
-- The City now has maximum 1 church, 1 warehouse, 1 prison, 1 library and 1 satanist's lair
-- Fixed bug with the time label becoming red while it's still player's turn
+- Made help articles be read from files
+- Added snow terrain
+- Added an option to go to main menu from the game over screen
+- Added rivers to the city generator
+- Added indication of the general direction to the nearest angel/demon
+- Added sea ports to the city generator
+- Added an option to customize the curremt scenario by choosing city layout, weather and player faction
 
 DOWNLOADS
 

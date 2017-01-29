@@ -1,6 +1,7 @@
 CHANGELOG
 
-v1.0.4
+--------------------
+Jan 29, 2017 v1.0.4
 
 - Made help articles be read from files
 - Added snow terrain
