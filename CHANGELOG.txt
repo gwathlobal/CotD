@@ -8,6 +8,7 @@ v1.0.4
 - Added rivers to the city generator
 - Added indication of the general direction to the nearest angel/demon
 - Added sea ports to the city generator
+- Added an option to customize the curremt scenario by choosing city layout, weather and player faction
 
 --------------------
 Jan 17, 2017 v1.0.3
