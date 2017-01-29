@@ -21,7 +21,7 @@
                             (when file 
                               (loop for line = (read-line file nil)
                                     with str = (create-string "")
-                                    while line do (format str "~A" line)
+                                    while line do (format str "~A~%" line)
                                     finally (return str)))))))
     (append (list nil) (map 'list get-txt-func file-list)))
   )

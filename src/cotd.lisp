@@ -28,8 +28,9 @@
            ;(format t "ALL MOBS DONE~%")
            
            (bt:with-lock-held ((path-lock *world*))
+             (setf (cur-mob-path *world*) 0)
              (bt:condition-notify (path-cv *world*)))
-           (setf (cur-mob-path *world*) 0)
+           
            
            (when turn-finished
              (incf (real-game-time *world*))
