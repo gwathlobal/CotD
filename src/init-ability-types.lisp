@@ -19,7 +19,19 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-divine-consealed+)
                                                         nil
-                                                        t))))
+                                                        t))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; if able to heal and less than 50% hp - heal
+                                                  (if (and (< (/ (cur-hp actor) (max-hp actor)) 
+                                                              0.5)
+                                                           (mob-ability-p actor +mob-abil-heal-self+)
+                                                           (can-invoke-ability actor actor +mob-abil-heal-self+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-conseal-divine+ :name "Conseal divinity" :descr "Disguise yourself as a human. Divine abilities do not work while in human form." 
@@ -35,7 +47,19 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-divine-consealed+)
                                                         nil
-                                                        t))))
+                                                        t))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; if the dst is more than 3 tiles away - stealth, if possible
+                                                  (if (and (path actor)
+                                                           (> (length (path actor)) 3)
+                                                           (mob-ability-p actor +mob-abil-conseal-divine+)
+                                                           (can-invoke-ability actor actor +mob-abil-conseal-divine+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-reveal-divine+ :name "Reveal divinity" :descr "Invoke to reveal you divinity." 
@@ -51,7 +75,26 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-divine-consealed+)
                                                         t
-                                                        nil))))
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; if able to heal and need to reveal itself - do it
+                                                  ;; if the dst tile is less than 2 tiles away - unstealth, if possible
+                                                  (if (or (and (<= (length (path actor)) 1)
+                                                               (mob-ability-p actor +mob-abil-reveal-divine+)
+                                                               (can-invoke-ability actor actor +mob-abil-reveal-divine+))
+                                                          (and (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                  0.5)
+                                                               (mob-ability-p actor +mob-abil-heal-self+)
+                                                               (mob-effect-p actor +mob-effect-divine-consealed+)
+                                                               (mob-ability-p actor +mob-abil-reveal-divine+)
+                                                               (can-invoke-ability actor actor +mob-abil-reveal-divine+)
+                                                               (abil-applic-cost-p +mob-abil-heal-self+ actor)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-detect-good+ :name "Detect good" :descr "You are able to reveal the true form of divine beings when you touch them. You can also sense the general direction to the nearest diving being." 
@@ -293,7 +336,22 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-calling-for-help+)
                                                         nil
-                                                        t))))
+                                                        t))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                   ;; call for reinforcements if there is a threatening enemy in sight and hp < 50% and you are not the last one
+                                                  (if (and nearest-enemy
+                                                           (not (zerop (strength nearest-enemy)))
+                                                           (< (/ (cur-hp actor) (max-hp actor)) 
+                                                              0.5)
+                                                           (mob-ability-p actor +mob-abil-call-for-help+)
+                                                           (can-invoke-ability actor actor +mob-abil-call-for-help+)
+                                                           (> (total-demons *world*) 1))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-answer-the-call+ :name "Answer the call" :descr "Invoke hellish powers to answer the summoning of your allies. If somebody has already answered the call, nothing will happen. If the teleport is successful, the ability will cost 5 time units." 
@@ -331,7 +389,7 @@
                                                                                    (format nil "~A disappeares in thin air.~%" (name actor)))
                                                             ;; teleport the caster to the caller
                                                             (set-mob-location actor fx fy)
-                                                            ;(setf (x actor) fx (y actor) fy)
+
                                                             (print-visible-message (x actor) (y actor) (level *world*) 
                                                                                    (format nil "~A answers the call of ~A.~%" (name actor) (name called-ally)))
                                                             ;; remove the calling for help status from the called and the caller
@@ -363,7 +421,18 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-called-for-help+)
                                                         t
-                                                        nil))))
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; answer the call if there is no enemy in sight
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-answer-the-call+)
+                                                           (can-invoke-ability actor actor +mob-abil-answer-the-call+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-loves-infighting+ :name "Loves infighting" :descr "You do not mind attacking your own kin." 
@@ -421,7 +490,19 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-ability-p actor +mob-abil-prayer-bless+)
                                                         t
-                                                        nil))))
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; if able to pray - do it
+                                                  (if (and (mob-ability-p actor +mob-abil-prayer-bless+)
+                                                           (can-invoke-ability actor actor +mob-abil-prayer-bless+)
+                                                           (or nearest-enemy
+                                                               (zerop (random 5))))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-free-call+ :name "Summon ally" :descr "Invoke hellish powers to summon one ally to your place. Remember that you may call but nobody is obliged to answer." 
@@ -459,7 +540,20 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-calling-for-help+)
                                                         nil
-                                                        t))))
+                                                        t))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; for satanists: call for reinforcements whenever there is a threatening enemy in sight and there still demons out there
+                                                  (if (and nearest-enemy
+                                                           (not (zerop (strength nearest-enemy)))
+                                                           (mob-ability-p actor +mob-abil-free-call+)
+                                                           (can-invoke-ability actor actor +mob-abil-free-call+)
+                                                           (> (total-demons *world*) 0))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-prayer-shield+ :name "Prayer" :descr "Pray to God for help." 
                                  :cost 0 :spd +normal-ap+ :passive nil
@@ -507,7 +601,18 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-ability-p actor +mob-abil-prayer-shield+)
                                                         t
-                                                        nil))))
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; if able to pray - do it
+                                                  (if (and (mob-ability-p actor +mob-abil-prayer-shield+)
+                                                           (can-invoke-ability actor actor +mob-abil-prayer-shield+)
+                                                           (zerop (random 3)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-curse+ :name "Curse" :descr "Curse the enemy with diabolical incantations." 
@@ -571,7 +676,19 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-ability-p actor +mob-abil-curse+)
                                                         t
-                                                        nil))))
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; for satanists: if able to curse - do it
+                                                  (if (and (mob-ability-p actor +mob-abil-curse+)
+                                                           (can-invoke-ability actor actor +mob-abil-curse+)
+                                                           nearest-enemy
+                                                           (zerop (random 3)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-shoot+ :name "Shoot" :descr "Shoot your deadly rifle." 
@@ -589,7 +706,18 @@
                                                       (declare (ignore ability-type target))
                                                       (if (mob-ability-p actor +mob-abil-shoot+)
                                                         t
-                                                        nil))))
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; soldiers: if there is an enemy in sight, shoot it
+                                                  (if (and nearest-enemy
+                                                           (mob-ability-p actor +mob-abil-shoot+)
+                                                           (can-invoke-ability actor actor +mob-abil-shoot+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-reload+ :name "Reload" :descr "Reload your deadly rifle." 
@@ -609,7 +737,17 @@
                                                       (if (and (mob-ability-p actor +mob-abil-shoot+)
                                                                (zerop (cur-fp actor)))
                                                         t
-                                                        nil))))
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; soldiers: if you can reload - do it
+                                                  (if (and (mob-ability-p actor +mob-abil-reload+)
+                                                           (can-invoke-ability actor actor +mob-abil-reload+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-keen-senses+ :name "Keen senses" :descr "When confronted by the supernatural, you can see through its illusions." 

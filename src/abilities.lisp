@@ -16,6 +16,8 @@
    (on-invoke :initform nil :initarg :on-invoke :accessor on-invoke) ;; a function that takes three parameters - ability-type, actor and target
    (on-check-applic :initform nil :initarg :on-check-applic :accessor on-check-applic) ;; a function that takes three parameters - ability type, actor and target
    (on-kill :initform nil :initarg :on-kill :accessor on-kill :type boolean) ;; if the ability should be invoked when actor kills target
+   (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)  ;; a function that checks for the AI if it can and should invoke the ability now
+   (on-invoke-ai :initform nil :initarg :on-invoke-ai :accessor on-invoke-ai) ;; a function that invokes the ability for the ai
    ))
 
 (defun set-ability-type (ability-type)

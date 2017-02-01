@@ -197,150 +197,63 @@
     
     ;; move to some random passable terrain 
     ;; a hack to easy the strain of pathfinding during the first turns - if you are human and there are more than 100 of you, do not pathfind
-    ;(when (not (and (mob-ability-p mob +mob-abil-human+) (> (total-humans *world*) 10)))
-      (unless (path mob)
-        (let ((rx (- (+ 10 (x mob))
-                     (1+ (random 20)))) 
-              (ry (- (+ 10 (y mob))
-                     (1+ (random 20))))
-              (path nil))
-          (declare (type fixnum rx ry))
-          
-          (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
-                          (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
-                          (and (get-mob-* (level *world*) rx ry)
-                               (not (eq (get-mob-* (level *world*) rx ry) mob))))
-                do
-                   (setf rx (- (+ 10 (x mob))
-                               (1+ (random 20))))
-                   (setf ry (- (+ 10 (y mob))
-                               (1+ (random 20)))))
-          (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
-          (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
-                             #'(lambda (dx dy) 
-                                 ;; checking for impassable objects
-                                 (check-move-for-ai mob dx dy)
-                                 )))
-          
-          (pop path)
-          (logger (format nil "AI-FUNCTION: Mob goes to (~A ~A)~%" rx ry))
-          (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
-          (setf (path mob) path)
-          
-          ))
-    ;)
-    
-    ;; call for reinforcements if there is a threatening enemy in sight and hp < 50% and you are not the last one
-    (when (and nearest-enemy
-               (not (zerop (strength nearest-enemy)))
-               (< (/ (cur-hp mob) (max-hp mob)) 
-                  0.5)
-               (mob-ability-p mob +mob-abil-call-for-help+)
-               (can-invoke-ability mob mob +mob-abil-call-for-help+)
-               (> (total-demons *world*) 1))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to call for help~%" (name mob) (id mob)))
-      (mob-invoke-ability mob mob +mob-abil-call-for-help+)
-      (return-from ai-function))
+    (unless (path mob)
+      (let ((rx (- (+ 10 (x mob))
+                   (1+ (random 20)))) 
+            (ry (- (+ 10 (y mob))
+                   (1+ (random 20))))
+            (path nil))
+        (declare (type fixnum rx ry))
+        (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                        (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
+                        (and (get-mob-* (level *world*) rx ry)
+                             (not (eq (get-mob-* (level *world*) rx ry) mob))))
+              do
+                 (setf rx (- (+ 10 (x mob))
+                             (1+ (random 20))))
+                 (setf ry (- (+ 10 (y mob))
+                             (1+ (random 20)))))
+        (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
+        (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
+                           #'(lambda (dx dy) 
+                               ;; checking for impassable objects
+                               (check-move-for-ai mob dx dy)
+                               )))
+        
+        (pop path)
+        (logger (format nil "AI-FUNCTION: Mob goes to (~A ~A)~%" rx ry))
+        (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
+        (setf (path mob) path)
+        
+        ))
 
-    ;; for satanists: call for reinforcements whenever there is a threatening enemy in sight and there still demons out there
-    (when (and nearest-enemy
-               (not (zerop (strength nearest-enemy)))
-               (mob-ability-p mob +mob-abil-free-call+)
-               (can-invoke-ability mob mob +mob-abil-free-call+)
-               (> (total-demons *world*) 0))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to call for help~%" (name mob) (id mob)))
-      (mob-invoke-ability mob mob +mob-abil-free-call+)
-      (return-from ai-function))
 
-    ;; for satanists: if able to curse - do it
-    (when (and (mob-ability-p mob +mob-abil-curse+)
-               (can-invoke-ability mob mob +mob-abil-curse+)
-               nearest-enemy
-               (zerop (random 3)))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to curse~%" (name mob) (id mob)))
-      (mob-invoke-ability mob mob +mob-abil-curse+)
-      (return-from ai-function))
-    
-    ;; answer the call if there is no enemy in sight
-    (unless nearest-enemy
-      (when (and (mob-ability-p mob +mob-abil-answer-the-call+)
-                 (can-invoke-ability mob mob +mob-abil-answer-the-call+))
-        (logger (format nil "AI-FUNCTION: ~A [~A] decides to answer the call for help~%" (name mob) (id mob)))
-        (mob-invoke-ability mob mob +mob-abil-answer-the-call+)
-        (return-from ai-function))
-      )
-
-    ;; if able to heal and less than 50% hp - heal
-    (when (and (< (/ (cur-hp mob) (max-hp mob)) 
-                  0.5)
-               (mob-ability-p mob +mob-abil-heal-self+))
-      (when (can-invoke-ability mob mob +mob-abil-heal-self+)
-        (logger (format nil "AI-FUNCTION: ~A [~A] decides to heal itself~%" (name mob) (id mob)))
-        (mob-invoke-ability mob mob +mob-abil-heal-self+)
-        (return-from ai-function))
+    (let ((ability-list) (r 0))
+      (declare (type fixnum r)
+               (type list ability-list))
+               
+      ;; find all applicable abilities
+      (setf ability-list (loop for ability-id being the hash-key in (abilities mob)
+                               for ability = (get-ability-type-by-id ability-id)
+                               for func of-type function = (on-check-ai ability)
+                               when (and func
+                                         (funcall func ability mob nearest-enemy nearest-ally))
+                                 collect ability))
       
-      ;; if able to heal and need to reveal itself - do it 
-      (when (and (mob-effect-p mob +mob-effect-divine-consealed+)
-                 (mob-ability-p mob +mob-abil-reveal-divine+)
-                 (can-invoke-ability mob mob +mob-abil-reveal-divine+)
-                 (abil-applic-cost-p +mob-abil-heal-self+ mob))
-        (logger (format nil "AI-FUNCTION: ~A [~A] decides to reveal itself, in order to heal~%" (name mob) (id mob)))
-        (mob-invoke-ability mob mob +mob-abil-reveal-divine+)
+      ;; randomly choose one of them and invoke it
+      (when ability-list
+        (setf r (random (length ability-list)))
+        (let ((ai-invoke-func (on-invoke-ai (nth r ability-list))))
+          (declare (type function ai-invoke-func))
+          (logger (format nil "AI-FUNCTION: ~A [~A] decides to invoke ability ~A~%" (name mob) (id mob) (name (nth r ability-list))))
+          (funcall ai-invoke-func (nth r ability-list) mob nearest-enemy nearest-ally))
         (return-from ai-function)
         )
-      )
-
-    ;; if able to pray - do it
-    (when (and (mob-ability-p mob +mob-abil-prayer-bless+)
-               (can-invoke-ability mob mob +mob-abil-prayer-bless+)
-               (or nearest-enemy
-                   (zerop (random 5))))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to pray for smiting~%" (name mob) (id mob)))
-      (mob-invoke-ability mob mob +mob-abil-prayer-bless+)
-      (return-from ai-function))
-    
-    (when (and (mob-ability-p mob +mob-abil-prayer-shield+)
-               (can-invoke-ability mob mob +mob-abil-prayer-shield+)
-               (zerop (random 3)))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to pray for shielding~%" (name mob) (id mob)))
-      (mob-invoke-ability mob mob +mob-abil-prayer-shield+)
-      (return-from ai-function))
-
-    ;; soldiers: if there is an enemy in sight, shoot it
-    (when (and nearest-enemy
-               (mob-ability-p mob +mob-abil-shoot+)
-               (can-invoke-ability mob mob +mob-abil-shoot+))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to shoot ~A [~A]~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy)))
-      (mob-invoke-ability mob nearest-enemy +mob-abil-shoot+)
-      (return-from ai-function))
-
-    ;; soldiers: if you can reload - do it
-    (when (and (mob-ability-p mob +mob-abil-reload+)
-               (can-invoke-ability mob mob +mob-abil-reload+))
-      (logger (format nil "AI-FUNCTION: ~A [~A] decides to reload~%" (name mob) (id mob)))
-      (mob-invoke-ability mob mob +mob-abil-reload+)
-      (return-from ai-function))
+    )
     
     ;; if the mob has its path set - move along it
     (when (path mob)
-      ;; if the dst is more than 3 tiles away - stealth, if possible
-      ;;(format t "AI-FUNCTION: (length (path mob)) ~A, (mob-ability-p mob +mob-abil-conseal-divine+) ~A, (can-invoke-ability mob +mob-abil-conseal-divine+) ~A~%" 
-      ;;        (length (path mob)) (mob-ability-p mob +mob-abil-conseal-divine+) (can-invoke-ability mob +mob-abil-conseal-divine+))
-      (when (and (> (length (path mob)) 3)
-                 (mob-ability-p mob +mob-abil-conseal-divine+)
-                 (can-invoke-ability mob mob +mob-abil-conseal-divine+))
-        (logger (format nil "AI-FUNCTION: ~A [~A] decides to conseal its divinity~%" (name mob) (id mob)))
-        (mob-invoke-ability mob mob +mob-abil-conseal-divine+)
-        (return-from ai-function))
 
-      ;; if the dst tile is less than 2 tiles away - unstealth, if possible
-      (when (and (<= (length (path mob)) 1)
-                 (mob-ability-p mob +mob-abil-reveal-divine+)
-                 (can-invoke-ability mob mob +mob-abil-reveal-divine+))
-        (logger (format nil "AI-FUNCTION: ~A [~A] decides to reveal its divinity~%" (name mob) (id mob)))
-        (mob-invoke-ability mob mob +mob-abil-reveal-divine+)
-        (return-from ai-function))
-      
       (let ((step) (step-x) (step-y))
         
         (logger (format nil "AI-FUNCTION: Move mob along the path - ~A~%" (path mob)))
