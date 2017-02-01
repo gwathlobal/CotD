@@ -22,6 +22,7 @@
 (defconstant +player-faction-test+ 7)
 (defconstant +player-faction-angels+ 8)
 (defconstant +player-faction-demons+ 9)
+(defconstant +city-layout-forest+ 10)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -118,6 +119,7 @@
     (loop for y from 0 below (array-dimension template-level 1) do
       (cond
         ((= (aref template-level x y) +terrain-border-floor+) (setf (aref template-level x y) +terrain-border-floor-snow+))
+        ((= (aref template-level x y) +terrain-border-grass+) (setf (aref template-level x y) +terrain-border-floor-snow+))
         ((= (aref template-level x y) +terrain-floor-dirt+) (setf (aref template-level x y) +terrain-floor-snow+))
         ((= (aref template-level x y) +terrain-floor-dirt-bright+) (setf (aref template-level x y) +terrain-floor-snow+))
         ((= (aref template-level x y) +terrain-floor-grass+) (setf (aref template-level x y) +terrain-floor-snow+))
@@ -395,3 +397,33 @@
         do
            (setf x (random *max-x-level*))
            (setf y (random *max-y-level*))))
+
+(defun place-reserved-buildings-forest (reserved-level)
+  (let ((result))
+    ;; place +building-city-park-tiny+ and +building-city-park-3+ along the borders
+    (loop for x from 0 below (array-dimension reserved-level 0)
+          do
+             (setf (aref reserved-level x 0) +building-city-park-tiny+)
+             (setf (aref reserved-level x (1- (array-dimension reserved-level 1))) +building-city-park-tiny+)
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ x 1 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ x 1 reserved-level)
+               (push (list +building-city-park-3+ x 1) result))
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) reserved-level)
+               (push (list +building-city-park-3+ x (- (array-dimension reserved-level 1) 3)) result)))
+    (loop for y from 0 below (array-dimension reserved-level 1)
+          do
+             (setf (aref reserved-level 0 y) +building-city-park-tiny+)
+             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y) +building-city-park-tiny+)
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ 1 y reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ 1 y reserved-level)
+               (push (list +building-city-park-3+ 1 y) result))
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y reserved-level)
+               (push (list +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y) result)))
+    
+    (loop for x from 0 below (array-dimension reserved-level 0) do
+      (loop for y from 0 below (array-dimension reserved-level 1) do
+        (when (= (aref reserved-level x y) +building-city-park-tiny+)
+          (push (list (aref reserved-level x y) x y) result))))
+    result))

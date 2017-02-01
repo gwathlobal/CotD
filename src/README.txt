@@ -6,7 +6,7 @@ OVERVIEW
 
 The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain. Choose your side and join the fray!
 
-This is a simple fast-paced coffeebreak roguelike inspired by as 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
+This is a simple fast-paced coffeebreak roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
 LATEST CHANGES v1.0.4

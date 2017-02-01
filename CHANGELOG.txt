@@ -1,5 +1,9 @@
 CHANGELOG
 
+v1.0.5
+
+- Added forest cities to the city generator
+
 --------------------
 Jan 29, 2017 v1.0.4
 
