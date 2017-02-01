@@ -12,6 +12,7 @@
 (defconstant +game-event-military-arrive-port-s+ 7)
 (defconstant +game-event-military-arrive-port-e+ 8)
 (defconstant +game-event-military-arrive-port-w+ 9)
+(defconstant +game-event-military-arrive-island+ 10)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

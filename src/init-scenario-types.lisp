@@ -71,10 +71,9 @@
                                                        (push #'populate-world-with-angels mob-func-list)
                                                        (push #'populate-world-with-demons mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
-                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list))
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-player+))
-                                                                 (setf (x *player*) 1 (y *player*) 1)
-                                                                 (add-mob-to-level-list (level *world*) *player*))
+                                                                 (find-unoccupied-place-for-angel world *player*))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
@@ -133,8 +132,17 @@
                                              :type +scenario-feature-city-layout+
                                              :name "A city in the woods"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
-                                                       ;; place tiny forest along the borders
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-normal #'get-reserved-buildings-normal #'place-reserved-buildings-forest)))
                                                        (push +game-event-military-arrive+ game-event-list)
+                                                       
+                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-island+
+                                             :type +scenario-feature-city-layout+
+                                             :name "An island city"
+                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
+                                                       ;; place tiny forest along the borders
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-river #'get-reserved-buildings-river #'place-reserved-buildings-island)))
+                                                       (push +game-event-military-arrive-island+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))

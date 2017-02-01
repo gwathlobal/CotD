@@ -45,6 +45,7 @@
 (defconstant +building-city-sea+ 24)
 (defconstant +building-city-warehouse-port-1+ 25)
 (defconstant +building-city-warehouse-port-2+ 26)
+(defconstant +building-city-island-ground-border+ 27)
 
 (defparameter *level-grid-size* 5)
 

@@ -23,6 +23,7 @@
 (defconstant +player-faction-angels+ 8)
 (defconstant +player-faction-demons+ 9)
 (defconstant +city-layout-forest+ 10)
+(defconstant +city-layout-island+ 11)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -425,5 +426,60 @@
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
         (when (= (aref reserved-level x y) +building-city-park-tiny+)
+          (push (list (aref reserved-level x y) x y) result))))
+    result))
+
+(defun place-reserved-buildings-island (reserved-level)
+  (let ((result))
+    ;; place water along the borders
+    (loop for x from 0 below (array-dimension reserved-level 0)
+          do
+             (setf (aref reserved-level x 0) +building-city-sea+)
+             (setf (aref reserved-level x 1) +building-city-sea+)
+             (setf (aref reserved-level x 2) +building-city-sea+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 1)) +building-city-sea+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 2)) +building-city-sea+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 3)) +building-city-sea+))
+            
+    (loop for y from 0 below (array-dimension reserved-level 1)
+          do
+             (setf (aref reserved-level 0 y) +building-city-sea+)
+             (setf (aref reserved-level 1 y) +building-city-sea+)
+             (when (and (>= y 2) (<= y (- (array-dimension reserved-level 1) 3)))
+               (setf (aref reserved-level 2 y) +building-city-sea+))
+             (setf (aref reserved-level (- (array-dimension reserved-level 0) 1) y) +building-city-sea+)
+             (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) y) +building-city-sea+)
+             (when (and (>= y 2) (<= y (- (array-dimension reserved-level 1) 3)))
+               (setf (aref reserved-level (- (array-dimension reserved-level 0) 3) y) +building-city-sea+)))
+
+    ;; place four piers - north, south, east, west
+    (let ((min) (max) (r))
+      ;; north
+      (setf min 3 max (- (array-dimension reserved-level 0) 3))
+      (setf r (+ (random (- max min)) min))
+      (setf (aref reserved-level r 1) +building-city-pier+)
+      (setf (aref reserved-level r 2) +building-city-pier+)
+      
+      ;; south
+      (setf r (+ (random (- max min)) min))
+      (setf (aref reserved-level r (- (array-dimension reserved-level 1) 2)) +building-city-pier+)
+      (setf (aref reserved-level r (- (array-dimension reserved-level 1) 3)) +building-city-pier+)
+      
+      ;; west
+      (setf min 3 max (- (array-dimension reserved-level 1) 3))
+      (setf r (+ (random (- max min)) min))
+      (setf (aref reserved-level 1 r) +building-city-pier+)
+      (setf (aref reserved-level 2 r) +building-city-pier+)
+
+      ;; east
+      (setf r (+ (random (- max min)) min))
+      (setf (aref reserved-level (- (array-dimension reserved-level 1) 2) r) +building-city-pier+)
+      (setf (aref reserved-level (- (array-dimension reserved-level 1) 3) r) +building-city-pier+))
+    
+    (loop for x from 0 below (array-dimension reserved-level 0) do
+      (loop for y from 0 below (array-dimension reserved-level 1) do
+        (when (or (= (aref reserved-level x y) +building-city-sea+)
+                  (= (aref reserved-level x y) +building-city-pier+)
+                  (= (aref reserved-level x y) +building-city-island-ground-border+))
           (push (list (aref reserved-level x y) x y) result))))
     result))

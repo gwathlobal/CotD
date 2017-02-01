@@ -564,3 +564,19 @@
                                             (values (list (list +mob-type-man+ 3 6)
                                                           (list +mob-type-man+ 6 3))
                                                     nil))))
+
+(set-building-type (make-building :id +building-city-island-ground-border+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            ;; randomly place the ground and sea tiles 
+                                            (loop for dx from 0 to 4 do
+                                              (loop for dy from 0 to 4 do
+                                                (if (zerop (random 2))
+                                                  (progn
+                                                    (if (zerop (random 4))
+                                                      (setf (aref template-level (+ x dx) (+ y dy)) +terrain-floor-dirt-bright+)
+                                                      (setf (aref template-level (+ x dx) (+ y dy)) +terrain-floor-dirt+)))
+                                                  (progn
+                                                    (setf (aref template-level (+ x dx) (+ y dy)) +terrain-water-sea+)))))
+
+                                            (values nil nil)
+                                            )))
