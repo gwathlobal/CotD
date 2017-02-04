@@ -218,11 +218,11 @@
   (unless (is-weapon-ranged actor)
     (return-from mob-reload-ranged-weapon nil))
 
-  (logger (format nil "MOB-RELOAD: ~A [~A] reloads his rifle~%" (name actor) (id actor)))
+  (logger (format nil "MOB-RELOAD: ~A [~A] reloads his ~A~%" (name actor) (id actor) (get-weapon-name actor)))
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (level *world*) 
-                         (format nil "~A reloads his rifle.~%" (name actor)))
+                         (format nil "~A reloads his ~(~A~).~%" (name actor) (get-weapon-name actor)))
 
   (make-act actor +normal-ap+))
 

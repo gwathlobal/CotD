@@ -237,6 +237,38 @@
 									       nil)))
 			  (make-output *current-window*))
                         ;;------------------
+			;; shoot mode - f
+			(when (and (sdl:key= key :sdl-key-f) (= mod 0))
+                          (if (is-weapon-ranged *player*)
+                            (progn
+                              (if (mob-can-shoot *player*)
+                                (progn
+                                  (setf *current-window* (make-instance 'map-select-window 
+                                                                        :return-to *current-window*
+                                                                        :cmd-str "[Enter] Fire  "
+                                                                        :exec-func #'(lambda ()
+                                                                                       (when (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
+                                                                                         (mob-shoot-target *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                                                         (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
+                                                                                         (setf *current-window* (return-to *current-window*))))))
+                                  (make-output *current-window*))
+                                (progn
+                                  (add-message (format nil "Can't switch into firing mode: need to reload.~%")))))
+                            (progn
+                              (add-message (format nil "Can't switch into firing mode: no ranged weapons.~%")))))
+                        ;;------------------
+			;; reload - r
+			(when (and (sdl:key= key :sdl-key-r) (= mod 0))
+                          (if (is-weapon-ranged *player*)
+                            (progn
+                              (if (< (get-ranged-weapon-charges *player*) (get-ranged-weapon-max-charges *player*))
+                                (progn
+                                  (mob-reload-ranged-weapon *player*))
+                                (progn
+                                  (add-message (format nil "Can't reload: magazine already full.~%")))))
+                            (progn
+                              (add-message (format nil "Can't reload: this is not a ranged weapon.~%")))))
+                        ;;------------------
 			;; view messages - m
                         (when (and (sdl:key= key :sdl-key-m) (= mod 0))
 			  (setf *current-window* (make-instance 'message-window 

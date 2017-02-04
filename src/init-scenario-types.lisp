@@ -86,7 +86,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'test-level-place-mobs mob-func-list)
-                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-imp+))) mob-func-list)
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-sergeant+))) mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
                                                        
