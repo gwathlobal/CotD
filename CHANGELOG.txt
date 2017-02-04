@@ -4,6 +4,7 @@ v1.0.5
 
 - Added forest cities to the city generator
 - Added island cities to the city generator
+- Added sergeants to the military. They are armed with a six-round revolvers, that deal less damaged than a rifle but do not need to reload every turn
 
 --------------------
 Jan 29, 2017 v1.0.4

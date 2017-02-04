@@ -62,11 +62,9 @@
    ;;   :abil-free-call - +mob-abil-free-call+
    ;;   :abil-prayer-shield - +mob-abil-prayer-shield+
    ;;   :abil-curse - +mob-abil-curse+
-   ;;   :abil-shoot - +mob-abil-shoot+
-   ;;   :abil-reload - +mob-abil-reload+
    ;;   :abil-keen-senses - +mob-abil-keen-senses+
    
-   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> <dmg min> <dmg max> <attack speed>)
+   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
    (base-sight :initform 8 :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
@@ -78,7 +76,7 @@
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
-                                                                abil-shoot abil-reload abil-keen-senses)
+                                                                abil-keen-senses)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -134,10 +132,6 @@
     (setf (gethash +mob-abil-prayer-shield+ (abilities mob-type)) t))
   (when abil-curse
     (setf (gethash +mob-abil-curse+ (abilities mob-type)) t))
-  (when abil-shoot
-    (setf (gethash +mob-abil-shoot+ (abilities mob-type)) t))
-  (when abil-reload
-    (setf (gethash +mob-abil-reload+ (abilities mob-type)) t))
   (when abil-keen-senses
     (setf (gethash +mob-abil-keen-senses+ (abilities mob-type)) t))
   )
@@ -151,19 +145,56 @@
   (setf (aref *mob-types* (mob-type mob-type)) mob-type))
 
 (defmethod get-weapon-name ((mob-type mob-type))
-  (nth 0 (weapon mob-type)))
+  (first (weapon mob-type)))
 
-(defmethod get-weapon-dmg-min ((mob-type mob-type))
-  (nth 1 (weapon mob-type)))
+(defmethod is-weapon-melee ((mob-type mob-type))
+  (if (second (weapon mob-type))
+    t
+    nil))
 
-(defmethod get-weapon-dmg-max ((mob-type mob-type))
-  (nth 2 (weapon mob-type)))
+(defmethod get-melee-weapon-dmg-min ((mob-type mob-type))
+  (when (second (weapon mob-type))
+    (nth 0 (second (weapon mob-type)))))
 
-(defmethod get-weapon-speed ((mob-type mob-type))
-  (nth 3 (weapon mob-type)))
+(defmethod get-melee-weapon-dmg-max ((mob-type mob-type))
+  (when (second (weapon mob-type))
+    (nth 1 (second (weapon mob-type)))))
+
+(defmethod get-melee-weapon-speed ((mob-type mob-type))
+  (when (second (weapon mob-type))
+    (nth 2 (second (weapon mob-type)))))
+
+(defmethod is-weapon-ranged ((mob-type mob-type))
+  (if (third (weapon mob-type))
+    t
+    nil))
+
+(defmethod get-ranged-weapon-dmg-min ((mob-type mob-type))
+  (when (third (weapon mob-type))
+    (nth 0 (third (weapon mob-type)))))
+
+(defmethod get-ranged-weapon-dmg-max ((mob-type mob-type))
+  (when (third (weapon mob-type))
+    (nth 1 (third (weapon mob-type)))))
+
+(defmethod get-ranged-weapon-speed ((mob-type mob-type))
+  (when (third (weapon mob-type))
+    (nth 2 (third (weapon mob-type)))))
+
+(defmethod get-ranged-weapon-charges ((mob-type mob-type))
+  (when (third (weapon mob-type))
+    (nth 3 (third (weapon mob-type)))))
 
 (defmethod get-weapon-descr-line ((mob-type mob-type))
-  (format nil "~A (dmg: ~A-~A) (spd: ~A)" (get-weapon-name mob-type) (get-weapon-dmg-min mob-type) (get-weapon-dmg-max mob-type) (get-weapon-speed mob-type)))
+  (let ((str (create-string)))
+    (format str "~A" (get-weapon-name mob-type))
+    (when (is-weapon-melee mob-type)
+      (format str "~% M: (dmg: ~A-~A) (spd: ~A)" (get-melee-weapon-dmg-min mob-type) (get-melee-weapon-dmg-max mob-type) (get-melee-weapon-speed mob-type)))
+    (when (is-weapon-ranged mob-type)
+      (format str "~% R: (dmg: ~A-~A) (spd: ~A) ~A/~A"
+              (get-ranged-weapon-dmg-min mob-type) (get-ranged-weapon-dmg-max mob-type) (get-ranged-weapon-speed mob-type)
+              (get-ranged-weapon-charges mob-type) (get-ranged-weapon-charges mob-type)))
+    str))
 
 ;;----------------------
 ;; MOB
@@ -192,7 +223,7 @@
 
    (effects :initform (make-hash-table) :accessor effects)
    
-   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> <dmg min> <dmg max> <attack speed>)
+   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
    (cur-sight :initform 6 :initarg :cur-sight :accessor cur-sight)
    (accuracy :initform 100 :initarg :accuracy :accessor accuracy)
    (att-spd :initform 10 :initarg :att-spd :accessor att-spd)
@@ -209,8 +240,6 @@
 (defmethod initialize-instance :after ((mob mob) &key)
   (setf (id mob) (find-free-id *mobs*))
   (setf (aref *mobs* (id mob)) mob)
-  
-  
   
   (setf (cur-hp mob) (max-hp mob))
   (setf (cur-fp mob) 0)
@@ -300,11 +329,13 @@
     (slot-value mob 'name)
     (name (get-mob-type-by-id (mob-type mob)))))
 
-(defmethod set-cur-weapons ((mob-obj mob))
-  (setf (weapon mob-obj) (copy-list (weapon (get-mob-type-by-id (mob-type mob-obj))))))
+(defmethod set-cur-weapons ((mob mob))
+  (setf (weapon mob) (copy-list (weapon (get-mob-type-by-id (mob-type mob)))))
+  (setf (second (weapon mob)) (copy-list (second (weapon (get-mob-type-by-id (mob-type mob))))))
+  (setf (third (weapon mob)) (copy-list (third (weapon (get-mob-type-by-id (mob-type mob)))))))
 
 (defun adjust-attack-speed (mob)
-  (setf (att-spd mob) (get-weapon-speed mob)))
+  (setf (att-spd mob) (get-melee-weapon-speed mob)))
 
 
 (defun adjust-dodge (mob-obj)
@@ -326,17 +357,54 @@
 (defmethod get-weapon-name ((mob mob))
   (get-weapon-name (get-mob-type-by-id (mob-type mob))))
 
-(defmethod get-weapon-dmg-min ((mob mob))
-  (get-weapon-dmg-min (get-mob-type-by-id (mob-type mob))))
+(defmethod is-weapon-melee ((mob mob))
+  (is-weapon-melee (get-mob-type-by-id (mob-type mob))))
 
-(defmethod get-weapon-dmg-max ((mob mob))
-  (get-weapon-dmg-max (get-mob-type-by-id (mob-type mob))))
+(defmethod get-melee-weapon-dmg-min ((mob mob))
+  (get-melee-weapon-dmg-min (get-mob-type-by-id (mob-type mob))))
 
-(defmethod get-weapon-speed ((mob mob))
-  (get-weapon-speed (get-mob-type-by-id (mob-type mob))))
+(defmethod get-melee-weapon-dmg-max ((mob mob))
+  (get-melee-weapon-dmg-max (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-melee-weapon-speed ((mob mob))
+  (get-melee-weapon-speed (get-mob-type-by-id (mob-type mob))))
+
+(defmethod is-weapon-ranged ((mob mob))
+  (is-weapon-ranged (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-ranged-weapon-dmg-min ((mob mob))
+  (get-ranged-weapon-dmg-min (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-ranged-weapon-dmg-max ((mob mob))
+  (get-ranged-weapon-dmg-max (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-ranged-weapon-speed ((mob mob))
+  (get-ranged-weapon-speed (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-ranged-weapon-charges ((mob mob))
+  (when (third (weapon mob))
+    (nth 3 (third (weapon mob)))))
+
+(defun set-ranged-weapon-charges (mob value)
+  (when (third (weapon mob))
+    (setf (nth 3 (third (weapon mob))) value)))
+
+(defun get-ranged-weapon-max-charges (mob)
+  (get-ranged-weapon-charges (get-mob-type-by-id (mob-type mob))))
 
 (defmethod get-weapon-descr-line ((mob mob))
   (get-weapon-descr-line (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-weapon-descr-line ((mob mob))
+  (let ((str (create-string)))
+    (format str "~A" (get-weapon-name mob))
+    (when (is-weapon-melee mob)
+      (format str "~% M: (dmg: ~A-~A) (spd: ~A)" (get-melee-weapon-dmg-min mob) (get-melee-weapon-dmg-max mob) (get-melee-weapon-speed mob)))
+    (when (is-weapon-ranged mob)
+      (format str "~% R: (dmg: ~A-~A) (spd: ~A) ~A/~A"
+              (get-ranged-weapon-dmg-min mob) (get-ranged-weapon-dmg-max mob) (get-ranged-weapon-speed mob)
+              (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob)))
+    str))
 
 (defmethod calculate-total-kills ((mob mob))
   (loop for killed-mob-stat being the hash-value in (stat-kills mob) 

@@ -206,15 +206,49 @@
     (print-visible-message (x target) (y target) (level *world*) (format nil "~%"))
     ))
 
+(defun mob-can-shoot (actor)
+  (unless (is-weapon-ranged actor)
+    (return-from mob-can-shoot nil))
+
+  (if (not (zerop (get-ranged-weapon-charges actor)))
+    t
+    nil))
+
+(defun mob-reload-ranged-weapon (actor)
+  (unless (is-weapon-ranged actor)
+    (return-from mob-reload-ranged-weapon nil))
+
+  (logger (format nil "MOB-RELOAD: ~A [~A] reloads his rifle~%" (name actor) (id actor)))
+  
+  (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
+  (print-visible-message (x actor) (y actor) (level *world*) 
+                         (format nil "~A reloads his rifle.~%" (name actor)))
+
+  (make-act actor +normal-ap+))
+
 (defun mob-shoot-target (actor target)
-  (let ((cur-dmg))
-    (setf cur-dmg (+ 2 (random 3)))
+  (let ((cur-dmg 0))
+    ;; reduce the number of bullets in the magazine
+    (set-ranged-weapon-charges actor (1- (get-ranged-weapon-charges actor)))
+    
+    ;; target under protection of divine shield - consume the shield and quit
+    (when (mob-effect-p target +mob-effect-divine-shield+)
+      (print-visible-message (x actor) (y actor) (level *world*) 
+                             (format nil "~A shoots ~A, but can not harm ~A.~%" (name actor) (name target) (name target)))
+      (rem-mob-effect target +mob-effect-divine-shield+)
+      (make-act actor (att-spd actor))
+      (return-from mob-shoot-target nil))
+    
+    (when (is-weapon-ranged actor)
+      (setf cur-dmg (+ (random (- (1+ (get-ranged-weapon-dmg-max actor)) (get-ranged-weapon-dmg-min actor))) 
+                               (get-ranged-weapon-dmg-min actor))))
 
     ;; reduce damage by the amount of armor
     (decf cur-dmg (cur-armor target))
 
     (when (< cur-dmg 0) (setf cur-dmg 0))
     (decf (cur-hp target) cur-dmg)
+    
     ;; place a blood spattering
     (if (> (accuracy actor) (random 100))
       (progn
@@ -238,6 +272,10 @@
         (print-visible-message (x target) (y target) (level *world*) 
                                (format nil "~A shoots ~A, but misses.~%" (name target) (name actor)))
         ))
+
+    
+    
+    (make-act actor (att-spd actor))
     ))
 
 (defun mob-invoke-ability (actor target ability-type-id)
@@ -301,11 +339,11 @@
                                        (format nil "~A attacks ~A, and ~A failes to dodge. " (name attacker) (name target) (name target)))
                 (setf failed-dodge t))
               ;; apply damage
-              (setf cur-dmg (+ (random (- (1+ (get-weapon-dmg-max attacker)) (get-weapon-dmg-min attacker))) 
-                               (get-weapon-dmg-min attacker)))
+              (setf cur-dmg (+ (random (- (1+ (get-melee-weapon-dmg-max attacker)) (get-melee-weapon-dmg-min attacker))) 
+                               (get-melee-weapon-dmg-min attacker)))
               
               (when (= (faction attacker) (faction target))
-                (setf cur-dmg (get-weapon-dmg-min attacker)))
+                (setf cur-dmg (get-melee-weapon-dmg-min attacker)))
 
               ;; reduce damage by the amount of armor
               (decf cur-dmg (cur-armor target))

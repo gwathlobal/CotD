@@ -24,11 +24,11 @@ THE LEGIONS OF HELL
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
  - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
- - Remeber, "friendly fire" is allowed for your faction. Be cautions when walking side-by-side with your "friends".
+ - Remember, "friendly fire" is allowed for your faction. Be cautions when walking side-by-side with your "friends".
  - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
  
 HUMANS
  - Humans are frail and week. Citizens of the City will try to flee whenever they see an enemy.
  - Priests will preach to smite their foes or grant allies divine shield. Smiting applies minor damage to all enemies in sight, while divine shield gives a one-time protection from any harm.
- - Satanists are allied with demons. They have are able to call demons to them for free and curse all enemies in sight with inaccuracy.
- - Soldiers arrive towards the end of the battle for the City. They are allied with the citizens but oppose both angels and demons. They are armed with single-shot rifles and need to reload every other turn. But their numbers and the ability to apply damage at range can make short work of any supernatural being.
+ - Satanists are allied with demons. They are able to call demons to them for free and curse all enemies in sight with inaccuracy.
+ - The military arrive towards the end of the battle for the City. They are allied with the citizens but oppose both angels and demons. They are armed with single-shot rifles or six round revolvers, so they need to reload their weapons from time to time. But their numbers and the ability to apply damage at range can make short work of any supernatural being.

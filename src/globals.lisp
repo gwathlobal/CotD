@@ -47,6 +47,7 @@
 (defconstant +mob-type-priest+ 13)
 (defconstant +mob-type-satanist+ 14)
 (defconstant +mob-type-soldier+ 15)
+(defconstant +mob-type-sergeant+ 16)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -82,9 +83,7 @@
 (defconstant +mob-abil-free-call+ 20)
 (defconstant +mob-abil-prayer-shield+ 21)
 (defconstant +mob-abil-curse+ 22)
-(defconstant +mob-abil-shoot+ 23)
-(defconstant +mob-abil-reload+ 24)
-(defconstant +mob-abil-keen-senses+ 25)
+(defconstant +mob-abil-keen-senses+ 23)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

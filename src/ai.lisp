@@ -227,7 +227,7 @@
         
         ))
 
-
+    ;; invoke abilities if any
     (let ((ability-list) (r 0))
       (declare (type fixnum r)
                (type list ability-list))
@@ -250,6 +250,26 @@
         (return-from ai-function)
         )
     )
+
+    ;; engage in ranged combat
+    ;; if no bullets in magazine - reload
+    (when (and (is-weapon-ranged mob)
+               (not (mob-can-shoot mob)))
+      (mob-reload-ranged-weapon mob)
+      (return-from ai-function))
+
+    ;; if can shoot and there is an enemy in sight - shoot it
+    (when (and (is-weapon-ranged mob)
+               nearest-enemy)
+      (mob-shoot-target mob nearest-enemy)
+      (return-from ai-function))
+
+    ;; if no enemy in sight and the magazine is not full - reload it
+    (when (and (is-weapon-ranged mob)
+               (not nearest-enemy)
+               (< (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob)))
+      (mob-reload-ranged-weapon mob)
+      (return-from ai-function))
     
     ;; if the mob has its path set - move along it
     (when (path mob)
