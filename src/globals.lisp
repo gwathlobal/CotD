@@ -48,6 +48,7 @@
 (defconstant +mob-type-satanist+ 14)
 (defconstant +mob-type-soldier+ 15)
 (defconstant +mob-type-sergeant+ 16)
+(defconstant +mob-type-chaplain+ 17)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -84,6 +85,7 @@
 (defconstant +mob-abil-prayer-shield+ 21)
 (defconstant +mob-abil-curse+ 22)
 (defconstant +mob-abil-keen-senses+ 23)
+(defconstant +mob-abil-prayer-reveal+ 24)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

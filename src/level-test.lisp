@@ -58,7 +58,7 @@
   (declare (ignore mob-template-list))
   (setf (x *player*) 45 (y *player*) 15)
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-sergeant+ :x (+ (x *player*) 5) :y (- (y *player*) 0)))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-chaplain+ :x (+ (x *player*) 5) :y (- (y *player*) 0)))
         (demon (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 0) :y (+ (y *player*) -4))))
     ;(setf (cur-hp demon) 1)
     (set-mob-effect *player* +mob-effect-divine-shield+ 100)

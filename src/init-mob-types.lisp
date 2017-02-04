@@ -109,6 +109,15 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                              ))
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
+                                       :name "Chaplain"
+                                       :glyph-idx 32 :glyph-color (sdl:color :r 85 :g 107 :b 47) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :faction +faction-type-military+
+                                       :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6)) :base-dodge 25
+                                       :strength 0
+                                       :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t
+                             ))
+
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
                                        :name "Angel"

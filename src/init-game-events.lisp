@@ -1,5 +1,7 @@
 (in-package :cotd)
 
+(defconstant +game-events-military-list+ (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+ +mob-type-sergeant+ +mob-type-chaplain+))
+
 (set-game-event (make-instance 'game-event :id +game-event-win-for-angels+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (zerop (total-demons world))
@@ -99,13 +101,13 @@
                                                                                              (cons 1 (- *max-y-level* 2))                      ;; south-east
                                                                                              (cons (- *max-x-level* 15) 1)                     ;; north-west
                                                                                              (cons (- *max-x-level* 15) (- *max-y-level* 2)))) ;; south-west
-                                                                 (military-list (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+))
                                                                  )
+                                                                 
 
                                                              ;; place for north and south horizontally
                                                              (loop for (sx . sy) in placement-list-horiz do
                                                                (loop for x from 0 to 9
-                                                                     for military-picked = (nth (random (length military-list)) military-list)
+                                                                     for military-picked = (nth (random (length +game-events-military-list+)) +game-events-military-list+)
                                                                      when (and (not (get-mob-* (level world) (+ sx x) sy))
                                                                                (not (get-terrain-type-trait (get-terrain-* (level world) (+ sx x) sy) +terrain-trait-blocks-move+)))
                                                                        do
@@ -140,7 +142,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for y from 0 below *max-y-level*
                                                                  with max-units = 40
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
@@ -166,7 +168,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for y from (1- *max-y-level*) downto 0
                                                                  with max-units = 40
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
@@ -192,7 +194,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for x from 0 below *max-x-level*
                                                                  with max-units = 40
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
@@ -218,7 +220,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for x from (1- *max-x-level*) downto 0 
                                                                  with max-units = 40
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
@@ -244,7 +246,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for x from (1- *max-x-level*) downto 0 
                                                                  with max-units = 10
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
@@ -260,7 +262,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for x from 0 below *max-x-level*
                                                                  with max-units = 10
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
@@ -276,7 +278,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for y from (1- *max-y-level*) downto 0
                                                                  with max-units = 10
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
@@ -292,7 +294,7 @@
                                                            ;; place the units until the total number is reached
                                                            (loop for y from 0 below *max-y-level*
                                                                  with max-units = 10
-                                                                 with military-list = (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-sergeant+)
+                                                                 with military-list = +game-events-military-list+
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)

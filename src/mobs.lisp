@@ -63,6 +63,7 @@
    ;;   :abil-prayer-shield - +mob-abil-prayer-shield+
    ;;   :abil-curse - +mob-abil-curse+
    ;;   :abil-keen-senses - +mob-abil-keen-senses+
+   ;;   :abil-prayer-reveal - +mob-abil-prayer-reveal+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
    (base-sight :initform 8 :initarg :base-sight :accessor base-sight)
@@ -76,7 +77,7 @@
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
-                                                                abil-keen-senses)
+                                                                abil-keen-senses abil-prayer-reveal)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -134,6 +135,8 @@
     (setf (gethash +mob-abil-curse+ (abilities mob-type)) t))
   (when abil-keen-senses
     (setf (gethash +mob-abil-keen-senses+ (abilities mob-type)) t))
+  (when abil-prayer-reveal
+    (setf (gethash +mob-abil-prayer-reveal+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

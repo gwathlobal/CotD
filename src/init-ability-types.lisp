@@ -696,3 +696,59 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-prayer-reveal+ :name "Prayer" :descr "Pray to reveal supernatural beings." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                
+                                                (logger (format nil "MOB-PRAYER-REVEAL: ~A [~A] prays for revealing supernatural beings~%" (name actor) (id actor)))
+
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A starts to pray. " (name actor)))
+
+                                                (if (zerop (random 3))
+                                                  (progn
+                                                    ;; 1/3th chance to do anything
+                                                    
+                                                    ;; reveal true form of all mobs in line of sight
+                                                    (loop for mob-id in (visible-mobs actor)
+                                                          for target = (get-mob-by-id mob-id)
+                                                          do
+                                                             (when (mob-effect-p target +mob-effect-divine-consealed+)
+                                                               (rem-mob-effect target +mob-effect-divine-consealed+)
+                                                               (setf (face-mob-type-id target) (mob-type target))
+                                                               (print-visible-message (x target) (y target) (level *world*) 
+                                                                                      (format nil "~A reveals the true form of ~A. " (name actor) (get-qualified-name target))))
+                                                             (when (mob-effect-p target +mob-effect-possessed+)
+                                                               (unless (mob-effect-p target +mob-effect-reveal-true-form+)
+                                                                 (print-visible-message (x target) (y target) (level *world*) 
+                                                                                        (format nil "~A reveals the true form of ~A. " (name actor) (get-qualified-name target))))
+                                                               (setf (face-mob-type-id target) (mob-type target))
+                                                               (set-mob-effect target +mob-effect-reveal-true-form+ 5)))                                                      
+                                                    
+                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                           (format nil "~%"))
+                                                    )
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                           (format nil "~%"))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-prayer-reveal+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; if able to pray - do it
+                                                  (if (and (mob-ability-p actor +mob-abil-prayer-reveal+)
+                                                           (can-invoke-ability actor actor +mob-abil-prayer-reveal+)
+                                                           (zerop (random 3)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
