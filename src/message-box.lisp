@@ -2,11 +2,11 @@
 
 ;; :string - the string to display
 
-(defvar *message-box* (make-message-box))
-
 (defstruct message-box
   (had-message-this-turn nil :type boolean)
   (strings () :type list))
+
+(defvar *message-box* (make-message-box))
 
 (defun add-message (str)
   (logger (format nil "ADD-MESSAGE: ~A~%" str))
