@@ -33,9 +33,9 @@ CITIZENS OF THE CITY
  - Satanists are allied with demons. They are able to call demons to them for free and curse all enemies in sight with inaccuracy.
  
 THE MILITARY 
- - The military arrive towards the end of the battle for the City. They are allied with the citizens but oppose both angels and demons. 
+ - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
  - The military is comprised of three units: Soldiers, Sergeants and Chaplains. All of them are capable of ranged combat, but do not gain power whatsoever.
  - Soldiers are armed with single-shot rifles and need to reload every other turn.
  - Sergeants wield six-round revolvers that deal less damage than a rifle, but do not need to be reloaded so often.
- - Chaplains also possess six-round revolvers but, more importantly, are able to pray to reveal disguised enemies or to grant divine protection to allies (similair to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.
+ - Chaplains are also armed with six-round revolvers but, more importantly, are able to pray to reveal disguised enemies or to grant divine protection to allies (similair to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.
  - If you side with the military, you start as a Chaplain. To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.

@@ -61,7 +61,7 @@
     (when (or (mob-effect-p mob +mob-effect-reveal-true-form+)
               (get-faction-relation (faction mob) (faction *player*)))
       (print-visible-message (x mob) (y mob) (level *world*) 
-                             (format nil "~A revolts against ~A.~%" (name (get-mob-by-id (slave-mob-id mob))) (name mob))))
+                             (format nil "~A revolts against ~A. " (name (get-mob-by-id (slave-mob-id mob))) (name mob))))
     (setf (path mob) nil)
     (ai-mob-random-dir mob)
     (return-from ai-function nil)
@@ -243,10 +243,10 @@
     ;; follow the leader
     (when (and (order mob)
                (= (first (order mob)) +mob-order-follow+))
-      ;; if the leader is visible, plot the path to it
+      ;; if the leader is nearby, plot the path to it
       (let ((leader (get-mob-by-id (second (order mob))))
             (path))
-        (when (and (member (id leader) (visible-mobs mob))
+        (when (and (< (get-distance (x mob) (y mob) (x leader) (y leader)) 8)
                    (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2))
           
             (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
@@ -359,7 +359,7 @@
         (logger (format nil "AI-FUNCTION: ~A [~A] revolts against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
         
         (print-visible-message (x player) (y player) (level *world*) 
-                               (format nil "~A revolts against ~A.~%" (name player) (name (get-mob-by-id (master-mob-id player))) ))
+                               (format nil "~A revolts against ~A. " (name player) (name (get-mob-by-id (master-mob-id player))) ))
         (ai-mob-random-dir (get-mob-by-id (master-mob-id player)))
         (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player))))
         (setf (path (get-mob-by-id (master-mob-id player))) nil)
@@ -387,7 +387,7 @@
         (get-input-player))
       
       (print-visible-message (x player) (y player) (level *world*) 
-                             (format nil "~A revolts against ~A.~%" (name (get-mob-by-id (slave-mob-id player))) (name player)))
+                             (format nil "~A revolts against ~A. " (name (get-mob-by-id (slave-mob-id player))) (name player)))
       (ai-mob-random-dir player)
       (return-from ai-function nil)
     ))

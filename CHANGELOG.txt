@@ -7,6 +7,7 @@ v1.0.5
 - Added sergeants to the military. They are armed with six-round revolvers, that deal less damaged than a rifle but do not need to reload every turn
 - Added chaplains to the military. They are armed with six-round revolvers and are able lead troops, pray to reveal angels and demons around them and grant divine protection to allies
 - Made the military a playable faction
+- Ranged combat accuracy is now affected by distance. The farther the target - the less likely you are able to hit it 
 
 --------------------
 Jan 29, 2017 v1.0.4

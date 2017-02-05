@@ -61,7 +61,7 @@ CITIZENS OF THE CITY
 --------------------
 THE MILITARY
 
- - The military is allied with the citizens of the City, but oppose both angels and demons.
+ - The military is allied with the citizens of the City, but opposes both angels and demons.
  - All military units are capable of ranged combat.
  - You start as a Chaplain who can lead troops, reveal disguised enemies and provide divine protection to allies.
  - To win, kill all demons. But do not let angels stand in your way.

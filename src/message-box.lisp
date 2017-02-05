@@ -2,25 +2,35 @@
 
 ;; :string - the string to display
 
-(defvar *message-box* (make-list 0))
+(defvar *message-box* (make-message-box))
+
+(defstruct message-box
+  (had-message-this-turn nil :type boolean)
+  (strings () :type list))
 
 (defun add-message (str)
   (logger (format nil "ADD-MESSAGE: ~A~%" str))
-  (let ((line (make-hash-table)))
-    (setf (gethash :string line) str)
-    (setf *message-box* (append *message-box* (list line)))))
+  (push str (message-box-strings *message-box*)))
 
 (defun get-message-str (n)
-  (gethash :string (nth n *message-box*)))
+  (nth n (message-box-strings *message-box*)))
 
 (defun message-list-length ()
-  (length *message-box*))
+  (length (message-box-strings *message-box*)))
 
 (defun clear-message-list ()
-  (setf *message-box* (make-list 0)))
+  (setf *message-box* (make-message-box)))
+
+(defun set-message-this-turn (bool)
+  (setf (message-box-had-message-this-turn *message-box*) bool))
+
+(defun get-message-this-turn ()
+  (message-box-had-message-this-turn *message-box*))
 
 (defun get-msg-str-list ()
-  (let ((str (make-array '(0) :element-type 'character :adjustable t :fill-pointer t)))
-    (dolist (line *message-box*)
-      (format str "~A" (gethash :string line)))
-    str))
+  (loop with str = (make-array '(0) :element-type 'character :adjustable t :fill-pointer t)
+        for line in (reverse (message-box-strings *message-box*))
+        do
+           (format str "~A" line)
+        finally (return str)))
+

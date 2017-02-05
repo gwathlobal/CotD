@@ -24,7 +24,9 @@
                (when (> (cur-ap mob) 0)
                  (setf turn-finished nil)
                  (setf (made-turn mob) nil)
-                 (ai-function mob))))
+                 (set-message-this-turn nil)
+                 (ai-function mob)
+                 (when (get-message-this-turn) (add-message (format nil "~%"))))))
            ;(format t "ALL MOBS DONE~%")
            
            (bt:with-lock-held ((path-lock *world*))
@@ -46,7 +48,7 @@
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   
-  (setf *message-box* nil)
+  (clear-message-list)
   
   (setf *cur-angel-names* (copy-list *init-angel-names*))
   (setf *cur-demon-names* (copy-list *init-demon-names*))

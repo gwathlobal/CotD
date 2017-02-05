@@ -49,6 +49,7 @@
 
 (defun print-visible-message (x y level str)
   (when (get-single-memo-visibility (get-memo-* level x y))
+    (set-message-this-turn t)
     (add-message str)))
 
 (defun check-move-on-level (mob dx dy)
@@ -178,7 +179,7 @@
     (rem-mob-effect target +mob-effect-reveal-true-form+)
   
     (print-visible-message (x actor) (y actor) (level *world*) 
-                           (format nil "~A releases its possession of ~A.~%" (name actor) (name target)))
+                           (format nil "~A releases its possession of ~A. " (name actor) (name target)))
   
     ))
 
@@ -203,7 +204,7 @@
       
       (make-dead target :splatter t :msg t :msg-newline nil :killer actor)
       )
-    (print-visible-message (x target) (y target) (level *world*) (format nil "~%"))
+    
     ))
 
 (defun mob-can-shoot (actor)
@@ -222,7 +223,7 @@
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (level *world*) 
-                         (format nil "~A reloads his ~(~A~).~%" (visible-name actor) (get-weapon-name actor)))
+                         (format nil "~A reloads his ~(~A~). " (visible-name actor) (get-weapon-name actor)))
 
   (make-act actor +normal-ap+))
 
@@ -234,7 +235,7 @@
     ;; target under protection of divine shield - consume the shield and quit
     (when (mob-effect-p target +mob-effect-divine-shield+)
       (print-visible-message (x actor) (y actor) (level *world*) 
-                             (format nil "~A shoots ~A, but can not harm ~A.~%" (visible-name actor) (visible-name target) (visible-name target)))
+                             (format nil "~A shoots ~A, but can not harm ~A. " (visible-name actor) (visible-name target) (visible-name target)))
       (rem-mob-effect target +mob-effect-divine-shield+)
       (make-act actor (att-spd actor))
       (return-from mob-shoot-target nil))
@@ -249,9 +250,10 @@
     (when (< cur-dmg 0) (setf cur-dmg 0))
     (decf (cur-hp target) cur-dmg)
     
-    ;; place a blood spattering
-    (if (> (accuracy actor) (random 100))
+    
+    (if (> (- (accuracy actor) (* (get-distance (x actor) (y actor) (x target) (y target)) 5)) (random 100))
       (progn
+        ;; place a blood spattering
         (when (> cur-dmg 0)
           (let ((dir (1+ (random 9))))
             (multiple-value-bind (dx dy) (x-y-dir dir) 				
@@ -270,14 +272,12 @@
             (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
             (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil))
           )
-        (print-visible-message (x actor) (y actor) (level *world*) (format nil "~%")))
+        )
       (progn
         (print-visible-message (x actor) (y actor) (level *world*) 
-                               (format nil "~A shoots ~A, but misses.~%" (visible-name target) (visible-name actor)))
+                               (format nil "~A shoots ~A, but misses. " (visible-name actor) (visible-name target)))
         ))
 
-    
-    
     (make-act actor (att-spd actor))
     ))
 
@@ -296,7 +296,7 @@
   ;; target under protection of divine shield - consume the shield and quit
   (when (mob-effect-p target +mob-effect-divine-shield+)
     (print-visible-message (x attacker) (y attacker) (level *world*) 
-                           (format nil "~A attacks ~A, but can not harm ~A.~%" (visible-name attacker) (visible-name target) (visible-name target)))
+                           (format nil "~A attacks ~A, but can not harm ~A. " (visible-name attacker) (visible-name target) (visible-name target)))
     (rem-mob-effect target +mob-effect-divine-shield+)
     (make-act attacker (att-spd attacker))
     (return-from melee-target nil)
@@ -331,7 +331,6 @@
             ;; target dodged
             (progn
               (set-mob-location target x y)
-              ;(setf (x target) x (y target) y)
               (print-visible-message (x attacker) (y attacker) (level *world*) 
                                      (format nil "~A attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
             ;; target did not dodge
@@ -374,7 +373,7 @@
   (when (check-dead target)
     (make-dead target :splatter t :msg t :msg-newline nil :killer attacker)
     )
-  (print-visible-message (x attacker) (y attacker) (level *world*) (format nil "~%"))
+  
   (make-act attacker (att-spd attacker))
   )
 
