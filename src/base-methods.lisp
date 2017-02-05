@@ -222,7 +222,7 @@
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (level *world*) 
-                         (format nil "~A reloads his ~(~A~).~%" (name actor) (get-weapon-name actor)))
+                         (format nil "~A reloads his ~(~A~).~%" (visible-name actor) (get-weapon-name actor)))
 
   (make-act actor +normal-ap+))
 
@@ -234,7 +234,7 @@
     ;; target under protection of divine shield - consume the shield and quit
     (when (mob-effect-p target +mob-effect-divine-shield+)
       (print-visible-message (x actor) (y actor) (level *world*) 
-                             (format nil "~A shoots ~A, but can not harm ~A.~%" (name actor) (name target) (name target)))
+                             (format nil "~A shoots ~A, but can not harm ~A.~%" (visible-name actor) (visible-name target) (visible-name target)))
       (rem-mob-effect target +mob-effect-divine-shield+)
       (make-act actor (att-spd actor))
       (return-from mob-shoot-target nil))
@@ -258,8 +258,11 @@
               (add-feature-to-level-list (level *world*) 
                                          (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy))))))
         
-        (print-visible-message (x target) (y target) (level *world*) 
-                               (format nil "~A shoots ~A for ~A damage. " (name actor) (name target) cur-dmg))
+        (if (zerop cur-dmg)
+          (print-visible-message (x actor) (y actor) (level *world*) 
+                                 (format nil "~A shoots ~A, but ~A is not hurt. " (visible-name actor) (visible-name target) (name target)))
+          (print-visible-message (x actor) (y actor) (level *world*) 
+                                 (format nil "~A shoots ~A for ~A damage. " (visible-name actor) (visible-name target) cur-dmg)))
         (when (check-dead target)
           (make-dead target :splatter t :msg t :msg-newline nil :killer actor)
           
@@ -267,10 +270,10 @@
             (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
             (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil))
           )
-        (print-visible-message (x target) (y target) (level *world*) (format nil "~%")))
+        (print-visible-message (x actor) (y actor) (level *world*) (format nil "~%")))
       (progn
-        (print-visible-message (x target) (y target) (level *world*) 
-                               (format nil "~A shoots ~A, but misses.~%" (name target) (name actor)))
+        (print-visible-message (x actor) (y actor) (level *world*) 
+                               (format nil "~A shoots ~A, but misses.~%" (visible-name target) (visible-name actor)))
         ))
 
     
@@ -293,7 +296,7 @@
   ;; target under protection of divine shield - consume the shield and quit
   (when (mob-effect-p target +mob-effect-divine-shield+)
     (print-visible-message (x attacker) (y attacker) (level *world*) 
-                           (format nil "~A attacks ~A, but can not harm ~A.~%" (name attacker) (name target) (name target)))
+                           (format nil "~A attacks ~A, but can not harm ~A.~%" (visible-name attacker) (visible-name target) (visible-name target)))
     (rem-mob-effect target +mob-effect-divine-shield+)
     (make-act attacker (att-spd attacker))
     (return-from melee-target nil)
@@ -305,11 +308,11 @@
       (rem-mob-effect attacker +mob-effect-divine-consealed+)
       (setf (face-mob-type-id attacker) (mob-type attacker))
       (print-visible-message (x attacker) (y attacker) (level *world*) 
-                             (format nil "~A reveals the true form of ~A. " (name target) (get-qualified-name attacker))))
+                             (format nil "~A reveals the true form of ~A. " (visible-name target) (get-qualified-name attacker))))
     (when (mob-effect-p attacker +mob-effect-possessed+)
       (unless (mob-effect-p attacker +mob-effect-reveal-true-form+)
         (print-visible-message (x attacker) (y attacker) (level *world*) 
-                               (format nil "~A reveals the true form of ~A. " (name target) (get-qualified-name attacker))))
+                               (format nil "~A reveals the true form of ~A. " (visible-name target) (get-qualified-name attacker))))
       (setf (face-mob-type-id attacker) (mob-type attacker))
       (set-mob-effect attacker +mob-effect-reveal-true-form+ 5)))
   
@@ -330,13 +333,13 @@
               (set-mob-location target x y)
               ;(setf (x target) x (y target) y)
               (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                     (format nil "~A attacks ~A, but ~A evades the attack. " (name attacker) (name target) (name target))))
+                                     (format nil "~A attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
             ;; target did not dodge
             (progn
               (setf failed-dodge nil)
               (when (and (> (cur-dodge target) dodge-chance) (not (eq check-result t)))
                 (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                       (format nil "~A attacks ~A, and ~A failes to dodge. " (name attacker) (name target) (name target)))
+                                       (format nil "~A attacks ~A, and ~A failes to dodge. " (visible-name attacker) (visible-name target) (visible-name target)))
                 (setf failed-dodge t))
               ;; apply damage
               (setf cur-dmg (+ (random (- (1+ (get-melee-weapon-dmg-max attacker)) (get-melee-weapon-dmg-min attacker))) 
@@ -359,13 +362,13 @@
                                                  (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy)))))))
               (if (zerop cur-dmg)
                 (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                       (format nil "~A hits ~A, but ~A is not hurt. " (name attacker) (name target) (name target)))
+                                       (format nil "~A hits ~A, but ~A is not hurt. " (visible-name attacker) (visible-name target) (visible-name target)))
                 (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                       (format nil "~A hits ~A for ~A damage. " (name attacker) (name target) cur-dmg)))
+                                       (format nil "~A hits ~A for ~A damage. " (visible-name attacker) (visible-name target) cur-dmg)))
               )))
         (progn
           ;; attacker missed
-          (print-visible-message (x attacker) (y attacker) (level *world*) (format nil "~A misses ~A. " (name attacker) (name target)))
+          (print-visible-message (x attacker) (y attacker) (level *world*) (format nil "~A misses ~A. " (visible-name attacker) (visible-name target)))
           ))
       ))
   (when (check-dead target)
@@ -382,7 +385,7 @@
 
 (defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil))
   (when msg
-    (print-visible-message (x mob) (y mob) (level *world*) (format nil "~A dies. " (name mob)))
+    (print-visible-message (x mob) (y mob) (level *world*) (format nil "~A dies. " (visible-name mob)))
     (when msg-newline (print-visible-message (x mob) (y mob) (level *world*) (format nil "~%"))))
   
   (unless (dead= mob)
@@ -412,8 +415,6 @@
       (if (gethash (mob-type mob) (stat-kills killer))
         (incf (gethash (mob-type mob) (stat-kills killer)))
         (setf (gethash (mob-type mob) (stat-kills killer)) 1))
-      
-      ;;(format t "KILLER STATS: ~A [~A] killed ~A~%" (name killer) (id killer) (calculate-total-kills killer))
       
       (let ((abil-list nil))
         ;; collect all passive on-kill abilities

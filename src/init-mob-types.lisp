@@ -115,7 +115,8 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6)) :base-dodge 25
                                        :strength 0
-                                       :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t
+                                       :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
+                                       :abil-detect-good t :abil-detect-evil t
                              ))
 
 

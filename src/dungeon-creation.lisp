@@ -37,6 +37,9 @@
 
     (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (return-scenario-functions weather city-layout player-faction))
 
+    ;; remove all nils from game-event-list, if any
+    (setf game-event-list (remove nil game-event-list))
+
     ;; apply city layout function, if any
     (when layout-func
       (multiple-value-setq (result-template feature-template-result mob-template-result) (funcall layout-func)))

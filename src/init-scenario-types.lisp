@@ -68,12 +68,25 @@
                                              :name "Player"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
-                                                       (push #'populate-world-with-angels mob-func-list)
-                                                       (push #'populate-world-with-demons mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
+                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                                           #'find-unoccupied-place-outside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
+                                                                                                       (cons +mob-type-demon+ 15)
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-player+))
-                                                                 (find-unoccupied-place-for-angel world *player*))
+                                                                 (find-unoccupied-place-outside world *player*))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
@@ -86,7 +99,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'test-level-place-mobs mob-func-list)
-                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-sergeant+))) mob-func-list)
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+))) mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
                                                        
@@ -97,12 +110,25 @@
                                              :name "Angels"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
-                                                       (push #'populate-world-with-angels mob-func-list)
-                                                       (push #'populate-world-with-demons mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
+                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                                           #'find-unoccupied-place-outside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
+                                                                                                       (cons +mob-type-demon+ 15)
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-angel+))
-                                                                 (find-unoccupied-place-for-angel world *player*))
+                                                                 (find-unoccupied-place-outside world *player*))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
@@ -115,12 +141,25 @@
                                              :name "Demons"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
-                                                       (push #'populate-world-with-angels mob-func-list)
-                                                       (push #'populate-world-with-demons mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
+                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                                           #'find-unoccupied-place-outside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
+                                                                                                       (cons +mob-type-demon+ 15)
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-imp+))
-                                                                 (find-unoccupied-place-for-demon world *player*))
+                                                                 (find-unoccupied-place-inside world *player*))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
@@ -144,5 +183,67 @@
                                                        ;; place tiny forest along the borders
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-river #'get-reserved-buildings-river #'place-reserved-buildings-island)))
                                                        (push +game-event-military-arrive-island+ game-event-list)
+                                                       
+                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +player-faction-military+
+                                             :type +scenario-feature-player-faction+
+                                             :name "Military"
+                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
+                                                       ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the 6 groups of military = 40, where each group has 1 chaplain, 2 sargeants and 3 soldiers
+                                                                 (loop repeat 5
+                                                                       do
+                                                                          (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
+                                                                            (find-unoccupied-place-outside world chaplain)
+                                                                            (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 2)
+                                                                                                                  (cons +mob-type-soldier+ 3))
+                                                                                                      #'(lambda (world mob)
+                                                                                                          (find-unoccupied-place-around world mob (x chaplain) (y chaplain))))))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
+                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
+                                                                                                       (cons +mob-type-demon+ 15)
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'create-mobs-from-template mob-func-list)
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+))
+                                                                 (find-unoccupied-place-outside world *player*)
+                                                                 ;; place the first group of military around the player
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 2)
+                                                                                                       (cons +mob-type-soldier+ 3))
+                                                                                           #'(lambda (world mob)
+                                                                                               (find-unoccupied-place-around world mob (x *player*) (y *player*)))))
+                                                             mob-func-list)
+
+                                                       ;; remove all "military arrives" events; after the function returns, all nils are to be deleted from the game-event-list  
+                                                       ;; I could use remove, but I am afraid that whether game-event-list may not be modified because it is implementation-dependent  
+                                                       (loop for i from 0 below (length game-event-list)
+                                                             for game-event-id = (nth i game-event-list)
+                                                             when (or (= game-event-id +game-event-military-arrive+)
+                                                                      (= game-event-id +game-event-military-arrive-port-n+)
+                                                                      (= game-event-id +game-event-military-arrive-port-s+)
+                                                                      (= game-event-id +game-event-military-arrive-port-e+)
+                                                                      (= game-event-id +game-event-military-arrive-port-w+)
+                                                                      (= game-event-id +game-event-military-arrive-island+))
+                                                               do
+                                                                  (setf (nth i game-event-list) nil))
+                                                       
+                                                       (push +game-event-lose-game+ game-event-list)
+                                                       (push +game-event-win-for-humans+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))

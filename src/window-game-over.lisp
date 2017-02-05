@@ -3,6 +3,7 @@
 (defconstant +game-over-player-dead+ 0)
 (defconstant +game-over-demons-won+ 1)
 (defconstant +game-over-angels-won+ 2)
+(defconstant +game-over-military-won+ 3)
 
 (defclass final-stats-window (window)
   ((game-over-type :initarg :game-over-type :accessor game-over-type)))
@@ -17,7 +18,8 @@
     (cond
       ((= (game-over-type win) +game-over-player-dead+) (setf str (format nil "YOU ARE DEAD")) (setf color sdl:*red*))
       ((= (game-over-type win) +game-over-demons-won+) (setf str (format nil "LEGIONS OF HELL WON")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-angels-won+) (setf str (format nil "THE HEAVENLY FORCES WON")) (setf color sdl:*green*)))
+      ((= (game-over-type win) +game-over-angels-won+) (setf str (format nil "THE HEAVENLY FORCES WON")) (setf color sdl:*green*))
+      ((= (game-over-type win) +game-over-military-won+) (setf str (format nil "THE MILITARY WON")) (setf color sdl:*green*)))
     (sdl:draw-string-solid-* str  (truncate *window-width* 2) 10 :justify :center :color color)
     )
   

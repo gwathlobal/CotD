@@ -24,6 +24,7 @@
 (defconstant +player-faction-demons+ 9)
 (defconstant +city-layout-forest+ 10)
 (defconstant +city-layout-island+ 11)
+(defconstant +player-faction-military+ 12)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -346,58 +347,72 @@
         do
            (add-mob-to-level-list (level world) (make-instance 'mob :mob-type mob-type-id :x x :y y))))
 
-(defun populate-world-with-angels (world mob-template-list)
-  (declare (ignore mob-template-list))
-  (loop repeat (truncate (total-humans world) 10)
-        with cur-archangels = 1
-        with mob-type-id = nil
-        do
-           (cond
-             ((> cur-archangels 0) (setf mob-type-id +mob-type-archangel+) (decf cur-archangels))
-             (t (setf mob-type-id +mob-type-angel+)))
-           
-           ;; find an unoccupied place
-           (find-unoccupied-place-for-angel world (make-instance 'mob :mob-type mob-type-id))
-        ))
+(defun populate-world-with-mobs (world mob-template-list placement-func)
+  (loop for (mob-template-id . num) in mob-template-list do
+    (loop repeat num
+          do
+             (funcall placement-func world (make-instance 'mob :mob-type mob-template-id))))
+  )
 
-(defun find-unoccupied-place-for-angel (world mob)
-  (loop with x = (random *max-x-level*)
-        with y = (random *max-y-level*)
-        until (and (not (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10))))
+(defun find-unoccupied-place-around (world mob sx sy)
+  (loop with min-x = sx
+        with max-x = sx
+        with min-y = sy
+        with max-y = sy
+        for cell-list = nil
+        do
+           ;; prepare the list of cells
+           ;; north 
+           (setf cell-list (append cell-list (loop with y = min-y
+                                                   for x from min-x to max-x
+                                                   collect (cons x y))))
+           ;; east
+           (setf cell-list (append cell-list (loop with x = max-x
+                                                   for y from min-y to max-y
+                                                   collect (cons x y))))
+           ;; south
+           (setf cell-list (append cell-list (loop with y = max-y
+                                                   for x from min-x to max-x
+                                                   collect (cons x y))))
+           ;; west
+           (setf cell-list (append cell-list (loop with x = min-x
+                                                   for y from min-y to max-y
+                                                   collect (cons x y))))
+
+           ;; iterate through the list of cells
+           (loop for (x . y) in cell-list
+                 when (and (>= x 0) (< x *max-x-level*) (>= y 0) (< y *max-y-level*)
+                           (not (get-mob-* (level world) x y))
+                           (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                   do
+                      (setf (x mob) x (y mob) y)
+                      (add-mob-to-level-list (level world) mob)
+                      (return-from find-unoccupied-place-around mob))
+
+           ;; if the loop is not over - increase the boundaries
+           (decf min-x)
+           (decf min-y)
+           (incf max-x)
+           (incf max-y)
+           ))
+ 
+(defun find-unoccupied-place-outside (world mob)
+  (loop for x = (random *max-x-level*)
+        for y = (random *max-y-level*)
+        until (and (not (and (> x 7) (< x (- *max-x-level* 7)) (> y 7) (< y (- *max-y-level* 7))))
                    (not (get-mob-* (level world) x y))
                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
         finally (setf (x mob) x (y mob) y)
-                (add-mob-to-level-list (level world) mob)
-        do
-           (setf x (random *max-x-level*))
-           (setf y (random *max-y-level*))))
+                (add-mob-to-level-list (level world) mob)))
 
-(defun populate-world-with-demons (world mob-template-list)
-  (declare (ignore mob-template-list))
-  (loop repeat (truncate (total-humans world) 4)
-        with cur-archdemons = 1
-        with cur-demons = 15
-        with mob-type-id = nil
-        do
-           (cond
-             ((> cur-archdemons 0) (setf mob-type-id +mob-type-archdemon+) (decf cur-archdemons))
-             ((> cur-demons 0) (setf mob-type-id +mob-type-demon+) (decf cur-demons))
-             (t (setf mob-type-id +mob-type-imp+)))
-           
-           ;; find an unoccupied place
-           (find-unoccupied-place-for-demon world (make-instance 'mob :mob-type mob-type-id))))
-
-(defun find-unoccupied-place-for-demon (world mob)
-  (loop with x = (random *max-x-level*)
-        with y = (random *max-y-level*)
+(defun find-unoccupied-place-inside (world mob)
+  (loop for x = (random *max-x-level*)
+        for y = (random *max-y-level*)
         until (and (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10)))
                    (not (get-mob-* (level world) x y))
                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
         finally (setf (x mob) x (y mob) y)
-                (add-mob-to-level-list (level world) mob)
-        do
-           (setf x (random *max-x-level*))
-           (setf y (random *max-y-level*))))
+                (add-mob-to-level-list (level world) mob)))
 
 (defun place-reserved-buildings-forest (reserved-level)
   (let ((result))

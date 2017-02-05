@@ -86,6 +86,7 @@
 (defconstant +mob-abil-curse+ 22)
 (defconstant +mob-abil-keen-senses+ 23)
 (defconstant +mob-abil-prayer-reveal+ 24)
+(defconstant +mob-abil-military-follow-me+ 25)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -95,6 +96,8 @@
 (defconstant +mob-effect-called-for-help+ 5)
 (defconstant +mob-effect-divine-shield+ 6)
 (defconstant +mob-effect-cursed+ 7)
+
+(defconstant +mob-order-follow+ 0)
 
 ;;--------------------
 ;; FEATURE-TYPE Constants

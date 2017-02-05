@@ -11,7 +11,8 @@
   (loop for effect being the hash-key in (effects mob)
         with y1 = y    
         do
-           (when (> (+ y1 (sdl:get-font-height)) (+ y h))
+           (when (and (> (hash-table-count (effects mob)) (truncate h (sdl:get-font-height)))
+                      (> (+ y1 (* 2 (sdl:get-font-height))) (+ y h)))
              (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
              (loop-finish))
              (cond
@@ -30,10 +31,11 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%Power: ~A/~A~%~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~%~A~%"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
-                        (cur-fp *player*) (max-fp *player*)
+                        (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
+                        (if (mob-ability-p *player* +mob-abil-military-follow-me+) (format nil "Followers: ~A~%" (count-follower-list *player*)) "")
                         (get-weapon-descr-line *player*)
                         (total-humans *world*)
                         (total-blessed *world*)
@@ -42,8 +44,9 @@
                         (sense-good-evil-str)
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
-    (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) 52)
-    (show-time-label idle-calcing x (+ y 237))
+    (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) (- (+ (- *window-height* 10 (sdl:char-height sdl:*default-font*)) (* -3 (sdl:char-height sdl:*default-font*)))
+                                                                                    (+ y (* (sdl:get-font-height) (1+ str-lines)))))
+    (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
     ))
 
 (defun show-small-message-box (x y w &optional (h *msg-box-window-height*))
@@ -56,10 +59,12 @@
                                                                                        0)))))
 
 (defun sense-good-evil-str ()
-  (let ((str (create-string)))
+  (let ((str (create-string)) (first t))
     (when (sense-evil-id *player*)
+      (when first (format str "~%") (setf first nil))
       (format str "Sense evil: ~A~%" (general-direction-str (x *player*) (y *player*) (x (get-mob-by-id (sense-evil-id *player*))) (y (get-mob-by-id (sense-evil-id *player*))))))
     (when (sense-good-id *player*)
+      (when first (format str "~%") (setf first nil))
       (format str "Sense good: ~A~%" (general-direction-str (x *player*) (y *player*) (x (get-mob-by-id (sense-good-id *player*))) (y (get-mob-by-id (sense-good-id *player*))))))
     str))
 
@@ -85,7 +90,7 @@
   (update-map-area)
     
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
-  (show-small-message-box *glyph-w* (+ 20 (* *glyph-h* *max-y-view*)) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
+  (show-small-message-box *glyph-w* (- *window-height* *msg-box-window-height* 10) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
     
   (sdl:update-display)
   
@@ -195,7 +200,11 @@
                                       (loop
                                         for ability-type-id in mob-abilities
                                         collect (if (abil-applic-cost-p ability-type-id *player*)
-                                                  (format nil "Cost: ~A. TU: ~A." (cost (get-ability-type-by-id ability-type-id)) (spd (get-ability-type-by-id ability-type-id)))
+                                                  (format nil "~ATU: ~A."
+                                                          (if (zerop (cost (get-ability-type-by-id ability-type-id)))
+                                                            ""
+                                                            (format nil "Cost: ~A. " (cost (get-ability-type-by-id ability-type-id))))
+                                                          (spd (get-ability-type-by-id ability-type-id)))
                                                   (format nil "Cost: ~A. Insufficient power!" (cost (get-ability-type-by-id ability-type-id))))))
 
                                 ;; populate the ability prompt list
@@ -286,7 +295,8 @@
               
                  (set-idle-calcing win)
 
-                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                 
+                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))) t)
               )
               
        (:video-expose-event () (make-output *current-window*)))

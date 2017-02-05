@@ -68,7 +68,7 @@
   (if *cotd-release*
     (progn
       (setf *current-window* (make-instance 'start-game-window 
-                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Custom scenario" "Help" "Exit")
+                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military" "Custom scenario" "Help" "Exit")
                                             :menu-funcs (list #'(lambda (n) 
                                                                   (declare (ignore n))
                                                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -85,6 +85,14 @@
                                                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
                                                                                                    (nth (random (length weather-types)) weather-types)
                                                                                                    +player-faction-demons+))))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+
+                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                                                   (nth (random (length weather-types)) weather-types)
+                                                                                                   +player-faction-military+))))
                                                               #'(lambda (n)
                                                                   (declare (ignore n))
                                                                   (setf *current-window* (make-instance 'custom-scenario-window
@@ -106,7 +114,7 @@
                                                                   (funcall *quit-func*))))))
     (progn
       (setf *current-window* (make-instance 'start-game-window 
-                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Custom scenario" "City with all-seeing" "Test level" "Help" "Exit")
+                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military" "Custom scenario" "City with all-seeing" "Test level" "Help" "Exit")
                                             :menu-funcs (list #'(lambda (n) 
                                                                   (declare (ignore n))
                                                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -123,6 +131,14 @@
                                                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
                                                                                                    (nth (random (length weather-types)) weather-types)
                                                                                                    +player-faction-demons+))))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+
+                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                                                   (nth (random (length weather-types)) weather-types)
+                                                                                                   +player-faction-military+))))
                                                               #'(lambda (n)
                                                                   (declare (ignore n))
                                                                   (setf *current-window* (make-instance 'custom-scenario-window
@@ -200,6 +216,9 @@
 
       (setf *window-width* (+ 200 50 (+ 30 (* *glyph-w* *max-x-view*))) 
             *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height*))
+
+      (when (<= *window-height* 384)
+        (incf *window-height* (+ (* 2 (sdl:char-height sdl:*default-font*)) 0)))
       
       (sdl:window *window-width* *window-height*
                   :title-caption "The City of the Damned"

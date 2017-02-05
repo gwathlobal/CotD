@@ -194,38 +194,6 @@
 	(setf (path mob) path)
         
         ))
-    
-    ;; move to some random passable terrain 
-    ;; a hack to easy the strain of pathfinding during the first turns - if you are human and there are more than 100 of you, do not pathfind
-    (unless (path mob)
-      (let ((rx (- (+ 10 (x mob))
-                   (1+ (random 20)))) 
-            (ry (- (+ 10 (y mob))
-                   (1+ (random 20))))
-            (path nil))
-        (declare (type fixnum rx ry))
-        (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
-                        (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
-                        (and (get-mob-* (level *world*) rx ry)
-                             (not (eq (get-mob-* (level *world*) rx ry) mob))))
-              do
-                 (setf rx (- (+ 10 (x mob))
-                             (1+ (random 20))))
-                 (setf ry (- (+ 10 (y mob))
-                             (1+ (random 20)))))
-        (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
-        (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
-                           #'(lambda (dx dy) 
-                               ;; checking for impassable objects
-                               (check-move-for-ai mob dx dy)
-                               )))
-        
-        (pop path)
-        (logger (format nil "AI-FUNCTION: Mob goes to (~A ~A)~%" rx ry))
-        (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
-        (setf (path mob) path)
-        
-        ))
 
     ;; invoke abilities if any
     (let ((ability-list) (r 0))
@@ -260,6 +228,7 @@
 
     ;; if can shoot and there is an enemy in sight - shoot it
     (when (and (is-weapon-ranged mob)
+               (mob-can-shoot mob)
                nearest-enemy)
       (mob-shoot-target mob nearest-enemy)
       (return-from ai-function))
@@ -270,33 +239,85 @@
                (< (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob)))
       (mob-reload-ranged-weapon mob)
       (return-from ai-function))
+
+    ;; follow the leader
+    (when (and (order mob)
+               (= (first (order mob)) +mob-order-follow+))
+      ;; if the leader is visible, plot the path to it
+      (let ((leader (get-mob-by-id (second (order mob))))
+            (path))
+        (when (and (member (id leader) (visible-mobs mob))
+                   (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2))
+          
+            (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
+            (setf path (a-star (list (x mob) (y mob)) (list (x leader) (y leader)) 
+                               #'(lambda (dx dy) 
+                                   ;; checking for impassable objects
+                                   (check-move-for-ai mob dx dy)
+                                   )))
+            
+            (pop path)
+            (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
+            (setf (path mob) path))))
+          
+    
+    ;; move to some random passable terrain 
+    ;; a hack to easy the strain of pathfinding during the first turns - if you are human and there are more than 100 of you, do not pathfind
+    (unless (path mob)
+      (let ((rx (- (+ 10 (x mob))
+                   (1+ (random 20)))) 
+            (ry (- (+ 10 (y mob))
+                   (1+ (random 20))))
+            (path nil))
+        (declare (type fixnum rx ry))
+        (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                        (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
+                        (and (get-mob-* (level *world*) rx ry)
+                             (not (eq (get-mob-* (level *world*) rx ry) mob))))
+              do
+                 (setf rx (- (+ 10 (x mob))
+                             (1+ (random 20))))
+                 (setf ry (- (+ 10 (y mob))
+                             (1+ (random 20)))))
+        (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
+        (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
+                           #'(lambda (dx dy) 
+                               ;; checking for impassable objects
+                               (check-move-for-ai mob dx dy)
+                               )))
+        
+        (pop path)
+        (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
+        (setf (path mob) path)
+        
+        ))
     
     ;; if the mob has its path set - move along it
     (when (path mob)
 
-      (let ((step) (step-x) (step-y))
+        (let ((step) (step-x) (step-y))
         
-        (logger (format nil "AI-FUNCTION: Move mob along the path - ~A~%" (path mob)))
-        (setf step (pop (path mob)))
-        
-        ;; if there is suddenly an obstacle, make the path recalculation
-     	(setf step-x (- (first step) (x mob)))
-	(setf step-y (- (second step) (y mob)))
-	
-        (unless (check-move-on-level mob (first step) (second step))
-          (logger (format nil "AI-FUNCTION: Can't move to target - (~A ~A)~%" (first step) (second step)))
-          (setf (path mob) nil)
-          (return-from ai-function))
-        
-        (unless (x-y-into-dir step-x step-y)
-          (logger (format nil "AI-FUNCTION: Wrong direction supplied (~A ~A)~%" (first step) (second step)))
-          (setf (path mob) nil)
-          (return-from ai-function))
-        
-	(move-mob mob (x-y-into-dir step-x step-y))
-        
-        
-	(return-from ai-function)))
+          (logger (format nil "AI-FUNCTION: Move mob along the path - ~A~%" (path mob)))
+          (setf step (pop (path mob)))
+          
+          ;; if there is suddenly an obstacle, make the path recalculation
+          (setf step-x (- (first step) (x mob)))
+          (setf step-y (- (second step) (y mob)))
+          
+          (unless (check-move-on-level mob (first step) (second step))
+            (logger (format nil "AI-FUNCTION: Can't move to target - (~A ~A)~%" (first step) (second step)))
+            (setf (path mob) nil)
+            (return-from ai-function))
+          
+          (unless (x-y-into-dir step-x step-y)
+            (logger (format nil "AI-FUNCTION: Wrong direction supplied (~A ~A)~%" (first step) (second step)))
+            (setf (path mob) nil)
+            (return-from ai-function))
+          
+          (move-mob mob (x-y-into-dir step-x step-y))
+          
+          
+          (return-from ai-function)))
     
     ;; if there are no hostile mobs move randomly
     ;; pester the AI until it makes some meaningful action

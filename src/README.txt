@@ -52,10 +52,19 @@ THE LEGIONS OF HELL
  - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
 
 --------------------
-HUMANS
+CITIZENS OF THE CITY
 
  - Humans are generally weak and frail.
  - Citizens of the City will mostly try to flee whenever there is an enemy in sight.
+ - But beware of the military that will arrive later in battle.
+
+--------------------
+THE MILITARY
+
+ - The military is allied with the citizens of the City, but oppose both angels and demons.
+ - All military units are capable of ranged combat.
+ - You start as a Chaplain who can lead troops, reveal disguised enemies and provide divine protection to allies.
+ - To win, kill all demons. But do not let angels stand in your way.
 
 --------------------
 KEYBINDINGS
@@ -64,8 +73,13 @@ KEYBINDINGS
  Page Up, Page Down, Home, End,
  Numpad keys
  Shift + 2                      - Character screen
+ 
  a                              - Invoke ability
  l                              - Look mode
+ f                              - Fire mode
+ r                              - Reload
+
+ Shift + 2                      - Character screen
  m                              - View messages
  ?                              - Help
  

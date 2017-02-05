@@ -56,8 +56,8 @@
       ((= (cur-step win) +custom-scenario-win-player-faction+) (setf color-3 sdl:*yellow*)))
     
     (sdl:draw-string-solid-* (format nil "1. City layout") 10 (+ 10 (* (sdl:char-height sdl:*default-font*) 5)) :justify :left :color color-1)
-    (sdl:draw-string-solid-* (format nil "2. Weather") (truncate *window-width* 2) (+ 10 (* (sdl:char-height sdl:*default-font*) 4)) :justify :center :color color-2)
-    (sdl:draw-string-solid-* (format nil "3. Player faction") (- *window-width* 10) (+ 10 (* (sdl:char-height sdl:*default-font*) 4)) :justify :right :color color-3))
+    (sdl:draw-string-solid-* (format nil "2. Weather") (truncate *window-width* 2) (+ 10 (* (sdl:char-height sdl:*default-font*) 5)) :justify :center :color color-2)
+    (sdl:draw-string-solid-* (format nil "3. Player faction") (- *window-width* 10) (+ 10 (* (sdl:char-height sdl:*default-font*) 5)) :justify :right :color color-3))
 
   ;; draw the selection for each step
   (let ((cur-str) (color-list nil))

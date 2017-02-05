@@ -5,7 +5,8 @@ v1.0.5
 - Added forest cities to the city generator
 - Added island cities to the city generator
 - Added sergeants to the military. They are armed with six-round revolvers, that deal less damaged than a rifle but do not need to reload every turn
-- Added chaplains to the military. They are armed with six-round revolvers and are able to pray to reveal angels and demons around them
+- Added chaplains to the military. They are armed with six-round revolvers and are able lead troops, pray to reveal angels and demons around them and grant divine protection to allies
+- Made the military a playable faction
 
 --------------------
 Jan 29, 2017 v1.0.4

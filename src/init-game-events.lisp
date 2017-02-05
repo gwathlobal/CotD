@@ -60,7 +60,7 @@
                                                            (sdl:with-events ()
                                                              (:quit-event () (funcall (quit-func *current-window*)) t)
                                                              (:key-down-event () 
-                                                                              (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-angels-won+))
+                                                                              (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-military-won+))
                                                                               (make-output *current-window*)
                                                                               (run-window *current-window*))
                                                              (:video-expose-event () (make-output *current-window*))))))

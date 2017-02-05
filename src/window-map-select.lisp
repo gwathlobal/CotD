@@ -11,25 +11,31 @@
 
 (defmethod make-output ((win map-select-window))
   (unless (is-done-once win)
-    ;;(format t "VIEW X,Y = (~A, ~A); x , y = (~A, ~A)~%" (view-x *player*) (view-y *player*) (x *player*) (y *player*))
-    ;; find the nearest mob & set it as target
-    (let ((mob-obj) (first t) (best-mob nil))
-      (dolist (mob-id (visible-mobs *player*))
-	(setf mob-obj (get-mob-by-id mob-id))
-	(when first 
-	  (setf best-mob mob-obj)
-	  (setf first nil))
-	(when (< (get-distance (x *player*) (y *player*) (x mob-obj) (y mob-obj))
-		 (get-distance (x *player*) (y *player*) (x best-mob) (y best-mob)))
-	  (setf best-mob mob-obj)))
-      (if best-mob
-	  (progn
-	    (setf (view-x *player*) (x best-mob))
-	    (setf (view-y *player*) (y best-mob)))
-	  (progn
-	    (setf (view-x *player*) (x *player*))
-	    (setf (view-y *player*) (y *player*))))
-    (setf (is-done-once win) t)))
+    ;; find the nearest hostile mob & set it as target
+    (setf (visible-mobs *player*) (sort (visible-mobs *player*)
+                                        #'(lambda (mob-1 mob-2)
+                                            (if (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                                     (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2)))))
+                                              t
+                                              nil))
+                                        :key #'(lambda (mob-id)
+                                                 (get-mob-by-id mob-id))))
+    (setf (visible-mobs *player*) (sort (visible-mobs *player*)
+                                        #'(lambda (mob-1 mob-2)
+                                            (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                                        (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                                     (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                                     (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
+                                              t
+                                              nil))
+                                        :key #'(lambda (mob-id)
+                                                 (get-mob-by-id mob-id))))
+    (if (and (visible-mobs *player*)
+             (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id (get-mob-by-id (first (visible-mobs *player*)))))))))
+      (setf (view-x *player*) (x (get-mob-by-id (first (visible-mobs *player*)))) (view-y *player*) (y (get-mob-by-id (first (visible-mobs *player*)))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
+      )
+    (setf (is-done-once win) t))
 
   (update-map-area :rel-x (view-x *player*) :rel-y (view-y *player*))
 
@@ -60,7 +66,7 @@
 	 (sdl:fill-surface color :template b-rect))))
   
   ;; drawing a list of objects in the grid-cell instead of a message box
-  (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x *glyph-w* :y (+ 20 (* *glyph-h* *max-y-view*)) :w (+ 250 (+ 10 (* *glyph-w* *max-x-view*))) :h *msg-box-window-height*))
+  (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x *glyph-w* :y (- *window-height* *msg-box-window-height* 10) :w (+ 250 (+ 10 (* *glyph-w* *max-x-view*))) :h *msg-box-window-height*))
     (sdl:fill-surface sdl:*black* :template obj-list-rect))
   (let ((str (create-string)) (feature-list))
     (when (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
@@ -72,10 +78,11 @@
       (when (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
 	(format str "~%~A" (get-current-mob-name (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
       )
-    (write-text str (sdl:rectangle :x *glyph-w* :y (+ 20 (* *glyph-h* *max-y-view*)) :w (+ 200 (+ 10 (* *glyph-w* *max-x-view*))) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height))))))
+    (sdl:with-rectangle (rect (sdl:rectangle :x *glyph-w* :y (- *window-height* *msg-box-window-height* 10) :w (+ 200 (+ 10 (* *glyph-w* *max-x-view*))) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height)))))
+      (write-text str rect)))
   
   ;; drawing the propmt line
-  (let ((x *glyph-w*) (y (+ 20 (* *glyph-h* *max-y-view*) (- *msg-box-window-height* (sdl:get-font-height)))) (w (+ 200 (+ 10 (* *glyph-w* *max-x-view*)))) (h (sdl:get-font-height)))
+  (let ((x *glyph-w*) (y (- *window-height* 10 (sdl:char-height sdl:*default-font*))) (w (+ 200 (+ 10 (* *glyph-w* *max-x-view*)))) (h (sdl:get-font-height)))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
       (if (cur-tab win)

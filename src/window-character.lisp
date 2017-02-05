@@ -28,10 +28,11 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect))
     
-    (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%Power: ~A/~A~%~%~A~%~A~A"
+    (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~A~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
-                        (cur-fp *player*) (max-fp *player*)
+                        (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
+                        (if (mob-ability-p *player* +mob-abil-military-follow-me+) (format nil "Followers: ~A~%" (count-follower-list *player*)) "")
                         (get-weapon-descr-line *player*)
                         (if (not (zerop (cur-armor *player*))) (format nil "Armor: ~A~%" (cur-armor *player*)) "")
                         (get-mob-stats-line *player*))
@@ -74,7 +75,7 @@
                           (descr ability)
                           (if (passive ability)
                             "Passive."
-                            (format nil "Cost: ~A pwr  Time units: ~A" (cost ability) (spd ability))))
+                            (format nil "~ATime units: ~A" (if (zerop (cost ability)) "" (format nil "Cost: ~A pwr  " (cost ability))) (spd ability))))
                   (sdl:rectangle :x x :y y :w w :h h) :color sdl:*white*)
     )
 

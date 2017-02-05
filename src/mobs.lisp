@@ -64,9 +64,10 @@
    ;;   :abil-curse - +mob-abil-curse+
    ;;   :abil-keen-senses - +mob-abil-keen-senses+
    ;;   :abil-prayer-reveal - +mob-abil-prayer-reveal+
+   ;;   :abil-military-follow-me - +mob-abil-military-follow-me+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
-   (base-sight :initform 8 :initarg :base-sight :accessor base-sight)
+   (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)
@@ -77,7 +78,7 @@
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
-                                                                abil-keen-senses abil-prayer-reveal)
+                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -137,6 +138,8 @@
     (setf (gethash +mob-abil-keen-senses+ (abilities mob-type)) t))
   (when abil-prayer-reveal
     (setf (gethash +mob-abil-prayer-reveal+ (abilities mob-type)) t))
+  (when abil-military-follow-me
+    (setf (gethash +mob-abil-military-follow-me+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -219,6 +222,8 @@
     
    (visible-mobs :initform nil :accessor visible-mobs)
    (path :initform nil :accessor path)
+
+   (order :initform nil :accessor order)
    
    (master-mob-id :initform nil :accessor master-mob-id) ;; mob that controls this mob
    (slave-mob-id :initform nil :accessor slave-mob-id)  ;; mob that is being controlled by this mob
@@ -332,6 +337,13 @@
     (slot-value mob 'name)
     (name (get-mob-type-by-id (mob-type mob)))))
 
+(defun visible-name (mob)
+  (when (= (faction *player*) (faction mob))
+    (return-from visible-name (name mob)))
+  (if (= (face-mob-type-id mob) (mob-type mob))
+    (name mob)
+    (name (get-mob-type-by-id (face-mob-type-id mob)))))
+
 (defmethod set-cur-weapons ((mob mob))
   (setf (weapon mob) (copy-list (weapon (get-mob-type-by-id (mob-type mob)))))
   (setf (second (weapon mob)) (copy-list (second (weapon (get-mob-type-by-id (mob-type mob))))))
@@ -442,6 +454,22 @@
           (setf (name mob) (nth name-pick-n *cur-demon-names*))
           (setf *cur-demon-names* (remove (nth name-pick-n *cur-demon-names*) *cur-demon-names*))))
     )))
+
+(defun get-followers-list (mob)
+  (loop for mob-id in (visible-mobs mob)
+        for follower = (get-mob-by-id mob-id)
+        when (and (order follower)
+                  (= (first (order follower)) +mob-order-follow+)
+                  (= (second (order follower)) (id mob)))
+          collect mob-id))
+
+(defun count-follower-list (mob)
+  (loop for mob-id in (visible-mobs mob)
+        for follower = (get-mob-by-id mob-id)
+        when (and (order follower)
+                  (= (first (order follower)) +mob-order-follow+)
+                  (= (second (order follower)) (id mob)))
+          count follower))
 
 ;;----------------------
 ;; PLAYER
