@@ -9,15 +9,14 @@ The Legions of Hell invaded the City with the intention to slay its inhabitants.
 This is a simple fast-paced coffeebreak roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.0.4
+LATEST CHANGES v1.0.5
 
-- Made help articles be read from files
-- Added snow terrain
-- Added an option to go to the main menu from the game over screen
-- Added rivers to the city generator
-- Added indication of the general direction to the nearest angel/demon
-- Added sea ports to the city generator
-- Added an option to customize the current scenario by choosing city layout, weather and player faction
+- Made the military a playable faction
+- Added sergeants to the military. They are armed with six-round revolvers, that deal less damaged than a rifle but do not need to reload every turn
+- Added chaplains to the military. They are armed with six-round revolvers and are able lead troops, pray to reveal angels and demons around them and grant divine protection to allies
+- Ranged combat accuracy is now affected by distance. The farther the target - the less likely you are able to hit it 
+- Added forest cities to the city generator
+- Added island cities to the city generator
 
 --------------------
 FEATURES
