@@ -65,6 +65,7 @@
    ;;   :abil-keen-senses - +mob-abil-keen-senses+
    ;;   :abil-prayer-reveal - +mob-abil-prayer-reveal+
    ;;   :abil-military-follow-me - +mob-abil-military-follow-me+
+   ;;   :abil-blindness - +mob-abil-blindness+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
@@ -78,7 +79,7 @@
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
-                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me)
+                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -140,6 +141,8 @@
     (setf (gethash +mob-abil-prayer-reveal+ (abilities mob-type)) t))
   (when abil-military-follow-me
     (setf (gethash +mob-abil-military-follow-me+ (abilities mob-type)) t))
+  (when abil-blindness
+    (setf (gethash +mob-abil-blindness+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -251,7 +254,6 @@
   
   (setf (cur-hp mob) (max-hp mob))
   (setf (cur-fp mob) 0)
-  (setf (cur-sight mob) (base-sight mob))
   (setf (cur-ap mob) (max-ap mob))
   
   (setf (face-mob-type-id mob) (mob-type mob))
@@ -261,6 +263,7 @@
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-accuracy mob)
+  (adjust-sight mob)
 
   ;; setting up name
   (set-name mob)
@@ -352,6 +355,11 @@
 (defun adjust-attack-speed (mob)
   (setf (att-spd mob) (get-melee-weapon-speed mob)))
 
+(defun adjust-sight (mob)
+  (let ((sight (base-sight mob)))
+    (when (mob-effect-p mob +mob-effect-blind+)
+      (setf sight 0))
+    (setf (cur-sight mob) sight)))
 
 (defun adjust-dodge (mob-obj)
   (let ((dodge 0))

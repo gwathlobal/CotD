@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added blindness ability to archangels
 - Added barricaded cities to the city generator
 
 --------------------

@@ -455,6 +455,7 @@
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-accuracy mob)
+  (adjust-sight mob)
   
   (when (mob-effect-p mob +mob-effect-possessed+)
     (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
@@ -494,6 +495,11 @@
     (set-mob-effect mob +mob-effect-cursed+ (1- (mob-effect-p mob +mob-effect-cursed+)))
     (when (zerop (mob-effect-p mob +mob-effect-cursed+))
       (rem-mob-effect mob +mob-effect-cursed+)))
+
+  (when (mob-effect-p mob +mob-effect-blind+)
+    (set-mob-effect mob +mob-effect-blind+ (1- (mob-effect-p mob +mob-effect-blind+)))
+    (when (zerop (mob-effect-p mob +mob-effect-blind+))
+      (rem-mob-effect mob +mob-effect-blind+)))
   
   (when (mob-effect-p mob +mob-effect-called-for-help+)
     (if (= (mob-effect-p mob +mob-effect-called-for-help+) 2)
@@ -508,6 +514,7 @@
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-accuracy mob)
+  (adjust-sight mob)
   
   (when (and (evolve-into mob)
              (>= (cur-fp mob) (max-fp mob)))

@@ -54,6 +54,12 @@
   
   (update-visible-mobs mob)
 
+  ;; if the mob is blind - move in random direction
+  (when (mob-effect-p mob +mob-effect-blind+)
+    (ai-mob-random-dir mob)
+    (setf (path mob) nil)
+    (return-from ai-function nil))
+
   ;; if the mob possesses smb, there is a chance that the slave will revolt and move randomly
   (when (and (slave-mob-id mob)
              (zerop (random (* *possessed-revolt-chance* (mob-ability-p mob +mob-abil-can-possess+)))))
@@ -209,6 +215,7 @@
                                  collect ability))
       
       ;; randomly choose one of them and invoke it
+      (format t "AVAILABLE ABILITIES ~A~%" ability-list)
       (when ability-list
         (setf r (random (length ability-list)))
         (let ((ai-invoke-func (on-invoke-ai (nth r ability-list))))
@@ -249,7 +256,7 @@
         (when (and (< (get-distance (x mob) (y mob) (x leader) (y leader)) 8)
                    (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2))
           
-            (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
+            (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
             (setf path (a-star (list (x mob) (y mob)) (list (x leader) (y leader)) 
                                #'(lambda (dx dy) 
                                    ;; checking for impassable objects
@@ -279,7 +286,7 @@
                              (1+ (random 20))))
                  (setf ry (- (+ 10 (y mob))
                              (1+ (random 20)))))
-        (logger (format nil "AI_FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
+        (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
         (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
                            #'(lambda (dx dy) 
                                ;; checking for impassable objects

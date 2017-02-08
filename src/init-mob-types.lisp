@@ -87,7 +87,7 @@
                                        :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 5
                                        :faction +faction-type-demons+
                                        :weapon (list "Burning touch" (list 2 3 +normal-ap+) nil) :base-dodge 20
-                                       :strength 0
+                                       :strength 1
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-call-for-help t :abil-free-call t :abil-curse t
                              ))
 
@@ -96,7 +96,7 @@
                                        :glyph-idx 32 :glyph-color sdl:*green* :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list 1 2 +normal-ap+) (list 2 4 +normal-ap+ 1)) :base-dodge 25
-                                       :strength 0
+                                       :strength 1
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                              ))
 
@@ -105,7 +105,7 @@
                                        :glyph-idx 32 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6)) :base-dodge 25
-                                       :strength 0
+                                       :strength 1
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                              ))
 
@@ -114,7 +114,7 @@
                                        :glyph-idx 32 :glyph-color (sdl:color :r 85 :g 107 :b 47) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6)) :base-dodge 25
-                                       :strength 0
+                                       :strength 1
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
                                        :abil-detect-good t :abil-detect-evil t
                              ))
@@ -137,7 +137,7 @@
                                        :weapon (list "Flaming sword" (list 5 9 +normal-ap+) nil) :base-dodge 25
                                        :strength 4
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t
-                                       :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t
+                                       :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-blindness t
                                        :ai-wants-bless t))
 
 

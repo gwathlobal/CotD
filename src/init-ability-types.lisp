@@ -501,6 +501,7 @@
                                                   ;; if able to pray - do it
                                                   (if (and (mob-ability-p actor +mob-abil-prayer-bless+)
                                                            (can-invoke-ability actor actor +mob-abil-prayer-bless+)
+                                                           (not (zerop (length (visible-mobs actor))))
                                                            (or nearest-enemy
                                                                (zerop (random 5))))
                                                     t
@@ -749,6 +750,7 @@
                                                   ;; if able to pray - do it
                                                   (if (and (mob-ability-p actor +mob-abil-prayer-reveal+)
                                                            (can-invoke-ability actor actor +mob-abil-prayer-reveal+)
+                                                           (not (zerop (length (visible-mobs actor))))
                                                            (zerop (random 3)))
                                                     t
                                                     nil))
@@ -786,9 +788,6 @@
                                                            (incf follower-num)
                                                            (when (>= follower-num 5) (loop-finish)))
 
-                                                ;(print-visible-message (x actor) (y actor) (level *world*) 
-                                                ;                       (format nil "~%"))
-                                                
                                                 (logger (format nil "MOB-ORDER-FOLLOW-ME: ~A [~A] orders to follow him. Followers ~A~%" (name actor) (id actor) (get-followers-list actor)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -808,6 +807,57 @@
                                                                                        (not (= (mob-type mob) +mob-type-chaplain+)))
                                                                                count mob-id)))
                                                            (zerop (random 3)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-blindness+ :name "Blindness" :descr "A flash of light that blinds nearby enemies for 2 turns." 
+                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A channels the heavenly light. " (visible-name actor)))
+                                                (logger (format nil "MOB-BLIND: ~A [~A] casts blindness.~%" (name actor) (id actor)))
+                                                ;; blind nearby non-angel mobs
+                                                (loop for i from 0 below (length (visible-mobs actor))
+                                                      for mob = (get-mob-by-id (nth i (visible-mobs actor)))
+                                                      when (not (mob-ability-p mob +mob-abil-angel+))
+                                                        do
+                                                           (set-mob-effect mob +mob-effect-blind+ 2)
+                                                           (adjust-sight mob)
+                                                           (setf (visible-mobs mob) nil)
+                                                           (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                  (format nil "~A is blind. " (visible-name mob)))
+                                                           )
+
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-blindness+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; cast blindness when your power is less than the power of enemies around you
+                                                  ;; or you have <= than 25% of max hp
+                                                  (if (and (mob-ability-p actor +mob-abil-blindness+)
+                                                           (can-invoke-ability actor actor +mob-abil-blindness+)
+                                                           (not (zerop (loop for mob-id in (visible-mobs actor)
+                                                                             for mob = (get-mob-by-id mob-id)
+                                                                             when (not (mob-effect-p mob +mob-effect-blind+))
+                                                                               count mob-id)))
+                                                           (or (<= (cur-hp actor) (truncate (max-hp actor) 4))
+                                                               (< (strength actor) (loop for mob-id in (visible-mobs actor)
+                                                                                         for mob = (get-mob-by-id mob-id)
+                                                                                         when (not (get-faction-relation (faction actor) (faction mob)))
+                                                                                           sum (strength mob)))))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
