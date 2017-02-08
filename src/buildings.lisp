@@ -46,6 +46,12 @@
 (defconstant +building-city-warehouse-port-1+ 25)
 (defconstant +building-city-warehouse-port-2+ 26)
 (defconstant +building-city-island-ground-border+ 27)
+(defconstant +building-city-barricade-ns+ 28)
+(defconstant +building-city-barricade-we+ 29)
+(defconstant +building-city-barricade-se+ 30)
+(defconstant +building-city-barricade-sw+ 31)
+(defconstant +building-city-barricade-nw+ 32)
+(defconstant +building-city-barricade-ne+ 33)
 
 (defparameter *level-grid-size* 5)
 

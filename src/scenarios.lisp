@@ -25,6 +25,7 @@
 (defconstant +city-layout-forest+ 10)
 (defconstant +city-layout-island+ 11)
 (defconstant +player-faction-military+ 12)
+(defconstant +city-layout-barricaded-city+ 13)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -496,5 +497,42 @@
         (when (or (= (aref reserved-level x y) +building-city-sea+)
                   (= (aref reserved-level x y) +building-city-pier+)
                   (= (aref reserved-level x y) +building-city-island-ground-border+))
+          (push (list (aref reserved-level x y) x y) result))))
+    result))
+
+(defun place-reserved-buildings-barricaded-city (reserved-level)
+  (let ((result))
+   
+    (loop for x from 1 below (1- (array-dimension reserved-level 0))
+          do
+             (setf (aref reserved-level x 1) +building-city-barricade-we+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 2)) +building-city-barricade-we+))
+
+     ;; making lines along the city borders - west & east
+    (loop for y from 1 below (1- (array-dimension reserved-level 1))
+          do
+             (setf (aref reserved-level 1 y) +building-city-barricade-ns+)
+             (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) y) +building-city-barricade-ns+))
+
+    ;; making barricade corners
+    (setf (aref reserved-level 1 1) +building-city-barricade-se+)
+    (setf (aref reserved-level 1 (- (array-dimension reserved-level 1) 2)) +building-city-barricade-ne+)
+    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) 1) +building-city-barricade-sw+)
+    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) (- (array-dimension reserved-level 1) 2)) +building-city-barricade-nw+)
+
+    ;; making entrances to the city
+    (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) 1) +building-city-reserved+)
+    (setf (aref reserved-level 1 (truncate (array-dimension reserved-level 1) 2)) +building-city-reserved+)
+    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) (truncate (array-dimension reserved-level 1) 2)) +building-city-reserved+)
+    (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) (- (array-dimension reserved-level 1) 2)) +building-city-reserved+)
+    
+    (loop for x from 0 below (array-dimension reserved-level 0) do
+      (loop for y from 0 below (array-dimension reserved-level 1) do
+        (when (or (= (aref reserved-level x y) +building-city-barricade-ns+)
+                  (= (aref reserved-level x y) +building-city-barricade-we+)
+                  (= (aref reserved-level x y) +building-city-barricade-ne+)
+                  (= (aref reserved-level x y) +building-city-barricade-se+)
+                  (= (aref reserved-level x y) +building-city-barricade-sw+)
+                  (= (aref reserved-level x y) +building-city-barricade-nw+))
           (push (list (aref reserved-level x y) x y) result))))
     result))

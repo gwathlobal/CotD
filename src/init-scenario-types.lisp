@@ -247,3 +247,13 @@
                                                        (push +game-event-win-for-humans+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-barricaded-city+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A barricaded city"
+                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-normal #'get-reserved-buildings-normal
+                                                                                                            #'place-reserved-buildings-barricaded-city)))
+                                                       (push +game-event-military-arrive+ game-event-list)
+                                                                                                                                                                     
+                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))

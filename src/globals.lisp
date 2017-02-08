@@ -139,6 +139,7 @@
 (defconstant +terrain-floor-pier+ 22)
 (defconstant +terrain-water-sea+ 23)
 (defconstant +terrain-border-grass+ 24)
+(defconstant +terrain-wall-barricade+ 25)
 
 (defparameter *faction-table* (make-hash-table))
 

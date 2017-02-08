@@ -580,3 +580,79 @@
 
                                             (values nil nil)
                                             )))
+
+(set-building-type (make-building :id +building-city-barricade-ns+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for dy from 0 to 4 do
+                                              (setf (aref template-level (+ x 1) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 3) (+ y dy)) +terrain-wall-barricade+))
+                                            
+                                            (values nil nil)
+                                            )))
+
+(set-building-type (make-building :id +building-city-barricade-we+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for dx from 0 to 4 do
+                                              (setf (aref template-level (+ x dx) (+ y 1)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 2)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 3)) +terrain-wall-barricade+))
+                                            
+                                            (values nil nil)
+                                            )))
+
+(set-building-type (make-building :id +building-city-barricade-se+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for dx from 2 to 4 do
+                                              (setf (aref template-level (+ x dx) (+ y 1)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 2)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 3)) +terrain-wall-barricade+))
+                                            (loop for dy from 2 to 4 do
+                                              (setf (aref template-level (+ x 1) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 3) (+ y dy)) +terrain-wall-barricade+))
+                                            
+                                            (values nil nil)
+                                            )))
+
+(set-building-type (make-building :id +building-city-barricade-sw+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for dx from 0 to 2 do
+                                              (setf (aref template-level (+ x dx) (+ y 1)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 2)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 3)) +terrain-wall-barricade+))
+                                            (loop for dy from 2 to 4 do
+                                              (setf (aref template-level (+ x 1) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 3) (+ y dy)) +terrain-wall-barricade+))
+                                            
+                                            (values nil nil)
+                                            )))
+
+(set-building-type (make-building :id +building-city-barricade-nw+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for dx from 0 to 2 do
+                                              (setf (aref template-level (+ x dx) (+ y 1)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 2)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 3)) +terrain-wall-barricade+))
+                                            (loop for dy from 0 to 2 do
+                                              (setf (aref template-level (+ x 1) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 3) (+ y dy)) +terrain-wall-barricade+))
+                                            
+                                            (values nil nil)
+                                            )))
+
+(set-building-type (make-building :id +building-city-barricade-ne+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y template-level)
+                                            (loop for dx from 2 to 4 do
+                                              (setf (aref template-level (+ x dx) (+ y 1)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 2)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 3)) +terrain-wall-barricade+))
+                                            (loop for dy from 0 to 2 do
+                                              (setf (aref template-level (+ x 1) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y dy)) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 3) (+ y dy)) +terrain-wall-barricade+))
+                                            
+                                            (values nil nil)
+                                            )))

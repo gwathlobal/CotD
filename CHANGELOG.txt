@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Added barricaded cities to the city generator
+
 --------------------
 Feb 05, 2017 v1.0.5
 

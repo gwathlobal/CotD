@@ -1,7 +1,5 @@
 (in-package :cotd)
 
-
-
 (defun find-free-id (array)
   (loop for i from 0 below (length array)
         unless (aref array i)
