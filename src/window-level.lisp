@@ -24,7 +24,8 @@
                ((= effect +mob-effect-called-for-help+) (sdl:draw-string-solid-* "Called" x y1 :color sdl:*green*))
                ((= effect +mob-effect-divine-shield+) (sdl:draw-string-solid-* "Divine shield" x y1 :color sdl:*yellow*))
                ((= effect +mob-effect-cursed+) (sdl:draw-string-solid-* "Cursed" x y1 :color (sdl:color :r 139 :g 69 :b 19)))
-               ((= effect +mob-effect-blind+) (sdl:draw-string-solid-* "Blind" x y1 :color (sdl:color :r 100 :g 100 :b 100))))
+               ((= effect +mob-effect-blind+) (sdl:draw-string-solid-* "Blind" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
+               ((= effect +mob-effect-fear+) (sdl:draw-string-solid-* "Fear" x y1 :color sdl:*magenta*)))
              (incf y1 (sdl:get-font-height))))
 
 (defun show-char-properties (x y idle-calcing)

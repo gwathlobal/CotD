@@ -88,6 +88,7 @@
 (defconstant +mob-abil-prayer-reveal+ 24)
 (defconstant +mob-abil-military-follow-me+ 25)
 (defconstant +mob-abil-blindness+ 26)
+(defconstant +mob-abil-instill-fear+ 27)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -98,6 +99,7 @@
 (defconstant +mob-effect-divine-shield+ 6)
 (defconstant +mob-effect-cursed+ 7)
 (defconstant +mob-effect-blind+ 8)
+(defconstant +mob-effect-fear+ 9)
 
 (defconstant +mob-order-follow+ 0)
 

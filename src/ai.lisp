@@ -116,10 +116,16 @@
     ;; if the mob is coward, move away from the nearest enemy
     (when (and nearest-enemy (mob-ai-coward-p mob))
       (logger (format nil "AI-FUNCTION: ~A [~A] is a coward with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
-      
       (ai-mob-flee mob nearest-enemy)      
-      (return-from ai-function)
-      )
+      (return-from ai-function))
+      
+
+    ;; if the mob is feared, move away from the nearest enemy
+    (when (and nearest-enemy (mob-effect-p mob +mob-effect-fear+))
+      (logger (format nil "AI-FUNCTION: ~A [~A] is in fear with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
+      (ai-mob-flee mob nearest-enemy)      
+      (return-from ai-function))
+      
     
     ;; if the mob has horde behavior, compare relative strengths of allies to relative strength of enemies
     ;; if less - flee
@@ -349,6 +355,38 @@
   
   (make-output *current-window*) 
 
+  ;; if player is fearing somebody & there is an enemy nearby
+  ;; wait for a meaningful action and move randomly instead
+  (when (mob-effect-p *player* +mob-effect-fear+)
+    (let ((nearest-enemy nil))
+      (loop for mob-id of-type fixnum in (visible-mobs *player*)
+            for mob = (get-mob-by-id mob-id)
+            with vis-mob-type = nil
+            do
+               ;; inspect a mob appearance
+               (setf vis-mob-type (get-mob-type-by-id (face-mob-type-id mob)))
+               ;; however is you are of the same faction, you know who is who
+               (when (= (faction *player*) (faction mob))
+                 (setf vis-mob-type (get-mob-type-by-id (mob-type mob))))
+                  
+               (when (not (get-faction-relation (faction *player*) (faction vis-mob-type)))
+                 ;; find the nearest hostile mob
+                 (unless nearest-enemy
+                   (setf nearest-enemy mob))
+                 (when (< (get-distance (x mob) (y mob) (x *player*) (y *player*))
+                          (get-distance (x nearest-enemy) (y nearest-enemy) (x *player*) (y *player*)))
+                   (setf nearest-enemy mob))
+                 ))
+      (format t "NEAREST-ENEMY ~A~%" nearest-enemy)
+      
+      (when nearest-enemy
+        (logger (format nil "AI-FUNCTION: ~A [~A] fears ~A [~A].~%" (name player) (id player) (name nearest-enemy) (id nearest-enemy)))
+        (setf (can-move-if-possessed player) t)
+        (loop while (can-move-if-possessed player) do
+          (get-input-player))
+        (ai-mob-flee *player* nearest-enemy)
+        (return-from ai-function nil))))
+  
   ;; if possessed & unable to revolt - wait till the player makes a meaningful action
   ;; then skip and invoke the master AI
   (logger (format nil "AI-FUNCTION: MASTER ID ~A, SLAVE ID ~A~%" (master-mob-id player) (slave-mob-id player)))

@@ -830,8 +830,10 @@
                                                         do
                                                            (set-mob-effect mob +mob-effect-blind+ 2)
                                                            (adjust-sight mob)
-                                                           (setf (visible-mobs mob) nil)
-                                                           (print-visible-message (x actor) (y actor) (level *world*) 
+                                                           (if (eq *player* mob)
+                                                             (update-visible-area (level *world*) (x *player*) (y *player*))
+                                                             (setf (visible-mobs mob) nil))
+                                                           (print-visible-message (x mob) (y mob) (level *world*) 
                                                                                   (format nil "~A is blind. " (visible-name mob)))
                                                            )
 
@@ -852,6 +854,59 @@
                                                            (not (zerop (loop for mob-id in (visible-mobs actor)
                                                                              for mob = (get-mob-by-id mob-id)
                                                                              when (not (mob-effect-p mob +mob-effect-blind+))
+                                                                               count mob-id)))
+                                                           (or (<= (cur-hp actor) (truncate (max-hp actor) 4))
+                                                               (< (strength actor) (loop for mob-id in (visible-mobs actor)
+                                                                                         for mob = (get-mob-by-id mob-id)
+                                                                                         when (not (get-faction-relation (faction actor) (faction mob)))
+                                                                                           sum (strength mob)))))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-instill-fear+ :name "Instill fear" :descr "Fear visible enemies around your for 3 turns." 
+                                 :cost 1 :spd (truncate +normal-ap+ 1.3) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A roars to fear its enemies. " (visible-name actor)))
+                                                (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
+                                                ;; fear nearby visible enemy mobs
+                                                ;; fear can be resisted depending on the strength of the mob
+                                                (loop for i from 0 below (length (visible-mobs actor))
+                                                      for mob = (get-mob-by-id (nth i (visible-mobs actor)))
+                                                      when (not (get-faction-relation (faction actor) (faction mob)))
+                                                        do
+                                                           (if (> (random (+ (strength mob) (mob-ability-p actor +mob-abil-instill-fear+))) (strength mob))
+                                                             (progn
+                                                               (set-mob-effect mob +mob-effect-fear+ 3)
+                                                               (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                      (format nil "~A is feared. " (visible-name mob))))
+                                                             (progn
+                                                               (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                      (format nil "~A resists fear. " (visible-name mob))))))
+                                                          
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-instill-fear+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; cast fear when your power is less than the power of enemies around you
+                                                  ;; or you have <= than 25% of max hp
+                                                  (if (and (mob-ability-p actor +mob-abil-instill-fear+)
+                                                           (can-invoke-ability actor actor +mob-abil-instill-fear+)
+                                                           (not (zerop (loop for mob-id in (visible-mobs actor)
+                                                                             for mob = (get-mob-by-id mob-id)
+                                                                             when (not (mob-effect-p mob +mob-effect-fear+))
                                                                                count mob-id)))
                                                            (or (<= (cur-hp actor) (truncate (max-hp actor) 4))
                                                                (< (strength actor) (loop for mob-id in (visible-mobs actor)

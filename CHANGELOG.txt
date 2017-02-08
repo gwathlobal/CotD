@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added fear ability to demons and archdemons
 - Added blindness ability to archangels
 - Added barricaded cities to the city generator
 

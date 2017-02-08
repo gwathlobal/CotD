@@ -294,7 +294,7 @@
   ;; target under protection of divine shield - consume the shield and quit
   (when (mob-effect-p target +mob-effect-divine-shield+)
     (print-visible-message (x attacker) (y attacker) (level *world*) 
-                           (format nil "~A attacks ~A, but can not harm ~A. " (visible-name attacker) (visible-name target) (visible-name target)))
+                           (format nil "~@(~A~) attacks ~A, but can not harm ~A. " (visible-name attacker) (visible-name target) (visible-name target)))
     (rem-mob-effect target +mob-effect-divine-shield+)
     (make-act attacker (att-spd attacker))
     (return-from melee-target nil)
@@ -330,13 +330,13 @@
             (progn
               (set-mob-location target x y)
               (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                     (format nil "~A attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
+                                     (format nil "~@(~A~) attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
             ;; target did not dodge
             (progn
               (setf failed-dodge nil)
               (when (and (> (cur-dodge target) dodge-chance) (not (eq check-result t)))
                 (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                       (format nil "~A attacks ~A, and ~A failes to dodge. " (visible-name attacker) (visible-name target) (visible-name target)))
+                                       (format nil "~@(~A~) attacks ~A, and ~A failes to dodge. " (visible-name attacker) (visible-name target) (visible-name target)))
                 (setf failed-dodge t))
               ;; apply damage
               (setf cur-dmg (+ (random (- (1+ (get-melee-weapon-dmg-max attacker)) (get-melee-weapon-dmg-min attacker))) 
@@ -359,13 +359,13 @@
                                                  (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy)))))))
               (if (zerop cur-dmg)
                 (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                       (format nil "~A hits ~A, but ~A is not hurt. " (visible-name attacker) (visible-name target) (visible-name target)))
+                                       (format nil "~@(~A~) hits ~A, but ~A is not hurt. " (visible-name attacker) (visible-name target) (visible-name target)))
                 (print-visible-message (x attacker) (y attacker) (level *world*) 
-                                       (format nil "~A hits ~A for ~A damage. " (visible-name attacker) (visible-name target) cur-dmg)))
+                                       (format nil "~@(~A~) hits ~A for ~A damage. " (visible-name attacker) (visible-name target) cur-dmg)))
               )))
         (progn
           ;; attacker missed
-          (print-visible-message (x attacker) (y attacker) (level *world*) (format nil "~A misses ~A. " (visible-name attacker) (visible-name target)))
+          (print-visible-message (x attacker) (y attacker) (level *world*) (format nil "~@(~A~) misses ~A. " (visible-name attacker) (visible-name target)))
           ))
       ))
   (when (check-dead target)
@@ -479,36 +479,16 @@
   (when (< (cur-fp mob) 0)
     (setf (cur-fp mob) 0))
 
-  (when (mob-effect-p mob +mob-effect-reveal-true-form+)
-    (set-mob-effect mob +mob-effect-reveal-true-form+ (1- (mob-effect-p mob +mob-effect-reveal-true-form+)))
-    (when (zerop (mob-effect-p mob +mob-effect-reveal-true-form+))
-      (rem-mob-effect mob +mob-effect-reveal-true-form+)
-      (when (slave-mob-id mob)
-        (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))))
-
-  (when (mob-effect-p mob +mob-effect-divine-shield+)
-    (set-mob-effect mob +mob-effect-divine-shield+ (1- (mob-effect-p mob +mob-effect-divine-shield+)))
-    (when (zerop (mob-effect-p mob +mob-effect-divine-shield+))
-      (rem-mob-effect mob +mob-effect-divine-shield+)))
-
-  (when (mob-effect-p mob +mob-effect-cursed+)
-    (set-mob-effect mob +mob-effect-cursed+ (1- (mob-effect-p mob +mob-effect-cursed+)))
-    (when (zerop (mob-effect-p mob +mob-effect-cursed+))
-      (rem-mob-effect mob +mob-effect-cursed+)))
-
-  (when (mob-effect-p mob +mob-effect-blind+)
-    (set-mob-effect mob +mob-effect-blind+ (1- (mob-effect-p mob +mob-effect-blind+)))
-    (when (zerop (mob-effect-p mob +mob-effect-blind+))
-      (rem-mob-effect mob +mob-effect-blind+)))
-  
-  (when (mob-effect-p mob +mob-effect-called-for-help+)
-    (if (= (mob-effect-p mob +mob-effect-called-for-help+) 2)
-      (set-mob-effect mob +mob-effect-called-for-help+ 1)
-      (rem-mob-effect mob +mob-effect-called-for-help+)))
-  (when (mob-effect-p mob +mob-effect-calling-for-help+)
-    (if (= (mob-effect-p mob +mob-effect-calling-for-help+) 2)
-      (set-mob-effect mob +mob-effect-calling-for-help+ 1)
-      (rem-mob-effect mob +mob-effect-calling-for-help+)))
+  (loop for effect-id being the hash-key in (effects mob)
+        when (and (not (eq (mob-effect-p mob effect-id) t))
+                  (not (eq (mob-effect-p mob effect-id) nil)))
+          do
+             (set-mob-effect mob effect-id (1- (mob-effect-p mob effect-id)))
+             (when (zerop (mob-effect-p mob effect-id))
+               (rem-mob-effect mob effect-id)
+               (when (= effect-id +mob-effect-reveal-true-form+)
+                 (when (slave-mob-id mob)
+                   (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob))))))))
 
   (adjust-attack-speed mob)
   (adjust-dodge mob)

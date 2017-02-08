@@ -66,6 +66,7 @@
    ;;   :abil-prayer-reveal - +mob-abil-prayer-reveal+
    ;;   :abil-military-follow-me - +mob-abil-military-follow-me+
    ;;   :abil-blindness - +mob-abil-blindness+
+   ;;   :abil-instill-fear - +mob-abil-instill-fear+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
@@ -79,7 +80,7 @@
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
-                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness)
+                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -143,6 +144,8 @@
     (setf (gethash +mob-abil-military-follow-me+ (abilities mob-type)) t))
   (when abil-blindness
     (setf (gethash +mob-abil-blindness+ (abilities mob-type)) t))
+  (when abil-instill-fear
+    (setf (gethash +mob-abil-instill-fear+ (abilities mob-type)) abil-instill-fear))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -341,6 +344,9 @@
     (name (get-mob-type-by-id (mob-type mob)))))
 
 (defun visible-name (mob)
+  (when (and (not (eq *player* mob))
+             (mob-effect-p *player* +mob-effect-blind+))
+    (return-from visible-name "somebody"))
   (when (= (faction *player*) (faction mob))
     (return-from visible-name (name mob)))
   (if (= (face-mob-type-id mob) (mob-type mob))
