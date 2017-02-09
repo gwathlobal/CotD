@@ -91,11 +91,12 @@
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-call-for-help t :abil-free-call t :abil-curse t
                              ))
 
+
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-soldier+ 
                                        :name "Soldier"
                                        :glyph-idx 32 :glyph-color sdl:*green* :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Rifle" (list 1 2 +normal-ap+) (list 2 4 +normal-ap+ 1)) :base-dodge 25
+                                       :weapon (list "Rifle" (list 1 2 +normal-ap+) (list 2 4 +normal-ap+ 1 1)) :base-dodge 25
                                        :strength 1
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                              ))
@@ -104,7 +105,7 @@
                                        :name "Sergeant"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6)) :base-dodge 25
+                                       :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6 1)) :base-dodge 25
                                        :strength 1
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                              ))
@@ -113,12 +114,20 @@
                                        :name "Chaplain"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 85 :g 107 :b 47) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6)) :base-dodge 25
+                                       :weapon (list "Revolver" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6 1)) :base-dodge 25
                                        :strength 1
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
                                        :abil-detect-good t :abil-detect-evil t
                              ))
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
+                                       :name "Machine-gunner"
+                                       :glyph-idx 32 :glyph-color (sdl:color :r 50 :g 150 :b 50) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :faction +faction-type-military+
+                                       :weapon (list "Light machine gun" (list 1 2 +normal-ap+) (list 1 2 +normal-ap+ 6 6)) :base-dodge 25
+                                       :strength 1
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
+                             ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
                                        :name "Angel"

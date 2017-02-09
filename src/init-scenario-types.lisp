@@ -99,7 +99,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'test-level-place-mobs mob-func-list)
-                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-archdemon+))) mob-func-list)
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-gunner+))) mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
                                                        
@@ -199,7 +199,8 @@
                                                                           (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
                                                                             (find-unoccupied-place-outside world chaplain)
                                                                             (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 2)
-                                                                                                                  (cons +mob-type-soldier+ 3))
+                                                                                                                  (cons +mob-type-soldier+ 2)
+                                                                                                                  (cons +mob-type-gunner+ 1))
                                                                                                       #'(lambda (world mob)
                                                                                                           (find-unoccupied-place-around world mob (x chaplain) (y chaplain))))))
                                                                  )
@@ -225,7 +226,8 @@
                                                                  (find-unoccupied-place-outside world *player*)
                                                                  ;; place the first group of military around the player
                                                                  (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 2)
-                                                                                                       (cons +mob-type-soldier+ 3))
+                                                                                                       (cons +mob-type-soldier+ 2)
+                                                                                                       (cons +mob-type-gunner+ 1))
                                                                                            #'(lambda (world mob)
                                                                                                (find-unoccupied-place-around world mob (x *player*) (y *player*)))))
                                                              mob-func-list)

@@ -69,7 +69,7 @@
    ;;   :abil-instill-fear - +mob-abil-instill-fear+
    ;;   :abil-charge - +mob-abil-charge+
    
-   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
+   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges> <rate of fire>))
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
@@ -200,14 +200,21 @@
   (when (third (weapon mob-type))
     (nth 3 (third (weapon mob-type)))))
 
+(defmethod get-ranged-weapon-rof ((mob-type mob-type))
+  ;; rate of fire - the number of charges the weapon consumes per shoot 
+  (when (third (weapon mob-type))
+    (nth 4 (third (weapon mob-type)))))
+
 (defmethod get-weapon-descr-line ((mob-type mob-type))
   (let ((str (create-string)))
     (format str "~A" (get-weapon-name mob-type))
     (when (is-weapon-melee mob-type)
       (format str "~% M: (dmg: ~A-~A) (spd: ~A)" (get-melee-weapon-dmg-min mob-type) (get-melee-weapon-dmg-max mob-type) (get-melee-weapon-speed mob-type)))
     (when (is-weapon-ranged mob-type)
-      (format str "~% R: (dmg: ~A-~A) (spd: ~A) ~A/~A"
-              (get-ranged-weapon-dmg-min mob-type) (get-ranged-weapon-dmg-max mob-type) (get-ranged-weapon-speed mob-type)
+      (format str "~% R: (dmg: ~A-~A~A) (spd: ~A) ~A/~A"
+              (get-ranged-weapon-dmg-min mob-type) (get-ranged-weapon-dmg-max mob-type)
+              (if (= (get-ranged-weapon-rof mob-type) 1) "" (format nil " x~A" (get-ranged-weapon-rof mob-type)))
+              (get-ranged-weapon-speed mob-type)
               (get-ranged-weapon-charges mob-type) (get-ranged-weapon-charges mob-type)))
     str))
 
@@ -241,7 +248,7 @@
    (effects :initform (make-hash-table) :accessor effects)
    (abilities-cd :initform (make-hash-table) :accessor abilities-cd)
    
-   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
+   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges> <rate-of-fire>))
    (cur-sight :initform 6 :initarg :cur-sight :accessor cur-sight)
    (accuracy :initform 100 :initarg :accuracy :accessor accuracy)
    (att-spd :initform 10 :initarg :att-spd :accessor att-spd)
@@ -429,6 +436,10 @@
 (defun get-ranged-weapon-max-charges (mob)
   (get-ranged-weapon-charges (get-mob-type-by-id (mob-type mob))))
 
+(defmethod get-ranged-weapon-rof ((mob mob))
+  (when (third (weapon mob))
+    (nth 4 (third (weapon mob)))))
+
 (defmethod get-weapon-descr-line ((mob mob))
   (get-weapon-descr-line (get-mob-type-by-id (mob-type mob))))
 
@@ -438,8 +449,10 @@
     (when (is-weapon-melee mob)
       (format str "~% M: (dmg: ~A-~A) (spd: ~A)" (get-melee-weapon-dmg-min mob) (get-melee-weapon-dmg-max mob) (get-melee-weapon-speed mob)))
     (when (is-weapon-ranged mob)
-      (format str "~% R: (dmg: ~A-~A) (spd: ~A) ~A/~A"
-              (get-ranged-weapon-dmg-min mob) (get-ranged-weapon-dmg-max mob) (get-ranged-weapon-speed mob)
+      (format str "~% R: (dmg: ~A-~A~A) (spd: ~A) ~A/~A"
+              (get-ranged-weapon-dmg-min mob) (get-ranged-weapon-dmg-max mob)
+              (if (= (get-ranged-weapon-rof mob) 1) "" (format nil " x~A" (get-ranged-weapon-rof mob)))
+              (get-ranged-weapon-speed mob)
               (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob)))
     str))
 

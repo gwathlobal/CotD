@@ -49,6 +49,7 @@
 (defconstant +mob-type-soldier+ 15)
 (defconstant +mob-type-sergeant+ 16)
 (defconstant +mob-type-chaplain+ 17)
+(defconstant +mob-type-gunner+ 18)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)

@@ -179,6 +179,11 @@
                         ;;------------------
 			;; select abilities - a
                         (when (and (sdl:key= key :sdl-key-a))
+
+                          (when (can-move-if-possessed *player*)
+                            (setf (can-move-if-possessed *player*) nil)
+                            (go exit-loop))
+                          
                           (let ((abil-name-list nil)
                                 (abil-descr-list nil)
                                 (abil-prompt-list nil)

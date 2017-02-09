@@ -235,56 +235,70 @@
   (make-act actor +normal-ap+))
 
 (defun mob-shoot-target (actor target)
-  (let ((cur-dmg 0))
+  (let ((cur-dmg 0) (affected-targets nil) (completely-missed t))
+    (unless (is-weapon-ranged actor)
+      (return-from mob-shoot-target nil))
     ;; reduce the number of bullets in the magazine
-    (set-ranged-weapon-charges actor (1- (get-ranged-weapon-charges actor)))
+    (set-ranged-weapon-charges actor (- (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor)))
+    (when (< (get-ranged-weapon-charges actor) 0)
+      (set-ranged-weapon-charges actor 0))
     
     ;; target under protection of divine shield - consume the shield and quit
     (when (mob-effect-p target +mob-effect-divine-shield+)
       (print-visible-message (x actor) (y actor) (level *world*) 
-                             (format nil "~A shoots ~A, but can not harm ~A. " (visible-name actor) (visible-name target) (visible-name target)))
+                             (format nil "~A shoots ~A. ~A takes no harm. " (visible-name actor) (visible-name target) (visible-name target)))
       (rem-mob-effect target +mob-effect-divine-shield+)
       (make-act actor (att-spd actor))
       (return-from mob-shoot-target nil))
+
+    (print-visible-message (x actor) (y actor) (level *world*) 
+                           (format nil "~A shoots ~A. " (visible-name actor) (visible-name target)))
     
-    (when (is-weapon-ranged actor)
+    (dotimes (n (get-ranged-weapon-rof actor))
+    
       (setf cur-dmg (+ (random (- (1+ (get-ranged-weapon-dmg-max actor)) (get-ranged-weapon-dmg-min actor))) 
-                               (get-ranged-weapon-dmg-min actor))))
+                               (get-ranged-weapon-dmg-min actor)))
+ 
+      (when (> (- (accuracy actor) (* (get-distance (x actor) (y actor) (x target) (y target)) 5)) (random 100))
+        (setf completely-missed nil)
 
-    ;; reduce damage by the amount of armor
-    (decf cur-dmg (cur-armor target))
-
-    (when (< cur-dmg 0) (setf cur-dmg 0))
-    (decf (cur-hp target) cur-dmg)
-    
-    
-    (if (> (- (accuracy actor) (* (get-distance (x actor) (y actor) (x target) (y target)) 5)) (random 100))
-      (progn
+        ;; reduce damage by the amount of armor
+        (decf cur-dmg (cur-armor target))
+        (decf (cur-hp target) cur-dmg)
+        (when (< cur-dmg 0) (setf cur-dmg 0))
+        
         ;; place a blood spattering
         (when (> cur-dmg 0)
           (let ((dir (1+ (random 9))))
             (multiple-value-bind (dx dy) (x-y-dir dir) 				
               (add-feature-to-level-list (level *world*) 
                                          (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy))))))
+ 
+        (if (find target affected-targets :key #'(lambda (n) (car n)))
+          (incf (cdr (find target affected-targets :key #'(lambda (n) (car n)))) cur-dmg)
+          (push (cons target cur-dmg) affected-targets))
         
-        (if (zerop cur-dmg)
-          (print-visible-message (x actor) (y actor) (level *world*) 
-                                 (format nil "~A shoots ~A, but ~A is not hurt. " (visible-name actor) (visible-name target) (name target)))
-          (print-visible-message (x actor) (y actor) (level *world*) 
-                                 (format nil "~A shoots ~A for ~A damage. " (visible-name actor) (visible-name target) cur-dmg)))
-        (when (check-dead target)
-          (make-dead target :splatter t :msg t :msg-newline nil :killer actor)
-          
-          (when (mob-effect-p target +mob-effect-possessed+)
-            (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
-            (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil))
-          )
         )
-      (progn
-        (print-visible-message (x actor) (y actor) (level *world*) 
-                               (format nil "~A shoots ~A, but misses. " (visible-name actor) (visible-name target)))
-        ))
+      )
 
+    (loop for (a-target . dmg) in affected-targets do
+      (if (zerop dmg)
+          (print-visible-message (x actor) (y actor) (level *world*) 
+                                 (format nil "~A is not hurt. " (visible-name a-target)))
+          (print-visible-message (x actor) (y actor) (level *world*) 
+                                 (format nil "~A is hit for ~A damage. " (visible-name a-target) dmg)))
+      (when (check-dead a-target)
+          (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor)
+          
+          (when (mob-effect-p a-target +mob-effect-possessed+)
+            (setf (cur-hp (get-mob-by-id (slave-mob-id a-target))) 0)
+            (make-dead (get-mob-by-id (slave-mob-id a-target)) :splatter nil :msg nil :msg-newline nil))
+          ))
+    
+    (when completely-missed
+      (print-visible-message (x actor) (y actor) (level *world*) 
+                             (format nil "~A misses. " (visible-name actor)))
+      )
     (make-act actor (att-spd actor))
     ))
 
