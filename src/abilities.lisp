@@ -10,6 +10,7 @@
    (descr :initform "" :initarg :descr :accessor descr)
    (cost :initform 0 :initarg :cost :accessor cost)
    (spd :initform +normal-ap+ :initarg :spd :accessor spd)
+   (cd :initform 0 :initarg :cd :accessor cd)
    (passive :initform t :initarg :passive :accessor passive) ;; passive abilities should have their cost set to 0
    (on-touch :initform nil :initarg :on-touch :accessor on-touch :type boolean) ;; if the abilities should be invoked, when actor bumps into target
    (final :initform t :initarg :final :accessor final :type boolean) ;; if the ability is invoked, no further abilities can be invoked
@@ -18,6 +19,7 @@
    (on-kill :initform nil :initarg :on-kill :accessor on-kill :type boolean) ;; if the ability should be invoked when actor kills target
    (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)  ;; a function that checks for the AI if it can and should invoke the ability now
    (on-invoke-ai :initform nil :initarg :on-invoke-ai :accessor on-invoke-ai) ;; a function that invokes the ability for the ai
+   (map-select-func :initform nil :initarg :map-select-func :accessor map-select-func) ;; a function that is invoked when the player need to select the target for the ability, also indicates that this is a targeted ability 
    ))
 
 (defun set-ability-type (ability-type)
@@ -29,10 +31,9 @@
   (aref *ability-types* ability-type-id)) 
 
 (defun can-invoke-ability (actor target ability-type-id)
-  ;;(format t "CAN-INVOKE-ABILITY: (cur-fp mob) ~A, (cost (get-ability-type-by-id ability-type-id)) ~A, (abil-applicable-p (get-ability-type-by-id ability-type-id) mob) ~A~%" 
-  ;;        (cur-fp mob) (cost (get-ability-type-by-id ability-type-id)) (abil-applicable-p (get-ability-type-by-id ability-type-id) mob))
   (if (and (abil-applic-cost-p ability-type-id actor)
-           (abil-applicable-p (get-ability-type-by-id ability-type-id) actor target))
+           (abil-applicable-p (get-ability-type-by-id ability-type-id) actor target)
+           (abil-applic-cd-p ability-type-id actor))
     t
     nil))
 
@@ -64,6 +65,22 @@
 (defun abil-spd-p (ability-type-id)
   (spd (get-ability-type-by-id ability-type-id)))
 
+(defun abil-max-cd-p (ability-type-id)
+  (cd (get-ability-type-by-id ability-type-id)))
+
+(defun abil-cur-cd-p (mob ability-type-id)
+  (if (gethash ability-type-id (abilities-cd mob))
+    (gethash ability-type-id (abilities-cd mob))
+    0))
+
+(defun set-abil-cur-cd (mob ability-type-id value)
+  (setf (gethash ability-type-id (abilities-cd mob)) value))
+
+(defun abil-applic-cd-p (ability-type-id mob)
+  (if (zerop (abil-cur-cd-p mob ability-type-id))
+    t
+    nil))
+
 (defmethod abilities ((mob mob))
   (abilities (get-mob-type-by-id (mob-type mob))))
 
@@ -79,3 +96,9 @@
     when (and (gethash ability-type-id (abilities actor))
               (abil-applicable-p (get-ability-type-by-id ability-type-id) actor target))
       collect ability-type-id))
+
+(defun copy-hash-table (hash-table)
+  (let ((new-table (make-hash-table)))
+    (loop for key being the hash-key in hash-table using (hash-value value) do
+      (setf (gethash key new-table) value))
+    new-table))

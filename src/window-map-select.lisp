@@ -9,7 +9,7 @@
    (cur-inv :initform 0 :accessor cur-inv)
    (cur-tab :initform t :accessor cur-tab))) ; t - map, nil - obj list
 
-(defmethod make-output ((win map-select-window))
+(defun map-select-update (win)
   (unless (is-done-once win)
     ;; find the nearest hostile mob & set it as target
     (setf (visible-mobs *player*) (sort (visible-mobs *player*)
@@ -88,7 +88,17 @@
       (if (cur-tab win)
         (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white*)
         (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white*))
-      (sdl:update-display))))
+      )))
+
+(defmethod make-output ((win map-select-window))
+  (fill-background-tiles)
+  
+  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
+  (show-small-message-box *glyph-w* (- *window-height* *msg-box-window-height* 10) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
+  
+  (map-select-update win)
+  
+  (sdl:update-display))
 
 (defmethod run-window ((win map-select-window))
   (tagbody
@@ -128,7 +138,8 @@
 			      (setf (cur-inv win) (run-selection-list key mod unicode (cur-inv win)))))
 			(cond
 			  ((sdl:key= key :sdl-key-escape) (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*)) (setf *current-window* (return-to win)) (go exit-func))
-			  ((sdl:key= key :sdl-key-return) (funcall (exec-func win)) (go exit-func))
+			  ((sdl:key= key :sdl-key-return) (when (funcall (exec-func win))
+                                                            (go exit-func)))
 			  ;((sdl:key= key :sdl-key-tab) (setf (cur-tab win) (not (cur-tab win))) (setf (cur-inv win) 0))
 			  )
 			(go exit-func))

@@ -167,7 +167,7 @@
                                        :weapon (list "Chains of Shattering" (list 5 10 +normal-ap+) nil) :base-dodge 20 :base-armor 1
                                        :strength 4
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
-                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4))
+                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t))
 
 
 (set-faction-relations +faction-type-humans+ (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-demons+ nil) (cons +faction-type-military+ t))

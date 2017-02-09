@@ -201,13 +201,17 @@
                                 (setf abil-descr-list
                                       (loop
                                         for ability-type-id in mob-abilities
-                                        collect (if (abil-applic-cost-p ability-type-id *player*)
-                                                  (format nil "~ATU: ~A."
+                                        collect (cond
+                                                  ((not (abil-applic-cost-p ability-type-id *player*)) (format nil "Cost: ~A. Insufficient power!" (cost (get-ability-type-by-id ability-type-id))))
+                                                  ((not (abil-applic-cd-p ability-type-id *player*)) (format nil "CD: ~A. On cooldown!" (abil-cur-cd-p *player* ability-type-id)))
+                                                  (t (format nil "~A~ATU: ~A."
                                                           (if (zerop (cost (get-ability-type-by-id ability-type-id)))
                                                             ""
                                                             (format nil "Cost: ~A. " (cost (get-ability-type-by-id ability-type-id))))
-                                                          (spd (get-ability-type-by-id ability-type-id)))
-                                                  (format nil "Cost: ~A. Insufficient power!" (cost (get-ability-type-by-id ability-type-id))))))
+                                                          (if (abil-applic-cd-p ability-type-id *player*)
+                                                            ""
+                                                            (format nil "CD: ~A. " (abil-cur-cd-p *player* ability-type-id)))
+                                                          (spd (get-ability-type-by-id ability-type-id)))))))
 
                                 ;; populate the ability prompt list
                                 (setf abil-prompt-list
@@ -225,12 +229,29 @@
                                                                       :descr-list abil-descr-list
                                                                       :enter-func #'(lambda (cur-sel)
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
-                                                                                        (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
-                                                                                        (setf *current-window* win)
-                                                                                        (set-idle-calcing win)
-                                                                                        (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                                                                                        (if (not (map-select-func (get-ability-type-by-id (nth cur-sel mob-abilities))))
+                                                                                          (progn
+                                                                                            (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
+                                                                                            (setf *current-window* win)
+                                                                                            (set-idle-calcing win)
+                                                                                            (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t))
+                                                                                          (progn
+                                                                                            (setf *current-window* (make-instance 'map-select-window 
+                                                                                                                                  :return-to *current-window*
+                                                                                                                                  :cmd-str "[Enter] Invoke  "
+                                                                                                                                  :exec-func #'(lambda ()
+                                                                                                                                                 (if (funcall (map-select-func (get-ability-type-by-id (nth cur-sel mob-abilities)))
+                                                                                                                                                              (nth cur-sel mob-abilities))
+                                                                                                                                                   (progn
+                                                                                                                                                     (setf *current-window* win)
+                                                                                                                                                     (make-output *current-window*)
+                                                                                                                                                     t)
+                                                                                                                                                   (progn
+                                                                                                                                                     nil)))
+                                                                                                                                  ))
+                                                                                            (make-output *current-window*)))
                                                                                         )
-                                                                                        )
+                                                                                      )
                                                                       :line-list abil-name-list
                                                                       :prompt-list abil-prompt-list)))
                               (progn
@@ -258,10 +279,15 @@
                                                                         :return-to *current-window*
                                                                         :cmd-str "[Enter] Fire  "
                                                                         :exec-func #'(lambda ()
-                                                                                       (when (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
-                                                                                         (mob-shoot-target *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
-                                                                                         (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
-                                                                                         (setf *current-window* (return-to *current-window*))))))
+                                                                                       (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
+                                                                                         (progn
+                                                                                           (mob-shoot-target *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                                                           (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
+                                                                                           (setf *current-window* (return-to *current-window*))
+                                                                                           t)
+                                                                                         (progn
+                                                                                           nil))
+                                                                                       )))
                                   (make-output *current-window*))
                                 (progn
                                   (add-message (format nil "Can't switch into firing mode: need to reload.~%")))))

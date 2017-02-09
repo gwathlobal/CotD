@@ -75,7 +75,10 @@
                           (descr ability)
                           (if (passive ability)
                             "Passive."
-                            (format nil "~ATime units: ~A" (if (zerop (cost ability)) "" (format nil "Cost: ~A pwr  " (cost ability))) (spd ability))))
+                            (format nil "~A~ATime units: ~A"
+                                    (if (zerop (cost ability)) "" (format nil "Cost: ~A pwr  " (cost ability)))
+                                    (if (zerop (cd ability)) "" (format nil "Cooldown: ~A TU  " (* +normal-ap+ (cd ability))))
+                                    (spd ability))))
                   (sdl:rectangle :x x :y y :w w :h h) :color sdl:*white*)
     )
 

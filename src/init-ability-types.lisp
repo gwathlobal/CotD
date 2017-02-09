@@ -867,7 +867,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-instill-fear+ :name "Instill fear" :descr "Fear visible enemies around your for 3 turns." 
+                                 :id +mob-abil-instill-fear+ :name "Instill fear" :descr "Fear visible enemies around your for 3 turns. More powerfull characters may resist fear." 
                                  :cost 1 :spd (truncate +normal-ap+ 1.3) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -918,3 +918,102 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-charge+ :name "Charge" :descr "Move up to 3 tiles to the specified place. Anybody on your way will be pushed back (if possible) and attacked." 
+                                 :cd 4 :cost 0 :spd (truncate +normal-ap+ 1) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; here the target is not a mob, but a (cons x y)
+                                                (logger (format nil "MOB-CHARGE: ~A [~A] charges to ~A.~%" (name actor) (id actor) target))
+
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A charges. " (visible-name actor)))
+                                                
+                                                (let ((path-line nil) (cur-ap) (game-time) (dx1) (dy1) (target1 (cons (car target) (cdr target))))
+                                                  (setf dx1 (- (car target) (x actor)))
+                                                  (setf dy1 (- (cdr target) (y actor)))
+
+                                                  (when (or (< (abs dx1) 3) (< (abs dy1) 3))
+                                                    (setf (car target1) (+ (car target1) (* 3 dx1)))
+                                                    (setf (cdr target1) (+ (cdr target1) (* 3 dy1))))
+                                                  
+                                                  (line-of-sight (x actor) (y actor) (car target1) (cdr target1) #'(lambda (dx dy)
+                                                                                                                     (let ((exit-result t))
+                                                                                                                       (block nil
+                                                                                                                         (push (cons dx dy) path-line)
+                                                                                                                         exit-result))))
+                                                  (setf path-line (nreverse path-line))
+                                                  (pop path-line)
+                                                  
+                                                  (setf game-time (player-game-time *world*))
+                                                  (setf cur-ap (cur-ap actor))
+                                                  
+                                                  (loop for (nx . ny) in path-line
+                                                        for dx = (- nx (x actor))
+                                                        for dy = (- ny (y actor))
+                                                        with charge-distance = 3
+                                                        with charge-result = nil
+                                                        while (not (zerop charge-distance))
+                                                        do
+                                                           (decf charge-distance)
+                                                           (setf charge-result (move-mob actor (x-y-into-dir dx dy) :push t))
+                                                           (when (eq charge-result nil)
+                                                             (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                                    (format nil "~A hits an obstacle. " (visible-name actor))))
+                                                           (unless (eq charge-result t)
+                                                             (loop-finish))
+                                                        )
+                                                  (setf (cur-ap actor) cur-ap)
+                                                  (setf (player-game-time *world*) game-time)
+                                                  ))
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-charge+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; if there is unobstructed direct path towards the enemy - charge
+                                                  (block nil
+                                                    (unless nearest-enemy
+                                                      (return nil))
+                                                    (let ((blocked nil))
+                                                      (line-of-sight (x actor) (y actor) (x nearest-enemy) (y nearest-enemy) #'(lambda (dx dy)
+                                                                                                                                 (declare (type fixnum dx dy))
+                                                                                                                                 (let ((terrain) (exit-result t))
+                                                                                                                                   (block nil
+                                                                                                                                     (when (or (< dx 0) (>= dx *max-x-level*)
+                                                                                                                                               (< dy 0) (>= dy *max-y-level*))
+                                                                                                                                       (setf exit-result 'exit)
+                                                                                                                                       (setf blocked t)
+                                                                                                                                       (return))
+                                                                                                                                     
+                                                                                                                                     (setf terrain (get-terrain-* (level *world*) dx dy))
+                                                                                                                                     (unless terrain
+                                                                                                                                       (setf exit-result 'exit)
+                                                                                                                                       (setf blocked t)
+                                                                                                                                       (return))
+                                                                                                                                     (when (get-terrain-type-trait terrain +terrain-trait-blocks-move+)
+                                                                                                                                       (setf exit-result 'exit)
+                                                                                                                                       (setf blocked t)
+                                                                                                                                       (return))
+                                                                                                                                     )
+                                                                                                                                   exit-result)))
+                                                      (if (and (mob-ability-p actor +mob-abil-charge+)
+                                                               (can-invoke-ability actor actor +mob-abil-charge+)
+                                                               (not blocked))
+                                                        t
+                                                        nil))))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor (cons (x nearest-enemy) (y nearest-enemy)) (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                        (progn
+                                                          nil)
+                                                        (progn
+                                                          (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
+                                                          t))
+                                                      )))

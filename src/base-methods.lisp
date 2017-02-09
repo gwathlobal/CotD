@@ -75,29 +75,38 @@
   (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
     (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob))))
 
-(defun move-mob (mob dir)
+(defun move-mob (mob dir &key (push nil))
   ;;(format t "MOVE-MOB: inside ~A~%" dir)
-  (progn
-    (multiple-value-bind (dx dy) (x-y-dir dir)
-      (declare (type fixnum dx dy))
-      (let* ((x (+ dx (x mob))) (y (+ dy (y mob)))
-	     (check-result (check-move-on-level mob x y)))
-	(declare (type fixnum x y))
-	(cond
-	  ;; all clear - move freely
-	  ((eq check-result t)
-
-           (set-mob-location mob x y)
-           
-	   (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
-           (return-from move-mob t)
-           )
-          ;; bumped into a mob
-	  ((typep check-result 'mob) 
-           (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result))) 
-           (on-bump check-result mob)
-           (return-from move-mob t))
-	  ))))
+  (multiple-value-bind (dx dy) (x-y-dir dir)
+    (declare (type fixnum dx dy))
+    (let* ((x (+ dx (x mob))) (y (+ dy (y mob)))
+           (check-result (check-move-on-level mob x y)))
+      (declare (type fixnum x y))
+      (cond
+        ;; all clear - move freely
+        ((eq check-result t)
+         
+         (set-mob-location mob x y)
+         
+         (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
+         (return-from move-mob t)
+         )
+        ;; bumped into a mob
+        ((typep check-result 'mob) 
+         (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result)))
+         (when push
+           ;; check if you can push the mob farther
+           (let* ((nx (+ dx (x check-result))) (ny (+ dy (y check-result)))
+                  (check-result-n (check-move-on-level check-result nx ny)))
+             (when (eq check-result-n t)
+               (print-visible-message (x mob) (y mob) (level *world*) 
+                                      (format nil "~A pushes ~A. " (visible-name mob) (visible-name check-result)))
+               (set-mob-location check-result nx ny)
+               (set-mob-location mob x y))
+             ))
+         (on-bump check-result mob)
+         (return-from move-mob mob))
+        )))
   nil)
 
 (defun make-act (mob speed)
@@ -283,6 +292,7 @@
   (when (can-invoke-ability actor target ability-type-id)
     (let ((ability-type (get-ability-type-by-id ability-type-id)))
       (funcall (on-invoke ability-type) ability-type actor target)
+      (set-abil-cur-cd actor ability-type-id (abil-max-cd-p ability-type-id))
       (make-act actor (spd ability-type)))))
 
 
@@ -490,6 +500,11 @@
                  (when (slave-mob-id mob)
                    (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob))))))))
 
+  (loop for ability-id being the hash-key in (abilities-cd mob)
+        when (not (zerop (abil-cur-cd-p mob ability-id)))
+          do
+             (set-abil-cur-cd mob ability-id (1- (abil-cur-cd-p mob ability-id))))
+  
   (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)

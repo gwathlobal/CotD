@@ -67,6 +67,7 @@
    ;;   :abil-military-follow-me - +mob-abil-military-follow-me+
    ;;   :abil-blindness - +mob-abil-blindness+
    ;;   :abil-instill-fear - +mob-abil-instill-fear+
+   ;;   :abil-charge - +mob-abil-charge+
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
@@ -80,7 +81,7 @@
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
-                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear)
+                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge)
   (when ai-coward
     (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
   (when ai-horde
@@ -146,6 +147,8 @@
     (setf (gethash +mob-abil-blindness+ (abilities mob-type)) t))
   (when abil-instill-fear
     (setf (gethash +mob-abil-instill-fear+ (abilities mob-type)) abil-instill-fear))
+  (when abil-charge
+    (setf (gethash +mob-abil-charge+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -236,6 +239,7 @@
    (face-mob-type-id ::initform nil :accessor face-mob-type-id) ;; others see this mob as this mob type 
 
    (effects :initform (make-hash-table) :accessor effects)
+   (abilities-cd :initform (make-hash-table) :accessor abilities-cd)
    
    (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed>) (<dmg min> <dmg max> <attack speed> <max charges>))
    (cur-sight :initform 6 :initarg :cur-sight :accessor cur-sight)
@@ -270,6 +274,10 @@
 
   ;; setting up name
   (set-name mob)
+
+   ;; set up current abilities cooldowns
+  (loop for ability-id being the hash-key in (abilities mob) do
+    (setf (gethash ability-id (abilities-cd mob)) 0))
   
   (when (mob-ability-p mob +mob-abil-human+)
     (incf (total-humans *world*))

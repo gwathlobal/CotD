@@ -89,6 +89,7 @@
 (defconstant +mob-abil-military-follow-me+ 25)
 (defconstant +mob-abil-blindness+ 26)
 (defconstant +mob-abil-instill-fear+ 27)
+(defconstant +mob-abil-charge+ 28)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
