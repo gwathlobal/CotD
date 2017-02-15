@@ -30,6 +30,10 @@
     (setf (path mob) nil)
     (setf step-x (if (> (x nearest-enemy) (x mob)) -1 1))
     (setf step-y (if (> (y nearest-enemy) (y mob)) -1 1))
+
+    (when (and (zerop (random 10))
+               (mob-ability-p mob +mob-abil-human+))
+      (print-visible-message (x mob) (y mob) (level *world*) (format nil "~A cries: \"Help! Help!\" " (visible-name mob))))
     
     ;; if can't move away - try any random direction
     (unless (move-mob mob (x-y-into-dir step-x step-y))
@@ -243,8 +247,32 @@
     (when (and (is-weapon-ranged mob)
                (mob-can-shoot mob)
                nearest-enemy)
-      (mob-shoot-target mob nearest-enemy)
-      (return-from ai-function))
+      (let ((tx 0) (ty 0)
+            (ex (x nearest-enemy)) (ey (y nearest-enemy)))
+        (declare (type fixnum tx ty ex ey))
+        (line-of-sight (x mob) (y mob) (x nearest-enemy) (y nearest-enemy) #'(lambda (dx dy)
+                                                                               (declare (type fixnum dx dy))
+                                                                               (let ((terrain) (exit-result t))
+                                                                                 (block nil
+                                                                                   (setf tx dx ty dy)
+                                                                                   (when (or (< dx 0) (>= dx *max-x-level*)
+                                                                                             (< dy 0) (>= dy *max-y-level*))
+                                                                                     (setf exit-result 'exit)
+                                                                                     (return))
+                                                                                   
+                                                                                   (setf terrain (get-terrain-* (level *world*) dx dy))
+                                                                                   (unless terrain
+                                                                                     (setf exit-result 'exit)
+                                                                                     (return))
+                                                                                   (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
+                                                                                     (setf exit-result 'exit)
+                                                                                     (return))
+                                                                                   )
+                                                                                 exit-result)))
+        (when (and (= tx ex)
+                   (= ty ey))
+          (mob-shoot-target mob nearest-enemy)
+          (return-from ai-function))))
 
     ;; if no enemy in sight and the magazine is not full - reload it
     (when (and (is-weapon-ranged mob)

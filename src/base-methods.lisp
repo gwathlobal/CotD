@@ -235,13 +235,18 @@
   (make-act actor +normal-ap+))
 
 (defun mob-shoot-target (actor target)
-  (let ((cur-dmg 0) (affected-targets nil) (completely-missed t))
+  (let ((cur-dmg 0) (bullets-left) (affected-targets nil) (completely-missed t))
     (unless (is-weapon-ranged actor)
       (return-from mob-shoot-target nil))
-    ;; reduce the number of bullets in the magazine
-    (set-ranged-weapon-charges actor (- (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor)))
-    (when (< (get-ranged-weapon-charges actor) 0)
-      (set-ranged-weapon-charges actor 0))
+
+     ;; reduce the number of bullets in the magazine
+    (if (> (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))
+      (progn
+        (setf bullets-left (get-ranged-weapon-rof actor))
+        (set-ranged-weapon-charges actor (- (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))))
+      (progn
+        (setf bullets-left (get-ranged-weapon-charges actor))
+        (set-ranged-weapon-charges actor 0)))
     
     ;; target under protection of divine shield - consume the shield and quit
     (when (mob-effect-p target +mob-effect-divine-shield+)
@@ -254,33 +259,77 @@
     (print-visible-message (x actor) (y actor) (level *world*) 
                            (format nil "~A shoots ~A. " (visible-name actor) (visible-name target)))
     
-    (dotimes (n (get-ranged-weapon-rof actor))
+    (loop repeat bullets-left
+          with rx
+          with ry
+          with target1
+          with tx
+          with ty
+          do
+             (setf rx 0 ry 0)
+             ;; disperse ammo depending on the distance to the target
+             (let ((dist (get-distance (x actor) (y actor) (x target) (y target))))
+               (when (and (>= dist 2)
+                          (< (- (r-acc actor) (* dist *acc-loss-per-tile*)) (random 100)))
+                 (setf rx (- (random (+ 3 (* 2 (truncate dist (r-acc actor))))) 
+                             (+ 1 (truncate dist (r-acc actor)))))
+                 (setf ry (- (random (+ 3 (* 2 (truncate dist (r-acc actor))))) 
+                             (+ 1 (truncate dist (r-acc actor)))))))
+      
+             ;; trace a line to the target so if we encounter an obstacle along the path we hit it
+             (line-of-sight (x actor) (y actor) (+ (x target) rx) (+ (y target) ry) #'(lambda (dx dy)
+                                                                                        (declare (type fixnum dx dy))
+                                                                                        (let ((terrain) (exit-result t))
+                                                                                          (block nil
+                                                                                            (setf tx dx ty dy)
+                                                                                            (when (or (< dx 0) (>= dx *max-x-level*)
+                                                                                                      (< dy 0) (>= dy *max-y-level*))
+                                                                                              (setf exit-result 'exit)
+                                                                                              (return))
+                                                                                            
+                                                                                            (setf terrain (get-terrain-* (level *world*) dx dy))
+                                                                                            (unless terrain
+                                                                                              (setf exit-result 'exit)
+                                                                                              (return))
+                                                                                            (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
+                                                                                              (setf exit-result 'exit)
+                                                                                              (return))
+                                                                                            )
+                                                                                          exit-result)))
+             
+             
+             (setf target1 (get-mob-* (level *world*) tx ty))
+             
+             (setf cur-dmg (+ (random (- (1+ (get-ranged-weapon-dmg-max actor)) (get-ranged-weapon-dmg-min actor))) 
+                              (get-ranged-weapon-dmg-min actor)))
+             
+             (when target1
+               (setf completely-missed nil)
+               
+               ;; reduce damage by the amount of risistance to this damage type
+               ;; first reduce the damage directly
+               ;; then - by percent
+               (when (get-armor-resist target1 (get-melee-weapon-dmg-type actor))
+                 (decf cur-dmg (get-armor-d-resist target1 (get-melee-weapon-dmg-type actor)))
+                 (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target1 (get-melee-weapon-dmg-type actor)))) 100)))
+               (when (< cur-dmg 0) (setf cur-dmg 0))
+               
+               (decf (cur-hp target1) cur-dmg)
+               
+               ;; place a blood spattering
+               (when (> cur-dmg 0)
+                 (let ((dir (1+ (random 9))))
+                   (multiple-value-bind (dx dy) (x-y-dir dir) 				
+                     (add-feature-to-level-list (level *world*) 
+                                                (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target1) dx) :y (+ (y target1) dy))))))
+               
+               (if (find target1 affected-targets :key #'(lambda (n) (car n)))
+                 (incf (cdr (find target1 affected-targets :key #'(lambda (n) (car n)))) cur-dmg)
+                 (push (cons target1 cur-dmg) affected-targets))
+               
+               )
+          )
     
-      (setf cur-dmg (+ (random (- (1+ (get-ranged-weapon-dmg-max actor)) (get-ranged-weapon-dmg-min actor))) 
-                               (get-ranged-weapon-dmg-min actor)))
- 
-      (when (> (- (accuracy actor) (* (get-distance (x actor) (y actor) (x target) (y target)) 5)) (random 100))
-        (setf completely-missed nil)
-
-        ;; reduce damage by the amount of armor
-        (decf cur-dmg (cur-armor target))
-        (decf (cur-hp target) cur-dmg)
-        (when (< cur-dmg 0) (setf cur-dmg 0))
-        
-        ;; place a blood spattering
-        (when (> cur-dmg 0)
-          (let ((dir (1+ (random 9))))
-            (multiple-value-bind (dx dy) (x-y-dir dir) 				
-              (add-feature-to-level-list (level *world*) 
-                                         (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy))))))
- 
-        (if (find target affected-targets :key #'(lambda (n) (car n)))
-          (incf (cdr (find target affected-targets :key #'(lambda (n) (car n)))) cur-dmg)
-          (push (cons target cur-dmg) affected-targets))
-        
-        )
-      )
-
     (loop for (a-target . dmg) in affected-targets do
       (if (zerop dmg)
           (print-visible-message (x actor) (y actor) (level *world*) 
@@ -343,7 +392,7 @@
 	   (x (+ dx (x target))) (y (+ dy (y target)))
 	   (check-result (check-move-on-level target x y)))
       ;; check if attacker has hit the target
-      (if (> (accuracy attacker) (random 100))
+      (if (> (m-acc attacker) (random 100))
         (progn
           ;; attacker hit
           ;; check if the target dodged
@@ -369,10 +418,14 @@
               (when (= (faction attacker) (faction target))
                 (setf cur-dmg (get-melee-weapon-dmg-min attacker)))
 
-              ;; reduce damage by the amount of armor
-              (decf cur-dmg (cur-armor target))
-              
+              ;; reduce damage by the amount of risistance to this damage type
+              ;; first reduce the damage directly
+              ;; then - by percent
+              (when (get-armor-resist target (get-melee-weapon-dmg-type attacker))
+                (decf cur-dmg (get-armor-d-resist target (get-melee-weapon-dmg-type attacker)))
+                (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target (get-melee-weapon-dmg-type attacker)))) 100)))
               (when (< cur-dmg 0) (setf cur-dmg 0))
+
               (decf (cur-hp target) cur-dmg)
               ;; place a blood spattering
               (unless (zerop cur-dmg)
@@ -478,7 +531,8 @@
   (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)
-  (adjust-accuracy mob)
+  (adjust-m-acc mob)
+  (adjust-r-acc mob)
   (adjust-sight mob)
   
   (when (mob-effect-p mob +mob-effect-possessed+)
@@ -522,7 +576,8 @@
   (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)
-  (adjust-accuracy mob)
+  (adjust-m-acc mob)
+  (adjust-r-acc mob)
   (adjust-sight mob)
   
   (when (and (evolve-into mob)

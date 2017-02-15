@@ -1,0 +1,8 @@
+RANGED COMBAT
+Some characters are capable of ranged combat. When they shoot, the game determines if they hit or missed the target. Their accuracy is based on the base accuracy of their weapon and is reduced for each tile away from the shooter by 5%. Note that targets standing in the neighboring tile will always be hit regardless of accuracy.
+Missing bullets tend to disperse around the target, the farther the target - the greater the dispersion. This means that you can hit some passer-by standing near your target (this is especially true for machine-gunners who have decreased accuracy and can shoot six bullets at once).
+Once the bullet's destination is determined, it flies to it until it hits an obstacle. Note that certain terrain tiles (like windows) provide a line of sight but block a line of fire, so you will always miss whenever you try to shoot through a window.
+
+ARMOR VS DAMAGE
+Whenever weapon damage is applied, the game checks the target's resistances to this damage type. Resistances are subdivided into two parts - direct resistances and percentage resistances.
+First, the amount of damage is reduced flatly by the amount of direct resistance (for example, 4 points of iron damage against 1 point of direct iron resistance makes 3). Then the result is further reduced by the percentage resistance, with the final damage result rounded down (for example, 3 points of iron damage against 50% iron resistance makes 1.5, rounded down to 1). This final damage is applied to the target. 

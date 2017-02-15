@@ -2,20 +2,21 @@
 
 (defconstant +win-help-page-menu+ 0)
 (defconstant +win-help-page-overview+ 1)
-(defconstant +win-help-page-keybindings+ 2)
-(defconstant +win-help-page-credits+ 3)
+(defconstant +win-help-page-concepts+ 2)
+(defconstant +win-help-page-keybindings+ 3)
+(defconstant +win-help-page-credits+ 4)
 
 
 (defclass help-window (window)
   ((cur-page :initform +win-help-page-menu+ :accessor cur-page)
    (cur-str :initform 0 :accessor cur-str)
    (cur-sel :initform 0 :accessor cur-sel)
-   (menu-items :initform (list "Overview" "Keybindings" "Credits") :accessor menu-items)
+   (menu-items :initform (list "Overview" "Concepts" "Keybindings" "Credits") :accessor menu-items)
    (help-txt :initform (help-window-populate-txt) :accessor help-txt)
    ))
 
 (defun help-window-populate-txt ()
-  (let ((file-list (list "help/overview.txt" "help/keybindings.txt" "help/credits.txt"))
+  (let ((file-list (list "help/overview.txt" "help/concepts.txt" "help/keybindings.txt" "help/credits.txt"))
         (get-txt-func #'(lambda (filename)
                           (with-open-file (file (merge-pathnames filename *current-dir*) :direction :input :if-does-not-exist nil)
                             (when file 
@@ -57,6 +58,10 @@
     ((= (cur-page win) +win-help-page-overview+) 
      (sdl:draw-string-solid-* "OVERVIEW" (truncate *window-width* 2) 0 :justify :center)
      (show-help-text win +win-help-page-overview+))
+     ;; draw overview page
+    ((= (cur-page win) +win-help-page-concepts+) 
+     (sdl:draw-string-solid-* "CONCEPTS" (truncate *window-width* 2) 0 :justify :center)
+     (show-help-text win +win-help-page-concepts+))
     ;; draw keybindings page
     ((= (cur-page win) +win-help-page-keybindings+) 
      (sdl:draw-string-solid-* "KEYBINDINGS" (truncate *window-width* 2) 0 :justify :center)
@@ -95,11 +100,13 @@
                      (cond
                        ((and (sdl:key= key :sdl-key-up) (= mod 0))
                         (when (or (= (cur-page win) +win-help-page-overview+)
+                                  (= (cur-page win) +win-help-page-concepts+)
                                   (= (cur-page win) +win-help-page-keybindings+)
                                   (= (cur-page win) +win-help-page-credits+))
                           (decf (cur-str win))))
                        ((and (sdl:key= key :sdl-key-down) (= mod 0))
                         (when (or (= (cur-page win) +win-help-page-overview+)
+                                  (= (cur-page win) +win-help-page-concepts+)
                                   (= (cur-page win) +win-help-page-keybindings+)
                                   (= (cur-page win) +win-help-page-credits+))
                           (incf (cur-str win))))

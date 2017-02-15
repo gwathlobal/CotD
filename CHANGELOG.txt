@@ -1,7 +1,9 @@
 CHANGELOG
 
+- Added damage types to weapons and damage resistances to armor 
+- Added bullet dispersion over distance
 - Added machine-gunners to the Military. They shoot the whole magazine in one round
-- Introduced a cooldown abilities. The first cooldown ability "Charge" added to archdemons
+- Introduced cooldown abilities. The first cooldown ability "Charge" added to archdemons
 - Added "Fear" ability to demons and archdemons
 - Added "Blindness" ability to archangels
 - Added barricaded cities to the city generator

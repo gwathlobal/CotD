@@ -6,14 +6,14 @@ OVERVIEW
 
 The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain. Choose your side and join the fray!
 
-This is a simple fast-paced coffeebreak roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
+This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
 LATEST CHANGES v1.0.5
 
 - Made the military a playable faction
 - Added sergeants to the military. They are armed with six-round revolvers, that deal less damaged than a rifle but do not need to reload every turn
-- Added chaplains to the military. They are armed with six-round revolvers and are able lead troops, pray to reveal angels and demons around them and grant divine protection to allies
+- Added chaplains to the military. They are armed with six-round revolvers and are able to lead troops, pray to reveal angels and demons around them and grant divine protection to allies
 - Ranged combat accuracy is now affected by distance. The farther the target - the less likely you are able to hit it 
 - Added forest cities to the city generator
 - Added island cities to the city generator
@@ -30,8 +30,8 @@ FEATURES
 GENERAL TIPS
 
  - You can side either with Angels or with Demons. Though mankind is allied with angels, it is mainly stuck in the conflict between the parties.
- - You are not alone and should not be able to overcome all obstacles by yourself, some enemies will require aid of your allies.
- - Your enemies are able to hide their true appearence, so observe and learn their tactics to avoid nasty surprises.
+ - You are not alone and should not be able to overcome all obstacles by yourself, some enemies will require aid from your allies.
+ - Your enemies are able to hide their true appearance, so observe and learn their tactics to avoid nasty surprises.
  - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.
  - Your resource is power. You can stockpile it to get a "level up" or spend it on your abilities.
  - You gain power proportional to the strength of killed enemies. Besides each party has other special ways to gain power.
@@ -55,12 +55,12 @@ CITIZENS OF THE CITY
 
  - Humans are generally weak and frail.
  - Citizens of the City will mostly try to flee whenever there is an enemy in sight.
- - But beware of the military that will arrive later in battle.
+ - But beware of the military that will arrive later in the battle.
 
 --------------------
 THE MILITARY
 
- - The military is allied with the citizens of the City, but opposes both angels and demons.
+ - The military is allied with the citizens of the City but opposes both angels and demons.
  - All military units are capable of ranged combat.
  - You start as a Chaplain who can lead troops, reveal disguised enemies and provide divine protection to allies.
  - To win, kill all demons. But do not let angels stand in your way.

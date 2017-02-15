@@ -31,7 +31,7 @@
 (defun show-char-properties (x y idle-calcing)
   (let* ((str)
          (str-lines))
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w 250 :h (* *glyph-h* *max-y-view*)))
+    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
       (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
@@ -46,8 +46,10 @@
                         (sense-good-evil-str)
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
-    (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) (- (+ (- *window-height* 10 (sdl:char-height sdl:*default-font*)) (* -3 (sdl:char-height sdl:*default-font*)))
+    
+    (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) (- (+ (- *window-height* *msg-box-window-height* 10) (* -3 (sdl:char-height sdl:*default-font*)))
                                                                                     (+ y (* (sdl:get-font-height) (1+ str-lines)))))
+    
     (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
     ))
 
@@ -92,7 +94,7 @@
   (update-map-area)
     
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
-  (show-small-message-box *glyph-w* (- *window-height* *msg-box-window-height* 10) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
+  (show-small-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 20))
     
   (sdl:update-display)
   
@@ -276,6 +278,11 @@
                         ;;------------------
 			;; shoot mode - f
 			(when (and (sdl:key= key :sdl-key-f) (= mod 0))
+
+                          (when (can-move-if-possessed *player*)
+                            (setf (can-move-if-possessed *player*) nil)
+                            (go exit-loop))
+                          
                           (if (is-weapon-ranged *player*)
                             (progn
                               (if (mob-can-shoot *player*)
@@ -283,6 +290,7 @@
                                   (setf *current-window* (make-instance 'map-select-window 
                                                                         :return-to *current-window*
                                                                         :cmd-str "[Enter] Fire  "
+                                                                        :check-lof t
                                                                         :exec-func #'(lambda ()
                                                                                        (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
                                                                                          (progn
@@ -301,6 +309,11 @@
                         ;;------------------
 			;; reload - r
 			(when (and (sdl:key= key :sdl-key-r) (= mod 0))
+
+                          (when (can-move-if-possessed *player*)
+                            (setf (can-move-if-possessed *player*) nil)
+                            (go exit-loop))
+                          
                           (if (is-weapon-ranged *player*)
                             (progn
                               (if (< (get-ranged-weapon-charges *player*) (get-ranged-weapon-max-charges *player*))

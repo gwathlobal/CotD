@@ -125,7 +125,7 @@ Enter the following command to load BORDEAUX-THREADS:
 
 6. Fetch CotD source files
 
-Fetch CotD source files from GitHub (clone the repository) and put them them to C:\Lisp\libraries.
+Fetch CotD source files from GitHub (clone the repository) and put them to C:\Lisp\libraries.
 
 7. Run CotD 
 

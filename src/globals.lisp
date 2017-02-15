@@ -105,6 +105,11 @@
 
 (defconstant +mob-order-follow+ 0)
 
+(defconstant +weapon-dmg-flesh+ 0)
+(defconstant +weapon-dmg-iron+ 1)
+(defconstant +weapon-dmg-fire+ 2)
+(defconstant +weapon-dmg-vorpal+ 3)
+
 ;;--------------------
 ;; FEATURE-TYPE Constants
 ;;-------------------- 
@@ -119,6 +124,7 @@
 
 (defconstant +terrain-trait-blocks-move+ 0)
 (defconstant +terrain-trait-blocks-vision+ 1)
+(defconstant +terrain-trait-blocks-projectiles+ 2)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -168,7 +174,7 @@
 
 (defconstant +normal-ap+ 10)
 (defparameter *possessed-revolt-chance* 12)
-
+(defparameter *acc-loss-per-tile* 5)
 
 ;;---------------------------
 ;; Multithreading parameters

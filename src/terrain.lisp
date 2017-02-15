@@ -13,6 +13,7 @@
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-move - +terrain-trait-blocks-move+
    ;; :trait-blocks-vision - +terrain-trait-blocks-vision+
+   ;; :trait-blocks-projectiles - +terrain-trait-blocks-projectiles+
    ))
 
 
@@ -24,12 +25,14 @@
 (defun get-terrain-type-by-id (terrain-type-id)
   (aref *terrain-types* terrain-type-id))
 
-(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision)
+(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles)
   
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
   (when trait-blocks-vision
     (setf (gethash +terrain-trait-blocks-vision+ (trait terrain-type)) t))
+  (when trait-blocks-projectiles
+    (setf (gethash +terrain-trait-blocks-projectiles+ (trait terrain-type)) t))
   )
 
 

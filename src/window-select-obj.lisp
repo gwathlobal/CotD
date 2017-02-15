@@ -11,10 +11,6 @@
 
 (defmethod make-output ((win select-obj-window))
   (let ((x (- (truncate *window-width* 2) 150)) (y (- (truncate *window-height* 2) 50)) (w 300) (h 65) (descr-h 0))
-    (logger (format nil "SELECT OBJ WINDOW~%"))
-    ;; adjusting the object selection
-    (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (obj-list win))))
-
     ;; find the descr height
     (when (descr-list win)
       (sdl:with-rectangle (rect (sdl:rectangle :x x :y y :w (- w 8) :h 600))
@@ -76,8 +72,9 @@
        (:key-down-event (:key key :mod mod :unicode unicode)
 			
 			(setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
+                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (obj-list win))))
 
-			(cond
+                        (cond
 			  ;; escape - quit
 			  ((sdl:key= key :sdl-key-escape) 
 			   (setf *current-window* (return-to win)) (go exit-func))

@@ -25,10 +25,10 @@
                               "...#.....#................................................######.....######..."
                               "...#.....#............#####.......#####......................................."
                               "...#######............#...............#......................................."
-                              "......................#...............#......................................."
+                              "......................#...............-......................................."
                               "...#######............########.########...................######.....######..."
                               "...#.....#............#....#.....#....#...................#...............#..."
-                              "...#..................#...............#...................#...............#..."
+                              "...#..................#...............-...................#...............#..."
                               "...#.....#............#....#.....#....#...................#...............#..."
                               "...#######............#################...................#################..."
                               ".............................................................................."
@@ -46,6 +46,7 @@
                (cond
                  ((char= c #\.) (setf (aref template-level (1+ x) (1+ y)) +terrain-floor-stone+))
                  ((char= c #\#) (setf (aref template-level (1+ x) (1+ y)) +terrain-wall-stone+))
+                 ((char= c #\-) (setf (aref template-level (1+ x) (1+ y)) +terrain-wall-window+))
                  )
                (incf x)
             ))
@@ -56,14 +57,14 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf (x *player*) 45 (y *player*) 15)
+  (setf (x *player*) 38 (y *player*) 15)
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 5) :y (- (y *player*) 0)))
-        (demon (make-instance 'mob :mob-type +mob-type-angel+ :x (+ (x *player*) 0) :y (+ (y *player*) -4))))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-soldier+ :x (+ (x *player*) 0) :y (+ (y *player*) 1)))
+        (demon (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 6) :y (+ (y *player*) 1))))
     ;(setf (cur-hp demon) 1)
-    ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
-    ;(set-mob-effect *player* +mob-effect-reveal-true-form+ 5)
-    ;(set-mob-effect *player* +mob-effect-calling-for-help+ 100)
+    (set-mob-effect *player* +mob-effect-divine-shield+ 100)
+    (set-mob-effect *player* +mob-effect-reveal-true-form+ 5)
+    (set-mob-effect *player* +mob-effect-calling-for-help+ 100)
     ;(setf (cur-fp *player*) (1- (max-fp *player*)))
     (add-mob-to-level-list (level world) soldier)
     (add-mob-to-level-list (level world) demon)

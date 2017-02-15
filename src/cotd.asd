@@ -10,7 +10,7 @@
 (defsystem cotd  
   :name "The City of the Damned"
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
-  :version "0.1"  
+  :version "1.0.5"  
   :author "Gwathlobal"    
   :depends-on (lispbuilder-sdl bordeaux-threads)
   :components
