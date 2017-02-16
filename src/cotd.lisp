@@ -28,9 +28,13 @@
                  (ai-function mob)
                  (when (get-message-this-turn) (add-message (format nil "~%")))
 
+                 (when (eq mob *player*)
+                   (update-visible-area (level *world*) (x *player*) (y *player*))
+                   (update-map-area))
+                 
                  ;; process animations for this turn if any
                  (when (animation-queue *world*)
-                   (update-map-area)
+                   
                    (loop for animation in (animation-queue *world*)
                          do
                             (display-animation-on-map animation))
@@ -56,6 +60,7 @@
 (defun init-game (layout-id weather-id faction-id)
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
+  (setf *items* (make-array (list 0) :adjustable t))
   
   (clear-message-list)
   

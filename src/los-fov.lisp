@@ -88,7 +88,19 @@
                                                                                 (get-single-memo-back-color (get-memo-* level (x ftr) (y ftr))))
                                                                   :visibility t
                                                                   :revealed t)))
-                                           ;; then mob, if any
+
+                                           ;; then item, if any
+                                           (when (get-items-* level dx dy)
+                                             (let ((vitem (get-item-by-id (first (get-items-* level dx dy)))))
+                                               (set-single-memo-* level 
+                                                                  (x vitem) (y vitem) 
+                                                                  :glyph-idx (glyph-idx vitem)
+                                                                  :glyph-color (glyph-color vitem)
+                                                                  :back-color (back-color vitem)
+                                                                  :visibility t
+                                                                  :revealed t)))
+                                           
+                                           ;; finally mob, if any
                                            (when (get-mob-* level dx dy)
                                              
                                              (let ((vmob (get-mob-* level dx dy)))
@@ -141,6 +153,19 @@
 				       (back-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
 				       (get-single-memo-back-color (get-memo-* level (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)))))
 		       :visibility t))
+
+
+
+  (dolist (item-id (item-id-list level))
+    ;;(format t "MOB NAME ~A, MOB ID ~A, MOB X ~A, MOB Y ~A~%" (name (get-mob-by-id mob-id)) mob-id (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)))
+    (set-single-memo-* level 
+		       (x (get-item-by-id item-id)) (y (get-item-by-id item-id)) 
+		       :glyph-idx (glyph-idx (get-item-by-id item-id))
+		       :glyph-color (glyph-color (get-item-by-id item-id))
+		       :back-color (back-color (get-item-by-id item-id))
+		       :visibility t)
+
+    )
   
   (dolist (mob-id (mob-id-list level))
     ;;(format t "MOB NAME ~A, MOB ID ~A, MOB X ~A, MOB Y ~A~%" (name (get-mob-by-id mob-id)) mob-id (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)))

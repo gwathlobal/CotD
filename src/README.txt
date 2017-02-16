@@ -81,6 +81,7 @@ KEYBINDINGS
  Shift + 2                      - Character screen
  m                              - View messages
  ?                              - Help
+ Shift + Q                      - Quit to main menu
  
 --------------------
 CREDITS

@@ -330,6 +330,10 @@
 								:return-to *current-window*))
 								
 			  (make-output *current-window*))
+                        ;;------------------
+			;; quit to menu - Shift + q
+                        (when (and (sdl:key= key :sdl-key-q) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                          (funcall *start-func*))
 			
 			(set-idle-calcing win)
 

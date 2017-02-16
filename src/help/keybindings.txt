@@ -10,3 +10,4 @@ r                              - Reload
 Shift + 2                      - Character screen
 m                              - View messages
 ?                              - Help
+Shift + q                      - Quit to main menu

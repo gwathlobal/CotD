@@ -108,7 +108,13 @@
                   (get-current-mob-name (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
                   (if lof-blocked "" (format nil " (hit: ~D%)" (if (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
                                                             100
-                                                            (truncate (- (r-acc *player*) (* (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) *acc-loss-per-tile*))))))))
+                                                                 (truncate (- (r-acc *player*) (* (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) *acc-loss-per-tile*))))))))
+        (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*))
+              for item = (get-item-by-id item-id)
+              do
+                 (format str "~%~A" (name item)))
+                         
+                         
         )
       (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 10) :w (- *window-width* 20) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height)))))
         (write-text str rect)))

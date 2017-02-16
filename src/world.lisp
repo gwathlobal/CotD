@@ -7,8 +7,10 @@
 (defclass level ()
   ((terrain :initform nil :accessor terrain :type simple-array) ; of type int, which is a idx of terrain-type
    (memo :initform nil :accessor memo :type simple-array) ; of type list containing (idx of glyph, color of glyph, color of background, visibility flag, revealed flag)
-   (mobs :initform nil :accessor mobs :type simple-array) ; of type int, which is the id of a mob
+   (mobs :initform nil :accessor mobs :type simple-array) ; of type fixnum, which is the id of a mob
+   (items :initform nil :accessor items :type simple-array) ; of type (<item id> ...)
    (mob-id-list :initarg :mob-id-list :initform (make-list 0) :accessor mob-id-list)
+   (item-id-list :initarg :item-id-list :initform (make-list 0) :accessor item-id-list)
    (feature-id-list :initarg :feature-id-list :initform (make-list 0) :accessor feature-id-list)
    ))
    
@@ -25,6 +27,14 @@
 
 (defun remove-feature-from-level-list (level feature)
   (setf (feature-id-list level) (remove (id feature) (feature-id-list level))))
+
+(defun add-item-to-level-list (level item)
+  (pushnew (id item) (item-id-list level))
+  (push (id item) (aref (items level) (x item) (y item))))
+
+(defun remove-item-from-level-list (level item)
+  (setf (item-id-list level) (remove (id item) (item-id-list level)))
+  (setf (aref (items level) (x item) (y item)) (remove (id item) (aref (items level) (x item) (y item)))))
 
 (defun get-terrain-* (level x y)
   (when (or (< x 0) (>= x *max-x-level*)
@@ -44,14 +54,6 @@
 	(setf feature-list (append feature-list (list feature)))))
     feature-list))
 
-;(defun get-mob-* (level x y)
-;  (let ((mob))
-;    (dolist (mob-id (mob-id-list level))
-;      (setf mob (get-mob-by-id mob-id))
-;      (when (and (= (x mob) x) (= (y mob) y))
-;	(return-from get-mob-* mob))))
-;  nil)
-
 (defun get-mob-* (level x y)
   (when (or (< x 0) (>= x *max-x-level*)
             (< y 0) (>= y *max-y-level*))
@@ -59,6 +61,12 @@
   (if (aref (mobs level) x y)
     (get-mob-by-id (aref (mobs level) x y))
     nil))
+
+(defun get-items-* (level x y)
+  (when (or (< x 0) (>= x *max-x-level*)
+            (< y 0) (>= y *max-y-level*))
+    (return-from get-items-* nil))
+  (aref (items level) x y))
 
 (defun get-memo-* (level x y)
   (aref (memo level) x y))

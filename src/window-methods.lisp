@@ -52,10 +52,6 @@
    ;; draw the level
    (let* ((x1 0) (y1 0) (glyph-w *glyph-w*) (glyph-h *glyph-h*) (single-memo))
      (declare (type fixnum x1 y1 rel-x rel-y glyph-w glyph-h))
-     ;; choose the coordinates reltive to which we will draw the map
-     ;;(cond
-     ;;  ((eql relative ':view) (setf rel-x (view-x *player*)) (setf rel-y (view-y *player*)))
-     ;;  (t (setf rel-x (x *player*)) (setf rel-y (y *player*))))
 
      (multiple-value-bind (sx sy max-x max-y) (calculate-start-coord rel-x rel-y array max-x-view max-y-view)
        (declare (type fixnum sx sy max-x max-y))

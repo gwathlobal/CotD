@@ -111,6 +111,12 @@
 (defconstant +weapon-dmg-vorpal+ 3)
 
 ;;--------------------
+;; ITEM-TYPE Constants
+;;-------------------- 
+
+(defconstant +item-type-body-part+ 0)
+
+;;--------------------
 ;; FEATURE-TYPE Constants
 ;;-------------------- 
 
@@ -159,9 +165,11 @@
 (defparameter *feature-types* (make-array (list 0) :adjustable t))
 (defparameter *terrain-types* (make-array (list 0) :adjustable t))
 (defparameter *mob-types* (make-array (list 0) :adjustable t))
+(defparameter *item-types* (make-array (list 0) :adjustable t))
 
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))
+(defparameter *items* (make-array (list 0) :adjustable t))
 
 (defparameter *world* nil)
 (defparameter *player* nil)

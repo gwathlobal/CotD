@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Characters leave corpses upon dying, for pure cosmetic reasons for now
+- Added "Shift + Q" command to exit the current game and return to the main menu
 - Added dots showing where the bullets hit
 - Added damage types to weapons and damage resistances to armor 
 - Added bullet dispersion over distance

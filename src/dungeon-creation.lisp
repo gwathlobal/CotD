@@ -97,6 +97,7 @@
     (setf level (make-instance 'level))
     (setf (terrain level) (make-array (list *max-x-level* *max-y-level*) :initial-element +terrain-floor-stone+))
     (setf (mobs level) (make-array (list *max-x-level* *max-y-level*) :initial-element nil))
+    (setf (items level) (make-array (list *max-x-level* *max-y-level*) :initial-element nil))
     (setf (memo level) (make-array (list *max-x-level* *max-y-level*) :initial-element (create-single-memo 0 sdl:*white* sdl:*black* nil nil)))
     level))
 
