@@ -116,41 +116,6 @@
    (cur-mob-path :initform 0 :accessor cur-mob-path)
    (path-lock :initform (bt:make-lock) :accessor path-lock)
    (path-cv :initform (bt:make-condition-variable) :accessor path-cv)
+
+   (animation-queue :initform () :accessor animation-queue)
    ))
-  
-(defclass world-for-angels (world)
-  ())
-
-(defclass world-for-demons (world)
-  ())
-
-(defclass world-for-humans (world)
-  ())
-
-(defmethod initialize-instance :after ((world world) &key)
-  ;(pushnew +game-event-lose-game+ (game-events world))
-  ;(pushnew +game-event-snow-falls+ (game-events world))
-  )
-
-(defmethod initialize-instance :after ((world world-for-angels) &key)
-  (pushnew +game-event-lose-game+ (game-events world))
-  (pushnew +game-event-win-for-angels+ (game-events world))
-  (pushnew +game-event-military-arrive+ (game-events world))
-  (pushnew +game-event-snow-falls+ (game-events world))
-  )
-
-(defmethod initialize-instance :after ((world world-for-demons) &key)
-  (pushnew +game-event-lose-game+ (game-events world))
-  (pushnew +game-event-win-for-demons+ (game-events world))
-  (pushnew +game-event-military-arrive+ (game-events world))
-  (pushnew +game-event-snow-falls+ (game-events world))
-  )
-
-(defmethod initialize-instance :after ((world world-for-humans) &key)
-  (pushnew +game-event-lose-game+ (game-events world))
-  (pushnew +game-event-win-for-humans+ (game-events world))
-  (pushnew +game-event-military-arrive+ (game-events world))
-  (pushnew +game-event-snow-falls+ (game-events world))
-  )
-
-

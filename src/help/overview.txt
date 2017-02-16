@@ -34,8 +34,9 @@ CITIZENS OF THE CITY
  
 THE MILITARY 
  - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
- - The military is comprised of three units: Soldiers, Sergeants, and Chaplains. All of them are capable of ranged combat but do not gain power whatsoever.
+ - The military is comprised of four units: Soldiers, Sergeants, Machine-gunners and Chaplains. All of them are capable of ranged combat but do not gain power whatsoever.
  - Soldiers are armed with single-shot rifles and need to reload every other turn.
  - Sergeants wield six-round revolvers that deal less damage than a rifle but do not need to be reloaded so often.
+ - Machine-gunners carry a light machine gun capable of firing the whole magazine in one turn. Alas, its accuracy leaves to be desired. 
  - Chaplains are also armed with six-round revolvers but, more importantly, are able to pray to reveal disguised enemies or to grant divine protection to allies (similar to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.
  - If you side with the military, you start as a Chaplain. To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.

@@ -26,6 +26,7 @@
      (:file "terrain" :depends-on ("globals"))
      (:file "lvl-features" :depends-on ("globals"))
      (:file "los-fov" :depends-on ("globals" "world" "mobs"))
+     (:file "animations" :depends-on ("globals"))
      (:file "base-methods" :depends-on ("message-box" "mobs" "world" "abilities" "terrain" "lvl-features" "los-fov"))
      (:file "buildings" :depends-on ("globals"))
      (:file "init-building-types" :depends-on ("buildings"))

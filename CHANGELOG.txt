@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added dots showing where the bullets hit
 - Added damage types to weapons and damage resistances to armor 
 - Added bullet dispersion over distance
 - Added machine-gunners to the Military. They shoot the whole magazine in one round

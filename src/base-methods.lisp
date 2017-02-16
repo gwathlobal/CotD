@@ -50,6 +50,10 @@
     (set-message-this-turn t)
     (add-message str)))
 
+(defun place-visible-animation (x y level animation-type-id)
+  (when (get-single-memo-visibility (get-memo-* level x y))
+    (push (make-animation :id animation-type-id :x x :y y) (animation-queue *world*))))
+
 (defun check-move-on-level (mob dx dy)
   ;;(format t "CHECK-MOVE-ON-LEVEL: inside~%")
   ;; trying to move beyound the level border 
@@ -296,7 +300,8 @@
                                                                                               (return))
                                                                                             )
                                                                                           exit-result)))
-             
+             ;; place a fire dot if the dest point is visible
+             (place-visible-animation tx ty (level *world*) +anim-type-fire-dot+)
              
              (setf target1 (get-mob-* (level *world*) tx ty))
              

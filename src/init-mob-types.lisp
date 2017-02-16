@@ -124,7 +124,7 @@
                                        :name "Machine-gunner"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 50 :g 150 :b 50) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 6 6 80)) :base-dodge 25
+                                       :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 70)) :base-dodge 25
                                        :strength 1
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                              ))

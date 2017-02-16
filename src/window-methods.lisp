@@ -48,9 +48,10 @@
      (values sx sy max-x max-y)))
 
 (defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*))
+  (declare (optimize (speed 3)))
    ;; draw the level
-   (let* ((x1 0) (y1 0) (single-memo))
-     (declare (type fixnum x1 y1 rel-x rel-y))
+   (let* ((x1 0) (y1 0) (glyph-w *glyph-w*) (glyph-h *glyph-h*) (single-memo))
+     (declare (type fixnum x1 y1 rel-x rel-y glyph-w glyph-h))
      ;; choose the coordinates reltive to which we will draw the map
      ;;(cond
      ;;  ((eql relative ':view) (setf rel-x (view-x *player*)) (setf rel-y (view-y *player*)))
@@ -63,8 +64,8 @@
 	 (dotimes (y max-y)
 	   (declare (type fixnum y))
 	   ;; calculate the coordinates where to draw the glyph
-	   (setq x1 (+ (* x *glyph-w*) *glyph-w*))
-	   (setq y1 (+ (* y *glyph-h*) *glyph-h*))
+	   (setf x1 (+ (* x glyph-w) glyph-w))
+	   (setf y1 (+ (* y glyph-h) glyph-h))
 	   ;; select the object, the glyph of which shall be drawn
 	   (setf single-memo (aref array (+ sx x) (+ sy y)))
 	   ;;(when (and (eql (get-single-memo-visible single-memo) nil) 
@@ -76,6 +77,25 @@
 	   (draw-glyph x1 y1 (get-single-memo-glyph-idx single-memo) 
 		       :front-color (get-single-memo-glyph-color single-memo) 
 		       :back-color (get-single-memo-back-color single-memo)))))))
+
+(defun display-animation-on-map (animation)
+  (let ((x (anim-x animation))
+        (y (anim-y animation))
+        (x1 0) (y1 0))
+    (declare (type fixnum x y x1 y1))
+    (multiple-value-bind (sx sy) (calculate-start-coord (view-x *player*) (view-y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
+    ;; calculate the coordinates where to draw the animation
+    
+      (setf x1 (+ (* (- x sx) *glyph-w*) *glyph-w*))
+      (setf y1 (+ (* (- y sy) *glyph-h*) *glyph-h*))
+
+    ;(format t "DRAW ANIM X ~A, Y ~A~%" x1 y1)
+      ;; drawing glyph
+      (draw-glyph x1 y1 (anim-type-glyph-idx (get-anim-type (anim-id animation))) 
+                  :front-color (anim-type-glyph-color (get-anim-type (anim-id animation)))
+                  :back-color (anim-type-back-color (get-anim-type (anim-id animation))))
+      )
+    ))
 
 (defun fill-background-tiles ()
   "Fill the background"

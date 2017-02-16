@@ -26,9 +26,18 @@
                  (setf (made-turn mob) nil)
                  (set-message-this-turn nil)
                  (ai-function mob)
-                 (when (get-message-this-turn) (add-message (format nil "~%"))))))
-           ;(format t "ALL MOBS DONE~%")
-           
+                 (when (get-message-this-turn) (add-message (format nil "~%")))
+
+                 ;; process animations for this turn if any
+                 (when (animation-queue *world*)
+                   (update-map-area)
+                   (loop for animation in (animation-queue *world*)
+                         do
+                            (display-animation-on-map animation))
+                   (sdl:update-display)
+                   (sdl-cffi::sdl-delay 100)
+                   (setf (animation-queue *world*) nil)))))
+                     
            (bt:with-lock-held ((path-lock *world*))
              (setf (cur-mob-path *world*) 0)
              (bt:condition-notify (path-cv *world*)))
