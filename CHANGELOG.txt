@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Angels can now chop off body parts when they kill somebody (they are armed with swords after all) 
 - Characters leave corpses upon dying, for pure cosmetic reasons for now
 - Added "Shift + Q" command to exit the current game and return to the main menu
 - Added dots showing where the bullets hit

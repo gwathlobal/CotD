@@ -57,7 +57,7 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf (x *player*) 38 (y *player*) 15)
+  (setf (x *player*) 43 (y *player*) 15)
   (add-mob-to-level-list (level world) *player*)
   (let ((soldier (make-instance 'mob :mob-type +mob-type-gunner+ :x (+ (x *player*) 0) :y (+ (y *player*) 1)))
         (demon (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 6) :y (+ (y *player*) 1))))
@@ -69,6 +69,6 @@
     (add-mob-to-level-list (level world) soldier)
     (add-mob-to-level-list (level world) demon)
 
-    (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 1)))
+    ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 1)))
     ;(add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-soldier+ :x (+ (x *player*) 3) :y (+ (y *player*) 1)))
     ))

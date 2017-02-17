@@ -74,22 +74,38 @@
 		       :front-color (get-single-memo-glyph-color single-memo) 
 		       :back-color (get-single-memo-back-color single-memo)))))))
 
-(defun display-animation-on-map (animation)
-  (let ((x (anim-x animation))
-        (y (anim-y animation))
-        (x1 0) (y1 0))
-    (declare (type fixnum x y x1 y1))
-    (multiple-value-bind (sx sy) (calculate-start-coord (view-x *player*) (view-y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
+(defun display-animation-on-map (map-x map-y glyph-idx glyph-color back-color)
+  (let ((scr-x 0) (scr-y 0))
+    (declare (type fixnum scr-x scr-y))
+    (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
+      ;; calculate the coordinates where to draw the animation
+      
+      (setf scr-x (+ (* (- map-x sx) *glyph-w*) *glyph-w*))
+      (setf scr-y (+ (* (- map-y sy) *glyph-h*) *glyph-h*))
+      (format t "MAP-X ~A MAP-Y ~A; SX ~A SY ~A; SCR-X ~A SCR-Y ~A~%" map-x map-y sx sy scr-x scr-y)
+      
+      ;; drawing glyph
+      (draw-glyph scr-x scr-y glyph-idx 
+                  :front-color glyph-color
+                  :back-color back-color)
+      )
+    ))
+
+(defun display-cell-on-map (map-x map-y &key (array (memo (level *world*))))
+  (let ((scr-x 0) (scr-y 0) (single-memo))
+    (declare (type fixnum scr-x scr-y))
+    (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
     ;; calculate the coordinates where to draw the animation
     
-      (setf x1 (+ (* (- x sx) *glyph-w*) *glyph-w*))
-      (setf y1 (+ (* (- y sy) *glyph-h*) *glyph-h*))
+      (setf scr-x (+ (* (- map-x sx) *glyph-w*) *glyph-w*))
+      (setf scr-y (+ (* (- map-y sy) *glyph-h*) *glyph-h*))
 
-    ;(format t "DRAW ANIM X ~A, Y ~A~%" x1 y1)
+      (setf single-memo (aref array map-x map-y))
+      
       ;; drawing glyph
-      (draw-glyph x1 y1 (anim-type-glyph-idx (get-anim-type (anim-id animation))) 
-                  :front-color (anim-type-glyph-color (get-anim-type (anim-id animation)))
-                  :back-color (anim-type-back-color (get-anim-type (anim-id animation))))
+      (draw-glyph scr-x scr-y (get-single-memo-glyph-idx single-memo) 
+                  :front-color (get-single-memo-glyph-color single-memo) 
+                  :back-color (get-single-memo-back-color single-memo))
       )
     ))
 

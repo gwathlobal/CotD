@@ -59,7 +59,12 @@
    ;;   :abil-instill-fear - +mob-abil-instill-fear+
    ;;   :abil-charge - +mob-abil-charge+
    
-   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy>) (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy>))
+   (weapon :initform nil :initarg :weapon :accessor weapon)
+   ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
+   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <list of aux params>))
+   ;; <list of aux params> may contain
+   ;;   :chops-body-parts
+   
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
    (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
@@ -186,6 +191,14 @@
   (when (second (weapon mob-type))
     (nth 4 (second (weapon mob-type)))))
 
+(defmethod get-melee-weapon-aux ((mob-type mob-type))
+  (when (second (weapon mob-type))
+    (nth 5 (second (weapon mob-type)))))
+
+(defmethod get-melee-weapon-aux-param ((mob-type mob-type) aux-feature)
+  (when (second (weapon mob-type))
+    (find aux-feature (nth 5 (second (weapon mob-type))))))
+
 (defmethod is-weapon-ranged ((mob-type mob-type))
   (if (third (weapon mob-type))
     t
@@ -219,6 +232,14 @@
 (defmethod get-ranged-weapon-acc ((mob-type mob-type))
   (when (third (weapon mob-type))
     (nth 6 (third (weapon mob-type)))))
+
+(defmethod get-ranged-weapon-aux ((mob-type mob-type))
+  (when (third (weapon mob-type))
+    (nth 7 (third (weapon mob-type)))))
+
+(defmethod get-ranged-weapon-aux-param ((mob-type mob-type) aux-feature)
+  (when (third (weapon mob-type))
+    (find aux-feature (nth 7 (third (weapon mob-type))))))
 
 (defmethod get-weapon-descr-line ((mob-type mob-type))
   (let ((str (create-string)))
@@ -294,7 +315,12 @@
    (effects :initform (make-hash-table) :accessor effects)
    (abilities-cd :initform (make-hash-table) :accessor abilities-cd)
    
-   (weapon :initform nil :initarg :weapon :accessor weapon) ;; of type (<weapon name> (<dmg min> <dmg max> <attack speed> <accuracy>) (<dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy>))
+   (weapon :initform nil :initarg :weapon :accessor weapon)
+    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
+   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <list of aux params>))
+   ;; <list of aux params> may contain
+   ;;   :chops-body-parts
+   
    (cur-sight :initform 6 :initarg :cur-sight :accessor cur-sight)
    (m-acc :initform +base-accuracy+ :initarg :m-acc :accessor m-acc)
    (r-acc :initform +base-accuracy+ :initarg :r-acc :accessor r-acc)
@@ -473,6 +499,12 @@
 (defmethod get-melee-weapon-acc ((mob mob))
   (get-melee-weapon-acc (get-mob-type-by-id (mob-type mob))))
 
+(defmethod get-melee-weapon-aux ((mob mob))
+  (get-melee-weapon-aux (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-melee-weapon-aux-param ((mob mob) aux-feature)
+  (get-melee-weapon-aux-param (get-mob-type-by-id (mob-type mob)) aux-feature))
+
 (defmethod is-weapon-ranged ((mob mob))
   (is-weapon-ranged (get-mob-type-by-id (mob-type mob))))
 
@@ -504,6 +536,12 @@
 
 (defmethod get-ranged-weapon-acc ((mob mob))
   (get-ranged-weapon-acc (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-ranged-weapon-aux ((mob mob))
+  (get-ranged-weapon-aux (get-mob-type-by-id (mob-type mob))))
+
+(defmethod get-ranged-weapon-aux-param ((mob mob) aux-feature)
+  (get-ranged-weapon-aux-param (get-mob-type-by-id (mob-type mob)) aux-feature))
 
 (defmethod get-weapon-descr-line ((mob mob))
   (let ((str (create-string)))

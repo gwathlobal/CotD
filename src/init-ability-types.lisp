@@ -893,7 +893,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-charge+ :name "Charge" :descr "Move up to 3 tiles to the specified place. Anybody on your way will be pushed back (if possible) and attacked." 
-                                 :cd 4 :cost 0 :spd (truncate +normal-ap+ 1) :passive nil
+                                 :cd 4 :cost 0 :spd (truncate (* +normal-ap+ 1.5)) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))

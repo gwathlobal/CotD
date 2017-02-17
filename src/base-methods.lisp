@@ -50,9 +50,9 @@
     (set-message-this-turn t)
     (add-message str)))
 
-(defun place-visible-animation (x y level animation-type-id)
+(defun place-visible-animation (x y level animation-type-id &key (params nil))
   (when (get-single-memo-visibility (get-memo-* level x y))
-    (push (make-animation :id animation-type-id :x x :y y) (animation-queue *world*))))
+    (push (make-animation :id animation-type-id :x x :y y :params params) (animation-queue *world*))))
 
 (defun check-move-on-level (mob dx dy)
   ;;(format t "CHECK-MOVE-ON-LEVEL: inside~%")
@@ -171,7 +171,7 @@
         (when (and (check-dead target)
                    (mob-effect-p target +mob-effect-possessed+))
           (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
-          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil))
+          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params nil))
         )))
                      
 (defun mob-depossess-target (actor)
@@ -213,7 +213,7 @@
       (when (mob-effect-p target +mob-effect-possessed+)
         (mob-depossess-target target))
       
-      (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t)
+      (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params nil)
       )
     
     ))
@@ -301,7 +301,7 @@
                                                                                             )
                                                                                           exit-result)))
              ;; place a fire dot if the dest point is visible
-             (place-visible-animation tx ty (level *world*) +anim-type-fire-dot+)
+             (place-visible-animation tx ty (level *world*) +anim-type-fire-dot+ :params ())
              
              (setf target1 (get-mob-* (level *world*) tx ty))
              
@@ -314,9 +314,9 @@
                ;; reduce damage by the amount of risistance to this damage type
                ;; first reduce the damage directly
                ;; then - by percent
-               (when (get-armor-resist target1 (get-melee-weapon-dmg-type actor))
-                 (decf cur-dmg (get-armor-d-resist target1 (get-melee-weapon-dmg-type actor)))
-                 (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target1 (get-melee-weapon-dmg-type actor)))) 100)))
+               (when (get-armor-resist target1 (get-ranged-weapon-dmg-type actor))
+                 (decf cur-dmg (get-armor-d-resist target1 (get-ranged-weapon-dmg-type actor)))
+                 (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target1 (get-ranged-weapon-dmg-type actor)))) 100)))
                (when (< cur-dmg 0) (setf cur-dmg 0))
                
                (decf (cur-hp target1) cur-dmg)
@@ -342,12 +342,12 @@
           (print-visible-message (x actor) (y actor) (level *world*) 
                                  (format nil "~A is hit for ~A damage. " (visible-name a-target) dmg)))
       (when (check-dead a-target)
-          (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor :corpse t)
+        (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-ranged-weapon-aux actor))
           
-          (when (mob-effect-p a-target +mob-effect-possessed+)
-            (setf (cur-hp (get-mob-by-id (slave-mob-id a-target))) 0)
-            (make-dead (get-mob-by-id (slave-mob-id a-target)) :splatter nil :msg nil :msg-newline nil :corpse nil))
-          ))
+        (when (mob-effect-p a-target +mob-effect-possessed+)
+          (setf (cur-hp (get-mob-by-id (slave-mob-id a-target))) 0)
+          (make-dead (get-mob-by-id (slave-mob-id a-target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))
+        ))
     
     (when completely-missed
       (print-visible-message (x actor) (y actor) (level *world*) 
@@ -451,7 +451,10 @@
           ))
       ))
   (when (check-dead target)
-    (make-dead target :splatter t :msg t :msg-newline nil :killer attacker :corpse t)
+    (if (mob-effect-p target +mob-effect-possessed+)
+      (make-dead target :splatter t :msg t :msg-newline nil :killer attacker :corpse nil :aux-params ())
+      (make-dead target :splatter t :msg t :msg-newline nil :killer attacker :corpse t :aux-params (get-melee-weapon-aux attacker)))
+                                                                                                   
     )
   
   (make-act attacker (att-spd attacker))
@@ -462,13 +465,11 @@
     (return-from check-dead t))
   nil)
 
-(defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t))
-  (when msg
-    (print-visible-message (x mob) (y mob) (level *world*) (format nil "~A dies. " (visible-name mob)))
-    (when msg-newline (print-visible-message (x mob) (y mob) (level *world*) (format nil "~%"))))
-  
-  (unless (dead= mob)
-    (when (mob-ability-p mob +mob-abil-human+)
+(defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()))
+  (let ((dead-msg-str (format nil "~A dies. " (visible-name mob))))
+    
+    (unless (dead= mob)
+      (when (mob-ability-p mob +mob-abil-human+)
       (decf (total-humans *world*)))
     (when (mob-ability-p mob +mob-abil-demon+)
       (decf (total-demons *world*)))
@@ -479,11 +480,46 @@
 
     ;; place the corpse
     (when corpse
-      (let ((item))
+      (let ((item) (r) (left-body-str))
+        (setf r 0)
+
+        ;; determine which body part to sever (if any)
+        (when (and aux-params
+                   (find :chops-body-parts aux-params))
+          (setf r (random 4)))
+
+        (cond
+          ;; sever head
+          ((= r 1) (progn
+                     (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "head"))
+                     (setf left-body-str "multilated body")
+                     (when killer
+                       (setf dead-msg-str (format nil "~A chops off ~A's head. " (visible-name killer) (visible-name mob))))))
+          ;; sever limb
+          ((= r 2) (progn
+                     (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "limb"))
+                     (setf left-body-str "multilated body")
+                     (when killer
+                       (setf dead-msg-str (format nil "~A severs ~A's limb. " (visible-name killer) (visible-name mob))))))
+          ;; sever torso
+          ((= r 3) (progn
+                     (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body"))
+                     (setf left-body-str "lower body")
+                     (when killer
+                       (setf dead-msg-str (format nil "~A cuts ~A in half. " (visible-name killer) (visible-name mob))))))
+          ;; do not sever anything
+          (t (setf left-body-str "body")))
+
         (setf item (make-instance 'item :item-type +item-type-body-part+ :x (x mob) :y (y mob)))
-        (setf (name item) (format nil "~@(~A~)'s body" (name mob)))
+        (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) left-body-str))
         (add-item-to-level-list (level *world*) item)
-        (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob)))))
+        (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob)))
+        
+        ))
+
+    (when msg
+      (print-visible-message (x mob) (y mob) (level *world*) dead-msg-str)
+      (when msg-newline (print-visible-message (x mob) (y mob) (level *world*) (format nil "~%"))))
     
     ;; apply all on-kill abilities of the killer 
     (when killer
@@ -522,7 +558,7 @@
     (when (and splatter (< (random 100) 75))
       (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob))))
     
-    (setf (dead= mob) t))
+    (setf (dead= mob) t)))
   )
 
 (defun mob-evolve (mob)
@@ -550,7 +586,7 @@
   
   (when (mob-effect-p mob +mob-effect-possessed+)
     (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
-    (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil)
+    (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())
     (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob)))
     (print-visible-message (x mob) (y mob) (level *world*) (format nil "Its ascension destroyed its vessel."))
     

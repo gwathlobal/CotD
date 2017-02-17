@@ -37,10 +37,11 @@
                    
                    (loop for animation in (animation-queue *world*)
                          do
-                            (display-animation-on-map animation))
+                            (play-animation animation))
                    (sdl:update-display)
                    (sdl-cffi::sdl-delay 100)
-                   (setf (animation-queue *world*) nil)))))
+                   (setf (animation-queue *world*) nil)
+                   (update-map-area)))))
                      
            (bt:with-lock-held ((path-lock *world*))
              (setf (cur-mob-path *world*) 0)

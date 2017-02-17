@@ -54,6 +54,55 @@
   (logger (format nil "UPDATE-VISIBLE-MOBS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-mobs mob)))
   )
 
+(defun reveal-cell-on-map (level map-x map-y)
+  ;; drawing terrain
+  (set-single-memo-* level map-x map-y 
+                     :glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) map-x map-y)))
+                     :glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) map-x map-y)))
+                     :back-color (back-color (get-terrain-type-by-id (aref (terrain level) map-x map-y)))
+                     :visibility t
+                     :revealed t)
+  
+  ;; then feature, if any
+  (when (get-features-* level map-x map-y)
+    (let ((ftr (first (last (get-features-* level map-x map-y)))))
+      (set-single-memo-* level 
+                         (x ftr) (y ftr) 
+                         :glyph-idx (if (glyph-idx (get-feature-type-by-id (feature-type ftr)))
+                                      (glyph-idx (get-feature-type-by-id (feature-type ftr)))
+                                      (get-single-memo-glyph-idx (get-memo-* level (x ftr) (y ftr))))
+                         :glyph-color (if (glyph-color (get-feature-type-by-id (feature-type ftr)))
+                                        (glyph-color (get-feature-type-by-id (feature-type ftr)))
+                                        (get-single-memo-glyph-color (get-memo-* level (x ftr) (y ftr))))
+                         :back-color (if (back-color (get-feature-type-by-id (feature-type ftr)))
+                                       (back-color (get-feature-type-by-id (feature-type ftr)))
+                                       (get-single-memo-back-color (get-memo-* level (x ftr) (y ftr))))
+                         :visibility t
+                         :revealed t)))
+  
+  ;; then item, if any
+  (when (get-items-* level map-x map-y)
+    (let ((vitem (get-item-by-id (first (get-items-* level map-x map-y)))))
+      (set-single-memo-* level 
+                         (x vitem) (y vitem) 
+                         :glyph-idx (glyph-idx vitem)
+                         :glyph-color (glyph-color vitem)
+                         :back-color (back-color vitem)
+                         :visibility t
+                         :revealed t)))
+  
+  ;; finally mob, if any
+  (when (get-mob-* level map-x map-y)
+    (let ((vmob (get-mob-* level map-x map-y)))
+      (set-single-memo-* level 
+                         (x vmob) (y vmob) 
+                         :glyph-idx (get-current-mob-glyph-idx vmob)
+                         :glyph-color (get-current-mob-glyph-color vmob)
+                         :back-color (get-current-mob-back-color vmob)
+                         :visibility t
+                         :revealed t))
+    ))
+
 (defun update-visible-area-normal (level x y)
   (draw-fov x y (cur-sight *player*) #'(lambda (dx dy)
                                          (let ((terrain) (exit-result t))
@@ -63,69 +112,21 @@
                                                (setf exit-result 'exit)
 					       (return))
 
-                                           ;; drawing terrain
-                                           (set-single-memo-* level dx dy 
-                                                              :glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) dx dy)))
-                                                              :glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) dx dy)))
-                                                              :back-color (back-color (get-terrain-type-by-id (aref (terrain level) dx dy)))
-                                                              :visibility t
-                                                              :revealed t)
-                                           		
-                                           ;; then feature, if any
-                                           (when (get-features-* level dx dy)
-                                             (let ((ftr (first (last (get-features-* level dx dy)))))
-                                               
-                                               (set-single-memo-* level 
-                                                                  (x ftr) (y ftr) 
-                                                                  :glyph-idx (if (glyph-idx (get-feature-type-by-id (feature-type ftr)))
-                                                                               (glyph-idx (get-feature-type-by-id (feature-type ftr)))
-                                                                               (get-single-memo-glyph-idx (get-memo-* level (x ftr) (y ftr))))
-                                                                  :glyph-color (if (glyph-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                 (glyph-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                 (get-single-memo-glyph-color (get-memo-* level (x ftr) (y ftr))))
-                                                                  :back-color (if (back-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                (back-color (get-feature-type-by-id (feature-type ftr)))
-                                                                                (get-single-memo-back-color (get-memo-* level (x ftr) (y ftr))))
-                                                                  :visibility t
-                                                                  :revealed t)))
-
-                                           ;; then item, if any
-                                           (when (get-items-* level dx dy)
-                                             (let ((vitem (get-item-by-id (first (get-items-* level dx dy)))))
-                                               (set-single-memo-* level 
-                                                                  (x vitem) (y vitem) 
-                                                                  :glyph-idx (glyph-idx vitem)
-                                                                  :glyph-color (glyph-color vitem)
-                                                                  :back-color (back-color vitem)
-                                                                  :visibility t
-                                                                  :revealed t)))
-                                           
-                                           ;; finally mob, if any
-                                           (when (get-mob-* level dx dy)
+                                             (reveal-cell-on-map level dx dy)
                                              
-                                             (let ((vmob (get-mob-* level dx dy)))
-                                               (set-single-memo-* level 
-                                                                  (x vmob) (y vmob) 
-                                                                  :glyph-idx (get-current-mob-glyph-idx vmob)
-                                                                  :glyph-color (get-current-mob-glyph-color vmob)
-                                                                  :back-color (get-current-mob-back-color vmob)
-                                                                  :visibility t
-                                                                  :revealed t))
+                                             ;; checking for impassable objects
+                                             (setf terrain (get-terrain-* level dx dy))
+                                             (unless terrain
+                                               (setf exit-result 'exit)
+                                               (return))
+                                             (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
+                                               (setf exit-result 'exit)
+                                               (return))
+                                             (when (and (get-mob-* level dx dy) 
+                                                        (not (eq (get-mob-* level dx dy) *player*))
+                                                        (get-single-memo-visibility (get-memo-* level dx dy)))
+                                               (pushnew (id (get-mob-* level dx dy)) (visible-mobs *player*)))
                                              )
-                                           ;; checking for impassable objects
-                                           
-                                           (setf terrain (get-terrain-* level dx dy))
-                                           (unless terrain
-                                             (setf exit-result 'exit)
-                                             (return))
-                                           (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
-                                             (setf exit-result 'exit)
-                                             (return))
-                                           (when (and (get-mob-* level dx dy) 
-                                                      (not (eq (get-mob-* level dx dy) *player*))
-                                                      (get-single-memo-visibility (get-memo-* level dx dy)))
-                                             (pushnew (id (get-mob-* level dx dy)) (visible-mobs *player*)))
-                                           )
 					   exit-result)))
   )
 
@@ -134,49 +135,8 @@
   ;; update visible area
   (dotimes (x1 *max-x-level*)
     (dotimes (y1 *max-y-level*)
-      (set-single-memo-* level x1 y1 
-			 :glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) x1 y1)))
-			 :glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) x1 y1)))
-			 :back-color (back-color (get-terrain-type-by-id (aref (terrain level) x1 y1)))
-			 :visibility t)
-      ))
-  (dolist (feature-id (feature-id-list level))
-    (set-single-memo-* level 
-		       (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)) 
-		       :glyph-idx (if (glyph-idx (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				      (glyph-idx (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				      (get-single-memo-glyph-idx (get-memo-* level (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)))))
-		       :glyph-color (if (glyph-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-					(glyph-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-					(get-single-memo-glyph-color (get-memo-* level (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)))))
-		       :back-color (if (back-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				       (back-color (get-feature-type-by-id (feature-type (get-feature-by-id feature-id))))
-				       (get-single-memo-back-color (get-memo-* level (x (get-feature-by-id feature-id)) (y (get-feature-by-id feature-id)))))
-		       :visibility t))
-
-
-
-  (dolist (item-id (item-id-list level))
-    ;;(format t "MOB NAME ~A, MOB ID ~A, MOB X ~A, MOB Y ~A~%" (name (get-mob-by-id mob-id)) mob-id (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)))
-    (set-single-memo-* level 
-		       (x (get-item-by-id item-id)) (y (get-item-by-id item-id)) 
-		       :glyph-idx (glyph-idx (get-item-by-id item-id))
-		       :glyph-color (glyph-color (get-item-by-id item-id))
-		       :back-color (back-color (get-item-by-id item-id))
-		       :visibility t)
-
-    )
-  
-  (dolist (mob-id (mob-id-list level))
-    ;;(format t "MOB NAME ~A, MOB ID ~A, MOB X ~A, MOB Y ~A~%" (name (get-mob-by-id mob-id)) mob-id (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)))
-    (set-single-memo-* level 
-		       (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)) 
-		       :glyph-idx (get-current-mob-glyph-idx (get-mob-by-id mob-id))
-		       :glyph-color (get-current-mob-glyph-color (get-mob-by-id mob-id))
-		       :back-color (get-current-mob-back-color (get-mob-by-id mob-id))
-		       :visibility t)
-
-    ))
+      (reveal-cell-on-map level x1 y1)
+      )))
 
 (defun update-visible-area (level x y)
   ;; make the the whole level invisible

@@ -1,14 +1,13 @@
 (in-package :cotd)
 
 (defconstant +anim-type-fire-dot+ 0)
+(defconstant +anim-type-severed-body-part+ 1)
 
 (defparameter *animation-types* (make-array (list 0) :adjustable t))
 
 (defstruct (animation-type (:conc-name anim-type-))
   (id)
-  (glyph-idx)
-  (glyph-color)
-  (back-color))
+  (func))
 
 (defun set-anim-type (animation-type)
   (when (>= (anim-type-id animation-type) (length *animation-types*))
@@ -21,6 +20,10 @@
 (defstruct (animation (:conc-name anim-))
   (id)
   (x)
-  (y))
+  (y)
+  (params))
 
-(set-anim-type (make-animation-type :id +anim-type-fire-dot+ :glyph-idx 10 :glyph-color (sdl:color :r 255 :g 140 :b 0) :back-color sdl:*black*))
+(defun play-animation (animation)
+  (funcall (anim-type-func (get-anim-type (anim-id animation))) animation))
+
+
