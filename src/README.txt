@@ -12,7 +12,7 @@ This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "Cit
 LATEST CHANGES v1.0.6
 
 - Angels can now chop off body parts when they kill somebody (they are armed with swords after all) 
-- Characters leave corpses upon dying, for pure cosmetic reasons
+- Characters leave corpses upon dying, for purely cosmetic reasons
 - Added "Shift + Q" command to exit the current game and return to the main menu
 - Added dots showing where the bullets hit
 - Added damage types to weapons and damage resistances to armor 
