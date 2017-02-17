@@ -14,9 +14,13 @@ Feb 05, 2017 v1.0.5
 - Added forest cities to the city generator
 - Added island cities to the city generator
 
+CURRENT CHANGELOG
+
+See the [CHANGELOG.txt](https://github.com/gwathlobal/CotD/blob/master/CHANGELOG.txt) file for the changes in the upcoming version.
+
 DOWNLOADS
 
-Head to the the [Releases](https://github.com/gwathlobal/CotD/releases) directory and grab the latest binary for your platform
+Head to the [Releases](https://github.com/gwathlobal/CotD/releases) directory and grab the latest binary for your platform.
 
 COMPILING
 

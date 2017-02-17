@@ -9,14 +9,19 @@ The Legions of Hell invaded the City with the intention to slay its inhabitants.
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.0.5
+LATEST CHANGES v1.0.6
 
-- Made the military a playable faction
-- Added sergeants to the military. They are armed with six-round revolvers, that deal less damaged than a rifle but do not need to reload every turn
-- Added chaplains to the military. They are armed with six-round revolvers and are able to lead troops, pray to reveal angels and demons around them and grant divine protection to allies
-- Ranged combat accuracy is now affected by distance. The farther the target - the less likely you are able to hit it 
-- Added forest cities to the city generator
-- Added island cities to the city generator
+- Angels can now chop off body parts when they kill somebody (they are armed with swords after all) 
+- Characters leave corpses upon dying, for pure cosmetic reasons
+- Added "Shift + Q" command to exit the current game and return to the main menu
+- Added dots showing where the bullets hit
+- Added damage types to weapons and damage resistances to armor 
+- Added bullet dispersion over distance
+- Added machine-gunners to the Military. They shoot the whole magazine in one round
+- Introduced cooldown abilities. The first cooldown ability "Charge" added to archdemons
+- Added "Fear" ability to demons and archdemons
+- Added "Blindness" ability to archangels
+- Added barricaded cities to the city generator
 
 --------------------
 FEATURES
