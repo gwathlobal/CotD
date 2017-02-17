@@ -225,7 +225,6 @@
                                  collect ability))
       
       ;; randomly choose one of them and invoke it
-      (format t "AVAILABLE ABILITIES ~A~%" ability-list)
       (when ability-list
         (setf r (random (length ability-list)))
         (let ((ai-invoke-func (on-invoke-ai (nth r ability-list))))
@@ -386,6 +385,7 @@
   ;; if player is fearing somebody & there is an enemy nearby
   ;; wait for a meaningful action and move randomly instead
   (when (mob-effect-p *player* +mob-effect-fear+)
+    (logger (format nil "AI-FUNCTION: ~A [~A] is under effects of fear.~%" (name player) (id player)))
     (let ((nearest-enemy nil))
       (loop for mob-id of-type fixnum in (visible-mobs *player*)
             for mob = (get-mob-by-id mob-id)
@@ -405,7 +405,6 @@
                           (get-distance (x nearest-enemy) (y nearest-enemy) (x *player*) (y *player*)))
                    (setf nearest-enemy mob))
                  ))
-      (format t "NEAREST-ENEMY ~A~%" nearest-enemy)
       
       (when nearest-enemy
         (logger (format nil "AI-FUNCTION: ~A [~A] fears ~A [~A].~%" (name player) (id player) (name nearest-enemy) (id nearest-enemy)))

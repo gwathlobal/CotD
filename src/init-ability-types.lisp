@@ -872,13 +872,16 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-enemy nearest-ally))
-                                                  ;; cast fear when your power is less than the power of enemies around you
+                                                  ;; cast fear when you are revealed (or they won't understand that they need to fear you) and
+                                                  ;; your power is less than the power of enemies around you
                                                   ;; or you have <= than 25% of max hp
                                                   (if (and (mob-ability-p actor +mob-abil-instill-fear+)
                                                            (can-invoke-ability actor actor +mob-abil-instill-fear+)
+                                                           (= (face-mob-type-id actor) (mob-type actor))
                                                            (not (zerop (loop for mob-id in (visible-mobs actor)
                                                                              for mob = (get-mob-by-id mob-id)
-                                                                             when (not (mob-effect-p mob +mob-effect-fear+))
+                                                                             when (and (not (get-faction-relation (faction actor) (faction mob)))
+                                                                                       (not (mob-effect-p mob +mob-effect-fear+)))
                                                                                count mob-id)))
                                                            (or (<= (cur-hp actor) (truncate (max-hp actor) 4))
                                                                (< (strength actor) (loop for mob-id in (visible-mobs actor)

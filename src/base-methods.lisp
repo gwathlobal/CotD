@@ -494,19 +494,19 @@
                      (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "head"))
                      (setf left-body-str "multilated body")
                      (when killer
-                       (setf dead-msg-str (format nil "~A chops off ~A's head. " (visible-name killer) (visible-name mob))))))
+                       (setf dead-msg-str (format nil "~@(~A~) chops off ~A's head. " (visible-name killer) (visible-name mob))))))
           ;; sever limb
           ((= r 2) (progn
                      (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "limb"))
                      (setf left-body-str "multilated body")
                      (when killer
-                       (setf dead-msg-str (format nil "~A severs ~A's limb. " (visible-name killer) (visible-name mob))))))
+                       (setf dead-msg-str (format nil "~@(~A~) severs ~A's limb. " (visible-name killer) (visible-name mob))))))
           ;; sever torso
           ((= r 3) (progn
                      (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body"))
                      (setf left-body-str "lower body")
                      (when killer
-                       (setf dead-msg-str (format nil "~A cuts ~A in half. " (visible-name killer) (visible-name mob))))))
+                       (setf dead-msg-str (format nil "~(~A~) cuts ~A in half. " (visible-name killer) (visible-name mob))))))
           ;; do not sever anything
           (t (setf left-body-str "body")))
 

@@ -155,9 +155,9 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-imp+
                                        :name "Imp"
-                                       :glyph-idx 73 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 10 :max-fp 5
+                                       :glyph-idx 73 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 12 :max-fp 5
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-demon+
-                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.8))
+                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 5 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.8))
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0))
                                        :strength 1
                                        :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
@@ -166,7 +166,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
                                        :name "Demon"
-                                       :glyph-idx 68 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 16 :max-fp 12
+                                       :glyph-idx 68 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 18 :max-fp 12
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-archdemon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0))
