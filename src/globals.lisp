@@ -51,12 +51,15 @@
 (defconstant +mob-type-chaplain+ 17)
 (defconstant +mob-type-gunner+ 18)
 (defconstant +mob-type-horse+ 19)
+(defconstant +mob-type-fiend+ 20)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
 (defconstant +faction-type-angels+ 2)
 (defconstant +faction-type-demons+ 3)
 (defconstant +faction-type-military+ 4)
+(defconstant +faction-type-animals+ 5)
+(defconstant +faction-type-demonic-animals+ 6)
 
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)

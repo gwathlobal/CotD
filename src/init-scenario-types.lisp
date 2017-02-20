@@ -77,10 +77,11 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
@@ -99,7 +100,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'test-level-place-mobs mob-func-list)
-                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-player+))) mob-func-list)
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore world mob-template-list)) (setf *player* (make-instance 'player :mob-type +mob-type-fiend+))) mob-func-list)
                                                        
                                                        (push +game-event-lose-game+ game-event-list)
                                                        
@@ -119,10 +120,11 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends 
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
@@ -150,10 +152,11 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
@@ -214,10 +217,11 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, and 15 will be demons
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)

@@ -656,3 +656,38 @@
                                             
                                             (values nil nil)
                                             )))
+
+(set-building-type (make-building :id +building-city-stables-1+ :grid-dim '(3 . 3) :act-dim '(14 . 15) :type +building-type-stables+
+                                  :func #'(lambda (x y template-level)
+                                            (let ((build-template (list ",,,,,,,,,,,,,,"
+                                                                        ",#####,,#####,"
+                                                                        ",-,,,,,,,,,,-,"
+                                                                        ",#####,,#####,"
+                                                                        ",-,,,,,,,,,,-,"
+                                                                        ",#####,,#####,"
+                                                                        ",-,,,,,,,,,,-,"
+                                                                        ",#####,,#####,"
+                                                                        ",-,,,,,,,,,,-,"
+                                                                        ",#####,,#####,"
+                                                                        ",-,,,,,,,,,,-,"
+                                                                        ",#####,,#####,"
+                                                                        ",-,,,,,,,,,,-,"
+                                                                        ",#####--#####,"
+                                                                        ",,,,,,,,,,,,,,"
+                                                                        )))
+                                              
+                                              (translate-build-to-template x y build-template template-level)
+                                              )
+                                            (values (list (list +mob-type-horse+ 2 2)
+                                                          (list +mob-type-horse+ 2 4)
+                                                          (list +mob-type-horse+ 2 6)
+                                                          (list +mob-type-horse+ 2 8)
+                                                          (list +mob-type-horse+ 2 10)
+                                                          (list +mob-type-horse+ 2 12)
+                                                          (list +mob-type-horse+ 11 2)
+                                                          (list +mob-type-horse+ 11 4)
+                                                          (list +mob-type-horse+ 11 6)
+                                                          (list +mob-type-horse+ 11 8)
+                                                          (list +mob-type-horse+ 11 10)
+                                                          (list +mob-type-horse+ 11 12))
+                                                    nil))))

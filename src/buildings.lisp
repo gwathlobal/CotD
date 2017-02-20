@@ -14,6 +14,7 @@
 (defconstant +building-type-library+ 7)
 (defconstant +building-type-warehouse+ 8)
 (defconstant +building-type-satanists+ 9)
+(defconstant +building-type-stables+ 10)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -52,6 +53,7 @@
 (defconstant +building-city-barricade-sw+ 31)
 (defconstant +building-city-barricade-nw+ 32)
 (defconstant +building-city-barricade-ne+ 33)
+(defconstant +building-city-stables-1+ 34)
 
 (defparameter *level-grid-size* 5)
 
