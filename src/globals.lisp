@@ -50,6 +50,7 @@
 (defconstant +mob-type-sergeant+ 16)
 (defconstant +mob-type-chaplain+ 17)
 (defconstant +mob-type-gunner+ 18)
+(defconstant +mob-type-horse+ 19)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -91,6 +92,8 @@
 (defconstant +mob-abil-blindness+ 26)
 (defconstant +mob-abil-instill-fear+ 27)
 (defconstant +mob-abil-charge+ 28)
+(defconstant +mob-abil-momentum+ 29)
+(defconstant +mob-abil-animal+ 30)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

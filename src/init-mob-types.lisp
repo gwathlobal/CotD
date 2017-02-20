@@ -185,6 +185,15 @@
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t))
 
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-horse+ 
+                                       :name "Horse"
+                                       :glyph-idx 72 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :faction +faction-type-humans+
+                                       :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
+                                       :strength 0
+                                       :abil-animal t :abil-momentum 2
+                                       :ai-coward t))
+
 (set-faction-relations +faction-type-humans+ (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-demons+ nil) (cons +faction-type-military+ t))
 (set-faction-relations +faction-type-angels+ (cons +faction-type-angels+ t) (cons +faction-type-humans+ t) (cons +faction-type-demons+ nil) (cons +faction-type-military+ nil))
 (set-faction-relations +faction-type-demons+ (cons +faction-type-demons+ t) (cons +faction-type-angels+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-military+ nil))

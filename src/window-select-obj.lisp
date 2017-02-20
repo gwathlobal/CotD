@@ -2,7 +2,7 @@
 
 (defclass select-obj-window (window)
   ((cur-sel :initform 0 :accessor cur-sel)
-   (obj-list :initarg :obj-list :accessor obj-list :type list)
+   (header-line :initform nil :initarg :header-line :accessor header-line)
    (line-list :initarg :line-list :accessor line-list :type list)
    (descr-list :initform nil :initarg :descr-list :accessor descr-list)
    (prompt-list :initarg :prompt-list :accessor prompt-list :type list) ;; each value is (<func if this prompt should apply with 1 arg - cur-sel> <prompt string proper>)
@@ -23,8 +23,8 @@
 	       (when (> new-descr-h descr-h) (setf descr-h new-descr-h))))))
 
     ;; define the height of the window depending on the length of the object array
-    (setf y (- (truncate *window-height* 2) (truncate (+ (* (sdl:char-height sdl:*default-font*) (length (obj-list win))) descr-h) 2)))
-    (setf h (+ 19 (* 13 (length (obj-list win))) descr-h))
+    (setf y (- (truncate *window-height* 2) (truncate (+ (* (sdl:char-height sdl:*default-font*) (length (line-list win))) descr-h) 2)))
+    (setf h (+ 19 (* 13 (length (line-list win))) descr-h))
 
     ;; drawing a large rectangle in white
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
@@ -39,17 +39,23 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y (- (+ y h) 17) :w w :h 1))
       (sdl:fill-surface sdl:*white* :template a-rect))
 
+    (when (header-line win)
+      (sdl:with-rectangle (rect (sdl:rectangle :x x :y (- y (sdl:char-height sdl:*default-font*) 2) :w w :h (+ (sdl:char-height sdl:*default-font*) 2)))
+        (sdl:fill-surface sdl:*white* :template rect))
+      (sdl:with-rectangle (rect (sdl:rectangle :x (1+ x) :y (1- (- y (sdl:char-height sdl:*default-font*))) :w (- w 2) :h (+ (sdl:char-height sdl:*default-font*) 1)))
+        (sdl:fill-surface sdl:*black* :template rect))
+      (sdl:draw-string-solid-* (header-line win) (+ x 5) (- y (sdl:char-height sdl:*default-font*) 1) :color sdl:*white*))
     ;; drawing objects
     (let ((cur-str) (color-list nil))
       (setf cur-str (cur-sel win))
-      (dotimes (i (length (obj-list win)))
+      (dotimes (i (length (line-list win)))
 	;; choose the description
 	;;(setf lst (append lst (list (aref (line-array win) i))))
 	
 	(if (= i cur-str) 
 	    (setf color-list (append color-list (list sdl:*yellow*)))
 	    (setf color-list (append color-list (list sdl:*white*)))))
-      (draw-selection-list (line-list win) cur-str (length (obj-list win)) (- (truncate *window-width* 2) 150) (1+ y) color-list))
+      (draw-selection-list (line-list win) cur-str (length (line-list win)) (- (truncate *window-width* 2) 150) (1+ y) color-list))
 
     ;; drawing descriptions
     (when (descr-list win)
@@ -72,7 +78,7 @@
        (:key-down-event (:key key :mod mod :unicode unicode)
 			
 			(setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
-                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (obj-list win))))
+                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (line-list win))))
 
                         (cond
 			  ;; escape - quit

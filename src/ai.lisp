@@ -28,6 +28,7 @@
         (step-y 0))
 
     (setf (path mob) nil)
+    (setf (path-dst mob) nil)
     (setf step-x (if (> (x nearest-enemy) (x mob)) -1 1))
     (setf step-y (if (> (y nearest-enemy) (y mob)) -1 1))
 
@@ -130,7 +131,6 @@
       (ai-mob-flee mob nearest-enemy)      
       (return-from ai-function))
       
-    
     ;; if the mob has horde behavior, compare relative strengths of allies to relative strength of enemies
     ;; if less - flee
     (when (mob-ai-horde-p mob)
@@ -208,9 +208,9 @@
         (pop path)
         
 	(setf (path mob) path)
+        (setf (path-dst mob) (cons (x nearest-target) (y nearest-target)))
         
         ))
-
     ;; invoke abilities if any
     (let ((ability-list) (r 0))
       (declare (type fixnum r)
@@ -223,6 +223,7 @@
                                when (and func
                                          (funcall func ability mob nearest-enemy nearest-ally))
                                  collect ability))
+
       
       ;; randomly choose one of them and invoke it
       (when ability-list
@@ -234,7 +235,7 @@
         (return-from ai-function)
         )
     )
-
+    
     ;; engage in ranged combat
     ;; if no bullets in magazine - reload
     (when (and (is-weapon-ranged mob)
@@ -286,10 +287,10 @@
       ;; if the leader is nearby, plot the path to it
       (let ((leader (get-mob-by-id (second (order mob))))
             (path))
-        (when (and (< (get-distance (x mob) (y mob) (x leader) (y leader)) 8)
+        (if (and (< (get-distance (x mob) (y mob) (x leader) (y leader)) 8)
                    (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2))
-          
-            (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
+          (progn
+            (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to follow the leader to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
             (setf path (a-star (list (x mob) (y mob)) (list (x leader) (y leader)) 
                                #'(lambda (dx dy) 
                                    ;; checking for impassable objects
@@ -298,29 +299,38 @@
             
             (pop path)
             (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
-            (setf (path mob) path))))
+            (setf (path mob) path)
+            (setf (path-dst mob) (cons (x leader) (y leader))))
+          (progn
+            (setf (path-dst mob) nil)))))
           
     
     ;; move to some random passable terrain 
     ;; a hack to easy the strain of pathfinding during the first turns - if you are human and there are more than 100 of you, do not pathfind
-    (unless (path mob)
+    (when (or (not (path mob))
+              (mob-ability-p mob +mob-abil-momentum+))
       (let ((rx (- (+ 10 (x mob))
                    (1+ (random 20)))) 
             (ry (- (+ 10 (y mob))
                    (1+ (random 20))))
             (path nil))
         (declare (type fixnum rx ry))
-        (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
-                        (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
-                        (and (get-mob-* (level *world*) rx ry)
-                             (not (eq (get-mob-* (level *world*) rx ry) mob))))
-              do
-                 (setf rx (- (+ 10 (x mob))
-                             (1+ (random 20))))
-                 (setf ry (- (+ 10 (y mob))
-                             (1+ (random 20)))))
-        (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry))
-        (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
+
+        ;; if the mob destination is not set, choose some random location
+        (unless (path-dst mob)
+          (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                          (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
+                          (and (get-mob-* (level *world*) rx ry)
+                               (not (eq (get-mob-* (level *world*) rx ry) mob))))
+                do
+                   (setf rx (- (+ 10 (x mob))
+                               (1+ (random 20))))
+                   (setf ry (- (+ 10 (y mob))
+                               (1+ (random 20)))))
+          (setf (path-dst mob) (cons rx ry))
+          (logger (format nil "AI-FUNCTION: Mob's destination is randomly set to (~A, ~A)~%" (car (path-dst mob)) (cdr (path-dst mob)))))
+        (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (car (path-dst mob)) (cdr (path-dst mob))))
+        (setf path (a-star (list (x mob) (y mob)) (list (car (path-dst mob)) (cdr (path-dst mob))) 
                            #'(lambda (dx dy) 
                                ;; checking for impassable objects
                                (check-move-for-ai mob dx dy)
@@ -329,7 +339,6 @@
         (pop path)
         (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
         (setf (path mob) path)
-        
         ))
     
     ;; if the mob has its path set - move along it
@@ -355,7 +364,11 @@
             (return-from ai-function))
           
           (move-mob mob (x-y-into-dir step-x step-y))
-          
+
+          (when (and (path-dst mob)
+                     (= (x mob) (car (path-dst mob)))
+                     (= (y mob) (cdr (path-dst mob))))
+            (setf (path-dst mob) nil))
           
           (return-from ai-function)))
     
@@ -487,26 +500,30 @@
                           (1+ (random 20))))
                    (path nil))
               (declare (type fixnum rx ry))
-              (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
-                              (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
-                              (and (get-mob-* (level *world*) rx ry)
-                                   (not (eq (get-mob-* (level *world*) rx ry) mob))))
-                    do
-                       (setf rx (- (+ 10 (x mob))
-                                   (1+ (random 20))))
-                       (setf ry (- (+ 10 (y mob))
-                                   (1+ (random 20)))))
-              (logger (format nil "THREAD: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) rx ry) stream)
-              (setf path (a-star (list (x mob) (y mob)) (list rx ry) 
+
+              ;; if the mob destination is not set, choose a random destination
+              (unless (path-dst mob)
+                (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                                (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
+                                (and (get-mob-* (level *world*) rx ry)
+                                     (not (eq (get-mob-* (level *world*) rx ry) mob))))
+                      do
+                         (setf rx (- (+ 10 (x mob))
+                                     (1+ (random 20))))
+                         (setf ry (- (+ 10 (y mob))
+                                     (1+ (random 20)))))
+                (setf (path-dst mob) (cons rx ry)))
+              
+              (logger (format nil "THREAD: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (car (path-dst mob)) (cdr (path-dst mob))) stream)
+              (setf path (a-star (list (x mob) (y mob)) (list (car (path-dst mob)) (cdr (path-dst mob))) 
                                  #'(lambda (dx dy) 
                                      ;; checking for impassable objects
                                      (check-move-for-ai mob dx dy)
                                      )))
               
               (pop path)
-              (logger (format nil "THREAD: Mob goes to (~A ~A)~%" rx ry) stream)
               (logger (format nil "THREAD: Set mob path - ~A~%" path) stream)
-              (setf (path mob) path) 
+              (setf (path mob) path)
               )
             )
           (incf (cur-mob-path *world*))

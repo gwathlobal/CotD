@@ -22,6 +22,19 @@
       ((equal xy '(1 -1)) 9)
       (t nil))))
 
+(defun x-y-into-str (xy-cons)
+  (cond
+    ((equal xy-cons '(-1 . 1)) "SW")
+    ((equal xy-cons '(0 . 1)) "S")
+    ((equal xy-cons '(1 . 1)) "SE")
+    ((equal xy-cons '(-1 . 0)) "W")
+    ((equal xy-cons '(0 . 0)) "None")
+    ((equal xy-cons '(1 . 0)) "E")
+    ((equal xy-cons '(-1 . -1)) "NW")
+    ((equal xy-cons '(0 . -1)) "N")
+    ((equal xy-cons '(1 . -1)) "NE")
+    (t "ERR")))
+
 (defun x-y-dir (dir)
   "Determine the x-y coordinate change from the single number specifying direction"
   (cond
@@ -34,6 +47,22 @@
     ((eql dir 7) (values-list '(-1 -1)))
     ((eql dir 8) (values-list '(0 -1)))
     ((eql dir 9) (values-list '(1 -1)))
+    (t (error "Wrong direction supplied!!!"))))
+
+(defun dir-neighbours (dir)
+  ;; find the neighbours of the direction
+  ;; the result is <along the direction> <not along the direction> <opposite the direction>
+  ;; for more info see the move-mob func
+  (cond
+    ((eql dir 1) (values-list '((4 1 2) (3 6 7 8) (9))))
+    ((eql dir 2) (values-list '((1 2 3) (4 6 7 9) (8))))
+    ((eql dir 3) (values-list '((2 3 6) (1 4 8 9) (7))))
+    ((eql dir 4) (values-list '((1 4 7) (8 2 9 3) (6))))
+    ((eql dir 5) (values-list '((1 2 3 4 5 6 7 8 9) () ())))
+    ((eql dir 6) (values-list '((9 6 3) (8 2 7 1) (4))))
+    ((eql dir 7) (values-list '((4 7 8) (1 9 2 6) (3))))
+    ((eql dir 8) (values-list '((7 8 9) (4 6 1 3) (2))))
+    ((eql dir 9) (values-list '((8 9 6) (7 3 4 2) (1))))
     (t (error "Wrong direction supplied!!!"))))
 
 (defun check-surroundings (x y include-center func)
@@ -80,37 +109,141 @@
     (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob))))
 
 (defun move-mob (mob dir &key (push nil))
-  ;;(format t "MOVE-MOB: inside ~A~%" dir)
-  (multiple-value-bind (dx dy) (x-y-dir dir)
+  (let ((dx 0)
+        (dy 0)
+        (sx (x mob))
+        (sy (y mob))
+        (along-dir)
+        (opposite-dir)
+        (not-along-dir)
+        (c-dir (x-y-into-dir (car (momentum-dir mob)) (cdr (momentum-dir mob)))))
     (declare (type fixnum dx dy))
-    (let* ((x (+ dx (x mob))) (y (+ dy (y mob)))
-           (check-result (check-move-on-level mob x y)))
-      (declare (type fixnum x y))
-      (cond
-        ;; all clear - move freely
-        ((eq check-result t)
-         
-         (set-mob-location mob x y)
-         
-         (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
-         (return-from move-mob t)
-         )
-        ;; bumped into a mob
-        ((typep check-result 'mob) 
-         (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result)))
-         (when push
-           ;; check if you can push the mob farther
-           (let* ((nx (+ dx (x check-result))) (ny (+ dy (y check-result)))
-                  (check-result-n (check-move-on-level check-result nx ny)))
-             (when (eq check-result-n t)
-               (print-visible-message (x mob) (y mob) (level *world*) 
-                                      (format nil "~A pushes ~A. " (visible-name mob) (visible-name check-result)))
-               (set-mob-location check-result nx ny)
-               (set-mob-location mob x y))
-             ))
-         (on-bump check-result mob)
-         (return-from move-mob mob))
-        )))
+    (multiple-value-setq (dx dy) (x-y-dir dir))
+    (multiple-value-setq (along-dir not-along-dir opposite-dir) (dir-neighbours c-dir))
+
+    (when (mob-ability-p mob +mob-abil-momentum+)
+      (setf push t))
+    
+    (format t "MOVE-MOB NAME ~A - SPD ~A, C-DIR ~A, DIR ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir along-dir not-along-dir opposite-dir)
+    (cond
+      ;; NB:
+      ;; (-1.-1) ( 0.-1) ( 1.-1)
+      ;; (-1. 0) ( 0. 0) ( 1. 0)
+      ;; (-1. 1) ( 0. 1) ( 1. 1)
+      ;; if mob already moving in the direction ( 1. 1), then the chosen direction can be
+      ;;   "opposite direction" which is (-1.-1)
+      ;;   "along the direction" which is ( 1. 1), ( 0. 1) or ( 1. 0)
+      ;;   "not along the direction" which is (-1. 1), (-1. 0), ( 1.-1) or ( 0.-1)
+      ;; if speed is 0 or moving along the direction - increase spead and set the movement dir to chosen dir
+      ((or (and (zerop (momentum-spd mob))
+                (/= dir 5))
+           (and (/= dir 5)
+                (find dir along-dir)))
+       (progn
+         (incf (momentum-spd mob))
+         (setf (car (momentum-dir mob)) dx)
+         (setf (cdr (momentum-dir mob)) dy)
+         (format t "MOVE-MOB ALONG - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy)))
+      ;; if moving in the opposite direction - reduce speed 
+      ((find dir opposite-dir)
+       (progn
+         (decf (momentum-spd mob))
+         (format t "MOVE-MOB OPPOSITE - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy)))
+      ;; if moving not along the direction - reduce spead and change the direction
+      ((find dir not-along-dir)
+       (progn
+         (decf (momentum-spd mob))
+         (incf (car (momentum-dir mob)) dx)
+         (incf (cdr (momentum-dir mob)) dy)
+         (format t "MOVE-MOB NOT ALONG - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy)))
+      )
+
+    ;; limit max speed
+    ;; for x axis
+    (when (and (mob-ability-p mob +mob-abil-momentum+)
+               (> (car (momentum-dir mob)) 1))
+      (setf (car (momentum-dir mob)) 1))
+    (when (and (mob-ability-p mob +mob-abil-momentum+)
+               (< (car (momentum-dir mob)) -1))
+      (setf (car (momentum-dir mob)) -1))
+    ;; for y axis
+    (when (and (mob-ability-p mob +mob-abil-momentum+)
+               (> (cdr (momentum-dir mob)) 1))
+      (setf (cdr (momentum-dir mob)) 1))
+    (when (and (mob-ability-p mob +mob-abil-momentum+)
+               (< (cdr (momentum-dir mob)) -1))
+      (setf (cdr (momentum-dir mob)) -1))
+
+    (when (and (mob-ability-p mob +mob-abil-momentum+)
+               (> (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
+      (setf (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
+    (when (< (momentum-spd mob) 0)
+      (setf (momentum-spd mob) 0))
+    
+    (loop repeat (if (zerop (momentum-spd mob))
+                   1
+                   (momentum-spd mob))
+          with move-result = nil
+          for x = (+ (car (momentum-dir mob)) (x mob))
+          for y = (+ (cdr (momentum-dir mob)) (y mob))
+          for check-result = (check-move-on-level mob x y)
+          do
+             ;(format t "MOVE-MOB: CHECK-MOVE ~A~%" (check-move-on-level mob x y))
+             (cond
+               ;; all clear - move freely
+               ((eq check-result t)
+                
+                (set-mob-location mob x y)
+
+                
+                ;(make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
+                (setf move-result t)
+                )
+               ;; bumped into a mob
+               ((typep check-result 'mob) 
+                (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result)))
+                ;(decf (momentum-spd mob))
+                (when push
+                  ;; check if you can push the mob farther
+                  (let* ((nx (+ (car (momentum-dir mob)) (x check-result)))
+                         (ny (+ (cdr (momentum-dir mob)) (y check-result)))
+                         (check-result-n (check-move-on-level check-result nx ny)))
+                    (when (eq check-result-n t)
+                      (print-visible-message (x mob) (y mob) (level *world*) 
+                                             (format nil "~A pushes ~A. " (visible-name mob) (visible-name check-result)))
+                      (set-mob-location check-result nx ny)
+                      (set-mob-location mob x y))
+                    ))
+                (on-bump check-result mob)
+                (setf (momentum-dir mob) (cons 0 0))
+                (setf (momentum-spd mob) 0)
+                (setf move-result mob))
+               ((or (eq check-result nil) (eq check-result 'obstacle))
+                (setf (momentum-spd mob) 0)
+                (setf (momentum-dir mob) (cons 0 0))
+
+                ;; a precaution so that horses and the like finish their turn when they made a move and bumped into an obstacle
+                ;; while not finishing their turn if they try to move into an obstacle standing next to it
+                (when (or (/= sx (x mob))
+                          (/= sy (y mob)))
+                  (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
+                (setf move-result nil)
+                (loop-finish)
+                )
+               )
+          finally
+             (when (zerop (momentum-spd mob)) (setf (momentum-dir mob) (cons 0 0)))
+
+             (when (eq move-result t)
+               (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
+             
+             (unless  (mob-ability-p mob +mob-abil-momentum+)
+               (progn
+                 (setf (momentum-dir mob) (cons 0 0))
+                 (setf (momentum-spd mob) 0)))
+             
+             (return-from move-mob move-result))
+    )
   nil)
 
 (defun make-act (mob speed)
@@ -257,7 +390,7 @@
       (print-visible-message (x actor) (y actor) (level *world*) 
                              (format nil "~A shoots ~A. ~A takes no harm. " (visible-name actor) (visible-name target) (visible-name target)))
       (rem-mob-effect target +mob-effect-divine-shield+)
-      (make-act actor (att-spd actor))
+      (make-act actor (get-ranged-weapon-speed actor))
       (return-from mob-shoot-target nil))
 
     (print-visible-message (x actor) (y actor) (level *world*) 
@@ -353,7 +486,7 @@
       (print-visible-message (x actor) (y actor) (level *world*) 
                              (format nil "~A misses. " (visible-name actor)))
       )
-    (make-act actor (att-spd actor))
+    (make-act actor (get-ranged-weapon-speed actor))
     ))
 
 (defun mob-invoke-ability (actor target ability-type-id)
@@ -374,7 +507,7 @@
     (print-visible-message (x attacker) (y attacker) (level *world*) 
                            (format nil "~@(~A~) attacks ~A, but can not harm ~A. " (visible-name attacker) (visible-name target) (visible-name target)))
     (rem-mob-effect target +mob-effect-divine-shield+)
-    (make-act attacker (att-spd attacker))
+    (make-act attacker (get-melee-weapon-speed attacker))
     (return-from melee-target nil)
     )
 
@@ -457,7 +590,7 @@
                                                                                                    
     )
   
-  (make-act attacker (att-spd attacker))
+  (make-act attacker (get-melee-weapon-speed attacker))
   )
 
 (defun check-dead (mob)
@@ -577,7 +710,6 @@
       (print-visible-message (x mob) (y mob) (level *world*) (format nil "It will be hereby known as ~A! " (name mob)))))
   
   (set-cur-weapons mob)
-  (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-m-acc mob)
@@ -622,7 +754,6 @@
           do
              (set-abil-cur-cd mob ability-id (1- (abil-cur-cd-p mob ability-id))))
   
-  (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-m-acc mob)

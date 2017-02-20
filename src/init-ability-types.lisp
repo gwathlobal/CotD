@@ -992,3 +992,17 @@
                                                           (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                           t))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-momentum+ :name "Momentum" :descr "You can move quicker than most but it is difficult for you to change direction." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-animal+ :name "Animal" :descr "You are an animal." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

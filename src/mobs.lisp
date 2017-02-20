@@ -28,12 +28,12 @@
       
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The following keys may be used in make-instance
-   ;;   :abil-heal-self - +mob-abil-heal-self+
+   ;;   :abil-heal-self - +mob-abil-heal-self+ (takes fixnum)
    ;;   :abil-conceal-divine - +mob-abil-conceal-divine+
    ;;   :abil-reveal-divine - +mob-abil-reveal-divine+
    ;;   :abil-detect-good - +mob-abil-detect-evil+
    ;;   :abil-detect-evil - +mob-abil-detect-evil+
-   ;;   :abil-can-possess - +mob-abil-can-possess+
+   ;;   :abil-can-possess - +mob-abil-can-possess+ (takes fixnum)
    ;;   :abil-possessable - +mob-abil-possessable+
    ;;   :abil-purging-touch - +mob-abil-purging-touch+
    ;;   :abil-blessing-touch - +mob-abil-blessing-touch+
@@ -58,6 +58,9 @@
    ;;   :abil-blindness - +mob-abil-blindness+
    ;;   :abil-instill-fear - +mob-abil-instill-fear+
    ;;   :abil-charge - +mob-abil-charge+
+   ;;   :abil-momentum - +mob-abil-momentum+ (takes fixnum)
+   ;;   :abil-animal - +mob-abil-animal+
+   
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -78,7 +81,8 @@
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
-                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge)
+                                                                abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
+                                                                abil-momentum abil-animal)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -153,6 +157,10 @@
     (setf (gethash +mob-abil-instill-fear+ (abilities mob-type)) abil-instill-fear))
   (when abil-charge
     (setf (gethash +mob-abil-charge+ (abilities mob-type)) t))
+  (when abil-momentum
+    (setf (gethash +mob-abil-momentum+ (abilities mob-type)) abil-momentum))
+  (when abil-animal
+    (setf (gethash +mob-abil-animal+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -305,7 +313,11 @@
     
    (visible-mobs :initform nil :accessor visible-mobs)
    (path :initform nil :accessor path)
+   (path-dst :initform nil :accessor path-dst) ;; is a actually a cons with coords (x y)
 
+   (momentum-spd :initform 0 :accessor momentum-spd)
+   (momentum-dir :initform (cons 0 0) :accessor momentum-dir)
+   
    (order :initform nil :accessor order)
    
    (master-mob-id :initform nil :accessor master-mob-id) ;; mob that controls this mob
@@ -316,7 +328,7 @@
    (abilities-cd :initform (make-hash-table) :accessor abilities-cd)
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
-    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
+   ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
    ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <list of aux params>))
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
@@ -324,7 +336,6 @@
    (cur-sight :initform 6 :initarg :cur-sight :accessor cur-sight)
    (m-acc :initform +base-accuracy+ :initarg :m-acc :accessor m-acc)
    (r-acc :initform +base-accuracy+ :initarg :r-acc :accessor r-acc)
-   (att-spd :initform 10 :initarg :att-spd :accessor att-spd)
    (cur-dodge :initform 5 :initarg :cur-dodge :accessor cur-dodge)
    (cur-armor :initform 0 :initarg :cur-armor :accessor cur-armor)
    
@@ -346,7 +357,6 @@
   (setf (face-mob-type-id mob) (mob-type mob))
   
   (set-cur-weapons mob)
-  (adjust-attack-speed mob)
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-m-acc mob)
@@ -446,9 +456,6 @@
   (setf (weapon mob) (copy-list (weapon (get-mob-type-by-id (mob-type mob)))))
   (setf (second (weapon mob)) (copy-list (second (weapon (get-mob-type-by-id (mob-type mob))))))
   (setf (third (weapon mob)) (copy-list (third (weapon (get-mob-type-by-id (mob-type mob)))))))
-
-(defun adjust-attack-speed (mob)
-  (setf (att-spd mob) (get-melee-weapon-speed mob)))
 
 (defun adjust-sight (mob)
   (let ((sight (base-sight mob)))
@@ -610,6 +617,7 @@
 (defun set-name (mob)
   (when (and (not (eq mob *player*))
              (not (mob-ability-p mob +mob-abil-human+))
+             (not (mob-ability-p mob +mob-abil-animal+))
              (not (= (mob-type mob) +mob-type-imp+)))
     (let ((name-pick-n))
       (if (mob-ability-p mob +mob-abil-angel+)

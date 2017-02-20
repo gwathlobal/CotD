@@ -33,7 +33,7 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
@@ -44,6 +44,7 @@
                         (total-angels *world*)
                         (total-demons *world*)
                         (sense-good-evil-str)
+                        (if (mob-ability-p *player* +mob-abil-momentum+) (format nil "~%Moving: ~A (spd ~A)" (x-y-into-str (momentum-dir *player*)) (momentum-spd *player*)) "")
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
     
@@ -231,8 +232,8 @@
                                 
                                 ;; display the window with the list
                                 (setf *current-window* (make-instance 'select-obj-window 
-                                                                      :return-to *current-window* 
-                                                                      :obj-list abil-name-list
+                                                                      :return-to *current-window*
+                                                                      :header-line "Choose ability:"
                                                                       :descr-list abil-descr-list
                                                                       :enter-func #'(lambda (cur-sel)
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
@@ -333,7 +334,22 @@
                         ;;------------------
 			;; quit to menu - Shift + q
                         (when (and (sdl:key= key :sdl-key-q) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
-                          (funcall *start-func*))
+                          (setf *current-window* (make-instance 'select-obj-window 
+                                                                :return-to *current-window*
+                                                                :header-line "Are you sure you want to quit?"
+                                                                :enter-func #'(lambda (cur-sel)
+                                                                                (if (= cur-sel 0)
+                                                                                  (funcall *start-func*)
+                                                                                  (setf *current-window* (return-to *current-window*)))
+                                                                                )
+                                                                :line-list (list "Yes" "No")
+                                                                :prompt-list (list #'(lambda (cur-sel)
+                                                                                       (declare (ignore cur-sel))
+                                                                                       "[Enter] Select  [Esc] Exit")
+                                                                                   #'(lambda (cur-sel)
+                                                                                       (declare (ignore cur-sel))
+                                                                                       "[Enter] Select  [Esc] Exit"))))
+                          )
 			
 			(set-idle-calcing win)
 
@@ -341,7 +357,8 @@
 			(make-output *current-window*)
 			(go exit-loop)
                         )
-       (:idle () #+swank(update-swank)
+       (:idle () #+swank
+                 (update-swank)
               
                  (set-idle-calcing win)
 
@@ -358,7 +375,8 @@
   `(restart-case (progn ,@body) (continue () :report "Continue")))
 
 
-#+swank(defun update-swank ()
+#+swank
+(defun update-swank ()
          "Called from within the main loop, this keep the lisp repl working while the game runs"
          (continuable (let ((connection (or swank::*emacs-connection* (swank::default-connection))))
                         (when connection
