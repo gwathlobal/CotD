@@ -53,6 +53,7 @@
              (setf (turn-finished *world*) t)
              (loop for mob across *mobs* do
                (unless (check-dead mob)
+                 (setf (made-turn mob) nil)
                  (on-tick mob)))
              ;(incf (game-time *world*))
              ))

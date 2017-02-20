@@ -97,6 +97,9 @@
 (defconstant +mob-abil-charge+ 28)
 (defconstant +mob-abil-momentum+ 29)
 (defconstant +mob-abil-animal+ 30)
+(defconstant +mob-abil-horseback-riding+ 31)
+(defconstant +mob-abil-horse-can-be-ridden+ 32)
+(defconstant +mob-abil-dismount+ 33)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

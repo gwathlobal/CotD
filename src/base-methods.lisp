@@ -105,6 +105,17 @@
   (setf (aref (mobs (level *world*)) (x mob) (y mob)) nil)
   (setf (x mob) x (y mob) y)
   (setf (aref (mobs (level *world*)) x y) (id mob))
+
+  ;; when the mob is riding somebody, change the mob's coords to the rider's current location
+  (when (riding-mob-id mob)
+    (setf (x (get-mob-by-id (riding-mob-id mob))) x
+          (y (get-mob-by-id (riding-mob-id mob))) y))
+  ;; when the mob is being ridden by somebody, change the rider's coords to the mob's current location
+  (when (mounted-by-mob-id mob)
+    (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
+          (y (get-mob-by-id (mounted-by-mob-id mob))) y)
+    (setf (aref (mobs (level *world*)) x y) (mounted-by-mob-id mob)))
+  
   (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
     (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob))))
 
@@ -116,17 +127,28 @@
         (along-dir)
         (opposite-dir)
         (not-along-dir)
-        (c-dir (x-y-into-dir (car (momentum-dir mob)) (cdr (momentum-dir mob)))))
+        (c-dir)
+        (gives-orders-to-mount nil))
     (declare (type fixnum dx dy))
+
+    (when (and (riding-mob-id mob)
+               (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+))
+      (logger (format nil "MOVE-MOB: ~A [~A] gives orders to mount ~A [~A] to move in the dir ~A~%" (name mob) (id mob) (name (get-mob-by-id (riding-mob-id mob))) (id (get-mob-by-id (riding-mob-id mob))) dir))
+      (setf gives-orders-to-mount t)
+      (setf mob (get-mob-by-id (riding-mob-id mob))))
+
+    (setf c-dir (x-y-into-dir (car (momentum-dir mob)) (cdr (momentum-dir mob))))
     (multiple-value-setq (dx dy) (x-y-dir dir))
     (multiple-value-setq (along-dir not-along-dir opposite-dir) (dir-neighbours c-dir))
 
-    (when (mob-ability-p mob +mob-abil-momentum+)
+    (when (or (mob-ability-p mob +mob-abil-momentum+)
+              (and (riding-mob-id mob)
+                   (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
       (setf push t))
-    
+
     (format t "MOVE-MOB NAME ~A - SPD ~A, C-DIR ~A, DIR ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir along-dir not-along-dir opposite-dir)
     (cond
-      ;; NB:
+      ;; NB: all this is necessary to introduce movement with momentum (for horses and the like)
       ;; (-1.-1) ( 0.-1) ( 1.-1)
       ;; (-1. 0) ( 0. 0) ( 1. 0)
       ;; (-1. 1) ( 0. 1) ( 1. 1)
@@ -158,27 +180,42 @@
          (format t "MOVE-MOB NOT ALONG - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy)))
       )
 
-    ;; limit max speed
+    ;; normalize direction
     ;; for x axis
-    (when (and (mob-ability-p mob +mob-abil-momentum+)
-               (> (car (momentum-dir mob)) 1))
+    (when (> (car (momentum-dir mob)) 1)
       (setf (car (momentum-dir mob)) 1))
-    (when (and (mob-ability-p mob +mob-abil-momentum+)
-               (< (car (momentum-dir mob)) -1))
+    (when (< (car (momentum-dir mob)) -1)
       (setf (car (momentum-dir mob)) -1))
     ;; for y axis
-    (when (and (mob-ability-p mob +mob-abil-momentum+)
-               (> (cdr (momentum-dir mob)) 1))
+    (when (> (cdr (momentum-dir mob)) 1)
       (setf (cdr (momentum-dir mob)) 1))
-    (when (and (mob-ability-p mob +mob-abil-momentum+)
-               (< (cdr (momentum-dir mob)) -1))
+    (when (< (cdr (momentum-dir mob)) -1)
       (setf (cdr (momentum-dir mob)) -1))
 
+    ;; limit max speed
     (when (and (mob-ability-p mob +mob-abil-momentum+)
                (> (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
       (setf (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
+    (when (and (riding-mob-id mob)
+               (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)
+               (> (momentum-spd mob) (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
+      (setf (momentum-spd mob) (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
     (when (< (momentum-spd mob) 0)
       (setf (momentum-spd mob) 0))
+
+    ;; if only giving orders - make an attack if possible and exit here, do not execute the movement itself
+    (when gives-orders-to-mount
+      ;; restore the mob that gives orders
+      (setf mob (get-mob-by-id (mounted-by-mob-id mob)))
+
+      ;; perform the attack in the chosen direction (otherwise it will be only the mount that attacks)
+      (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy))))
+        (when (typep check-result 'mob)
+          (on-bump check-result mob)
+          (return-from move-mob check-result)))
+      
+      (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
+      (return-from move-mob t))
     
     (loop repeat (if (zerop (momentum-spd mob))
                    1
@@ -188,7 +225,7 @@
           for y = (+ (cdr (momentum-dir mob)) (y mob))
           for check-result = (check-move-on-level mob x y)
           do
-             ;(format t "MOVE-MOB: CHECK-MOVE ~A~%" (check-move-on-level mob x y))
+             (format t "MOVE-MOB: CHECK-MOVE ~A~%" (check-move-on-level mob x y))
              (cond
                ;; all clear - move freely
                ((eq check-result t)
@@ -202,7 +239,13 @@
                ;; bumped into a mob
                ((typep check-result 'mob) 
                 (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result)))
-                ;(decf (momentum-spd mob))
+
+                ;; if the mount bumps into its rider - do nothing
+                (when (and (mounted-by-mob-id mob)
+                           (eq check-result (get-mob-by-id (mounted-by-mob-id mob))))
+                  (setf move-result t)
+                  (loop-finish))
+                
                 (when push
                   ;; check if you can push the mob farther
                   (let* ((nx (+ (car (momentum-dir mob)) (x check-result)))
@@ -217,7 +260,8 @@
                 (on-bump check-result mob)
                 (setf (momentum-dir mob) (cons 0 0))
                 (setf (momentum-spd mob) 0)
-                (setf move-result mob))
+                (setf move-result check-result)
+                (loop-finish))
                ((or (eq check-result nil) (eq check-result 'obstacle))
                 (setf (momentum-spd mob) 0)
                 (setf (momentum-dir mob) (cons 0 0))
@@ -237,17 +281,19 @@
              (when (eq move-result t)
                (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
              
-             (unless  (mob-ability-p mob +mob-abil-momentum+)
+             (when (and (not (mob-ability-p mob +mob-abil-momentum+))
+                        (not (and (riding-mob-id mob)
+                                  (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+))))
                (progn
                  (setf (momentum-dir mob) (cons 0 0))
                  (setf (momentum-spd mob) 0)))
-             
+
              (return-from move-mob move-result))
     )
   nil)
 
 (defun make-act (mob speed)
-  ;;(format t "MAKE-ACT: ~A SPD ~A~%" (name mob) speed)
+  (format t "MAKE-ACT: ~A SPD ~A~%" (name mob) speed)
   (when (zerop speed) (return-from make-act nil))
   (decf (cur-ap mob) speed)
   (setf (made-turn mob) t)
@@ -267,6 +313,11 @@
           (logger (format nil "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target)))
           (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
           (return-from on-bump t))
+
+        ;; if the target is mounted, 50% chance that the actor will bump target's mount
+        (when (riding-mob-id target)
+          (when (zerop (random 2))
+            (setf target (get-mob-by-id (riding-mob-id target)))))
         
         (let ((abil-list nil))
           ;; collect all passive non-final on-touch abilities
@@ -437,6 +488,13 @@
              (place-visible-animation tx ty (level *world*) +anim-type-fire-dot+ :params ())
              
              (setf target1 (get-mob-* (level *world*) tx ty))
+
+
+             ;; if the target is mounted, 50% chance that the actor will hit target's mount
+             (when (and target1
+                        (riding-mob-id target1))
+               (when (zerop (random 2))
+                 (setf target1 (get-mob-by-id (riding-mob-id target1)))))
              
              (setf cur-dmg (+ (random (- (1+ (get-ranged-weapon-dmg-max actor)) (get-ranged-weapon-dmg-min actor))) 
                               (get-ranged-weapon-dmg-min actor)))
@@ -540,6 +598,15 @@
             ;; target dodged
             (progn
               (set-mob-location target x y)
+
+              ;; reduce the momentum to zero
+              (setf (momentum-dir target) (cons 0 0))
+              (setf (momentum-spd target) 0)
+              ;; if the target is being ridden, reduce the rider's momentum to zero
+              (when (mounted-by-mob-id target)
+                (setf (momentum-dir (get-mob-by-id (mounted-by-mob-id target))) (cons 0 0))
+                (setf (momentum-spd (get-mob-by-id (mounted-by-mob-id target))) 0))
+              
               (print-visible-message (x attacker) (y attacker) (level *world*) 
                                      (format nil "~@(~A~) attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
             ;; target did not dodge
@@ -683,9 +750,20 @@
               when (can-invoke-ability killer mob abil-type-id)
                 do
                    (mob-invoke-ability killer mob abil-type-id))
-        ))
-
+        )) 
+    
     (remove-mob-from-level-list (level *world*) mob)
+
+    ;; if the target is being ridden, dismount the rider
+    (when (mounted-by-mob-id mob)
+      (setf (riding-mob-id (get-mob-by-id (mounted-by-mob-id mob))) nil)
+      (add-mob-to-level-list (level *world*) (get-mob-by-id (mounted-by-mob-id mob))))
+    ;; if the target is riding something, place back the mount on map
+    (when (riding-mob-id mob)
+      (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id mob))) nil)
+      (setf (x (get-mob-by-id (riding-mob-id mob))) (x mob)
+            (y (get-mob-by-id (riding-mob-id mob))) (y mob))
+      (add-mob-to-level-list (level *world*) (get-mob-by-id (riding-mob-id mob))))
     
     ;; place blood stain if req
     (when (and splatter (< (random 100) 75))

@@ -98,7 +98,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 100 ())) :base-dodge 25
                                        :strength 1
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sergeant+ 
@@ -107,7 +107,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
                                        :strength 1
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
@@ -117,7 +117,7 @@
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
                                        :strength 1
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
-                                       :abil-detect-good t :abil-detect-evil t
+                                       :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
@@ -191,7 +191,7 @@
                                        :faction +faction-type-animals+
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
-                                       :abil-animal t :abil-momentum 2
+                                       :abil-animal t :abil-momentum 2 :abil-horse-can-be-ridden t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fiend+ 
@@ -202,6 +202,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0))
                                        :strength 2
                                        :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2))
+
 
 (set-faction-relations +faction-type-humans+
                        (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t) (cons +faction-type-military+ t)

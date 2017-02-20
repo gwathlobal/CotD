@@ -94,7 +94,9 @@
     ;; drawing a list of objects in the grid-cell instead of a message box
     (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 10) :w (- *window-width* 20) :h *msg-box-window-height*))
       (sdl:fill-surface sdl:*black* :template obj-list-rect))
-    (let ((str (create-string)) (feature-list))
+    (let ((str (create-string))
+          (feature-list)
+          (mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
       (when (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
         ;;(format t "HERE~%")
         (when lof-blocked
@@ -103,12 +105,17 @@
         (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*)))
         (dolist (feature feature-list)
           (format str ", ~A" (name feature)))
-        (when (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
-          (format str "~%~A~A"
-                  (get-current-mob-name (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
-                  (if lof-blocked "" (format nil " (hit: ~D%)" (if (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
-                                                            100
-                                                                 (truncate (- (r-acc *player*) (* (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) *acc-loss-per-tile*))))))))
+        (when mob
+          (format str "~%~A~A~A"
+                  (get-current-mob-name mob)
+                  (if (riding-mob-id mob)
+                    (format nil ", riding ~A" (get-current-mob-name (get-mob-by-id (riding-mob-id mob))))
+                    "")
+                  (if (and (check-lof win) (not lof-blocked))
+                    (format nil " (hit: ~D%)" (if (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
+                                                100
+                                                (truncate (- (r-acc *player*) (* (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) *acc-loss-per-tile*)))))
+                    "")))
         (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*))
               for item = (get-item-by-id item-id)
               do

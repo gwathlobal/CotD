@@ -1006,3 +1006,117 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-horseback-riding+ :name "Horseback riding" :descr "You can ride horses. To mount a horse, you must stand next to it." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A mounts ~A. " (visible-name actor) (visible-name target)))
+
+                                                (setf (mounted-by-mob-id target) (id actor))
+                                                (setf (riding-mob-id actor) (id target))
+
+                                                ;(remove-mob-from-level-list (level *world*) target)
+                                                (set-mob-location actor (x target) (y target))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-horseback-riding+)
+                                                               (not (riding-mob-id actor)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-enemy ability-type nearest-ally))
+                                                  (let ((mount nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                      (when (and mob
+                                                                                                                 (get-faction-relation (faction actor) (faction mob))
+                                                                                                                 (mob-ability-p mob +mob-abil-horse-can-be-ridden+)
+                                                                                                                 (not (mounted-by-mob-id mob)))
+                                                                                                        (setf mount mob)))))
+                                                    (if mount
+                                                      t
+                                                      nil))
+                                                  )
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (let ((mount nil))
+                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                      (when (and mob
+                                                                                                                 (get-faction-relation (faction actor) (faction mob))
+                                                                                                                 (mob-ability-p mob +mob-abil-horse-can-be-ridden+)
+                                                                                                                 (null (mounted-by-mob-id mob)))
+                                                                                                        (setf mount mob)))))
+                                                     (mob-invoke-ability actor mount (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                               (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
+                                                               (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
+                                                               (get-faction-relation (faction *player*) (faction (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                               (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) +mob-abil-horse-can-be-ridden+)
+                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
+                                                        (progn
+                                                          (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) ability-type-id)
+                                                          t)
+                                                        (progn
+                                                          nil))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-horse-can-be-ridden+ :name "Can be ridden" :descr "If somebody has the 'Horseback riding' ability, he/she can mount you." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-dismount+ :name "Dismount" :descr "Get off your mount, if you are riding one." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; here the target is not a mob, but a (cons x y)
+
+                                                (let ((mount (get-mob-by-id (riding-mob-id actor))))
+                                                  (logger (format nil "MOB-DISMOUNT: ~A [~A] dismounts ~A [~A].~%" (name actor) (id actor) (name mount) (id mount)))
+                                                  
+                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                         (format nil "~A dismounts ~A. " (visible-name actor) (visible-name mount)))
+                                                  
+                                                  (setf (mounted-by-mob-id mount) nil)
+                                                  (setf (riding-mob-id actor) nil)
+
+                                                  (set-mob-location actor (car target) (cdr target))
+                                                  (set-mob-location mount (x mount) (y mount)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-dismount+)
+                                                               (riding-mob-id actor))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore actor nearest-enemy ability-type nearest-ally))
+                                                  nil
+                                                  )
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy))
+                                                   (mob-invoke-ability actor nearest-ally (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (or (>= (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
+                                                              (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                              (not (eq (check-move-on-level *player* (view-x *player*) (view-y *player*)) t))
+                                                              )
+                                                        (progn
+                                                          nil)
+                                                        (progn
+                                                          (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
+                                                          t))
+                                                      )))

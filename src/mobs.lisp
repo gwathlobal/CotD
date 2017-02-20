@@ -60,7 +60,9 @@
    ;;   :abil-charge - +mob-abil-charge+
    ;;   :abil-momentum - +mob-abil-momentum+ (takes fixnum)
    ;;   :abil-animal - +mob-abil-animal+
-   
+   ;;   :abil-horseback-riding - +mob-abil-horseback-riding+
+   ;;   :abil-horse-can-be-ridden - +mob-abil-horse-can-be-ridden+
+   ;;   :abil-dismount - +mob-abil-dismount+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -82,7 +84,7 @@
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
-                                                                abil-momentum abil-animal)
+                                                                abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -161,6 +163,12 @@
     (setf (gethash +mob-abil-momentum+ (abilities mob-type)) abil-momentum))
   (when abil-animal
     (setf (gethash +mob-abil-animal+ (abilities mob-type)) t))
+  (when abil-horseback-riding
+    (setf (gethash +mob-abil-horseback-riding+ (abilities mob-type)) t))
+  (when abil-horse-can-be-ridden
+    (setf (gethash +mob-abil-horse-can-be-ridden+ (abilities mob-type)) t))
+  (when abil-dismount
+    (setf (gethash +mob-abil-dismount+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -319,9 +327,12 @@
    (momentum-dir :initform (cons 0 0) :accessor momentum-dir)
    
    (order :initform nil :accessor order)
+
+   (riding-mob-id :initform nil :accessor riding-mob-id)        ;; mob is riding this mob-id
+   (mounted-by-mob-id :initform nil :accessor mounted-by-mob-id) ;; mob is being ridden by this mob-id
    
-   (master-mob-id :initform nil :accessor master-mob-id) ;; mob that controls this mob
-   (slave-mob-id :initform nil :accessor slave-mob-id)  ;; mob that is being controlled by this mob
+   (master-mob-id :initform nil :accessor master-mob-id)        ;; mob that controls this mob
+   (slave-mob-id :initform nil :accessor slave-mob-id)          ;; mob that is being controlled by this mob
    (face-mob-type-id ::initform nil :accessor face-mob-type-id) ;; others see this mob as this mob type 
 
    (effects :initform (make-hash-table) :accessor effects)

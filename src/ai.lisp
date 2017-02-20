@@ -56,6 +56,19 @@
     (logger (format nil "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A], skipping its turn.~%" (name mob) (id mob) (name (get-mob-by-id (master-mob-id mob))) (master-mob-id mob)))
     (make-act mob +normal-ap+)
     (return-from ai-function nil))
+
+  ;; skip turn if being ridden
+  (when (mounted-by-mob-id mob)
+    (if (made-turn (get-mob-by-id (mounted-by-mob-id mob)))
+      (progn
+        (logger (format nil "AI-FUNCTION: ~A [~A] is being ridden by ~A [~A], moving according to the direction.~%" (name mob) (id mob) (name (get-mob-by-id (mounted-by-mob-id mob))) (mounted-by-mob-id mob)))
+        (move-mob mob (x-y-into-dir 0 0))
+        (return-from ai-function nil))
+      (progn
+        (logger (format nil "AI-FUNCTION: ~A [~A] is being ridden by ~A [~A], waiting for the rider's command.~%" (name mob) (id mob) (name (get-mob-by-id (mounted-by-mob-id mob))) (mounted-by-mob-id mob)))
+        (setf (made-turn mob) t)
+        (return-from ai-function nil))))
+    
   
   (update-visible-mobs mob)
 
