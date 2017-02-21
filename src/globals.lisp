@@ -100,6 +100,8 @@
 (defconstant +mob-abil-horseback-riding+ 31)
 (defconstant +mob-abil-horse-can-be-ridden+ 32)
 (defconstant +mob-abil-dismount+ 33)
+(defconstant +mob-abil-dominate-fiend+ 34)
+(defconstant +mob-abil-fiend-can-be-ridden+ 35)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

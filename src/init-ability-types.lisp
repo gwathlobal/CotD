@@ -945,7 +945,8 @@
                                                   ))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-charge+)
+                                                      (if (and (mob-ability-p actor +mob-abil-charge+)
+                                                               (not (riding-mob-id actor)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -1021,7 +1022,8 @@
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
 
-                                                ;(remove-mob-from-level-list (level *world*) target)
+                                                (adjust-dodge actor)
+                                                
                                                 (set-mob-location actor (x target) (y target))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -1120,3 +1122,79 @@
                                                           (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                           t))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-dominate-fiend+ :name "Dominate fiend" :descr "You can mount a fiend, if you stand next to it. Riding a fiend will reveal your true form." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil "~A mounts ~A" (visible-name actor) (visible-name target)))
+
+                                                (setf (mounted-by-mob-id target) (id actor))
+                                                (setf (riding-mob-id actor) (id target))
+
+                                                (set-mob-location actor (x target) (y target))
+
+                                                (adjust-dodge actor)
+                                                
+                                                ;; reveal the true form of those who ride fiends
+                                                (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
+                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                         (format nil " and reveals itself as ~A" (get-qualified-name actor))))
+                                                (setf (face-mob-type-id actor) (mob-type actor))
+                                                (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
+                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                       (format nil ". "))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-dominate-fiend+)
+                                                               (not (riding-mob-id actor)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-enemy ability-type nearest-ally))
+                                                  (let ((mount nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                      (when (and mob
+                                                                                                                 (mob-ability-p mob +mob-abil-fiend-can-be-ridden+)
+                                                                                                                 (not (mounted-by-mob-id mob)))
+                                                                                                        (setf mount mob)))))
+                                                    (if mount
+                                                      t
+                                                      nil))
+                                                  )
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (let ((mount nil))
+                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                      (when (and mob
+                                                                                                                 (mob-ability-p mob +mob-abil-fiend-can-be-ridden+)
+                                                                                                                 (null (mounted-by-mob-id mob)))
+                                                                                                        (setf mount mob)))))
+                                                     (mob-invoke-ability actor mount (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                               (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
+                                                               (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
+                                                               (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) +mob-abil-fiend-can-be-ridden+)
+                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
+                                                        (progn
+                                                          (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) ability-type-id)
+                                                          t)
+                                                        (progn
+                                                          nil))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-fiend-can-be-ridden+ :name "Can be ridden" :descr "If somebody has the 'Dominate fiend' ability, he/she can mount you." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

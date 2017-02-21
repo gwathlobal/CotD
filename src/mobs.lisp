@@ -63,6 +63,8 @@
    ;;   :abil-horseback-riding - +mob-abil-horseback-riding+
    ;;   :abil-horse-can-be-ridden - +mob-abil-horse-can-be-ridden+
    ;;   :abil-dismount - +mob-abil-dismount+
+   ;;   :abil-dominate-fiend - +mob-abil-dominate-fiend+
+   ;;   :abil-fiend-can-be-ridden - +mob-abil-fiend-can-be-ridden+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -84,7 +86,7 @@
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
-                                                                abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount)
+                                                                abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -169,6 +171,10 @@
     (setf (gethash +mob-abil-horse-can-be-ridden+ (abilities mob-type)) t))
   (when abil-dismount
     (setf (gethash +mob-abil-dismount+ (abilities mob-type)) t))
+  (when abil-dominate-fiend
+    (setf (gethash +mob-abil-dominate-fiend+ (abilities mob-type)) t))
+  (when abil-fiend-can-be-ridden
+    (setf (gethash +mob-abil-fiend-can-be-ridden+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -474,10 +480,14 @@
       (setf sight 0))
     (setf (cur-sight mob) sight)))
 
-(defun adjust-dodge (mob-obj)
+(defun adjust-dodge (mob)
   (let ((dodge 0))
-    (setf dodge (base-dodge (get-mob-type-by-id (mob-type mob-obj))))
-    (setf (cur-dodge mob-obj) dodge)))
+    (setf dodge (base-dodge (get-mob-type-by-id (mob-type mob))))
+
+    ;; when riding - your dodge chance is reduced to zero
+    (when (riding-mob-id mob)
+      (setf dodge 0))
+    (setf (cur-dodge mob) dodge)))
 
 (defun adjust-armor (mob-obj)
   (let ((armor 0))

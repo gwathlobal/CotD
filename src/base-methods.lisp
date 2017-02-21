@@ -602,11 +602,7 @@
               ;; reduce the momentum to zero
               (setf (momentum-dir target) (cons 0 0))
               (setf (momentum-spd target) 0)
-              ;; if the target is being ridden, reduce the rider's momentum to zero
-              (when (mounted-by-mob-id target)
-                (setf (momentum-dir (get-mob-by-id (mounted-by-mob-id target))) (cons 0 0))
-                (setf (momentum-spd (get-mob-by-id (mounted-by-mob-id target))) 0))
-              
+                            
               (print-visible-message (x attacker) (y attacker) (level *world*) 
                                      (format nil "~@(~A~) attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
             ;; target did not dodge
@@ -757,6 +753,7 @@
     ;; if the target is being ridden, dismount the rider
     (when (mounted-by-mob-id mob)
       (setf (riding-mob-id (get-mob-by-id (mounted-by-mob-id mob))) nil)
+      (adjust-dodge (get-mob-by-id (mounted-by-mob-id mob)))
       (add-mob-to-level-list (level *world*) (get-mob-by-id (mounted-by-mob-id mob))))
     ;; if the target is riding something, place back the mount on map
     (when (riding-mob-id mob)
@@ -816,11 +813,18 @@
   (when (< (cur-fp mob) 0)
     (setf (cur-fp mob) 0))
 
+  ;; a special case for revealing demons that ride fiends
+  (when (and (riding-mob-id mob)
+             (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-fiend-can-be-ridden+)
+             (eq (mob-effect-p mob +mob-effect-reveal-true-form+) 1))
+    (set-mob-effect mob +mob-effect-reveal-true-form+ 2))
+             
   (loop for effect-id being the hash-key in (effects mob)
         when (and (not (eq (mob-effect-p mob effect-id) t))
                   (not (eq (mob-effect-p mob effect-id) nil)))
           do
              (set-mob-effect mob effect-id (1- (mob-effect-p mob effect-id)))
+
              (when (zerop (mob-effect-p mob effect-id))
                (rem-mob-effect mob effect-id)
                (when (= effect-id +mob-effect-reveal-true-form+)

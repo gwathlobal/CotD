@@ -30,13 +30,14 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
     
-    (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%~A~A"
+    (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%~A~%Dodge chance: ~A~%~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
                         (if (mob-ability-p *player* +mob-abil-military-follow-me+) (format nil "Followers: ~A~%" (count-follower-list *player*)) "")
                         (get-weapon-descr-long *player*)
                         (get-armor-descr *player*)
+                        (cur-dodge *player*)
                         (get-mob-stats-line *player*))
                 a-rect :color sdl:*white*)
       )
