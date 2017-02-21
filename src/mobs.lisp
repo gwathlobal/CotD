@@ -65,6 +65,7 @@
    ;;   :abil-dismount - +mob-abil-dismount+
    ;;   :abil-dominate-fiend - +mob-abil-dominate-fiend+
    ;;   :abil-fiend-can-be-ridden - +mob-abil-fiend-can-be-ridden+
+   ;;   :abil-starts-with-horse - +mob-abil-starts-with-horse+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -86,7 +87,8 @@
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
-                                                                abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden)
+                                                                abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
+                                                                abil-starts-with-horse)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -175,6 +177,8 @@
     (setf (gethash +mob-abil-dominate-fiend+ (abilities mob-type)) t))
   (when abil-fiend-can-be-ridden
     (setf (gethash +mob-abil-fiend-can-be-ridden+ (abilities mob-type)) t))
+  (when abil-starts-with-horse
+    (setf (gethash +mob-abil-starts-with-horse+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -372,6 +376,13 @@
   (setf (cur-ap mob) (max-ap mob))
   
   (setf (face-mob-type-id mob) (mob-type mob))
+
+  ;; when starting with a horse - create a horse on the spot and mount it
+  (when (mob-ability-p mob +mob-abil-starts-with-horse+)
+    (let ((horse (make-instance 'mob :mob-type +mob-type-horse+ :x (x mob) :y (y mob))))
+      (add-mob-to-level-list (level *world*) horse)
+      (setf (mounted-by-mob-id horse) (id mob))
+      (setf (riding-mob-id mob) (id horse))))
   
   (set-cur-weapons mob)
   (adjust-dodge mob)
@@ -396,6 +407,8 @@
   (when (mob-ability-p mob +mob-abil-angel+)
     (incf (total-angels *world*))
     (incf (initial-angels *world*)))
+
+ 
   )
 
 (defun get-mob-by-id (mob-id)

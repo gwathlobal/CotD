@@ -140,7 +140,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures. Possessed creatures may sometimes revolt. Higher-ranking demons are better at supressing the victim's willpower." 
+                                 :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures. Possessed creatures may sometimes revolt. Higher-ranking demons are better at supressing the victim's willpower. You can not possess mortals while mounted." 
                                  :passive t :cost 0 :spd +normal-ap+ 
                                  :final t :on-touch t
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -168,6 +168,7 @@
                                                                (not (mob-effect-p target +mob-effect-divine-shield+))
                                                                (not (mob-effect-p actor +mob-effect-possessed+))
                                                                (not (mob-effect-p target +mob-effect-possessed+))
+                                                               (not (riding-mob-id actor))
                                                                )
                                                         t
                                                         nil))))
@@ -1194,6 +1195,13 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-fiend-can-be-ridden+ :name "Can be ridden" :descr "If somebody has the 'Dominate fiend' ability, he/she can mount you." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-starts-with-horse+ :name "Starts with a horse" :descr "You start your mission riding a horse." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil

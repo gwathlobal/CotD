@@ -1,6 +1,6 @@
 (in-package :cotd)
 
-(defparameter *game-events-military-list* (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-gunner+ +mob-type-gunner+ +mob-type-sergeant+ +mob-type-sergeant+ +mob-type-chaplain+))
+(defparameter *game-events-military-list* (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-gunner+ +mob-type-gunner+ +mob-type-sergeant+ +mob-type-scout+ +mob-type-chaplain+))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-angels+ :disabled nil
                                            :on-check #'(lambda (world)

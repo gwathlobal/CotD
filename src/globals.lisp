@@ -52,6 +52,7 @@
 (defconstant +mob-type-gunner+ 18)
 (defconstant +mob-type-horse+ 19)
 (defconstant +mob-type-fiend+ 20)
+(defconstant +mob-type-scout+ 21)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -102,6 +103,7 @@
 (defconstant +mob-abil-dismount+ 33)
 (defconstant +mob-abil-dominate-fiend+ 34)
 (defconstant +mob-abil-fiend-can-be-ridden+ 35)
+(defconstant +mob-abil-starts-with-horse+ 36)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

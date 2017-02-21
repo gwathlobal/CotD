@@ -112,6 +112,19 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; adjust coordinates of all horses to their riders
+                                                                 (loop for mob-id in (mob-id-list (level world))
+                                                                       for horse = (get-mob-by-id mob-id)
+                                                                       for rider = (if (mounted-by-mob-id horse)
+                                                                                     (get-mob-by-id (mounted-by-mob-id horse))
+                                                                                     nil)
+                                                                       when rider
+                                                                         do
+                                                                            (setf (x horse) (x rider) (y horse) (y rider)))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
                                                                                                        (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
@@ -142,6 +155,19 @@
                                              :name "Demons"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; adjust coordinates of all horses to their riders
+                                                                 (loop for mob-id in (mob-id-list (level world))
+                                                                       for horse = (get-mob-by-id mob-id)
+                                                                       for rider = (if (mounted-by-mob-id horse)
+                                                                                     (get-mob-by-id (mounted-by-mob-id horse))
+                                                                                     nil)
+                                                                       when rider
+                                                                         do
+                                                                            (setf (x horse) (x rider) (y horse) (y rider)))
+                                                                 )
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
@@ -195,12 +221,26 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
+                                                                 (loop for mob-id in (mob-id-list (level world))
+                                                                       for horse = (get-mob-by-id mob-id)
+                                                                       for rider = (if (mounted-by-mob-id horse)
+                                                                                     (get-mob-by-id (mounted-by-mob-id horse))
+                                                                                     nil)
+                                                                       when rider
+                                                                         do
+                                                                            (setf (x horse) (x rider) (y horse) (y rider)))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the 6 groups of military = 40, where each group has 1 chaplain, 2 sargeants and 3 soldiers
                                                                  (loop repeat 5
                                                                        do
                                                                           (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
                                                                             (find-unoccupied-place-outside world chaplain)
-                                                                            (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 2)
+                                                                            (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
+                                                                                                                  (cons +mob-type-scout+ 1)
                                                                                                                   (cons +mob-type-soldier+ 2)
                                                                                                                   (cons +mob-type-gunner+ 1))
                                                                                                       #'(lambda (world mob)
@@ -228,7 +268,8 @@
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+))
                                                                  (find-unoccupied-place-outside world *player*)
                                                                  ;; place the first group of military around the player
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 2)
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
+                                                                                                       (cons +mob-type-scout+ 1)
                                                                                                        (cons +mob-type-soldier+ 2)
                                                                                                        (cons +mob-type-gunner+ 1))
                                                                                            #'(lambda (world mob)
