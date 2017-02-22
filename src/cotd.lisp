@@ -53,8 +53,9 @@
              (setf (turn-finished *world*) t)
              (loop for mob across *mobs* do
                (unless (check-dead mob)
-                 (setf (made-turn mob) nil)
-                 (on-tick mob)))
+                 (on-tick mob)
+                 (when (> (cur-ap mob) 0)
+                   (setf (made-turn mob) nil))))
              ;(incf (game-time *world*))
              ))
   )
@@ -86,7 +87,7 @@
   (if *cotd-release*
     (progn
       (setf *current-window* (make-instance 'start-game-window 
-                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military" "Custom scenario" "Help" "Exit")
+                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military (as Chaplain)" "Join the Military (as Scout)" "Custom scenario" "Help" "Exit")
                                             :menu-funcs (list #'(lambda (n) 
                                                                   (declare (ignore n))
                                                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -110,7 +111,15 @@
 
                                                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
                                                                                                    (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-military+))))
+                                                                                                   +player-faction-military-chaplain+))))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+
+                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                                                   (nth (random (length weather-types)) weather-types)
+                                                                                                   +player-faction-military-scout+))))
                                                               #'(lambda (n)
                                                                   (declare (ignore n))
                                                                   (setf *current-window* (make-instance 'custom-scenario-window
@@ -132,7 +141,8 @@
                                                                   (funcall *quit-func*))))))
     (progn
       (setf *current-window* (make-instance 'start-game-window 
-                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military" "Custom scenario" "City with all-seeing" "Test level" "Help" "Exit")
+                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military (as Chaplain)" "Join the Military (as Scout)" "Custom scenario" "City with all-seeing"
+                                                              "Test level" "Help" "Exit")
                                             :menu-funcs (list #'(lambda (n) 
                                                                   (declare (ignore n))
                                                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -156,7 +166,15 @@
 
                                                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
                                                                                                    (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-military+))))
+                                                                                                   +player-faction-military-chaplain+))))
+                                                              #'(lambda (n) 
+                                                                  (declare (ignore n))
+                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+
+                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                                                   (nth (random (length weather-types)) weather-types)
+                                                                                                   +player-faction-military-scout+))))
                                                               #'(lambda (n)
                                                                   (declare (ignore n))
                                                                   (setf *current-window* (make-instance 'custom-scenario-window

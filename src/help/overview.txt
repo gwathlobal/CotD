@@ -37,8 +37,11 @@ THE MILITARY
  - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
  - The military is comprised of five units: Soldiers, Scouts, Sergeants, Machine-gunners and Chaplains. All of them are capable of ranged combat but do not gain power whatsoever.
  - Soldiers are armed with single-shot rifles and need to reload every other turn.
- - Scouts' weaponary is the same as soldiers' but they enter the battle riding a horse.
+ - Scouts' weaponry is the same as soldiers' but they enter the battle riding a horse.
  - Sergeants wield six-round revolvers that deal less damage than a rifle but do not need to be reloaded so often.
  - Machine-gunners carry a light machine gun capable of firing the whole magazine in one turn. Alas, its accuracy leaves to be desired. 
  - Chaplains are also armed with six-round revolvers but, more importantly, are able to pray to reveal disguised enemies or to grant divine protection to allies (similar to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.
- - If you side with the military, you start as a Chaplain. To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.
+ - If you side with the military, you may start as a Chaplain or as a Scout. 
+ - Chaplains are accompanied by a host of loyal troops. 
+ - Scouts start alone but compensate that with unsurpassed speed. Be careful, though - unlike a Chaplain, you do not have protection from possession. So if a demon traps you in your own body, the game is over for you.
+ - To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.

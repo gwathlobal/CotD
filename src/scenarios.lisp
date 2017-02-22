@@ -24,8 +24,9 @@
 (defconstant +player-faction-demons+ 9)
 (defconstant +city-layout-forest+ 10)
 (defconstant +city-layout-island+ 11)
-(defconstant +player-faction-military+ 12)
+(defconstant +player-faction-military-chaplain+ 12)
 (defconstant +city-layout-barricaded-city+ 13)
+(defconstant +player-faction-military-scout+ 14)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

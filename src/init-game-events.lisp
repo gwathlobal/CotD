@@ -65,7 +65,7 @@
                                                                               (run-window *current-window*))
                                                              (:video-expose-event () (make-output *current-window*))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-lose-game+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-lose-game-died+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
                                                          (if (check-dead *player*)
@@ -82,6 +82,28 @@
                                                              (:quit-event () (funcall (quit-func *current-window*)) t)
                                                              (:key-down-event () 
                                                                               (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-player-dead+))
+                                                                              (make-output *current-window*)
+                                                                              (run-window *current-window*))
+                                                             (:video-expose-event () (make-output *current-window*))))))
+
+(set-game-event (make-instance 'game-event :id +game-event-lose-game-possessed+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         (if (and (mob-ability-p *player* +mob-abil-human+)
+                                                                  (master-mob-id *player*))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (declare (ignore world))
+                                                           (add-message (create-string "~%"))
+                                                           (add-message (create-string "You are possessed.~%"))
+                                                           (setf *current-window* (make-instance 'cell-window))
+                                                           (update-visible-area (level *world*) (x *player*) (y *player*))
+                                                           (make-output *current-window*)
+                                                           (sdl:with-events ()
+                                                             (:quit-event () (funcall (quit-func *current-window*)) t)
+                                                             (:key-down-event () 
+                                                                              (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-player-possessed+))
                                                                               (make-output *current-window*)
                                                                               (run-window *current-window*))
                                                              (:video-expose-event () (make-output *current-window*))))))

@@ -8,6 +8,7 @@ v1.0.7
 - Horseback riding added! Military units are able to use horses as mounts. When riding a mount, your mount moves independently of your actions, you can only give directions to it. This means that once you've gained speed, the mount will be moving in the chosen direction on its own, while you can shoot the enemies as you pass them by. Mounts may also be used as meatshields as enemies have 50% chance to hit your mount instead of you.
 - All demons are able to mount fiends.
 - Added scouts to the military. They are armed with rifles and start riding a horse.
+- You may now start as a scout. Scouts gain no followers but compensate that with their unsurpassed speed.
 - Added stables to the buildings of the city.
 
 --------------------

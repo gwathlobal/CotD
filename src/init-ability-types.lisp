@@ -156,6 +156,12 @@
                                                 (set-mob-effect actor +mob-effect-possessed+)
                                                 (set-mob-effect target +mob-effect-possessed+)
                                                 (setf (face-mob-type-id actor) (mob-type target))
+
+                                                ;; when the target is riding something - replace the rider with the actor
+                                                (when (riding-mob-id target)
+                                                  (setf (riding-mob-id actor) (riding-mob-id target))
+                                                  (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id actor))) (id actor))
+                                                  (setf (riding-mob-id target) nil))
                                                 
                                                 (print-visible-message (x actor) (y actor) (level *world*) 
                                                                        (format nil "~A possesses ~A. " (name actor) (visible-name target)))
@@ -746,7 +752,7 @@
                                                       for mob = (get-mob-by-id (nth i (visible-mobs actor)))
                                                       with follower-num = 0
                                                       when (and (= (faction actor) (faction mob))
-                                                                (not (= (mob-type mob) +mob-type-chaplain+))
+                                                                (not (mob-ability-p mob +mob-abil-independent+))
                                                                 (or (not (order mob))
                                                                     (and (order mob)
                                                                          (= (first (order mob)) +mob-order-follow+)
@@ -1202,6 +1208,13 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-starts-with-horse+ :name "Starts with a horse" :descr "You start your mission riding a horse." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-independent+ :name "Independent" :descr "You do not take orders from anyone." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil

@@ -14,3 +14,14 @@ Whenever weapon damage is applied, the game checks the target's resistances to t
 First, the amount of damage is reduced flatly by the amount of direct resistance (for example, 4 points of iron damage against 1 point of direct iron resistance makes 3). Then the result is further reduced by the percentage resistance, with the final damage amount rounded down (for example, 3 points of iron damage against 50% iron resistance makes 1.5, rounded down to 1). This final damage is applied to the target. 
 
 Note that only weapon damage is mitigated by armor. Other sources of damage (like burns from blessings) are applied directly to target's hit points.
+
+
+MOUNTED COMBAT
+
+Some units (horses and fiends) move in a special way - they have momentum. That means they have speed and direction where they move. If they start to move in a certain direction they gain speed. If they skip a turn, they will continue to move in the chosen direction. If they try to move the opposite direction, they will lose speed. If they try to move sideways at high speed, they change direction somewhat but will lose speed at the same time. Maximum speed is limited to 2 (that means that if a horse has the speed of 2, it will cover 2 tiles in the chosen direction during its turn).
+
+If a unit with momentum hits an obstacle it will lose its speed and try to push the obstacle in the direction of its movement. While walls and other terrain features can not be pushed, other units are movable. If the pushed unit belongs to another faction, it will be also attacked.
+
+Units with momentum may also be used as mounts. All demons may mount fiends, and all military units (except machine-gunners) may mount horses. This will provide the benefits of a unit with momentum while allowing the rider to engage in other activities (for example, once a scout has gained speed, he will be able to shoot his target while continuing to move in the chosen direction). Mounts also serve as meatshields as the attacker has a 50% chance to attack the mount instead of the rider.
+
+Note however that engaging in combat while mounted invokes a 20% accuracy penalty to ranged attacks.

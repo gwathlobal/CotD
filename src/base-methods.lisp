@@ -114,7 +114,13 @@
   (when (mounted-by-mob-id mob)
     (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
           (y (get-mob-by-id (mounted-by-mob-id mob))) y)
-    (setf (aref (mobs (level *world*)) x y) (mounted-by-mob-id mob)))
+    (setf (aref (mobs (level *world*)) x y) (mounted-by-mob-id mob))
+    ;; if the rider is possessed - it is the master who is placed on the map
+    ;(when (master-mob-id (get-mob-by-id (mounted-by-mob-id mob)))
+    ;  (setf (x (get-mob-by-id (master-mob-id (get-mob-by-id (mounted-by-mob-id mob))))) x
+    ;        (y (get-mob-by-id (master-mob-id (get-mob-by-id (mounted-by-mob-id mob))))) y)
+    ;  (setf (aref (mobs (level *world*)) x y) (master-mob-id (get-mob-by-id (mounted-by-mob-id mob)))))
+    )
   
   (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
     (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob))))
@@ -365,14 +371,18 @@
     (setf (x target) (x actor) (y target) (y actor))
     (add-mob-to-level-list (level *world*) target)
     
-  
     (setf (master-mob-id target) nil)
     (setf (slave-mob-id actor) nil)
     (setf (face-mob-type-id actor) (mob-type actor))
     (rem-mob-effect actor +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-reveal-true-form+)
-  
+
+    ;; if the master is riding something - put slave as the rider
+    (when (riding-mob-id actor)
+      (setf (riding-mob-id target) (riding-mob-id actor))
+      (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id target))) (id target)))
+    
     (print-visible-message (x actor) (y actor) (level *world*) 
                            (format nil "~A releases its possession of ~A. " (name actor) (name target)))
   
@@ -702,7 +712,7 @@
                      (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body"))
                      (setf left-body-str "lower body")
                      (when killer
-                       (setf dead-msg-str (format nil "~(~A~) cuts ~A in half. " (visible-name killer) (visible-name mob))))))
+                       (setf dead-msg-str (format nil "~@(~A~) cuts ~A in half. " (visible-name killer) (visible-name mob))))))
           ;; do not sever anything
           (t (setf left-body-str "body")))
 

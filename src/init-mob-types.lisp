@@ -117,7 +117,7 @@
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
                                        :strength 1
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
-                                       :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t
+                                       :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t :abil-independent t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
@@ -136,6 +136,7 @@
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 100 ())) :base-dodge 25
                                        :strength 1
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-starts-with-horse t
+                                       :abil-independent t :abil-detect-good t :abil-detect-evil t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
@@ -198,7 +199,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-horse+ 
                                        :name "Horse"
-                                       :glyph-idx 72 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 72 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :max-hp 12 :max-fp 0
                                        :faction +faction-type-animals+
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0

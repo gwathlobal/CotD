@@ -5,7 +5,7 @@
 (defconstant +game-event-win-for-angels+ 0)
 (defconstant +game-event-win-for-demons+ 1)
 (defconstant +game-event-win-for-humans+ 2)
-(defconstant +game-event-lose-game+ 3)
+(defconstant +game-event-lose-game-died+ 3)
 (defconstant +game-event-military-arrive+ 4)
 (defconstant +game-event-snow-falls+ 5)
 (defconstant +game-event-military-arrive-port-n+ 6)
@@ -13,6 +13,7 @@
 (defconstant +game-event-military-arrive-port-e+ 8)
 (defconstant +game-event-military-arrive-port-w+ 9)
 (defconstant +game-event-military-arrive-island+ 10)
+(defconstant +game-event-lose-game-possessed+ 11)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)
