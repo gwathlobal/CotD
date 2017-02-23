@@ -44,14 +44,20 @@
                         (total-angels *world*)
                         (total-demons *world*)
                         (sense-good-evil-str)
-                        (if (mob-ability-p *player* +mob-abil-momentum+) (format nil "~%Moving: ~A (spd ~A)" (x-y-into-str (momentum-dir *player*)) (momentum-spd *player*)) "")
-                        (if (riding-mob-id *player*) (format nil "~%Riding: ~A~%  HP: ~A/~A~%  Direction: ~A~%  Spd: ~A"
+                        (if (mob-ability-p *player* +mob-abil-momentum+) (format nil "~%Moving: ~A~A"
+                                                                                 (x-y-into-str (momentum-dir *player*))
+                                                                                 (if (not (zerop (momentum-spd *player*)))
+                                                                                   (format nil " (Spd: ~A)" (momentum-spd *player*))
+                                                                                   ""))
+                          "")
+                        (if (riding-mob-id *player*) (format nil "~%Riding: ~A~%  HP: ~A/~A~%  Direction: ~A~A"
                                                              (name (get-mob-by-id (riding-mob-id *player*)))
                                                              (cur-hp (get-mob-by-id (riding-mob-id *player*))) (max-hp (get-mob-by-id (riding-mob-id *player*)))
                                                              (x-y-into-str (momentum-dir (get-mob-by-id (riding-mob-id *player*))))
-                                                             (momentum-spd (get-mob-by-id (riding-mob-id *player*)))
+                                                             (if (not (zerop (momentum-spd (get-mob-by-id (riding-mob-id *player*)))))
+                                                               (format nil " (Spd: ~A)" (momentum-spd (get-mob-by-id (riding-mob-id *player*))))
+                                                               ""))
                                                              
-                                                             )
                           "")
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))

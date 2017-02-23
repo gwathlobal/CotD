@@ -105,6 +105,7 @@
 (defconstant +mob-abil-fiend-can-be-ridden+ 35)
 (defconstant +mob-abil-starts-with-horse+ 36)
 (defconstant +mob-abil-independent+ 37)
+(defconstant +mob-abil-eagle-eye+ 38)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

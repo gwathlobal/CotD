@@ -1219,3 +1219,60 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-eagle-eye+ :name "Eagle eye" :descr "You can inspect an enemy unit to reveal its true form." 
+                                 :cd 4 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-EAGLE-EYE: ~A [~A] uses eagle eye to reveal ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (if (or (mob-effect-p target +mob-effect-divine-consealed+)
+                                                          (and (mob-effect-p target +mob-effect-possessed+)
+                                                               (not (mob-effect-p target +mob-effect-reveal-true-form+))))
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                           (format nil "~A reveals the true form of ~A. " (visible-name actor) (visible-name target)))
+                                                    
+                                                    (rem-mob-effect target +mob-effect-divine-consealed+)
+                                                    (setf (face-mob-type-id target) (mob-type target))
+                                                    (set-mob-effect target +mob-effect-reveal-true-form+ 5)
+                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                           (format nil "It is ~A. " (get-qualified-name target))))
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                           (format nil "~A tries to reveal the true form of ~A. But ~A does not conseal anything. " (visible-name actor) (visible-name target) (visible-name target)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-eagle-eye+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore actor nearest-enemy ability-type))
+                                                  ;; a little bit of cheating here
+                                                  (if (and (or (mob-effect-p nearest-ally +mob-effect-divine-consealed+)
+                                                               (and (mob-effect-p nearest-ally +mob-effect-possessed+)
+                                                                    (not (mob-effect-p nearest-ally +mob-effect-reveal-true-form+))))
+                                                           (zerop (random 4)))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy))
+                                                   (mob-invoke-ability actor nearest-ally (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                        (if (and mob
+                                                                 (not (eq *player* mob))
+                                                                 (not (mob-effect-p mob +mob-effect-reveal-true-form+))
+                                                                 (not (and (mob-ability-p mob +mob-abil-demon+)
+                                                                           (not (mob-effect-p mob +mob-effect-possessed+))))
+                                                                 (not (and (mob-ability-p mob +mob-abil-angel+)
+                                                                           (not (mob-effect-p mob +mob-effect-divine-consealed+)))))
+                                                          (progn
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

@@ -67,7 +67,9 @@ THE MILITARY
 
  - The military is allied with the citizens of the City but opposes both angels and demons.
  - All military units are capable of ranged combat.
- - You start as a Chaplain who can lead troops, reveal disguised enemies and provide divine protection to allies.
+ - You may start as a Chaplain or as a Scout.
+ - The Chaplain can lead troops, reveal disguised enemies and provide divine protection to allies.
+ - The Scout starts with a horse, can also reveal disguised enemies and is armed with a powerful rifle.
  - To win, kill all demons. But do not let angels stand in your way.
 
 --------------------

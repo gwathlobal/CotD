@@ -329,8 +329,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the 6 groups of military = 40, where each group has 1 chaplain, 2 sargeants and 3 soldiers
-                                                                 (loop repeat 5
+                                                                 ;; populate the world with the 6 groups of military = 40, where each group has 1 chaplain, 1 sargeant, 1 scout and 3 soldiers
+                                                                 (loop repeat 6
                                                                        do
                                                                           (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
                                                                             (find-unoccupied-place-outside world chaplain)
