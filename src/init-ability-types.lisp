@@ -1040,7 +1040,7 @@
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore nearest-enemy ability-type nearest-ally))
+                                                  (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                     (let ((mob (get-mob-* (level *world*) dx dy)))
@@ -1049,7 +1049,8 @@
                                                                                                                  (mob-ability-p mob +mob-abil-horse-can-be-ridden+)
                                                                                                                  (not (mounted-by-mob-id mob)))
                                                                                                         (setf mount mob)))))
-                                                    (if mount
+                                                    (if (and mount
+                                                             (can-invoke-ability actor actor (id ability-type)))
                                                       t
                                                       nil))
                                                   )
@@ -1164,7 +1165,7 @@
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore nearest-enemy ability-type nearest-ally))
+                                                  (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                     (let ((mob (get-mob-* (level *world*) dx dy)))
@@ -1172,7 +1173,8 @@
                                                                                                                  (mob-ability-p mob +mob-abil-fiend-can-be-ridden+)
                                                                                                                  (not (mounted-by-mob-id mob)))
                                                                                                         (setf mount mob)))))
-                                                    (if mount
+                                                    (if (and mount
+                                                             (can-invoke-ability actor mount (id ability-type)))
                                                       t
                                                       nil))
                                                   )
@@ -1222,7 +1224,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-eagle-eye+ :name "Eagle eye" :descr "You can inspect an enemy unit to reveal its true form." 
-                                 :cd 4 :cost 0 :spd +normal-ap+ :passive nil
+                                 :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
@@ -1250,9 +1252,11 @@
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore actor nearest-enemy ability-type))
+                                                  (declare (ignore nearest-enemy))
                                                   ;; a little bit of cheating here
-                                                  (if (and (or (mob-effect-p nearest-ally +mob-effect-divine-consealed+)
+                                                  (if (and (can-invoke-ability actor actor (id ability-type))
+                                                           nearest-ally
+                                                           (or (mob-effect-p nearest-ally +mob-effect-divine-consealed+)
                                                                (and (mob-effect-p nearest-ally +mob-effect-possessed+)
                                                                     (not (mob-effect-p nearest-ally +mob-effect-reveal-true-form+))))
                                                            (zerop (random 4)))

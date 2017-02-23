@@ -4,7 +4,7 @@ Some characters are capable of ranged combat. When they shoot, the game determin
 
 Missing bullets tend to disperse around the target, the farther the target - the greater the dispersion. This means that you can hit some passer-by standing near your target (this is especially true for machine-gunners who have decreased accuracy and can shoot six bullets at once).
 
-Once the bullet's destination is determined, it flies to it until it hits an obstacle. Note that certain terrain tiles (like windows) provide a line of sight but block a line of fire, so you will always miss whenever you try to shoot through a window.
+Once the bullet's destination is determined, it flies to it until it hits an obstacle. Note that certain terrain tiles (like windows) provide a line of sight but block any line of fire, so you will always miss whenever you try to shoot through a window.
 
 
 ARMOR VS DAMAGE
@@ -18,9 +18,14 @@ Note that only weapon damage is mitigated by armor. Other sources of damage (lik
 
 MOUNTED COMBAT
 
-Some units (horses and fiends) move in a special way - they have momentum. That means they have speed and direction where they move. If they start to move in a certain direction they gain speed. If they skip a turn, they will continue to move in the chosen direction. If they try to move the opposite direction, they will lose speed. If they try to move sideways at high speed, they change direction somewhat but will lose speed at the same time. Maximum speed is limited to 2 (that means that if a horse has the speed of 2, it will cover 2 tiles in the chosen direction during its turn).
+Some units (horses and fiends) move in a special way - they have momentum. That means they have speed and direction where they move. The following rules apply:
+ - If a unit starts to move in a certain direction it gains speed. 
+ - If a unit skips a turn, it will continue to move in the chosen direction. 
+ - If a unit tries to move in the opposite direction, it will lose speed. 
+ - If a unit tries to move sideways at high speed, it will change direction somewhat but will lose speed at the same time. 
+Maximum speed is limited to 2 (that means that if a horse has the speed of 2, it will cover 2 tiles in the chosen direction during its turn).
 
-If a unit with momentum hits an obstacle it will lose its speed and try to push the obstacle in the direction of its movement. While walls and other terrain features can not be pushed, other units are movable. If the pushed unit belongs to another faction, it will be also attacked.
+If a unit with momentum hits an obstacle it will lose its speed completely and try to push the obstacle in the direction of its movement. While walls and other terrain features can not be pushed, other units are movable. If the pushed unit belongs to another faction, it will be also attacked.
 
 Units with momentum may also be used as mounts. All demons may mount fiends, and all military units (except machine-gunners) may mount horses. This will provide the benefits of a unit with momentum while allowing the rider to engage in other activities (for example, once a scout has gained speed, he will be able to shoot his target while continuing to move in the chosen direction). Mounts also serve as meatshields as the attacker has a 50% chance to attack the mount instead of the rider.
 

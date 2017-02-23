@@ -514,16 +514,22 @@
     (setf (cur-armor mob-obj) armor)))
 
 (defun adjust-m-acc (mob)
-  (let ((accuracy +base-accuracy+))
+  (setf (m-acc mob) 0)
+  (unless (is-weapon-melee mob)
+    (return-from adjust-m-acc 0))
+  (let ((accuracy (get-melee-weapon-acc mob)))
     (when (mob-effect-p mob +mob-effect-cursed+)
       (setf accuracy 75))
     (setf (m-acc mob) accuracy)))
 
 (defun adjust-r-acc (mob)
-  (let ((accuracy +base-accuracy+))
+  (setf (r-acc mob) 0)
+  (unless (is-weapon-ranged mob)
+    (return-from adjust-r-acc 0))
+  (let ((accuracy (get-ranged-weapon-acc mob)))
     (when (mob-effect-p mob +mob-effect-cursed+)
       (decf accuracy 25))
-
+    
     (when (riding-mob-id mob)
       (decf accuracy 20))
     

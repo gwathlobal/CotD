@@ -220,7 +220,7 @@
           (on-bump check-result mob)
           (return-from move-mob check-result)))
       
-      (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
+      (make-act mob (move-spd (get-mob-type-by-id (mob-type (get-mob-by-id (riding-mob-id mob))))))
       (return-from move-mob t))
     
     (loop repeat (if (zerop (momentum-spd mob))
