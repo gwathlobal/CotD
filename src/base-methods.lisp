@@ -220,6 +220,7 @@
           (on-bump check-result mob)
           (return-from move-mob check-result)))
       
+	  ;; a trick not to confuse player when the horse move-spd is greater than the rider's move-spd
       (make-act mob (move-spd (get-mob-type-by-id (mob-type (get-mob-by-id (riding-mob-id mob))))))
       (return-from move-mob t))
     
