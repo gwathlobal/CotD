@@ -9,19 +9,16 @@ The Legions of Hell invaded the City with the intention to slay its inhabitants.
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.0.6
+LATEST CHANGES v1.0.7
 
-- Angels can now chop off body parts when they kill somebody (they are armed with swords after all) 
-- Characters leave corpses upon dying, for purely cosmetic reasons
-- Added "Shift + Q" command to exit the current game and return to the main menu
-- Added dots showing where the bullets hit
-- Added damage types to weapons and damage resistances to armor 
-- Added bullet dispersion over distance
-- Added machine-gunners to the Military. They shoot the whole magazine in one round
-- Introduced cooldown abilities. The first cooldown ability "Charge" added to archdemons
-- Added "Fear" ability to demons and archdemons
-- Added "Blindness" ability to archangels
-- Added barricaded cities to the city generator
+- Momentum added! When you have the Momentum ability, that means that you gain speed when moving in a direction and are able to cover several tiles within one turn but you can not drastically change your direction when at high speed (unlike normal movement when you can make all kind of turns and backpedal at any time). If you bump into an obstacle, your speed drops to zero. If you bump into another unit, your speed drops to zero but you will try to push this unit (similar to the Charge ability).
+- Horses are added to the game. They are allied with all non-demon factions and have momentum. Horses can be found in the stables.
+- Fiends added to the game. They are demonic beasts who will attack everybody (even demons). They also have momentum.
+- Horseback riding added! Military units are able to use horses as mounts. When riding a mount, your mount moves independently of your actions, you can only give directions to it. This means that once you've gained speed, the mount will be moving in the chosen direction on its own, while you can shoot the enemies as you pass them by. Mounts may also be used as meatshields as enemies have 50% chance to hit your mount instead of you.
+- All demons are able to mount fiends.
+- Added scouts to the military. They are armed with rifles, are able to reveal a single enemy and start riding a horse.
+- You may now start as a scout. Scouts gain no followers but compensate that with their unsurpassed speed.
+- Added stables to the buildings of the city.
 
 --------------------
 FEATURES
