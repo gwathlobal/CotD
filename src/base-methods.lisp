@@ -84,46 +84,77 @@
     (push (make-animation :id animation-type-id :x x :y y :params params) (animation-queue *world*))))
 
 (defun check-move-on-level (mob dx dy)
-  ;;(format t "CHECK-MOVE-ON-LEVEL: inside~%")
-  ;; trying to move beyound the level border 
-  (when (or (< dx 0) (< dy 0) (>= dx *max-x-level*) (>= dy *max-y-level*)) (return-from check-move-on-level nil))
-  ;; checking for obstacle
-  (when (get-terrain-type-trait (get-terrain-* (level *world*) dx dy) +terrain-trait-blocks-move+)
-    (return-from check-move-on-level 'obstacle))
-  ;; checking for mobs
-  ;(format t "Obstacle = ~%")
-  (when (and (get-mob-* (level *world*) dx dy)
-             (not (eq (get-mob-* (level *world*) dx dy) mob)))
-    (return-from check-move-on-level (get-mob-* (level *world*) dx dy)))
-  
-  ;; all checks passed - can move freely
-  (return-from check-move-on-level t))
+  (let ((sx) (sy))
+    ;; calculate the coords of the mob's NE corner
+    (setf sx (- dx (truncate (1- (map-size mob)) 2)))
+    (setf sy (- dy (truncate (1- (map-size mob)) 2)))
+
+    (loop for nx from sx below (+ sx (map-size mob)) do
+      (loop for ny from sy below (+ sy (map-size mob)) do
+        ;; trying to move beyound the level border 
+        (when (or (< nx 0) (< ny 0) (>= nx *max-x-level*) (>= ny *max-y-level*))
+          (return-from check-move-on-level nil))
+        
+        ;; checking for obstacle
+        (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny) +terrain-trait-blocks-move+)
+          (return-from check-move-on-level 'obstacle))
+        
+        ;; checking for mobs
+        (when (and (get-mob-* (level *world*) nx ny)
+                   (not (eq (get-mob-* (level *world*) nx ny) mob)))
+          (return-from check-move-on-level (get-mob-* (level *world*) nx ny)))))
+    
+    ;; all checks passed - can move freely
+    (return-from check-move-on-level t)))
 
 (defun set-mob-location (mob x y)
-  (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
-    (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob)))
-  (setf (aref (mobs (level *world*)) (x mob) (y mob)) nil)
-  (setf (x mob) x (y mob) y)
-  (setf (aref (mobs (level *world*)) x y) (id mob))
+  (let ((sx) (sy))
+    ;; calculate the coords of the mob's NE corner
+    (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
+    (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
 
-  ;; when the mob is riding somebody, change the mob's coords to the rider's current location
-  (when (riding-mob-id mob)
-    (setf (x (get-mob-by-id (riding-mob-id mob))) x
-          (y (get-mob-by-id (riding-mob-id mob))) y))
-  ;; when the mob is being ridden by somebody, change the rider's coords to the mob's current location
-  (when (mounted-by-mob-id mob)
-    (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
-          (y (get-mob-by-id (mounted-by-mob-id mob))) y)
-    (setf (aref (mobs (level *world*)) x y) (mounted-by-mob-id mob))
-    ;; if the rider is possessed - it is the master who is placed on the map
-    ;(when (master-mob-id (get-mob-by-id (mounted-by-mob-id mob)))
-    ;  (setf (x (get-mob-by-id (master-mob-id (get-mob-by-id (mounted-by-mob-id mob))))) x
-    ;        (y (get-mob-by-id (master-mob-id (get-mob-by-id (mounted-by-mob-id mob))))) y)
-    ;  (setf (aref (mobs (level *world*)) x y) (master-mob-id (get-mob-by-id (mounted-by-mob-id mob)))))
-    )
-  
-  (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob))))
-    (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) (x mob) (y mob)))) mob (x mob) (y mob))))
+    ;(format t "SET-MOB-LOCATION: ~A SX ~A, SY ~A~%" (name mob) sx sy)
+    
+    ;; remove the mob from the orignal position
+    ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement 
+    (loop for nx from sx below (+ sx (map-size mob)) do
+      (loop for ny from sy below (+ sy (map-size mob)) do
+        (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny)))
+          (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny))) mob nx ny))
+        ;(format t "SET-MOB-LOCATION: ~A NX ~A, NY ~A~%" (name mob) nx ny)
+        (setf (aref (mobs (level *world*)) nx ny) nil)))
+
+    ;; change the cootds of the center of the mob
+    (setf (x mob) x (y mob) y)
+    ;; when the mob is riding somebody, change the mob's coords to the rider's current location
+    (when (riding-mob-id mob)
+      (setf (x (get-mob-by-id (riding-mob-id mob))) x
+            (y (get-mob-by-id (riding-mob-id mob))) y))
+    ;; when the mob is being ridden by somebody, change the rider's coords to the mob's current location
+    (when (mounted-by-mob-id mob)
+      (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
+            (y (get-mob-by-id (mounted-by-mob-id mob))) y))
+
+    ;; calculate the new coords of the mob's NE corner
+    (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
+    (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
+    
+    ;(format t "SET-MOB-LOCATION: ~A SX ~A, SY ~A~%" (name mob) sx sy)
+
+    ;; place the mob to the new position
+    ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement
+    (loop for nx from sx below (+ sx (map-size mob)) do
+      (loop for ny from sy below (+ sy (map-size mob)) do
+        ;(format t "SET-MOB-LOCATION: ~A NX ~A, NY ~A~%" (name mob) nx ny)
+        (setf (aref (mobs (level *world*)) nx ny) (id mob))
+        
+        (when (mounted-by-mob-id mob)
+          (setf (aref (mobs (level *world*)) nx ny) (mounted-by-mob-id mob)))
+        
+        (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx)))
+          (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx))) mob nx nx))
+            ))
+    ))
 
 (defun move-mob (mob dir &key (push nil))
   (let ((dx 0)
@@ -859,8 +890,40 @@
   )
   
 
-(defun get-current-mob-glyph-idx (mob)
+(defun get-current-mob-glyph-idx (mob &key (x (x mob)) (y (y mob)))
   (cond
+    ((and (> (map-size mob) 1)
+          (= (- (x mob) x) (* -1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* -1 (truncate (1- (map-size mob)) 2))))
+     106)
+    ((and (> (map-size mob) 1)
+          (= (- (x mob) x) (* 1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* -1 (truncate (1- (map-size mob)) 2))))
+     107)
+    ((and (> (map-size mob) 1)
+          (= (- (x mob) x) (* -1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* 1 (truncate (1- (map-size mob)) 2))))
+     105)
+    ((and (> (map-size mob) 1)
+          (= (- (x mob) x) (* 1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* 1 (truncate (1- (map-size mob)) 2))))
+     104)
+    ((and (> (map-size mob) 1)
+          (or (= (- (x mob) x) (* 1 (truncate (1- (map-size mob)) 2)))
+              (= (- (x mob) x) (* -1 (truncate (1- (map-size mob)) 2))))
+          ;(= (- (y mob) y) 0)
+          )
+     108)
+    ((and (> (map-size mob) 1)
+          ;(= (- (x mob) x) 0)
+          (or (= (- (y mob) y) (* 1 (truncate (1- (map-size mob)) 2)))
+              (= (- (y mob) y) (* -1 (truncate (1- (map-size mob)) 2))))
+          )
+     109)
+    ((and (> (map-size mob) 1)
+          (or (/= (- (x mob) x) 0)
+              (/= (- (y mob) y) 0)))
+     0)
     ((and (mob-effect-p mob +mob-effect-possessed+)
           (mob-effect-p mob +mob-effect-reveal-true-form+))
      (glyph-idx (get-mob-type-by-id (mob-type (get-mob-by-id (slave-mob-id mob))))))

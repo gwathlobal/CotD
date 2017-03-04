@@ -4,19 +4,87 @@
 
 (defun check-move-for-ai (mob dx dy)
   (declare (optimize (speed 3))
-           (type fixnum dx dy)
-           (ignore mob))
-  ;; cant move beyond level borders 
-  (when (or (< dx 0) (< dy 0) (>= dx *max-x-level*) (>= dy *max-y-level*)) (return-from check-move-for-ai nil))
-  
-  ;; checking for terrain obstacle
-  (when (get-terrain-type-trait (get-terrain-* (level *world*) dx dy) +terrain-trait-blocks-move+) 
-    (return-from check-move-for-ai nil))
+           (type fixnum dx dy))
+  (let ((sx 0) (sy 0)
+        (map-size (map-size mob)))
+    (declare (type fixnum sx sy map-size))
+    ;; calculate the coords of the mob's NE corner
+    (setf sx (- dx (truncate (1- map-size) 2)))
+    (setf sy (- dy (truncate (1- map-size) 2)))
 
-  t
-  )
+    (loop for nx from sx below (+ sx map-size) do
+      (loop for ny from sy below (+ sy map-size) do
+        ;; cant move beyond level borders 
+        (when (or (< nx 0) (< ny 0) (>= nx *max-x-level*) (>= ny *max-y-level*))
+          (return-from check-move-for-ai nil))
+        
+        ;; checking for terrain obstacle
+        (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny) +terrain-trait-blocks-move+) 
+          (return-from check-move-for-ai nil))))
 
+    t))
 
+(defun ai-find-move-around (mob tx ty)
+  (declare (optimize (speed 3))
+           (type fixnum tx ty))
+  (let* ((cell-list)
+         (map-size (map-size mob))
+         (half-size (truncate (1- map-size) 2)))
+    (declare (type list cell-list)
+             (type fixnum map-size half-size))
+    ;; collect all cells that constitute the perimeter of the mob around the target cell
+    (loop for off-x of-type fixnum from (- half-size) to (+ half-size)
+          for x of-type fixnum = (+ tx off-x)
+          for y-up of-type fixnum = (- ty half-size)
+          for y-down of-type fixnum = (+ ty half-size)
+          do
+             (push (cons x y-up) cell-list)
+             (push (cons x y-down) cell-list))
+    (loop for off-y from (- half-size) to (+ half-size)
+          for y of-type fixnum = (+ ty off-y)
+          for x-up of-type fixnum = (- tx half-size)
+          for x-down of-type fixnum = (+ tx half-size)
+          do
+      (push (cons x-up y) cell-list)
+      (push (cons x-down y) cell-list))
+
+    ;(format t "AI-FIND-MOVE-AROUND: Cell list with duplicates ~A~%" cell-list)
+    
+    ;; remove all duplicates from the list
+    (remove-duplicates cell-list :test #'(lambda (a b)
+                                           (let ((x1 (car a))
+                                                 (x2 (car b))
+                                                 (y1 (cdr a))
+                                                 (y2 (cdr b)))
+                                             (declare (type fixnum x1 x2 y1 y2))
+                                             (if (and (= x1 x2)
+                                                      (= y1 y2))
+                                               t
+                                               nil))))
+
+    ;(format t "AI-FIND-MOVE-AROUND: Cell list without duplicates ~A~%" cell-list)
+    
+    ;; sort them so that the closest to the mob are checked first
+    (setf cell-list (stable-sort cell-list #'(lambda (a b)
+                                               (if (< (get-distance tx ty (car a) (cdr a))
+                                                      (get-distance tx ty (car b) (cdr b)))
+                                                 t
+                                                 nil))))
+
+    ;(format t "AI-FIND-MOVE-AROUND: Cell list sorted ~A~%" cell-list)
+    
+    ;; check each cell for passability
+    (loop for (dx . dy) in cell-list
+          for connect-d of-type fixnum = (aref (aref (connect-map (level *world*)) map-size) dx dy)
+          for connect-mob of-type fixnum = (aref (aref (connect-map (level *world*)) map-size) (x mob) (y mob))
+          do
+      (when (and (= connect-d connect-mob)
+                 (check-move-for-ai mob dx dy))
+        ;(format t "AI-FIND-MOVE-AROUND: Return value ~A~%" (cons dx dy))
+        (return-from ai-find-move-around (cons dx dy))))
+
+    ;(format t "AI-FIND-MOVE-AROUND: Return value ~A~%" nil)
+    nil))
 
 (defun ai-mob-flee (mob nearest-enemy)
   (unless nearest-enemy
@@ -204,26 +272,6 @@
         (setf nearest-target nil)
         ))
     
-    
-    ;; got to the nearest target
-    (when nearest-target
-      (logger (format nil "AI-FUNCTION: Target found ~A [~A]~%" (name nearest-target) (id nearest-target)))
-      (let ((path nil))
-       
-        (setf path (a-star (list (x mob) (y mob)) (list (x nearest-target) (y nearest-target)) 
-                           #'(lambda (dx dy) 
-                               ;; checking for impassable objects
-                               (check-move-for-ai mob dx dy)
-                               )))
-        
-        (logger (format nil "AI-FUNCTION: Mob - (~A ~A) Target - (~A ~A)~%" (x mob) (y mob) (x nearest-target) (y nearest-target)))
-        (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
-        (pop path)
-        
-	(setf (path mob) path)
-        (setf (path-dst mob) (cons (x nearest-target) (y nearest-target)))
-        
-        ))
     ;; invoke abilities if any
     (let ((ability-list) (r 0))
       (declare (type fixnum r)
@@ -317,24 +365,60 @@
           (progn
             (setf (path-dst mob) nil)))))
           
+
+    ;; got to the nearest target
+    (when nearest-target
+      (logger (format nil "AI-FUNCTION: Target found ~A [~A]~%" (name nearest-target) (id nearest-target)))
+      (let ((path nil)
+            (connect-map (aref (connect-map (level *world*)) (map-size mob)))
+            (target-pos nil))
+
+        (cond
+          ((= (aref connect-map (x mob) (y mob))
+              (aref connect-map (x nearest-target) (y nearest-target)))
+           (setf target-pos (cons (x nearest-target) (y nearest-target))))
+          ((and (> (map-size mob) 1)
+                (ai-find-move-around mob (x nearest-target) (y nearest-target)))
+           (setf target-pos (ai-find-move-around mob (x nearest-target) (y nearest-target)))))
+
+        (when target-pos
+
+          (setf path (a-star (list (x mob) (y mob)) (list (car target-pos) (cdr target-pos)) 
+                             #'(lambda (dx dy) 
+                                 ;; checking for impassable objects
+                                 (check-move-for-ai mob dx dy)
+                                 )))
+          
+          (logger (format nil "AI-FUNCTION: Mob - (~A ~A) Target - (~A ~A)~%" (x mob) (y mob) (car target-pos) (cdr target-pos)))
+          (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
+          (pop path)
+          
+          (setf (path mob) path)
+          (setf (path-dst mob) target-pos)
+          
+        )))
     
     ;; move to some random passable terrain 
-    ;; a hack to easy the strain of pathfinding during the first turns - if you are human and there are more than 100 of you, do not pathfind
     (when (or (not (path mob))
               (mob-ability-p mob +mob-abil-momentum+))
       (let ((rx (- (+ 10 (x mob))
                    (1+ (random 20)))) 
             (ry (- (+ 10 (y mob))
                    (1+ (random 20))))
-            (path nil))
+            (path nil)
+            (connect-map (aref (connect-map (level *world*)) (map-size mob))))
         (declare (type fixnum rx ry))
 
+        (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to a random nearby place~%" (x mob) (y mob)))
+        
         ;; if the mob destination is not set, choose some random location
         (unless (path-dst mob)
           (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
                           (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
                           (and (get-mob-* (level *world*) rx ry)
-                               (not (eq (get-mob-* (level *world*) rx ry) mob))))
+                               (not (eq (get-mob-* (level *world*) rx ry) mob)))
+                          (/= (aref connect-map (x mob) (y mob))
+                              (aref connect-map rx ry)))
                 do
                    (setf rx (- (+ 10 (x mob))
                                (1+ (random 20))))
@@ -342,17 +426,20 @@
                                (1+ (random 20)))))
           (setf (path-dst mob) (cons rx ry))
           (logger (format nil "AI-FUNCTION: Mob's destination is randomly set to (~A, ~A)~%" (car (path-dst mob)) (cdr (path-dst mob)))))
-        (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (car (path-dst mob)) (cdr (path-dst mob))))
-        (setf path (a-star (list (x mob) (y mob)) (list (car (path-dst mob)) (cdr (path-dst mob))) 
-                           #'(lambda (dx dy) 
-                               ;; checking for impassable objects
-                               (check-move-for-ai mob dx dy)
-                               )))
-        
-        (pop path)
-        (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
-        (setf (path mob) path)
-        ))
+        (when (= (aref connect-map (x mob) (y mob))
+                 (aref connect-map (car (path-dst mob)) (cdr (path-dst mob))))
+          
+          (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (car (path-dst mob)) (cdr (path-dst mob))))
+          (setf path (a-star (list (x mob) (y mob)) (list (car (path-dst mob)) (cdr (path-dst mob))) 
+                             #'(lambda (dx dy) 
+                                 ;; checking for impassable objects
+                                 (check-move-for-ai mob dx dy)
+                                 )))
+          
+          (pop path)
+          (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
+          (setf (path mob) path)
+          )))
     
     ;; if the mob has its path set - move along it
     (when (path mob)
@@ -511,7 +598,8 @@
                           (1+ (random 20)))) 
                    (ry (- (+ 10 (y mob))
                           (1+ (random 20))))
-                   (path nil))
+                   (path nil)
+                   (connect-map (aref (connect-map (level *world*)) (map-size mob))))
               (declare (type fixnum rx ry))
 
               ;; if the mob destination is not set, choose a random destination
@@ -519,25 +607,29 @@
                 (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
                                 (get-terrain-type-trait (get-terrain-* (level *world*) rx ry) +terrain-trait-blocks-move+)
                                 (and (get-mob-* (level *world*) rx ry)
-                                     (not (eq (get-mob-* (level *world*) rx ry) mob))))
+                                     (not (eq (get-mob-* (level *world*) rx ry) mob)))
+                                (/= (aref connect-map (x mob) (y mob))
+                                    (aref connect-map rx ry)))
                       do
                          (setf rx (- (+ 10 (x mob))
                                      (1+ (random 20))))
                          (setf ry (- (+ 10 (y mob))
                                      (1+ (random 20)))))
                 (setf (path-dst mob) (cons rx ry)))
-              
-              (logger (format nil "THREAD: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (car (path-dst mob)) (cdr (path-dst mob))) stream)
-              (setf path (a-star (list (x mob) (y mob)) (list (car (path-dst mob)) (cdr (path-dst mob))) 
-                                 #'(lambda (dx dy) 
-                                     ;; checking for impassable objects
-                                     (check-move-for-ai mob dx dy)
-                                     )))
-              
-              (pop path)
-              (logger (format nil "THREAD: Set mob path - ~A~%" path) stream)
-              (setf (path mob) path)
-              )
+
+               (when (= (aref connect-map (x mob) (y mob))
+                        (aref connect-map (car (path-dst mob)) (cdr (path-dst mob))))
+                 (logger (format nil "THREAD: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (car (path-dst mob)) (cdr (path-dst mob))) stream)
+                 (setf path (a-star (list (x mob) (y mob)) (list (car (path-dst mob)) (cdr (path-dst mob))) 
+                                    #'(lambda (dx dy) 
+                                        ;; checking for impassable objects
+                                        (check-move-for-ai mob dx dy)
+                                        )))
+                 
+                 (pop path)
+                 (logger (format nil "THREAD: Set mob path - ~A~%" path) stream)
+                 (setf (path mob) path)
+                 ))
             )
           (incf (cur-mob-path *world*))
           (logger (format nil "THREAD: cur-mob-path - ~A~%" (cur-mob-path *world*)) stream))

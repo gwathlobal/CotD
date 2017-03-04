@@ -13,6 +13,7 @@
    (faction :initform +faction-type-none+ :initarg :faction :accessor faction)
    (mob-type :initarg :mob-type :accessor mob-type)
    (evolve-mob-id :initform nil :initarg :evolve-mob-id :accessor evolve-mob-id)
+   (map-size :initform 1 :initarg :map-size :accessor map-size)  ;; can take odd mumbers only, because there should always be a center
    
    (max-hp :initform 1 :initarg :max-hp :accessor max-hp)
    (max-fp :initform 1 :initarg :max-fp :accessor max-fp)
@@ -702,6 +703,9 @@
                   (= (first (order follower)) +mob-order-follow+)
                   (= (second (order follower)) (id mob)))
           count follower))
+
+(defmethod map-size ((mob mob))
+  (map-size (get-mob-type-by-id (mob-type mob))))
 
 ;;----------------------
 ;; PLAYER

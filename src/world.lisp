@@ -12,15 +12,31 @@
    (mob-id-list :initarg :mob-id-list :initform (make-list 0) :accessor mob-id-list)
    (item-id-list :initarg :item-id-list :initform (make-list 0) :accessor item-id-list)
    (feature-id-list :initarg :feature-id-list :initform (make-list 0) :accessor feature-id-list)
+   (connect-map :initform (make-array '(6) :initial-element nil) :accessor connect-map :type simple-array) ; an array that holds connection maps (which are arrays themselves) for all sizes of mobs,
+                                                                                                                           ; note that sizes can only be odd numbers, so some indices of the array will hold nil 
    ))
    
 (defun add-mob-to-level-list (level mob)
   (pushnew (id mob) (mob-id-list level))
-  (setf (aref (mobs level) (x mob) (y mob)) (id mob)))
+  
+  (let ((sx) (sy))
+    (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
+    (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
+    
+    (loop for nx from sx below (+ sx (map-size mob)) do
+      (loop for ny from sy below (+ sy (map-size mob)) do
+        (setf (aref (mobs level) nx ny) (id mob))))))
 
 (defun remove-mob-from-level-list (level mob)
   (setf (mob-id-list level) (remove (id mob) (mob-id-list level)))
-  (setf (aref (mobs level) (x mob) (y mob)) nil))
+  
+  (let ((sx) (sy))
+    (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
+    (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
+    
+    (loop for nx from sx below (+ sx (map-size mob)) do
+      (loop for ny from sy below (+ sy (map-size mob)) do
+        (setf (aref (mobs level) nx ny) nil)))))
 
 (defun add-feature-to-level-list (level feature)
   (pushnew (id feature) (feature-id-list level)))

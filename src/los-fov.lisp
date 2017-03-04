@@ -95,8 +95,8 @@
   (when (get-mob-* level map-x map-y)
     (let ((vmob (get-mob-* level map-x map-y)))
       (set-single-memo-* level 
-                         (x vmob) (y vmob) 
-                         :glyph-idx (get-current-mob-glyph-idx vmob)
+                         map-x map-y 
+                         :glyph-idx (get-current-mob-glyph-idx vmob :x map-x :y map-y)
                          :glyph-color (get-current-mob-glyph-color vmob)
                          :back-color (get-current-mob-back-color vmob)
                          :visibility t

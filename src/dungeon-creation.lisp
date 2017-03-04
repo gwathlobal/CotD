@@ -81,6 +81,12 @@
     ;; set the game events
     (setf (game-events world) game-event-list)
 
+    ;; check map for connectivity
+    ;(time (progn
+    (create-connect-map (level world) 1)
+    (create-connect-map (level world) 3)
+    (create-connect-map (level world) 5)
+    ;))
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure*)
@@ -111,3 +117,67 @@
 	 (loop for y from 0 to (1- *max-y-level*) do
 	      (set-terrain-* level x y (aref template-level x y))))
     level))
+
+(defun flood-fill (first-cell &key check-func make-func)
+  (declare (optimize (speed 3))
+           (type function check-func make-func))
+  
+  (let ((open-list nil))
+    (push first-cell open-list)
+    (loop while open-list
+          for c-cell of-type cons = (pop open-list)
+          for cx of-type fixnum = (car c-cell)
+          for cy of-type fixnum = (cdr c-cell)
+          do
+             (funcall make-func cx cy)
+             
+             (loop for y-offset of-type fixnum from -1 to 1
+                   for y of-type fixnum = (+ cy y-offset) do
+                     (loop for x-offset of-type fixnum from -1 to 1
+                           for x of-type fixnum = (+ cx x-offset)
+                           when (and (>= x 0) (>= y 0) (< x *max-x-level*) (< y *max-y-level*)
+                                     (not (and (zerop x-offset) (zerop y-offset)))
+                                     (funcall check-func x y))
+                             do
+                                (push (cons x y) open-list)))
+
+          )
+    ))
+
+(defun create-connect-map (level mob-size)
+  (declare (optimize (speed 3))
+           (type fixnum mob-size))
+  (let* ((max-x (array-dimension (terrain level) 0))
+         (max-y (array-dimension (terrain level) 1))
+         (connect-map (make-array (list max-x max-y) :initial-element +connect-room-none+))
+         (room-id 0)
+         (check-func #'(lambda (x y)
+                         (let* ((connect-id (aref connect-map x y))
+                                (half-size (truncate (1- mob-size) 2)))
+                           (declare (type fixnum connect-id half-size))
+                           (if (and (= connect-id +connect-room-none+)
+                                    (funcall #'(lambda (sx sy)
+                                                 (let ((result t))
+                                                   (loop for off-x of-type fixnum from (- half-size) to (+ half-size)
+                                                         for nx of-type fixnum = (+ sx off-x) do
+                                                           (loop for off-y of-type fixnum from (- half-size) to (+ half-size)
+                                                                 for ny of-type fixnum = (+ sy off-y)
+                                                                 when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
+                                                                          (get-terrain-type-trait (get-terrain-* level nx ny) +terrain-trait-blocks-move+))
+                                                                   do
+                                                                      (setf result nil)))
+                                                   result))
+                                             x y))
+                             t
+                             nil))))
+         (make-func #'(lambda (x y)
+                        (setf (aref connect-map x y) room-id))))
+    (declare (type fixnum max-x max-y room-id))
+    
+    (loop for x from 0 below max-x do
+      (loop for y from 0 below max-y do
+        (when (funcall check-func x y)
+          (flood-fill (cons x y) :check-func check-func :make-func make-func)
+          (incf room-id))
+        ))
+    (setf (aref (connect-map level) mob-size) connect-map)))
