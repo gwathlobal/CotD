@@ -44,16 +44,18 @@
                         (total-angels *world*)
                         (total-demons *world*)
                         (sense-good-evil-str)
-                        (if (mob-ability-p *player* +mob-abil-momentum+) (format nil "~%Moving: ~A~A"
-                                                                                 (x-y-into-str (momentum-dir *player*))
-                                                                                 (if (not (zerop (momentum-spd *player*)))
-                                                                                   (format nil " (Spd: ~A)" (momentum-spd *player*))
-                                                                                   ""))
+                        (if (or (mob-ability-p *player* +mob-abil-momentum+)
+                                (mob-ability-p *player* +mob-abil-facing+)) (format nil "~%Moving: ~A~A"
+                                                                                    (x-y-into-str (momentum-dir *player*))
+                                                                                    (if (not (zerop (momentum-spd *player*)))
+                                                                                      (format nil " (Spd: ~A)" (momentum-spd *player*))
+                                                                                      ""))
                           "")
                         (if (riding-mob-id *player*) (format nil "~%Riding: ~A~%  HP: ~A/~A~A"
                                                              (name (get-mob-by-id (riding-mob-id *player*)))
                                                              (cur-hp (get-mob-by-id (riding-mob-id *player*))) (max-hp (get-mob-by-id (riding-mob-id *player*)))
-                                                             (if (mob-ability-p (get-mob-by-id (riding-mob-id *player*)) +mob-abil-momentum+)
+                                                             (if (or (mob-ability-p (get-mob-by-id (riding-mob-id *player*)) +mob-abil-momentum+)
+                                                                     (mob-ability-p (get-mob-by-id (riding-mob-id *player*)) +mob-abil-facing+))
                                                                (format nil "~%  Direction: ~A~A"
                                                                        (x-y-into-str (momentum-dir (get-mob-by-id (riding-mob-id *player*))))
                                                                        (if (not (zerop (momentum-spd (get-mob-by-id (riding-mob-id *player*)))))

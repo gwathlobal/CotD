@@ -579,6 +579,7 @@
   ;; pester the player until it makes some meaningful action that can trigger the event chain
   (loop until (made-turn player) do
     (setf (can-move-if-possessed player) nil)
+    (format t "HERE~%")
     (get-input-player))
   (setf *time-at-end-of-player-turn* (get-internal-real-time)))
 

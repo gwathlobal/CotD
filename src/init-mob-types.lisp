@@ -133,7 +133,7 @@
                                        :name "Scout"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 60 :g 179 :b 113) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 110 ())) :base-dodge 25
+                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 120 ())) :base-dodge 25
                                        :strength 1
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-starts-with-horse t
                                        :abil-independent t :abil-detect-good t :abil-detect-evil t :abil-eagle-eye t
@@ -222,8 +222,8 @@
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 2 :base-sight 7
-                                       :map-size 5
-                                       :abil-animal t :abil-angel t :abil-horse-can-be-ridden t))
+                                       :map-size 3
+                                       :abil-animal t :abil-angel t :abil-horse-can-be-ridden t :abil-facing t))
 
 
 (set-faction-relations +faction-type-humans+

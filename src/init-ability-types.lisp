@@ -1309,3 +1309,10 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-facing+ :name "Facing" :descr "You can not change the direction of your movement easily. You must first face the place where you go." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

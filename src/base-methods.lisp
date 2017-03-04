@@ -51,18 +51,18 @@
 
 (defun dir-neighbours (dir)
   ;; find the neighbours of the direction
-  ;; the result is <along the direction> <not along the direction> <opposite the direction>
+  ;; the result is <along the direction> <not along the direction> <to the left from the direction> <to the right from the direction> <near the opposite direction> <opposite the direction>
   ;; for more info see the move-mob func
   (cond
-    ((eql dir 1) (values-list '((4 1 2) (3 6 7 8) (9))))
-    ((eql dir 2) (values-list '((1 2 3) (4 6 7 9) (8))))
-    ((eql dir 3) (values-list '((2 3 6) (1 4 8 9) (7))))
-    ((eql dir 4) (values-list '((1 4 7) (8 2 9 3) (6))))
-    ((eql dir 5) (values-list '((1 2 3 4 5 6 7 8 9) () ())))
-    ((eql dir 6) (values-list '((9 6 3) (8 2 7 1) (4))))
-    ((eql dir 7) (values-list '((4 7 8) (1 9 2 6) (3))))
-    ((eql dir 8) (values-list '((7 8 9) (4 6 1 3) (2))))
-    ((eql dir 9) (values-list '((8 9 6) (7 3 4 2) (1))))
+    ((eql dir 1) (values-list '((4 1 2) (3 6 7 8) (3 6) (7 8) (8 6) (9))))
+    ((eql dir 2) (values-list '((1 2 3) (4 6 7 9) (6 9) (4 7) (7 9) (8))))
+    ((eql dir 3) (values-list '((2 3 6) (1 4 8 9) (9 8) (1 4) (4 8) (7))))
+    ((eql dir 4) (values-list '((1 4 7) (8 2 9 3) (2 3) (8 9) (9 3) (6))))
+    ((eql dir 5) (values-list '((1 2 3 4 5 6 7 8 9) () () () () ())))
+    ((eql dir 6) (values-list '((9 6 3) (8 2 7 1) (8 7) (2 1) (7 1) (4))))
+    ((eql dir 7) (values-list '((4 7 8) (1 9 2 6) (1 2) (9 3) (6 2) (3))))
+    ((eql dir 8) (values-list '((7 8 9) (4 6 1 3) (4 1) (6 3) (1 3) (2))))
+    ((eql dir 9) (values-list '((8 9 6) (7 3 4 2) (7 4) (3 2) (4 2) (1))))
     (t (error "Wrong direction supplied!!!"))))
 
 (defun check-surroundings (x y include-center func)
@@ -123,15 +123,12 @@
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
     (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
 
-    ;(format t "SET-MOB-LOCATION: ~A SX ~A, SY ~A~%" (name mob) sx sy)
-    
     ;; remove the mob from the orignal position
     ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement 
     (loop for nx from sx below (+ sx (map-size mob)) do
       (loop for ny from sy below (+ sy (map-size mob)) do
         (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny)))
           (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny))) mob nx ny))
-        ;(format t "SET-MOB-LOCATION: ~A NX ~A, NY ~A~%" (name mob) nx ny)
         (setf (aref (mobs (level *world*)) nx ny) nil)))
 
     ;; change the cootds of the center of the mob
@@ -141,13 +138,10 @@
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
     (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
     
-    ;(format t "SET-MOB-LOCATION: ~A SX ~A, SY ~A~%" (name mob) sx sy)
-
     ;; place the mob to the new position
     ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement
     (loop for nx from sx below (+ sx (map-size mob)) do
       (loop for ny from sy below (+ sy (map-size mob)) do
-        ;(format t "SET-MOB-LOCATION: ~A NX ~A, NY ~A~%" (name mob) nx ny)
         (setf (aref (mobs (level *world*)) nx ny) (id mob))
 
         (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx)))
@@ -169,6 +163,9 @@
         (along-dir)
         (opposite-dir)
         (not-along-dir)
+        (near-opposite-dir)
+        (to-the-left-dir)
+        (to-the-right-dir)
         (c-dir))
     (declare (type fixnum dx dy))
 
@@ -176,12 +173,11 @@
     ;; if being ridden - restore the direction from the order being given by the rider
     (when (and (mounted-by-mob-id mob)
                (order-for-next-turn mob))
-      (setf dir (order-for-next-turn mob))
-      ;(setf (order-for-next-turn mob) nil)
-      )
+      (setf dir (order-for-next-turn mob)))
     
     (multiple-value-setq (dx dy) (x-y-dir dir))
-    
+
+    ;; if riding somebody, only give an order tou your mount but do not move yourself
     (when (riding-mob-id mob)
       (logger (format nil "MOVE-MOB: ~A [~A] gives orders to mount ~A [~A] to move in the dir ~A~%" (name mob) (id mob) (name (get-mob-by-id (riding-mob-id mob))) (id (get-mob-by-id (riding-mob-id mob))) dir))
 
@@ -201,19 +197,17 @@
           (return-from move-mob check-result))
 
         (when (or (eq check-result nil)
-                  (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy)) nil))
+                  (and (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy)) nil)
+                       (= dir (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob))))))))
           (return-from move-mob check-result)))
 
-      ;; a trick not to confuse player when the horse move-spd is greater than the rider's move-spd
       (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
       (return-from move-mob t))
 
     (setf c-dir (x-y-into-dir (car (momentum-dir mob)) (cdr (momentum-dir mob))))
-    (multiple-value-setq (along-dir not-along-dir opposite-dir) (dir-neighbours c-dir))
+    (multiple-value-setq (along-dir not-along-dir to-the-left-dir to-the-right-dir near-opposite-dir opposite-dir) (dir-neighbours c-dir))
 
-    (when (or (mob-ability-p mob +mob-abil-momentum+)
-              (and (riding-mob-id mob)
-                   (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
+    (when (mob-ability-p mob +mob-abil-momentum+)
       (setf push t))
 
     (logger (format nil "MOVE-MOB: ~A - spd ~A, c-dir ~A, dir ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir along-dir not-along-dir opposite-dir))
@@ -226,8 +220,12 @@
       ;;   "opposite direction" which is (-1.-1)
       ;;   "along the direction" which is ( 1. 1), ( 0. 1) or ( 1. 0)
       ;;   "not along the direction" which is (-1. 1), (-1. 0), ( 1.-1) or ( 0.-1)
+      ;;   "direction to the left" which is ( 1. -1) or ( 0.-1), note that mob's direction will be set to ( 1.-1) when the mob tries to change its direction abruptly
+      ;;   "direction to the right" which is (-1. 1) or (-1. 0), note that mob's direction will be set to (-1. 1) when the mob tries to change its direction abruptly
+      ;;   "near the opposite direction" which is (-1. 0) or ( 0.-1)
       ;; if speed is 0 or moving along the direction - increase spead and set the movement dir to chosen dir
-      ((or (and (zerop (momentum-spd mob))
+      ((or (and (not (mob-ability-p mob +mob-abil-facing+))
+                (zerop (momentum-spd mob))
                 (/= dir 5))
            (and (/= dir 5)
                 (find dir along-dir)))
@@ -240,13 +238,28 @@
       ((find dir opposite-dir)
        (progn
          (decf (momentum-spd mob))
+         ;; if the mob is has facing, choose one of the directions neighbouring the opposite one, so that he turns around using this direction 
+         (when (mob-ability-p mob +mob-abil-facing+)
+           (multiple-value-setq (along-dir not-along-dir to-the-left-dir to-the-right-dir near-opposite-dir opposite-dir) (dir-neighbours dir))
+           (if (zerop (random 2))
+             (multiple-value-setq (dx dy) (x-y-dir (first near-opposite-dir)))
+             (multiple-value-setq (dx dy) (x-y-dir (second near-opposite-dir))))
+           (setf (car (momentum-dir mob)) dx)
+           (setf (cdr (momentum-dir mob)) dy)
+           (setf dx 0 dy 0))
          (format t "MOVE-MOB OPPOSITE - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy)))
       ;; if moving not along the direction - reduce spead and change the direction
       ((find dir not-along-dir)
        (progn
          (decf (momentum-spd mob))
-         (incf (car (momentum-dir mob)) dx)
-         (incf (cdr (momentum-dir mob)) dy)
+         ;; change direction either to the left or to the right depending on where the proposed direction lies
+         (if (find dir to-the-left-dir)
+           (multiple-value-setq (dx dy) (x-y-dir (first to-the-left-dir)))
+           (multiple-value-setq (dx dy) (x-y-dir (first to-the-right-dir))))
+         (setf (car (momentum-dir mob)) dx)
+         (setf (cdr (momentum-dir mob)) dy)
+         (when (mob-ability-p mob +mob-abil-facing+)
+           (setf dx 0 dy 0))
          (format t "MOVE-MOB NOT ALONG - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy)))
       )
 
@@ -266,22 +279,24 @@
     (when (and (mob-ability-p mob +mob-abil-momentum+)
                (> (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
       (setf (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
-    (when (and (riding-mob-id mob)
-               (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)
-               (> (momentum-spd mob) (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
-      (setf (momentum-spd mob) (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
+    (when (not (mob-ability-p mob +mob-abil-momentum+))
+      (setf (momentum-spd mob) 0))
     (when (< (momentum-spd mob) 0)
       (setf (momentum-spd mob) 0))  
+
+    (when (mob-ability-p mob +mob-abil-momentum+)
+      (setf dx (car (momentum-dir mob)))
+      (setf dy (cdr (momentum-dir mob))))
     
     (loop repeat (if (zerop (momentum-spd mob))
                    1
                    (momentum-spd mob))
-          with move-result = nil
-          for x = (+ (car (momentum-dir mob)) (x mob))
-          for y = (+ (cdr (momentum-dir mob)) (y mob))
+          for move-result = nil
+          for x = (+ (x mob) dx)
+          for y = (+ (y mob) dy)
           for check-result = (check-move-on-level mob x y)
           do
-             (logger (format t "MOVE-MOB: CHECK-MOVE ~A~%" check-result))
+             (logger (format nil "MOVE-MOB: CHECK-MOVE ~A~%" check-result))
              (cond
                ;; all clear - move freely
                ((eq check-result t)
@@ -290,14 +305,20 @@
                 )
                ;; bumped into an obstacle or the map border
                ((or (eq check-result nil) (eq (first check-result) :obstacles))
-                (setf (momentum-spd mob) 0)
-                (setf (momentum-dir mob) (cons 0 0))
+
+                (format t "HERE 1~%")
+                (when (mob-ability-p mob +mob-abil-momentum+)
+                  (setf (momentum-spd mob) 0)
+                  (setf (momentum-dir mob) (cons 0 0)))
                 (setf (order-for-next-turn mob) 5)
 
                 ;; a precaution so that horses finish their turn when they made a move and bumped into an obstacle
                 ;; while not finishing their turn if they try to move into an obstacle standing next to it
                 (when (or (/= sx (x mob))
-                          (/= sy (y mob)))
+                          (/= sy (y mob))
+                          (/= c-dir (x-y-into-dir dx dy))
+                          )
+                  (format t "HERE 2~%")
                   (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
                 (setf move-result nil)
                 (loop-finish)
@@ -340,24 +361,23 @@
                 (when (eq move-result t)
                   (loop-finish))
                                 
-                (setf (momentum-dir mob) (cons 0 0))
-                (setf (momentum-spd mob) 0)
+                
+                (when (mob-ability-p mob +mob-abil-momentum+)
+                  (setf (momentum-spd mob) 0)
+                  (setf (momentum-dir mob) (cons 0 0)))
                 (setf move-result check-result)
                 (loop-finish))
                )
           finally
-             (when (zerop (momentum-spd mob)) (setf (momentum-dir mob) (cons 0 0)))
-
+             (cond
+               ((mob-ability-p mob +mob-abil-momentum+) (when (zerop (momentum-spd mob))
+                                                          (setf (momentum-dir mob) (cons 0 0))))
+               ((mob-ability-p mob +mob-abil-facing+) nil)
+               (t (setf (momentum-dir mob) (cons 0 0))))
+             
              (when (eq move-result t)
                (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
              
-             (when (and (not (mob-ability-p mob +mob-abil-momentum+))
-                        (not (and (riding-mob-id mob)
-                                  (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+))))
-               (progn
-                 (setf (momentum-dir mob) (cons 0 0))
-                 (setf (momentum-spd mob) 0)))
-
              (return-from move-mob move-result))
     )
   nil)
@@ -924,6 +944,48 @@
 
 (defun get-current-mob-glyph-idx (mob &key (x (x mob)) (y (y mob)))
   (cond
+   
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (x mob) x) (* -1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* -1 (truncate (1- (map-size mob)) 2))))
+     114)
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (x mob) x) (* 1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* -1 (truncate (1- (map-size mob)) 2))))
+     115)
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (x mob) x) (* -1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* 1 (truncate (1- (map-size mob)) 2))))
+     116)
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (x mob) x) (* 1 (truncate (1- (map-size mob)) 2)))
+          (= (- (y mob) y) (* 1 (truncate (1- (map-size mob)) 2))))
+     117)
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (x mob) x) (- (truncate (1- (map-size mob)) 2))))
+     112)
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (x mob) x) (+ (truncate (1- (map-size mob)) 2))))
+     113)
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (y mob) y) (- (truncate (1- (map-size mob)) 2))))
+     111)
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)
+          (= (- (y mob) y) (+ (truncate (1- (map-size mob)) 2))))
+     110)
+    
+    ((and (> (map-size mob) 1)
+          (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y))
+     (glyph-idx (get-mob-type-by-id (face-mob-type-id mob))))
+    
     ((and (> (map-size mob) 1)
           (= (- (x mob) x) (* -1 (truncate (1- (map-size mob)) 2)))
           (= (- (y mob) y) (* -1 (truncate (1- (map-size mob)) 2))))

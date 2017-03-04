@@ -107,6 +107,7 @@
 (defconstant +mob-abil-starts-with-horse+ 36)
 (defconstant +mob-abil-independent+ 37)
 (defconstant +mob-abil-eagle-eye+ 38)
+(defconstant +mob-abil-facing+ 39)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
