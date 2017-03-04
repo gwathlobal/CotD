@@ -344,9 +344,10 @@
    (momentum-dir :initform (cons 0 0) :accessor momentum-dir)
    
    (order :initform nil :accessor order)
-
+   
    (riding-mob-id :initform nil :accessor riding-mob-id)        ;; mob is riding this mob-id
    (mounted-by-mob-id :initform nil :accessor mounted-by-mob-id) ;; mob is being ridden by this mob-id
+   (order-for-next-turn :initform nil :accessor order-for-next-turn) ;; the order for mounts where to move next turn, type fixnum (direction)
    
    (master-mob-id :initform nil :accessor master-mob-id)        ;; mob that controls this mob
    (slave-mob-id :initform nil :accessor slave-mob-id)          ;; mob that is being controlled by this mob

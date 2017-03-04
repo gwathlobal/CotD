@@ -84,7 +84,8 @@
     (push (make-animation :id animation-type-id :x x :y y :params params) (animation-queue *world*))))
 
 (defun check-move-on-level (mob dx dy)
-  (let ((sx) (sy))
+  (let ((sx) (sy)
+        (mob-list nil))
     ;; calculate the coords of the mob's NE corner
     (setf sx (- dx (truncate (1- (map-size mob)) 2)))
     (setf sy (- dy (truncate (1- (map-size mob)) 2)))
@@ -97,18 +98,27 @@
         
         ;; checking for obstacle
         (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny) +terrain-trait-blocks-move+)
-          (return-from check-move-on-level 'obstacle))
+          (return-from check-move-on-level nil)
+          ;(return-from check-move-on-level (list :obstacles ()))
+          )
         
         ;; checking for mobs
         (when (and (get-mob-* (level *world*) nx ny)
-                   (not (eq (get-mob-* (level *world*) nx ny) mob)))
-          (return-from check-move-on-level (get-mob-* (level *world*) nx ny)))))
+                   (not (eq (get-mob-* (level *world*) nx ny) mob))
+                   (or (eq (mounted-by-mob-id mob) nil)
+                       (not (eq (mounted-by-mob-id mob) (id (get-mob-* (level *world*) nx ny))))))
+          (push (get-mob-* (level *world*) nx ny) mob-list)
+          )))
+
+    (when mob-list
+      (return-from check-move-on-level (list :mobs mob-list)))
     
     ;; all checks passed - can move freely
     (return-from check-move-on-level t)))
 
 (defun set-mob-location (mob x y)
   (let ((sx) (sy))
+
     ;; calculate the coords of the mob's NE corner
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
     (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
@@ -126,14 +136,6 @@
 
     ;; change the cootds of the center of the mob
     (setf (x mob) x (y mob) y)
-    ;; when the mob is riding somebody, change the mob's coords to the rider's current location
-    (when (riding-mob-id mob)
-      (setf (x (get-mob-by-id (riding-mob-id mob))) x
-            (y (get-mob-by-id (riding-mob-id mob))) y))
-    ;; when the mob is being ridden by somebody, change the rider's coords to the mob's current location
-    (when (mounted-by-mob-id mob)
-      (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
-            (y (get-mob-by-id (mounted-by-mob-id mob))) y))
 
     ;; calculate the new coords of the mob's NE corner
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
@@ -147,13 +149,16 @@
       (loop for ny from sy below (+ sy (map-size mob)) do
         ;(format t "SET-MOB-LOCATION: ~A NX ~A, NY ~A~%" (name mob) nx ny)
         (setf (aref (mobs (level *world*)) nx ny) (id mob))
-        
-        (when (mounted-by-mob-id mob)
-          (setf (aref (mobs (level *world*)) nx ny) (mounted-by-mob-id mob)))
-        
+
         (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx)))
           (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx))) mob nx nx))
             ))
+
+    ;; when the mob is being ridden by somebody, change the rider's coords to the mob's center location
+    (when (mounted-by-mob-id mob)
+      (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
+            (y (get-mob-by-id (mounted-by-mob-id mob))) y)
+      (setf (aref (mobs (level *world*)) (x mob) (y mob)) (mounted-by-mob-id mob)))
     ))
 
 (defun move-mob (mob dir &key (push nil))
@@ -164,18 +169,46 @@
         (along-dir)
         (opposite-dir)
         (not-along-dir)
-        (c-dir)
-        (gives-orders-to-mount nil))
+        (c-dir))
     (declare (type fixnum dx dy))
 
-    (when (and (riding-mob-id mob)
-               (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+))
+
+    ;; if being ridden - restore the direction from the order being given by the rider
+    (when (and (mounted-by-mob-id mob)
+               (order-for-next-turn mob))
+      (setf dir (order-for-next-turn mob))
+      ;(setf (order-for-next-turn mob) nil)
+      )
+    
+    (multiple-value-setq (dx dy) (x-y-dir dir))
+    
+    (when (riding-mob-id mob)
       (logger (format nil "MOVE-MOB: ~A [~A] gives orders to mount ~A [~A] to move in the dir ~A~%" (name mob) (id mob) (name (get-mob-by-id (riding-mob-id mob))) (id (get-mob-by-id (riding-mob-id mob))) dir))
-      (setf gives-orders-to-mount t)
-      (setf mob (get-mob-by-id (riding-mob-id mob))))
+
+      ;; assign the order for the mount for its next turn
+      (setf (order-for-next-turn (get-mob-by-id (riding-mob-id mob))) dir)
+      
+      ;; perform the attack in the chosen direction (otherwise it will be only the mount that attacks)
+      (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy))))
+        ;; right now multi-tile mobs can not ride other multitile mobs and I intend to leave it this way
+        ;; this means that there will always be only one mob in the affected mob list
+        (when (and check-result
+                   (not (eq check-result t))
+                   (eq (first check-result) :mobs)
+                   (not (eq (get-mob-by-id (riding-mob-id mob))
+                            (first (second check-result)))))
+          (on-bump (first (second check-result)) mob)
+          (return-from move-mob check-result))
+
+        (when (or (eq check-result nil)
+                  (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy)) nil))
+          (return-from move-mob check-result)))
+
+      ;; a trick not to confuse player when the horse move-spd is greater than the rider's move-spd
+      (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
+      (return-from move-mob t))
 
     (setf c-dir (x-y-into-dir (car (momentum-dir mob)) (cdr (momentum-dir mob))))
-    (multiple-value-setq (dx dy) (x-y-dir dir))
     (multiple-value-setq (along-dir not-along-dir opposite-dir) (dir-neighbours c-dir))
 
     (when (or (mob-ability-p mob +mob-abil-momentum+)
@@ -183,7 +216,7 @@
                    (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
       (setf push t))
 
-    (format t "MOVE-MOB NAME ~A - SPD ~A, C-DIR ~A, DIR ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir along-dir not-along-dir opposite-dir)
+    (logger (format nil "MOVE-MOB: ~A - spd ~A, c-dir ~A, dir ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir along-dir not-along-dir opposite-dir))
     (cond
       ;; NB: all this is necessary to introduce movement with momentum (for horses and the like)
       ;; (-1.-1) ( 0.-1) ( 1.-1)
@@ -238,22 +271,7 @@
                (> (momentum-spd mob) (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
       (setf (momentum-spd mob) (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-momentum+)))
     (when (< (momentum-spd mob) 0)
-      (setf (momentum-spd mob) 0))
-
-    ;; if only giving orders - make an attack if possible and exit here, do not execute the movement itself
-    (when gives-orders-to-mount
-      ;; restore the mob that gives orders
-      (setf mob (get-mob-by-id (mounted-by-mob-id mob)))
-
-      ;; perform the attack in the chosen direction (otherwise it will be only the mount that attacks)
-      (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy))))
-        (when (typep check-result 'mob)
-          (on-bump check-result mob)
-          (return-from move-mob check-result)))
-      
-	  ;; a trick not to confuse player when the horse move-spd is greater than the rider's move-spd
-      (make-act mob (move-spd (get-mob-type-by-id (mob-type (get-mob-by-id (riding-mob-id mob))))))
-      (return-from move-mob t))
+      (setf (momentum-spd mob) 0))  
     
     (loop repeat (if (zerop (momentum-spd mob))
                    1
@@ -263,48 +281,20 @@
           for y = (+ (cdr (momentum-dir mob)) (y mob))
           for check-result = (check-move-on-level mob x y)
           do
-             (format t "MOVE-MOB: CHECK-MOVE ~A~%" (check-move-on-level mob x y))
+             (logger (format t "MOVE-MOB: CHECK-MOVE ~A~%" check-result))
              (cond
                ;; all clear - move freely
                ((eq check-result t)
-                
                 (set-mob-location mob x y)
-
-                
-                ;(make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
                 (setf move-result t)
                 )
-               ;; bumped into a mob
-               ((typep check-result 'mob) 
-                (logger (format nil "MOVE-MOB: ~A [~A] bumped into a mob ~A [~A]~%" (name mob) (id mob) (name check-result) (id check-result)))
-
-                ;; if the mount bumps into its rider - do nothing
-                (when (and (mounted-by-mob-id mob)
-                           (eq check-result (get-mob-by-id (mounted-by-mob-id mob))))
-                  (setf move-result t)
-                  (loop-finish))
-                
-                (when push
-                  ;; check if you can push the mob farther
-                  (let* ((nx (+ (car (momentum-dir mob)) (x check-result)))
-                         (ny (+ (cdr (momentum-dir mob)) (y check-result)))
-                         (check-result-n (check-move-on-level check-result nx ny)))
-                    (when (eq check-result-n t)
-                      (print-visible-message (x mob) (y mob) (level *world*) 
-                                             (format nil "~A pushes ~A. " (visible-name mob) (visible-name check-result)))
-                      (set-mob-location check-result nx ny)
-                      (set-mob-location mob x y))
-                    ))
-                (on-bump check-result mob)
-                (setf (momentum-dir mob) (cons 0 0))
-                (setf (momentum-spd mob) 0)
-                (setf move-result check-result)
-                (loop-finish))
-               ((or (eq check-result nil) (eq check-result 'obstacle))
+               ;; bumped into an obstacle or the map border
+               ((or (eq check-result nil) (eq (first check-result) :obstacles))
                 (setf (momentum-spd mob) 0)
                 (setf (momentum-dir mob) (cons 0 0))
+                (setf (order-for-next-turn mob) 5)
 
-                ;; a precaution so that horses and the like finish their turn when they made a move and bumped into an obstacle
+                ;; a precaution so that horses finish their turn when they made a move and bumped into an obstacle
                 ;; while not finishing their turn if they try to move into an obstacle standing next to it
                 (when (or (/= sx (x mob))
                           (/= sy (y mob)))
@@ -312,6 +302,48 @@
                 (setf move-result nil)
                 (loop-finish)
                 )
+               ;; bumped into a mob
+               ((eq (first check-result) :mobs) 
+                (logger (format nil "MOVE-MOB: ~A [~A] bumped into mobs (~A)~%" (name mob) (id mob) (loop named nil
+                                                                                                          with str = (create-string)
+                                                                                                          for tmob in (second check-result)
+                                                                                                          do
+                                                                                                             (format str "~A [~A], " (name tmob) (id tmob))
+                                                                                                          finally
+                                                                                                             (return-from nil str))))
+
+                (loop with cur-ap = (cur-ap mob) 
+                      for target-mob in (second check-result) do
+                        ;; if the mount bumps into its rider - do nothing
+                        (if (and (mounted-by-mob-id mob)
+                                 (eq target-mob (get-mob-by-id (mounted-by-mob-id mob))))
+                          (progn 
+                            (setf move-result t))
+                          (progn
+                            (when push
+                              ;; check if you can push the mob farther
+                              (let* ((nx (+ (car (momentum-dir mob)) (x target-mob)))
+                                     (ny (+ (cdr (momentum-dir mob)) (y target-mob)))
+                                     (check-result-n (check-move-on-level target-mob nx ny)))
+                                (when (eq check-result-n t)
+                                  (print-visible-message (x mob) (y mob) (level *world*) 
+                                                         (format nil "~A pushes ~A. " (visible-name mob) (visible-name target-mob)))
+                                  (set-mob-location target-mob nx ny)
+                                  (set-mob-location mob x y))
+                                ))
+                            (on-bump target-mob mob)))
+                      finally
+                         (when (> (map-size mob) 1)
+                           (setf (cur-ap mob) cur-ap)
+                           (make-act mob (get-melee-weapon-speed mob))))
+
+                (when (eq move-result t)
+                  (loop-finish))
+                                
+                (setf (momentum-dir mob) (cons 0 0))
+                (setf (momentum-spd mob) 0)
+                (setf move-result check-result)
+                (loop-finish))
                )
           finally
              (when (zerop (momentum-spd mob)) (setf (momentum-dir mob) (cons 0 0)))

@@ -53,7 +53,7 @@
 (defconstant +mob-type-horse+ 19)
 (defconstant +mob-type-fiend+ 20)
 (defconstant +mob-type-scout+ 21)
-(defconstant +mob-type-gargantuar+ 22)
+(defconstant +mob-type-gargantaur+ 22)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)

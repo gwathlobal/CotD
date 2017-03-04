@@ -1120,15 +1120,44 @@
                                                    (declare (ignore nearest-enemy))
                                                    (mob-invoke-ability actor nearest-ally (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
-                                                      (if (or (>= (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
-                                                              (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
-                                                              (not (eq (check-move-on-level *player* (view-x *player*) (view-y *player*)) t))
-                                                              )
-                                                        (progn
-                                                          nil)
-                                                        (progn
-                                                          (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
-                                                          t))
+                                                      (let ((cell-list nil)
+                                                            (half-size (truncate (1- (map-size (get-mob-by-id (riding-mob-id *player*)))) 2)))
+                                                        ;; collect all cells around the mount
+                                                        (loop for off of-type fixnum from (1- (- half-size)) to (1+ (+ half-size))
+                                                              for x of-type fixnum = (+ (x *player*) off)
+                                                              for y of-type fixnum = (+ (y *player*) off)
+                                                              for y-up of-type fixnum = (- (y *player*) half-size 1)
+                                                              for y-down of-type fixnum = (+ (y *player*) half-size 1)
+                                                              for x-up of-type fixnum = (- (x *player*) half-size 1)
+                                                              for x-down of-type fixnum = (+ (x *player*) half-size 1)
+                                                              do
+                                                                 (push (cons x y-up) cell-list)
+                                                                 (push (cons x y-down) cell-list)
+                                                                 (push (cons x-up y) cell-list)
+                                                                 (push (cons x-down y) cell-list))
+
+                                                        ;; remove all duplicate cells
+                                                        (setf cell-list (remove-duplicates cell-list :test #'(lambda (a b)
+                                                                                                               (let ((x1 (car a)) (x2 (car b)) (y1 (cdr a)) (y2 (cdr b)))
+                                                                                                                 (declare (type fixnum x1 x2 y1 y2))
+                                                                                                                 (if (and (= x1 x2) (= y1 y2))
+                                                                                                                   t
+                                                                                                                   nil)))))
+
+                                                        (if (and (eq (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) nil)
+                                                                 (eq (check-move-on-level *player* (view-x *player*) (view-y *player*)) t)
+                                                                 (find (cons (view-x *player*) (view-y *player*)) cell-list
+                                                                       :test #'(lambda (a b)
+                                                                                 (let ((x1 (car a)) (x2 (car b)) (y1 (cdr a)) (y2 (cdr b)))
+                                                                                   (declare (type fixnum x1 x2 y1 y2))
+                                                                                   (if (and (= x1 x2) (= y1 y2))
+                                                                                     t
+                                                                                     nil)))))
+                                                          (progn
+                                                            (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 

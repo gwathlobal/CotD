@@ -215,15 +215,15 @@
                                        :strength 2
                                        :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2 :abil-fiend-can-be-ridden t))
 
-(set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantuar+ 
-                                       :name "Gargantuar"
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantaur+ 
+                                       :name "Gargantaur"
                                        :glyph-idx 39 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 60 :max-fp 0
-                                       :faction +faction-type-angels+
-                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 35
+                                       :faction +faction-type-animals+
+                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
-                                       :strength 2
+                                       :strength 2 :base-sight 7
                                        :map-size 5
-                                       :abil-animal t :abil-angel t))
+                                       :abil-animal t :abil-angel t :abil-horse-can-be-ridden t))
 
 
 (set-faction-relations +faction-type-humans+

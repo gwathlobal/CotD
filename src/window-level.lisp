@@ -50,13 +50,17 @@
                                                                                    (format nil " (Spd: ~A)" (momentum-spd *player*))
                                                                                    ""))
                           "")
-                        (if (riding-mob-id *player*) (format nil "~%Riding: ~A~%  HP: ~A/~A~%  Direction: ~A~A"
+                        (if (riding-mob-id *player*) (format nil "~%Riding: ~A~%  HP: ~A/~A~A"
                                                              (name (get-mob-by-id (riding-mob-id *player*)))
                                                              (cur-hp (get-mob-by-id (riding-mob-id *player*))) (max-hp (get-mob-by-id (riding-mob-id *player*)))
-                                                             (x-y-into-str (momentum-dir (get-mob-by-id (riding-mob-id *player*))))
-                                                             (if (not (zerop (momentum-spd (get-mob-by-id (riding-mob-id *player*)))))
-                                                               (format nil " (Spd: ~A)" (momentum-spd (get-mob-by-id (riding-mob-id *player*))))
-                                                               ""))
+                                                             (if (mob-ability-p (get-mob-by-id (riding-mob-id *player*)) +mob-abil-momentum+)
+                                                               (format nil "~%  Direction: ~A~A"
+                                                                       (x-y-into-str (momentum-dir (get-mob-by-id (riding-mob-id *player*))))
+                                                                       (if (not (zerop (momentum-spd (get-mob-by-id (riding-mob-id *player*)))))
+                                                                         (format nil " (Spd: ~A)" (momentum-spd (get-mob-by-id (riding-mob-id *player*))))
+                                                                         ""))
+                                                               "")
+                                                             )
                                                              
                           "")
                       ))

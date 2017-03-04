@@ -33,34 +33,32 @@
     (declare (type list cell-list)
              (type fixnum map-size half-size))
     ;; collect all cells that constitute the perimeter of the mob around the target cell
-    (loop for off-x of-type fixnum from (- half-size) to (+ half-size)
-          for x of-type fixnum = (+ tx off-x)
+    (loop for off of-type fixnum from (- half-size) to (+ half-size)
+          for x of-type fixnum = (+ tx off)
           for y-up of-type fixnum = (- ty half-size)
           for y-down of-type fixnum = (+ ty half-size)
-          do
-             (push (cons x y-up) cell-list)
-             (push (cons x y-down) cell-list))
-    (loop for off-y from (- half-size) to (+ half-size)
-          for y of-type fixnum = (+ ty off-y)
+          for y of-type fixnum = (+ ty off)
           for x-up of-type fixnum = (- tx half-size)
           for x-down of-type fixnum = (+ tx half-size)
           do
-      (push (cons x-up y) cell-list)
-      (push (cons x-down y) cell-list))
+             (push (cons x y-up) cell-list)
+             (push (cons x y-down) cell-list)
+             (push (cons x-up y) cell-list)
+             (push (cons x-down y) cell-list))
 
     ;(format t "AI-FIND-MOVE-AROUND: Cell list with duplicates ~A~%" cell-list)
     
     ;; remove all duplicates from the list
-    (remove-duplicates cell-list :test #'(lambda (a b)
-                                           (let ((x1 (car a))
-                                                 (x2 (car b))
-                                                 (y1 (cdr a))
-                                                 (y2 (cdr b)))
-                                             (declare (type fixnum x1 x2 y1 y2))
-                                             (if (and (= x1 x2)
-                                                      (= y1 y2))
-                                               t
-                                               nil))))
+    (setf cell-list (remove-duplicates cell-list :test #'(lambda (a b)
+                                                           (let ((x1 (car a))
+                                                                 (x2 (car b))
+                                                                 (y1 (cdr a))
+                                                                 (y2 (cdr b)))
+                                                             (declare (type fixnum x1 x2 y1 y2))
+                                                             (if (and (= x1 x2)
+                                                                      (= y1 y2))
+                                                               t
+                                                               nil)))))
 
     ;(format t "AI-FIND-MOVE-AROUND: Cell list without duplicates ~A~%" cell-list)
     
