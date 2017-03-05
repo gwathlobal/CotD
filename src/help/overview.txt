@@ -30,7 +30,7 @@ THE LEGIONS OF HELL
 OUTSIDER BEASTS
  - Outsider beasts are half-sentient creatures of various origin that will actively attack everything in sight, including their own kin.
  - The demonic invasion has attracted Fiends. If a demon gets near one, it will be able to dominate and ride it as a mount.
- - The Gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win.
+ - The Gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win. Angels may dominate these at the cost of their own health, but in return, they will be able to invoke Gargantaur's mind burn.
  
 CITIZENS OF THE CITY
  - Humans are frail and week. Citizens of the City will try to flee whenever they see an enemy.

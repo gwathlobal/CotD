@@ -180,6 +180,8 @@
 (defconstant +terrain-water-sea+ 23)
 (defconstant +terrain-border-grass+ 24)
 (defconstant +terrain-wall-barricade+ 25)
+(defconstant +terrain-door-closed+ 26)
+(defconstant +terrain-door-open+ 27)
 
 (defparameter *faction-table* (make-hash-table))
 

@@ -110,6 +110,8 @@
                ((char= c #\c) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-cabinet+))
                ((char= c #\C) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-crate+))
                ((char= c #\B) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bookshelf+))
+               ((char= c #\+) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-door-closed+))
+               ((char= c #\') (setf (aref template-level (+ x x1) (+ y y1)) +terrain-door-open+))
                )
              (incf x1)
           )))

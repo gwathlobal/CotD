@@ -222,7 +222,9 @@
         (when (or (eq check-result nil)
                   (and (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy)) nil)
                        (= dir (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob))))))))
-          (return-from move-mob check-result)))
+          (logger (format nil "MOVE-MOB: ~A [~A] is unable to move to give order (CHECK = ~A, MOUNT DIR ~A)~%" (name mob) (id mob) check-result
+                          (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob)))))))
+          (return-from move-mob nil)))
 
       (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
       (return-from move-mob t))
@@ -339,8 +341,10 @@
                 ;; while not finishing their turn if they try to move into an obstacle standing next to it
                 (when (or (/= sx (x mob))
                           (/= sy (y mob))
-                          (/= c-dir (x-y-into-dir dx dy))
+                          (and (mob-ability-p mob +mob-abil-facing+)
+                               (/= c-dir (x-y-into-dir dx dy)))
                           )
+                  (format t "SX = ~A, X = ~A, SY = ~A, Y = ~A, C-DIR = ~A, DIR = ~A~%" sx (x mob) sy (y mob) c-dir (x-y-into-dir dx dy))
                   (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
                 (setf move-result nil)
                 (loop-finish)
