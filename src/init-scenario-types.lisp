@@ -70,6 +70,13 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
                                                                                                        (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
@@ -77,11 +84,10 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
@@ -127,6 +133,13 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
                                                                                                        (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
@@ -134,11 +147,10 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends 
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
@@ -173,6 +185,13 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
                                                                                                        (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
@@ -180,11 +199,10 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
@@ -238,6 +256,13 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the 6 groups of military = 40, where each group has 1 chaplain, 2 sargeants and 3 soldiers
                                                                  (loop repeat 5
                                                                        do
@@ -260,11 +285,10 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)
@@ -329,6 +353,13 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the 6 groups of military = 40, where each group has 1 chaplain, 1 sargeant, 1 scout and 3 soldiers
                                                                  (loop repeat 6
                                                                        do
@@ -351,11 +382,10 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons & (humans / 15) will be fiends
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
                                                                  (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
                                                                                                        (cons +mob-type-demon+ 15)
-                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16))
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'create-mobs-from-template mob-func-list)

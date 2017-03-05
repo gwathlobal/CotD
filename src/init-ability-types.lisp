@@ -1296,7 +1296,8 @@
                                                    (mob-invoke-ability actor nearest-ally (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
-                                                        (if (and mob
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                                 mob
                                                                  (not (eq *player* mob))
                                                                  (not (mob-effect-p mob +mob-effect-reveal-true-form+))
                                                                  (not (and (mob-ability-p mob +mob-abil-demon+)
@@ -1316,3 +1317,119 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-immovable+ :name "Immovable" :descr "You won't let anybody push you around." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mind-burn+ :name "Mind burn" :descr "Burn the mind of an enemy in your line of sight for 2-4 dmg." 
+                                 :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (let ((cur-dmg))
+                                                  (setf cur-dmg (+ 2 (random 3)))
+                                                  (decf (cur-hp target) cur-dmg)
+                                                                                                    
+                                                  (print-visible-message (x target) (y target) (level *world*) 
+                                                                         (format nil "~A burns the mind of ~A for ~A damage. " (visible-name actor) (visible-name target)  cur-dmg))
+                                                  (when (check-dead target)
+                                                    (make-dead target :splatter nil :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
+                                                    (when (mob-effect-p target +mob-effect-possessed+)
+                                                      (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+                                                      (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))
+                                                    )
+    
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-mind-burn+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  ;; a little bit of cheating here
+                                                  (if (and (can-invoke-ability actor actor (id ability-type))
+                                                           nearest-enemy)
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-gargantaur-teleport+ :name "Teleport self" :descr "Teleport yourself somewhere else." 
+                                 :cd 20 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                
+                                                (logger (format nil "MOB-GARGANTAUR-TELEPORT: ~A [~A] teleports self~%" (name actor) (id actor)))
+
+                                                (let ((rx (- (+ 80 (x actor))
+                                                             (1+ (random 160)))) 
+                                                      (ry (- (+ 80 (y actor))
+                                                             (1+ (random 160))))
+                                                      (n 200))
+                                                  ;; 200 hundred tries to find a suitable place for teleport
+                                                  (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                                                                  (< (get-distance (x actor) (y actor) rx ry) 40)
+                                                                  (not (eq (check-move-on-level actor rx ry) t)))
+                                                        do
+                                                           
+                                                           (decf n)
+                                                           (when (zerop n)
+                                                             (loop-finish))
+                                                           (setf rx (- (+ 40 (x actor))
+                                                                       (1+ (random 80))))
+                                                           (setf ry (- (+ 40 (y actor))
+                                                                       (1+ (random 80)))))
+                                                  ;(format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry) (get-distance (x actor) (y actor) rx ry))
+                                                  (if (not (zerop n))
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~A disappeares in thin air. " (visible-name actor)))
+                                                      (set-mob-location actor rx ry)
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~A appears out of thin air. " (visible-name actor))))
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))))
+                                                  ))
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-gargantaur-teleport+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; teleport if there is no enemy in sight or if HP < 50%
+                                                  (if (and (mob-ability-p actor +mob-abil-gargantaur-teleport+)
+                                                           (can-invoke-ability actor actor +mob-abil-gargantaur-teleport+)
+                                                           (or (not nearest-enemy)
+                                                               (and nearest-enemy
+                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                       0.5))))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

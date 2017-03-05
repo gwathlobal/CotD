@@ -30,3 +30,12 @@ If a unit with momentum hits an obstacle it will lose its speed completely and t
 Units with momentum may also be used as mounts. All demons may mount fiends, and all military units (except machine-gunners) may mount horses. This will provide the benefits of a unit with momentum while allowing the rider to engage in other activities (for example, once a scout has gained speed, he will be able to shoot his target while continuing to move in the chosen direction). Mounts also serve as meatshields as the attacker has a 50% chance to attack the mount instead of the rider.
 
 Note however that engaging in combat while mounted invokes a 20% accuracy penalty to ranged attacks.
+
+
+MULTI-TILE CREATURES
+
+Some units (a Gargantaur) are so huge that they occupy several tiles on the level. This implies the following:
+ - They will not be able to get into narrow spaces (like some streets or the inside of the houses).
+ - They are much easier to be hit with ranged weapons (even if the bullets disperse, this are still likely to land on a tile which the creature occupies).
+ - They are able to move only in the direction they face (unlike smaller creatures). So if they first move south and then want to go north, it will require of them to make a 180-degree turn.
+ - They can melee attack several enemies at the same time. For example, a Gargantaur has the size of 3x3 and can crush up to 3 units standing next to it.

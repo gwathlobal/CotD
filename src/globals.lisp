@@ -61,7 +61,7 @@
 (defconstant +faction-type-demons+ 3)
 (defconstant +faction-type-military+ 4)
 (defconstant +faction-type-animals+ 5)
-(defconstant +faction-type-demonic-animals+ 6)
+(defconstant +faction-type-outsider-beasts+ 6)
 
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)
@@ -108,6 +108,9 @@
 (defconstant +mob-abil-independent+ 37)
 (defconstant +mob-abil-eagle-eye+ 38)
 (defconstant +mob-abil-facing+ 39)
+(defconstant +mob-abil-immovable+ 40)
+(defconstant +mob-abil-mind-burn+ 41)
+(defconstant +mob-abil-gargantaur-teleport+ 42)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

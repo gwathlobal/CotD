@@ -70,6 +70,9 @@
    ;;   :abil-independent - +mob-abil-independent+
    ;;   :abil-eagle-eye - +mob-abil-eagle-eye+
    ;;   :abil-facing - +mob-abil-facing+
+   ;;   :abil-immovable - +mob-abil-immovable+
+   ;;   :abil-mind-burn - +mob-abil-mind-burn+
+   ;;   :abil-gargantaur-teleport - +mob-abil-gargantaur-teleport+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -92,7 +95,7 @@
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
-                                                                abil-starts-with-horse abil-independent abil-eagle-eye abil-facing)
+                                                                abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -189,6 +192,12 @@
     (setf (gethash +mob-abil-eagle-eye+ (abilities mob-type)) t))
   (when abil-facing
     (setf (gethash +mob-abil-facing+ (abilities mob-type)) t))
+  (when abil-immovable
+    (setf (gethash +mob-abil-immovable+ (abilities mob-type)) t))
+  (when abil-mind-burn
+    (setf (gethash +mob-abil-mind-burn+ (abilities mob-type)) t))
+  (when abil-gargantaur-teleport
+    (setf (gethash +mob-abil-gargantaur-teleport+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -415,7 +424,8 @@
   (when (mob-ability-p mob +mob-abil-demon+)
     (incf (total-demons *world*))
     (incf (initial-demons *world*)))
-  (when (mob-ability-p mob +mob-abil-angel+)
+  (when (and (mob-ability-p mob +mob-abil-angel+)
+             (not (= (mob-type mob) +mob-type-gargantaur+)))
     (incf (total-angels *world*))
     (incf (initial-angels *world*)))
 

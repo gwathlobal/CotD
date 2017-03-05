@@ -59,7 +59,7 @@
   (declare (ignore mob-template-list))
   (setf *player* (make-instance 'player :mob-type +mob-type-gargantaur+ :x 45 :y 15))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-gargantaur+ :x (+ (x *player*) 4) :y (- (y *player*) 1)))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 4) :y (- (y *player*) 1)))
         ;(demon (make-instance 'mob :mob-type +mob-type-soldier+ :x (- (x *player*) 2) :y (+ (y *player*) 0)))
         )
     ;(setf (cur-hp demon) 1)

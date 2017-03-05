@@ -209,38 +209,38 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fiend+ 
                                        :name "Fiend"
                                        :glyph-idx 70 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 12 :max-fp 0
-                                       :faction +faction-type-demonic-animals+
+                                       :faction +faction-type-outsider-beasts+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 35
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 2
-                                       :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2 :abil-fiend-can-be-ridden t))
+                                       :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2 :abil-fiend-can-be-ridden t :abil-loves-infighting t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantaur+ 
                                        :name "Gargantaur"
-                                       :glyph-idx 39 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 60 :max-fp 0
-                                       :faction +faction-type-animals+
-                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0
-                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
-                                       :strength 2 :base-sight 7
+                                       :glyph-idx 39 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 25 :max-fp 2
+                                       :faction +faction-type-outsider-beasts+
+                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 6 10 +normal-ap+ 100 ()) nil) :base-dodge 0
+                                       :armor (list (list +weapon-dmg-flesh+ 4 0) (list +weapon-dmg-iron+ 2 0) (list +weapon-dmg-vorpal+ 4 0) (list +weapon-dmg-fire+ 4 0))
+                                       :strength 8 :base-sight 7
                                        :map-size 3
-                                       :abil-animal t :abil-angel t :abil-horse-can-be-ridden t :abil-facing t))
+                                       :abil-animal t :abil-angel t :abil-facing t :abil-immovable t :abil-loves-infighting t :abil-mind-burn t :abil-heal-self 1 :abil-gargantaur-teleport t :abil-detect-evil t))
 
 
 (set-faction-relations +faction-type-humans+
                        (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t) (cons +faction-type-military+ t)
-                       (cons +faction-type-demonic-animals+ nil) (cons +faction-type-demons+ nil))
+                       (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil))
 (set-faction-relations +faction-type-angels+
                        (cons +faction-type-angels+ t) (cons +faction-type-humans+ t) (cons +faction-type-animals+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-demonic-animals+ nil) (cons +faction-type-military+ nil))
+                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil))
 (set-faction-relations +faction-type-demons+
                        (cons +faction-type-demons+ t)
-                       (cons +faction-type-angels+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demonic-animals+ nil))
+                       (cons +faction-type-angels+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-beasts+ nil))
 (set-faction-relations +faction-type-military+
                        (cons +faction-type-military+ t) (cons +faction-type-humans+ t) (cons +faction-type-animals+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-demonic-animals+ nil))
+                       (cons +faction-type-demons+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-outsider-beasts+ nil))
 (set-faction-relations +faction-type-animals+
                        (cons +faction-type-animals+ t) (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-military+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-demonic-animals+ nil))
-(set-faction-relations +faction-type-demonic-animals+
-                       (cons +faction-type-demonic-animals+ t)
+                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil))
+(set-faction-relations +faction-type-outsider-beasts+
+                       (cons +faction-type-outsider-beasts+ nil)
                        (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil))

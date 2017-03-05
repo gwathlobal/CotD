@@ -398,8 +398,10 @@
            ;; iterate through the list of cells
            (loop for (x . y) in cell-list
                  when (and (>= x 0) (< x *max-x-level*) (>= y 0) (< y *max-y-level*)
-                           (not (get-mob-* (level world) x y))
-                           (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                           (eq (check-move-on-level mob x y) t)
+                           ;(not (get-mob-* (level world) x y))
+                           ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
+                           )
                    do
                       (setf (x mob) x (y mob) y)
                       (add-mob-to-level-list (level world) mob)
@@ -416,8 +418,9 @@
   (loop for x = (random *max-x-level*)
         for y = (random *max-y-level*)
         until (and (not (and (> x 7) (< x (- *max-x-level* 7)) (> y 7) (< y (- *max-y-level* 7))))
-                   (not (get-mob-* (level world) x y))
-                   (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                   ;(not (get-mob-* (level world) x y))
+                   ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
+                   (eq (check-move-on-level mob x y) t))
         finally (setf (x mob) x (y mob) y)
                 (add-mob-to-level-list (level world) mob)))
 
@@ -425,8 +428,10 @@
   (loop for x = (random *max-x-level*)
         for y = (random *max-y-level*)
         until (and (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10)))
-                   (not (get-mob-* (level world) x y))
-                   (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                   (eq (check-move-on-level mob x y) t)
+                   ;(not (get-mob-* (level world) x y))
+                   ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
+                   )
         finally (setf (x mob) x (y mob) y)
                 (add-mob-to-level-list (level world) mob)))
 

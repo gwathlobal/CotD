@@ -6,7 +6,9 @@
   (declare (optimize (speed 3))
            (type fixnum dx dy))
   (let ((sx 0) (sy 0)
-        (map-size (map-size mob)))
+        (map-size (if (riding-mob-id mob)
+                    (map-size (get-mob-by-id (riding-mob-id mob)))
+                    (map-size mob))))
     (declare (type fixnum sx sy map-size))
     ;; calculate the coords of the mob's NE corner
     (setf sx (- dx (truncate (1- map-size) 2)))
@@ -579,7 +581,6 @@
   ;; pester the player until it makes some meaningful action that can trigger the event chain
   (loop until (made-turn player) do
     (setf (can-move-if-possessed player) nil)
-    (format t "HERE~%")
     (get-input-player))
   (setf *time-at-end-of-player-turn* (get-internal-real-time)))
 

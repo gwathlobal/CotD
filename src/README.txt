@@ -27,6 +27,8 @@ FEATURES
  - Angels and Demons battling in its streets
  - Factions and allies
  - Blood and gore
+ - Mounted combat
+ - Multi-tile monsters
 
 --------------------
 GENERAL TIPS

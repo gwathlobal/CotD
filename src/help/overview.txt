@@ -21,12 +21,16 @@ THE LEGIONS OF HELL
  - The Legions of Hell are represented with three units: Imp, Demon, and Archdemon.
  - You start as a puny Imp who is no match for an Angel. Run or summon help when confronted by one.
  - Imps and Demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
- - Your invasion has also attracted Fiends. Fiends are half-sentient demonic beasts that will actively attack everything on sight. However, if you get near one, you will be able to dominate and ride it as a mount.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
  - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
  - Remember, "friendly fire" is allowed for your faction. Be cautious when walking side-by-side with your "friends".
  - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
+
+OUTSIDER BEASTS
+ - Outsider beasts are half-sentient creatures of various origin that will actively attack everything in sight, including their own kin.
+ - The demonic invasion has attracted Fiends. If a demon gets near one, it will be able to dominate and ride it as a mount.
+ - The Gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win.
  
 CITIZENS OF THE CITY
  - Humans are frail and week. Citizens of the City will try to flee whenever they see an enemy.
