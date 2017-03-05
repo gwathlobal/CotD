@@ -111,6 +111,8 @@
 (defconstant +mob-abil-immovable+ 40)
 (defconstant +mob-abil-mind-burn+ 41)
 (defconstant +mob-abil-gargantaur-teleport+ 42)
+(defconstant +mob-abil-dominate-gargantaur+ 43)
+(defconstant +mob-abil-gargantaurs-mind-burn+ 44)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

@@ -10,30 +10,29 @@
    (cur-tab :initform t :accessor cur-tab))) ; t - map, nil - obj list
 
 (defmethod initialize-instance :after ((win map-select-window) &key)
-  ;; find the nearest hostile mob & set it as target
-  (setf (visible-mobs *player*) (sort (visible-mobs *player*)
-                                      #'(lambda (mob-1 mob-2)
-                                          (if (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
-                                                   (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2)))))
-                                            t
-                                            nil))
-                                      :key #'(lambda (mob-id)
-                                               (get-mob-by-id mob-id))))
-  (setf (visible-mobs *player*) (sort (visible-mobs *player*)
-                                      #'(lambda (mob-1 mob-2)
-                                          (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
-                                                      (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
-                                                   (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
-                                                   (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
-                                            t
-                                            nil))
-                                      :key #'(lambda (mob-id)
-                                               (get-mob-by-id mob-id))))
-  (if (and (visible-mobs *player*)
-           (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id (get-mob-by-id (first (visible-mobs *player*)))))))))
-    (setf (view-x *player*) (x (get-mob-by-id (first (visible-mobs *player*)))) (view-y *player*) (y (get-mob-by-id (first (visible-mobs *player*)))))
-    (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
-    ))
+  (let ((hostile-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          when (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id (get-mob-by-id mob-id))))))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id))))
+            do
+               (push mob-id hostile-mobs))
+    
+    (setf hostile-mobs (sort hostile-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
+                                   t
+                                   nil))
+                             :key #'(lambda (mob-id)
+                                      (get-mob-by-id mob-id))))
+    (if hostile-mobs
+      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
+    )))
 
 (defun map-select-update (win)
   (update-map-area :rel-x (view-x *player*) :rel-y (view-y *player*))

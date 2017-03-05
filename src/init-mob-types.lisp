@@ -147,7 +147,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t
-                                       :abil-heal-self 1 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t
+                                       :abil-heal-self 1 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
                                        :ai-wants-bless t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archangel+
@@ -158,7 +158,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 4
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t
-                                       :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-blindness t
+                                       :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
                                        :ai-wants-bless t))
 
 
@@ -176,7 +176,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
                                        :name "Demon"
-                                       :glyph-idx 68 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 18 :max-fp 12
+                                       :glyph-idx 68 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 20 :max-fp 12
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-archdemon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))

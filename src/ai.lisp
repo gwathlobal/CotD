@@ -125,6 +125,11 @@
     (make-act mob +normal-ap+)
     (return-from ai-function nil))
 
+  (when (and (path-dst mob)
+             (= (x mob) (car (path-dst mob)))
+             (= (y mob) (cdr (path-dst mob))))
+    (setf (path-dst mob) nil))
+  
   ;; skip turn if being ridden
   (when (mounted-by-mob-id mob)
     (if (made-turn (get-mob-by-id (mounted-by-mob-id mob)))
@@ -169,13 +174,16 @@
       for mob-id of-type fixnum in (visible-mobs mob)
       with vis-mob-type = nil
       do
+         
          ;; inspect a mob appearance
          (setf vis-mob-type (get-mob-type-by-id (face-mob-type-id (get-mob-by-id mob-id))))
          ;; however is you are of the same faction, you know who is who
          (when (= (faction mob) (faction (get-mob-by-id mob-id)))
            (setf vis-mob-type (get-mob-type-by-id (mob-type (get-mob-by-id mob-id)))))
                   
-         (if (get-faction-relation (faction mob) (faction vis-mob-type))
+         (if (or (get-faction-relation (faction mob) (faction vis-mob-type))
+                 (and (mounted-by-mob-id (get-mob-by-id mob-id))
+                      (get-faction-relation (faction mob) (faction (get-mob-by-id (mounted-by-mob-id (get-mob-by-id mob-id)))))))
            (progn
              (pushnew mob-id allied-mobs)
              ;; find the nearest allied mob
@@ -347,12 +355,26 @@
                (= (first (order mob)) +mob-order-follow+))
       ;; if the leader is nearby, plot the path to it
       (let ((leader (get-mob-by-id (second (order mob))))
+            (connect-map (aref (connect-map (level *world*)) (if (riding-mob-id mob)
+                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                               (map-size mob))))
+            (target-pos)
             (path))
+        
+        (cond
+          ((= (aref connect-map (x mob) (y mob))
+              (aref connect-map (x leader) (y leader)))
+           (setf target-pos (cons (x leader) (y leader))))
+          ((and (> (map-size mob) 1)
+                (ai-find-move-around mob (x leader) (y leader)))
+           (setf target-pos (ai-find-move-around mob (x leader) (y leader)))))
+        
         (if (and (< (get-distance (x mob) (y mob) (x leader) (y leader)) 8)
-                   (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2))
+                 (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2)
+                 target-pos)
           (progn
             (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to follow the leader to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
-            (setf path (a-star (list (x mob) (y mob)) (list (x leader) (y leader)) 
+            (setf path (a-star (list (x mob) (y mob)) (list (car target-pos) (cdr target-pos)) 
                                #'(lambda (dx dy) 
                                    ;; checking for impassable objects
                                    (check-move-for-ai mob dx dy)
@@ -361,7 +383,7 @@
             (pop path)
             (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
             (setf (path mob) path)
-            (setf (path-dst mob) (cons (x leader) (y leader))))
+            (setf (path-dst mob) target-pos))
           (progn
             (setf (path-dst mob) nil)))))
           
@@ -370,7 +392,9 @@
     (when nearest-target
       (logger (format nil "AI-FUNCTION: Target found ~A [~A]~%" (name nearest-target) (id nearest-target)))
       (let ((path nil)
-            (connect-map (aref (connect-map (level *world*)) (map-size mob)))
+            (connect-map (aref (connect-map (level *world*)) (if (riding-mob-id mob)
+                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                               (map-size mob))))
             (target-pos nil))
 
         (cond
@@ -406,7 +430,9 @@
             (ry (- (+ 10 (y mob))
                    (1+ (random 20))))
             (path nil)
-            (connect-map (aref (connect-map (level *world*)) (map-size mob))))
+            (connect-map (aref (connect-map (level *world*)) (if (riding-mob-id mob)
+                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                               (map-size mob)))))
         (declare (type fixnum rx ry))
 
         (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to a random nearby place~%" (x mob) (y mob)))
@@ -465,6 +491,8 @@
           
           (move-mob mob (x-y-into-dir step-x step-y))
 
+          (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A)~%" (path-dst mob) (x mob) (y mob)))
+          
           (when (and (path-dst mob)
                      (= (x mob) (car (path-dst mob)))
                      (= (y mob) (cdr (path-dst mob))))

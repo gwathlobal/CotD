@@ -117,42 +117,65 @@
     (return-from check-move-on-level t)))
 
 (defun set-mob-location (mob x y)
-  (let ((sx) (sy))
+  (let ((place-func #'(lambda (nmob)
+                        (let ((sx) (sy))
+                          ;; calculate the coords of the mob's NE corner
+                          (setf sx (- (x nmob) (truncate (1- (map-size nmob)) 2)))
+                          (setf sy (- (y nmob) (truncate (1- (map-size nmob)) 2)))
+                          
+                          ;; remove the mob from the orignal position
+                          ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement 
+                          (loop for nx from sx below (+ sx (map-size nmob)) do
+                            (loop for ny from sy below (+ sy (map-size nmob)) do
+                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny)))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny))) nmob nx ny))
+                              (setf (aref (mobs (level *world*)) nx ny) nil)))
+                          
+                          ;; change the coords of the center of the mob
+                          (setf (x nmob) x (y nmob) y)
+                          
+                          ;; calculate the new coords of the mob's NE corner
+                          (setf sx (- (x nmob) (truncate (1- (map-size nmob)) 2)))
+                          (setf sy (- (y nmob) (truncate (1- (map-size nmob)) 2)))
+                          
+                          ;; place the mob to the new position
+                          ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement
+                          (loop for nx from sx below (+ sx (map-size nmob)) do
+                            (loop for ny from sy below (+ sy (map-size nmob)) do
+                              (setf (aref (mobs (level *world*)) nx ny) (id nmob))
+                              
+                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx)))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx))) nmob nx nx))))))))
 
-    ;; calculate the coords of the mob's NE corner
-    (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
-    (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
+    ;; we have 3 cases of movement:
+    ;; 1) the mob moves while is riding someone (currently available if the mob teleports somewhere with a mount, as normally the rider does not move, only gives directions to the mount)
+    ;; 2) the mob moves while being ridden by someone (all kinds of mounted movement)
+    ;; 3) the mob moves by itself
+    (cond
+      ((riding-mob-id mob)
+       (progn
+         ;; it is imperative the a 1-tile mob rides a multi-tile mob and not vice versa
 
-    ;; remove the mob from the orignal position
-    ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement 
-    (loop for nx from sx below (+ sx (map-size mob)) do
-      (loop for ny from sy below (+ sy (map-size mob)) do
-        (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny)))
-          (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny))) mob nx ny))
-        (setf (aref (mobs (level *world*)) nx ny) nil)))
+         (funcall place-func (get-mob-by-id (riding-mob-id mob)))
 
-    ;; change the cootds of the center of the mob
-    (setf (x mob) x (y mob) y)
+         ;; place the rider
+         (setf (x mob) x (y mob) y)
+         (setf (aref (mobs (level *world*)) x y) (id mob))
+         ))
+      ((mounted-by-mob-id mob)
+       (progn
+         ;; it is imperative the a 1-tile mob rides a multi-tile mob and not vice versa
 
-    ;; calculate the new coords of the mob's NE corner
-    (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
-    (setf sy (- (y mob) (truncate (1- (map-size mob)) 2)))
-    
-    ;; place the mob to the new position
-    ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement
-    (loop for nx from sx below (+ sx (map-size mob)) do
-      (loop for ny from sy below (+ sy (map-size mob)) do
-        (setf (aref (mobs (level *world*)) nx ny) (id mob))
-
-        (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx)))
-          (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx))) mob nx nx))
-            ))
-
-    ;; when the mob is being ridden by somebody, change the rider's coords to the mob's center location
-    (when (mounted-by-mob-id mob)
-      (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
-            (y (get-mob-by-id (mounted-by-mob-id mob))) y)
-      (setf (aref (mobs (level *world*)) (x mob) (y mob)) (mounted-by-mob-id mob)))
+         (funcall place-func mob)
+         
+         ;; place the rider
+         (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
+               (y (get-mob-by-id (mounted-by-mob-id mob))) y)
+         (setf (aref (mobs (level *world*)) (x mob) (y mob)) (mounted-by-mob-id mob))
+         ))
+      (t
+       (progn
+         (funcall place-func mob))))
     ))
 
 (defun move-mob (mob dir &key (push nil))
@@ -907,9 +930,10 @@
   (when (< (cur-fp mob) 0)
     (setf (cur-fp mob) 0))
 
-  ;; a special case for revealing demons that ride fiends
+  ;; a special case for revealing demons & angels that ride fiends & gargantaur
   (when (and (riding-mob-id mob)
-             (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-fiend-can-be-ridden+)
+             (or (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-demon+)
+                 (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-angel+))
              (eq (mob-effect-p mob +mob-effect-reveal-true-form+) 1))
     (set-mob-effect mob +mob-effect-reveal-true-form+ 2))
              

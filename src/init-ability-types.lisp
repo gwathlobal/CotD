@@ -21,10 +21,14 @@
                                                         nil
                                                         t))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (declare (ignore ability-type nearest-ally))
                                                   ;; if able to heal and less than 50% hp - heal
-                                                  (if (and (< (/ (cur-hp actor) (max-hp actor)) 
-                                                              0.5)
+                                                  (if (and (or (and nearest-enemy
+                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                       0.5))
+                                                               (and (not nearest-enemy)
+                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                       0.9)))
                                                            (mob-ability-p actor +mob-abil-heal-self+)
                                                            (can-invoke-ability actor actor +mob-abil-heal-self+))
                                                     t
@@ -1026,12 +1030,11 @@
                                                 (print-visible-message (x actor) (y actor) (level *world*) 
                                                                        (format nil "~A mounts ~A. " (visible-name actor) (visible-name target)))
 
+                                                (set-mob-location actor (x target) (y target))
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
 
                                                 (adjust-dodge actor)
-                                                
-                                                (set-mob-location actor (x target) (y target))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -1171,10 +1174,10 @@
                                                 (print-visible-message (x actor) (y actor) (level *world*) 
                                                                        (format nil "~A mounts ~A" (visible-name actor) (visible-name target)))
 
+                                                (set-mob-location actor (x target) (y target))
+                                                
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
-
-                                                (set-mob-location actor (x target) (y target))
 
                                                 (adjust-dodge actor)
                                                 
@@ -1355,7 +1358,6 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore nearest-ally))
-                                                  ;; a little bit of cheating here
                                                   (if (and (can-invoke-ability actor actor (id ability-type))
                                                            nearest-enemy)
                                                       t
@@ -1433,3 +1435,141 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-dominate-gargantaur+ :name "Dominate Gargantaur" :descr "You can mount a Gargantaur, if you stand next to it, but at a cost of inflicting yourself the amount of damage equal to the half of your maximum HP. Riding one will reveal your true form." 
+                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-DOMINATE-GARGANTAUR: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (let ((cur-dmg (truncate (max-hp actor) 2)))
+                                                  (decf (cur-hp actor) cur-dmg)
+
+                                                  (if (<= (cur-hp actor) 0)
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~A cringes with pain, taking ~A dmg, while trying to mount ~A. " (visible-name actor) cur-dmg (visible-name target)))
+                                                      (make-dead actor :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil "~A cringes with pain, taking ~A dmg, and mounts ~A" (visible-name actor) cur-dmg (visible-name target)))
+
+                                                      (set-mob-location actor (x target) (y target))
+                                                      
+                                                      (setf (mounted-by-mob-id target) (id actor))
+                                                      (setf (riding-mob-id actor) (id target))
+                                                                                                            
+                                                      (adjust-dodge actor)
+                                                      
+                                                      ;; reveal the true form of those who ride fiends
+                                                      (when (mob-effect-p actor +mob-effect-divine-consealed+)
+                                                        (rem-mob-effect actor +mob-effect-divine-consealed+)
+                                                        (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                               (format nil " to reveal itself as ~A" (get-qualified-name actor))))
+                                                      (setf (face-mob-type-id actor) (mob-type actor))
+                                                      (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
+                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                             (format nil ". "))
+                                                      ))
+                                                  ))
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-dominate-gargantaur+)
+                                                               (not (riding-mob-id actor)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-enemy nearest-ally))
+                                                  (let ((mount nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                      (when (and mob
+                                                                                                                 (= (mob-type mob) +mob-type-gargantaur+)
+                                                                                                                 (null (mounted-by-mob-id mob)))
+                                                                                                        (setf mount mob)))))
+                                                    (if (and mount
+                                                             (> (/ (cur-hp actor) (max-hp actor)) 
+                                                                0.5)
+                                                             (can-invoke-ability actor mount (id ability-type)))
+                                                      t
+                                                      nil))
+                                                  )
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (let ((mount nil))
+                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                      (when (and mob
+                                                                                                                 (= (mob-type mob) +mob-type-gargantaur+)
+                                                                                                                 (null (mounted-by-mob-id mob)))
+                                                                                                        (setf mount mob)))))
+                                                     (mob-invoke-ability actor mount (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mount-list nil))
+                                                        (check-surroundings (x *player*) (y *player*) nil #'(lambda (dx dy)
+                                                                                                              (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                                (when (and mob
+                                                                                                                           (= (mob-type mob) +mob-type-gargantaur+)
+                                                                                                                           (null (mounted-by-mob-id mob)))
+                                                                                                                  (pushnew mob mount-list)))))
+                                                        
+                                                        (if (find (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) mount-list)
+                                                          (progn
+                                                            (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) ability-type-id)
+                                                            t)
+                                                        (progn
+                                                          nil))
+                                                      ))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-gargantaurs-mind-burn+ :name "Gargantaur's mind burn" :descr "Use your Gargantuar to burn the mind of an enemy in your line of sight for 2-4 dmg. You must be riding a Gargantaur to invoke this ability." 
+                                 :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-GARGANTAURS-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (let ((cur-dmg))
+                                                  (setf cur-dmg (+ 2 (random 3)))
+                                                  (decf (cur-hp target) cur-dmg)
+                                                                                                    
+                                                  (print-visible-message (x target) (y target) (level *world*) 
+                                                                         (format nil "~A uses its Gargantaur to burn the mind of ~A for ~A damage. " (visible-name actor) (visible-name target)  cur-dmg))
+                                                  (when (check-dead target)
+                                                    (make-dead target :splatter nil :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
+                                                    (when (mob-effect-p target +mob-effect-possessed+)
+                                                      (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+                                                      (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))
+                                                    )
+    
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-gargantaurs-mind-burn+)
+                                                               (riding-mob-id actor)
+                                                               (= (mob-type (get-mob-by-id (riding-mob-id actor))) +mob-type-gargantaur+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor actor (id ability-type))
+                                                           nearest-enemy)
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
