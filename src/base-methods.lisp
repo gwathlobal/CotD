@@ -344,7 +344,6 @@
                           (and (mob-ability-p mob +mob-abil-facing+)
                                (/= c-dir (x-y-into-dir dx dy)))
                           )
-                  (format t "SX = ~A, X = ~A, SY = ~A, Y = ~A, C-DIR = ~A, DIR = ~A~%" sx (x mob) sy (y mob) c-dir (x-y-into-dir dx dy))
                   (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
                 (setf move-result nil)
                 (loop-finish)

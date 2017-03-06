@@ -1174,6 +1174,12 @@
                                                 (print-visible-message (x actor) (y actor) (level *world*) 
                                                                        (format nil "~A mounts ~A" (visible-name actor) (visible-name target)))
 
+                                                ;; reveal the true form of those who ride fiends
+                                                (when (and (slave-mob-id actor)
+                                                           (not (mob-effect-p actor +mob-effect-reveal-true-form+)))
+                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                         (format nil " and reveals itself as ~A" (get-qualified-name actor))))
+                                                
                                                 (set-mob-location actor (x target) (y target))
                                                 
                                                 (setf (mounted-by-mob-id target) (id actor))
@@ -1181,10 +1187,7 @@
 
                                                 (adjust-dodge actor)
                                                 
-                                                ;; reveal the true form of those who ride fiends
-                                                (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
-                                                                         (format nil " and reveals itself as ~A" (get-qualified-name actor))))
+                                                
                                                 (setf (face-mob-type-id actor) (mob-type actor))
                                                 (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
                                                 (print-visible-message (x actor) (y actor) (level *world*) 
@@ -1456,6 +1459,12 @@
                                                       (print-visible-message (x actor) (y actor) (level *world*) 
                                                                              (format nil "~A cringes with pain, taking ~A dmg, and mounts ~A" (visible-name actor) cur-dmg (visible-name target)))
 
+                                                      ;; reveal the true form of those who ride fiends
+                                                      (when (mob-effect-p actor +mob-effect-divine-consealed+)
+                                                        (rem-mob-effect actor +mob-effect-divine-consealed+)
+                                                        (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                               (format nil " to reveal itself as ~A" (get-qualified-name actor))))
+                                                      
                                                       (set-mob-location actor (x target) (y target))
                                                       
                                                       (setf (mounted-by-mob-id target) (id actor))
@@ -1463,11 +1472,7 @@
                                                                                                             
                                                       (adjust-dodge actor)
                                                       
-                                                      ;; reveal the true form of those who ride fiends
-                                                      (when (mob-effect-p actor +mob-effect-divine-consealed+)
-                                                        (rem-mob-effect actor +mob-effect-divine-consealed+)
-                                                        (print-visible-message (x actor) (y actor) (level *world*) 
-                                                                               (format nil " to reveal itself as ~A" (get-qualified-name actor))))
+                                                      
                                                       (setf (face-mob-type-id actor) (mob-type actor))
                                                       (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
                                                       (print-visible-message (x actor) (y actor) (level *world*) 
