@@ -9,16 +9,10 @@ The Legions of Hell invaded the City with the intention to slay its inhabitants.
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.0.7
+LATEST CHANGES v1.0.8
 
-- Momentum added! When you have the Momentum ability, that means that you gain speed when moving in a direction and are able to cover several tiles within one turn but you can not drastically change your direction when at high speed (unlike normal movement when you can make all kind of turns and backpedal at any time). If you bump into an obstacle, your speed drops to zero. If you bump into another unit, your speed drops to zero but you will try to push this unit (similar to the Charge ability).
-- Horses are added to the game. They are allied with all non-demon factions and have momentum. Horses can be found in the stables.
-- Fiends added to the game. They are demonic beasts who will attack everybody (even demons). They also have momentum.
-- Horseback riding added! Military units are able to use horses as mounts. When riding a mount, your mount moves independently of your actions, you can only give directions to it. This means that once you've gained speed, the mount will be moving in the chosen direction on its own, while you can shoot the enemies as you pass them by. Mounts may also be used as meatshields as enemies have 50% chance to hit your mount instead of you.
-- All demons are able to mount fiends.
-- Added scouts to the military. They are armed with rifles, are able to reveal a single enemy and start riding a horse.
-- You may now start as a scout. Scouts gain no followers but compensate that with their unsurpassed speed.
-- Added stables to the buildings of the city.
+- Added Gargantaur to the list of monsters. This is a huge outsider beast (occupies 3x3 tiles) that is impervious to most attacks, can attack minds of enemies, as well as heal and teleport itself. While it is classified as an angelic being, do not get it wrong - it will attack anything in sight. Being huge, it has a "face" so unlike smaller beings it will need to really turn around to change the direction of its movement.
+- Angels are now able to mount Gargantaurs at the cost of half of their HP. Apart from increasing their defense (the Gargantaur's 3x3 size means that it will take all melee hits first), this gives them an ability to invoke Gargantaur's mind burn.
 
 --------------------
 FEATURES
