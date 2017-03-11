@@ -25,7 +25,7 @@
     
     (loop for nx from sx below (+ sx (map-size mob)) do
       (loop for ny from sy below (+ sy (map-size mob)) do
-        (setf (aref (mobs level) nx ny) (id mob))))))
+        (setf (aref (mobs level) nx ny (z mob)) (id mob))))))
 
 (defun remove-mob-from-level-list (level mob)
   (setf (mob-id-list level) (remove (id mob) (mob-id-list level)))
@@ -36,7 +36,7 @@
     
     (loop for nx from sx below (+ sx (map-size mob)) do
       (loop for ny from sy below (+ sy (map-size mob)) do
-        (setf (aref (mobs level) nx ny) nil)))))
+        (setf (aref (mobs level) nx ny (z mob)) nil)))))
 
 (defun add-feature-to-level-list (level feature)
   (pushnew (id feature) (feature-id-list level)))
@@ -46,49 +46,52 @@
 
 (defun add-item-to-level-list (level item)
   (pushnew (id item) (item-id-list level))
-  (push (id item) (aref (items level) (x item) (y item))))
+  (push (id item) (aref (items level) (x item) (y item) (z item))))
 
 (defun remove-item-from-level-list (level item)
   (setf (item-id-list level) (remove (id item) (item-id-list level)))
-  (setf (aref (items level) (x item) (y item)) (remove (id item) (aref (items level) (x item) (y item)))))
+  (setf (aref (items level) (x item) (y item) (z item)) (remove (id item) (aref (items level) (x item) (y item) (z item)))))
 
-(defun get-terrain-* (level x y)
-  (when (or (< x 0) (>= x *max-x-level*)
-            (< y 0) (>= y *max-y-level*))
+(defun get-terrain-* (level x y z)
+  (when (or (< x 0) (>= x (array-dimension (terrain level) 0))
+            (< y 0) (>= y (array-dimension (terrain level) 1))
+            (< z 0) (>= z (array-dimension (terrain level) 2)))
     (return-from get-terrain-* nil))
-  (aref (terrain level) x y))
+  (aref (terrain level) x y z))
 
-(defun set-terrain-* (level x y terrain-type-id)
-  (setf (aref (terrain level) x y) terrain-type-id))
+(defun set-terrain-* (level x y z terrain-type-id)
+  (setf (aref (terrain level) x y z) terrain-type-id))
 
-(defun get-features-* (level x y)
+(defun get-features-* (level x y z)
   (let ((feature)
 	(feature-list nil))
     (dolist (feature-id (feature-id-list level))
       (setf feature (get-feature-by-id feature-id))
-      (when (and (= (x feature) x) (= (y feature) y))
+      (when (and (= (x feature) x) (= (y feature) y) (= (z feature) z))
 	(setf feature-list (append feature-list (list feature)))))
     feature-list))
 
-(defun get-mob-* (level x y)
-  (when (or (< x 0) (>= x *max-x-level*)
-            (< y 0) (>= y *max-y-level*))
+(defun get-mob-* (level x y z)
+  (when (or (< x 0) (>= x (array-dimension (mobs level) 0))
+            (< y 0) (>= y (array-dimension (mobs level) 1))
+            (< z 0) (>= z (array-dimension (mobs level) 2)))
     (return-from get-mob-* nil))
-  (if (aref (mobs level) x y)
-    (get-mob-by-id (aref (mobs level) x y))
+  (if (aref (mobs level) x y z)
+    (get-mob-by-id (aref (mobs level) x y z))
     nil))
 
-(defun get-items-* (level x y)
-  (when (or (< x 0) (>= x *max-x-level*)
-            (< y 0) (>= y *max-y-level*))
+(defun get-items-* (level x y z)
+  (when (or (< x 0) (>= x (array-dimension (items level) 0))
+            (< y 0) (>= y (array-dimension (items level) 1))
+            (< z 0) (>= z (array-dimension (items level) 2)))
     (return-from get-items-* nil))
-  (aref (items level) x y))
+  (aref (items level) x y z))
 
-(defun get-memo-* (level x y)
-  (aref (memo level) x y))
+(defun get-memo-* (level x y z)
+  (aref (memo level) x y z))
   
-(defun set-memo-* (level x y single-memo)
-  (setf (aref (memo level) x y) single-memo))
+(defun set-memo-* (level x y z single-memo)
+  (setf (aref (memo level) x y z) single-memo))
 
 (defun create-single-memo (glyph-idx glyph-color back-color visibility revealed)
   (list glyph-idx glyph-color back-color visibility revealed))
@@ -108,12 +111,12 @@
 (defun get-single-memo-revealed (single-memo)
   (nth 4 single-memo))
 
-(defun set-single-memo-* (level x y &key (glyph-idx (get-single-memo-glyph-idx (get-memo-* level x y)))
-                                         (glyph-color (get-single-memo-glyph-color (get-memo-* level x y))) 
-                                         (back-color (get-single-memo-back-color (get-memo-* level x y))) 
-                                         (visibility (get-single-memo-visibility (get-memo-* level x y)))
-                                         (revealed (get-single-memo-revealed (get-memo-* level x y))))
-  (set-memo-* level x y (create-single-memo glyph-idx glyph-color back-color visibility revealed)))
+(defun set-single-memo-* (level x y z &key (glyph-idx (get-single-memo-glyph-idx (get-memo-* level x y z)))
+                                           (glyph-color (get-single-memo-glyph-color (get-memo-* level x y z))) 
+                                           (back-color (get-single-memo-back-color (get-memo-* level x y z))) 
+                                           (visibility (get-single-memo-visibility (get-memo-* level x y z)))
+                                           (revealed (get-single-memo-revealed (get-memo-* level x y z))))
+  (set-memo-* level x y z (create-single-memo glyph-idx glyph-color back-color visibility revealed)))
 
 ;;----------------------
 ;; WORLD

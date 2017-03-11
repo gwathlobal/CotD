@@ -18,7 +18,7 @@
                                              :type +scenario-feature-city-layout+ :debug t :disabled t
                                              :name "Test"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
-                                                       (setf layout-func #'(lambda () (create-template-test-city *max-x-level* *max-y-level* nil)))
+                                                       (setf layout-func #'(lambda () (create-template-test-city *max-x-level* *max-y-level* *max-z-level* nil)))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
@@ -26,7 +26,7 @@
                                              :type +scenario-feature-city-layout+
                                              :name "An ordinary city"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
-                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-normal #'get-reserved-buildings-normal nil)))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level* #'get-max-buildings-normal #'get-reserved-buildings-normal nil)))
                                                        (push +game-event-military-arrive+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -35,7 +35,8 @@
                                              :type +scenario-feature-city-layout+
                                              :name "A city upon a river"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
-                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-river #'get-reserved-buildings-river #'place-reserved-buildings-river)))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'get-max-buildings-river #'get-reserved-buildings-river #'place-reserved-buildings-river)))
                                                        (push +game-event-military-arrive+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -45,7 +46,7 @@
                                              :name "A seaport city"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        (let ((r (random 4)))
-                                                         (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-port #'get-reserved-buildings-port
+                                                         (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level* #'get-max-buildings-port #'get-reserved-buildings-port
                                                                                                               #'(lambda (reserved-level)
                                                                                                                   (let ((result))
                                                                                                                     (cond
@@ -128,7 +129,7 @@
                                                                                      nil)
                                                                        when rider
                                                                          do
-                                                                            (setf (x horse) (x rider) (y horse) (y rider)))
+                                                                            (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -180,7 +181,7 @@
                                                                                      nil)
                                                                        when rider
                                                                          do
-                                                                            (setf (x horse) (x rider) (y horse) (y rider)))
+                                                                            (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -221,7 +222,8 @@
                                              :type +scenario-feature-city-layout+
                                              :name "A city in the woods"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
-                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-normal #'get-reserved-buildings-normal #'place-reserved-buildings-forest)))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'get-max-buildings-normal #'get-reserved-buildings-normal #'place-reserved-buildings-forest)))
                                                        (push +game-event-military-arrive+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -231,7 +233,8 @@
                                              :name "An island city"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; place tiny forest along the borders
-                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-river #'get-reserved-buildings-river #'place-reserved-buildings-island)))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'get-max-buildings-river #'get-reserved-buildings-river #'place-reserved-buildings-island)))
                                                        (push +game-event-military-arrive-island+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -251,7 +254,7 @@
                                                                                      nil)
                                                                        when rider
                                                                          do
-                                                                            (setf (x horse) (x rider) (y horse) (y rider)))
+                                                                            (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -273,7 +276,7 @@
                                                                                                                   (cons +mob-type-soldier+ 2)
                                                                                                                   (cons +mob-type-gunner+ 1))
                                                                                                       #'(lambda (world mob)
-                                                                                                          (find-unoccupied-place-around world mob (x chaplain) (y chaplain))))))
+                                                                                                          (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -301,7 +304,7 @@
                                                                                                        (cons +mob-type-soldier+ 2)
                                                                                                        (cons +mob-type-gunner+ 1))
                                                                                            #'(lambda (world mob)
-                                                                                               (find-unoccupied-place-around world mob (x *player*) (y *player*)))))
+                                                                                               (find-unoccupied-place-around world mob (x *player*) (y *player*) (z *player*)))))
                                                              mob-func-list)
 
                                                        ;; remove all "military arrives" events; after the function returns, all nils are to be deleted from the game-event-list  
@@ -327,8 +330,8 @@
                                              :type +scenario-feature-city-layout+
                                              :name "A barricaded city"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
-                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* #'get-max-buildings-normal #'get-reserved-buildings-normal
-                                                                                                            #'place-reserved-buildings-barricaded-city)))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'get-max-buildings-normal #'get-reserved-buildings-normal #'place-reserved-buildings-barricaded-city)))
                                                        (push +game-event-military-arrive+ game-event-list)
                                                                                                                                                                      
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -348,7 +351,7 @@
                                                                                      nil)
                                                                        when rider
                                                                          do
-                                                                            (setf (x horse) (x rider) (y horse) (y rider)))
+                                                                            (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -370,7 +373,7 @@
                                                                                                                   (cons +mob-type-soldier+ 2)
                                                                                                                   (cons +mob-type-gunner+ 1))
                                                                                                       #'(lambda (world mob)
-                                                                                                          (find-unoccupied-place-around world mob (x chaplain) (y chaplain))))))
+                                                                                                          (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)

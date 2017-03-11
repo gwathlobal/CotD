@@ -347,6 +347,7 @@
    (mob-type :initform 0 :initarg :mob-type :accessor mob-type :type fixnum)
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)
+   (z :initarg :z :initform 0 :accessor z :type fixnum)
    
    (dead= :initform nil :accessor dead=)
    (cur-ap :initform +normal-ap+ :accessor cur-ap :type fixnum)
@@ -736,6 +737,7 @@
   ((name :initform "Player" :initarg :name :accessor name)
    (view-x :initform 0 :accessor view-x)
    (view-y :initform 0 :accessor view-y)
+   (view-z :initform 0 :accessor view-z)
    (sense-evil-id :initform nil :accessor sense-evil-id)
    (sense-good-id :initform nil :accessor sense-good-id)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)))

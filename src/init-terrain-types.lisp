@@ -22,9 +22,9 @@
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-floor-snow+ :glyph-idx 95 :glyph-color sdl:*white* :back-color sdl:*black* :name "Snow" :trait-blocks-move t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-snow+ :glyph-idx 95 :glyph-color sdl:*white* :back-color sdl:*black* :name "Snow"
-                                               :on-step #'(lambda (mob x y)
+                                               :on-step #'(lambda (mob x y z)
                                                             (declare (ignore mob))
-                                                            (set-terrain-* (level *world*) x y +terrain-floor-snow-prints+))))
+                                                            (set-terrain-* (level *world*) x y z +terrain-floor-snow-prints+))))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-snow-prints+ :glyph-idx 95 :glyph-color (sdl:color :r 80 :g 80 :b 155) :back-color sdl:*black* :name "Snow"))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch-snow+ :glyph-idx 52 :glyph-color sdl:*white* :back-color sdl:*black* :name "Snow-covered birch tree"
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t))

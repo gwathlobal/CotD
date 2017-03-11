@@ -21,6 +21,7 @@
   (id)
   (x)
   (y)
+  (z)
   (params))
 
 (defun play-animation (animation)

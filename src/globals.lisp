@@ -7,6 +7,7 @@
 
 (defparameter *max-x-level* 100)
 (defparameter *max-y-level* 100)
+(defparameter *max-z-level* 1)
 (defparameter *max-x-view* 25)
 (defparameter *max-y-view* 25)
 

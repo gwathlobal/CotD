@@ -58,7 +58,8 @@
     
     (logger (format nil "Creating actual level ~A~%" 0))
     (setf (level world) (create-level-from-template result-template))
-
+    (logger (format nil "HERE~%"))
+    
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure*)
@@ -94,17 +95,17 @@
     world))
 
 (defun create-features-from-template (level feature-template-list)
-  (loop for (feature-type-id x y) in feature-template-list 
+  (loop for (feature-type-id x y z) in feature-template-list 
         do
-           (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y))))
+           (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z))))
 
 (defun create-level ()
   (let ((level))
     (setf level (make-instance 'level))
-    (setf (terrain level) (make-array (list *max-x-level* *max-y-level*) :initial-element +terrain-floor-stone+))
-    (setf (mobs level) (make-array (list *max-x-level* *max-y-level*) :initial-element nil))
-    (setf (items level) (make-array (list *max-x-level* *max-y-level*) :initial-element nil))
-    (setf (memo level) (make-array (list *max-x-level* *max-y-level*) :initial-element (create-single-memo 0 sdl:*white* sdl:*black* nil nil)))
+    (setf (terrain level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element +terrain-floor-stone+))
+    (setf (mobs level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element nil))
+    (setf (items level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element nil))
+    (setf (memo level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element (create-single-memo 0 sdl:*white* sdl:*black* nil nil)))
     level))
 
 (defun create-level-from-template (template-level)
@@ -112,35 +113,43 @@
   ;; <type of the tile>
   ;;   :terrain
   ;;   :obstacle
-  (let ((level (create-level)))
-    (loop for x from 0 to (1- *max-x-level*) do
-	 (loop for y from 0 to (1- *max-y-level*) do
-	      (set-terrain-* level x y (aref template-level x y))))
+  (let ((level (create-level))
+        (max-x (array-dimension template-level 0))
+        (max-y (array-dimension template-level 1))
+        (max-z (array-dimension template-level 2)))
+    (loop for x from 0 to (1- max-x) do
+      (loop for y from 0 to (1- max-y) do
+        (loop for z from 0 to (1- max-z) do
+          (set-terrain-* level x y z (aref template-level x y z)))))
     level))
 
-(defun flood-fill (first-cell &key check-func make-func)
+(defun flood-fill (first-cell &key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*) check-func make-func)
   (declare (optimize (speed 3))
-           (type function check-func make-func))
+           (type function check-func make-func)
+           (type fixnum max-x max-y max-z))
   
   (let ((open-list nil))
     (push first-cell open-list)
     (loop while open-list
-          for c-cell of-type cons = (pop open-list)
-          for cx of-type fixnum = (car c-cell)
-          for cy of-type fixnum = (cdr c-cell)
+          for c-cell of-type list = (pop open-list)
+          for cx of-type fixnum = (first c-cell)
+          for cy of-type fixnum = (second c-cell)
+          for cz of-type fixnum = (third c-cell)
           do
-             (funcall make-func cx cy)
+             (funcall make-func cx cy cz)
              
              (loop for y-offset of-type fixnum from -1 to 1
                    for y of-type fixnum = (+ cy y-offset) do
                      (loop for x-offset of-type fixnum from -1 to 1
-                           for x of-type fixnum = (+ cx x-offset)
-                           when (and (>= x 0) (>= y 0) (< x *max-x-level*) (< y *max-y-level*)
-                                     (not (and (zerop x-offset) (zerop y-offset)))
-                                     (funcall check-func x y))
-                             do
-                                (push (cons x y) open-list)))
-
+                           for x of-type fixnum = (+ cx x-offset) do
+                           (loop for z-offset of-type fixnum from -1 to 1
+                                 for z of-type fixnum = (+ cz z-offset)
+                                 when (and (>= x 0) (>= y 0) (>= z 0) (< x max-x) (< y max-y) (< z max-z)
+                                           (not (and (zerop x-offset) (zerop y-offset) (zerop z-offset)))
+                                           (funcall check-func x y z))
+                                   do
+                                      (push (list x y z) open-list))))
+                     
           )
     ))
 
@@ -149,10 +158,11 @@
            (type fixnum mob-size))
   (let* ((max-x (array-dimension (terrain level) 0))
          (max-y (array-dimension (terrain level) 1))
-         (connect-map (make-array (list max-x max-y) :initial-element +connect-room-none+))
+         (max-z (array-dimension (terrain level) 2))
+         (connect-map (make-array (list max-x max-y max-z) :initial-element +connect-room-none+))
          (room-id 0)
-         (check-func #'(lambda (x y)
-                         (let* ((connect-id (aref connect-map x y))
+         (check-func #'(lambda (x y z)
+                         (let* ((connect-id (aref connect-map x y z))
                                 (half-size (truncate (1- mob-size) 2)))
                            (declare (type fixnum connect-id half-size))
                            (if (and (= connect-id +connect-room-none+)
@@ -163,21 +173,22 @@
                                                            (loop for off-y of-type fixnum from (- half-size) to (+ half-size)
                                                                  for ny of-type fixnum = (+ sy off-y)
                                                                  when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
-                                                                          (get-terrain-type-trait (get-terrain-* level nx ny) +terrain-trait-blocks-move+))
+                                                                          (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
                                                                    do
                                                                       (setf result nil)))
                                                    result))
                                              x y))
                              t
                              nil))))
-         (make-func #'(lambda (x y)
-                        (setf (aref connect-map x y) room-id))))
+         (make-func #'(lambda (x y z)
+                        (setf (aref connect-map x y z) room-id))))
     (declare (type fixnum max-x max-y room-id))
     
     (loop for x from 0 below max-x do
       (loop for y from 0 below max-y do
-        (when (funcall check-func x y)
-          (flood-fill (cons x y) :check-func check-func :make-func make-func)
-          (incf room-id))
-        ))
+        (loop for z from 0 below max-z do
+          (when (funcall check-func x y z)
+            (flood-fill (list x y z) :check-func check-func :make-func make-func)
+            (incf room-id))
+              )))
     (setf (aref (connect-map level) mob-size) connect-map)))

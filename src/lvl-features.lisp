@@ -29,6 +29,7 @@
    (feature-type :initform 0 :initarg :feature-type :accessor feature-type :type fixnum)
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)
+   (z :initarg :z :initform 0 :accessor z :type fixnum)
    ))
 
 (defmethod initialize-instance :after ((feature feature) &key)

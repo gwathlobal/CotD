@@ -76,7 +76,7 @@
                                                            (add-message (create-string "~%"))
                                                            (add-message (create-string "You are dead.~%"))
                                                            (setf *current-window* (make-instance 'cell-window))
-                                                           (update-visible-area (level *world*) (x *player*) (y *player*))
+                                                           (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                                                            (make-output *current-window*)
                                                            (sdl:with-events ()
                                                              (:quit-event () (funcall (quit-func *current-window*)) t)
@@ -98,7 +98,7 @@
                                                            (add-message (create-string "~%"))
                                                            (add-message (create-string "You are possessed.~%"))
                                                            (setf *current-window* (make-instance 'cell-window))
-                                                           (update-visible-area (level *world*) (x *player*) (y *player*))
+                                                           (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                                                            (make-output *current-window*)
                                                            (sdl:with-events ()
                                                              (:quit-event () (funcall (quit-func *current-window*)) t)
@@ -130,10 +130,10 @@
                                                              (loop for (sx . sy) in placement-list-horiz do
                                                                (loop for x from 0 to 9
                                                                      for military-picked = (nth (random (length *game-events-military-list*)) *game-events-military-list*)
-                                                                     when (and (not (get-mob-* (level world) (+ sx x) sy))
-                                                                               (not (get-terrain-type-trait (get-terrain-* (level world) (+ sx x) sy) +terrain-trait-blocks-move+)))
+                                                                     when (and (not (get-mob-* (level world) (+ sx x) sy 0))
+                                                                               (not (get-terrain-type-trait (get-terrain-* (level world) (+ sx x) sy 0) +terrain-trait-blocks-move+)))
                                                                        do
-                                                                          (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x (+ sx x) :y sy))))
+                                                                          (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x (+ sx x) :y sy :z 0))))
                                                              
                                                              ))
                                ))
@@ -146,10 +146,10 @@
                                                            (loop repeat (sqrt (* (array-dimension (terrain (level world)) 0) (array-dimension (terrain (level world)) 1)))
                                                                  for x = (random (array-dimension (terrain (level world)) 0))
                                                                  for y = (random (array-dimension (terrain (level world)) 1))
-                                                                 when (= (get-terrain-* (level world) x y) +terrain-floor-snow-prints+)
+                                                                 when (= (get-terrain-* (level world) x y 0) +terrain-floor-snow-prints+)
                                                                    do
                                                                       (logger (format nil "GAME-EVENT: Snow falls at (~A ~A)~%" x y))
-                                                                      (set-terrain-* (level world) x y +terrain-floor-snow+))
+                                                                      (set-terrain-* (level world) x y 0 +terrain-floor-snow+))
                                                            )))
 
 (set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-n+ :disabled nil
@@ -168,10 +168,10 @@
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 0))
                                                                                (decf max-units)
                                                                                (when (zerop max-units) (loop-finish)))
                                                                     (when (zerop max-units) (loop-finish)))
@@ -194,10 +194,10 @@
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 0))
                                                                                (decf max-units)
                                                                                (when (zerop max-units) (loop-finish)))
                                                                     (when (zerop max-units) (loop-finish)))
@@ -220,10 +220,10 @@
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 0))
                                                                                (decf max-units)
                                                                                (when (zerop max-units) (loop-finish)))
                                                                     (when (zerop max-units) (loop-finish)))
@@ -246,10 +246,10 @@
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
+                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 0))
                                                                                (decf max-units)
                                                                                (when (zerop max-units) (loop-finish)))
                                                                     (when (zerop max-units) (loop-finish)))
@@ -272,8 +272,8 @@
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
                                                                                (decf max-units)
@@ -288,8 +288,8 @@
                                                                  do
                                                                     (loop for y from 0 below *max-y-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
                                                                                (decf max-units)
@@ -304,8 +304,8 @@
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
                                                                                (decf max-units)
@@ -320,8 +320,8 @@
                                                                  do
                                                                     (loop for x from 0 below *max-x-level*
                                                                           for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+)))
+                                                                          when (and (not (get-mob-* (level world) x y 0))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 0) +terrain-trait-blocks-move+)))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y))
                                                                                (decf max-units)

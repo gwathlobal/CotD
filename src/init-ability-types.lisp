@@ -13,7 +13,7 @@
                                                     (setf heal-pwr (- (max-hp actor) (cur-hp actor))))
                                                   (incf (cur-hp actor) heal-pwr)
                                                   (decf (cur-fp actor) (cost ability-type))
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A invokes divine powers to heal itself for ~A. " (visible-name actor) heal-pwr))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -45,7 +45,7 @@
                                                 (declare (ignore ability-type target))
                                                 (set-mob-effect actor +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id actor) +mob-type-human+)
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A invokes divine powers to disguise itself as a human. " (name actor))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -74,7 +74,7 @@
                                                 (declare (ignore ability-type target))
                                                 (rem-mob-effect actor +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id actor) (mob-type actor))
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A reveals its true divine form. " (name actor))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -109,7 +109,7 @@
                                                 (declare (ignore ability-type))
                                                 (rem-mob-effect target +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id target) (mob-type target))
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
@@ -125,7 +125,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (unless (mob-effect-p target +mob-effect-reveal-true-form+)
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                 (setf (face-mob-type-id target) (mob-type target))
                                                 (set-mob-effect target +mob-effect-reveal-true-form+ 5))
@@ -153,7 +153,7 @@
                                                 (logger (format nil "MOB-POSSESS-TARGET: ~A [~A] possesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
                                                 
                                                 (remove-mob-from-level-list (level *world*) target)
-                                                (set-mob-location actor (x target) (y target))
+                                                (set-mob-location actor (x target) (y target) (z target))
                                                                                                 
                                                 (setf (master-mob-id target) (id actor))
                                                 (setf (slave-mob-id actor) (id target))
@@ -167,7 +167,7 @@
                                                   (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id actor))) (id actor))
                                                   (setf (riding-mob-id target) nil))
                                                 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A possesses ~A. " (name actor) (visible-name target)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -217,7 +217,7 @@
                                                 (incf (total-blessed *world*))
                                                 (incf (cur-fp actor))
                                                 (incf (stat-blesses actor))
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A blesses ~A. " (visible-name actor) (visible-name target)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -303,7 +303,7 @@
                                                   (incf (cur-hp actor) heal-pwr)
                                                        
                                                   (unless (zerop heal-pwr)
-                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil "~A heals for ~A with the lifeforce of ~A. " (visible-name actor) heal-pwr (visible-name target))))
                                                   )
                                                 )
@@ -341,7 +341,7 @@
                                                   
                                                   (set-mob-effect actor +mob-effect-calling-for-help+ 2)
                                                   (decf (cur-fp actor) (cost ability-type))
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A calls for reinforcements. " (visible-name actor))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -386,26 +386,27 @@
                                                   (if allies-list
                                                     (progn
                                                       (let ((called-ally (get-mob-by-id (first allies-list)))
-                                                            (fx nil) (fy nil))
+                                                            (fx nil) (fy nil) (fz nil))
                                                         ;; if anyone found, find a free place around the caller
                                                         (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the caller ~A [~A]~%" (name actor) (id actor) (name called-ally) (id called-ally)))
                                                         (check-surroundings (x called-ally) (y called-ally) nil #'(lambda (x y)
-                                                                                                                    (when (and (not (get-mob-* (level *world*) x y))
-                                                                                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) x y) +terrain-trait-blocks-move+)))
-                                                                                                                      (setf fx x fy y))))
-                                                        (if (and fx fy)
+                                                                                                                    (when (and (not (get-mob-* (level *world*) x y (z called-ally)))
+                                                                                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) x y (z called-ally))
+                                                                                                                                                            +terrain-trait-blocks-move+)))
+                                                                                                                      (setf fx x fy y fz (z called-ally)))))
+                                                        (if (and fx fy fz)
                                                           ;; free place found
                                                           (progn
                                                             (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the place to teleport (~A, ~A)~%" (name actor) (id actor) fx fy))
-                                                            (print-visible-message (x actor) (y actor) (level *world*) 
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A disappeares in thin air. " (visible-name actor)))
                                                             ;; teleport the caster to the caller
-                                                            (set-mob-location actor fx fy)
+                                                            (set-mob-location actor fx fy fz)
 
                                                             (if (get-faction-relation (faction called-ally) (faction *player*))
-                                                              (print-visible-message (x actor) (y actor) (level *world*) 
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                      (format nil "~A answers the call of ~A. " (visible-name actor) (visible-name called-ally)))
-                                                              (print-visible-message (x actor) (y actor) (level *world*) 
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                      (format nil "~A appears out of thin air. " (visible-name actor))))
                                                             ;; remove the calling for help status from the called and the caller
                                                             (rem-mob-effect called-ally +mob-effect-calling-for-help+)
@@ -417,7 +418,7 @@
                                                             )
                                                           (progn
                                                             (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] unable to the place to teleport~%" (name actor) (id actor)))
-                                                            (print-visible-message (x actor) (y actor) (level *world*) 
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))
                                                             ;; no free place found - just remove the status from the called and the caller
                                                             (rem-mob-effect called-ally +mob-effect-calling-for-help+)
@@ -427,7 +428,7 @@
                                                     (progn
                                                       ;; if none found, simply remove the "answer the call" status
                                                       (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] is unable to find the caller ~%" (name actor) (id actor)))
-                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))
                                                       (rem-mob-effect actor +mob-effect-called-for-help+)
                                                       ))
@@ -465,7 +466,7 @@
                                                 
                                                 (logger (format nil "MOB-PRAYER-BLESS: ~A [~A] prays for smiting~%" (name actor) (id actor)))
 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A starts to pray. " (visible-name actor)))
 
                                                 (let ((enemy-list nil))
@@ -486,7 +487,7 @@
                                                              (logger (format nil "MOB-PRAYER-BLESS: ~A [~A] affects the enemy ~A~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
                                                              (when (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-possessed+)
                                                                (unless (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+)
-                                                                 (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                         (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name (get-mob-by-id enemy-mob-id)))))
                                                                (setf (face-mob-type-id (get-mob-by-id enemy-mob-id)) (mob-type (get-mob-by-id enemy-mob-id)))
                                                                (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+ 5))
@@ -541,7 +542,7 @@
                                                   
                                                   (set-mob-effect actor +mob-effect-calling-for-help+ 2)
                                                   (decf (cur-fp actor) (cost ability-type))
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A murmurs some incantations. " (visible-name actor))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -571,7 +572,7 @@
                                                 
                                                 (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] prays for shielding~%" (name actor) (id actor)))
 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A prays for protection. " (visible-name actor)))
 
                                                 (let ((ally-list nil))
@@ -592,7 +593,7 @@
                                                           do
                                                              (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the ally ~A~%" (name actor) (id actor) (get-mob-by-id ally-mob-id)))
                                                              (set-mob-effect (get-mob-by-id ally-mob-id) +mob-effect-divine-shield+ 99)
-                                                             (print-visible-message (x actor) (y actor) (level *world*) 
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A is granted divine shield. " (visible-name (get-mob-by-id ally-mob-id))))
                                                           )
                                                     
@@ -624,7 +625,7 @@
                                                 
                                                 (logger (format nil "MOB-CURSE: ~A [~A] incants the curses~%" (name actor) (id actor)))
 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A laughs and curses maniacally. " (visible-name actor)))
 
                                                 (let ((enemy-list nil))
@@ -655,13 +656,13 @@
                                                              (if protected
                                                                (progn
                                                                  (logger (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name (get-mob-by-id enemy-mob-id)) (id (get-mob-by-id enemy-mob-id))))
-                                                                 (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                         (format nil "~A's curse removed divine protection from ~A. " (visible-name actor) (visible-name (get-mob-by-id enemy-mob-id))))
                                                                  )
                                                                (progn
                                                                  (logger (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
                                                                  (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-cursed+ 5)
-                                                                 (print-visible-message (x actor) (y actor) (level *world*) 
+                                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                         (format nil "~A is cursed. " (visible-name (get-mob-by-id enemy-mob-id))))))
                                                           )
 
@@ -701,7 +702,7 @@
                                                 
                                                 (logger (format nil "MOB-PRAYER-REVEAL: ~A [~A] prays for revealing supernatural beings~%" (name actor) (id actor)))
 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A prays for revelation. " (visible-name actor)))
 
                                                 ;; reveal true form of all mobs in line of sight, 1/3rd chance
@@ -713,11 +714,11 @@
                                                              (rem-mob-effect target +mob-effect-divine-consealed+)
                                                              (set-mob-effect target +mob-effect-reveal-true-form+ 5)
                                                              (setf (face-mob-type-id target) (mob-type target))
-                                                             (print-visible-message (x target) (y target) (level *world*) 
+                                                             (print-visible-message (x target) (y target) (z actor) (level *world*) 
                                                                                     (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                            (when (mob-effect-p target +mob-effect-possessed+)
                                                              (unless (mob-effect-p target +mob-effect-reveal-true-form+)
-                                                               (print-visible-message (x target) (y target) (level *world*) 
+                                                               (print-visible-message (x target) (y target) (z actor) (level *world*) 
                                                                                       (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                              (setf (face-mob-type-id target) (mob-type target))
                                                              (set-mob-effect target +mob-effect-reveal-true-form+ 5))))                                                      
@@ -748,7 +749,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A orders nearby allies to follow him. " (visible-name actor)))
                                                 
                                                 ;; set order to up to six nearby units without orders
@@ -766,7 +767,7 @@
                                                                          (/= (first (order mob)) +mob-order-follow+))))
                                                         do
                                                            (setf (order mob) (list +mob-order-follow+ (id actor)))
-                                                           (print-visible-message (x actor) (y actor) (level *world*) 
+                                                           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                   (format nil "~A obeys. " (visible-name mob)))
                                                            (incf follower-num)
                                                            (when (>= follower-num 5) (loop-finish)))
@@ -803,7 +804,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A channels the heavenly light. " (visible-name actor)))
                                                 (logger (format nil "MOB-BLIND: ~A [~A] casts blindness.~%" (name actor) (id actor)))
                                                 ;; blind nearby non-angel mobs
@@ -814,9 +815,9 @@
                                                            (set-mob-effect mob +mob-effect-blind+ 2)
                                                            (adjust-sight mob)
                                                            (if (eq *player* mob)
-                                                             (update-visible-area (level *world*) (x *player*) (y *player*))
+                                                             (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                                                              (setf (visible-mobs mob) nil))
-                                                           (print-visible-message (x mob) (y mob) (level *world*) 
+                                                           (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                   (format nil "~A is blind. " (visible-name mob)))
                                                            )
 
@@ -856,7 +857,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A roars to fear its enemies. " (visible-name actor)))
                                                 (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
                                                 ;; fear nearby visible enemy mobs
@@ -868,10 +869,10 @@
                                                            (if (> (random (+ (strength mob) (mob-ability-p actor +mob-abil-instill-fear+))) (strength mob))
                                                              (progn
                                                                (set-mob-effect mob +mob-effect-fear+ 3)
-                                                               (print-visible-message (x actor) (y actor) (level *world*) 
+                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                       (format nil "~A is feared. " (visible-name mob))))
                                                              (progn
-                                                               (print-visible-message (x actor) (y actor) (level *world*) 
+                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                       (format nil "~A resists fear. " (visible-name mob))))))
                                                           
                                                 (decf (cur-fp actor) (cost ability-type))
@@ -914,7 +915,7 @@
                                                 ;; here the target is not a mob, but a (cons x y)
                                                 (logger (format nil "MOB-CHARGE: ~A [~A] charges to ~A.~%" (name actor) (id actor) target))
 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A charges. " (visible-name actor)))
                                                 
                                                 (let ((path-line nil) (cur-ap) (game-time) (dx1) (dy1) (target1 (cons (car target) (cdr target))))
@@ -925,11 +926,12 @@
                                                     (setf (car target1) (+ (car target1) (* 3 dx1)))
                                                     (setf (cdr target1) (+ (cdr target1) (* 3 dy1))))
                                                   
-                                                  (line-of-sight (x actor) (y actor) (car target1) (cdr target1) #'(lambda (dx dy)
-                                                                                                                     (let ((exit-result t))
-                                                                                                                       (block nil
-                                                                                                                         (push (cons dx dy) path-line)
-                                                                                                                         exit-result))))
+                                                  (line-of-sight (x actor) (y actor) (z actor) (car target1) (cdr target1) (z actor) #'(lambda (dx dy dz)
+                                                                                                                                         (declare (ignore dz))
+                                                                                                                                         (let ((exit-result t))
+                                                                                                                                            (block nil
+                                                                                                                                              (push (cons dx dy) path-line)
+                                                                                                                                              exit-result))))
                                                   (setf path-line (nreverse path-line))
                                                   (pop path-line)
                                                   
@@ -946,7 +948,7 @@
                                                            (decf charge-distance)
                                                            (setf charge-result (move-mob actor (x-y-into-dir dx dy) :push t))
                                                            (when (eq charge-result nil)
-                                                             (print-visible-message (x actor) (y actor) (level *world*) 
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A hits an obstacle. " (visible-name actor))))
                                                            (unless (eq charge-result t)
                                                              (loop-finish))
@@ -967,27 +969,29 @@
                                                     (unless nearest-enemy
                                                       (return nil))
                                                     (let ((blocked nil))
-                                                      (line-of-sight (x actor) (y actor) (x nearest-enemy) (y nearest-enemy) #'(lambda (dx dy)
-                                                                                                                                 (declare (type fixnum dx dy))
-                                                                                                                                 (let ((terrain) (exit-result t))
-                                                                                                                                   (block nil
-                                                                                                                                     (when (or (< dx 0) (>= dx *max-x-level*)
-                                                                                                                                               (< dy 0) (>= dy *max-y-level*))
-                                                                                                                                       (setf exit-result 'exit)
-                                                                                                                                       (setf blocked t)
-                                                                                                                                       (return))
-                                                                                                                                     
-                                                                                                                                     (setf terrain (get-terrain-* (level *world*) dx dy))
-                                                                                                                                     (unless terrain
-                                                                                                                                       (setf exit-result 'exit)
-                                                                                                                                       (setf blocked t)
-                                                                                                                                       (return))
-                                                                                                                                     (when (get-terrain-type-trait terrain +terrain-trait-blocks-move+)
-                                                                                                                                       (setf exit-result 'exit)
-                                                                                                                                       (setf blocked t)
-                                                                                                                                       (return))
-                                                                                                                                     )
-                                                                                                                                   exit-result)))
+                                                      (line-of-sight (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)
+                                                                     #'(lambda (dx dy dz)
+                                                                         (declare (type fixnum dx dy))
+                                                                         (let ((terrain) (exit-result t))
+                                                                           (block nil
+                                                                             (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
+                                                                                       (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
+                                                                                       (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
+                                                                               (setf exit-result 'exit)
+                                                                               (setf blocked t)
+                                                                               (return))
+                                                                             
+                                                                             (setf terrain (get-terrain-* (level *world*) dx dy dz))
+                                                                             (unless terrain
+                                                                               (setf exit-result 'exit)
+                                                                               (setf blocked t)
+                                                                               (return))
+                                                                             (when (get-terrain-type-trait terrain +terrain-trait-blocks-move+)
+                                                                               (setf exit-result 'exit)
+                                                                               (setf blocked t)
+                                                                               (return))
+                                                                             )
+                                                                           exit-result)))
                                                       (if (and (mob-ability-p actor +mob-abil-charge+)
                                                                (can-invoke-ability actor actor +mob-abil-charge+)
                                                                (not blocked))
@@ -997,7 +1001,7 @@
                                                    (declare (ignore nearest-ally))
                                                    (mob-invoke-ability actor (cons (x nearest-enemy) (y nearest-enemy)) (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
-                                                      (if (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                      (if (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                         (progn
                                                           nil)
                                                         (progn
@@ -1027,10 +1031,10 @@
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A mounts ~A. " (visible-name actor) (visible-name target)))
 
-                                                (set-mob-location actor (x target) (y target))
+                                                (set-mob-location actor (x target) (y target) (z target))
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
 
@@ -1046,7 +1050,7 @@
                                                   (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and mob
                                                                                                                  (get-faction-relation (faction actor) (faction mob))
                                                                                                                  (mob-ability-p mob +mob-abil-horse-can-be-ridden+)
@@ -1061,7 +1065,7 @@
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (let ((mount nil))
                                                      (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and mob
                                                                                                                  (get-faction-relation (faction actor) (faction mob))
                                                                                                                  (mob-ability-p mob +mob-abil-horse-can-be-ridden+)
@@ -1069,14 +1073,14 @@
                                                                                                         (setf mount mob)))))
                                                      (mob-invoke-ability actor mount (id ability-type))))
                                  :map-select-func #'(lambda (ability-type-id)
-                                                      (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                      (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
-                                                               (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
-                                                               (get-faction-relation (faction *player*) (faction (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
-                                                               (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) +mob-abil-horse-can-be-ridden+)
-                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
+                                                               (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
+                                                               (get-faction-relation (faction *player*) (faction (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                               (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +mob-abil-horse-can-be-ridden+)
+                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))))
                                                         (progn
-                                                          (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) ability-type-id)
+                                                          (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
                                                           nil))
@@ -1100,14 +1104,14 @@
                                                 (let ((mount (get-mob-by-id (riding-mob-id actor))))
                                                   (logger (format nil "MOB-DISMOUNT: ~A [~A] dismounts ~A [~A].~%" (name actor) (id actor) (name mount) (id mount)))
                                                   
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A dismounts ~A. " (visible-name actor) (visible-name mount)))
                                                   
                                                   (setf (mounted-by-mob-id mount) nil)
                                                   (setf (riding-mob-id actor) nil)
 
-                                                  (set-mob-location actor (car target) (cdr target))
-                                                  (set-mob-location mount (x mount) (y mount)))
+                                                  (set-mob-location actor (car target) (cdr target) (z target))
+                                                  (set-mob-location mount (x mount) (y mount) (z mount)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -1147,8 +1151,8 @@
                                                                                                                    t
                                                                                                                    nil)))))
 
-                                                        (if (and (eq (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) nil)
-                                                                 (eq (check-move-on-level *player* (view-x *player*) (view-y *player*)) t)
+                                                        (if (and (eq (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (z *player*)) nil)
+                                                                 (eq (check-move-on-level *player* (view-x *player*) (view-y *player*) (z *player*)) t)
                                                                  (find (cons (view-x *player*) (view-y *player*)) cell-list
                                                                        :test #'(lambda (a b)
                                                                                  (let ((x1 (car a)) (x2 (car b)) (y1 (cdr a)) (y2 (cdr b)))
@@ -1171,16 +1175,16 @@
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A mounts ~A" (visible-name actor) (visible-name target)))
 
                                                 ;; reveal the true form of those who ride fiends
                                                 (when (and (slave-mob-id actor)
                                                            (not (mob-effect-p actor +mob-effect-reveal-true-form+)))
-                                                  (print-visible-message (x actor) (y actor) (level *world*) 
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil " and reveals itself as ~A" (get-qualified-name actor))))
                                                 
-                                                (set-mob-location actor (x target) (y target))
+                                                (set-mob-location actor (x target) (y target) (z target))
                                                 
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
@@ -1190,7 +1194,7 @@
                                                 
                                                 (setf (face-mob-type-id actor) (mob-type actor))
                                                 (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
-                                                (print-visible-message (x actor) (y actor) (level *world*) 
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil ". "))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -1203,7 +1207,7 @@
                                                   (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and mob
                                                                                                                  (mob-ability-p mob +mob-abil-fiend-can-be-ridden+)
                                                                                                                  (not (mounted-by-mob-id mob)))
@@ -1217,20 +1221,20 @@
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (let ((mount nil))
                                                      (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and mob
                                                                                                                  (mob-ability-p mob +mob-abil-fiend-can-be-ridden+)
                                                                                                                  (null (mounted-by-mob-id mob)))
                                                                                                         (setf mount mob)))))
                                                      (mob-invoke-ability actor mount (id ability-type))))
                                  :map-select-func #'(lambda (ability-type-id)
-                                                      (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
+                                                      (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
-                                                               (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
-                                                               (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) +mob-abil-fiend-can-be-ridden+)
-                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))))
+                                                               (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
+                                                               (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +mob-abil-fiend-can-be-ridden+)
+                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))))
                                                         (progn
-                                                          (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) ability-type-id)
+                                                          (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
                                                           nil))
@@ -1269,16 +1273,16 @@
                                                           (and (mob-effect-p target +mob-effect-possessed+)
                                                                (not (mob-effect-p target +mob-effect-reveal-true-form+))))
                                                   (progn
-                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil "~A reveals the true form of ~A. " (visible-name actor) (visible-name target)))
                                                     
                                                     (rem-mob-effect target +mob-effect-divine-consealed+)
                                                     (setf (face-mob-type-id target) (mob-type target))
                                                     (set-mob-effect target +mob-effect-reveal-true-form+ 5)
-                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil "It is ~A. " (get-qualified-name target))))
                                                   (progn
-                                                    (print-visible-message (x actor) (y actor) (level *world*) 
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil "~A tries to reveal the true form of ~A. But ~A does not conseal anything. " (visible-name actor) (visible-name target) (visible-name target)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -1301,8 +1305,8 @@
                                                    (declare (ignore nearest-enemy))
                                                    (mob-invoke-ability actor nearest-ally (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
-                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
-                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
                                                                  (not (eq *player* mob))
                                                                  (not (mob-effect-p mob +mob-effect-reveal-true-form+))
@@ -1343,7 +1347,7 @@
                                                   (setf cur-dmg (+ 2 (random 3)))
                                                   (decf (cur-hp target) cur-dmg)
                                                                                                     
-                                                  (print-visible-message (x target) (y target) (level *world*) 
+                                                  (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                          (format nil "~A burns the mind of ~A for ~A damage. " (visible-name actor) (visible-name target)  cur-dmg))
                                                   (when (check-dead target)
                                                     (make-dead target :splatter nil :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
@@ -1369,8 +1373,8 @@
                                                    (declare (ignore nearest-ally))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
-                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
-                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
                                                                  (not (eq *player* mob)))
                                                           (progn
@@ -1389,15 +1393,17 @@
                                                 
                                                 (logger (format nil "MOB-GARGANTAUR-TELEPORT: ~A [~A] teleports self~%" (name actor) (id actor)))
 
-                                                (let ((rx (- (+ 80 (x actor))
+                                                (let ((max-x (array-dimension (terrain (level *world*)) 0))
+                                                      (max-y (array-dimension (terrain (level *world*)) 1))
+                                                      (rx (- (+ 80 (x actor))
                                                              (1+ (random 160)))) 
                                                       (ry (- (+ 80 (y actor))
                                                              (1+ (random 160))))
                                                       (n 200))
                                                   ;; 200 hundred tries to find a suitable place for teleport
-                                                  (loop while (or (< rx 0) (< ry 0) (>= rx *max-x-level*) (>= ry *max-y-level*)
+                                                  (loop while (or (< rx 0) (< ry 0) (>= rx max-x) (>= ry max-y)
                                                                   (< (get-distance (x actor) (y actor) rx ry) 40)
-                                                                  (not (eq (check-move-on-level actor rx ry) t)))
+                                                                  (not (eq (check-move-on-level actor rx ry (z actor)) t)))
                                                         do
                                                            
                                                            (decf n)
@@ -1410,13 +1416,13 @@
                                                   ;(format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry) (get-distance (x actor) (y actor) rx ry))
                                                   (if (not (zerop n))
                                                     (progn
-                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A disappeares in thin air. " (visible-name actor)))
-                                                      (set-mob-location actor rx ry)
-                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                      (set-mob-location actor rx ry (z actor))
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A appears out of thin air. " (visible-name actor))))
                                                     (progn
-                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))))
                                                   ))
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -1452,20 +1458,20 @@
 
                                                   (if (<= (cur-hp actor) 0)
                                                     (progn
-                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A cringes with pain, taking ~A dmg, while trying to mount ~A. " (visible-name actor) cur-dmg (visible-name target)))
                                                       (make-dead actor :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))
                                                     (progn
-                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A cringes with pain, taking ~A dmg, and mounts ~A" (visible-name actor) cur-dmg (visible-name target)))
 
                                                       ;; reveal the true form of those who ride fiends
                                                       (when (mob-effect-p actor +mob-effect-divine-consealed+)
                                                         (rem-mob-effect actor +mob-effect-divine-consealed+)
-                                                        (print-visible-message (x actor) (y actor) (level *world*) 
+                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                (format nil " to reveal itself as ~A" (get-qualified-name actor))))
                                                       
-                                                      (set-mob-location actor (x target) (y target))
+                                                      (set-mob-location actor (x target) (y target) (z target))
                                                       
                                                       (setf (mounted-by-mob-id target) (id actor))
                                                       (setf (riding-mob-id actor) (id target))
@@ -1475,7 +1481,7 @@
                                                       
                                                       (setf (face-mob-type-id actor) (mob-type actor))
                                                       (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
-                                                      (print-visible-message (x actor) (y actor) (level *world*) 
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil ". "))
                                                       ))
                                                   ))
@@ -1489,7 +1495,7 @@
                                                   (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and mob
                                                                                                                  (= (mob-type mob) +mob-type-gargantaur+)
                                                                                                                  (null (mounted-by-mob-id mob)))
@@ -1505,7 +1511,7 @@
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (let ((mount nil))
                                                      (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and mob
                                                                                                                  (= (mob-type mob) +mob-type-gargantaur+)
                                                                                                                  (null (mounted-by-mob-id mob)))
@@ -1514,15 +1520,15 @@
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mount-list nil))
                                                         (check-surroundings (x *player*) (y *player*) nil #'(lambda (dx dy)
-                                                                                                              (let ((mob (get-mob-* (level *world*) dx dy)))
+                                                                                                              (let ((mob (get-mob-* (level *world*) dx dy (z *player*))))
                                                                                                                 (when (and mob
                                                                                                                            (= (mob-type mob) +mob-type-gargantaur+)
                                                                                                                            (null (mounted-by-mob-id mob)))
                                                                                                                   (pushnew mob mount-list)))))
                                                         
-                                                        (if (find (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) mount-list)
+                                                        (if (find (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) mount-list)
                                                           (progn
-                                                            (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) ability-type-id)
+                                                            (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                         (progn
                                                           nil))
@@ -1540,7 +1546,7 @@
                                                   (setf cur-dmg (+ 2 (random 3)))
                                                   (decf (cur-hp target) cur-dmg)
                                                                                                     
-                                                  (print-visible-message (x target) (y target) (level *world*) 
+                                                  (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                          (format nil "~A uses its Gargantaur to burn the mind of ~A for ~A damage. " (visible-name actor) (visible-name target)  cur-dmg))
                                                   (when (check-dead target)
                                                     (make-dead target :splatter nil :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
@@ -1568,8 +1574,8 @@
                                                    (declare (ignore nearest-ally))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
-                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
-                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
                                                                  (not (eq *player* mob)))
                                                           (progn

@@ -74,16 +74,16 @@
 		 (or (/= (+ (1- x) x1) x) (/= (+ (1- y) y1) y)))
 	(funcall func (+ (1- x) x1) (+ (1- y) y1))))))
 
-(defun print-visible-message (x y level str)
-  (when (get-single-memo-visibility (get-memo-* level x y))
+(defun print-visible-message (x y z level str)
+  (when (get-single-memo-visibility (get-memo-* level x y z))
     (set-message-this-turn t)
     (add-message str)))
 
-(defun place-visible-animation (x y level animation-type-id &key (params nil))
-  (when (get-single-memo-visibility (get-memo-* level x y))
-    (push (make-animation :id animation-type-id :x x :y y :params params) (animation-queue *world*))))
+(defun place-visible-animation (x y z level animation-type-id &key (params nil))
+  (when (get-single-memo-visibility (get-memo-* level x y z))
+    (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue *world*))))
 
-(defun check-move-on-level (mob dx dy)
+(defun check-move-on-level (mob dx dy dz)
   (let ((sx) (sy)
         (mob-list nil))
     ;; calculate the coords of the mob's NE corner
@@ -97,17 +97,17 @@
           (return-from check-move-on-level nil))
         
         ;; checking for obstacle
-        (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny) +terrain-trait-blocks-move+)
+        (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+)
           (return-from check-move-on-level nil)
           ;(return-from check-move-on-level (list :obstacles ()))
           )
         
         ;; checking for mobs
-        (when (and (get-mob-* (level *world*) nx ny)
-                   (not (eq (get-mob-* (level *world*) nx ny) mob))
+        (when (and (get-mob-* (level *world*) nx ny dz)
+                   (not (eq (get-mob-* (level *world*) nx ny dz) mob))
                    (or (eq (mounted-by-mob-id mob) nil)
-                       (not (eq (mounted-by-mob-id mob) (id (get-mob-* (level *world*) nx ny))))))
-          (pushnew (get-mob-* (level *world*) nx ny) mob-list)
+                       (not (eq (mounted-by-mob-id mob) (id (get-mob-* (level *world*) nx ny dz))))))
+          (pushnew (get-mob-* (level *world*) nx ny dz) mob-list)
           )))
 
     (when mob-list
@@ -116,7 +116,7 @@
     ;; all checks passed - can move freely
     (return-from check-move-on-level t)))
 
-(defun set-mob-location (mob x y)
+(defun set-mob-location (mob x y z)
   (let ((place-func #'(lambda (nmob)
                         (let ((sx) (sy))
                           ;; calculate the coords of the mob's NE corner
@@ -127,12 +127,12 @@
                           ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement 
                           (loop for nx from sx below (+ sx (map-size nmob)) do
                             (loop for ny from sy below (+ sy (map-size nmob)) do
-                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny)))
-                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny))) nmob nx ny))
-                              (setf (aref (mobs (level *world*)) nx ny) nil)))
+                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z)))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z))) nmob nx ny z))
+                              (setf (aref (mobs (level *world*)) nx ny z) nil)))
                           
                           ;; change the coords of the center of the mob
-                          (setf (x nmob) x (y nmob) y)
+                          (setf (x nmob) x (y nmob) y (z nmob) z)
                           
                           ;; calculate the new coords of the mob's NE corner
                           (setf sx (- (x nmob) (truncate (1- (map-size nmob)) 2)))
@@ -142,10 +142,10 @@
                           ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement
                           (loop for nx from sx below (+ sx (map-size nmob)) do
                             (loop for ny from sy below (+ sy (map-size nmob)) do
-                              (setf (aref (mobs (level *world*)) nx ny) (id nmob))
+                              (setf (aref (mobs (level *world*)) nx ny z) (id nmob))
                               
-                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx)))
-                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx))) nmob nx nx))))))))
+                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx z)))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx z))) nmob nx nx z))))))))
 
     ;; we have 3 cases of movement:
     ;; 1) the mob moves while is riding someone (currently available if the mob teleports somewhere with a mount, as normally the rider does not move, only gives directions to the mount)
@@ -159,8 +159,8 @@
          (funcall place-func (get-mob-by-id (riding-mob-id mob)))
 
          ;; place the rider
-         (setf (x mob) x (y mob) y)
-         (setf (aref (mobs (level *world*)) x y) (id mob))
+         (setf (x mob) x (y mob) y (z mob) z)
+         (setf (aref (mobs (level *world*)) x y z) (id mob))
          ))
       ((mounted-by-mob-id mob)
        (progn
@@ -170,8 +170,9 @@
          
          ;; place the rider
          (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
-               (y (get-mob-by-id (mounted-by-mob-id mob))) y)
-         (setf (aref (mobs (level *world*)) (x mob) (y mob)) (mounted-by-mob-id mob))
+               (y (get-mob-by-id (mounted-by-mob-id mob))) y
+               (z (get-mob-by-id (mounted-by-mob-id mob))) z)
+         (setf (aref (mobs (level *world*)) (x mob) (y mob) (z mob)) (mounted-by-mob-id mob))
          ))
       (t
        (progn
@@ -208,7 +209,7 @@
       (setf (order-for-next-turn (get-mob-by-id (riding-mob-id mob))) dir)
       
       ;; perform the attack in the chosen direction (otherwise it will be only the mount that attacks)
-      (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy))))
+      (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy) (z mob))))
         ;; right now multi-tile mobs can not ride other multitile mobs and I intend to leave it this way
         ;; this means that there will always be only one mob in the affected mob list
         (when (and check-result
@@ -220,7 +221,7 @@
           (return-from move-mob check-result))
 
         (when (or (eq check-result nil)
-                  (and (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy)) nil)
+                  (and (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy) (z mob)) nil)
                        (= dir (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob))))))))
           (logger (format nil "MOVE-MOB: ~A [~A] is unable to move to give order (CHECK = ~A, MOUNT DIR ~A)~%" (name mob) (id mob) check-result
                           (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob)))))))
@@ -319,14 +320,15 @@
           for move-result = nil
           for x = (+ (x mob) dx)
           for y = (+ (y mob) dy)
-          for check-result = (check-move-on-level mob x y)
+          for z = (z mob)
+          for check-result = (check-move-on-level mob x y z)
           do
              (logger (format nil "MOVE-MOB: CHECK-MOVE ~A~%" check-result))
              (cond
                ;; all clear - move freely
                ((eq check-result t)
                 
-                (set-mob-location mob x y)
+                (set-mob-location mob x y z)
                 (setf move-result t)
                 )
                ;; bumped into an obstacle or the map border
@@ -371,12 +373,12 @@
                               ;; check if you can push the mob farther
                               (let* ((nx (+ (car (momentum-dir mob)) (x target-mob)))
                                      (ny (+ (cdr (momentum-dir mob)) (y target-mob)))
-                                     (check-result-n (check-move-on-level target-mob nx ny)))
+                                     (check-result-n (check-move-on-level target-mob nx ny z)))
                                 (when (eq check-result-n t)
-                                  (print-visible-message (x mob) (y mob) (level *world*) 
+                                  (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                          (format nil "~A pushes ~A. " (visible-name mob) (visible-name target-mob)))
-                                  (set-mob-location target-mob nx ny)
-                                  (set-mob-location mob x y))
+                                  (set-mob-location target-mob nx ny z)
+                                  (set-mob-location mob x y z))
                                 ))
                             (on-bump target-mob mob)))
                       finally
@@ -414,7 +416,7 @@
   (decf (cur-ap mob) speed)
   (setf (made-turn mob) t)
   (when (eq mob *player*)
-    (incf (player-game-time *world*) speed)))
+    (incf (player-game-time *world*) (truncate (* speed +normal-ap+) (max-ap mob)))))
 
 (defmethod on-bump ((target mob) (actor mob))
   (if (eql target actor)
@@ -478,7 +480,7 @@
   (logger (format nil "MOB-DEPOSSESS-TARGET: Master ~A [~A], slave [~A]~%" (name actor) (id actor) (slave-mob-id actor)))
   (let ((target (get-mob-by-id (slave-mob-id actor))))
     (logger (format nil "MOB-DEPOSSESS-TARGET: ~A [~A] releases its possession of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
-    (setf (x target) (x actor) (y target) (y actor))
+    (setf (x target) (x actor) (y target) (y actor) (z target) (z actor))
     (add-mob-to-level-list (level *world*) target)
     
     (setf (master-mob-id target) nil)
@@ -493,7 +495,7 @@
       (setf (riding-mob-id target) (riding-mob-id actor))
       (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id target))) (id target)))
     
-    (print-visible-message (x actor) (y actor) (level *world*) 
+    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                            (format nil "~A releases its possession of ~A. " (name actor) (name target)))
   
     ))
@@ -508,10 +510,10 @@
         (multiple-value-bind (dx dy) (x-y-dir dir) 				
           (when (> 50 (random 100))
             (add-feature-to-level-list (level *world*) 
-                                       (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy)))))))
+                                       (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy) :z (z target)))))))
     
     
-    (print-visible-message (x target) (y target) (level *world*) 
+    (print-visible-message (x target) (y target) (z target) (level *world*) 
                            (format nil "~A is scorched by ~A for ~A damage. " (name target) (name actor) cur-dmg))
     (when (check-dead target)
       (when (mob-effect-p target +mob-effect-possessed+)
@@ -537,7 +539,7 @@
   (logger (format nil "MOB-RELOAD: ~A [~A] reloads his ~A~%" (name actor) (id actor) (get-weapon-name actor)))
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
-  (print-visible-message (x actor) (y actor) (level *world*) 
+  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                          (format nil "~A reloads his ~(~A~). " (visible-name actor) (get-weapon-name actor)))
 
   (make-act actor +normal-ap+))
@@ -558,13 +560,13 @@
     
     ;; target under protection of divine shield - consume the shield and quit
     (when (mob-effect-p target +mob-effect-divine-shield+)
-      (print-visible-message (x actor) (y actor) (level *world*) 
+      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                              (format nil "~A shoots ~A. ~A takes no harm. " (visible-name actor) (visible-name target) (visible-name target)))
       (rem-mob-effect target +mob-effect-divine-shield+)
       (make-act actor (get-ranged-weapon-speed actor))
       (return-from mob-shoot-target nil))
 
-    (print-visible-message (x actor) (y actor) (level *world*) 
+    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                            (format nil "~A shoots ~A. " (visible-name actor) (visible-name target)))
     
     (loop repeat bullets-left
@@ -585,29 +587,31 @@
                              (+ 1 (truncate dist (r-acc actor)))))))
       
              ;; trace a line to the target so if we encounter an obstacle along the path we hit it
-             (line-of-sight (x actor) (y actor) (+ (x target) rx) (+ (y target) ry) #'(lambda (dx dy)
-                                                                                        (declare (type fixnum dx dy))
-                                                                                        (let ((terrain) (exit-result t))
-                                                                                          (block nil
-                                                                                            (setf tx dx ty dy)
-                                                                                            (when (or (< dx 0) (>= dx *max-x-level*)
-                                                                                                      (< dy 0) (>= dy *max-y-level*))
-                                                                                              (setf exit-result 'exit)
-                                                                                              (return))
-                                                                                            
-                                                                                            (setf terrain (get-terrain-* (level *world*) dx dy))
-                                                                                            (unless terrain
-                                                                                              (setf exit-result 'exit)
-                                                                                              (return))
-                                                                                            (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
-                                                                                              (setf exit-result 'exit)
-                                                                                              (return))
-                                                                                            )
-                                                                                          exit-result)))
+             (line-of-sight (x actor) (y actor) (z actor) (+ (x target) rx) (+ (y target) ry) (z target)
+                            #'(lambda (dx dy dz)
+                                (declare (type fixnum dx dy))
+                                (let ((terrain) (exit-result t))
+                                  (block nil
+                                    (setf tx dx ty dy)
+                                    (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
+                                              (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
+                                              (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    
+                                    (setf terrain (get-terrain-* (level *world*) dx dy dz))
+                                    (unless terrain
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    )
+                                  exit-result)))
              ;; place a fire dot if the dest point is visible
-             (place-visible-animation tx ty (level *world*) +anim-type-fire-dot+ :params ())
+             (place-visible-animation tx ty (z target) (level *world*) +anim-type-fire-dot+ :params ())
              
-             (setf target1 (get-mob-* (level *world*) tx ty))
+             (setf target1 (get-mob-* (level *world*) tx ty (z target)))
 
 
              ;; if the target is mounted, 50% chance that the actor will hit target's mount
@@ -637,7 +641,7 @@
                  (let ((dir (1+ (random 9))))
                    (multiple-value-bind (dx dy) (x-y-dir dir) 				
                      (add-feature-to-level-list (level *world*) 
-                                                (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target1) dx) :y (+ (y target1) dy))))))
+                                                (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target1) dx) :y (+ (y target1) dy) :z (z target))))))
                
                (if (find target1 affected-targets :key #'(lambda (n) (car n)))
                  (incf (cdr (find target1 affected-targets :key #'(lambda (n) (car n)))) cur-dmg)
@@ -648,9 +652,9 @@
     
     (loop for (a-target . dmg) in affected-targets do
       (if (zerop dmg)
-          (print-visible-message (x actor) (y actor) (level *world*) 
+          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                  (format nil "~A is not hurt. " (visible-name a-target)))
-          (print-visible-message (x actor) (y actor) (level *world*) 
+          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                  (format nil "~A is hit for ~A damage. " (visible-name a-target) dmg)))
       (when (check-dead a-target)
         (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-ranged-weapon-aux actor))
@@ -661,7 +665,7 @@
         ))
     
     (when completely-missed
-      (print-visible-message (x actor) (y actor) (level *world*) 
+      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                              (format nil "~A misses. " (visible-name actor)))
       )
     (make-act actor (get-ranged-weapon-speed actor))
@@ -682,7 +686,7 @@
 
   ;; target under protection of divine shield - consume the shield and quit
   (when (mob-effect-p target +mob-effect-divine-shield+)
-    (print-visible-message (x attacker) (y attacker) (level *world*) 
+    (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
                            (format nil "~@(~A~) attacks ~A, but can not harm ~A. " (visible-name attacker) (visible-name target) (visible-name target)))
     (rem-mob-effect target +mob-effect-divine-shield+)
     (make-act attacker (get-melee-weapon-speed attacker))
@@ -694,11 +698,11 @@
     (when (mob-effect-p attacker +mob-effect-divine-consealed+)
       (rem-mob-effect attacker +mob-effect-divine-consealed+)
       (setf (face-mob-type-id attacker) (mob-type attacker))
-      (print-visible-message (x attacker) (y attacker) (level *world*) 
+      (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
                              (format nil "~A reveals the true form of ~A. " (visible-name target) (get-qualified-name attacker))))
     (when (mob-effect-p attacker +mob-effect-possessed+)
       (unless (mob-effect-p attacker +mob-effect-reveal-true-form+)
-        (print-visible-message (x attacker) (y attacker) (level *world*) 
+        (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
                                (format nil "~A reveals the true form of ~A. " (visible-name target) (get-qualified-name attacker))))
       (setf (face-mob-type-id attacker) (mob-type attacker))
       (set-mob-effect attacker +mob-effect-reveal-true-form+ 5)))
@@ -706,7 +710,7 @@
   (multiple-value-bind (dx dy) (x-y-dir (1+ (random 9)))
     (let* ((cur-dmg) (dodge-chance) (failed-dodge nil) 
 	   (x (+ dx (x target))) (y (+ dy (y target)))
-	   (check-result (check-move-on-level target x y)))
+	   (check-result (check-move-on-level target x y (z target))))
       ;; check if attacker has hit the target
       (if (> (m-acc attacker) (random 100))
         (progn
@@ -717,19 +721,19 @@
                    (eq check-result t))
             ;; target dodged
             (progn
-              (set-mob-location target x y)
+              (set-mob-location target x y (z target))
 
               ;; reduce the momentum to zero
               (setf (momentum-dir target) (cons 0 0))
               (setf (momentum-spd target) 0)
                             
-              (print-visible-message (x attacker) (y attacker) (level *world*) 
+              (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
                                      (format nil "~@(~A~) attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
             ;; target did not dodge
             (progn
               (setf failed-dodge nil)
               (when (and (> (cur-dodge target) dodge-chance) (not (eq check-result t)))
-                (print-visible-message (x attacker) (y attacker) (level *world*) 
+                (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
                                        (format nil "~@(~A~) attacks ~A, and ~A failes to dodge. " (visible-name attacker) (visible-name target) (visible-name target)))
                 (setf failed-dodge t))
               ;; apply damage
@@ -754,16 +758,16 @@
                   (multiple-value-bind (dx dy) (x-y-dir dir) 				
                     (when (> 50 (random 100))
                       (add-feature-to-level-list (level *world*) 
-                                                 (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy)))))))
+                                                 (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy) :z (z target)))))))
               (if (zerop cur-dmg)
-                (print-visible-message (x attacker) (y attacker) (level *world*) 
+                (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
                                        (format nil "~@(~A~) hits ~A, but ~A is not hurt. " (visible-name attacker) (visible-name target) (visible-name target)))
-                (print-visible-message (x attacker) (y attacker) (level *world*) 
+                (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
                                        (format nil "~@(~A~) hits ~A for ~A damage. " (visible-name attacker) (visible-name target) cur-dmg)))
               )))
         (progn
           ;; attacker missed
-          (print-visible-message (x attacker) (y attacker) (level *world*) (format nil "~@(~A~) misses ~A. " (visible-name attacker) (visible-name target)))
+          (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) (format nil "~@(~A~) misses ~A. " (visible-name attacker) (visible-name target)))
           ))
       ))
   (when (check-dead target)
@@ -807,26 +811,26 @@
         (cond
           ;; sever head
           ((= r 1) (progn
-                     (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "head"))
+                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "head"))
                      (setf left-body-str "multilated body")
                      (when killer
                        (setf dead-msg-str (format nil "~@(~A~) chops off ~A's head. " (visible-name killer) (visible-name mob))))))
           ;; sever limb
           ((= r 2) (progn
-                     (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "limb"))
+                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "limb"))
                      (setf left-body-str "multilated body")
                      (when killer
                        (setf dead-msg-str (format nil "~@(~A~) severs ~A's limb. " (visible-name killer) (visible-name mob))))))
           ;; sever torso
           ((= r 3) (progn
-                     (place-visible-animation (x mob) (y mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body"))
+                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body"))
                      (setf left-body-str "lower body")
                      (when killer
                        (setf dead-msg-str (format nil "~@(~A~) cuts ~A in half. " (visible-name killer) (visible-name mob))))))
           ;; do not sever anything
           (t (setf left-body-str "body")))
 
-        (setf item (make-instance 'item :item-type +item-type-body-part+ :x (x mob) :y (y mob)))
+        (setf item (make-instance 'item :item-type +item-type-body-part+ :x (x mob) :y (y mob) :z (z mob)))
         (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) left-body-str))
         (add-item-to-level-list (level *world*) item)
         (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob)))
@@ -834,8 +838,8 @@
         ))
 
     (when msg
-      (print-visible-message (x mob) (y mob) (level *world*) dead-msg-str)
-      (when msg-newline (print-visible-message (x mob) (y mob) (level *world*) (format nil "~%"))))
+      (print-visible-message (x mob) (y mob) (z mob) (level *world*) dead-msg-str)
+      (when msg-newline (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%"))))
     
     ;; apply all on-kill abilities of the killer 
     (when killer
@@ -884,13 +888,13 @@
     
     ;; place blood stain if req
     (when (and splatter (< (random 100) 75))
-      (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob))))
+      (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob) :z (z mob))))
     
     (setf (dead= mob) t)))
   )
 
 (defun mob-evolve (mob)
-  (print-visible-message (x mob) (y mob) (level *world*) (format nil "~A assumes a superior form of ~A! " (name mob) (name (get-mob-type-by-id (evolve-into mob)))))
+  (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A assumes a superior form of ~A! " (name mob) (name (get-mob-type-by-id (evolve-into mob)))))
   
   (setf (mob-type mob) (evolve-into mob))
   (setf (cur-hp mob) (max-hp mob))
@@ -902,7 +906,7 @@
   (when (= (mob-type mob) +mob-type-demon+) 
     (set-name mob)
     (unless (eq mob *player*)
-      (print-visible-message (x mob) (y mob) (level *world*) (format nil "It will be hereby known as ~A! " (name mob)))))
+      (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "It will be hereby known as ~A! " (name mob)))))
   
   (set-cur-weapons mob)
   (adjust-dodge mob)
@@ -915,20 +919,20 @@
     (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
     (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())
     (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob)))
-    (print-visible-message (x mob) (y mob) (level *world*) (format nil "Its ascension destroyed its vessel."))
+    (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "Its ascension destroyed its vessel."))
     
     (rem-mob-effect mob +mob-effect-possessed+)
     (setf (master-mob-id mob) nil)
     (setf (slave-mob-id mob) nil)
     )
-  (print-visible-message (x mob) (y mob) (level *world*) (format nil "~%")))
+  (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%")))
 
 (defgeneric on-tick (mob))
 
 (defmethod on-tick ((mob mob))
 
   ;; increase cur-ap by max-ap
-  (incf (cur-ap mob) (max-ap mob))
+  ;(incf (cur-ap mob) (max-ap mob))
       
   (when (< (cur-fp mob) 0)
     (setf (cur-fp mob) 0))
@@ -969,7 +973,8 @@
   )
   
 
-(defun get-current-mob-glyph-idx (mob &key (x (x mob)) (y (y mob)))
+(defun get-current-mob-glyph-idx (mob &key (x (x mob)) (y (y mob)) (z (z mob)))
+  (declare (ignore z))
   (cond  
     ((and (> (map-size mob) 1)
           (= (+ (x mob) (car (momentum-dir mob))) x) (= (+ (y mob) (cdr (momentum-dir mob))) y)

@@ -14,6 +14,7 @@
                    do
                       (funcall (on-trigger game-event) *world*))
 
+           ;; we need this for events to get triggered only once  
            (setf (turn-finished *world*) nil)
            
            ;; iterate through all the mobs
@@ -29,7 +30,7 @@
                  (when (get-message-this-turn) (add-message (format nil "~%")))
 
                  (when (eq mob *player*)
-                   (update-visible-area (level *world*) (x *player*) (y *player*))
+                   (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                    (update-map-area))
                  
                  ;; process animations for this turn if any
@@ -41,7 +42,10 @@
                    (sdl:update-display)
                    (sdl-cffi::sdl-delay 100)
                    (setf (animation-queue *world*) nil)
-                   (update-map-area)))))
+                   (update-map-area))
+
+                 (when (<= (cur-ap mob) 0)
+                   (on-tick mob)))))
                      
            (bt:with-lock-held ((path-lock *world*))
              (setf (cur-mob-path *world*) 0)
@@ -53,9 +57,13 @@
              (setf (turn-finished *world*) t)
              (loop for mob across *mobs* do
                (unless (check-dead mob)
-                 (on-tick mob)
-                 (when (> (cur-ap mob) 0)
-                   (setf (made-turn mob) nil))))
+                  ;; increase cur-ap by max-ap
+                 (incf (cur-ap mob) (max-ap mob))
+                 
+                 ;(on-tick mob)
+                 ;(when (> (cur-ap mob) 0)
+                 ;  (setf (made-turn mob) nil))
+                 ))
              ;(incf (game-time *world*))
              ))
   )

@@ -313,9 +313,9 @@
                                                                         :cmd-str "[Enter] Fire  "
                                                                         :check-lof t
                                                                         :exec-func #'(lambda ()
-                                                                                       (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*))
+                                                                                       (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
                                                                                          (progn
-                                                                                           (mob-shoot-target *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*)))
+                                                                                           (mob-shoot-target *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                                            (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
                                                                                            (setf *current-window* (return-to *current-window*))
                                                                                            t)

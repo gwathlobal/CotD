@@ -89,41 +89,41 @@
 (defun get-building-type (building-type-id)
   (gethash building-type-id *building-types*))
 
-(defun translate-build-to-template (x y build-template template-level)
+(defun translate-build-to-template (x y z build-template template-level)
   (loop for y1 from 0 below (length build-template) do
     (loop for c across (nth y1 build-template) 
           with x1 = 0
           do
              (cond
-               ((char= c #\.) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-stone+))
-               ((char= c #\#) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-wall-stone+))
-               ((char= c #\T) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-tree-birch+))
-               ((char= c #\,) (setf (aref template-level (+ x x1) (+ y y1)) (if (< (random 100) 20)
-                                                                              +terrain-floor-dirt-bright+
-                                                                              +terrain-floor-dirt+)))
-               ((char= c #\_) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-water-lake+))
-               ((char= c #\`) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-grass+))
-               ((char= c #\-) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-wall-window+))
-               ((char= c #\h) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-chair+))
-               ((char= c #\t) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-table+))
-               ((char= c #\b) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bed+))
-               ((char= c #\c) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-cabinet+))
-               ((char= c #\C) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-crate+))
-               ((char= c #\B) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-floor-bookshelf+))
-               ((char= c #\+) (setf (aref template-level (+ x x1) (+ y y1)) +terrain-door-closed+))
-               ((char= c #\') (setf (aref template-level (+ x x1) (+ y y1)) +terrain-door-open+))
+               ((char= c #\.) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-stone+))
+               ((char= c #\#) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-wall-stone+))
+               ((char= c #\T) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-tree-birch+))
+               ((char= c #\,) (setf (aref template-level (+ x x1) (+ y y1) z) (if (< (random 100) 20)
+                                                                                +terrain-floor-dirt-bright+
+                                                                                +terrain-floor-dirt+)))
+               ((char= c #\_) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-water-lake+))
+               ((char= c #\`) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-grass+))
+               ((char= c #\-) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-wall-window+))
+               ((char= c #\h) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-chair+))
+               ((char= c #\t) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-table+))
+               ((char= c #\b) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-bed+))
+               ((char= c #\c) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-cabinet+))
+               ((char= c #\C) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-crate+))
+               ((char= c #\B) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-bookshelf+))
+               ((char= c #\+) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-door-closed+))
+               ((char= c #\') (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-door-open+))
                )
              (incf x1)
           )))
 
-(defun level-city-reserve-build-on-grid (template-building-id gx gy reserved-level)
+(defun level-city-reserve-build-on-grid (template-building-id gx gy gz reserved-level)
   (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
     (loop for y1 from 0 below dy do
       (loop for x1 from 0 below dx do
-        (setf (aref reserved-level (+ gx x1) (+ gy y1)) template-building-id)))
+        (setf (aref reserved-level (+ gx x1) (+ gy y1) gz) template-building-id)))
     ))
 
-(defun level-city-can-place-build-on-grid (template-building-id gx gy reserved-level)
+(defun level-city-can-place-build-on-grid (template-building-id gx gy gz reserved-level)
   (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
     ;; if the staring point of the building + its dimensions) is more than level dimensions - fail
     (when (or (> (+ gx dx) (array-dimension reserved-level 0))
@@ -133,7 +133,7 @@
     ;; if any of the grid tiles that the building is going to occupy are already reserved - fail
     (loop for y1 from 0 below dy do
       (loop for x1 from 0 below dx do
-        (when (/= (aref reserved-level (+ gx x1) (+ gy y1)) +building-city-free+)
+        (when (/= (aref reserved-level (+ gx x1) (+ gy y1) gz) +building-city-free+)
           (return-from level-city-can-place-build-on-grid nil))
             ))
     ;; all checks done - success

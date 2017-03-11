@@ -30,8 +30,8 @@
                              :key #'(lambda (mob-id)
                                       (get-mob-by-id mob-id))))
     (if hostile-mobs
-      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))))
-      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
+      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))) (view-z *player*) (z (get-mob-by-id (first hostile-mobs))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
     )))
 
 (defun map-select-update (win)
@@ -49,33 +49,35 @@
         ;;(format t "VIEW X,Y = (~A, ~A); sx, sy = (~A, ~A); x1 , y1 = (~A, ~A)~%" (view-x *player*) (view-y *player*) sx sy x1 y1)
 
         (when (check-lof win)
-          (line-of-sight (x *player*) (y *player*) (view-x *player*) (view-y *player*) #'(lambda (dx dy)
-                                                                                           (declare (type fixnum dx dy))
-                                                                                           (let ((terrain) (exit-result t))
-                                                                                             (block nil
-                                                                                               (setf tx dx ty dy)
-                                                                                               (when (or (< dx 0) (>= dx *max-x-level*)
-                                                                                                         (< dy 0) (>= dy *max-y-level*))
-                                                                                                 (setf exit-result 'exit)
-                                                                                                 (return))
-                                                                                               
-                                                                                               (setf terrain (get-terrain-* (level *world*) dx dy))
-                                                                                               (unless terrain
-                                                                                                 (setf exit-result 'exit)
-                                                                                                 (return))
-                                                                                               (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
-                                                                                                 (setf exit-result 'exit)
-                                                                                                 (return))
-                                                                                               )
-                                                                                             exit-result))))
+          (line-of-sight (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
+                         #'(lambda (dx dy dz)
+                             (declare (type fixnum dx dy))
+                             (let ((terrain) (exit-result t))
+                               (block nil
+                                 (setf tx dx ty dy)
+                                 (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
+                                           (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
+                                           (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
+                                   (setf exit-result 'exit)
+                                   (return))
+                                 
+                                 (setf terrain (get-terrain-* (level *world*) dx dy dz))
+                                 (unless terrain
+                                   (setf exit-result 'exit)
+                                   (return))
+                                 (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
+                                   (setf exit-result 'exit)
+                                   (return))
+                                 )
+                               exit-result))))
 
         (when (and (= tx (view-x *player*)) (= ty (view-y *player*)))
           (setf lof-blocked nil))
                    
         ;; adjust color depending on the target
         (if (and (not lof-blocked)
-                 (get-mob-* (level *world*) (view-x *player*) (view-y *player*)) 
-                 (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*))))
+                 (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) 
+                 (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
           (setf color sdl:*red*)
           (setf color sdl:*yellow*))
         
@@ -95,13 +97,13 @@
       (sdl:fill-surface sdl:*black* :template obj-list-rect))
     (let ((str (create-string))
           (feature-list)
-          (mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*))))
-      (when (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*)))
+          (mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+      (when (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
         ;;(format t "HERE~%")
         (when lof-blocked
           (format str "Line of fire blocked!~%"))
-        (format str "~A (~A, ~A)" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*))) (view-x *player*) (view-y *player*))
-        (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*)))
+        (format str "~A (~A, ~A, ~A)" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (view-x *player*) (view-y *player*) (view-z *player*))
+        (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
         (dolist (feature feature-list)
           (format str ", ~A" (name feature)))
         (when mob
@@ -115,7 +117,7 @@
                                                 100
                                                 (truncate (- (r-acc *player*) (* (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) *acc-loss-per-tile*)))))
                     "")))
-        (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*))
+        (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
               for item = (get-item-by-id item-id)
               do
                  (format str "~%~A" (name item)))

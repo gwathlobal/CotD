@@ -144,8 +144,8 @@
                                    +building-city-bridge+
                                    +building-city-river+)
           do
-             (setf (aref reserved-level x (1- (truncate (array-dimension reserved-level 1) 2))) building-type-id)
-             (setf (aref reserved-level x (truncate (array-dimension reserved-level 1) 2)) building-type-id))))
+             (setf (aref reserved-level x (1- (truncate (array-dimension reserved-level 1) 2)) 0) building-type-id)
+             (setf (aref reserved-level x (truncate (array-dimension reserved-level 1) 2) 0) building-type-id))))
 
 (defun place-city-river-w (reserved-level)
   (let ((max-x (array-dimension reserved-level 0))
@@ -156,8 +156,8 @@
                                    +building-city-bridge+
                                    +building-city-river+)
           do
-             (setf (aref reserved-level x (1- (truncate (array-dimension reserved-level 1) 2))) building-type-id)
-             (setf (aref reserved-level x (truncate (array-dimension reserved-level 1) 2)) building-type-id))))
+             (setf (aref reserved-level x (1- (truncate (array-dimension reserved-level 1) 2)) 0) building-type-id)
+             (setf (aref reserved-level x (truncate (array-dimension reserved-level 1) 2) 0) building-type-id))))
            
 (defun place-city-river-n (reserved-level)
   (let ((max-y (1- (truncate (array-dimension reserved-level 1) 2)))
@@ -168,8 +168,8 @@
                                    +building-city-bridge+
                                    +building-city-river+)
           do
-             (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) y) building-type-id)
-             (setf (aref reserved-level (1- (truncate (array-dimension reserved-level 0) 2)) y) building-type-id))))
+             (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) y 0) building-type-id)
+             (setf (aref reserved-level (1- (truncate (array-dimension reserved-level 0) 2)) y 0) building-type-id))))
 
 (defun place-city-river-s (reserved-level)
   (let ((max-y (array-dimension reserved-level 1))
@@ -180,29 +180,29 @@
                                    +building-city-bridge+
                                    +building-city-river+)
           do
-             (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) y) building-type-id)
-             (setf (aref reserved-level (1- (truncate (array-dimension reserved-level 0) 2)) y) building-type-id))))
+             (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) y 0) building-type-id)
+             (setf (aref reserved-level (1- (truncate (array-dimension reserved-level 0) 2)) y 0) building-type-id))))
 
 (defun place-city-river-center (reserved-level)
   (let ((x (1- (truncate (array-dimension reserved-level 0) 2)))
         (y (1- (truncate (array-dimension reserved-level 1) 2))))
     
-    (setf (aref reserved-level (+ x 0) (+ y 0)) +building-city-river+)
-    (setf (aref reserved-level (+ x 1) (+ y 0)) +building-city-river+)
-    (setf (aref reserved-level (+ x 0) (+ y 1)) +building-city-river+)
-    (setf (aref reserved-level (+ x 1) (+ y 1)) +building-city-river+)))
+    (setf (aref reserved-level (+ x 0) (+ y 0) 0) +building-city-river+)
+    (setf (aref reserved-level (+ x 1) (+ y 0) 0) +building-city-river+)
+    (setf (aref reserved-level (+ x 0) (+ y 1) 0) +building-city-river+)
+    (setf (aref reserved-level (+ x 1) (+ y 1) 0) +building-city-river+)))
 
 (defun change-level-to-snow (template-level)
   (loop for x from 0 below (array-dimension template-level 0) do
     (loop for y from 0 below (array-dimension template-level 1) do
       (cond
-        ((= (aref template-level x y) +terrain-border-floor+) (setf (aref template-level x y) +terrain-border-floor-snow+))
-        ((= (aref template-level x y) +terrain-border-grass+) (setf (aref template-level x y) +terrain-border-floor-snow+))
-        ((= (aref template-level x y) +terrain-floor-dirt+) (setf (aref template-level x y) +terrain-floor-snow+))
-        ((= (aref template-level x y) +terrain-floor-dirt-bright+) (setf (aref template-level x y) +terrain-floor-snow+))
-        ((= (aref template-level x y) +terrain-floor-grass+) (setf (aref template-level x y) +terrain-floor-snow+))
-        ((= (aref template-level x y) +terrain-tree-birch+) (setf (aref template-level x y) +terrain-tree-birch-snow+))
-        ((= (aref template-level x y) +terrain-water-lake+) (setf (aref template-level x y) +terrain-water-ice+)))))
+        ((= (aref template-level x y 0) +terrain-border-floor+) (setf (aref template-level x y 0) +terrain-border-floor-snow+))
+        ((= (aref template-level x y 0) +terrain-border-grass+) (setf (aref template-level x y 0) +terrain-border-floor-snow+))
+        ((= (aref template-level x y 0) +terrain-floor-dirt+) (setf (aref template-level x y 0) +terrain-floor-snow+))
+        ((= (aref template-level x y 0) +terrain-floor-dirt-bright+) (setf (aref template-level x y 0) +terrain-floor-snow+))
+        ((= (aref template-level x y 0) +terrain-floor-grass+) (setf (aref template-level x y 0) +terrain-floor-snow+))
+        ((= (aref template-level x y 0) +terrain-tree-birch+) (setf (aref template-level x y 0) +terrain-tree-birch-snow+))
+        ((= (aref template-level x y 0) +terrain-water-lake+) (setf (aref template-level x y 0) +terrain-water-ice+)))))
   template-level)
 
 (defun place-reserved-buildings-river (reserved-level)
@@ -229,9 +229,9 @@
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y) +building-city-river+)
-                  (= (aref reserved-level x y) +building-city-bridge+))
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (or (= (aref reserved-level x y 0) +building-city-river+)
+                  (= (aref reserved-level x y 0) +building-city-bridge+))
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))
 
 (defun place-reserved-buildings-port-n (reserved-level)
@@ -248,21 +248,21 @@
                                      +building-city-warehouse-port-1+
                                      +building-city-warehouse-port-2+)
           do
-             (setf (aref reserved-level x 0) +building-city-sea+)
-             (setf (aref reserved-level x 1) building-type-id)
-             (setf (aref reserved-level x 2) building-type-id)
-             (when (level-city-can-place-build-on-grid random-warehouse-1 x 3 reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-1 x 3 reserved-level)
-               (push (list random-warehouse-1 x 3) result))
-             (when (level-city-can-place-build-on-grid random-warehouse-2 x 5 reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-2 x 5 reserved-level)
-               (push (list random-warehouse-2 x 5) result)))
+             (setf (aref reserved-level x 0 0) +building-city-sea+)
+             (setf (aref reserved-level x 1 0) building-type-id)
+             (setf (aref reserved-level x 2 0) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 x 3 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 x 3 0 reserved-level)
+               (push (list random-warehouse-1 x 3 0) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 x 5 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 x 5 0 reserved-level)
+               (push (list random-warehouse-2 x 5 0) result)))
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y) +building-city-sea+)
-                  (= (aref reserved-level x y) +building-city-pier+))
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (or (= (aref reserved-level x y 0) +building-city-sea+)
+                  (= (aref reserved-level x y 0) +building-city-pier+))
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))
 
 (defun place-reserved-buildings-port-s (reserved-level)
@@ -279,21 +279,21 @@
                                      +building-city-warehouse-port-1+
                                      +building-city-warehouse-port-2+)
           do
-             (setf (aref reserved-level x (- max-y 0)) +building-city-sea+)
-             (setf (aref reserved-level x (- max-y 1)) building-type-id)
-             (setf (aref reserved-level x (- max-y 2)) building-type-id)
-             (when (level-city-can-place-build-on-grid random-warehouse-1 x (- max-y 4) reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-1 x (- max-y 4) reserved-level)
-               (push (list random-warehouse-1 x (- max-y 4)) result))
-             (when (level-city-can-place-build-on-grid random-warehouse-2 x (- max-y 6) reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-2 x (- max-y 6) reserved-level)
-               (push (list random-warehouse-2 x (- max-y 6)) result)))
+             (setf (aref reserved-level x (- max-y 0) 0) +building-city-sea+)
+             (setf (aref reserved-level x (- max-y 1) 0) building-type-id)
+             (setf (aref reserved-level x (- max-y 2) 0) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 x (- max-y 4) 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 x (- max-y 4) 0 reserved-level)
+               (push (list random-warehouse-1 x (- max-y 4) 0) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 x (- max-y 6) 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 x (- max-y 6) 0 reserved-level)
+               (push (list random-warehouse-2 x (- max-y 6) 0) result)))
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y) +building-city-sea+)
-                  (= (aref reserved-level x y) +building-city-pier+))
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (or (= (aref reserved-level x y 0) +building-city-sea+)
+                  (= (aref reserved-level x y 0) +building-city-pier+))
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))
 
 (defun place-reserved-buildings-port-e (reserved-level)
@@ -310,21 +310,21 @@
                                      +building-city-warehouse-port-1+
                                      +building-city-warehouse-port-2+)
           do
-             (setf (aref reserved-level (- max-x 0) y) +building-city-sea+)
-             (setf (aref reserved-level (- max-x 1) y) building-type-id)
-             (setf (aref reserved-level (- max-x 2) y) building-type-id)
-             (when (level-city-can-place-build-on-grid random-warehouse-1 (- max-x 4) y reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-1 (- max-x 4) y reserved-level)
-               (push (list random-warehouse-1 (- max-x 4) y) result))
-             (when (level-city-can-place-build-on-grid random-warehouse-2 (- max-x 6) y reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-2 (- max-x 6) y reserved-level)
-               (push (list random-warehouse-2 (- max-x 6) y) result)))
+             (setf (aref reserved-level (- max-x 0) y 0) +building-city-sea+)
+             (setf (aref reserved-level (- max-x 1) y 0) building-type-id)
+             (setf (aref reserved-level (- max-x 2) y 0) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 (- max-x 4) y 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 (- max-x 4) y 0 reserved-level)
+               (push (list random-warehouse-1 (- max-x 4) y 0) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 (- max-x 6) y 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 (- max-x 6) y 0 reserved-level)
+               (push (list random-warehouse-2 (- max-x 6) y 0) result)))
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y) +building-city-sea+)
-                  (= (aref reserved-level x y) +building-city-pier+))
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (or (= (aref reserved-level x y 0) +building-city-sea+)
+                  (= (aref reserved-level x y 0) +building-city-pier+))
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))
 
 (defun place-reserved-buildings-port-w (reserved-level)
@@ -341,27 +341,27 @@
                                      +building-city-warehouse-port-1+
                                      +building-city-warehouse-port-2+)
           do
-             (setf (aref reserved-level 0 y) +building-city-sea+)
-             (setf (aref reserved-level 1 y) building-type-id)
-             (setf (aref reserved-level 2 y) building-type-id)
-             (when (level-city-can-place-build-on-grid random-warehouse-1 3 y reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-1 3 y reserved-level)
-               (push (list random-warehouse-1 3 y) result))
-             (when (level-city-can-place-build-on-grid random-warehouse-2 5 y reserved-level)
-               (level-city-reserve-build-on-grid random-warehouse-2 5 y reserved-level)
-               (push (list random-warehouse-2 5 y) result)))
+             (setf (aref reserved-level 0 y 0) +building-city-sea+)
+             (setf (aref reserved-level 1 y 0) building-type-id)
+             (setf (aref reserved-level 2 y 0) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 3 y 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 3 y 0 reserved-level)
+               (push (list random-warehouse-1 3 y 0) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 5 y 0 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 5 y 0 reserved-level)
+               (push (list random-warehouse-2 5 y 0) result)))
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y) +building-city-sea+)
-                  (= (aref reserved-level x y) +building-city-pier+))
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (or (= (aref reserved-level x y 0) +building-city-sea+)
+                  (= (aref reserved-level x y 0) +building-city-pier+))
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))
 
 (defun create-mobs-from-template (world mob-template-list)
-  (loop for (mob-type-id x y) in mob-template-list 
+  (loop for (mob-type-id x y z) in mob-template-list 
         do
-           (add-mob-to-level-list (level world) (make-instance 'mob :mob-type mob-type-id :x x :y y))))
+           (add-mob-to-level-list (level world) (make-instance 'mob :mob-type mob-type-id :x x :y y :z z))))
 
 (defun populate-world-with-mobs (world mob-template-list placement-func)
   (loop for (mob-template-id . num) in mob-template-list do
@@ -370,11 +370,13 @@
              (funcall placement-func world (make-instance 'mob :mob-type mob-template-id))))
   )
 
-(defun find-unoccupied-place-around (world mob sx sy)
+(defun find-unoccupied-place-around (world mob sx sy sz)
   (loop with min-x = sx
         with max-x = sx
         with min-y = sy
         with max-y = sy
+        with max-x-level = (array-dimension (terrain (level *world*)) 0)
+        with max-y-level = (array-dimension (terrain (level *world*)) 1)
         for cell-list = nil
         do
            ;; prepare the list of cells
@@ -397,13 +399,13 @@
 
            ;; iterate through the list of cells
            (loop for (x . y) in cell-list
-                 when (and (>= x 0) (< x *max-x-level*) (>= y 0) (< y *max-y-level*)
-                           (eq (check-move-on-level mob x y) t)
+                 when (and (>= x 0) (< x max-x-level) (>= y 0) (< y max-y-level)
+                           (eq (check-move-on-level mob x y sz) t)
                            ;(not (get-mob-* (level world) x y))
                            ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
                            )
                    do
-                      (setf (x mob) x (y mob) y)
+                      (setf (x mob) x (y mob) y (z mob) sz)
                       (add-mob-to-level-list (level world) mob)
                       (return-from find-unoccupied-place-around mob))
 
@@ -415,24 +417,30 @@
            ))
  
 (defun find-unoccupied-place-outside (world mob)
-  (loop for x = (random *max-x-level*)
-        for y = (random *max-y-level*)
-        until (and (not (and (> x 7) (< x (- *max-x-level* 7)) (> y 7) (< y (- *max-y-level* 7))))
+  (loop with max-x = (array-dimension (terrain (level *world*)) 0)
+        with max-y = (array-dimension (terrain (level *world*)) 1)
+        for x = (random max-x)
+        for y = (random max-y)
+        for z = 0
+        until (and (not (and (> x 7) (< x (- max-x 7)) (> y 7) (< y (- max-y 7))))
                    ;(not (get-mob-* (level world) x y))
                    ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
-                   (eq (check-move-on-level mob x y) t))
-        finally (setf (x mob) x (y mob) y)
+                   (eq (check-move-on-level mob x y z) t))
+        finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 
 (defun find-unoccupied-place-inside (world mob)
-  (loop for x = (random *max-x-level*)
-        for y = (random *max-y-level*)
-        until (and (and (> x 10) (< x (- *max-x-level* 10)) (> y 10) (< y (- *max-y-level* 10)))
-                   (eq (check-move-on-level mob x y) t)
+  (loop with max-x = (array-dimension (terrain (level *world*)) 0)
+        with max-y = (array-dimension (terrain (level *world*)) 1)
+        for x = (random max-x)
+        for y = (random max-y)
+        for z = 0
+        until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
+                   (eq (check-move-on-level mob x y z) t)
                    ;(not (get-mob-* (level world) x y))
                    ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
                    )
-        finally (setf (x mob) x (y mob) y)
+        finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 
 (defun place-reserved-buildings-forest (reserved-level)
@@ -440,29 +448,29 @@
     ;; place +building-city-park-tiny+ and +building-city-park-3+ along the borders
     (loop for x from 0 below (array-dimension reserved-level 0)
           do
-             (setf (aref reserved-level x 0) +building-city-park-tiny+)
-             (setf (aref reserved-level x (1- (array-dimension reserved-level 1))) +building-city-park-tiny+)
-             (when (level-city-can-place-build-on-grid +building-city-park-3+ x 1 reserved-level)
-               (level-city-reserve-build-on-grid +building-city-park-3+ x 1 reserved-level)
-               (push (list +building-city-park-3+ x 1) result))
-             (when (level-city-can-place-build-on-grid +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) reserved-level)
-               (level-city-reserve-build-on-grid +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) reserved-level)
-               (push (list +building-city-park-3+ x (- (array-dimension reserved-level 1) 3)) result)))
+             (setf (aref reserved-level x 0 0) +building-city-park-tiny+)
+             (setf (aref reserved-level x (1- (array-dimension reserved-level 1)) 0) +building-city-park-tiny+)
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ x 1 0 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ x 1 0 reserved-level)
+               (push (list +building-city-park-3+ x 1 0) result))
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) 0 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) 0 reserved-level)
+               (push (list +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) 0) result)))
     (loop for y from 0 below (array-dimension reserved-level 1)
           do
-             (setf (aref reserved-level 0 y) +building-city-park-tiny+)
-             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y) +building-city-park-tiny+)
-             (when (level-city-can-place-build-on-grid +building-city-park-3+ 1 y reserved-level)
-               (level-city-reserve-build-on-grid +building-city-park-3+ 1 y reserved-level)
-               (push (list +building-city-park-3+ 1 y) result))
-             (when (level-city-can-place-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y reserved-level)
-               (level-city-reserve-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y reserved-level)
-               (push (list +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y) result)))
+             (setf (aref reserved-level 0 y 0) +building-city-park-tiny+)
+             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y 0) +building-city-park-tiny+)
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ 1 y 0 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ 1 y 0 reserved-level)
+               (push (list +building-city-park-3+ 1 y 0) result))
+             (when (level-city-can-place-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y 0 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y 0 reserved-level)
+               (push (list +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y 0) result)))
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (= (aref reserved-level x y) +building-city-park-tiny+)
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (= (aref reserved-level x y 0) +building-city-park-tiny+)
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))
 
 (defun place-reserved-buildings-island (reserved-level)
@@ -470,54 +478,54 @@
     ;; place water along the borders
     (loop for x from 0 below (array-dimension reserved-level 0)
           do
-             (setf (aref reserved-level x 0) +building-city-sea+)
-             (setf (aref reserved-level x 1) +building-city-sea+)
-             (setf (aref reserved-level x 2) +building-city-sea+)
-             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 1)) +building-city-sea+)
-             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 2)) +building-city-sea+)
-             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 3)) +building-city-sea+))
+             (setf (aref reserved-level x 0 0) +building-city-sea+)
+             (setf (aref reserved-level x 1 0) +building-city-sea+)
+             (setf (aref reserved-level x 2 0) +building-city-sea+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 1) 0) +building-city-sea+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 2) 0) +building-city-sea+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 3) 0) +building-city-sea+))
             
     (loop for y from 0 below (array-dimension reserved-level 1)
           do
-             (setf (aref reserved-level 0 y) +building-city-sea+)
-             (setf (aref reserved-level 1 y) +building-city-sea+)
+             (setf (aref reserved-level 0 y 0) +building-city-sea+)
+             (setf (aref reserved-level 1 y 0) +building-city-sea+)
              (when (and (>= y 2) (<= y (- (array-dimension reserved-level 1) 3)))
-               (setf (aref reserved-level 2 y) +building-city-sea+))
-             (setf (aref reserved-level (- (array-dimension reserved-level 0) 1) y) +building-city-sea+)
-             (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) y) +building-city-sea+)
+               (setf (aref reserved-level 2 y 0) +building-city-sea+))
+             (setf (aref reserved-level (- (array-dimension reserved-level 0) 1) y 0) +building-city-sea+)
+             (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) y 0) +building-city-sea+)
              (when (and (>= y 2) (<= y (- (array-dimension reserved-level 1) 3)))
-               (setf (aref reserved-level (- (array-dimension reserved-level 0) 3) y) +building-city-sea+)))
+               (setf (aref reserved-level (- (array-dimension reserved-level 0) 3) y 0) +building-city-sea+)))
 
     ;; place four piers - north, south, east, west
     (let ((min) (max) (r))
       ;; north
       (setf min 3 max (- (array-dimension reserved-level 0) 3))
       (setf r (+ (random (- max min)) min))
-      (setf (aref reserved-level r 1) +building-city-pier+)
-      (setf (aref reserved-level r 2) +building-city-pier+)
+      (setf (aref reserved-level r 1 0) +building-city-pier+)
+      (setf (aref reserved-level r 2 0) +building-city-pier+)
       
       ;; south
       (setf r (+ (random (- max min)) min))
-      (setf (aref reserved-level r (- (array-dimension reserved-level 1) 2)) +building-city-pier+)
-      (setf (aref reserved-level r (- (array-dimension reserved-level 1) 3)) +building-city-pier+)
+      (setf (aref reserved-level r (- (array-dimension reserved-level 1) 2) 0) +building-city-pier+)
+      (setf (aref reserved-level r (- (array-dimension reserved-level 1) 3) 0) +building-city-pier+)
       
       ;; west
       (setf min 3 max (- (array-dimension reserved-level 1) 3))
       (setf r (+ (random (- max min)) min))
-      (setf (aref reserved-level 1 r) +building-city-pier+)
-      (setf (aref reserved-level 2 r) +building-city-pier+)
+      (setf (aref reserved-level 1 r 0) +building-city-pier+)
+      (setf (aref reserved-level 2 r 0) +building-city-pier+)
 
       ;; east
       (setf r (+ (random (- max min)) min))
-      (setf (aref reserved-level (- (array-dimension reserved-level 1) 2) r) +building-city-pier+)
-      (setf (aref reserved-level (- (array-dimension reserved-level 1) 3) r) +building-city-pier+))
+      (setf (aref reserved-level (- (array-dimension reserved-level 1) 2) r 0) +building-city-pier+)
+      (setf (aref reserved-level (- (array-dimension reserved-level 1) 3) r 0) +building-city-pier+))
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y) +building-city-sea+)
-                  (= (aref reserved-level x y) +building-city-pier+)
-                  (= (aref reserved-level x y) +building-city-island-ground-border+))
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (or (= (aref reserved-level x y 0) +building-city-sea+)
+                  (= (aref reserved-level x y 0) +building-city-pier+)
+                  (= (aref reserved-level x y 0) +building-city-island-ground-border+))
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))
 
 (defun place-reserved-buildings-barricaded-city (reserved-level)
@@ -525,34 +533,34 @@
    
     (loop for x from 1 below (1- (array-dimension reserved-level 0))
           do
-             (setf (aref reserved-level x 1) +building-city-barricade-we+)
-             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 2)) +building-city-barricade-we+))
+             (setf (aref reserved-level x 1 0) +building-city-barricade-we+)
+             (setf (aref reserved-level x (- (array-dimension reserved-level 1) 2) 0) +building-city-barricade-we+))
 
      ;; making lines along the city borders - west & east
     (loop for y from 1 below (1- (array-dimension reserved-level 1))
           do
-             (setf (aref reserved-level 1 y) +building-city-barricade-ns+)
-             (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) y) +building-city-barricade-ns+))
+             (setf (aref reserved-level 1 y 0) +building-city-barricade-ns+)
+             (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) y 0) +building-city-barricade-ns+))
 
     ;; making barricade corners
-    (setf (aref reserved-level 1 1) +building-city-barricade-se+)
-    (setf (aref reserved-level 1 (- (array-dimension reserved-level 1) 2)) +building-city-barricade-ne+)
-    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) 1) +building-city-barricade-sw+)
-    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) (- (array-dimension reserved-level 1) 2)) +building-city-barricade-nw+)
+    (setf (aref reserved-level 1 1 0) +building-city-barricade-se+)
+    (setf (aref reserved-level 1 (- (array-dimension reserved-level 1) 2) 0) +building-city-barricade-ne+)
+    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) 1 0) +building-city-barricade-sw+)
+    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) (- (array-dimension reserved-level 1) 2) 0) +building-city-barricade-nw+)
 
     ;; making entrances to the city
-    (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) 1) +building-city-reserved+)
-    (setf (aref reserved-level 1 (truncate (array-dimension reserved-level 1) 2)) +building-city-reserved+)
-    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) (truncate (array-dimension reserved-level 1) 2)) +building-city-reserved+)
-    (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) (- (array-dimension reserved-level 1) 2)) +building-city-reserved+)
+    (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) 1 0) +building-city-reserved+)
+    (setf (aref reserved-level 1 (truncate (array-dimension reserved-level 1) 2) 0) +building-city-reserved+)
+    (setf (aref reserved-level (- (array-dimension reserved-level 0) 2) (truncate (array-dimension reserved-level 1) 2) 0) +building-city-reserved+)
+    (setf (aref reserved-level (truncate (array-dimension reserved-level 0) 2) (- (array-dimension reserved-level 1) 2) 0) +building-city-reserved+)
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y) +building-city-barricade-ns+)
-                  (= (aref reserved-level x y) +building-city-barricade-we+)
-                  (= (aref reserved-level x y) +building-city-barricade-ne+)
-                  (= (aref reserved-level x y) +building-city-barricade-se+)
-                  (= (aref reserved-level x y) +building-city-barricade-sw+)
-                  (= (aref reserved-level x y) +building-city-barricade-nw+))
-          (push (list (aref reserved-level x y) x y) result))))
+        (when (or (= (aref reserved-level x y 0) +building-city-barricade-ns+)
+                  (= (aref reserved-level x y 0) +building-city-barricade-we+)
+                  (= (aref reserved-level x y 0) +building-city-barricade-ne+)
+                  (= (aref reserved-level x y 0) +building-city-barricade-se+)
+                  (= (aref reserved-level x y 0) +building-city-barricade-sw+)
+                  (= (aref reserved-level x y 0) +building-city-barricade-nw+))
+          (push (list (aref reserved-level x y 0) x y 0) result))))
     result))

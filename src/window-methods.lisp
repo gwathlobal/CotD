@@ -47,7 +47,7 @@
      ;;(format t "rel = (~A, ~A), s = (~A, ~A)~%" rel-x rel-y sx sy)
      (values sx sy max-x max-y)))
 
-(defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*))
+(defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*))
   (declare (optimize (speed 3)))
    ;; draw the level
    (let* ((x1 0) (y1 0) (glyph-w *glyph-w*) (glyph-h *glyph-h*) (single-memo))
@@ -63,7 +63,7 @@
 	   (setf x1 (+ (* x glyph-w) glyph-w))
 	   (setf y1 (+ (* y glyph-h) glyph-h))
 	   ;; select the object, the glyph of which shall be drawn
-	   (setf single-memo (aref array (+ sx x) (+ sy y)))
+	   (setf single-memo (aref array (+ sx x) (+ sy y) rel-z))
 	   ;;(when (and (eql (get-single-memo-visible single-memo) nil) 
 	   ;;      (not (eql (glyph object) (map-object-template-glyph (get-map-object-template +glyph-blank+)))))
 	   ;;  (setf (glyph-color object) (sdl:color :r 140 :b 140 :g 140))
@@ -91,7 +91,7 @@
       )
     ))
 
-(defun display-cell-on-map (map-x map-y &key (array (memo (level *world*))))
+(defun display-cell-on-map (map-x map-y map-z &key (array (memo (level *world*))))
   (let ((scr-x 0) (scr-y 0) (single-memo))
     (declare (type fixnum scr-x scr-y))
     (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
@@ -100,7 +100,7 @@
       (setf scr-x (+ (* (- map-x sx) *glyph-w*) *glyph-w*))
       (setf scr-y (+ (* (- map-y sy) *glyph-h*) *glyph-h*))
 
-      (setf single-memo (aref array map-x map-y))
+      (setf single-memo (aref array map-x map-y map-z))
       
       ;; drawing glyph
       (draw-glyph scr-x scr-y (get-single-memo-glyph-idx single-memo) 
