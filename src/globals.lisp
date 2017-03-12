@@ -183,6 +183,8 @@
 (defconstant +terrain-wall-barricade+ 25)
 (defconstant +terrain-door-closed+ 26)
 (defconstant +terrain-door-open+ 27)
+(defconstant +terrain-border-air+ 28)
+(defconstant +terrain-floor-air+ 29)
 
 (defparameter *faction-table* (make-hash-table))
 

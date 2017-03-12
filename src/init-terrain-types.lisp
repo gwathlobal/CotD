@@ -38,3 +38,5 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-open+ :glyph-idx 7 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Open door"))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-closed+ :glyph-idx 11 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Closed door"
                                                :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-border-air+ :glyph-idx 96 :glyph-color sdl:*cyan* :back-color sdl:*black* :name "Air" :trait-blocks-move t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-air+ :glyph-idx 96 :glyph-color sdl:*cyan* :back-color sdl:*black* :name "Air" :trait-blocks-move t))

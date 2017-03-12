@@ -144,8 +144,8 @@
                             (loop for ny from sy below (+ sy (map-size nmob)) do
                               (setf (aref (mobs (level *world*)) nx ny z) (id nmob))
                               
-                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx z)))
-                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx nx z))) nmob nx nx z))))))))
+                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z)))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z))) nmob nx ny z))))))))
 
     ;; we have 3 cases of movement:
     ;; 1) the mob moves while is riding someone (currently available if the mob teleports somewhere with a mount, as normally the rider does not move, only gives directions to the mount)

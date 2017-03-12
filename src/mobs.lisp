@@ -83,7 +83,7 @@
    ;;   :chops-body-parts
    
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
-   (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
+   (base-sight :initform 10 :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)
@@ -407,7 +407,7 @@
 
   ;; when starting with a horse - create a horse on the spot and mount it
   (when (mob-ability-p mob +mob-abil-starts-with-horse+)
-    (let ((horse (make-instance 'mob :mob-type +mob-type-horse+ :x (x mob) :y (y mob))))
+    (let ((horse (make-instance 'mob :mob-type +mob-type-horse+ :x (x mob) :y (y mob) :z (z mob))))
       (add-mob-to-level-list (level *world*) horse)
       (setf (mounted-by-mob-id horse) (id mob))
       (setf (riding-mob-id mob) (id horse))))

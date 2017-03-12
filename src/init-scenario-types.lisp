@@ -255,6 +255,8 @@
                                                                        when rider
                                                                          do
                                                                             (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+                                                                 ;; remove the glitch from (0, 0, 0)
+                                                                 (setf (aref (mobs (level world)) 0 0 0) nil)
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -352,6 +354,8 @@
                                                                        when rider
                                                                          do
                                                                             (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+                                                                 ;; remove the glitch from (0, 0, 0)
+                                                                 (setf (aref (mobs (level world)) 0 0 0) nil)
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)

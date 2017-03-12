@@ -99,13 +99,13 @@
         do
            (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z))))
 
-(defun create-level ()
+(defun create-level (&key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*))
   (let ((level))
     (setf level (make-instance 'level))
-    (setf (terrain level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element +terrain-floor-stone+))
-    (setf (mobs level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element nil))
-    (setf (items level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element nil))
-    (setf (memo level) (make-array (list *max-x-level* *max-y-level* *max-z-level*) :initial-element (create-single-memo 0 sdl:*white* sdl:*black* nil nil)))
+    (setf (terrain level) (make-array (list max-x max-y max-z) :initial-element +terrain-floor-stone+))
+    (setf (mobs level) (make-array (list max-x max-y max-z) :initial-element nil))
+    (setf (items level) (make-array (list max-x max-y max-z) :initial-element nil))
+    (setf (memo level) (make-array (list max-x max-y max-z) :initial-element (create-single-memo 0 sdl:*white* sdl:*black* nil nil)))
     level))
 
 (defun create-level-from-template (template-level)
@@ -113,10 +113,10 @@
   ;; <type of the tile>
   ;;   :terrain
   ;;   :obstacle
-  (let ((level (create-level))
-        (max-x (array-dimension template-level 0))
-        (max-y (array-dimension template-level 1))
-        (max-z (array-dimension template-level 2)))
+  (let* ((max-x (array-dimension template-level 0))
+         (max-y (array-dimension template-level 1))
+         (max-z (array-dimension template-level 2))
+         (level (create-level :max-x max-x :max-y max-y :max-z max-z)))
     (loop for x from 0 to (1- max-x) do
       (loop for y from 0 to (1- max-y) do
         (loop for z from 0 to (1- max-z) do
@@ -182,13 +182,13 @@
                              nil))))
          (make-func #'(lambda (x y z)
                         (setf (aref connect-map x y z) room-id))))
-    (declare (type fixnum max-x max-y room-id))
+    (declare (type fixnum max-x max-y max-z room-id))
     
     (loop for x from 0 below max-x do
       (loop for y from 0 below max-y do
         (loop for z from 0 below max-z do
           (when (funcall check-func x y z)
-            (flood-fill (list x y z) :check-func check-func :make-func make-func)
+            (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
               )))
     (setf (aref (connect-map level) mob-size) connect-map)))

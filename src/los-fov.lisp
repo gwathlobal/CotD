@@ -4,18 +4,62 @@
   (declare (type fixnum sx sy tx ty))
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)))))
 
+(defun get-distance-3d (sx sy sz tx ty tz)
+  (declare (type fixnum sx sy sz tx ty tz))
+  (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)) (* (- sz tz) (- sz tz)))))
+
 (defun update-visible-mobs-normal (mob)
+  (loop for mob-id in (mob-id-list (level *world*))
+        for tmob = (get-mob-by-id mob-id)
+        when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))
+          do
+             (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
+                            #'(lambda (dx dy dz)
+                                (declare (type fixnum dx dy dz))
+                                (let* ((terrain) (exit-result t) (mob-id 0) 
+                                       )
+                                  (declare (type fixnum mob-id))
+                   
+                                  (block nil
+                                    (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
+                                              (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
+                                              (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
+                                      (setf exit-result 'exit)
+                                      (return))
+                                                                        
+                                    (setf terrain (get-terrain-* (level *world*) dx dy dz))
+                                    (unless terrain
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    (when (and (get-mob-* (level *world*) dx dy dz) 
+                                               (not (eq (get-mob-* (level *world*) dx dy dz) mob)))
+                                      (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
+                                      (pushnew mob-id (visible-mobs mob)))
+                                    
+                                    )
+                                  exit-result)))))
+
+(defun update-visible-mobs-fov (mob)
   (declare (optimize (speed 3)))
   (draw-fov (x mob) (y mob) (z mob) (cur-sight mob) #'(lambda (dx dy dz)
                                                         (declare (type fixnum dx dy dz))
-                                                        (let ((terrain) (exit-result t) (mob-id 0))
-                                                          (declare (type fixnum mob-id))
+                                                        (let* ((terrain) (exit-result t) (mob-id 0) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
+                                                               (dist (get-distance-3d (x mob) (y mob) (z mob) dx dy dz)))
+                                                          (declare (type fixnum mob-id cur-sight cur-sight-1)
+                                                                   (type float dist))
                                                           (block nil
                                                             (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
                                                                       (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
                                                                       (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
                                                               (setf exit-result 'exit)
                                                               (return))
+                                                            (when (> dist cur-sight-1)
+                                                              (setf exit-result 'exit)
+                                                              (return))
+                                                            
                                                             
                                                             (setf terrain (get-terrain-* (level *world*) dx dy dz))
                                                             (unless terrain
@@ -64,8 +108,6 @@
                      :visibility t
                      :revealed t)
 
-;(format t "HERE~%")
-  
   ;; then feature, if any
   (when (get-features-* level map-x map-y map-z)
     (let ((ftr (first (last (get-features-* level map-x map-y map-z)))))
@@ -116,6 +158,10 @@
                                                (setf exit-result 'exit)
 					       (return))
 
+                                             (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
+                                               (setf exit-result 'exit)
+					       (return))
+                                             
                                              (reveal-cell-on-map level dx dy dz)
                                              
                                              ;; checking for impassable objects
@@ -131,7 +177,8 @@
                                                         (get-single-memo-visibility (get-memo-* level dx dy dz)))
                                                (pushnew (id (get-mob-* level dx dy dz)) (visible-mobs *player*)))
                                              )
-					   exit-result)))
+					   exit-result))
+            )
   )
 
 (defun update-visible-area-all (level x y z)
@@ -162,11 +209,62 @@
   (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))
   )
 
-(defun draw-fov (cx cy cz r func)
+(defun draw-fov (cx cy cz r func &optional (limit-z t))
   (declare (optimize (speed 3)))
   (declare (type fixnum cx cy cz r)
            (type function func))
-  (funcall func cx cy cz)
+  (let ((target-cells nil)
+        (max-z (if limit-z
+                 (if (>= (+ cz r) (array-dimension (terrain (level *world*)) 2))
+                   (1- (array-dimension (terrain (level *world*)) 2))
+                   (+ cz r))
+                 (+ cz r)))
+        (min-z (if limit-z
+                 (if (< (- cz r) 0)
+                   0
+                   (- cz r))
+                 (- cz r))))
+    (declare (type fixnum max-z min-z))
+    
+    ;; push the top & bottom z-plane
+    (loop for x from (- r) to r
+          for dx of-type fixnum = (+ cx x)
+          do
+             (loop for y from (- r) to r
+                   for dy of-type fixnum = (+ cy y)
+                   do
+                      (push (list dx dy min-z) target-cells)
+                      (push (list dx dy max-z) target-cells)))
+    
+    ;; push all z-planes in between
+    (loop for z of-type fixnum from (1+ min-z) to (1- max-z)
+          for xr+ of-type fixnum = (+ cx r)
+          for xr- of-type fixnum = (- cx r)
+          for yr+ of-type fixnum = (+ cy r)
+          for yr- of-type fixnum = (- cy r)
+          do
+             (loop for n from (- r) to r
+                   for xn of-type fixnum = (+ cx n)
+                   do
+                      (push (list xn yr+ z) target-cells)
+                      (push (list xn yr- z) target-cells))
+             (loop for n from (- r) to r
+                   for yn of-type fixnum = (+ cy n)
+                   do
+                      (push (list xr+ yn z) target-cells)
+                      (push (list xr- yn z) target-cells))
+          )
+  
+    ;; check LOS for all perimeter cells
+    (loop for (tx ty tz) in target-cells do
+      (line-of-sight cx cy cz tx ty tz func)
+      )
+    ))
+
+(defun draw-fov-old (cx cy cz r func)
+  (declare (optimize (speed 3)))
+  (declare (type fixnum cx cy cz r)
+           (type function func))
   (let ((target-cells nil))
     (loop for i of-type fixnum from 0 to 360 by 1
           for tx of-type fixnum = (+ cx (round (* r (cos (* i (/ pi 180))))))
@@ -175,57 +273,39 @@
              (unless (find (cons tx ty) target-cells :test #'equal)
                (push (cons tx ty) target-cells)))
     (loop for (tx . ty) in target-cells do
-          (line-of-sight cx cy cz tx ty cz func))
+      (line-of-sight cx cy cz tx ty cz func))
     ))
 
-(defun line-of-sight (sx sy sz tx ty tz func)
+(defun line-of-sight (x0 y0 z0 x1 y1 z1 func)
   (declare (optimize (speed 3))
-           (type fixnum sx sy sz tx ty tz)
+           (type fixnum x0 x1 y0 y1 z0 z1)
            (type function func))
-  
-  ;; stop at once if the starting point = target point
-  (when (and (= sx tx) (= sy ty) (= sz tz))
-    (funcall func sx sy sz)
-    (return-from line-of-sight nil))
- 
-   (let ((x 0) (y 0) (nx (1+ (abs (- sx tx)))) (ny (1+ (abs (- sy ty))))
-         (px 1) (py 1) (slope 0) (ix 0) (iy 0))
-     (declare (type fixnum x y nx ny px py ix iy)
-              (type rational slope))
-     
-    ;; determine the direction where to draw the line
-    (cond
-      ((> sx tx) (setf ix -1))
-      ((= sx tx) (setf ix 0))
-      (t (setf ix 1)))
-    (cond
-      ((> sy ty) (setf iy -1))
-      ((= sy ty) (setf iy 0))
-      (t (setf iy 1)))
-    (if (>= nx ny) (setf slope (/ nx ny)) (setf slope (/ ny nx)))
-    
-    (if (>= nx ny)
-	(progn (loop while (< (abs x) nx) do
-		    (when (>= (abs x) (round (* slope py)))
-		      (incf y iy)
-		      (incf py))
-		    
-		    (when (eql (funcall func (+ sx x) (+ sy y) sz) 'exit) ;(format t "RET!~%") 
-		      (return-from line-of-sight nil))
-		    
-		    (incf x ix)
-		    ))
-	(progn (loop while (< (abs y) ny) do
-		    (when (>= (abs y) (round (* slope px)))
-		      (incf x ix)
-		      (incf px))
-		    
-		    (when (eql (funcall func (+ sx x) (+ sy y) sz) 'exit) ;(format t "RET!~%") 
-			  (return-from line-of-sight nil))
-		    
-		    (incf y iy)
-		    ))))
-  t)
+  (let* ((dx (abs (- x1 x0)))
+         (dy (abs (- y1 y0)))
+         (dz (abs (- z1 z0)))
+         (sx (if (< x0 x1) 1 -1))
+         (sy (if (< y0 y1) 1 -1))
+         (sz (if (< z0 z1) 1 -1))
+         (dm (max dx dy dz))
+         (i dm))
+    (declare (type fixnum dx dy dz sx sy sz dm i))
+    (setf x1 (truncate dm 2) y1 (truncate dm 2) z1 (truncate dm 2))
+    (loop while (and (not (< i 0))
+                     (not (eq (funcall func x0 y0 z0) 'exit)))
+          do
+             (decf i)
+             (decf x1 dx) (decf y1 dy) (decf z1 dz)
+             (when (< x1 0)
+               (incf x1 dm)
+               (incf x0 sx))
+             (when (< y1 0)
+               (incf y1 dm)
+               (incf y0 sy))
+             (when (< z1 0)
+               (incf z1 dm)
+               (incf z0 sz))
+          ))
+  )
 
 (defun fov-shadow-casting (cx cy r opaque-func vis-func)
   (funcall vis-func cx cy)

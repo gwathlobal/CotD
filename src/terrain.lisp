@@ -35,8 +35,6 @@
     (setf (gethash +terrain-trait-blocks-projectiles+ (trait terrain-type)) t))
   )
 
-
-
 (defun get-terrain-type-trait (terrain-type-id key)
   (gethash key (trait (get-terrain-type-by-id terrain-type-id))))
 

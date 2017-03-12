@@ -35,7 +35,7 @@
     )))
 
 (defun map-select-update (win)
-  (update-map-area :rel-x (view-x *player*) :rel-y (view-y *player*))
+  (update-map-area :rel-x (view-x *player*) :rel-y (view-y *player*) :rel-z (view-z *player*))
 
   ;; drawing the highlighting rectangle around the viewed grid-cell
   (let ((lof-blocked t))
@@ -151,12 +151,14 @@
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
-			
+
+                        ;(format t "KEY= ~A~%" key)
+                        
 			(if (cur-tab win)
 			    (progn
 			      ;; move the target rectangle
 			      (when (or (sdl:key= key :sdl-key-pageup) (sdl:key= key :sdl-key-kp9))
-				(when (and (< (view-x *player*) (- *max-x-level* 1)) (> (view-y *player*) 0))
+				(when (and (< (view-x *player*) (- (array-dimension (terrain (level *world*)) 0) 1)) (> (view-y *player*) 0))
 				  (incf (view-x *player*)) (decf (view-y *player*))))
 			      (when (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8))
 				(when (> (view-y *player*) 0)
@@ -165,20 +167,26 @@
 				(when (and (> (view-x *player*) 0) (> (view-y *player*) 0))
 				  (decf (view-x *player*)) (decf (view-y *player*))))
 			      (when (or (sdl:key= key :sdl-key-right) (sdl:key= key :sdl-key-kp6))
-				(when (< (view-x *player*) (- *max-x-level* 1))
+				(when (< (view-x *player*) (- (array-dimension (terrain (level *world*)) 0) 1))
 				  (incf (view-x *player*))))
 			      (when (or (sdl:key= key :sdl-key-left) (sdl:key= key :sdl-key-kp4))
 				(when (> (view-x *player*) 0)
 				  (decf (view-x *player*))))
 			      (when (or (sdl:key= key :sdl-key-pagedown) (sdl:key= key :sdl-key-kp3))
-				(when (and (< (view-x *player*) (- *max-x-level* 1)) (< (view-y *player*) (- *max-y-level* 1)))
+				(when (and (< (view-x *player*) (- (array-dimension (terrain (level *world*)) 0) 1)) (< (view-y *player*) (- (array-dimension (terrain (level *world*)) 1) 1)))
 				  (incf (view-x *player*)) (incf (view-y *player*))))
 			      (when (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2))
-				(when (< (view-y *player*) (- *max-y-level* 1))
+				(when (< (view-y *player*) (- (array-dimension (terrain (level *world*)) 1) 1))
                                   (incf (view-y *player*))))
 			      (when (or (sdl:key= key :sdl-key-end) (sdl:key= key :sdl-key-kp1))
-				(when (and (> (view-x *player*) 0) (< (view-y *player*) (- *max-y-level* 1)))
+				(when (and (> (view-x *player*) 0) (< (view-y *player*) (- (array-dimension (terrain (level *world*)) 1) 1)))
 				  (decf (view-x *player*)) (incf (view-y *player*))))
+                              (when (and (sdl:key= key :sdl-key-period) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                (when (and (> (view-z *player*) 0))
+                                  (decf (view-z *player*))))
+                              (when (and (sdl:key= key :sdl-key-comma) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                (when (and (< (view-z *player*) (- (array-dimension (terrain (level *world*)) 2) 1)))
+                                  (incf (view-z *player*))))
 			      )
 			    (progn
 			      (setf (cur-inv win) (run-selection-list key mod unicode (cur-inv win)))))

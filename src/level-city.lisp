@@ -6,12 +6,12 @@
 
   ;(setf max-x *max-x-level*)
   ;(setf max-y *max-y-level*)
-
+  (setf max-z 10)
   ;; make a template level
   ;; and an enlarged grid with scale 1 to 10 cells of template level
   ;; grid will be used to make reservations for buildings
   ;; once all places on grid are reserved, put actual buildings to the template level in places that were reserved 
-  (let* ((reserv-max-x (truncate max-x *level-grid-size*)) (reserv-max-y (truncate max-y *level-grid-size*)) (reserv-max-z max-z)
+  (let* ((reserv-max-x (truncate max-x *level-grid-size*)) (reserv-max-y (truncate max-y *level-grid-size*)) (reserv-max-z 1)
          (template-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element +terrain-border-floor+))
          (reserved-level (make-array (list reserv-max-x reserv-max-y 1) :element-type 'fixnum :initial-element +building-city-reserved+))
          (feature-list)
@@ -134,13 +134,19 @@
                  ;; reserve the tiles for the building
                  (level-city-reserve-build-on-grid +building-city-park-tiny+ x y 0 reserved-level))
             ))
+
+    (loop for y from 0 below max-y do
+      (loop for x from 0 below max-x do
+        (loop for z from 1 below max-z do
+          (setf (aref template-level x y z) +terrain-border-air+))))
     
     (loop for y from 1 below (1- max-y) do
       (loop for x from 1 below (1- max-x) do
-        (loop for z from 0 below max-z do
-          (if (< (random 100) 20)
-            (setf (aref template-level x y z) +terrain-floor-dirt-bright+)
-            (setf (aref template-level x y z) +terrain-floor-dirt+)))))
+        (if (< (random 100) 20)
+            (setf (aref template-level x y 0) +terrain-floor-dirt-bright+)
+            (setf (aref template-level x y 0) +terrain-floor-dirt+))
+        (loop for z from 1 below max-z do
+          (setf (aref template-level x y z) +terrain-floor-air+))))
     
     (print-reserved-level reserved-level)
     
@@ -162,7 +168,6 @@
              
              ;; place the actual building
              (when (building-func (get-building-type build-type-id))
-               (format t "BUILDING-TYPE-ID = ~A~%" build-type-id)
                (multiple-value-setq (building-mobs building-features) (funcall (building-func (get-building-type build-type-id))
                                                                                (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) gz
                                                                                template-level)))
