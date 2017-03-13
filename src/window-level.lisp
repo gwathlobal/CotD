@@ -413,7 +413,8 @@
 (defun set-idle-calcing (win)
   (if (made-turn *player*)
     (setf (idle-calcing win) :npc-turn)
-    (if (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
+    (if (not (or (< (cur-mob-path *world*) (length (mob-id-list (level *world*))))
+                 (< (cur-mob-fov *world*) (length (mob-id-list (level *world*))))))
       (setf (idle-calcing win) :in-progress)
       (setf (idle-calcing win) :done))))
 

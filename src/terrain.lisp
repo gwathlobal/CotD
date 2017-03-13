@@ -14,6 +14,7 @@
    ;; :trait-blocks-move - +terrain-trait-blocks-move+
    ;; :trait-blocks-vision - +terrain-trait-blocks-vision+
    ;; :trait-blocks-projectiles - +terrain-trait-blocks-projectiles+
+   ;; :trait-opaque-floor - +terrain-trait-opaque-floor+
    ))
 
 
@@ -25,7 +26,7 @@
 (defun get-terrain-type-by-id (terrain-type-id)
   (aref *terrain-types* terrain-type-id))
 
-(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles)
+(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor)
   
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
@@ -33,6 +34,8 @@
     (setf (gethash +terrain-trait-blocks-vision+ (trait terrain-type)) t))
   (when trait-blocks-projectiles
     (setf (gethash +terrain-trait-blocks-projectiles+ (trait terrain-type)) t))
+  (when trait-opaque-floor
+    (setf (gethash +terrain-trait-opaque-floor+ (trait terrain-type)) t))
   )
 
 (defun get-terrain-type-trait (terrain-type-id key)

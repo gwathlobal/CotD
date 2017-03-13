@@ -23,7 +23,7 @@
                                                 (setf tx rx ty ry tz (z mob))
                                                 
                                                 (line-of-sight (x mob) (y mob) (z mob) (+ (x mob) rx) (+ (y mob) ry) (z mob)
-                                                               #'(lambda (dx dy dz)
+                                                               #'(lambda (dx dy dz prev-cell)
                                                                    (declare (type fixnum dx dy dz))
                                                                    (let ((terrain) (exit-result t))
                                                                      (block nil
@@ -32,6 +32,18 @@
                                                                                  (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
                                                                          (setf exit-result 'exit)
                                                                          (return))
+                                                                       
+                                                                       ;; LOS does not propagate vertically through floors
+                                                                       (when (and prev-cell
+                                                                                  (/= (- (third prev-cell) dz) 0))
+                                                                         (if (< (- (third prev-cell) dz) 0)
+                                                                           (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
+                                                                           (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
+                                                                         (when (or (null terrain)
+                                                                                   (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
+                                                                           (setf exit-result 'exit)
+                                                                           (return)))
+                                                            
                                                                        (setf terrain (get-terrain-* (level *world*) dx dy dz))
                                                                        (unless terrain
                                                                          (setf exit-result 'exit)

@@ -154,6 +154,7 @@
 (defconstant +terrain-trait-blocks-move+ 0)
 (defconstant +terrain-trait-blocks-vision+ 1)
 (defconstant +terrain-trait-blocks-projectiles+ 2)
+(defconstant +terrain-trait-opaque-floor+ 3)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -185,6 +186,8 @@
 (defconstant +terrain-door-open+ 27)
 (defconstant +terrain-border-air+ 28)
 (defconstant +terrain-floor-air+ 29)
+(defconstant +terrain-slope-stone-up+ 30)
+(defconstant +terrain-slope-stone-down+ 31)
 
 (defparameter *faction-table* (make-hash-table))
 
@@ -210,6 +213,7 @@
 (defconstant +normal-ap+ 10)
 (defparameter *possessed-revolt-chance* 12)
 (defparameter *acc-loss-per-tile* 5)
+(defparameter *max-mob-sight* 10)
 
 (defconstant +connect-room-none+ -1)
 
@@ -218,3 +222,4 @@
 ;;--------------------------- 
 
 (defparameter *path-thread* nil)
+(defparameter *fov-thread* nil)

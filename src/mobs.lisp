@@ -83,7 +83,7 @@
    ;;   :chops-body-parts
    
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
-   (base-sight :initform 10 :initarg :base-sight :accessor base-sight)
+   (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)
@@ -355,8 +355,10 @@
    
    (cur-hp :initform 0 :initarg :cur-hp :accessor cur-hp)
    (cur-fp :initform 0 :initarg :cur-fp :accessor cur-fp)
-    
+
+   ;(fov-map :initform (make-array (list (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)))) :accessor fov-map)
    (visible-mobs :initform nil :accessor visible-mobs)
+
    (path :initform nil :accessor path)
    (path-dst :initform nil :accessor path-dst) ;; is a actually a cons with coords (x y)
 

@@ -324,7 +324,7 @@
       (let ((tx 0) (ty 0) (tz 0)
             (ex (x nearest-enemy)) (ey (y nearest-enemy)) (ez (z nearest-enemy)))
         (declare (type fixnum tx ty tz ex ey ez))
-        (line-of-sight (x mob) (y mob) (z mob) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy) #'(lambda (dx dy dz)
+        (line-of-sight (x mob) (y mob) (z mob) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy) #'(lambda (dx dy dz prev-cell)
                                                                                (declare (type fixnum dx dy))
                                                                                (let ((terrain) (exit-result t))
                                                                                  (block nil
@@ -334,6 +334,17 @@
                                                                                              (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
                                                                                      (setf exit-result 'exit)
                                                                                      (return))
+
+                                                                                   ;; LOS does not propagate vertically through floors
+                                                                                   (when (and prev-cell
+                                                                                              (/= (- (third prev-cell) dz) 0))
+                                                                                     (if (< (- (third prev-cell) dz) 0)
+                                                                                       (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
+                                                                                       (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
+                                                                                     (when (or (null terrain)
+                                                                                               (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
+                                                                                       (setf exit-result 'exit)
+                                                                                       (return)))
                                                                                    
                                                                                    (setf terrain (get-terrain-* (level *world*) dx dy dz))
                                                                                    (unless terrain
@@ -517,12 +528,15 @@
 
 (defmethod ai-function ((player player))
   (logger (format nil "~%AI-FUnction Player~%"))
-  ;(logger (format nil "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
+  ;(logger (format nil "~%TIME-ELAPSED BEFORE: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
 
-  (format t "TIME-ELAPSED: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  
+  (format t "~%TIME-ELAPSED BEFORE: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
   
   (update-visible-area (level *world*) (x player) (y player) (z player))
 
+  (format t "TIME-ELAPSED AFTER: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  
   ;; find the nearest enemy
   (when (mob-ability-p *player* +mob-abil-detect-good+)
     (sense-good))

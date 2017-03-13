@@ -30,7 +30,7 @@
                                   "...#.....#............#####.......#####......................................."
                                   "...#######............#...............#......................................."
                                   "......................#...............-......................................."
-                                  "...#######............########'########...................######.....######..."
+                                  "...#######............########'########u..................######.....######..."
                                   "...#.....#............#....#.....#....#...................#...............#..."
                                   "...#.....+............#....+.....+....-...................#...............#..."
                                   "...#.....#............#....#.....#....#...................#...............#..."
@@ -52,9 +52,9 @@
                                   "   .......                                                ......     ......   "
                                   "   .......                                                ......     ......   "
                                   "   .......            .....       .....                                       "
-                                  "   .......            .               .                                       "
-                                  "                      .               .                                       "
-                                  "   .......            .................                   .................   "
+                                  "   .......            .....       .....                                       "
+                                  "                      .....       .....                                       "
+                                  "   .......            .................d                  .................   "
                                   "   .......            .................                   .................   "
                                   "   .......            .................                   .................   "
                                   "   .......            .................                   .................   "
@@ -90,6 +90,8 @@
                            ((char= c #\+) (setf (aref template-level (1+ x) (1+ y) z) +terrain-door-closed+))
                            ((char= c #\') (setf (aref template-level (1+ x) (1+ y) z) +terrain-door-open+))
                            ((char= c #\Space) (setf (aref template-level (1+ x) (1+ y) z) +terrain-floor-air+))
+                           ((char= c #\u) (setf (aref template-level (1+ x) (1+ y) z) +terrain-slope-stone-up+))
+                           ((char= c #\d) (setf (aref template-level (1+ x) (1+ y) z) +terrain-slope-stone-down+))
                            )
                          (incf x)
                       )))
@@ -102,10 +104,10 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-player+ :x 45 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-soldier+ :x 40 :y 16 :z 0))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-horse+ :x (- (x *player*) 4) :y (- (y *player*) 0) :z 0))
-        (demon (make-instance 'mob :mob-type +mob-type-soldier+ :x (- (x *player*) 3) :y (+ (y *player*) 0) :z 0))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-horse+ :x (+ (x *player*) 4) :y (- (y *player*) 0) :z 0))
+        (demon (make-instance 'mob :mob-type +mob-type-soldier+ :x (+ (x *player*) 3) :y (+ (y *player*) 0) :z 0))
         )
     (setf (cur-fp *player*) 10)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)

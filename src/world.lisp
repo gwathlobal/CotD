@@ -9,11 +9,12 @@
    (memo :initform nil :accessor memo :type simple-array) ; of type list containing (idx of glyph, color of glyph, color of background, visibility flag, revealed flag)
    (mobs :initform nil :accessor mobs :type simple-array) ; of type fixnum, which is the id of a mob
    (items :initform nil :accessor items :type simple-array) ; of type (<item id> ...)
+   (features :initform nil :accessor features :type simple-array) ; of type (<feature id> ...)
    (mob-id-list :initarg :mob-id-list :initform (make-list 0) :accessor mob-id-list)
    (item-id-list :initarg :item-id-list :initform (make-list 0) :accessor item-id-list)
    (feature-id-list :initarg :feature-id-list :initform (make-list 0) :accessor feature-id-list)
    (connect-map :initform (make-array '(6) :initial-element nil) :accessor connect-map :type simple-array) ; an array that holds connection maps (which are arrays themselves) for all sizes of mobs,
-                                                                                                                           ; note that sizes can only be odd numbers, so some indices of the array will hold nil 
+                                                                                                           ; note that sizes can only be odd numbers, so some indices of the array will hold nil 
    ))
    
 (defun add-mob-to-level-list (level mob)
@@ -39,10 +40,12 @@
         (setf (aref (mobs level) nx ny (z mob)) nil)))))
 
 (defun add-feature-to-level-list (level feature)
-  (pushnew (id feature) (feature-id-list level)))
+  (pushnew (id feature) (feature-id-list level))
+  (push (id feature) (aref (features level) (x feature) (y feature) (z feature))))
 
 (defun remove-feature-from-level-list (level feature)
-  (setf (feature-id-list level) (remove (id feature) (feature-id-list level))))
+  (setf (feature-id-list level) (remove (id feature) (feature-id-list level)))
+  (setf (aref (features level) (x feature) (y feature) (z feature)) (remove (id feature) (aref (features level) (x feature) (y feature) (z feature)))))
 
 (defun add-item-to-level-list (level item)
   (pushnew (id item) (item-id-list level))
@@ -63,13 +66,11 @@
   (setf (aref (terrain level) x y z) terrain-type-id))
 
 (defun get-features-* (level x y z)
-  (let ((feature)
-	(feature-list nil))
-    (dolist (feature-id (feature-id-list level))
-      (setf feature (get-feature-by-id feature-id))
-      (when (and (= (x feature) x) (= (y feature) y) (= (z feature) z))
-	(setf feature-list (append feature-list (list feature)))))
-    feature-list))
+  (when (or (< x 0) (>= x (array-dimension (items level) 0))
+            (< y 0) (>= y (array-dimension (items level) 1))
+            (< z 0) (>= z (array-dimension (items level) 2)))
+    (return-from get-features-* nil))
+  (aref (features level) x y z))
 
 (defun get-mob-* (level x y z)
   (when (or (< x 0) (>= x (array-dimension (mobs level) 0))
@@ -143,6 +144,10 @@
    (cur-mob-path :initform 0 :accessor cur-mob-path)
    (path-lock :initform (bt:make-lock) :accessor path-lock)
    (path-cv :initform (bt:make-condition-variable) :accessor path-cv)
+
+   (cur-mob-fov :initform 0 :accessor cur-mob-fov)
+   (fov-lock :initform (bt:make-lock) :accessor fov-lock)
+   (fov-cv :initform (bt:make-condition-variable) :accessor fov-cv)
 
    (animation-queue :initform () :accessor animation-queue)
    ))

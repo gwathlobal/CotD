@@ -14,7 +14,7 @@
         when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))
           do
              (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
-                            #'(lambda (dx dy dz)
+                            #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
                                 (let* ((terrain) (exit-result t) (mob-id 0) 
                                        )
@@ -26,7 +26,18 @@
                                               (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
                                       (setf exit-result 'exit)
                                       (return))
-                                                                        
+
+                                    ;; LOS does not propagate vertically through floors
+                                    (when (and prev-cell
+                                               (/= (- (third prev-cell) dz) 0))
+                                      (if (< (- (third prev-cell) dz) 0)
+                                        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
+                                        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
+                                      (when (or (null terrain)
+                                                (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
+                                        (setf exit-result 'exit)
+                                        (return)))
+                                    
                                     (setf terrain (get-terrain-* (level *world*) dx dy dz))
                                     (unless terrain
                                       (setf exit-result 'exit)
@@ -44,7 +55,7 @@
 
 (defun update-visible-mobs-fov (mob)
   (declare (optimize (speed 3)))
-  (draw-fov (x mob) (y mob) (z mob) (cur-sight mob) #'(lambda (dx dy dz)
+  (draw-fov (x mob) (y mob) (z mob) (cur-sight mob) #'(lambda (dx dy dz prev-cell)
                                                         (declare (type fixnum dx dy dz))
                                                         (let* ((terrain) (exit-result t) (mob-id 0) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
                                                                (dist (get-distance-3d (x mob) (y mob) (z mob) dx dy dz)))
@@ -59,7 +70,17 @@
                                                             (when (> dist cur-sight-1)
                                                               (setf exit-result 'exit)
                                                               (return))
-                                                            
+
+                                                            ;; LOS does not propagate vertically through floors
+                                                            (when (and prev-cell
+                                                                       (/= (- (third prev-cell) dz) 0))
+                                                              (if (< (- (third prev-cell) dz) 0)
+                                                                (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
+                                                                (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
+                                                              (when (or (null terrain)
+                                                                        (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
+                                                                (setf exit-result 'exit)
+                                                                (return)))
                                                             
                                                             (setf terrain (get-terrain-* (level *world*) dx dy dz))
                                                             (unless terrain
@@ -101,55 +122,51 @@
 
 (defun reveal-cell-on-map (level map-x map-y map-z)
   ;; drawing terrain
-  (set-single-memo-* level map-x map-y map-z
-                     :glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z)))
-                     :glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z)))
-                     :back-color (back-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z)))
-                     :visibility t
-                     :revealed t)
-
-  ;; then feature, if any
-  (when (get-features-* level map-x map-y map-z)
-    (let ((ftr (first (last (get-features-* level map-x map-y map-z)))))
-      (set-single-memo-* level 
-                         (x ftr) (y ftr) (z ftr)
-                         :glyph-idx (if (glyph-idx (get-feature-type-by-id (feature-type ftr)))
-                                      (glyph-idx (get-feature-type-by-id (feature-type ftr)))
-                                      (get-single-memo-glyph-idx (get-memo-* level (x ftr) (y ftr) (z ftr))))
-                         :glyph-color (if (glyph-color (get-feature-type-by-id (feature-type ftr)))
-                                        (glyph-color (get-feature-type-by-id (feature-type ftr)))
-                                        (get-single-memo-glyph-color (get-memo-* level (x ftr) (y ftr) (z ftr))))
-                         :back-color (if (back-color (get-feature-type-by-id (feature-type ftr)))
-                                       (back-color (get-feature-type-by-id (feature-type ftr)))
-                                       (get-single-memo-back-color (get-memo-* level (x ftr) (y ftr) (z ftr))))
-                         :visibility t
-                         :revealed t)))
-  
-  ;; then item, if any
-  (when (get-items-* level map-x map-y map-z)
-    (let ((vitem (get-item-by-id (first (get-items-* level map-x map-y map-z)))))
-      (set-single-memo-* level 
-                         (x vitem) (y vitem) (z vitem)
-                         :glyph-idx (glyph-idx vitem)
-                         :glyph-color (glyph-color vitem)
-                         :back-color (back-color vitem)
-                         :visibility t
-                         :revealed t)))
-  
-  ;; finally mob, if any
-  (when (get-mob-* level map-x map-y map-z)
-    (let ((vmob (get-mob-* level map-x map-y map-z)))
-      (set-single-memo-* level 
-                         map-x map-y map-z
-                         :glyph-idx (get-current-mob-glyph-idx vmob :x map-x :y map-y :z map-z)
-                         :glyph-color (get-current-mob-glyph-color vmob)
-                         :back-color (get-current-mob-back-color vmob)
-                         :visibility t
-                         :revealed t))
-    ))
+  (let ((glyph-idx)
+        (glyph-color)
+        (back-color))
+    (setf glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
+    (setf glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
+    (setf back-color (back-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
+          
+    ;; then feature, if any
+    (when (get-features-* level map-x map-y map-z)
+      (let ((ftr (get-feature-by-id (first (get-features-* level map-x map-y map-z)))))
+        (when (glyph-idx (get-feature-type-by-id (feature-type ftr)))
+          (setf glyph-idx (glyph-idx (get-feature-type-by-id (feature-type ftr))))) 
+        (when (glyph-color (get-feature-type-by-id (feature-type ftr)))
+          (setf glyph-color (glyph-color (get-feature-type-by-id (feature-type ftr)))))
+        (when (back-color (get-feature-type-by-id (feature-type ftr)))
+          (setf back-color (back-color (get-feature-type-by-id (feature-type ftr)))))
+        ))
+    
+    ;; then item, if any
+    (when (get-items-* level map-x map-y map-z)
+      (let ((vitem (get-item-by-id (first (get-items-* level map-x map-y map-z)))))
+        (setf glyph-idx (glyph-idx vitem))
+        (setf glyph-color (glyph-color vitem))
+        (setf back-color (back-color vitem))
+        ))
+    
+    ;; finally mob, if any
+    (when (get-mob-* level map-x map-y map-z)
+      (let ((vmob (get-mob-* level map-x map-y map-z)))
+        (setf glyph-idx (get-current-mob-glyph-idx vmob :x map-x :y map-y :z map-z))
+        (setf glyph-color (get-current-mob-glyph-color vmob))
+        (setf back-color (get-current-mob-back-color vmob))
+        )
+      )
+    (set-single-memo-* level map-x map-y map-z
+                       :glyph-idx glyph-idx
+                       :glyph-color glyph-color
+                       :back-color back-color
+                       :visibility t
+                       :revealed t)
+  ))
 
 (defun update-visible-area-normal (level x y z)
-  (draw-fov x y z (cur-sight *player*) #'(lambda (dx dy dz)
+ 
+  (draw-fov x y z (cur-sight *player*) #'(lambda (dx dy dz prev-cell)
                                          (let ((terrain) (exit-result t))
                                            (block nil
                                              (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
@@ -161,6 +178,17 @@
                                              (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
                                                (setf exit-result 'exit)
 					       (return))
+
+                                             ;; LOS does not propagate vertically through floors
+                                             (when (and prev-cell
+                                                        (/= (- (third prev-cell) dz) 0))
+                                               (if (< (- (third prev-cell) dz) 0)
+                                                 (setf terrain (get-terrain-* level (first prev-cell) (second prev-cell) dz))
+                                                 (setf terrain (get-terrain-* level (first prev-cell) (second prev-cell) (third prev-cell))))
+                                               (when (or (null terrain)
+                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
+                                                 (setf exit-result 'exit)
+                                                 (return)))
                                              
                                              (reveal-cell-on-map level dx dy dz)
                                              
@@ -174,11 +202,12 @@
                                                (return))
                                              (when (and (get-mob-* level dx dy dz) 
                                                         (not (eq (get-mob-* level dx dy dz) *player*))
-                                                        (get-single-memo-visibility (get-memo-* level dx dy dz)))
+                                                        )
                                                (pushnew (id (get-mob-* level dx dy dz)) (visible-mobs *player*)))
                                              )
 					   exit-result))
             )
+  
   )
 
 (defun update-visible-area-all (level x y z)
@@ -200,13 +229,13 @@
           (set-single-memo-* level x1 y1 z1 :visibility nil))
       )))
 
-  
   (setf (visible-mobs *player*) nil)
+  
   (if (mob-ability-p *player* +mob-abil-see-all+)
     (update-visible-area-all level x y z)
     (update-visible-area-normal level x y z))
   
-  (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))
+  (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))  
   )
 
 (defun draw-fov (cx cy cz r func &optional (limit-z t))
@@ -258,7 +287,8 @@
     ;; check LOS for all perimeter cells
     (loop for (tx ty tz) in target-cells do
       (line-of-sight cx cy cz tx ty tz func)
-      )
+          )
+    
     ))
 
 (defun draw-fov-old (cx cy cz r func)
@@ -290,10 +320,12 @@
          (i dm))
     (declare (type fixnum dx dy dz sx sy sz dm i))
     (setf x1 (truncate dm 2) y1 (truncate dm 2) z1 (truncate dm 2))
-    (loop while (and (not (< i 0))
-                     (not (eq (funcall func x0 y0 z0) 'exit)))
+    (loop with prev-cell = nil
+          while (and (not (< i 0))
+                     (not (eq (funcall func x0 y0 z0 prev-cell) 'exit)))
           do
              (decf i)
+             (setf prev-cell (list x0 y0 z0))
              (decf x1 dx) (decf y1 dy) (decf z1 dz)
              (when (< x1 0)
                (incf x1 dm)
@@ -522,3 +554,70 @@
       (compute octant cx cy r 1 (cons 1 1) (cons 1 0)))
     
     ))
+
+;;-----------------------------
+;; FOV Multithreading function
+;;-----------------------------
+
+#||
+(defun thread-fov-loop (stream)
+  (loop while t do
+    (bt:with-lock-held ((fov-lock *world*))
+      ;(format stream "~%THREAD: cur-mob-fov ~A, player turn ~A~%" (cur-mob-fov *world*) (not (made-turn *player*)))
+      (if (and (< (cur-mob-fov *world*) (length (mob-id-list (level *world*))))
+               ;(not (made-turn *player*))
+               )
+        (progn
+          (when (not (dead= (get-mob-by-id (cur-mob-fov *world*))))
+            (logger (format nil "~%THREAD: Mob ~A [~A] calculates FOV~%" (name (get-mob-by-id (cur-mob-fov *world*))) (id (get-mob-by-id (cur-mob-fov *world*)))) stream)
+            
+            (let ((mob (get-mob-by-id (cur-mob-fov *world*))))
+              ;; setting the fov-map to nil
+              (loop for x from 0 below (array-dimension (fov-map mob) 0) do
+                (loop for y from 0 below (array-dimension (fov-map mob) 1) do
+                  (loop for z from 0 below (array-dimension (fov-map mob) 2) do
+                    (setf (aref (fov-map mob) x y z) nil))))
+              
+              (draw-fov (x mob) (y mob) (z mob) (cur-sight mob)
+                        #'(lambda (dx dy dz)
+                            (declare (type fixnum dx dy dz))
+                            (let* ((terrain) (exit-result t) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
+                                 (dist (get-distance-3d (x mob) (y mob) (z mob) dx dy dz)))
+                            (declare (type fixnum cur-sight cur-sight-1)
+                                     (type float dist))
+                            (block nil
+                              (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
+                                        (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
+                                        (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
+                                (setf exit-result 'exit)
+                                (return))
+                              (when (> dist cur-sight-1)
+                                (setf exit-result 'exit)
+                                (return))
+                              
+                              
+                              (setf terrain (get-terrain-* (level *world*) dx dy dz))
+                              (unless terrain
+                                (setf exit-result 'exit)
+                                (return))
+                              (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
+                                (setf exit-result 'exit)
+                                (return))
+
+                              (setf (aref (fov-map mob)
+                                          (- dx (- (x mob) *max-mob-sight*))
+                                          (- dy (- (y mob) *max-mob-sight*))
+                                          (- dz (- (z mob) *max-mob-sight*)))
+                                    t)
+                              )
+                              exit-result)))
+            ))
+          (incf (cur-mob-fov *world*))
+          )
+        (progn
+          (logger (format nil "THREAD: Done calculating FOVs~%~%") stream)
+          (setf (cur-mob-fov *world*) (length (mob-id-list (level *world*))))
+          (bt:condition-wait (fov-cv *world*) (fov-lock *world*)))
+        
+        ))))
+||#

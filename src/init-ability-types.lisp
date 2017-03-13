@@ -926,8 +926,8 @@
                                                     (setf (car target1) (+ (car target1) (* 3 dx1)))
                                                     (setf (cdr target1) (+ (cdr target1) (* 3 dy1))))
                                                   
-                                                  (line-of-sight (x actor) (y actor) (z actor) (car target1) (cdr target1) (z actor) #'(lambda (dx dy dz)
-                                                                                                                                         (declare (ignore dz))
+                                                  (line-of-sight (x actor) (y actor) (z actor) (car target1) (cdr target1) (z actor) #'(lambda (dx dy dz prev-cell)
+                                                                                                                                         (declare (ignore dz prev-cell))
                                                                                                                                          (let ((exit-result t))
                                                                                                                                             (block nil
                                                                                                                                               (push (cons dx dy) path-line)
@@ -970,7 +970,7 @@
                                                       (return nil))
                                                     (let ((blocked nil))
                                                       (line-of-sight (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)
-                                                                     #'(lambda (dx dy dz)
+                                                                     #'(lambda (dx dy dz prev-cell)
                                                                          (declare (type fixnum dx dy))
                                                                          (let ((terrain) (exit-result t))
                                                                            (block nil
@@ -981,6 +981,17 @@
                                                                                (setf blocked t)
                                                                                (return))
                                                                              
+                                                                             ;; LOS does not propagate vertically through floors
+                                                                             (when (and prev-cell
+                                                                                        (/= (- (third prev-cell) dz) 0))
+                                                                               (if (< (- (third prev-cell) dz) 0)
+                                                                                 (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
+                                                                                 (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
+                                                                               (when (or (null terrain)
+                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
+                                                                                 (setf exit-result 'exit)
+                                                                                 (return)))
+                                                            
                                                                              (setf terrain (get-terrain-* (level *world*) dx dy dz))
                                                                              (unless terrain
                                                                                (setf exit-result 'exit)
