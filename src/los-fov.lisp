@@ -8,6 +8,44 @@
   (declare (type fixnum sx sy sz tx ty tz))
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)) (* (- sz tz) (- sz tz)))))
 
+(defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil))
+  (let ((terrain))
+    (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
+              (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
+              (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
+      (return-from check-LOS-propagate nil))
+    
+    ;; LOS does not propagate vertically through floors
+    (when (and prev-cell
+               (/= (- (third prev-cell) dz) 0))
+      (if (< (- (third prev-cell) dz) 0)
+        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
+        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
+      (when (or (null terrain)
+                (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
+        (return-from check-LOS-propagate nil)))
+
+    (when player-reveal-cell
+      (reveal-cell-on-map (level *world*) dx dy dz))
+    
+    (setf terrain (get-terrain-* (level *world*) dx dy dz))
+    (unless terrain
+      (return-from check-LOS-propagate nil))
+
+    (when (and check-move
+               (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+      (return-from check-LOS-propagate nil))
+    
+    (when (and check-vision
+               (get-terrain-type-trait terrain +terrain-trait-blocks-vision+))
+      (return-from check-LOS-propagate nil))
+    
+    (when (and check-projectile
+               (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+))
+      (return-from check-LOS-propagate nil))
+
+    t))
+
 (defun update-visible-mobs-normal (mob)
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
@@ -16,35 +54,15 @@
              (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
-                                (let* ((terrain) (exit-result t) (mob-id 0) 
-                                       )
+                                (let* ((exit-result t) (mob-id 0)) 
                                   (declare (type fixnum mob-id))
                    
                                   (block nil
-                                    (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-                                              (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-                                              (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
-                                      (setf exit-result 'exit)
-                                      (return))
 
-                                    ;; LOS does not propagate vertically through floors
-                                    (when (and prev-cell
-                                               (/= (- (third prev-cell) dz) 0))
-                                      (if (< (- (third prev-cell) dz) 0)
-                                        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
-                                        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
-                                      (when (or (null terrain)
-                                                (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-                                        (setf exit-result 'exit)
-                                        (return)))
+                                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                      (setf exit-result 'exit)
+                                      (return))
                                     
-                                    (setf terrain (get-terrain-* (level *world*) dx dy dz))
-                                    (unless terrain
-                                      (setf exit-result 'exit)
-                                      (return))
-                                    (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
-                                      (setf exit-result 'exit)
-                                      (return))
                                     (when (and (get-mob-* (level *world*) dx dy dz) 
                                                (not (eq (get-mob-* (level *world*) dx dy dz) mob)))
                                       (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
@@ -57,38 +75,20 @@
   (declare (optimize (speed 3)))
   (draw-fov (x mob) (y mob) (z mob) (cur-sight mob) #'(lambda (dx dy dz prev-cell)
                                                         (declare (type fixnum dx dy dz))
-                                                        (let* ((terrain) (exit-result t) (mob-id 0) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
+                                                        (let* ((exit-result t) (mob-id 0) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
                                                                (dist (get-distance-3d (x mob) (y mob) (z mob) dx dy dz)))
                                                           (declare (type fixnum mob-id cur-sight cur-sight-1)
                                                                    (type float dist))
                                                           (block nil
-                                                            (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-                                                                      (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-                                                                      (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
-                                                              (setf exit-result 'exit)
-                                                              (return))
+
                                                             (when (> dist cur-sight-1)
                                                               (setf exit-result 'exit)
                                                               (return))
-
-                                                            ;; LOS does not propagate vertically through floors
-                                                            (when (and prev-cell
-                                                                       (/= (- (third prev-cell) dz) 0))
-                                                              (if (< (- (third prev-cell) dz) 0)
-                                                                (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
-                                                                (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
-                                                              (when (or (null terrain)
-                                                                        (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-                                                                (setf exit-result 'exit)
-                                                                (return)))
-                                                            
-                                                            (setf terrain (get-terrain-* (level *world*) dx dy dz))
-                                                            (unless terrain
+                                                           
+                                                            (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
                                                               (setf exit-result 'exit)
                                                               (return))
-                                                            (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
-                                                              (setf exit-result 'exit)
-                                                              (return))
+                                                             
                                                             (when (and (get-mob-* (level *world*) dx dy dz) 
                                                                        (not (eq (get-mob-* (level *world*) dx dy dz) mob)))
                                                               (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
@@ -167,42 +167,19 @@
 (defun update-visible-area-normal (level x y z)
  
   (draw-fov x y z (cur-sight *player*) #'(lambda (dx dy dz prev-cell)
-                                         (let ((terrain) (exit-result t))
+                                         (let ((exit-result t))
                                            (block nil
-                                             (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-                                                       (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-                                                       (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
-                                               (setf exit-result 'exit)
-					       (return))
-
+                                             
                                              (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
                                                (setf exit-result 'exit)
 					       (return))
 
-                                             ;; LOS does not propagate vertically through floors
-                                             (when (and prev-cell
-                                                        (/= (- (third prev-cell) dz) 0))
-                                               (if (< (- (third prev-cell) dz) 0)
-                                                 (setf terrain (get-terrain-* level (first prev-cell) (second prev-cell) dz))
-                                                 (setf terrain (get-terrain-* level (first prev-cell) (second prev-cell) (third prev-cell))))
-                                               (when (or (null terrain)
-                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-                                                 (setf exit-result 'exit)
-                                                 (return)))
-                                             
-                                             (reveal-cell-on-map level dx dy dz)
-                                             
-                                             ;; checking for impassable objects
-                                             (setf terrain (get-terrain-* level dx dy dz))
-                                             (unless terrain
+                                             (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
                                                (setf exit-result 'exit)
                                                (return))
-                                             (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
-                                               (setf exit-result 'exit)
-                                               (return))
+                                             
                                              (when (and (get-mob-* level dx dy dz) 
-                                                        (not (eq (get-mob-* level dx dy dz) *player*))
-                                                        )
+                                                        (not (eq (get-mob-* level dx dy dz) *player*)))
                                                (pushnew (id (get-mob-* level dx dy dz)) (visible-mobs *player*)))
                                              )
 					   exit-result))

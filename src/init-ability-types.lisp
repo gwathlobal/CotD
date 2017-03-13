@@ -972,32 +972,9 @@
                                                       (line-of-sight (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)
                                                                      #'(lambda (dx dy dz prev-cell)
                                                                          (declare (type fixnum dx dy))
-                                                                         (let ((terrain) (exit-result t))
+                                                                         (let ((exit-result t))
                                                                            (block nil
-                                                                             (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-                                                                                       (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-                                                                                       (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
-                                                                               (setf exit-result 'exit)
-                                                                               (setf blocked t)
-                                                                               (return))
-                                                                             
-                                                                             ;; LOS does not propagate vertically through floors
-                                                                             (when (and prev-cell
-                                                                                        (/= (- (third prev-cell) dz) 0))
-                                                                               (if (< (- (third prev-cell) dz) 0)
-                                                                                 (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
-                                                                                 (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
-                                                                               (when (or (null terrain)
-                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-                                                                                 (setf exit-result 'exit)
-                                                                                 (return)))
-                                                            
-                                                                             (setf terrain (get-terrain-* (level *world*) dx dy dz))
-                                                                             (unless terrain
-                                                                               (setf exit-result 'exit)
-                                                                               (setf blocked t)
-                                                                               (return))
-                                                                             (when (get-terrain-type-trait terrain +terrain-trait-blocks-move+)
+                                                                             (unless (check-LOS-propagate dx dy dz prev-cell :check-move t)
                                                                                (setf exit-result 'exit)
                                                                                (setf blocked t)
                                                                                (return))

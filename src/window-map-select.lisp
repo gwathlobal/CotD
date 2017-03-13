@@ -39,7 +39,7 @@
 
   ;; drawing the highlighting rectangle around the viewed grid-cell
   (let ((lof-blocked t))
-    (let ((x1 0) (y1 0) (color) (tx (view-x *player*)) (ty (view-y *player*)))
+    (let ((x1 0) (y1 0) (color) (tx (view-x *player*)) (ty (view-y *player*)) (tz (view-z *player*)))
       (declare (type fixnum x1 y1))
       (multiple-value-bind (sx sy max-x max-y) (calculate-start-coord (view-x *player*) (view-y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
         (setf (max-x win) max-x (max-y win) max-y)
@@ -52,37 +52,17 @@
           (line-of-sight (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
                          #'(lambda (dx dy dz prev-cell)
                              (declare (type fixnum dx dy))
-                             (let ((terrain) (exit-result t))
+                             (let ((exit-result t))
                                (block nil
-                                 (setf tx dx ty dy)
-                                 (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-                                           (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-                                           (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
-                                   (setf exit-result 'exit)
-                                   (return))
+                                 (setf tx dx ty dy tz dz)
 
-                                 ;; LOS does not propagate vertically through floors
-                                 (when (and prev-cell
-                                            (/= (- (third prev-cell) dz) 0))
-                                   (if (< (- (third prev-cell) dz) 0)
-                                     (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
-                                     (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
-                                   (when (or (null terrain)
-                                             (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-                                     (setf exit-result 'exit)
-                                     (return)))
-                                 
-                                 (setf terrain (get-terrain-* (level *world*) dx dy dz))
-                                 (unless terrain
-                                   (setf exit-result 'exit)
-                                   (return))
-                                 (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
+                                 (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
                                    (setf exit-result 'exit)
                                    (return))
                                  )
                                exit-result))))
 
-        (when (and (= tx (view-x *player*)) (= ty (view-y *player*)))
+        (when (and (= tx (view-x *player*)) (= ty (view-y *player*)) (= tz (view-z *player*)))
           (setf lof-blocked nil))
                    
         ;; adjust color depending on the target

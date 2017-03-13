@@ -575,6 +575,7 @@
           with target1
           with tx
           with ty
+          with tz
           do
              (setf rx 0 ry 0)
              ;; disperse ammo depending on the distance to the target
@@ -589,40 +590,20 @@
              ;; trace a line to the target so if we encounter an obstacle along the path we hit it
              (line-of-sight (x actor) (y actor) (z actor) (+ (x target) rx) (+ (y target) ry) (z target)
                             #'(lambda (dx dy dz prev-cell)
-                                (declare (type fixnum dx dy))
-                                (let ((terrain) (exit-result t))
+                                (declare (type fixnum dx dy dz))
+                                (let ((exit-result t))
                                   (block nil
-                                    (setf tx dx ty dy)
-                                    (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-                                              (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-                                              (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
-                                      (setf exit-result 'exit)
-                                      (return))
+                                    (setf tx dx ty dy tz dz)
 
-                                    ;; LOS does not propagate vertically through floors
-                                    (when (and prev-cell
-                                               (/= (- (third prev-cell) dz) 0))
-                                      (if (< (- (third prev-cell) dz) 0)
-                                        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
-                                        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
-                                      (when (or (null terrain)
-                                                (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-                                        (setf exit-result 'exit)
-                                        (return)))
-                                                            
-                                    (setf terrain (get-terrain-* (level *world*) dx dy dz))
-                                    (unless terrain
-                                      (setf exit-result 'exit)
-                                      (return))
-                                    (when (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+)
+                                    (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
                                       (setf exit-result 'exit)
                                       (return))
                                     )
                                   exit-result)))
              ;; place a fire dot if the dest point is visible
-             (place-visible-animation tx ty (z target) (level *world*) +anim-type-fire-dot+ :params ())
+             (place-visible-animation tx ty tz (level *world*) +anim-type-fire-dot+ :params ())
              
-             (setf target1 (get-mob-* (level *world*) tx ty (z target)))
+             (setf target1 (get-mob-* (level *world*) tx ty tz))
 
 
              ;; if the target is mounted, 50% chance that the actor will hit target's mount

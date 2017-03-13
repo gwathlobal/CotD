@@ -25,34 +25,14 @@
                                                 (line-of-sight (x mob) (y mob) (z mob) (+ (x mob) rx) (+ (y mob) ry) (z mob)
                                                                #'(lambda (dx dy dz prev-cell)
                                                                    (declare (type fixnum dx dy dz))
-                                                                   (let ((terrain) (exit-result t))
+                                                                   (let ((exit-result t))
                                                                      (block nil
-                                                                       (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-                                                                                 (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-                                                                                 (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
+
+                                                                       (unless (check-LOS-propagate dx dy dz prev-cell :check-move t)
                                                                          (setf exit-result 'exit)
                                                                          (return))
                                                                        
-                                                                       ;; LOS does not propagate vertically through floors
-                                                                       (when (and prev-cell
-                                                                                  (/= (- (third prev-cell) dz) 0))
-                                                                         (if (< (- (third prev-cell) dz) 0)
-                                                                           (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
-                                                                           (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
-                                                                         (when (or (null terrain)
-                                                                                   (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-                                                                           (setf exit-result 'exit)
-                                                                           (return)))
-                                                            
-                                                                       (setf terrain (get-terrain-* (level *world*) dx dy dz))
-                                                                       (unless terrain
-                                                                         (setf exit-result 'exit)
-                                                                         (return))
-                                                                       (when (get-terrain-type-trait terrain +terrain-trait-blocks-move+)
-                                                                         (setf exit-result 'exit)
-                                                                         (return))
-                                                                       
-                                                                       (setf tx dx ty dy)
+                                                                       (setf tx dx ty dy tz dz)
                                                                        ;; display a severed flying body part
                                                                        (display-animation-on-map dx dy 5 sdl:*red* sdl:*black*)
                                                                        (sdl:update-display)
@@ -66,10 +46,10 @@
                                                                        )
                                                                      exit-result)))
                                                 
-                                                (setf item (make-instance 'item :item-type +item-type-body-part+ :x tx :y ty :z (z mob)))
+                                                (setf item (make-instance 'item :item-type +item-type-body-part+ :x tx :y ty :z tz))
                                                 (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) body-part-str))
                                                 (add-item-to-level-list (level *world*) item)
-                                                (reveal-cell-on-map (level *world*) tx ty (z mob))
+                                                (reveal-cell-on-map (level *world*) tx ty tz)
                                                 (display-cell-on-map tx ty tz)
                                                 (logger (format nil "ANIMATION-FUNC: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) tx ty))
                                                 )
