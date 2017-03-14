@@ -30,7 +30,7 @@
                                   "...#.....#............#####.......#####......................................."
                                   "...#######............#...............#......................................."
                                   "......................#...............-......................................."
-                                  "...#######............########'########u..................######.....######..."
+                                  "...#######...........u########'########u..................######.....######..."
                                   "...#.....#............#....#.....#....#...................#...............#..."
                                   "...#.....+............#....+.....+....-...................#...............#..."
                                   "...#.....#............#....#.....#....#...................#...............#..."
@@ -54,11 +54,35 @@
                                   "   .......            .....       .....                                       "
                                   "   .......            .....       .....                                       "
                                   "                      .....       .....                                       "
-                                  "   .......            .................d                  .................   "
-                                  "   .......            .................                   .................   "
-                                  "   .......            .................                   .................   "
-                                  "   .......            .................                   .................   "
-                                  "   .......            .................                   .................   "
+                                  "   .......           d.................d                  .................   "
+                                  "   .......            ....u.......u....                   .................   "
+                                  "   .......            ..#####...#####..                   .................   "
+                                  "   .......            ..#...........#..                   .................   "
+                                  "   .......            ..#############..                   .................   "
+                                  "                                                                              "
+                                  "                                                                              "))
+        
+        (level-template-z-2 (list "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                                                                              "
+                                  "                          d       d                                           "
+                                  "                        .............                                         "
+                                  "                        .............                                         "
+                                  "                        .............                                         "
                                   "                                                                              "
                                   "                                                                              "))
         )
@@ -77,8 +101,8 @@
       (loop for x from 1 below (1- max-x) do
         (setf (aref template-level x y 0) +terrain-floor-stone+)))
 
-    (loop for level in (list level-template-z-0 level-template-z-1)
-          for z from 0 to 1 do
+    (loop for level in (list level-template-z-0 level-template-z-1 level-template-z-2)
+          for z from 0 to 2 do
             (loop for y from 0 below (length level) do
               (loop for c across (nth y level)
                     with x = 0
@@ -104,10 +128,10 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-soldier+ :x 40 :y 16 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+ :x 40 :y 16 :z 0))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-horse+ :x (+ (x *player*) 4) :y (- (y *player*) 0) :z 0))
-        (demon (make-instance 'mob :mob-type +mob-type-soldier+ :x (+ (x *player*) 3) :y (+ (y *player*) 0) :z 0))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 4) :y (- (y *player*) 0) :z 0))
+        (demon (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 3) :y (+ (y *player*) 0) :z 0))
         )
     (setf (cur-fp *player*) 10)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)

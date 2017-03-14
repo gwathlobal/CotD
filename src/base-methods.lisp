@@ -74,6 +74,20 @@
 		 (or (/= (+ (1- x) x1) x) (/= (+ (1- y) y1) y)))
 	(funcall func (+ (1- x) x1) (+ (1- y) y1))))))
 
+(defun check-surroundings-3d (x y z include-center func)
+  (loop for dx from -1 to 1 do
+    (loop for dy from -1 to 1 do
+      (loop for dz from -1 to 1 do
+        (cond
+          ((and include-center
+                (= dx dy dz 0))
+           (funcall func (+ x dx) (+ y dy) (+ z dz)))
+          ((and (not include-center)
+                (= dx dy dz 0))
+           nil)
+          (t (funcall func (+ x dx) (+ y dy) (+ z dz))))))))
+  
+
 (defun print-visible-message (x y z level str)
   (when (get-single-memo-visibility (get-memo-* level x y z))
     (set-message-this-turn t)
@@ -127,9 +141,9 @@
                           ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement 
                           (loop for nx from sx below (+ sx (map-size nmob)) do
                             (loop for ny from sy below (+ sy (map-size nmob)) do
-                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z)))
-                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z))) nmob nx ny z))
-                              (setf (aref (mobs (level *world*)) nx ny z) nil)))
+                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob))))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z))) nmob nx ny (z nmob)))
+                              (setf (aref (mobs (level *world*)) nx ny (z nmob)) nil)))
                           
                           ;; change the coords of the center of the mob
                           (setf (x nmob) x (y nmob) y (z nmob) z)
@@ -201,7 +215,7 @@
     
     (multiple-value-setq (dx dy) (x-y-dir dir))
 
-    ;; if riding somebody, only give an order tou your mount but do not move yourself
+    ;; if riding somebody, only give an order to your mount but do not move yourself
     (when (riding-mob-id mob)
       (logger (format nil "MOVE-MOB: ~A [~A] gives orders to mount ~A [~A] to move in the dir ~A~%" (name mob) (id mob) (name (get-mob-by-id (riding-mob-id mob))) (id (get-mob-by-id (riding-mob-id mob))) dir))
 
@@ -320,7 +334,16 @@
           for move-result = nil
           for x = (+ (x mob) dx)
           for y = (+ (y mob) dy)
-          for z = (z mob)
+          for z = (cond
+                    ;; if the current cell is slope up and the cell along the direction is a wall - increase the target z level, so that the mob can go up
+                    ((and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-slope-up+)
+                          (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-blocks-move+))
+                     (1+ (z mob)))
+                    ;; if the target cell is slope down - decrease the target z level, so that the mob can go down
+                    ((get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-slope-down+)
+                     (1- (z mob)))
+                    ;; otherwise the z level in unchanged
+                    (t (z mob)))
           for check-result = (check-move-on-level mob x y z)
           do
              (logger (format nil "MOVE-MOB: CHECK-MOVE ~A~%" check-result))

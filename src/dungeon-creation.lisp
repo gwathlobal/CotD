@@ -147,7 +147,7 @@
                                  for z of-type fixnum = (+ cz z-offset)
                                  when (and (>= x 0) (>= y 0) (>= z 0) (< x max-x) (< y max-y) (< z max-z)
                                            (not (and (zerop x-offset) (zerop y-offset) (zerop z-offset)))
-                                           (funcall check-func x y z))
+                                           (funcall check-func x y z cx cy cz))
                                    do
                                       (push (list x y z) open-list))))
                      
@@ -162,7 +162,7 @@
          (max-z (array-dimension (terrain level) 2))
          (connect-map (make-array (list max-x max-y max-z) :initial-element +connect-room-none+))
          (room-id 0)
-         (check-func #'(lambda (x y z)
+         (check-func #'(lambda (x y z cx cy cz)
                          (let* ((connect-id (aref connect-map x y z))
                                 (half-size (truncate (1- mob-size) 2)))
                            (declare (type fixnum connect-id half-size))
@@ -174,7 +174,10 @@
                                                            (loop for off-y of-type fixnum from (- half-size) to (+ half-size)
                                                                  for ny of-type fixnum = (+ sy off-y)
                                                                  when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
-                                                                          (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
+                                                                          (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+)
+                                                                          (and (/= (- z cz) 0)
+                                                                               (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-slope-up+))
+                                                                               (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-slope-down+))))
                                                                    do
                                                                       (setf result nil)))
                                                    result))
@@ -188,7 +191,7 @@
     (loop for x from 0 below max-x do
       (loop for y from 0 below max-y do
         (loop for z from 0 below max-z do
-          (when (funcall check-func x y z)
+          (when (funcall check-func x y z x y z)
             (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
               )))

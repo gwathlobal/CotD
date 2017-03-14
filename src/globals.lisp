@@ -155,6 +155,8 @@
 (defconstant +terrain-trait-blocks-vision+ 1)
 (defconstant +terrain-trait-blocks-projectiles+ 2)
 (defconstant +terrain-trait-opaque-floor+ 3)
+(defconstant +terrain-trait-slope-up+ 4)
+(defconstant +terrain-trait-slope-down+ 5)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)

@@ -65,5 +65,6 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-air+ :glyph-idx 96 :glyph-color sdl:*cyan* :back-color sdl:*black* :name "Air" :trait-blocks-move t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-air+ :glyph-idx 96 :glyph-color sdl:*cyan* :back-color sdl:*black* :name "Air" :trait-blocks-move t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-slope-stone-up+ :glyph-idx 118 :glyph-color sdl:*white* :back-color sdl:*black* :name "Slope up"
-                                               :trait-opaque-floor t))
-(set-terrain-type (make-instance 'terrain-type :id +terrain-slope-stone-down+ :glyph-idx 119 :glyph-color sdl:*white* :back-color sdl:*black* :name "Slope down"))
+                                               :trait-opaque-floor t :trait-slope-up t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-slope-stone-down+ :glyph-idx 119 :glyph-color sdl:*white* :back-color sdl:*black* :name "Slope down"
+                                               :trait-slope-down t))
