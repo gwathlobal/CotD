@@ -1,5 +1,7 @@
 CHANGELOG
 
+- The 3rd dimension was added to the map! Buildings now have several floors, can go up and down the slopes.
+
 --------------------
 Mar 6, 2017 v1.0.8
 

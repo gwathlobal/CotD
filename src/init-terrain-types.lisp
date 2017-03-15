@@ -68,3 +68,5 @@
                                                :trait-opaque-floor t :trait-slope-up t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-slope-stone-down+ :glyph-idx 119 :glyph-color sdl:*white* :back-color sdl:*black* :name "Slope down"
                                                :trait-slope-down t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-earth+ :glyph-idx 96 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color (sdl:color :r 185 :g 83 :b 43) :name "Earth"
+                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t))

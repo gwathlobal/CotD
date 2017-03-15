@@ -7,7 +7,7 @@
 
 (defparameter *max-x-level* 100)
 (defparameter *max-y-level* 100)
-(defparameter *max-z-level* 1)
+(defparameter *max-z-level* 10)
 (defparameter *max-x-view* 25)
 (defparameter *max-y-view* 25)
 
@@ -190,6 +190,7 @@
 (defconstant +terrain-floor-air+ 29)
 (defconstant +terrain-slope-stone-up+ 30)
 (defconstant +terrain-slope-stone-down+ 31)
+(defconstant +terrain-wall-earth+ 32)
 
 (defparameter *faction-table* (make-hash-table))
 

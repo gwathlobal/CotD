@@ -96,7 +96,7 @@
         (format str "~A (~A, ~A, ~A)" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (view-x *player*) (view-y *player*) (view-z *player*))
         (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
         (dolist (feature feature-list)
-          (format str ", ~A" (name feature)))
+          (format str ", ~A" (name (get-feature-by-id feature))))
         (when mob
           (format str "~%~A~A~A"
                   (get-current-mob-name mob)
