@@ -83,7 +83,7 @@
    ;;   :chops-body-parts
    
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
-   (base-sight :initform 6 :initarg :base-sight :accessor base-sight)
+   (base-sight :initform *base-mob-sight* :initarg :base-sight :accessor base-sight)
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)

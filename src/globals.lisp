@@ -217,6 +217,7 @@
 (defparameter *possessed-revolt-chance* 12)
 (defparameter *acc-loss-per-tile* 5)
 (defparameter *max-mob-sight* 10)
+(defparameter *base-mob-sight* 6)
 
 (defconstant +connect-room-none+ -1)
 

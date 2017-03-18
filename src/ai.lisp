@@ -647,7 +647,7 @@
 
               ;; if the mob destination is not set, choose a random destination
               (unless (path-dst mob)
-                (loop while (or (< rx 0) (< ry 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1))
+                (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
                                 (get-terrain-type-trait (get-terrain-* (level *world*) rx ry (z mob)) +terrain-trait-blocks-move+)
                                 (and (get-mob-* (level *world*) rx ry (z mob))
                                      (not (eq (get-mob-* (level *world*) rx ry rz) mob)))

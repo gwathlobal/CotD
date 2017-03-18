@@ -9,6 +9,7 @@
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)) (* (- sz tz) (- sz tz)))))
 
 (defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil))
+  ;(declare (optimize (speed 3)))
   (let ((terrain))
     (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
               (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
@@ -18,12 +19,18 @@
     ;; LOS does not propagate vertically through floors
     (when (and prev-cell
                (/= (- (third prev-cell) dz) 0))
-      (if (< (- (third prev-cell) dz) 0)
-        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz))
-        (setf terrain (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell))))
-      (when (or (null terrain)
-                (get-terrain-type-trait terrain +terrain-trait-opaque-floor+))
-        (return-from check-LOS-propagate nil)))
+      (if (> (- (third prev-cell) dz) 0)
+        ;; prev is up, the tile above current has opaque floor
+        (when (and (get-terrain-* (level *world*) dx dy (third prev-cell))
+                   (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+))
+          (return-from check-LOS-propagate nil))
+        ;; prev is down
+        (when (and (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz)
+                   (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) +terrain-trait-opaque-floor+)
+                   (get-terrain-* (level *world*) dx dy dz)
+                   (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+))
+          (return-from check-LOS-propagate nil)))
+      )
 
     (when player-reveal-cell
       (reveal-cell-on-map (level *world*) dx dy dz))
@@ -46,7 +53,61 @@
 
     t))
 
-(defun update-visible-mobs-normal (mob)
+(defun update-visible-mobs-cube (mob)
+  (let ((max-x (if (>= (+ (x mob) (cur-sight mob)) (array-dimension (terrain (level *world*)) 0))
+                   (1- (array-dimension (terrain (level *world*)) 0))
+                   (+ (x mob) (cur-sight mob))))
+        (min-x (if (< (- (x mob) (cur-sight mob)) 0)
+                   0
+                   (- (x mob) (cur-sight mob))))
+        (max-y (if (>= (+ (y mob) (cur-sight mob)) (array-dimension (terrain (level *world*)) 1))
+                   (1- (array-dimension (terrain (level *world*)) 1))
+                   (+ (y mob) (cur-sight mob))))
+        (min-y (if (< (- (y mob) (cur-sight mob)) 0)
+                   0
+                   (- (y mob) (cur-sight mob))))
+        (max-z (if (>= (+ (z mob) (cur-sight mob)) (array-dimension (terrain (level *world*)) 2))
+                   (1- (array-dimension (terrain (level *world*)) 2))
+                   (+ (z mob) (cur-sight mob))))
+        (min-z (if (< (- (z mob) (cur-sight mob)) 0)
+                   0
+                   (- (z mob) (cur-sight mob)))))
+  (loop for dx from min-x to max-x do
+    (loop for dy from min-y to max-y do
+      (loop for dz from min-z to max-z
+            do
+               (block nil
+                 ;(when (or (< dx 0) (< dy 0) (< dz 0) (>= dx (array-dimension (terrain (level *world*)) 0)) (>= dy (array-dimension (terrain (level *world*)) 1)) (>= dz (array-dimension (terrain (level *world*)) 2)))
+                 ;  (return))
+
+                 (when (get-mob-* (level *world*) dx dy dz)
+                   (line-of-sight (x mob) (y mob) (z mob) dx dy dz
+                                  #'(lambda (dx dy dz prev-cell)
+                                      (declare (type fixnum dx dy dz))
+                                      (let* ((exit-result t) (mob-id 0) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
+                                             (dist (get-distance-3d (x mob) (y mob) (z mob) dx dy dz)))
+                                        (declare (type fixnum mob-id cur-sight cur-sight-1)
+                                                 (type float dist))
+                                        (block nil
+                                          
+                                          (when (> dist cur-sight-1)
+                                            (setf exit-result 'exit)
+                                            (return))
+                                          
+                                          (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                            (setf exit-result 'exit)
+                                            (return))
+                                          
+                                          (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                     (not (eq (get-mob-* (level *world*) dx dy dz) mob)))
+                                            (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
+                                            (pushnew mob-id (visible-mobs mob)))
+                                          
+                                          )
+                                        exit-result))))
+                 ))))))
+
+(defun update-visible-mobs (mob)
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
         when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))

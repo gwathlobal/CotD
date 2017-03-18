@@ -741,15 +741,41 @@
               ;; reduce the momentum to zero
               (setf (momentum-dir target) (cons 0 0))
               (setf (momentum-spd target) 0)
-                            
-              (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
-                                     (format nil "~@(~A~) attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target))))
+
+              (cond
+                ((and (get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                      (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                 (progn
+                   (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                          (format nil "~@(~A~) attacks ~A, but ~A evades the attack. " (visible-name attacker) (visible-name target) (visible-name target)))))
+                ((get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                 (progn
+                   (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                          (format nil "~@(~A~) attacks somebody, but it evades the attack. " (visible-name attacker)))))
+                ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                 (progn
+                   (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                          (format nil "Somebody attacks ~A, but ~A evades the attack. " (visible-name target) (visible-name target))))))
+              )
             ;; target did not dodge
             (progn
               (setf failed-dodge nil)
               (when (and (> (cur-dodge target) dodge-chance) (not (eq check-result t)))
-                (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
-                                       (format nil "~@(~A~) attacks ~A, and ~A failes to dodge. " (visible-name attacker) (visible-name target) (visible-name target)))
+                (cond
+                  ((and (get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                        (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                   (progn
+                     (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                            (format nil "~@(~A~) attacks ~A, and ~A failes to dodge. " (visible-name attacker) (visible-name target) (visible-name target)))))
+                  ((get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                   (progn
+                     (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                            (format nil "~@(~A~) attacks somebody, and it failes to dodge. " (visible-name attacker)))))
+                  ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                   (progn
+                     (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                            (format nil "Somebody attacks ~A, and ~A failes to dodge. " (visible-name target) (visible-name target))))))
+                
                 (setf failed-dodge t))
               ;; apply damage
               (setf cur-dmg (+ (random (- (1+ (get-melee-weapon-dmg-max attacker)) (get-melee-weapon-dmg-min attacker))) 
@@ -775,14 +801,55 @@
                       (add-feature-to-level-list (level *world*) 
                                                  (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy) :z (z target)))))))
               (if (zerop cur-dmg)
-                (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
-                                       (format nil "~@(~A~) hits ~A, but ~A is not hurt. " (visible-name attacker) (visible-name target) (visible-name target)))
-                (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
-                                       (format nil "~@(~A~) hits ~A for ~A damage. " (visible-name attacker) (visible-name target) cur-dmg)))
+                (progn
+                  (cond
+                    ((and (get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                     (progn
+                       (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                              (format nil "~@(~A~) hits ~A, but ~A is not hurt. " (visible-name attacker) (visible-name target) (visible-name target)))))
+                    ((get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                     (progn
+                       (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                              (format nil "~@(~A~) hits somebody, but it is not hurt. " (visible-name attacker)))))
+                    ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                     (progn
+                       (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                              (format nil "Somebody hits ~A, but ~A is not hurt. " (visible-name target) (visible-name target)))))))
+                (progn
+                  (cond
+                    ((and (get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                     (progn
+                       (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                              (format nil "~@(~A~) hits ~A for ~A damage. " (visible-name attacker) (visible-name target) cur-dmg))))
+                    ((get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                     (progn
+                       (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                              (format nil "~@(~A~) hits somebody for ~A damage. " (visible-name attacker) cur-dmg))))
+                    ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                     (progn
+                       (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                              (format nil "Somebody hits ~A for ~A damage. " (visible-name target) cur-dmg))))))
+                )
               )))
         (progn
           ;; attacker missed
-          (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) (format nil "~@(~A~) misses ~A. " (visible-name attacker) (visible-name target)))
+          (cond
+            ((and (get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+                  (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+             (progn
+               (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                      (format nil "~@(~A~) misses ~A. " (visible-name attacker) (visible-name target)))))
+            ((get-single-memo-visibility (get-memo-* (level *world*) (x attacker) (y attacker) (z attacker)))
+             (progn
+               (print-visible-message (x attacker) (y attacker) (z attacker) (level *world*) 
+                                      (format nil "~@(~A~) misses somebody. " (visible-name attacker)))))
+            ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+             (progn
+               (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                      (format nil "Somebody misses ~A. " (visible-name target))))))
+          
           ))
       ))
   (when (check-dead target)
