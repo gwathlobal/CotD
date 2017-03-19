@@ -172,14 +172,31 @@
                                                    (loop for off-x of-type fixnum from (- half-size) to (+ half-size)
                                                          for nx of-type fixnum = (+ sx off-x) do
                                                            (loop for off-y of-type fixnum from (- half-size) to (+ half-size)
-                                                                 for ny of-type fixnum = (+ sy off-y)
-                                                                 when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
-                                                                          (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+)
-                                                                          (and (/= (- z cz) 0)
-                                                                               (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-slope-up+))
-                                                                               (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-slope-down+))))
-                                                                   do
-                                                                      (setf result nil)))
+                                                                 for ny of-type fixnum = (+ sy off-y) do
+                                                                 (block nil
+                                                                   (when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
+                                                                             (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
+                                                                     (setf result nil)
+                                                                     (return))
+                                                                   
+                                                                   (when (and (/= (- z cz) 0)
+                                                                              (or (and (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+)
+                                                                                       (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+))
+                                                                                  (and (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-slope-down+)
+                                                                                       (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+))))
+                                                                     (setf result nil)
+                                                                     (return))
+                                                                   
+                                                                   (when (and (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+))
+                                                                              (not (and (/= (- z cz) 0)
+                                                                                        (= cx nx)
+                                                                                        (= cy ny)
+                                                                                        (and (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-slope-down+)
+                                                                                             (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-slope-up+))
+                                                                                        )))
+                                                                     (setf result nil)
+                                                                     (return))
+                                                                   )))
                                                    result))
                                              x y))
                              t

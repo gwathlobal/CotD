@@ -130,6 +130,46 @@
     ;; all checks passed - can move freely
     (return-from check-move-on-level t)))
 
+
+(defmethod apply-gravity ((mob mob))
+  (let ((result nil))
+    (loop for z from (z mob) downto 0 
+          for check-result = (check-move-on-level mob (x mob) (y mob) z)
+          do
+             ;(format t "Z ~A FLOOR ~A~%" z (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
+             (when (eq check-result t)
+               (setf result z))
+             (when (or (not (eq check-result t))
+                       (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
+               (loop-finish)))
+    (when (= result (z mob))
+      (setf result nil))
+
+    result))
+
+(defmethod apply-gravity ((feature feature))
+  (let ((result nil))
+    (loop for z from (z feature) downto 0 
+          do
+             (when (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-opaque-floor+)
+               (setf result z)
+               (loop-finish)))
+    (when (= result (z feature))
+      (setf result nil))
+    result))
+
+(defmethod apply-gravity ((item item))
+  (let ((result nil))
+    (loop for z from (z item) downto 0 
+          do
+             (when (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) z) +terrain-trait-opaque-floor+)
+               (setf result z)
+               (loop-finish)))
+    (when (= result (z item))
+      (setf result nil))
+    result))
+      
+
 (defun set-mob-location (mob x y z)
   (let ((place-func #'(lambda (nmob)
                         (let ((sx) (sy))
@@ -191,6 +231,18 @@
       (t
        (progn
          (funcall place-func mob))))
+
+    ;; apply gravity
+    (when (apply-gravity mob)
+      (let ((init-z (z mob)) (cur-dmg 0))
+        (set-mob-location mob (x mob) (y mob) (apply-gravity mob))
+        (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
+        (decf (cur-hp mob) cur-dmg)
+        (when (> cur-dmg 0)
+          (print-visible-message (x mob) (y mob) (z mob) (level *world*)
+                                 (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
+        (when (check-dead mob)
+          (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))))
     ))
 
 (defun move-mob (mob dir &key (push nil))

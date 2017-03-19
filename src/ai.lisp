@@ -24,11 +24,16 @@
         (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+) 
           (return-from check-move-for-ai nil))
 
+        (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+))
+                   (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-slope-down+)))
+          (return-from check-move-for-ai nil))
+
         ;; check if the z level changes and the mob is not on the up/down slope 
         (when (and (/= (- dz cz) 0)
                    (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-slope-up+))
                    (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-slope-down+)))
-          (return-from check-move-for-ai nil))))
+          (return-from check-move-for-ai nil))
+            ))
 
     t))
 

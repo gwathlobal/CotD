@@ -107,7 +107,7 @@
                                         exit-result))))
                  ))))))
 
-(defun update-visible-mobs (mob)
+(defun update-visible-mobs-normal (mob)
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
         when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))
@@ -276,7 +276,7 @@
   (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))  
   )
 
-(defun draw-fov (cx cy cz r func &optional (limit-z t))
+(defun draw-fov (cx cy cz r func &optional (limit-z nil))
   (declare (optimize (speed 3)))
   (declare (type fixnum cx cy cz r)
            (type function func))

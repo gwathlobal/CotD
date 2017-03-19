@@ -26,7 +26,18 @@
     
     (loop for nx from sx below (+ sx (map-size mob)) do
       (loop for ny from sy below (+ sy (map-size mob)) do
-        (setf (aref (mobs level) nx ny (z mob)) (id mob))))))
+        (setf (aref (mobs level) nx ny (z mob)) (id mob)))))
+
+  (when (apply-gravity mob)
+      (let ((init-z (z mob)) (cur-dmg 0))
+        (set-mob-location mob (x mob) (y mob) (apply-gravity mob))
+        (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
+        (decf (cur-hp mob) cur-dmg)
+        (when (> cur-dmg 0)
+          (print-visible-message (x mob) (y mob) (z mob) level
+                                 (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
+        (when (check-dead mob)
+          (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())))))
 
 (defun remove-mob-from-level-list (level mob)
   (setf (mob-id-list level) (remove (id mob) (mob-id-list level)))
@@ -41,7 +52,12 @@
 
 (defun add-feature-to-level-list (level feature)
   (pushnew (id feature) (feature-id-list level))
-  (push (id feature) (aref (features level) (x feature) (y feature) (z feature))))
+  (push (id feature) (aref (features level) (x feature) (y feature) (z feature)))
+
+  (when (apply-gravity feature)
+    (remove-feature-from-level-list level feature)
+    (setf (z feature) (apply-gravity feature))
+    (add-feature-to-level-list level feature)))
 
 (defun remove-feature-from-level-list (level feature)
   (setf (feature-id-list level) (remove (id feature) (feature-id-list level)))
@@ -49,7 +65,12 @@
 
 (defun add-item-to-level-list (level item)
   (pushnew (id item) (item-id-list level))
-  (push (id item) (aref (items level) (x item) (y item) (z item))))
+  (push (id item) (aref (items level) (x item) (y item) (z item)))
+
+  (when (apply-gravity item)
+    (remove-item-from-level-list level item)
+    (setf (z item) (apply-gravity item))
+    (add-item-to-level-list level item)))
 
 (defun remove-item-from-level-list (level item)
   (setf (item-id-list level) (remove (id item) (item-id-list level)))
