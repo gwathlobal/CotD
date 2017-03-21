@@ -142,7 +142,7 @@
              (when (or (not (eq check-result t))
                        (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
                (loop-finish)))
-    (when (= result (z mob))
+    (when (eq result (z mob))
       (setf result nil))
 
     result))
@@ -154,7 +154,7 @@
              (when (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-opaque-floor+)
                (setf result z)
                (loop-finish)))
-    (when (= result (z feature))
+    (when (eq result (z feature))
       (setf result nil))
     result))
 
@@ -165,7 +165,7 @@
              (when (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) z) +terrain-trait-opaque-floor+)
                (setf result z)
                (loop-finish)))
-    (when (= result (z item))
+    (when (eq result (z item))
       (setf result nil))
     result))
       
