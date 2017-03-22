@@ -199,7 +199,10 @@
                               (setf (aref (mobs (level *world*)) nx ny z) (id nmob))
                               
                               (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z)))
-                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z))) nmob nx ny z))))))))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z))) nmob nx ny z)))))))
+        (orig-x (x mob))
+        (orig-y (y mob))
+        (orig-z (z mob)))
 
     ;; we have 3 cases of movement:
     ;; 1) the mob moves while is riding someone (currently available if the mob teleports somewhere with a mount, as normally the rider does not move, only gives directions to the mount)
@@ -243,6 +246,15 @@
                                  (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
         (when (check-dead mob)
           (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))))
+
+    (format t "Mob ~A [~A]: MOB-ABOVE - ~A, NO-FLOOR-ABOVE ~A~%" (name mob) (id mob) (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))
+            (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+)))
+    
+    ;; apply gravity to the mob, standing on your head if any
+    (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
+               (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+))
+               (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)))
+      (set-mob-location (get-mob-* (level *world*) orig-x orig-y (1+ (z mob))) orig-x orig-y (1+ orig-z)))
     ))
 
 (defun move-mob (mob dir &key (push nil))
