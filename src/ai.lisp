@@ -24,14 +24,21 @@
         (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+) 
           (return-from check-move-for-ai nil))
 
-        (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+))
-                   (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-slope-down+)))
-          (return-from check-move-for-ai nil))
-
-        ;; check if the z level changes and the mob is not on the up/down slope 
+        ;; can go 1) from up to down if the landing tile is floor and is not directly below the source tile
+        ;;        2) from down to up if the source tile is slope up and the landing tile has floor and is not directly above the the source tile
+        ;; in all other cases when trying to move along the z axis - movement is blocked
         (when (and (/= (- dz cz) 0)
-                   (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-slope-up+))
-                   (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-slope-down+)))
+                   (not (and (< (- dz cz) 0)
+                             (or (/= (- dx cx) 0)
+                                 (/= (- dy cy) 0))
+                             (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
+                             (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny (1+ dz)) +terrain-trait-opaque-floor+))))
+                   (not (and (> (- dz cz) 0)
+                             (or (/= (- dx cx) 0)
+                                 (/= (- dy cy) 0))
+                             (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
+                             (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-slope-up+)
+                             (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy (1+ cz)) +terrain-trait-opaque-floor+)))))
           (return-from check-move-for-ai nil))
             ))
 
@@ -447,12 +454,13 @@
                                                                (map-size mob)))))
         (declare (type fixnum rx ry))
 
-        (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to a random nearby place~%" (x mob) (y mob)))
+        (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to go to a random nearby place~%" (x mob) (y mob) (z mob)))
         
         ;; if the mob destination is not set, choose some random location
         (unless (path-dst mob)
           (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
                           (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
+                          (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
                           (and (get-mob-* (level *world*) rx ry rz)
                                (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
                           (/= (aref connect-map (x mob) (y mob) (z mob))
@@ -653,7 +661,8 @@
               ;; if the mob destination is not set, choose a random destination
               (unless (path-dst mob)
                 (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
-                                (get-terrain-type-trait (get-terrain-* (level *world*) rx ry (z mob)) +terrain-trait-blocks-move+)
+                                (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
+                                (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
                                 (and (get-mob-* (level *world*) rx ry (z mob))
                                      (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
                                 (/= (aref connect-map (x mob) (y mob) (z mob))
@@ -669,7 +678,7 @@
 
                (when (= (aref connect-map (x mob) (y mob) (z mob))
                         (aref connect-map (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))
-                 (logger (format nil "THREAD: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (first (path-dst mob)) (second (path-dst mob))) stream)
+                 (logger (format nil "THREAD: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) stream)
                  (setf path (a-star (list (x mob) (y mob) (z mob)) (list (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) 
                                     #'(lambda (dx dy dz cx cy cz) 
                                         ;; checking for impassable objects
