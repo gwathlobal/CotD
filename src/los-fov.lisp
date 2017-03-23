@@ -189,7 +189,15 @@
     (setf glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
     (setf glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
     (setf back-color (back-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
-          
+    
+    ;; if the terrain has no floor, you can see an indication that there is a mob on the tile below
+    (when (and (not (get-terrain-type-trait (get-terrain-* level map-x map-y map-z) +terrain-trait-opaque-floor+))
+               (>= (1- map-z) 0)
+               (get-mob-* level map-x map-y (1- map-z)))
+      (if (get-faction-relation (faction *player*) (get-visible-faction (get-mob-* level map-x map-y (1- map-z))))
+        (setf back-color sdl:*blue*)
+        (setf back-color sdl:*red*)))
+    
     ;; then feature, if any
     (when (get-features-* level map-x map-y map-z)
       (let ((ftr (get-feature-by-id (first (get-features-* level map-x map-y map-z)))))
@@ -272,6 +280,8 @@
   (if (mob-ability-p *player* +mob-abil-see-all+)
     (update-visible-area-all level x y z)
     (update-visible-area-normal level x y z))
+
+  (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
   
   (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))  
   )

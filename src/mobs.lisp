@@ -769,3 +769,14 @@
     ;; return the relation for faction-type-2, if not set - then they are enemies
     (gethash faction-type-2 faction-table)
     ))
+
+(defun get-visible-faction (mob &key (viewer *player*))
+  (let ((result-faction))
+    ;; see the faction of the mob's appearance
+    (setf result-faction (faction (get-mob-type-by-id (face-mob-type-id mob))))
+
+    ;; but if you are really of the same faction, you know the truth
+    (when (= (faction viewer) (faction mob))
+      (setf result-faction (faction mob)))
+
+    result-faction))

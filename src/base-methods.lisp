@@ -246,11 +246,8 @@
                                  (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
         (when (check-dead mob)
           (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))))
-
-    (format t "Mob ~A [~A]: MOB-ABOVE - ~A, NO-FLOOR-ABOVE ~A~%" (name mob) (id mob) (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))
-            (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+)))
     
-    ;; apply gravity to the mob, standing on your head if any
+    ;; apply gravity to the mob, standing on your head, if any
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
                (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+))
                (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)))

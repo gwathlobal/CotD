@@ -15,7 +15,7 @@
                       (> (+ y1 (* 2 (sdl:get-font-height))) (+ y h)))
              (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
              (loop-finish))
-             (cond
+           (cond
                ((= effect +mob-effect-possessed+) (sdl:draw-string-solid-* "Possession" x y1 :color sdl:*red*))
                ((= effect +mob-effect-blessed+) (sdl:draw-string-solid-* "Blessed" x y1 :color sdl:*blue*))
                ((= effect +mob-effect-reveal-true-form+) (sdl:draw-string-solid-* "Revealed" x y1 :color sdl:*red*))
@@ -107,6 +107,33 @@
       ((or (> a -22.5) (<= a 22.5)) (setf result "W")))
     result))
 
+(defun show-visible-mobs (x y w h &key (mob *player*))
+  (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
+    (sdl:fill-surface sdl:*black* :template a-rect))
+  (loop with visible-mobs = (copy-list (visible-mobs mob))
+        with y1 = y
+          initially
+             (setf visible-mobs (stable-sort visible-mobs #'(lambda (a b)
+                                                              (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
+                                                                     (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
+                                                                t
+                                                                nil))
+                                             :key #'get-mob-by-id))
+        for mob-id in visible-mobs
+        for vmob = (get-mob-by-id mob-id)
+        
+        do
+           (draw-glyph x y1 (get-current-mob-glyph-idx vmob :x (x vmob) :y (y vmob) :z (z vmob))
+                       :front-color (get-current-mob-glyph-color vmob)
+                       :back-color (get-current-mob-back-color vmob))
+           (sdl:draw-string-solid-* (format nil "~A~A"
+                                            (visible-name vmob)
+                                            (if (/= (- (z vmob) (z mob)) 0)
+                                              (format nil " (~@d)" (- (z vmob) (z mob)))
+                                              ""))
+                                    (+ x *glyph-w* 10) y1 :color sdl:*white*)
+           (incf y1 *glyph-h*)))
+
 (defun update-screen (win)
   
   ;; filling the background with black rectangle
@@ -115,7 +142,8 @@
   (update-map-area)
     
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
-  (show-small-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 20))
+  (show-small-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 200 10))
+  (show-visible-mobs (- *window-width* 200) (- *window-height* *msg-box-window-height* 10) 200 *msg-box-window-height*)
     
   (sdl:update-display)
   

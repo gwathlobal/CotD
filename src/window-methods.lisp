@@ -74,15 +74,19 @@
 		       :front-color (get-single-memo-glyph-color single-memo) 
 		       :back-color (get-single-memo-back-color single-memo)))))))
 
-(defun display-animation-on-map (map-x map-y glyph-idx glyph-color back-color)
+(defun display-animation-on-map (map-x map-y map-z glyph-idx glyph-color back-color)
   (let ((scr-x 0) (scr-y 0))
     (declare (type fixnum scr-x scr-y))
+    
+    (when (/= (view-z *player*) map-z)
+      (return-from display-animation-on-map nil))
+
     (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
       ;; calculate the coordinates where to draw the animation
       
       (setf scr-x (+ (* (- map-x sx) *glyph-w*) *glyph-w*))
       (setf scr-y (+ (* (- map-y sy) *glyph-h*) *glyph-h*))
-      (format t "MAP-X ~A MAP-Y ~A; SX ~A SY ~A; SCR-X ~A SCR-Y ~A~%" map-x map-y sx sy scr-x scr-y)
+      ;(format t "MAP-X ~A MAP-Y ~A; SX ~A SY ~A; SCR-X ~A SCR-Y ~A~%" map-x map-y sx sy scr-x scr-y)
       
       ;; drawing glyph
       (draw-glyph scr-x scr-y glyph-idx 
@@ -94,6 +98,10 @@
 (defun display-cell-on-map (map-x map-y map-z &key (array (memo (level *world*))))
   (let ((scr-x 0) (scr-y 0) (single-memo))
     (declare (type fixnum scr-x scr-y))
+
+    (when (/= (view-z *player*) map-z)
+      (return-from display-cell-on-map nil))
+    
     (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
     ;; calculate the coordinates where to draw the animation
     

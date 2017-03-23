@@ -4,10 +4,11 @@
                                     :func #'(lambda (animation)
                                               (let ((x (anim-x animation))
                                                     (y (anim-y animation))
+                                                    (z (anim-z animation))
                                                     (glyph-idx 10)
                                                     (glyph-color (sdl:color :r 255 :g 140 :b 0))
                                                     (back-color sdl:*black*))
-                                                (display-animation-on-map x y glyph-idx glyph-color back-color)
+                                                (display-animation-on-map x y z glyph-idx glyph-color back-color)
                                                 ))
                                                   
                                     ))
@@ -31,10 +32,10 @@
                                                                        (unless (check-LOS-propagate dx dy dz prev-cell :check-move t)
                                                                          (setf exit-result 'exit)
                                                                          (return))
-                                                                       
+
                                                                        (setf tx dx ty dy tz dz)
                                                                        ;; display a severed flying body part
-                                                                       (display-animation-on-map dx dy 5 sdl:*red* sdl:*black*)
+                                                                       (display-animation-on-map dx dy dz 5 sdl:*red* sdl:*black*)
                                                                        (sdl:update-display)
                                                                        (sdl-cffi::sdl-delay 100)
                                                                        
