@@ -244,7 +244,7 @@
                     (read-options s-expr *options*))))   
         (progn 
           (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
-            (format file "~%;; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\" or \"small\"~%(tiles large)~%")
+            (format file "~%;; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\"~%(tiles large)~%")
             (format file "~%;; FONT: Changes the size of text font~%;; Format (font <font type>)~%;; <font type> can be (without quotes) \"font-6x13\" or \"font-8x13\"~%(font font-6x13)")))
         )
       
