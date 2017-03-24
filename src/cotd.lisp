@@ -251,7 +251,6 @@
       ;; set parameters depending on options
       ;; tiles
       (cond
-        ((equal (options-tiles *options*) 'small) (setf *glyph-w* 10 *glyph-h* 10 tiles-path "data/font_small.bmp"))
         (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
       ;; font
       (cond
