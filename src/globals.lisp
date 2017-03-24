@@ -191,6 +191,7 @@
 (defconstant +terrain-slope-stone-up+ 30)
 (defconstant +terrain-slope-stone-down+ 31)
 (defconstant +terrain-wall-earth+ 32)
+(defconstant +terrain-wall-bush+ 33)
 
 (defparameter *faction-table* (make-hash-table))
 

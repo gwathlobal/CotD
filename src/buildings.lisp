@@ -15,6 +15,7 @@
 (defconstant +building-type-warehouse+ 8)
 (defconstant +building-type-satanists+ 9)
 (defconstant +building-type-stables+ 10)
+(defconstant +building-type-mansion+ 11)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -54,6 +55,8 @@
 (defconstant +building-city-barricade-nw+ 32)
 (defconstant +building-city-barricade-ne+ 33)
 (defconstant +building-city-stables-1+ 34)
+(defconstant +building-city-mansion-1+ 35)
+(defconstant +building-city-mansion-2+ 36)
 
 (defparameter *level-grid-size* 5)
 
@@ -116,6 +119,7 @@
                ((char= c #\Space) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-air+))
                ((char= c #\u) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-slope-stone-up+))
                ((char= c #\d) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-slope-stone-down+))
+               ((char= c #\*) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-wall-bush+))
                )
              (incf x1)
           )))

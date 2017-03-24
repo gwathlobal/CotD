@@ -166,154 +166,222 @@
                                                           (list +mob-type-child+ 4 5 (+ z 1)))
                                                     nil))))
 
-(set-building-type (make-building :id +building-city-townhall-1+ :grid-dim '(4 . 2) :act-dim '(16 . 9) :type +building-type-townhall+
+(set-building-type (make-building :id +building-city-townhall-1+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,"
                                                                             ",####......####,"
                                                                             ",#```......```#,"
                                                                             ",#```......```#,"
+                                                                            ",#```......```#,"
                                                                             ",##-###..###-##,"
                                                                             ",#...#c..c#...#,"
-                                                                            ",#ht........th#,"
+                                                                            ",#............#,"
+                                                                            ",##u.#....#.th#,"
                                                                             ",###-##--##-###,"
                                                                             ",,,,,,,,,,,,,,,,"))
-
+                                                  
                                                   (build-template-z-3 (list "                "
                                                                             " ....      .... "
                                                                             " .            . "
                                                                             " .            . "
-                                                                            " .............. "
-                                                                            " .............. "
-                                                                            " .............. "
-                                                                            " .............. "
+                                                                            " .            . "
+                                                                            " ##-###-###.... "
+                                                                            " #...#....#.... "
+                                                                            " #............. "
+                                                                            " #.d.#c.ht#.... "
+                                                                            " ###-##-###.... "
+                                                                            "                "))
+
+                                                  (build-template-z-4 (list "                "
+                                                                            "                "
+                                                                            "                "
+                                                                            "                "
+                                                                            "                "
+                                                                            " ..........     "
+                                                                            " ..........     "
+                                                                            " ..........     "
+                                                                            " ..........     "
+                                                                            " ..........     "
                                                                             "                ")))
                                               ;; we assume that z = 2
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
                                               )
-                                            (values (list (list +mob-type-clerk+ 3 5 z)
-                                                          (list +mob-type-clerk+ 7 6 z)
-                                                          (list +mob-type-clerk+ 12 5 z))
+                                            (values (list (list +mob-type-clerk+ 7 8 (+ z 1))
+                                                          (list +mob-type-clerk+ 7 8 z)
+                                                          (list +mob-type-clerk+ 12 7 z))
                                                     nil))))
 
-(set-building-type (make-building :id +building-city-townhall-2+ :grid-dim '(4 . 2) :act-dim '(16 . 9) :type +building-type-townhall+
+(set-building-type (make-building :id +building-city-townhall-2+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,"
                                                                             ",###-##--##-###,"
-                                                                            ",#ht........th#,"
+                                                                            ",#ht.#....#.u##,"
+                                                                            ",#............#,"
                                                                             ",#...#c..c#...#,"
                                                                             ",##-###..###-##,"
+                                                                            ",#```......```#,"
                                                                             ",#```......```#,"
                                                                             ",#```......```#,"
                                                                             ",####......####,"
                                                                             ",,,,,,,,,,,,,,,,"))
 
                                                   (build-template-z-3 (list "                "
-                                                                            " .............. "
-                                                                            " .............. "
-                                                                            " .............. "
-                                                                            " .............. "
+                                                                            " ....###-##-### "
+                                                                            " ....#th.c#.d.# "
+                                                                            " .............# "
+                                                                            " ....#....#...# "
+                                                                            " ....###-###-## "
+                                                                            " .            . "
                                                                             " .            . "
                                                                             " .            . "
                                                                             " ....      .... "
+                                                                            "                "))
+
+                                                  (build-template-z-4 (list "                "
+                                                                            "     .......... "
+                                                                            "     .......... "
+                                                                            "     .......... "
+                                                                            "     .......... "
+                                                                            "     .......... "
+                                                                            "                "
+                                                                            "                "
+                                                                            "                "
+                                                                            "                "
                                                                             "                ")))
                                               ;; we assume that z = 2
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
                                               )
                                             (values (list (list +mob-type-clerk+ 3 3 z)
-                                                          (list +mob-type-clerk+ 12 3 z)
+                                                          (list +mob-type-clerk+ 8 3 (+ z 1))
                                                           (list +mob-type-clerk+ 8 2 z))
                                                     nil))))
 
-(set-building-type (make-building :id +building-city-townhall-3+ :grid-dim '(2 . 4) :act-dim '(9 . 16) :type +building-type-townhall+
+(set-building-type (make-building :id +building-city-townhall-3+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,,"
-                                                                            ",#######,"
-                                                                            ",#h.#``#,"
-                                                                            ",#t.-``#,"
-                                                                            ",-..#``#,"
-                                                                            ",#.##...,"
-                                                                            ",#.c#...,"
-                                                                            ",-......,"
-                                                                            ",-......,"
-                                                                            ",#.c#...,"
-                                                                            ",#.##...,"
-                                                                            ",-..#``#,"
-                                                                            ",#t.-``#,"
-                                                                            ",#h.#``#,"
-                                                                            ",#######,"
-                                                                            ",,,,,,,,,"))
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,,"
+                                                                            ",#########,"
+                                                                            ",##..#```#,"
+                                                                            ",#u..-```#,"
+                                                                            ",-...#```#,"
+                                                                            ",##.##....,"
+                                                                            ",#..c#....,"
+                                                                            ",-........,"
+                                                                            ",-........,"
+                                                                            ",#..c#....,"
+                                                                            ",##.##....,"
+                                                                            ",-...#```#,"
+                                                                            ",#t..-```#,"
+                                                                            ",#h..#```#,"
+                                                                            ",#########,"
+                                                                            ",,,,,,,,,,,"))
+
+                                                  (build-template-z-3 (list "           "
+                                                                            " #####.... "
+                                                                            " #...#   . "
+                                                                            " #d..-   . "
+                                                                            " -...#   . "
+                                                                            " ##.##     "
+                                                                            " #..c#     "
+                                                                            " -...-     "
+                                                                            " #h..#     "
+                                                                            " #t..#     "
+                                                                            " ##.##     "
+                                                                            " .....   . "
+                                                                            " .....   . "
+                                                                            " .....   . "
+                                                                            " ......... "
+                                                                            "           "))
                                                   
-                                                  (build-template-z-3 (list "         "
-                                                                            " ....... "
-                                                                            " ....  . "
-                                                                            " ....  . "
-                                                                            " ....  . "
-                                                                            " ....    "
-                                                                            " ....    "
-                                                                            " ....    "
-                                                                            " ....    "
-                                                                            " ....    "
-                                                                            " ....    "
-                                                                            " ....  . "
-                                                                            " ....  . "
-                                                                            " ....  . "
-                                                                            " ....... "
-                                                                            "         "
-                                                                            )))
+                                                  (build-template-z-4 (list "           "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            " .....     "
+                                                                            "           "
+                                                                            "           "
+                                                                            "           "
+                                                                            "           "
+                                                                            "           ")))
                                               ;; we assume that z = 2
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
                                               )
-                                            (values (list (list +mob-type-clerk+ 2 2 z)
+                                            (values (list (list +mob-type-clerk+ 2 8 (+ z 1))
                                                           (list +mob-type-clerk+ 2 13 z)
                                                           (list +mob-type-clerk+ 2 8 z))
                                                     nil))))
 
-(set-building-type (make-building :id +building-city-townhall-4+ :grid-dim '(2 . 4) :act-dim '(9 . 16) :type +building-type-townhall+
+(set-building-type (make-building :id +building-city-townhall-4+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,,"
-                                                                            ",#######,"
-                                                                            ",#``#.h#,"
-                                                                            ",#``-.t#,"
-                                                                            ",#``#..#,"
-                                                                            ",...##.#,"
-                                                                            ",...#c.#"
-                                                                            ",......-,"
-                                                                            ",......-,"
-                                                                            ",...#c.#,"
-                                                                            ",...##.#,"
-                                                                            ",#``#..-,"
-                                                                            ",#``-.t#,"
-                                                                            ",#``#.h#,"
-                                                                            ",#######,"
-                                                                            ",,,,,,,,,"))
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,,"
+                                                                            ",#########,"
+                                                                            ",#```#..h#,"
+                                                                            ",#```-..t#,"
+                                                                            ",#```#...#,"
+                                                                            ",....##.##,"
+                                                                            ",....#c..#,"
+                                                                            ",........-,"
+                                                                            ",........-,"
+                                                                            ",....#c..#,"
+                                                                            ",....##.##,"
+                                                                            ",#```#...-,"
+                                                                            ",#```-..u#,"
+                                                                            ",#```#..##,"
+                                                                            ",#########,"
+                                                                            ",,,,,,,,,,,"))
 
-                                                  (build-template-z-3 (list "         "
-                                                                            " ....... "
-                                                                            " .  .... "
-                                                                            " .  .... "
-                                                                            " .  .... "
-                                                                            "    .... "
-                                                                            "    .... "
-                                                                            "    .... "
-                                                                            "    .... "
-                                                                            "    .... "
-                                                                            "    .... "
-                                                                            " .  .... "
-                                                                            " .  .... "
-                                                                            " .  .... "
-                                                                            " ....... "
-                                                                            "         "
-                                                                            )))
+                                                  (build-template-z-3 (list "           "
+                                                                            " ......... "
+                                                                            " .   ..... "
+                                                                            " .   ..... "
+                                                                            " .   ..... "
+                                                                            "     ##.## "
+                                                                            "     #..t# "
+                                                                            "     #..h# "
+                                                                            "     -...- "
+                                                                            "     #..c# "
+                                                                            "     ##.## "
+                                                                            " .   #...- "
+                                                                            " .   -..d# "
+                                                                            " .   #...# "
+                                                                            " ....##### "
+                                                                            "           "))
+
+                                                  (build-template-z-4 (list "           "
+                                                                            "           "
+                                                                            "           "
+                                                                            "           "
+                                                                            "           "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "     ..... "
+                                                                            "           ")))
                                               ;; we assume that z = 2
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
                                               )
-                                            (values (list (list +mob-type-clerk+ 5 2 z)
-                                                          (list +mob-type-clerk+ 5 13 z)
-                                                          (list +mob-type-clerk+ 5 8 z))
+                                            (values (list (list +mob-type-clerk+ 7 2 z)
+                                                          (list +mob-type-clerk+ 7 8 (+ z 1))
+                                                          (list +mob-type-clerk+ 7 8 z))
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-park-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
@@ -612,25 +680,63 @@
                                                                             ",,,,,,,,,,,,,,,,,"))
 
                                                   (build-template-z-3 (list "                 "
+                                                                            "      #####      "
+                                                                            "     ##   ##     "
+                                                                            " #####     ##### "
+                                                                            " #             # "
+                                                                            " -             - "
+                                                                            " #             # "
+                                                                            " ##-#       #-## "
+                                                                            "    -       -    "
+                                                                            "    #       #    "
+                                                                            "    #       #    "
+                                                                            "    -       -    "
+                                                                            " ####       #### "
+                                                                            " #  #       #  # "
+                                                                            " #  #       #  # "
+                                                                            " ####-#####-#### "
+                                                                            "                 "))
+
+                                                  (build-template-z-4 (list "                 "
                                                                             "      .....      "
+                                                                            "     ..###..     "
+                                                                            " .....## ##..... "
+                                                                            " .#####   #####. "
+                                                                            " .#           #. "
+                                                                            " .####     ####. "
+                                                                            " ....#     #.... "
+                                                                            "    .#     #.    "
+                                                                            "    .#     #.    "
+                                                                            "    .#     #.    "
+                                                                            "    .#     #.    "
+                                                                            " ....#     #.... "
+                                                                            " ....#     #.... "
+                                                                            " ....#     #.... "
+                                                                            " ....#######.... "
+                                                                            "                 "))
+
+                                                  (build-template-z-5 (list "                 "
+                                                                            "                 "
+                                                                            "       ...       "
+                                                                            "      .....      "
+                                                                            "  .............  "
+                                                                            "  .............  "
+                                                                            "  .............  "
                                                                             "     .......     "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            "    .........    "
-                                                                            "    .........    "
-                                                                            "    .........    "
-                                                                            "    .........    "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
                                                                             "                 ")))
                                               ;; we assume that z = 2
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 3) build-template-z-5 template-level)
                                               )
                                             (values (list (list +mob-type-priest+ 8 2 z)
                                                           (list +mob-type-priest+ 3 4 z)
@@ -1041,7 +1147,7 @@
                                                                             " ............ "
                                                                             " ............ "
                                                                             " ............ "
-                                                                            " ............ "
+                                                                            "              "
                                                                             )))
                                               ;; we assume that z = 2
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
@@ -1059,4 +1165,120 @@
                                                           (list +mob-type-horse+ 11 8 z)
                                                           (list +mob-type-horse+ 11 10 z)
                                                           (list +mob-type-horse+ 11 12 z))
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-mansion-1+ :grid-dim '(4 . 3) :act-dim '(18 . 14) :type +building-type-mansion+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,,,,,"
+                                                                            ",,###-#-###-#-###,,"
+                                                                            ",,#B..#.c#c.#..c#,,"
+                                                                            ",,#B.....u.....c-,,"
+                                                                            ",,#B..#c...c#..c#,,"
+                                                                            ",,##.####-####-##,,"
+                                                                            ",,#...#`````````*,,"
+                                                                            ",,#....`````````*,,"
+                                                                            ",,#...#`````````*,,"
+                                                                            ",,#...#`````````*,,"
+                                                                            ",,##.##**********,,"
+                                                                            ",,,,,,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,,,,,"))
+
+                                                  (build-template-z-3 (list "                   "
+                                                                            "                   "
+                                                                            "  ###-#-###-#....  "
+                                                                            "  #...#.....#..h.  "
+                                                                            "  #ht....d.....t.  "
+                                                                            "  #...#BB.BB#..h.  "
+                                                                            "  ##.####-###....  "
+                                                                            "  #c..#            "
+                                                                            "  #...-            "
+                                                                            "  #..t-            "
+                                                                            "  #b.h#            "
+                                                                            "  ##-##            "
+                                                                            "                   "
+                                                                            "                   "))
+
+                                                  (build-template-z-4 (list "                   "
+                                                                            "                   "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "                   "
+                                                                            "                   ")))
+                                              ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              )
+                                            (values (list (list +mob-type-man+ 4 4 z)
+                                                          (list +mob-type-woman+ 9 4 z)
+                                                          (list +mob-type-woman+ 14 4 z)
+                                                          (list +mob-type-child+ 4 8 (+ z 1))
+                                                          (list +mob-type-man+ 5 4 (+ z 1)))
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-mansion-2+ :grid-dim '(4 . 3) :act-dim '(18 . 14) :type +building-type-mansion+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,,,,,"
+                                                                            ",,##.##**********,,"
+                                                                            ",,#...#`````````*,,"
+                                                                            ",,#...#`````````*,,"
+                                                                            ",,#....`````````*,,"
+                                                                            ",,#...#`````````*,,"
+                                                                            ",,##.####-####-##,,"
+                                                                            ",,#B..#c...c#..c#,,"
+                                                                            ",,#B.....u.....c-,,"
+                                                                            ",,#B..#.c#c.#..c#,,"
+                                                                            ",,###-#-###-#-###,,"
+                                                                            ",,,,,,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,,,,,"))
+
+                                                  (build-template-z-3 (list "                   "
+                                                                            "                   "
+                                                                            "  ##-##            "
+                                                                            "  #b.h#            "
+                                                                            "  #..t-            "
+                                                                            "  #...-            "
+                                                                            "  #c..#            "
+                                                                            "  ##.####-###....  "
+                                                                            "  #...#BB.BB#..h.  "
+                                                                            "  #ht....d.....t.  "
+                                                                            "  #...#.....#..h.  "
+                                                                            "  ###-#-###-#....  "
+                                                                            "                   "
+                                                                            "                   "))
+
+                                                  (build-template-z-4 (list "                   "
+                                                                            "                   "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "  .....            "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "  ...........      "
+                                                                            "                   "
+                                                                            "                   ")))
+                                              ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              )
+                                            (values (list (list +mob-type-man+ 4 9 z)
+                                                          (list +mob-type-woman+ 9 9 z)
+                                                          (list +mob-type-woman+ 14 9 z)
+                                                          (list +mob-type-child+ 4 4 (+ z 1))
+                                                          (list +mob-type-man+ 5 9 (+ z 1)))
                                                     nil))))
