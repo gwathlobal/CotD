@@ -146,10 +146,10 @@
                                                            (loop repeat (sqrt (* (array-dimension (terrain (level world)) 0) (array-dimension (terrain (level world)) 1)))
                                                                  for x = (random (array-dimension (terrain (level world)) 0))
                                                                  for y = (random (array-dimension (terrain (level world)) 1))
-                                                                 when (= (get-terrain-* (level world) x y 0) +terrain-floor-snow-prints+)
+                                                                 when (= (get-terrain-* (level world) x y 2) +terrain-floor-snow-prints+)
                                                                    do
                                                                       (logger (format nil "GAME-EVENT: Snow falls at (~A ~A)~%" x y))
-                                                                      (set-terrain-* (level world) x y 0 +terrain-floor-snow+))
+                                                                      (set-terrain-* (level world) x y 2 +terrain-floor-snow+))
                                                            )))
 
 (set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-n+ :disabled nil

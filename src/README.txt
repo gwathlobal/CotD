@@ -23,6 +23,7 @@ FEATURES
  - Blood and gore
  - Mounted combat
  - Multi-tile monsters
+ - 3D map
 
 --------------------
 GENERAL TIPS
@@ -77,6 +78,10 @@ KEYBINDINGS
  l                              - Look mode
  f                              - Fire mode
  r                              - Reload
+
+ Shift + ,                      - Look up (while in look/fire mode)
+
+ Shift + .                      - Look down (while in look/fire mode)
 
  Shift + 2                      - Character screen
  m                              - View messages

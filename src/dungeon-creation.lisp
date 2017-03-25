@@ -58,7 +58,6 @@
     
     (logger (format nil "Creating actual level ~A~%" 0))
     (setf (level world) (create-level-from-template result-template))
-    (logger (format nil "HERE~%"))
     
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)

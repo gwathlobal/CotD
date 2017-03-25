@@ -1,7 +1,7 @@
 CHANGELOG
 
 - The 3rd dimension was added to the map! Buildings now have several floors, mobs can go up and down the slopes.
-- Gravity added. You can step off the edges and fall down. You can drop one Z level without any consequences but any distance greater than that and you will take increasing falling damage.
+- Gravity added! You can step off the ledges and fall down. You can drop one Z level without any consequences but any distance greater than that and you will take increasing falling damage.
 - Mobs will now reconize gravity and will short-cut off the ledges if they see they won't take any damage without finding the nearest slope down.
 - Added mansions to the building types.
 

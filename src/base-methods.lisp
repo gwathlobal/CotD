@@ -182,7 +182,7 @@
                           (loop for nx from sx below (+ sx (map-size nmob)) do
                             (loop for ny from sy below (+ sy (map-size nmob)) do
                               (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob))))
-                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny z))) nmob nx ny (z nmob)))
+                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob)))) nmob nx ny (z nmob)))
                               (setf (aref (mobs (level *world*)) nx ny (z nmob)) nil)))
                           
                           ;; change the coords of the center of the mob
@@ -481,6 +481,7 @@
                 (loop-finish))
                )
           finally
+             (setf (order-for-next-turn mob) nil)
              (cond
                ((mob-ability-p mob +mob-abil-momentum+) (when (zerop (momentum-spd mob))
                                                           (setf (momentum-dir mob) (cons 0 0))))

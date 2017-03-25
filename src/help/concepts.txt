@@ -41,3 +41,8 @@ Some units (a Gargantaur) are so huge that they occupy several tiles on the leve
  - They can melee attack several enemies at the same time. For example, a Gargantaur has the size of 3x3 and can crush up to 3 units standing next to it.
  
 Multi-tile units may also serve as mounts (for example, Angels can dominate Gargantaurs). Riding one will give excellent protection against melee attacks, but you will still have to cope with the creature's size and the necessity to turn it around to move in the desired direction.
+
+
+GRAVITY
+
+When you step into a tile with no floor in it (like empty air), you will fall down until you hit something solid. If the distance that you have traveled while falling is more than 1 Z level, you will take 5 damage for each level beyond 1.

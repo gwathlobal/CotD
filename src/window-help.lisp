@@ -6,6 +6,8 @@
 (defconstant +win-help-page-keybindings+ 3)
 (defconstant +win-help-page-credits+ 4)
 
+;; It is required for the help to be displayed correctly (without double newlines), that the help txt files are saved with Unix-style endlines
+;; By default when cloning a repository from Github to Windows in creates txt files with Windows-style endlines 
 
 (defclass help-window (window)
   ((cur-page :initform +win-help-page-menu+ :accessor cur-page)

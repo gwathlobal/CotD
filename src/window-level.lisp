@@ -320,7 +320,7 @@
 			(when (and (sdl:key= key :sdl-key-l) (= mod 0))
 			  (setf *current-window* (make-instance 'map-select-window 
 								:return-to *current-window*
-								:cmd-str ""
+								:cmd-str "[<] Look up  [>] Look down  "
 								:exec-func #'(lambda ()
 									       nil)))
 			  (make-output *current-window*))
@@ -338,7 +338,7 @@
                                 (progn
                                   (setf *current-window* (make-instance 'map-select-window 
                                                                         :return-to *current-window*
-                                                                        :cmd-str "[Enter] Fire  "
+                                                                        :cmd-str "[Enter] Fire  [<] Look up  [>] Look down  "
                                                                         :check-lof t
                                                                         :exec-func #'(lambda ()
                                                                                        (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
