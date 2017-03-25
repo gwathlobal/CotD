@@ -77,7 +77,8 @@
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
   
-  (clear-message-list)
+  (clear-message-list *full-message-box*)
+  (clear-message-list *small-message-box*)
   
   (setf *cur-angel-names* (copy-list *init-angel-names*))
   (setf *cur-demon-names* (copy-list *init-demon-names*))
@@ -291,6 +292,16 @@
        (setf *start-func* #'(lambda () (go start-tag)))
      start-tag
        (multiple-value-bind (layout-id weather-id faction-id) (main-menu)
+         (setf *current-window* (make-instance 'loading-window 
+                                               :update-func #'(lambda ()
+                                                                (when (/= *max-progress-bar* 0) 
+                                                                  (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
+                                                                    (let ((str (format nil "Generating map... ~3D%" (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
+                                                                      (sdl:draw-string-solid-*  str
+                                                                                                (truncate (- (/ *window-width* 2) (/ (* (length str) 6) 2)))
+                                                                                                (truncate (- (/ *window-height* 2) (/ 13 2)))
+                                                                                                :color sdl:*white*))
+                                                                    )))))
          (init-game layout-id weather-id faction-id))
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
@@ -312,6 +323,7 @@
      exit-tag
        ;; destroy the thread once the game is about to be exited
        (when (and *path-thread* (bt:thread-alive-p *path-thread*)) (bt:destroy-thread *path-thread*))
+       ;(when (and *fov-thread* (bt:thread-alive-p *fov-thread*)) (bt:destroy-thread *fov-thread*))
      nil))
 )
 

@@ -77,11 +77,11 @@
 (defun show-small-message-box (x y w &optional (h *msg-box-window-height*))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
     (sdl:fill-surface sdl:*black* :template a-rect)) 
-  (let ((max-lines (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :count-only t)))
+  (let ((max-lines (write-text (get-msg-str-list *small-message-box*) (sdl:rectangle :x x :y y :w w :h h) :count-only t)))
     (when (> (message-list-length) 0)
-      (write-text (get-msg-str-list) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
-                                                                                       (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
-                                                                                       0)))))
+      (write-text (get-msg-str-list *small-message-box*) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
+                                                                                                           (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
+                                                                                                           0)))))
 
 (defun sense-good-evil-str ()
   (let ((str (create-string)) (first t))
@@ -161,6 +161,10 @@
        (:quit-event () (funcall (quit-func *current-window*)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
                         (declare (ignore unicode))
+
+                        ;; remove the messages from the small message box
+                        (clear-message-list *small-message-box*)
+                        
                         ;;------------------
 			;; moving - arrows
 			(when (or (sdl:key= key :sdl-key-pageup) (sdl:key= key :sdl-key-kp9))

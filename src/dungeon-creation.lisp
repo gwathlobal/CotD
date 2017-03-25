@@ -31,7 +31,7 @@
         (game-event-list)
 	)
     ;; resetting the progress bar
-    (setf *max-progress-bar* 2)
+    (setf *max-progress-bar* 8)
     (setf *cur-progress-bar* 0)
     (funcall *update-screen-closure*)
 
@@ -84,8 +84,19 @@
     ;; check map for connectivity
     ;(time (progn
     (create-connect-map (level world) 1)
+
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure*)
+    
     (create-connect-map (level world) 3)
+
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure*)
+    
     (create-connect-map (level world) 5)
+
     ;))
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
