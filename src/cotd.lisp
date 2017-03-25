@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 (in-package :cotd)
 
 (defun game-loop ()
@@ -245,14 +246,13 @@
                     (read-options s-expr *options*))))   
         (progn 
           (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
-            (format file "~%;; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\" or \"small\"~%(tiles large)~%")
+            (format file "~%;; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\"~%(tiles large)~%")
             (format file "~%;; FONT: Changes the size of text font~%;; Format (font <font type>)~%;; <font type> can be (without quotes) \"font-6x13\" or \"font-8x13\"~%(font font-6x13)")))
         )
       
       ;; set parameters depending on options
       ;; tiles
       (cond
-        ((equal (options-tiles *options*) 'small) (setf *glyph-w* 10 *glyph-h* 10 tiles-path "data/font_small.bmp"))
         (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
       ;; font
       (cond

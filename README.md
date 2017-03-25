@@ -5,10 +5,13 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-Mar 6, 2017 v1.0.8
+Mar 25, 2017 v1.0.9
 
-- Added Gargantaur to the list of monsters. This is a huge outsider beast (occupies 3x3 tiles) that is impervious to most attacks, can attack minds of enemies, as well as heal and teleport itself. While it is classified as an angelic being, do not get it wrong - it will attack anything in sight. Being huge, it has a "face" so unlike smaller beings it will need to really turn around to change the direction of its movement.
-- Angels are now able to mount Gargantaurs at the cost of half of their HP. Apart from increasing their defense (the Gargantaur's 3x3 size means that it will take all melee hits first), this gives them an ability to invoke Gargantaur's mind burn.
+- The 3rd dimension was added to the map! Buildings now have several floors, mobs can go up and down the slopes.
+- Gravity added! You can step off the ledges and fall down. You can drop one Z level without any consequences but any distance greater than that and you will take increasing falling damage.
+- Mobs will now recognize the gravity and will short-cut off the ledges if they see they won't take any damage without finding the nearest slope down.
+- Added mansions to the building types.
+- Removed support of small tiles.
 
 CURRENT CHANGELOG
 

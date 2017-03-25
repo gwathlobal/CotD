@@ -135,7 +135,7 @@
 
 (defmethod ai-function ((mob mob))
   ;(declare (optimize (speed 3)))
-  (logger (format nil "~%AI-Function Computer ~A [~A]~%" (name mob) (id mob)))
+  (logger (format nil "~%AI-Function Computer ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
   
   ;; skip and invoke the master AI
   (when (master-mob-id mob)
@@ -644,7 +644,8 @@
     (bt:with-lock-held ((path-lock *world*))      
       (if (and (< (cur-mob-path *world*) (length (mob-id-list (level *world*)))) (not (made-turn *player*)))
         (progn
-          (when (and (not (dead= (get-mob-by-id (cur-mob-path *world*))))
+          (when (and (not (eq *player* (get-mob-by-id (cur-mob-path *world*))))
+                     (not (dead= (get-mob-by-id (cur-mob-path *world*))))
                      (not (path (get-mob-by-id (cur-mob-path *world*)))))
             (logger (format nil "~%THREAD: Mob ~A [~A] calculates paths~%" (name (get-mob-by-id (cur-mob-path *world*))) (id (get-mob-by-id (cur-mob-path *world*)))) stream)
             (let* ((mob (get-mob-by-id (cur-mob-path *world*)))
