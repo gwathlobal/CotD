@@ -92,6 +92,16 @@
                              ))
 
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-thief+ 
+                                       :name "Thief"
+                                       :glyph-idx 32 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 7 :max-fp 5
+                                       :faction +faction-type-humans+
+                                       :weapon (list "Knife" (list +weapon-dmg-iron+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 30
+                                       :strength 1
+                                       :abil-human t :abil-death-from-above t
+                             ))
+
+
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-soldier+ 
                                        :name "Soldier"
                                        :glyph-idx 32 :glyph-color sdl:*green* :back-color sdl:*black* :max-hp 8 :max-fp 0

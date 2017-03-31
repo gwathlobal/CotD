@@ -1572,3 +1572,114 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-death-from-above+ :name "Death from above" :descr "Jump from above on your prey and land a devastating attack for 5-8 iron dmg." 
+                                 :cd 1 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-DEATH-FROM-ABOVE: ~A [~A] uses death from above on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A strikes from above. " (visible-name actor)))
+                                                                                                
+                                                (let ((tx (x actor)) (ty (y actor)))
+                                                  (check-surroundings (x target) (y target) nil
+                                                                      #'(lambda (dx dy)
+                                                                          (when (eq (check-move-on-level actor dx dy (z target)) t)
+                                                                            (setf tx dx ty dy))))
+                                                  (set-mob-location actor tx ty (z target)))
+
+                                                (make-melee-attack actor target :weapon (list "Knife" (list +weapon-dmg-iron+ 5 8 +normal-ap+ 100 ()) ())
+                                                                                :acc 100 :no-dodge t :make-act nil)
+                                                
+                                                (when (check-dead target)
+                                                  (when (mob-effect-p target +mob-effect-possessed+)
+                                                    (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+                                                    (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-death-from-above+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor actor (id ability-type))
+                                                           nearest-enemy
+                                                           ;; check if you are above
+                                                           (> (z actor) (z nearest-enemy))
+                                                           ;; check if you are not too far
+                                                           (< (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 3)
+                                                           ;; check if there is unobstructed line of sight
+                                                           (funcall #'(lambda ()
+                                                                        (let ((result t) (x (x actor)) (y (y actor)))
+                                                                          (when (and (<= (abs (- (x actor) (x nearest-enemy))) 1)
+                                                                                     (<= (abs (- (y actor) (y nearest-enemy))) 1))
+                                                                            (setf x (x nearest-enemy) y (y nearest-enemy)))
+                                                                          (line-of-sight x y (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)
+                                                                                         #'(lambda (dx dy dz prev-cell)
+                                                                                             (declare (type fixnum dx dy dz))
+                                                                                             (let* ((exit-result t))
+                                                                                               (block nil
+                                                                                                 (unless (check-LOS-propagate dx dy dz prev-cell :check-move t)
+                                                                                                   (setf exit-result 'exit)
+                                                                                                   (setf result nil)
+                                                                                                   (return))
+                                                                                                 )
+                                                                                               exit-result)))
+                                                                          result)))
+                                                           ;; check if there is a place to land
+                                                           (funcall #'(lambda ()
+                                                                        (let ((result nil))
+                                                                          (check-surroundings (x nearest-enemy) (y nearest-enemy) nil
+                                                                                              #'(lambda (dx dy)
+                                                                                                  (when (eq (check-move-on-level actor dx dy (z nearest-enemy)) t)
+                                                                                                    (setf result t))))
+                                                                          result))))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob))
+                                                                 (> (z *player*) (z mob))
+                                                                 (< (get-distance (x *player*) (y *player*) (x mob) (y mob)) 3)
+                                                                 (funcall #'(lambda ()
+                                                                              (let ((result t) (x (x *player*)) (y (y *player*)))
+                                                                                (when (and (<= (abs (- (x *player*) (x mob))) 1)
+                                                                                           (<= (abs (- (y *player*) (y mob))) 1))
+                                                                                  (setf x (x mob) y (y mob)))
+                                                                                (line-of-sight x y (z *player*) (x mob) (y mob) (z mob)
+                                                                                               #'(lambda (dx dy dz prev-cell)
+                                                                                                   (declare (type fixnum dx dy dz))
+                                                                                                   (let* ((exit-result t))
+                                                                                                     (block nil
+                                                                                                       (unless (check-LOS-propagate dx dy dz prev-cell :check-move t)
+                                                                                                         (setf exit-result 'exit)
+                                                                                                         (setf result nil)
+                                                                                                         (return))
+                                                                                                       )
+                                                                                                     exit-result)))
+                                                                                result)))
+                                                                 (funcall #'(lambda ()
+                                                                        (let ((result nil))
+                                                                          (check-surroundings (x mob) (y mob) nil
+                                                                                              #'(lambda (dx dy)
+                                                                                                  (when (eq (check-move-on-level *player* dx dy (z mob)) t)
+                                                                                                    (setf result t))))
+                                                                          result))))
+                                                          (progn
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

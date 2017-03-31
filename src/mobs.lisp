@@ -75,6 +75,7 @@
    ;;   :abil-gargantaur-teleport - +mob-abil-gargantaur-teleport+
    ;;   :abil-dominate-gargantaur - +mob-abil-dominate-gargantaur+
    ;;   :abil-gargantaurs-mind-burn - +mob-abil-gargantaurs-mind-burn+
+   ;;   :abil-death-from-above - +mob-abil-death-from-above+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -98,7 +99,7 @@
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
-                                                                abil-gargantaurs-mind-burn)
+                                                                abil-gargantaurs-mind-burn abil-death-from-above)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -205,6 +206,8 @@
     (setf (gethash +mob-abil-dominate-gargantaur+ (abilities mob-type)) t))
   (when abil-gargantaurs-mind-burn
     (setf (gethash +mob-abil-gargantaurs-mind-burn+ (abilities mob-type)) t))
+  (when abil-death-from-above
+    (setf (gethash +mob-abil-death-from-above+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -218,8 +221,16 @@
 (defmethod get-weapon-name ((mob-type mob-type))
   (first (weapon mob-type)))
 
+(defun get-weapon-name-simple (weapon)
+  (first weapon))
+
 (defmethod is-weapon-melee ((mob-type mob-type))
   (if (second (weapon mob-type))
+    t
+    nil))
+
+(defun is-weapon-melee-simple (weapon)
+  (if (second weapon)
     t
     nil))
 
@@ -227,29 +238,57 @@
   (when (second (weapon mob-type))
     (nth 0 (second (weapon mob-type)))))
 
+(defun get-melee-weapon-dmg-type-simple (weapon)
+  (when (second weapon)
+    (nth 0 (second weapon))))
+
 (defmethod get-melee-weapon-dmg-min ((mob-type mob-type))
   (when (second (weapon mob-type))
     (nth 1 (second (weapon mob-type)))))
+
+(defun get-melee-weapon-dmg-min-simple (weapon)
+  (when (second weapon)
+    (nth 1 (second weapon))))
 
 (defmethod get-melee-weapon-dmg-max ((mob-type mob-type))
   (when (second (weapon mob-type))
     (nth 2 (second (weapon mob-type)))))
 
+(defun get-melee-weapon-dmg-max-simple (weapon)
+  (when (second weapon)
+    (nth 2 (second weapon))))
+
 (defmethod get-melee-weapon-speed ((mob-type mob-type))
   (when (second (weapon mob-type))
     (nth 3 (second (weapon mob-type)))))
+
+(defun get-melee-weapon-speed-simple (weapon)
+  (when (second weapon)
+    (nth 3 (second weapon))))
 
 (defmethod get-melee-weapon-acc ((mob-type mob-type))
   (when (second (weapon mob-type))
     (nth 4 (second (weapon mob-type)))))
 
+(defun get-melee-weapon-acc-simple (weapon)
+  (when (second weapon)
+    (nth 4 (second weapon))))
+
 (defmethod get-melee-weapon-aux ((mob-type mob-type))
   (when (second (weapon mob-type))
     (nth 5 (second (weapon mob-type)))))
 
+(defun get-melee-weapon-aux-simple (weapon)
+  (when (second weapon)
+    (nth 5 (second weapon))))
+
 (defmethod get-melee-weapon-aux-param ((mob-type mob-type) aux-feature)
   (when (second (weapon mob-type))
     (find aux-feature (nth 5 (second (weapon mob-type))))))
+
+(defun get-melee-weapon-aux-param-simple (weapon aux-feature)
+  (when (second weapon)
+    (find aux-feature (nth 5 (second weapon)))))
 
 (defmethod is-weapon-ranged ((mob-type mob-type))
   (if (third (weapon mob-type))

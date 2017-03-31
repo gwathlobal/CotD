@@ -55,6 +55,7 @@
 (defconstant +mob-type-fiend+ 20)
 (defconstant +mob-type-scout+ 21)
 (defconstant +mob-type-gargantaur+ 22)
+(defconstant +mob-type-thief+ 23)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -114,6 +115,7 @@
 (defconstant +mob-abil-gargantaur-teleport+ 42)
 (defconstant +mob-abil-dominate-gargantaur+ 43)
 (defconstant +mob-abil-gargantaurs-mind-burn+ 44)
+(defconstant +mob-abil-death-from-above+ 45)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

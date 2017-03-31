@@ -1,5 +1,9 @@
 CHANGELOG
 
+
+- Added the Thief to the game.
+- Added Death from Above ability to the Thief. This allows the Thief to jump onto an enemy from an upper Z level and make a devastating blow.
+
 --------------------
 Mar 25, 2017 v1.0.9
 
