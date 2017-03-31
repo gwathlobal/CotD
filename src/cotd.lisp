@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 (in-package :cotd)
 
 (defun game-loop ()

@@ -74,14 +74,14 @@
     (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
     ))
 
-(defun show-small-message-box (x y w &optional (h *msg-box-window-height*))
+(defun show-message-box (x y w &optional (h *msg-box-window-height*) (message-box *small-message-box*))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
     (sdl:fill-surface sdl:*black* :template a-rect)) 
-  (let ((max-lines (write-text (get-msg-str-list *small-message-box*) (sdl:rectangle :x x :y y :w w :h h) :count-only t)))
+  (let ((max-lines (write-text (get-msg-str-list message-box) (sdl:rectangle :x x :y y :w w :h h) :count-only t)))
     (when (> (message-list-length) 0)
-      (write-text (get-msg-str-list *small-message-box*) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
-                                                                                                           (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
-                                                                                                           0)))))
+      (write-text (get-msg-str-list message-box) (sdl:rectangle :x x :y y :w w :h h) :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
+                                                                                                   (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
+                                                                                                   0)))))
 
 (defun sense-good-evil-str ()
   (let ((str (create-string)) (first t))
@@ -142,7 +142,7 @@
   (update-map-area)
     
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
-  (show-small-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 200 10))
+  (show-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 200 10))
   (show-visible-mobs (- *window-width* 200) (- *window-height* *msg-box-window-height* 10) 200 *msg-box-window-height*)
     
   (sdl:update-display)
