@@ -83,7 +83,11 @@
   (setf *cur-angel-names* (copy-list *init-angel-names*))
   (setf *cur-demon-names* (copy-list *init-demon-names*))
 
-  (setf *update-screen-closure* #'(lambda () (make-output *current-window*)
+  (setf *update-screen-closure* #'(lambda (str)
+                                    (when (and str
+                                               (subtypep (type-of *current-window*) 'loading-window))
+                                      (setf (cur-str *current-window*) str))
+                                    (make-output *current-window*)
 				    ))
 
   (setf *world* (make-instance 'world))
@@ -292,10 +296,12 @@
      start-tag
        (multiple-value-bind (layout-id weather-id faction-id) (main-menu)
          (setf *current-window* (make-instance 'loading-window 
-                                               :update-func #'(lambda ()
+                                               :update-func #'(lambda (win)
                                                                 (when (/= *max-progress-bar* 0) 
                                                                   (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-                                                                    (let ((str (format nil "Generating map... ~3D%" (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
+                                                                    (let ((str (format nil "~A... ~3D%"
+                                                                                       (cur-str win)
+                                                                                       (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
                                                                       (sdl:draw-string-solid-*  str
                                                                                                 (truncate (- (/ *window-width* 2) (/ (* (length str) 6) 2)))
                                                                                                 (truncate (- (/ *window-height* 2) (/ 13 2)))

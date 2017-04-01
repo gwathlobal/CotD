@@ -31,9 +31,10 @@
         (game-event-list)
 	)
     ;; resetting the progress bar
-    (setf *max-progress-bar* 9)
+    (setf *max-progress-bar* 11)
     (setf *cur-progress-bar* 0)
-    (funcall *update-screen-closure*)
+    
+    (funcall *update-screen-closure* "Generating map")
 
     (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (return-scenario-functions weather city-layout player-faction))
 
@@ -46,7 +47,7 @@
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* nil)
     
     ;; apply the post-processing function, if any
     (loop for post-processing-func in post-processing-func-list do
@@ -54,21 +55,21 @@
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* nil)
     
     (logger (format nil "Creating actual level ~A~%" 0))
     (setf (level world) (create-level-from-template result-template))
     
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* "Adding features")
     
     ;; set up features
     (create-features-from-template (level world) feature-template-result)
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* "Adding mobs")
     
     ;; set up mobs
     (loop for mob-func in mob-func-list do
@@ -81,42 +82,44 @@
     
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* "Creating connectivity maps (walk)")
+    
     (create-connect-map-walk (level world) 1)
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* nil)
     
     (create-connect-map-walk (level world) 3)
 
     ;; adjusting the progress bar
-    ;(incf *cur-progress-bar*)
-    ;(funcall *update-screen-closure*)
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* nil)
     
-    ;(create-connect-map-walk (level world) 5)
+    (create-connect-map-walk (level world) 5)
 
     ;(time (progn
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* "Creating connectivity maps (climb)")
+    
     (create-connect-map-climb (level world) 1)
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* nil)
     
     (create-connect-map-climb (level world) 3)
 
     ;; adjusting the progress bar
-    ;(incf *cur-progress-bar*)
-    ;(funcall *update-screen-closure*)
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* nil)
     
-    ;(create-connect-map-climb (level world) 5)
+    (create-connect-map-climb (level world) 5)
     
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure*)
+    (funcall *update-screen-closure* "Finalizing")
     
     world))
 

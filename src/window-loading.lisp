@@ -1,7 +1,8 @@
 (in-package :cotd)
 
 (defclass loading-window (window)
-  ((update-func :initarg :update-func :accessor update-func)))
+  ((update-func :initarg :update-func :accessor update-func)
+   (cur-str :initform "Generating map" :initarg :cur-str :accessor cur-str)))
 
 (defmethod make-output ((win loading-window))
   ;; fill the screen black
@@ -9,16 +10,12 @@
     (sdl:fill-surface sdl:*black* :template a-rect))
  
   ;; invoke the function to update the window
-  (funcall (update-func win))
+  (funcall (update-func win) win)
 
   (sdl:update-display))
 
 (defmethod run-window ((win loading-window))
-  (tagbody
-     (sdl:with-events ()
-       (:quit-event () (funcall (quit-func win)) t)
-       (:key-down-event (:key key :mod mod :unicode unicode)
-			(go exit-func)
-			)
-       (:video-expose-event () (make-output *current-window*)))
-     exit-func (make-output *current-window*)))
+  (sdl:with-events ()
+    (:quit-event () (funcall (quit-func win)) t)
+    (:video-expose-event () (make-output *current-window*)))
+  )
