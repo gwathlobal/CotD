@@ -140,6 +140,48 @@
                                            (revealed (get-single-memo-revealed (get-memo-* level x y z))))
   (set-memo-* level x y z (create-single-memo glyph-idx glyph-color back-color visibility revealed)))
 
+(defun get-connect-map-value (connect-map x y z move-mode)
+  (let ((move-mode-array (aref connect-map x y z)))
+    ;(format t "GET ~A, MOVE-MODE ~A, LENGTH ~A~%" move-mode-array move-mode (length move-mode-array))
+    (unless move-mode-array
+      (return-from get-connect-map-value -1))
+    (when (>= move-mode (length move-mode-array))
+      (return-from get-connect-map-value -1))
+    (unless (aref move-mode-array move-mode)
+      (return-from get-connect-map-value -1))
+    
+    (aref move-mode-array move-mode)
+    ))
+
+(defun get-level-connect-map-value (level x y z map-size move-mode)
+  (when (or (zerop map-size)
+            (evenp map-size))
+    (error "GET-CONNECT-MAP-SIZE: Map size should be an odd number"))
+  (let ((move-mode-array (aref (aref (connect-map level) map-size) x y z)))
+    (unless move-mode-array
+      (return-from get-level-connect-map-value -1))
+    (when (>= move-mode (length move-mode-array))
+      (return-from get-level-connect-map-value -1))
+    (unless (aref move-mode-array move-mode)
+      (return-from get-level-connect-map-value -1))
+    
+    (aref move-mode-array move-mode)
+    ))
+
+(defun set-connect-map-value (connect-map x y z move-mode value)
+
+  ;; we assume that the connect map arrays have been created
+  (unless (aref connect-map x y z)
+    (setf (aref connect-map x y z) (make-array (list (1+ move-mode)) :initial-element -1 :adjustable t)))
+   
+  (let ((move-mode-array (aref connect-map x y z)))
+    (when (>= move-mode (length move-mode-array))
+      (adjust-array move-mode-array (list (1+ move-mode))))
+    ;(format t "SET ~A, MOVE-MODE ~A, LENGTH ~A~%" move-mode-array move-mode (length move-mode-array))
+    (setf (aref move-mode-array move-mode) value)
+    )
+  )
+
 ;;----------------------
 ;; WORLD
 ;;----------------------

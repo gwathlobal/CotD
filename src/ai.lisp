@@ -2,10 +2,10 @@
 
 (defgeneric ai-function (mob))
 
-(defun check-move-for-ai (mob dx dy dz cx cy cz)
+(defun check-move-for-ai (mob dx dy dz cx cy cz &key (final-dst nil))
   (declare (optimize (speed 3))
            (type fixnum dx dy dz cx cy cz))
-  (let ((sx 0) (sy 0)
+  (let ((sx 0) (sy 0) (move-result nil)
         (map-size (if (riding-mob-id mob)
                     (map-size (get-mob-by-id (riding-mob-id mob)))
                     (map-size mob))))
@@ -24,22 +24,67 @@
         (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+) 
           (return-from check-move-for-ai nil))
 
-        ;; can go 1) from up to down if the landing tile is floor and is not directly below the source tile
-        ;;        2) from down to up if the source tile is slope up and the landing tile has floor and is not directly above the the source tile
-        ;; in all other cases when trying to move along the z axis - movement is blocked
-        (when (and (/= (- dz cz) 0)
-                   (not (and (< (- dz cz) 0)
-                             (or (/= (- dx cx) 0)
-                                 (/= (- dy cy) 0))
-                             (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
-                             (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny (1+ dz)) +terrain-trait-opaque-floor+))))
-                   (not (and (> (- dz cz) 0)
-                             (or (/= (- dx cx) 0)
-                                 (/= (- dy cy) 0))
-                             (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
-                             (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-slope-up+)
-                             (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy (1+ cz)) +terrain-trait-opaque-floor+)))))
+        (setf move-result nil)
+        
+        ;; can go from down to up if the source tile is slope up and the landing tile has floor and is not directly above the the source tile
+        (when (and (> (- dz cz) 0)
+                   (not (and (= cx nx)
+                             (= cy ny)))
+                   (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* (level *world*) nx ny cz) +terrain-trait-blocks-move+)
+                   (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-slope-up+)
+                   (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy (1+ cz)) +terrain-trait-opaque-floor+)))
+          (setf move-result t))
+
+        ;; can go from up to down if the landing tile is floor and is not directly below the source tile
+        (when (and (< (- dz cz) 0)
+                   (or (/= (- dx cx) 0)
+                       (/= (- dy cy) 0))
+                   (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
+                   (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny cz) +terrain-trait-opaque-floor+)))
+          (setf move-result t))
+
+        ;; can go from horizontally if the landing tile has opaque floor and there is no final destination
+        ;; or can go horizontally if the landing tile has opaque floor and it is NOT the final distination
+        ;; or can go horizontally if the landing tile is the final destination (and we do not care about the floor)
+        (when (or (and (= (- dz cz) 0)
+                       (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
+                       (not final-dst))
+                  (and (= (- dz cz) 0)
+                       final-dst
+                       (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-opaque-floor+)
+                       (not (and (= nx (first final-dst))
+                                 (= ny (second final-dst))
+                                 (= dz (third final-dst)))))
+                  (and (= (- dz cz) 0)
+                       final-dst
+                       (and (= nx (first final-dst))
+                            (= ny (second final-dst))
+                            (= dz (third final-dst)))))
+          (setf move-result t))
+
+        ;; you can go anywhere horizontaly or directly up/down if you are climbing and there is a wall or floor next to you
+        (when (and (not move-result)
+                   (mob-effect-p mob +mob-effect-climbing-mode+)
+                   (or (= (- cz dz) 0)
+                       (and (/= (- cz dz) 0)
+                            (= nx cx)
+                            (= ny cy))
+                       )
+                   (check-move-along-z cx cy cz nx ny dz)
+                   (funcall #'(lambda ()
+                                (let ((result nil))
+                                  (check-surroundings nx ny nil #'(lambda (dx dy)
+                                                                    (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-not-climable+))
+                                                                               (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-move+)))
+                                                                      (setf result t))))
+                                  result))))
+          (setf move-result t))
+        
+        (unless move-result
           (return-from check-move-for-ai nil))
+        
             ))
 
     t))
@@ -84,24 +129,24 @@
     
     ;; sort them so that the closest to the mob are checked first
     (setf cell-list (stable-sort cell-list #'(lambda (a b)
-                                               (if (< (get-distance tx ty (car a) (cdr a))
-                                                      (get-distance tx ty (car b) (cdr b)))
+                                               (if (< (get-distance (x mob) (y mob) (car a) (cdr a))
+                                                      (get-distance (x mob) (y mob) (car b) (cdr b)))
                                                  t
                                                  nil))))
 
-    ;(format t "AI-FIND-MOVE-AROUND: Cell list sorted ~A~%" cell-list)
+    ;;(format t "AI-FIND-MOVE-AROUND: Cell list sorted ~A~%" cell-list)
     
     ;; check each cell for passability
     (loop for (dx . dy) in cell-list
-          for connect-d of-type fixnum = (aref (aref (connect-map (level *world*)) map-size) dx dy (z mob))
-          for connect-mob of-type fixnum = (aref (aref (connect-map (level *world*)) map-size) (x mob) (y mob) (z mob))
+          for connect-d of-type fixnum = (get-level-connect-map-value (level *world*) dx dy (z mob) map-size (get-mob-move-mode mob))
+          for connect-mob of-type fixnum = (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) map-size (get-mob-move-mode mob))
           do
       (when (and (= connect-d connect-mob)
                  (check-move-for-ai mob dx dy (z mob) dx dy (z mob)))
-        ;(format t "AI-FIND-MOVE-AROUND: Return value ~A~%" (cons dx dy))
+        ;;(format t "AI-FIND-MOVE-AROUND: Return value ~A~%" (cons dx dy))
         (return-from ai-find-move-around (list dx dy (z mob)))))
 
-    ;(format t "AI-FIND-MOVE-AROUND: Return value ~A~%" nil)
+    ;;(format t "AI-FIND-MOVE-AROUND: Return value ~A~%" nil)
     nil))
 
 (defun ai-mob-flee (mob nearest-enemy)
@@ -372,15 +417,19 @@
                (= (first (order mob)) +mob-order-follow+))
       ;; if the leader is nearby, plot the path to it
       (let ((leader (get-mob-by-id (second (order mob))))
-            (connect-map (aref (connect-map (level *world*)) (if (riding-mob-id mob)
-                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
-                                                               (map-size mob))))
             (target-pos)
             (path))
         
         (cond
-          ((= (aref connect-map (x mob) (y mob) (z mob))
-              (aref connect-map (x leader) (y leader) (z leader)))
+          ((= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
+                                                                                     (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                     (map-size mob))
+                                           (get-mob-move-mode mob))
+              (get-level-connect-map-value (level *world*) (x leader) (y leader) (z leader) (if (riding-mob-id mob)
+                                                                                              (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                              (map-size mob))
+                                           (get-mob-move-mode mob))
+              )
            (setf target-pos (list (x leader) (y leader) (z leader))))
           ((and (> (map-size mob) 1)
                 (ai-find-move-around mob (x leader) (y leader)))
@@ -390,11 +439,11 @@
                  (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2)
                  target-pos)
           (progn
-            (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to follow the leader to (~A, ~A)~%" (x mob) (y mob) (x leader) (y leader)))
+            (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to follow the leader to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x leader) (y leader) (z leader)))
             (setf path (a-star (list (x mob) (y mob) (z mob)) (list (first target-pos) (second target-pos) (third target-pos)) 
                                #'(lambda (dx dy dz cx cy cz) 
                                    ;; checking for impassable objects
-                                   (check-move-for-ai mob dx dy dz cx cy cz)
+                                   (check-move-for-ai mob dx dy dz cx cy cz :final-dst target-pos)
                                    )))
             
             (pop path)
@@ -409,14 +458,20 @@
     (when nearest-target
       (logger (format nil "AI-FUNCTION: Target found ~A [~A]~%" (name nearest-target) (id nearest-target)))
       (let ((path nil)
-            (connect-map (aref (connect-map (level *world*)) (if (riding-mob-id mob)
-                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
-                                                               (map-size mob))))
+            
             (target-pos nil))
 
         (cond
-          ((= (aref connect-map (x mob) (y mob) (z mob))
-              (aref connect-map (x nearest-target) (y nearest-target) (z nearest-target)))
+          ((= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
+                                                                                     (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                     (map-size mob))
+                                           (get-mob-move-mode mob))
+              (get-level-connect-map-value (level *world*) (x nearest-target) (y nearest-target) (z nearest-target) (if (riding-mob-id mob)
+                                                                                                                      (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                      (map-size mob))
+                                           (get-mob-move-mode mob))
+              )
+           
            (setf target-pos (list (x nearest-target) (y nearest-target) (z nearest-target))))
           ((and (> (map-size mob) 1)
                 (ai-find-move-around mob (x nearest-target) (y nearest-target)))
@@ -427,10 +482,10 @@
           (setf path (a-star (list (x mob) (y mob) (z mob)) (list (first target-pos) (second target-pos) (third target-pos)) 
                                #'(lambda (dx dy dz cx cy cz) 
                                    ;; checking for impassable objects
-                                   (check-move-for-ai mob dx dy dz cx cy cz)
+                                   (check-move-for-ai mob dx dy dz cx cy cz :final-dst target-pos)
                                    )))
                     
-          (logger (format nil "AI-FUNCTION: Mob - (~A ~A) Target - (~A ~A)~%" (x mob) (y mob) (first target-pos) (second target-pos)))
+          (logger (format nil "AI-FUNCTION: Mob - (~A ~A ~A) Target - (~A ~A ~A)~%" (x mob) (y mob) (z mob) (first target-pos) (second target-pos) (third target-pos)))
           (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
           (pop path)
           
@@ -449,9 +504,7 @@
             (rz (- (+ 5 (z mob))
                    (1+ (random 10))))
             (path nil)
-            (connect-map (aref (connect-map (level *world*)) (if (riding-mob-id mob)
-                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
-                                                               (map-size mob)))))
+            )
         (declare (type fixnum rx ry))
 
         (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to go to a random nearby place~%" (x mob) (y mob) (z mob)))
@@ -463,8 +516,15 @@
                           (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
                           (and (get-mob-* (level *world*) rx ry rz)
                                (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
-                          (/= (aref connect-map (x mob) (y mob) (z mob))
-                              (aref connect-map rx ry rz)))
+                          (/= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
+                                                                                                     (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                     (map-size mob))
+                                                           (get-mob-move-mode mob))
+                              (get-level-connect-map-value (level *world*) rx ry rz (if (riding-mob-id mob)
+                                                                                      (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                      (map-size mob))
+                                                           (get-mob-move-mode mob))
+                              ))
                 do
                    (setf rx (- (+ 10 (x mob))
                                (1+ (random 20))))
@@ -474,14 +534,21 @@
                                (1+ (random 10)))))
           (setf (path-dst mob) (list rx ry rz))
           (logger (format nil "AI-FUNCTION: Mob's destination is randomly set to (~A, ~A, ~A)~%" (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)))))
-        (when (= (aref connect-map (x mob) (y mob) (z mob))
-                 (aref connect-map (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))
+        (when (= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
+                                                                                        (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                        (map-size mob))
+                                              (get-mob-move-mode mob))
+                 (get-level-connect-map-value (level *world*) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)) (if (riding-mob-id mob)
+                                                                                                                                      (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                                      (map-size mob))
+                                              (get-mob-move-mode mob))
+                 )
           
           (logger (format nil "AI-FUNCTION: Mob (~A, ~A) wants to go to (~A, ~A)~%" (x mob) (y mob) (first (path-dst mob)) (second (path-dst mob))))
           (setf path (a-star (list (x mob) (y mob) (z mob)) (list (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) 
                                #'(lambda (dx dy dz cx cy cz) 
                                    ;; checking for impassable objects
-                                   (check-move-for-ai mob dx dy dz cx cy cz)
+                                   (check-move-for-ai mob dx dy dz cx cy cz :final-dst (path-dst mob))
                                    )))
                     
           (pop path)
@@ -492,7 +559,7 @@
     ;; if the mob has its path set - move along it
     (when (path mob)
 
-        (let ((step) (step-x) (step-y))
+        (let ((step) (step-x) (step-y) (step-z))
         
           (logger (format nil "AI-FUNCTION: Move mob along the path - ~A~%" (path mob)))
           (setf step (pop (path mob)))
@@ -500,9 +567,10 @@
           ;; if there is suddenly an obstacle, make the path recalculation
           (setf step-x (- (first step) (x mob)))
           (setf step-y (- (second step) (y mob)))
+          (setf step-z (- (third step) (z mob)))
           
           (unless (check-move-on-level mob (first step) (second step) (third step))
-            (logger (format nil "AI-FUNCTION: Can't move to target - (~A ~A)~%" (first step) (second step)))
+            (logger (format nil "AI-FUNCTION: Can't move to target - (~A ~A ~A)~%" (first step) (second step) (third step)))
             (setf (path mob) nil)
             (return-from ai-function))
           
@@ -511,9 +579,9 @@
             (setf (path mob) nil)
             (return-from ai-function))
           
-          (move-mob mob (x-y-into-dir step-x step-y))
+          (move-mob mob (x-y-into-dir step-x step-y) :dir-z step-z)
 
-          (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A)~%" (path-dst mob) (x mob) (y mob)))
+          (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A ~A)~%" (path-dst mob) (x mob) (y mob) (z mob)))
           
           (when (and (path-dst mob)
                      (= (x mob) (first (path-dst mob)))
@@ -656,7 +724,7 @@
                    (rz (- (+ 5 (z mob))
                           (1+ (random 10))))
                    (path nil)
-                   (connect-map (aref (connect-map (level *world*)) (map-size mob))))
+                   )
               (declare (type fixnum rx ry))
 
               ;; if the mob destination is not set, choose a random destination
@@ -666,8 +734,15 @@
                                 (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
                                 (and (get-mob-* (level *world*) rx ry (z mob))
                                      (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
-                                (/= (aref connect-map (x mob) (y mob) (z mob))
-                                    (aref connect-map rx ry rz)))
+                                (/= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
+                                                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                           (map-size mob))
+                                                                 (get-mob-move-mode mob))
+                                    (get-level-connect-map-value (level *world*) rx ry rz (if (riding-mob-id mob)
+                                                                                            (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                            (map-size mob))
+                                                                 (get-mob-move-mode mob))
+                              ))
                       do
                          (setf rx (- (+ 10 (x mob))
                                      (1+ (random 20))))
@@ -677,8 +752,15 @@
                                      (1+ (random 10)))))
                 (setf (path-dst mob) (list rx ry rz)))
 
-               (when (= (aref connect-map (x mob) (y mob) (z mob))
-                        (aref connect-map (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))
+               (when (= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
+                                                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                               (map-size mob))
+                                                     (get-mob-move-mode mob))
+                        (get-level-connect-map-value (level *world*) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)) (if (riding-mob-id mob)
+                                                                                                                                             (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                                             (map-size mob))
+                                                     (get-mob-move-mode mob))
+                        )
                  (logger (format nil "THREAD: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) stream)
                  (setf path (a-star (list (x mob) (y mob) (z mob)) (list (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) 
                                     #'(lambda (dx dy dz cx cy cz) 

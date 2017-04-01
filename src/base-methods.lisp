@@ -130,6 +130,24 @@
     ;; all checks passed - can move freely
     (return-from check-move-on-level t)))
 
+(defun check-move-along-z (sx sy sz dx dy dz)
+  (cond
+    ;; move down
+    ((< (- dz sz) 0) (progn
+                            (if (and (>= dz 0)
+                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (1+ dz)) +terrain-trait-opaque-floor+))
+                                     )
+                              t
+                              nil)))
+    ;; move up
+    ((> (- dz sz) 0) (progn
+                            (if (and (< dz (array-dimension (terrain (level *world*)) 2))
+                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) sx sy dz) +terrain-trait-opaque-floor+))
+                                     )
+                              t
+                              nil)))
+    ;; no vertical movement
+    (t t)))
 
 (defmethod apply-gravity ((mob mob))
   (let ((result nil))
@@ -139,8 +157,23 @@
              ;(format t "Z ~A FLOOR ~A~%" z (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
              (when (eq check-result t)
                (setf result z))
+             
+             ;; stop falling if
              (when (or (not (eq check-result t))
-                       (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
+                       ;; there is floor on this tile
+                       (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+)
+                       ;; there is no floor on this tile, but the mob is in climbing mode and there is a wall or a floor nearby
+                       (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
+                            (mob-effect-p mob +mob-effect-climbing-mode+)
+                            (funcall #'(lambda ()
+                                         (let ((result nil))
+                                           (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
+                                                                                       (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-not-climable+))
+                                                                                                  (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-opaque-floor+)
+                                                                                                      (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-blocks-move+)))
+                                                                                         (setf result t))))
+                                           result))))
+                       )
                (loop-finish)))
     (when (eq result (z mob))
       (setf result nil))
@@ -171,6 +204,7 @@
       
 
 (defun set-mob-location (mob x y z)
+  
   (let ((place-func #'(lambda (nmob)
                         (let ((sx) (sy))
                           ;; calculate the coords of the mob's NE corner
@@ -251,10 +285,10 @@
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
                (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+))
                (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)))
-      (set-mob-location (get-mob-* (level *world*) orig-x orig-y (1+ (z mob))) orig-x orig-y (1+ orig-z)))
+      (set-mob-location (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)) orig-x orig-y (1+ orig-z)))
     ))
 
-(defun move-mob (mob dir &key (push nil))
+(defun move-mob (mob dir &key (push nil) (dir-z 0))
   (let ((dx 0)
         (dy 0)
         (sx (x mob))
@@ -284,7 +318,7 @@
       (setf (order-for-next-turn (get-mob-by-id (riding-mob-id mob))) dir)
       
       ;; perform the attack in the chosen direction (otherwise it will be only the mount that attacks)
-      (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy) (z mob))))
+      (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy) (+ (z mob) dir-z))))
         ;; right now multi-tile mobs can not ride other multitile mobs and I intend to leave it this way
         ;; this means that there will always be only one mob in the affected mob list
         (when (and check-result
@@ -296,7 +330,7 @@
           (return-from move-mob check-result))
 
         (when (or (eq check-result nil)
-                  (and (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy) (z mob)) nil)
+                  (and (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy) (+ (z mob) dir-z)) nil)
                        (= dir (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob))))))))
           (logger (format nil "MOVE-MOB: ~A [~A] is unable to move to give order (CHECK = ~A, MOUNT DIR ~A)~%" (name mob) (id mob) check-result
                           (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob)))))))
@@ -397,23 +431,28 @@
           for y = (+ (y mob) dy)
           for z = (cond
                     ;; if the current cell is slope up and the cell along the direction is a wall - increase the target z level, so that the mob can go up
-                    ((and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-slope-up+)
+                    ((and 
+                          (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-slope-up+)
                           (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-blocks-move+))
                      (1+ (z mob)))
                     ;; if the target cell is slope down - decrease the target z level, so that the mob can go down
-                    ((get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-slope-down+)
+                    ((and (not (mob-effect-p mob +mob-effect-climbing-mode+))
+                         (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-slope-down+))
                      (1- (z mob)))
                     ;; otherwise the z level in unchanged
-                    (t (z mob)))
-          for check-result = (check-move-on-level mob x y z)
+                    (t (+ (z mob) dir-z)))
+          for check-result = (if (check-move-along-z (x mob) (y mob) (z mob) x y z)
+                               (check-move-on-level mob x y z)
+                               nil)
+          
           do
              (logger (format nil "MOVE-MOB: CHECK-MOVE ~A~%" check-result))
              (cond
                ;; all clear - move freely
                ((eq check-result t)
-                
                 (set-mob-location mob x y z)
                 (setf move-result t)
+                
                 )
                ;; bumped into an obstacle or the map border
                ((or (eq check-result nil) (eq (first check-result) :obstacles))
@@ -801,11 +840,6 @@
                    (eq check-result t))
             ;; target dodged
             (progn
-              (set-mob-location target x y (z target))
-
-              ;; reduce the momentum to zero
-              (setf (momentum-dir target) (cons 0 0))
-              (setf (momentum-spd target) 0)
 
               (cond
                 ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
@@ -821,6 +855,14 @@
                  (progn
                    (print-visible-message (x target) (y target) (z target) (level *world*) 
                                           (format nil "Somebody attacks ~A, but ~A evades the attack. " (visible-name target) (visible-name target))))))
+              
+              (set-mob-location target x y (z target))
+
+              ;; reduce the momentum to zero
+              (setf (momentum-dir target) (cons 0 0))
+              (setf (momentum-spd target) 0)
+
+              
               )
             ;; target did not dodge
             (progn
@@ -1072,6 +1114,10 @@
   (adjust-m-acc mob)
   (adjust-r-acc mob)
   (adjust-sight mob)
+
+  ;; if the mob has no climbing ability - disable it
+  (when (not (mob-ability-p mob +mob-abil-climbing+))
+    (rem-mob-effect mob +mob-effect-climbing-mode+))
   
   (when (mob-effect-p mob +mob-effect-possessed+)
     (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
@@ -1128,6 +1174,11 @@
   (when (and (evolve-into mob)
              (>= (cur-fp mob) (max-fp mob)))
     (mob-evolve mob))
+
+  ;; if the mob has climbing ability - turn it on, if disabled
+  (when (and (mob-ability-p mob +mob-abil-climbing+)
+             (not (mob-effect-p mob +mob-effect-climbing-mode+)))
+    (set-mob-effect mob +mob-effect-climbing-mode+))
   )
   
 

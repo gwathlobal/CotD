@@ -77,7 +77,7 @@ the goal, and may depend on many factors"
                         (loop for z-offset of-type fixnum from -1 to 1
                               as z of-type fixnum = (+ (node-z-pos node) z-offset)
                               ;; don't need to check the node itself
-                              unless (and (zerop x-offset) (zerop y-offset))
+                              unless (and (zerop x-offset) (zerop y-offset) (zerop z-offset))
                               ;; don't need to check already closed nodes
                               unless (find-node-with-coords x y z closed-nodes)
                               ;; don't need to find already open nodes, either

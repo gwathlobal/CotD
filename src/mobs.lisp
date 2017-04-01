@@ -76,6 +76,7 @@
    ;;   :abil-dominate-gargantaur - +mob-abil-dominate-gargantaur+
    ;;   :abil-gargantaurs-mind-burn - +mob-abil-gargantaurs-mind-burn+
    ;;   :abil-death-from-above - +mob-abil-death-from-above+
+   ;;   :abil-climbing - +mob-abil-climbing+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -99,7 +100,7 @@
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
-                                                                abil-gargantaurs-mind-burn abil-death-from-above)
+                                                                abil-gargantaurs-mind-burn abil-death-from-above abil-climbing)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -208,6 +209,8 @@
     (setf (gethash +mob-abil-gargantaurs-mind-burn+ (abilities mob-type)) t))
   (when abil-death-from-above
     (setf (gethash +mob-abil-death-from-above+ (abilities mob-type)) t))
+  (when abil-climbing
+    (setf (gethash +mob-abil-climbing+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -466,6 +469,10 @@
    ;; set up current abilities cooldowns
   (loop for ability-id being the hash-key in (abilities mob) do
     (setf (gethash ability-id (abilities-cd mob)) 0))
+
+  ;; if the mob has climbing ability - start with it turned on
+  (when (mob-ability-p mob +mob-abil-climbing+)
+    (set-mob-effect mob +mob-effect-climbing-mode+))
   
   (when (mob-ability-p mob +mob-abil-human+)
     (incf (total-humans *world*))
@@ -769,6 +776,11 @@
 
 (defmethod map-size ((mob mob))
   (map-size (get-mob-type-by-id (mob-type mob))))
+
+(defun get-mob-move-mode (mob)
+  (cond
+    ((mob-effect-p mob +mob-effect-climbing-mode+) +connect-map-move-climb+)
+    (t +connect-map-move-walk+)))
 
 ;;----------------------
 ;; PLAYER

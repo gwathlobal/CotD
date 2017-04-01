@@ -20,9 +20,10 @@
     (when (and prev-cell
                (/= (- (third prev-cell) dz) 0))
       (if (> (- (third prev-cell) dz) 0)
-        ;; prev is up, the tile above current has opaque floor
+        ;; prev is up, the tile above current has opaque floor & the prev tile has opaque floor
         (when (and (get-terrain-* (level *world*) dx dy (third prev-cell))
-                   (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+))
+                   (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) +terrain-trait-opaque-floor+))
           (return-from check-LOS-propagate nil))
         ;; prev is down
         (when (and (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz)
@@ -190,14 +191,6 @@
     (setf glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
     (setf back-color (back-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
     
-    ;; if the terrain has no floor, you can see an indication that there is a mob on the tile below
-    (when (and (not (get-terrain-type-trait (get-terrain-* level map-x map-y map-z) +terrain-trait-opaque-floor+))
-               (>= (1- map-z) 0)
-               (get-mob-* level map-x map-y (1- map-z)))
-      (if (get-faction-relation (faction *player*) (get-visible-faction (get-mob-* level map-x map-y (1- map-z))))
-        (setf back-color sdl:*blue*)
-        (setf back-color sdl:*red*)))
-    
     ;; then feature, if any
     (when (get-features-* level map-x map-y map-z)
       (let ((ftr (get-feature-by-id (first (get-features-* level map-x map-y map-z)))))
@@ -253,6 +246,18 @@
                                              )
 					   exit-result))
             )
+  (loop for mob-id in (visible-mobs *player*)
+        for mob = (get-mob-by-id mob-id)
+        do
+           ;; if the terrain has no floor, you can see an indication that there is a mob on the tile below
+           (when (and (< (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
+                      (get-single-memo-visibility (get-memo-* level (x mob) (y mob) (1+ (z mob))))
+                      (get-single-memo-revealed (get-memo-* level (x mob) (y mob) (1+ (z mob))))
+                      (not (get-terrain-type-trait (get-terrain-* level (x mob) (y mob) (1+ (z mob))) +terrain-trait-opaque-floor+))
+                      )
+             (if (get-faction-relation (faction *player*) (get-visible-faction mob))
+               (set-single-memo-* (level *world*) (x mob) (y mob) (1+ (z mob)) :back-color sdl:*blue*)
+               (set-single-memo-* (level *world*) (x mob) (y mob) (1+ (z mob)) :back-color sdl:*red*))))
   
   )
 
@@ -271,7 +276,7 @@
     (dotimes (y1 (array-dimension (memo (level *world*)) 1))
       (dotimes (z1 (array-dimension (memo (level *world*)) 2))
         (if (get-single-memo-revealed (get-memo-* level x1 y1 z1))
-          (set-single-memo-* level x1 y1 z1 :glyph-color (sdl:color :r 50 :g 50 :b 50) :visibility nil)
+          (set-single-memo-* level x1 y1 z1 :glyph-color (sdl:color :r 50 :g 50 :b 50) :back-color sdl:*black* :visibility nil)
           (set-single-memo-* level x1 y1 z1 :visibility nil))
       )))
 

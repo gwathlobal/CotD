@@ -7,7 +7,7 @@
 
 (defparameter *max-x-level* 100)
 (defparameter *max-y-level* 100)
-(defparameter *max-z-level* 10)
+(defparameter *max-z-level* 9)
 (defparameter *max-x-view* 25)
 (defparameter *max-y-view* 25)
 
@@ -116,6 +116,7 @@
 (defconstant +mob-abil-dominate-gargantaur+ 43)
 (defconstant +mob-abil-gargantaurs-mind-burn+ 44)
 (defconstant +mob-abil-death-from-above+ 45)
+(defconstant +mob-abil-climbing+ 46)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -127,6 +128,7 @@
 (defconstant +mob-effect-cursed+ 7)
 (defconstant +mob-effect-blind+ 8)
 (defconstant +mob-effect-fear+ 9)
+(defconstant +mob-effect-climbing-mode+ 10)
 
 (defconstant +mob-order-follow+ 0)
 
@@ -159,6 +161,7 @@
 (defconstant +terrain-trait-opaque-floor+ 3)
 (defconstant +terrain-trait-slope-up+ 4)
 (defconstant +terrain-trait-slope-down+ 5)
+(defconstant +terrain-trait-not-climable+ 6)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -223,6 +226,10 @@
 (defparameter *base-mob-sight* 6)
 
 (defconstant +connect-room-none+ -1)
+
+;; Connect map indices for various movement types
+(defconstant +connect-map-move-walk+ 0)
+(defconstant +connect-map-move-climb+ 1)
 
 ;;---------------------------
 ;; Multithreading parameters

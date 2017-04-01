@@ -993,6 +993,7 @@
                                                         (progn
                                                           nil)
                                                         (progn
+                                                          (clear-message-list *small-message-box*)
                                                           (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                           t))
                                                       )))
@@ -1068,6 +1069,7 @@
                                                                (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +mob-abil-horse-can-be-ridden+)
                                                                (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))))
                                                         (progn
+                                                          (clear-message-list *small-message-box*)
                                                           (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
@@ -1149,6 +1151,7 @@
                                                                                      t
                                                                                      nil)))))
                                                           (progn
+                                                            (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -1222,6 +1225,7 @@
                                                                (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +mob-abil-fiend-can-be-ridden+)
                                                                (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))))
                                                         (progn
+                                                          (clear-message-list *small-message-box*)
                                                           (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
@@ -1303,6 +1307,7 @@
                                                                  (not (and (mob-ability-p mob +mob-abil-angel+)
                                                                            (not (mob-effect-p mob +mob-effect-divine-consealed+)))))
                                                           (progn
+                                                            (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -1366,6 +1371,7 @@
                                                                  mob
                                                                  (not (eq *player* mob)))
                                                           (progn
+                                                            (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -1516,6 +1522,7 @@
                                                         
                                                         (if (find (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) mount-list)
                                                           (progn
+                                                            (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                         (progn
@@ -1567,6 +1574,7 @@
                                                                  mob
                                                                  (not (eq *player* mob)))
                                                           (progn
+                                                            (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -1575,7 +1583,7 @@
 
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-death-from-above+ :name "Death from above" :descr "Jump from above on your prey and land a devastating attack for 5-8 iron dmg." 
+                                 :id +mob-abil-death-from-above+ :name "Death from Above" :descr "Jump from above on your prey and land a devastating attack for 5-8 iron dmg." 
                                  :cd 1 :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -1585,12 +1593,15 @@
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A strikes from above. " (visible-name actor)))
                                                                                                 
-                                                (let ((tx (x actor)) (ty (y actor)))
-                                                  (check-surroundings (x target) (y target) nil
-                                                                      #'(lambda (dx dy)
-                                                                          (when (eq (check-move-on-level actor dx dy (z target)) t)
-                                                                            (setf tx dx ty dy))))
-                                                  (set-mob-location actor tx ty (z target)))
+                                                (let ((tx (x target)) (ty (y target)) (tz (1+ (z target))))
+                                                  (block surround
+                                                    (check-surroundings (x target) (y target) nil
+                                                                        #'(lambda (dx dy)
+                                                                            (when (eq (check-move-on-level actor dx dy (z target)) t)
+                                                                              (setf tx dx ty dy tz (z target))
+                                                                              (when (zerop (random 4))
+                                                                                (return-from surround))))))
+                                                  (set-mob-location actor tx ty tz))
 
                                                 (make-melee-attack actor target :weapon (list "Knife" (list +weapon-dmg-iron+ 5 8 +normal-ap+ 100 ()) ())
                                                                                 :acc 100 :no-dodge t :make-act nil)
@@ -1633,14 +1644,7 @@
                                                                                                  )
                                                                                                exit-result)))
                                                                           result)))
-                                                           ;; check if there is a place to land
-                                                           (funcall #'(lambda ()
-                                                                        (let ((result nil))
-                                                                          (check-surroundings (x nearest-enemy) (y nearest-enemy) nil
-                                                                                              #'(lambda (dx dy)
-                                                                                                  (when (eq (check-move-on-level actor dx dy (z nearest-enemy)) t)
-                                                                                                    (setf result t))))
-                                                                          result))))
+                                                           )
                                                       t
                                                       nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -1670,16 +1674,45 @@
                                                                                                        )
                                                                                                      exit-result)))
                                                                                 result)))
-                                                                 (funcall #'(lambda ()
-                                                                        (let ((result nil))
-                                                                          (check-surroundings (x mob) (y mob) nil
-                                                                                              #'(lambda (dx dy)
-                                                                                                  (when (eq (check-move-on-level *player* dx dy (z mob)) t)
-                                                                                                    (setf result t))))
-                                                                          result))))
+                                                                 )
                                                           (progn
+                                                            (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-climbing+ :name "Climbing" :descr "Toggle climbing mode. While in climbing mode you are able to scale walls up and down and will not fall down until you have a solid wall or a floor nearby." 
+                                 :cost 0 :spd 0 :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (if (mob-effect-p actor +mob-effect-climbing-mode+)
+                                                  (progn
+                                                    (when (eq actor *player*)
+                                                      (add-message "You toggle off the climbing mode. "))
+                                                    (rem-mob-effect actor +mob-effect-climbing-mode+)
+                                                    (when (apply-gravity actor)
+                                                      (set-mob-location actor (x actor) (y actor) (z actor))
+                                                      (make-act actor +normal-ap+)))
+                                                  (progn
+                                                    (when (eq actor *player*)
+                                                      (add-message "You toggle on the climbing mode. "))
+                                                    (set-mob-effect actor +mob-effect-climbing-mode+))))
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-climbing+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-climbing+)
+                                                           (can-invoke-ability actor actor +mob-abil-climbing+)
+                                                           (not (mob-effect-p actor +mob-effect-climbing-mode+)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
