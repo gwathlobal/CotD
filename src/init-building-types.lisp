@@ -443,6 +443,18 @@
                                                        (when (> tree-num 1)
                                                          (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-dirt+))))
 
+                                            ;; place a large birch tree
+                                            (let ((dx (random 8))
+                                                  (dy (random 8))
+                                                  (r (random 5)))
+                                              (cond
+                                                ((= r 4) (level-place-birch-mature-4 template-level (+ dx x) (+ dy y) z))
+                                                ((= r 3) (level-place-birch-mature-3 template-level (+ dx x) (+ dy y) z))
+                                                ((= r 2) (level-place-birch-mature-2 template-level (+ dx x) (+ dy y) z))
+                                                ((= r 2) (level-place-birch-mature-1 template-level (+ dx x) (+ dy y) z))
+                                                (t nil))
+                                              )
+                                            
                                             ;; place grass around trees
                                             (loop for dx from 1 to 8 do
                                               (loop for dy from 1 to 8 do
@@ -455,7 +467,61 @@
                                             (values (loop repeat 2
                                                           collect (loop with rx = (random 10)
                                                                         with ry = (random 10)
-                                                                        until (not (= (aref template-level (+ x rx) (+ y ry) z) +terrain-tree-birch+))
+                                                                        until (and (not (= (aref template-level (+ x rx) (+ y ry) z) +terrain-tree-birch+))
+                                                                                   (not (= (aref template-level (+ x rx) (+ y ry) z) +terrain-tree-birch-trunk+)))
+                                                                        finally (return (list +mob-type-man+ rx ry z))
+                                                                        do
+                                                                           (setf rx (random 10))
+                                                                           (setf ry (random 10))
+                                                                        ))
+                                                    nil)
+                                            
+                                            
+                                            )))
+
+(set-building-type (make-building :id +building-city-park-4+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
+                                  :func #'(lambda (x y z template-level)
+                                            ;; populate the area with trees, leaving the border untouched
+                                            (loop for dx from 1 to 8 do
+                                              (loop for dy from 1 to 8 do
+                                                (when (zerop (random 3))
+                                                  (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+))))
+
+                                            ;; make sure that each tree has no more than one adjacent tree
+                                            (loop for dx from 1 to 8 do
+                                              (loop for dy from 1 to 8
+                                                    with tree-num
+                                                    do
+                                                       (setf tree-num 0)
+                                                       (check-surroundings (+ x dx) (+ y dy) nil
+                                                                           #'(lambda (x y)
+                                                                               (when (= (aref template-level x y z) +terrain-tree-birch+)
+                                                                                 (incf tree-num))))
+                                                       (when (> tree-num 1)
+                                                         (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-dirt+))))
+
+                                            ;; place grass around trees
+                                            (loop for dx from 1 to 8 do
+                                              (loop for dy from 1 to 8 do
+                                                (when (= (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+)
+                                                  (check-surroundings (+ x dx) (+ y dy) nil
+                                                                      #'(lambda (x y)
+                                                                          (setf (aref template-level x y z) +terrain-floor-grass+))))))
+
+                                            ;; place a large oak tree
+                                            (let ((dx (random 7))
+                                                  (dy (random 7))
+                                                  (r (random 1)))
+                                              (cond
+                                                (t (level-place-oak-mature-1 template-level (+ dx x) (+ dy y) z)))
+                                              )
+                                            
+                                            ;; find a place to position citizens
+                                            (values (loop repeat 2
+                                                          collect (loop with rx = (random 10)
+                                                                        with ry = (random 10)
+                                                                        until (and (not (= (aref template-level (+ x rx) (+ y ry) z) +terrain-tree-birch+))
+                                                                                   (not (= (aref template-level (+ x rx) (+ y ry) z) +terrain-tree-birch-trunk+)))
                                                                         finally (return (list +mob-type-man+ rx ry z))
                                                                         do
                                                                            (setf rx (random 10))
@@ -468,37 +534,50 @@
 
 (set-building-type (make-building :id +building-city-park-tiny+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
-                                            ;; populate the area with trees, leaving the border untouched
-                                            (loop for dx from 1 to 3 do
-                                              (loop for dy from 1 to 3 do
-                                                (when (zerop (random 3))
-                                                  (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+))))
-
-                                            ;; make sure that each tree has no more than two adjacent trees
-                                            (loop for dx from 1 to 3 do
-                                              (loop for dy from 1 to 3
-                                                    with tree-num
-                                                    do
-                                                       (setf tree-num 0)
-                                                       (check-surroundings (+ x dx) (+ y dy) nil
-                                                                           #'(lambda (x y)
-                                                                               (when (= (aref template-level x y z) +terrain-tree-birch+)
-                                                                                 (incf tree-num))))
-                                                       (when (> tree-num 2)
-                                                         (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-dirt+))))
-
-                                            ;; place grass around trees
-                                            (loop for dx from 1 to 3 do
-                                              (loop for dy from 1 to 3 do
-                                                (when (= (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+)
-                                                  (check-surroundings (+ x dx) (+ y dy) nil
-                                                                      #'(lambda (x y)
-                                                                          (if (= (aref template-level x y z) +terrain-border-floor+)
-                                                                            (setf (aref template-level x y z) +terrain-border-grass+)
-                                                                            (setf (aref template-level x y z) +terrain-floor-grass+)))))))
-                                            
-                                            (values nil nil)
-                                            )))
+                                            (if (zerop (random 5))
+                                              (progn
+                                                ;; place a large birch tree
+                                                (let ((r (random 4)))
+                                                  (cond
+                                                    ((= r 3) (level-place-birch-mature-4 template-level (+ 1 x) (+ 1 y) z))
+                                                    ((= r 2) (level-place-birch-mature-3 template-level (+ 1 x) (+ 1 y) z))
+                                                    ((= r 1) (level-place-birch-mature-2 template-level (+ 1 x) (+ 1 y) z))
+                                                    (t (level-place-birch-mature-1 template-level (+ 1 x) (+ 1 y) z)))
+                                                  )
+                                                (values nil nil)
+                                                )
+                                              (progn
+                                                ;; populate the area with trees, leaving the border untouched
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3 do
+                                                    (when (zerop (random 3))
+                                                      (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+))))
+                                                
+                                                ;; make sure that each tree has no more than two adjacent trees
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3
+                                                        with tree-num
+                                                        do
+                                                           (setf tree-num 0)
+                                                           (check-surroundings (+ x dx) (+ y dy) nil
+                                                                               #'(lambda (x y)
+                                                                                   (when (= (aref template-level x y z) +terrain-tree-birch+)
+                                                                                     (incf tree-num))))
+                                                           (when (> tree-num 2)
+                                                             (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-dirt+))))
+                                                
+                                                ;; place grass around trees
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3 do
+                                                    (when (= (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+)
+                                                      (check-surroundings (+ x dx) (+ y dy) nil
+                                                                          #'(lambda (x y)
+                                                                              (if (= (aref template-level x y z) +terrain-border-floor+)
+                                                                                (setf (aref template-level x y z) +terrain-border-grass+)
+                                                                                (setf (aref template-level x y z) +terrain-floor-grass+)))))))
+                                                
+                                                (values nil nil))))
+                                  ))
 
 (set-building-type (make-building :id +building-city-lake-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
                                   :func #'(lambda (x y z template-level)

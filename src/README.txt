@@ -82,8 +82,8 @@ KEYBINDINGS
  f                              - Fire mode
  r                              - Reload
 
- Shift + ,                      - Look up (while in look/fire mode)
- Shift + .                      - Look down (while in look/fire mode)
+ Shift + ,                      - Look/Climb up
+ Shift + .                      - Look/Climb down
 
  Shift + 2                      - Character screen
  m                              - View messages

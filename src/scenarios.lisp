@@ -203,7 +203,8 @@
           ((= (aref template-level x y z) +terrain-floor-dirt-bright+) (setf (aref template-level x y z) +terrain-floor-snow+))
           ((= (aref template-level x y z) +terrain-floor-grass+) (setf (aref template-level x y z) +terrain-floor-snow+))
           ((= (aref template-level x y z) +terrain-tree-birch+) (setf (aref template-level x y z) +terrain-tree-birch-snow+))
-          ((= (aref template-level x y z) +terrain-water-lake+) (setf (aref template-level x y z) +terrain-water-ice+))))))
+          ((= (aref template-level x y z) +terrain-water-lake+) (setf (aref template-level x y z) +terrain-water-ice+))
+          ((= (aref template-level x y z) +terrain-floor-leaves+) (setf (aref template-level x y z) +terrain-floor-leaves-snow+))))))
   template-level)
 
 (defun place-reserved-buildings-river (reserved-level)

@@ -57,6 +57,7 @@
 (defconstant +building-city-stables-1+ 34)
 (defconstant +building-city-mansion-1+ 35)
 (defconstant +building-city-mansion-2+ 36)
+(defconstant +building-city-park-4+ 37)
 
 (defparameter *level-grid-size* 5)
 
@@ -147,3 +148,245 @@
     ;; all checks done - success
     t
     ))
+
+(defun level-place-birch-mature-1 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  
+  ;; z = 3
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  
+  ;; z = 4
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-grass+)
+  )
+
+(defun level-place-birch-mature-2 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  
+  ;; z = 3
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  
+  ;; z = 4
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-grass+)
+  )
+
+(defun level-place-birch-mature-3 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  
+  ;; z = 3
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  
+  ;; z = 4
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-branches+)
+  )
+
+(defun level-place-birch-mature-4 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  
+  ;; z = 3
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  
+  ;; z = 4
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-tree-birch-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+
+  ;; z = 5
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 3)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 3)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 3)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 3)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 3)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 3)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 3)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 3)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 3)) +terrain-floor-branches+)
+  )
+
+(defun level-place-oak-mature-1 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 3) (+ z 0)) +terrain-floor-grass+)
+
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-oak-trunk-nw+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-tree-oak-trunk-sw+)
+  (setf (aref template-level (+ x 1) (+ y 3) (+ z 0)) +terrain-floor-grass+)
+
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-tree-oak-trunk-ne+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-tree-oak-trunk-se+)
+  (setf (aref template-level (+ x 2) (+ y 3) (+ z 0)) +terrain-floor-grass+)
+
+  (setf (aref template-level (+ x 3) (+ y 0) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 3) (+ y 1) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 3) (+ y 2) (+ z 0)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 3) (+ y 3) (+ z 0)) +terrain-floor-grass+)
+  
+  ;; z = 3
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 0) (+ y 3) (+ z 1)) +terrain-floor-grass+)
+
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-tree-oak-trunk-nw+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-tree-oak-trunk-sw+)
+  (setf (aref template-level (+ x 1) (+ y 3) (+ z 1)) +terrain-floor-branches+)
+
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-tree-oak-trunk-ne+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-tree-oak-trunk-se+)
+  (setf (aref template-level (+ x 2) (+ y 3) (+ z 1)) +terrain-floor-leaves+)
+
+  ;;(setf (aref template-level (+ x 3) (+ y 0) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 3) (+ y 1) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 3) (+ y 2) (+ z 1)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 3) (+ y 3) (+ z 1)) +terrain-floor-grass+)
+  
+  ;; z = 4
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 3) (+ z 2)) +terrain-floor-grass+)
+
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-tree-oak-trunk-nw+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-tree-oak-trunk-sw+)
+  (setf (aref template-level (+ x 1) (+ y 3) (+ z 2)) +terrain-floor-leaves+)
+
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-tree-oak-trunk-ne+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-tree-oak-trunk-se+)
+  (setf (aref template-level (+ x 2) (+ y 3) (+ z 2)) +terrain-floor-branches+)
+
+  ;;(setf (aref template-level (+ x 3) (+ y 0) (+ z 2)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 3) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 3) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 3) (+ y 3) (+ z 2)) +terrain-floor-grass+)
+
+  ;; z = 5
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 3)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 3)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 3)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 0) (+ y 3) (+ z 3)) +terrain-floor-grass+)
+
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 3)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 3)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 3)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 3) (+ z 3)) +terrain-floor-leaves+)
+
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 3)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 3)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 3)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 2) (+ y 3) (+ z 3)) +terrain-floor-leaves+)
+
+  ;;(setf (aref template-level (+ x 3) (+ y 0) (+ z 3)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 3) (+ y 1) (+ z 3)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 3) (+ y 2) (+ z 3)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 3) (+ y 3) (+ z 3)) +terrain-floor-grass+)
+  )

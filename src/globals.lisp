@@ -197,6 +197,14 @@
 (defconstant +terrain-slope-stone-down+ 31)
 (defconstant +terrain-wall-earth+ 32)
 (defconstant +terrain-wall-bush+ 33)
+(defconstant +terrain-floor-branches+ 34)
+(defconstant +terrain-floor-leaves+ 35)
+(defconstant +terrain-tree-birch-trunk+ 36)
+(defconstant +terrain-floor-leaves-snow+ 37)
+(defconstant +terrain-tree-oak-trunk-nw+ 38)
+(defconstant +terrain-tree-oak-trunk-sw+ 39)
+(defconstant +terrain-tree-oak-trunk-ne+ 40)
+(defconstant +terrain-tree-oak-trunk-se+ 41)
 
 (defparameter *faction-table* (make-hash-table))
 

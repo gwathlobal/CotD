@@ -10,7 +10,7 @@
                                                :trait-opaque-floor t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-stone+ :glyph-idx 96 :glyph-color sdl:*white* :back-color sdl:*white* :name "Stone wall"
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t  :trait-opaque-floor t))
-(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch+ :glyph-idx 52 :glyph-color sdl:*green* :back-color sdl:*black* :name "Birch tree"
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch+ :glyph-idx 52 :glyph-color sdl:*green* :back-color sdl:*black* :name "Young birch tree"
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t  :trait-opaque-floor t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-grass+ :glyph-idx 95 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* :name "Grass"
                                                :trait-opaque-floor t))
@@ -72,3 +72,19 @@
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-bush+ :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* :name "Bush"
                                                :trait-blocks-move t :trait-opaque-floor t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-branches+ :glyph-idx 3 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* :name "Tree branch"
+                                               :trait-opaque-floor t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-leaves+ :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* :name "Tree leaves"
+                                               :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch-trunk+ :glyph-idx 16 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* :name "Mature birch"
+                                               :trait-opaque-floor t :trait-blocks-move t :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-leaves-snow+ :glyph-idx 3 :glyph-color sdl:*white* :back-color sdl:*black* :name "Snow-covered tree leaves"
+                                               :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-nw+ :glyph-idx 104 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* :name "Mature oak"
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-ne+ :glyph-idx 105 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* :name "Mature oak"
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-se+ :glyph-idx 106 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* :name "Mature oak"
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-sw+ :glyph-idx 107 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* :name "Mature oak"
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-vision t))
