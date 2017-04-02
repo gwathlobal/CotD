@@ -15,6 +15,9 @@
    (feature-id-list :initarg :feature-id-list :initform (make-list 0) :accessor feature-id-list)
    (connect-map :initform (make-array '(6) :initial-element nil) :accessor connect-map :type simple-array) ; an array that holds connection maps (which are arrays themselves) for all sizes of mobs,
                                                                                                            ; note that sizes can only be odd numbers, so some indices of the array will hold nil 
+   (light-map :accessor light-map)
+   (outdoor-light :initform 0 :accessor outdoor-light)
+   (light-sources :initform (make-array '(0) :adjustable t) :accessor light-sources)
    ))
    
 (defun add-mob-to-level-list (level mob)
@@ -182,6 +185,18 @@
     )
   )
 
+(defun get-outdoor-light-* (level x y z)
+  (truncate (* (outdoor-light level)
+               (aref (light-map level) x y z))
+            100))
+
+(defun make-light-source (x y z light-radius)
+  (list x y z light-radius))
+
+(defun add-light-source (level light-source)
+  (adjust-array (light-sources level) (list (1+ (length (light-sources level)))))
+  (setf (aref (light-sources level) (1- (length (light-sources level)))) light-source))
+
 ;;----------------------
 ;; WORLD
 ;;----------------------
@@ -214,3 +229,35 @@
 
    (animation-queue :initform () :accessor animation-queue)
    ))
+
+;;----------------------
+;; DATE
+;;----------------------
+
+(defun get-current-date-time (date-time)
+  (let ((year 0)
+        (month 0)
+        (day 0)
+        (hour 0)
+        (min 0)
+        (sec 0))
+    (multiple-value-setq (year month) (truncate (* date-time 6) (* 12 30 24 60 60)))
+    (multiple-value-setq (month day) (truncate month (* 30 24 60 60)))
+    (multiple-value-setq (day hour) (truncate day (* 24 60 60)))
+    (multiple-value-setq (hour min) (truncate hour (* 60 60)))
+    (multiple-value-setq (min sec) (truncate min 60))
+    (values year month day hour min sec)))
+
+(defun set-current-date-time (year month day hour min sec)
+  (let ((date-time 0))
+    (incf date-time (truncate (* year 12 30 24 60 60) 6))
+    (incf date-time (truncate (* month 30 24 60 60) 6))
+    (incf date-time (truncate (* day 24 60 60) 6))
+    (incf date-time (truncate (* hour 60 60) 6))
+    (incf date-time (truncate (* min 60) 6))
+    (incf date-time (truncate sec 6))
+    date-time))
+
+(defun show-date-time-short (date-time)
+  (multiple-value-bind (year month day hour min sec) (get-current-date-time date-time)
+    (format nil "~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d:~2,'0d" year (1+ month) (1+ day) hour min sec)))

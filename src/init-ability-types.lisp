@@ -4,6 +4,7 @@
                                  :id +mob-abil-heal-self+ :name "Heal self" :descr "Invoke divine powers to heal yourself." 
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 (let ((heal-pwr (+ (* 4 (mob-ability-p actor +mob-abil-heal-self+))
@@ -41,6 +42,7 @@
                                  :id +mob-abil-conseal-divine+ :name "Conseal divinity" :descr "Disguise yourself as a human. Divine abilities do not work while in human form." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 25
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 (set-mob-effect actor +mob-effect-divine-consealed+)
@@ -70,6 +72,7 @@
                                  :id +mob-abil-reveal-divine+ :name "Reveal divinity" :descr "Invoke to reveal you divinity." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 25
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 (rem-mob-effect actor +mob-effect-divine-consealed+)
@@ -187,6 +190,7 @@
                                  :id +mob-abil-purging-touch+ :name "Purging touch" :descr "You are able to destroy demons who possess humans without harming the mortal bodies of the latter." 
                                  :passive t :cost 0 :spd 0 
                                  :final t :on-touch t
+                                 :motion 10
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
@@ -208,6 +212,7 @@
                                  :id +mob-abil-blessing-touch+ :name "Blessing touch" :descr "You are able to bless humans when you touch them." 
                                  :passive t :cost 0 :spd +normal-ap+
                                  :final t :on-touch t
+                                 :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
@@ -241,6 +246,7 @@
                                  :id +mob-abil-unholy+ :name "Unholy" :descr "You burn (dmg: 1-2) when touching a blessed creature." 
                                  :passive t :cost 0 :spd +normal-ap+
                                  :final t :on-touch t
+                                 :motion 30
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
@@ -290,6 +296,7 @@
                                  :id +mob-abil-lifesteal+ :name "Lifesteal" :descr "You heal yourself with the lifeforce of your slain enemies. The more powerful creature you kill - the more health you gain." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-kill t
+                                 :motion 10
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
@@ -315,6 +322,7 @@
                                  :id +mob-abil-call-for-help+ :name "Summon ally" :descr "Invoke hellish powers to summon one ally to your place. Remember that you may call but nobody is obliged to answer." 
                                  :cost 1 :spd (truncate +normal-ap+ 3) :passive nil
                                  :final t :on-touch nil
+                                 :motion 30
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
@@ -369,6 +377,7 @@
                                  :id +mob-abil-answer-the-call+ :name "Answer the call" :descr "Invoke hellish powers to answer the summoning of your allies. If somebody has already answered the call, nothing will happen. If the teleport is successful, the ability will cost 5 time units." 
                                  :cost 0 :spd 0 :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
@@ -461,6 +470,7 @@
                                  :id +mob-abil-prayer-bless+ :name "Prayer" :descr "Pray to God for help." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 20
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
@@ -517,6 +527,7 @@
                                  :id +mob-abil-free-call+ :name "Summon ally" :descr "Invoke hellish powers to summon one ally to your place. Remember that you may call but nobody is obliged to answer." 
                                  :cost 0 :spd (truncate +normal-ap+ 3) :passive nil
                                  :final t :on-touch nil
+                                 :motion 30
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
@@ -567,6 +578,7 @@
                                  :id +mob-abil-prayer-shield+ :name "Pray for protection" :descr "Pray to grant divine protection (1/3rd chance only) to all allies in the area. Divine protection prevents the next harmful action against you." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 20
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
@@ -620,6 +632,7 @@
                                  :id +mob-abil-curse+ :name "Curse" :descr "Curse the enemy with diabolical incantations." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
@@ -697,6 +710,7 @@
                                  :id +mob-abil-prayer-reveal+ :name "Pray for revelation" :descr "Pray to reveal supernatural beings in the area (1/2nd chance) and prevent them from being disguised for a while." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 20
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
@@ -746,6 +760,7 @@
                                  :id +mob-abil-military-follow-me+ :name "Follow me!" :descr "Order nearby subordinates to follow you. Up to five people may obey this order. Troops that are already following others, may be reluctant to follow you." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 20
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
@@ -801,6 +816,7 @@
                                  :id +mob-abil-blindness+ :name "Blindness" :descr "A flash of light that blinds nearby enemies for 2 turns." 
                                  :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 10
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
@@ -854,6 +870,7 @@
                                  :id +mob-abil-instill-fear+ :name "Instill fear" :descr "Fear visible enemies around your for 3 turns. More powerfull characters may resist fear." 
                                  :cost 1 :spd (truncate +normal-ap+ 1.3) :passive nil
                                  :final t :on-touch nil
+                                 :motion 30
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
@@ -910,6 +927,7 @@
                                  :id +mob-abil-charge+ :name "Charge" :descr "Move up to 3 tiles to the specified place. Anybody on your way will be pushed back (if possible) and attacked." 
                                  :cd 4 :cost 0 :spd (truncate (* +normal-ap+ 1.5)) :passive nil
                                  :final t :on-touch nil
+                                 :motion 10
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; here the target is not a mob, but a (cons x y)
@@ -1016,6 +1034,7 @@
                                  :id +mob-abil-horseback-riding+ :name "Horseback riding" :descr "You can ride horses. To mount a horse, you must stand next to it." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1087,6 +1106,7 @@
                                  :id +mob-abil-dismount+ :name "Dismount" :descr "Get off your mount, if you are riding one." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; here the target is not a mob, but a (cons x y)
@@ -1162,6 +1182,7 @@
                                  :id +mob-abil-dominate-fiend+ :name "Dominate fiend" :descr "You can mount a fiend, if you stand next to it. Riding a fiend will reveal your true form." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1257,6 +1278,7 @@
                                  :id +mob-abil-eagle-eye+ :name "Eagle eye" :descr "You can inspect an enemy unit to reveal its true form." 
                                  :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 10
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-EAGLE-EYE: ~A [~A] uses eagle eye to reveal ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1332,6 +1354,7 @@
                                  :id +mob-abil-mind-burn+ :name "Mind burn" :descr "Burn the mind of an enemy in your line of sight for 2-4 dmg." 
                                  :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 10
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1382,6 +1405,7 @@
                                  :id +mob-abil-gargantaur-teleport+ :name "Teleport self" :descr "Teleport yourself somewhere else." 
                                  :cd 20 :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
@@ -1443,6 +1467,7 @@
                                  :id +mob-abil-dominate-gargantaur+ :name "Dominate Gargantaur" :descr "You can mount a Gargantaur, if you stand next to it, but at a cost of inflicting yourself the amount of damage equal to the half of your maximum HP. Riding one will reveal your true form." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DOMINATE-GARGANTAUR: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1533,6 +1558,7 @@
                                  :id +mob-abil-gargantaurs-mind-burn+ :name "Gargantaur's mind burn" :descr "Use your Gargantuar to burn the mind of an enemy in your line of sight for 2-4 dmg. You must be riding a Gargantaur to invoke this ability." 
                                  :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 10
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-GARGANTAURS-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1586,6 +1612,7 @@
                                  :id +mob-abil-death-from-above+ :name "Death from Above" :descr "Jump from above on your prey and land a devastating attack for 5-8 iron dmg." 
                                  :cd 1 :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DEATH-FROM-ABOVE: ~A [~A] uses death from above on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1684,7 +1711,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-climbing+ :name "Climbing" :descr "Toggle climbing mode. While in climbing mode you are able to scale walls up and down and will not fall down until you have a solid wall or a floor nearby." 
+                                 :id +mob-abil-climbing+ :name "Climbing" :descr "Toggle the climbing mode. While in the climbing mode you are able to scale walls up and down and will not fall as long as you remain next to a solid wall or a floor. You can toggle the climbing mode at any time." 
                                  :cost 0 :spd 0 :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)

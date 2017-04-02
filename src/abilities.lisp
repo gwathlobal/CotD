@@ -11,6 +11,7 @@
    (cost :initform 0 :initarg :cost :accessor cost)
    (spd :initform +normal-ap+ :initarg :spd :accessor spd)
    (cd :initform 0 :initarg :cd :accessor cd)
+   (motion :initform 0 :initarg :motion :accessor motion)
    (passive :initform t :initarg :passive :accessor passive) ;; passive abilities should have their cost set to 0
    (on-touch :initform nil :initarg :on-touch :accessor on-touch :type boolean) ;; if the abilities should be invoked, when actor bumps into target
    (final :initform t :initarg :final :accessor final :type boolean) ;; if the ability is invoked, no further abilities can be invoked
@@ -80,6 +81,9 @@
   (if (zerop (abil-cur-cd-p mob ability-type-id))
     t
     nil))
+
+(defun abil-motion-p (ability-type-id)
+  (motion (get-ability-type-by-id ability-type-id)))
 
 (defmethod abilities ((mob mob))
   (abilities (get-mob-type-by-id (mob-type mob))))

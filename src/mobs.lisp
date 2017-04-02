@@ -89,6 +89,8 @@
    (base-dodge :initform 5 :initarg :base-dodge :accessor base-dodge)
    (base-armor :initform 0 :initarg :base-armor :accessor base-armor)
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)
+   (base-light-radius :initform *base-light-radius* :initarg :base-light-radius :accessor base-light-radius)
+   (base-stealth :initform 0 :initarg :base-stealth :accessor base-stealth)
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
@@ -431,6 +433,11 @@
    (r-acc :initform +base-accuracy+ :initarg :r-acc :accessor r-acc)
    (cur-dodge :initform 5 :initarg :cur-dodge :accessor cur-dodge)
    (cur-armor :initform 0 :initarg :cur-armor :accessor cur-armor)
+
+   (brightness :initform 0 :accessor brightness)
+   (cur-light :initform *base-light-radius* :initarg :cur-light :accessor cur-light)
+   (motion :initform 0 :accessor motion)
+   (cur-stealth :initform 0 :accessor cur-stealth)
    
    (stat-kills :initform (make-hash-table) :accessor stat-kills)
    (stat-blesses :initform 0 :accessor stat-blesses)
@@ -514,6 +521,12 @@
 (defmethod base-sight ((mob mob))
   (base-sight (get-mob-type-by-id (mob-type mob))))
 
+(defmethod base-light-radius ((mob mob))
+  (base-light-radius (get-mob-type-by-id (mob-type mob))))
+
+(defmethod base-stealth ((mob mob))
+  (base-stealth (get-mob-type-by-id (mob-type mob))))
+
 (defmethod strength ((mob mob))
   (strength (get-mob-type-by-id (mob-type mob))))
 
@@ -565,6 +578,9 @@
   (setf (third (weapon mob)) (copy-list (third (weapon (get-mob-type-by-id (mob-type mob)))))))
 
 (defun adjust-sight (mob)
+  (let ((light (base-light-radius mob)))
+    (setf (cur-light mob) light))
+  
   (let ((sight (base-sight mob)))
     (when (mob-effect-p mob +mob-effect-blind+)
       (setf sight 0))
@@ -579,10 +595,13 @@
       (setf dodge 0))
     (setf (cur-dodge mob) dodge)))
 
-(defun adjust-armor (mob-obj)
+(defun adjust-armor (mob)
+  (let ((stealth (base-stealth mob)))
+    (setf (cur-stealth mob) stealth))
+
   (let ((armor 0))
-    (setf armor (base-armor (get-mob-type-by-id (mob-type mob-obj))))
-    (setf (cur-armor mob-obj) armor)))
+    (setf armor (base-armor (get-mob-type-by-id (mob-type mob))))
+    (setf (cur-armor mob) armor)))
 
 (defun adjust-m-acc (mob)
   (setf (m-acc mob) 0)
@@ -781,6 +800,34 @@
   (cond
     ((mob-effect-p mob +mob-effect-climbing-mode+) +connect-map-move-climb+)
     (t +connect-map-move-walk+)))
+
+(defun get-mob-visibility (mob)
+  (let ((visibility 0))
+    (incf visibility (brightness mob))
+    (incf visibility (motion mob))
+    (decf visibility (cur-stealth mob))
+    (when (< visibility 0)
+      (setf visibility 0))
+    visibility))
+
+(defun check-mob-visibile (mob &key (observer nil))
+  (let ((exposure (get-mob-visibility mob))
+        (threshold *mob-visibility-threshold*)
+        (result nil))
+
+    (when (and observer
+               (mob-effect-p observer +mob-effect-alertness+))
+      (incf exposure *mob-exposure-alertness*))
+    
+    (if (>= exposure threshold)
+      (setf result t)
+      (setf result nil))
+
+    ;; you always see people of you own faction
+    (when (get-faction-relation (faction mob) (faction observer))
+      (setf result t))
+    
+    result))
 
 ;;----------------------
 ;; PLAYER

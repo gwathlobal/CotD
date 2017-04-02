@@ -329,3 +329,12 @@
                                                                     (when (zerop max-units) (loop-finish)))
                                                            )
                                ))
+
+(set-game-event (make-instance 'game-event :id +game-event-adjust-outdoor-ligth+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (setf (outdoor-light (level world))
+                                                                 (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 12 60 10)) (player-game-time world))))))))
+                                                           )))

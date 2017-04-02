@@ -25,6 +25,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
+                                       :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :ai-coward t))
 
@@ -34,6 +35,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
+                                       :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :ai-coward t))
 
@@ -43,6 +45,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
+                                       :base-light-radius 3
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :ai-coward t))
 
@@ -52,6 +55,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
+                                       :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :ai-coward t))
 
@@ -61,6 +65,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
+                                       :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                              ))
 
@@ -70,6 +75,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Police baton" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
+                                       :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                              ))
 
@@ -79,6 +85,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Cross" (list +weapon-dmg-iron+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 0
+                                       :base-light-radius 4
                                        :abil-can-be-blessed t :abil-detect-evil t :abil-prayer-bless t :abil-prayer-shield t :abil-human t
                                        :ai-stop t
                              ))
@@ -88,6 +95,7 @@
                                        :faction +faction-type-demons+
                                        :weapon (list "Burning touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 1
+                                       :base-light-radius 4
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-call-for-help t :abil-free-call t :abil-curse t
                              ))
 
@@ -98,6 +106,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 30
                                        :strength 1
+                                       :base-light-radius 0 :base-stealth 10
                                        :abil-human t :abil-death-from-above t :abil-climbing t
                              ))
 
@@ -151,7 +160,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
                                        :name "Angel"
-                                       :glyph-idx 65 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 16 :max-fp 16
+                                       :glyph-idx 65 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 18 :max-fp 16
                                        :faction +faction-type-angels+ :evolve-mob-id +mob-type-archangel+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
@@ -179,6 +188,7 @@
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 5 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.8))
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
+                                       :base-light-radius 0
                                        :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t
                                        :abil-dominate-fiend t :abil-dismount t
@@ -191,6 +201,7 @@
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
+                                       :base-light-radius 0
                                        :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3
                                        :abil-dominate-fiend t :abil-dismount t))
@@ -201,7 +212,8 @@
                                        :faction +faction-type-demons+
                                        :weapon (list "Chains of Shattering" (list +weapon-dmg-vorpal+ 5 10 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
-                                       :strength 4
+                                       :strength 5
+                                       :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t
                                        :abil-dominate-fiend t :abil-dismount t))

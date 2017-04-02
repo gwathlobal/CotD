@@ -7,6 +7,7 @@
 (defconstant +scenario-feature-weather+ 0)
 (defconstant +scenario-feature-city-layout+ 1)
 (defconstant +scenario-feature-player-faction+ 2)
+(defconstant +scenario-feature-time-of-day+ 3)
 
 ;;---------------------------------
 ;; SCENARIO-FEATURE Constants
@@ -27,6 +28,10 @@
 (defconstant +player-faction-military-chaplain+ 12)
 (defconstant +city-layout-barricaded-city+ 13)
 (defconstant +player-faction-military-scout+ 14)
+(defconstant +tod-type-night+ 15)
+(defconstant +tod-type-day+ 16)
+(defconstant +tod-type-morning+ 17)
+(defconstant +tod-type-evening+ 18)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -567,3 +572,23 @@
                   (= (aref reserved-level x y 2) +building-city-barricade-nw+))
           (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
+
+(defun set-up-outdoor-light (level light-power)
+  (setf (outdoor-light level) light-power)
+
+  ;; propagate light from above to determine which parts of the map are outdoor and which are "inside"
+  ;; also set up all stationary light sources
+  (loop for x from 0 below (array-dimension (light-map level) 0) do
+    (loop for y from 0 below (array-dimension (light-map level) 1)
+          for light-pwr = 100
+          do
+             (loop for z from (1- (array-dimension (light-map level) 2)) downto 0
+                   do
+                      (setf (aref (light-map level) x y z) light-pwr)
+                      (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                        (setf light-pwr 0))
+                      (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-light-source+)
+                        (add-light-source level (make-light-source x y z (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-light-source+))))
+                   )))
+
+  )

@@ -18,6 +18,7 @@
    ;; :trait-slope-up - +terrain-trait-slope-up+
    ;; :trait-slope-down - +terrain-trait-slope-down+
    ;; :trait-not-climable - +terrain-trait-not-climable+
+   ;; :trait-light-source - +terrain-trait-light-source+
    ))
 
 
@@ -29,7 +30,7 @@
 (defun get-terrain-type-by-id (terrain-type-id)
   (aref *terrain-types* terrain-type-id))
 
-(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor trait-slope-up trait-slope-down trait-not-climable)
+(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor trait-slope-up trait-slope-down trait-not-climable trait-light-source)
   
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
@@ -45,6 +46,8 @@
     (setf (gethash +terrain-trait-slope-down+ (trait terrain-type)) t))
   (when trait-not-climable
     (setf (gethash +terrain-trait-not-climable+ (trait terrain-type)) t))
+  (when trait-light-source
+    (setf (gethash +terrain-trait-light-source+ (trait terrain-type)) trait-light-source))
   )
 
 (defun get-terrain-type-trait (terrain-type-id key)

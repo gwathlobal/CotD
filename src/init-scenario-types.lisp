@@ -28,7 +28,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level* #'get-max-buildings-normal #'get-reserved-buildings-normal nil)))
                                                        (push +game-event-military-arrive+ game-event-list)
-                                                       
+                                                                                                              
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-river+
@@ -38,7 +38,7 @@
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'get-max-buildings-river #'get-reserved-buildings-river #'place-reserved-buildings-river)))
                                                        (push +game-event-military-arrive+ game-event-list)
-                                                       
+                                                                                                              
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-port+
@@ -61,7 +61,7 @@
                                                            ((= r 2) (push +game-event-military-arrive-port-e+ game-event-list)) ;; east
                                                            ((= r 3) (push +game-event-military-arrive-port-w+ game-event-list))) ;; west
                                                          )
-                                                       
+                                                                                                              
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-player+
@@ -99,7 +99,7 @@
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
                                                        (push +game-event-lose-game-possessed+ game-event-list)
-                                                       
+                                                                                                              
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-test+
@@ -420,3 +420,27 @@
                                                        (push +game-event-win-for-humans+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +tod-type-night+
+                                             :type +scenario-feature-time-of-day+
+                                             :name "Night"
+                                             :func #'(lambda (level)
+                                                       (set-up-outdoor-light level 0))))
+
+(set-scenario-feature (make-scenario-feature :id +tod-type-day+
+                                             :type +scenario-feature-time-of-day+
+                                             :name "Day"
+                                             :func #'(lambda (level)
+                                                       (set-up-outdoor-light level 100))))
+
+(set-scenario-feature (make-scenario-feature :id +tod-type-morning+
+                                             :type +scenario-feature-time-of-day+
+                                             :name "Morning"
+                                             :func #'(lambda (level)
+                                                       (set-up-outdoor-light level 50))))
+
+(set-scenario-feature (make-scenario-feature :id +tod-type-evening+
+                                             :type +scenario-feature-time-of-day+
+                                             :name "Evening"
+                                             :func #'(lambda (level)
+                                                       (set-up-outdoor-light level 50))))

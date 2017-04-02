@@ -88,3 +88,5 @@
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-vision t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-sw+ :glyph-idx 107 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* :name "Mature oak"
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-vision t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern+ :glyph-idx 92 :glyph-color sdl:*yellow* :back-color sdl:*black* :name "Lantern"
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 6))

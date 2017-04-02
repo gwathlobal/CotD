@@ -247,6 +247,15 @@
        (progn
          ;; it is imperative the a 1-tile mob rides a multi-tile mob and not vice versa
 
+         ;; set motion
+         (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
+           (incf (motion mob) *mob-motion-stand*)
+           (incf (motion mob) *mob-motion-move*))
+         
+         (if (and (= (x (get-mob-by-id (riding-mob-id mob))) x) (= (y (get-mob-by-id (riding-mob-id mob))) y) (= (z (get-mob-by-id (riding-mob-id mob))) z))
+           (incf (motion (get-mob-by-id (riding-mob-id mob))) *mob-motion-stand*)
+           (incf (motion (get-mob-by-id (riding-mob-id mob))) *mob-motion-move*))
+                
          (funcall place-func (get-mob-by-id (riding-mob-id mob)))
 
          ;; place the rider
@@ -257,6 +266,15 @@
        (progn
          ;; it is imperative the a 1-tile mob rides a multi-tile mob and not vice versa
 
+         ;; set motion
+         (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
+           (incf (motion mob) *mob-motion-stand*)
+           (incf (motion mob) *mob-motion-move*))
+         
+         (if (and (= (x (get-mob-by-id (mounted-by-mob-id mob))) x) (= (y (get-mob-by-id (mounted-by-mob-id mob))) y) (= (z (get-mob-by-id (mounted-by-mob-id mob))) z))
+           (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-stand*)
+           (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-move*))
+         
          (funcall place-func mob)
          
          ;; place the rider
@@ -267,6 +285,11 @@
          ))
       (t
        (progn
+         ;; set motion
+         (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
+           (incf (motion mob) *mob-motion-stand*)
+           (incf (motion mob) *mob-motion-move*))
+         
          (funcall place-func mob))))
 
     ;; apply gravity
@@ -336,6 +359,9 @@
                           (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob)))))))
           (return-from move-mob nil)))
 
+      ;; set motion
+      (incf (motion mob) *mob-motion-order*)
+      
       (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
       (return-from move-mob t))
 
@@ -450,6 +476,7 @@
              (cond
                ;; all clear - move freely
                ((eq check-result t)
+
                 (set-mob-location mob x y z)
                 (setf move-result t)
                 
@@ -500,6 +527,8 @@
                                 (when (eq check-result-n t)
                                   (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                          (format nil "~A pushes ~A. " (visible-name mob) (visible-name target-mob)))
+                                  (incf (motion mob) 40)
+                                  (incf (motion target-mob) 40)
                                   (set-mob-location target-mob nx ny z)
                                   (set-mob-location mob x y z))
                                 ))
@@ -542,6 +571,13 @@
   (when (eq mob *player*)
     (incf (player-game-time *world*) (truncate (* speed +normal-ap+) (max-ap mob)))))
 
+(defun stumble-upon-mob (actor target)
+  (logger (format nil "STUMBLE-UPON-MOB: ~A [~A] stumbled upon ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                         (format nil "~A stumbles upon ~A! " (visible-name actor) (visible-name target)))
+  (set-mob-effect actor +mob-effect-alertness+ 5)
+  (incf (motion target) 100))
+
 (defmethod on-bump ((target mob) (actor mob))
   (if (eql target actor)
       (progn
@@ -556,6 +592,9 @@
           (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
           (return-from on-bump t))
 
+        (when (not (check-mob-visibile target :observer actor))
+          (stumble-upon-mob actor target))
+        
         ;; if the target is mounted, 50% chance that the actor will bump target's mount
         (when (riding-mob-id target)
           (when (zerop (random 2))
@@ -661,6 +700,9 @@
     (return-from mob-reload-ranged-weapon nil))
 
   (logger (format nil "MOB-RELOAD: ~A [~A] reloads his ~A~%" (name actor) (id actor) (get-weapon-name actor)))
+
+  ;; set motion
+  (incf (motion actor) *mob-motion-reload*)
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -673,6 +715,9 @@
     (unless (is-weapon-ranged actor)
       (return-from mob-shoot-target nil))
 
+    ;; set motion
+    (incf (motion actor) *mob-motion-shoot*)
+    
      ;; reduce the number of bullets in the magazine
     (if (> (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))
       (progn
@@ -792,6 +837,7 @@
     (let ((ability-type (get-ability-type-by-id ability-type-id)))
       (funcall (on-invoke ability-type) ability-type actor target)
       (set-abil-cur-cd actor ability-type-id (abil-max-cd-p ability-type-id))
+      (incf (motion actor) (motion ability-type))
       (make-act actor (spd ability-type)))))
 
 (defun make-melee-attack (actor target &key (weapon nil) (acc 100) (no-dodge nil) (make-act t))
@@ -807,6 +853,9 @@
     (rem-mob-effect target +mob-effect-divine-shield+)
     (when make-act (make-act actor (get-melee-weapon-speed actor)))
     (return-from make-melee-attack nil))
+
+  ;; set motion
+  (incf (motion actor) *mob-motion-melee*)
 
   ;; if the target has keen senses - destroy the illusions
   (when (mob-ability-p target +mob-abil-keen-senses+)
@@ -1129,6 +1178,9 @@
     (setf (master-mob-id mob) nil)
     (setf (slave-mob-id mob) nil)
     )
+
+  (incf (motion mob) *mob-motion-ascend*)
+  
   (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%")))
 
 (defgeneric on-tick (mob))

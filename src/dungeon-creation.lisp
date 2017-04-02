@@ -14,7 +14,7 @@
     
     (values layout-func post-processing-func-list mob-func-list game-event-list)))
 
-(defun create-world (world layout-id weather-id faction-id)
+(defun create-world (world layout-id weather-id tod-id faction-id)
   
   (let ((mob-template-result)
         (feature-template-result)
@@ -59,6 +59,27 @@
     
     (logger (format nil "Creating actual level ~A~%" 0))
     (setf (level world) (create-level-from-template result-template))
+
+    ;; creating light map
+    (funcall (sf-func (get-scenario-feature-by-id tod-id)) (level world))
+
+    ;; setting up time, a bit of hardcode here
+    (let ((year 1915)
+          (month 7)
+          (day 12)
+          (hour 12)
+          (min (random 45))
+          (sec (random 60)))
+      (when (= weather-id +weather-type-snow+)
+        (setf month 1))
+      (when (= tod-id +tod-type-night+)
+        (setf hour 0))
+      (when (= tod-id +tod-type-morning+)
+        (setf hour 8))
+      (when (= tod-id +tod-type-evening+)
+        (setf hour 19))
+      (setf (player-game-time world) (set-current-date-time year month day hour min sec)))
+    (push +game-event-adjust-outdoor-ligth+ game-event-list)
     
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
@@ -136,6 +157,7 @@
     (setf (items level) (make-array (list max-x max-y max-z) :initial-element nil))
     (setf (features level) (make-array (list max-x max-y max-z) :initial-element nil))
     (setf (memo level) (make-array (list max-x max-y max-z) :initial-element (create-single-memo 0 sdl:*white* sdl:*black* nil nil)))
+    (setf (light-map level) (make-array (list max-x max-y max-z) :initial-element 0))
     level))
 
 (defun create-level-from-template (template-level)
@@ -338,6 +360,7 @@
                                                                                     (and (/= (- cz z) 0)
                                                                                          (= nx cx)
                                                                                          (= ny cy)))
+                                                                                (check-move-along-z cx cy cz nx ny z)
                                                                                 (funcall #'(lambda ()
                                                                                              (let ((result nil))
                                                                                                (block surround

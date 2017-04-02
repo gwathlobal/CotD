@@ -34,7 +34,10 @@
       )
 
     (when player-reveal-cell
-      (reveal-cell-on-map (level *world*) dx dy dz))
+      (reveal-cell-on-map (level *world*) dx dy dz :reveal-mob (if (or (null (get-mob-* (level *world*) dx dy dz))
+                                                                       (eq (get-mob-* (level *world*) dx dy dz) *player*))
+                                                                 t
+                                                                 (check-mob-visibile (get-mob-* (level *world*) dx dy dz) :observer *player*))))
     
     (setf terrain (get-terrain-* (level *world*) dx dy dz))
     (unless terrain
@@ -108,17 +111,22 @@
                                         exit-result))))
                  ))))))
 
-(defun update-visible-mobs-normal (mob)
+(defun calculate-mob-brightness (mob)
+  (setf (brightness mob) (+ (* *light-power-faloff* (cur-light mob))
+                            (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob))))
+
+  ;; check through all the mobs
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
-        when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))
+        for light-power = (* *light-power-faloff* (cur-light tmob))
+        when (not (eq mob tmob))
           do
-             (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
+             ;; set up mob brightness
+             (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (cur-light tmob))
+               (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
-                                (let* ((exit-result t) (mob-id 0)) 
-                                  (declare (type fixnum mob-id))
-                   
+                                (let* ((exit-result t)) 
                                   (block nil
 
                                     (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
@@ -126,12 +134,84 @@
                                       (return))
                                     
                                     (when (and (get-mob-* (level *world*) dx dy dz) 
-                                               (not (eq (get-mob-* (level *world*) dx dy dz) mob)))
-                                      (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
-                                      (pushnew mob-id (visible-mobs mob)))
+                                               (eq (get-mob-* (level *world*) dx dy dz) mob))
+                                      (incf (brightness mob) light-power))
+                                    (decf light-power *light-power-faloff*))
                                     
-                                    )
-                                  exit-result)))))
+                                  exit-result))))
+        )
+  ;; check through all stationary light sources
+  (loop for (x y z light-radius) across (light-sources (level *world*))
+        for light-power = (* *light-power-faloff* light-radius)
+        do
+           ;; set up mob brightness
+           (when (< (get-distance-3d x y z (x mob) (y mob) (z mob)) light-radius)
+               (line-of-sight x y z (x mob) (y mob) (z mob)
+                            #'(lambda (dx dy dz prev-cell)
+                                (declare (type fixnum dx dy dz))
+                                (let* ((exit-result t)) 
+                                  (block nil
+
+                                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    
+                                    (when (and (get-mob-* (level *world*) dx dy dz) 
+                                               (eq (get-mob-* (level *world*) dx dy dz) mob))
+                                      (incf (brightness mob) light-power))
+                                    (decf light-power *light-power-faloff*))
+                                    
+                                  exit-result))))
+        )
+  )
+
+(defun update-visible-mobs-normal (mob)
+  (setf (brightness mob) 0)
+  (loop for mob-id in (mob-id-list (level *world*))
+        for tmob = (get-mob-by-id mob-id)
+        for light-power = (* *light-power-faloff* (cur-light tmob))
+        when (not (eq mob tmob))
+          do
+             ;; set up mob brightness
+             ;(when (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (cur-light tmob))
+             ;  (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
+             ;               #'(lambda (dx dy dz prev-cell)
+             ;                   (declare (type fixnum dx dy dz))
+             ;                   (let* ((exit-result t)) 
+             ;                     (block nil
+             ;
+             ;                       (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+             ;                         (setf exit-result 'exit)
+             ;                         (return))
+             ;                       
+             ;                       (when (and (get-mob-* (level *world*) dx dy dz) 
+             ;                                  (eq (get-mob-* (level *world*) dx dy dz) mob))
+             ;                         (incf (brightness mob) light-power))
+             ;                       (decf light-power *light-power-faloff*))
+             ;                       
+             ;                     exit-result))))
+             ;; set up visible mobs
+             (when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))
+               (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
+                              #'(lambda (dx dy dz prev-cell)
+                                  (declare (type fixnum dx dy dz))
+                                  (let* ((exit-result t) (mob-id 0)) 
+                                    (declare (type fixnum mob-id))
+                                    
+                                    (block nil
+                                      
+                                      (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                        (setf exit-result 'exit)
+                                        (return))
+                                      
+                                      (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                 (not (eq (get-mob-* (level *world*) dx dy dz) mob))
+                                                 (check-mob-visibile (get-mob-* (level *world*) dx dy dz) :observer mob))
+                                        (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
+                                        (pushnew mob-id (visible-mobs mob)))
+                                      
+                                      )
+                                    exit-result))))))
 
 (defun update-visible-mobs-fov (mob)
   (declare (optimize (speed 3)))
@@ -182,7 +262,7 @@
   (logger (format nil "UPDATE-VISIBLE-MOBS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-mobs mob)))
   )
 
-(defun reveal-cell-on-map (level map-x map-y map-z)
+(defun reveal-cell-on-map (level map-x map-y map-z &key (reveal-mob t))
   ;; drawing terrain
   (let ((glyph-idx)
         (glyph-color)
@@ -211,7 +291,8 @@
         ))
     
     ;; finally mob, if any
-    (when (get-mob-* level map-x map-y map-z)
+    (when (and reveal-mob
+               (get-mob-* level map-x map-y map-z))
       (let ((vmob (get-mob-* level map-x map-y map-z)))
         (setf glyph-idx (get-current-mob-glyph-idx vmob :x map-x :y map-y :z map-z))
         (setf glyph-color (get-current-mob-glyph-color vmob))
@@ -227,25 +308,35 @@
   ))
 
 (defun update-visible-area-normal (level x y z)
- 
-  (draw-fov x y z (cur-sight *player*) #'(lambda (dx dy dz prev-cell)
-                                         (let ((exit-result t))
-                                           (block nil
-                                             
-                                             (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
-                                               (setf exit-result 'exit)
-					       (return))
 
-                                             (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
-                                               (setf exit-result 'exit)
-                                               (return))
-                                             
-                                             (when (and (get-mob-* level dx dy dz) 
-                                                        (not (eq (get-mob-* level dx dy dz) *player*)))
-                                               (pushnew (id (get-mob-* level dx dy dz)) (visible-mobs *player*)))
-                                             )
-					   exit-result))
-            )
+  ;; set up player brightness
+  
+  
+    (draw-fov x y z (cur-sight *player*)
+              #'(lambda (dx dy dz prev-cell)
+                  (let ((exit-result t))
+                    (block nil
+                      
+                      (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
+                        (setf exit-result 'exit)
+                        (return))
+                      
+                      (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
+                        (setf exit-result 'exit)
+                        (return))
+                      
+                      (when (and (get-mob-* level dx dy dz) 
+                                 (not (eq (get-mob-* level dx dy dz) *player*))
+                                 (check-mob-visibile (get-mob-* level dx dy dz) :observer *player*)
+                                 )
+                        (pushnew (id (get-mob-* level dx dy dz)) (visible-mobs *player*))
+                        
+                        )
+                      
+                      )
+                    exit-result)) 
+              )
+  
   (loop for mob-id in (visible-mobs *player*)
         for mob = (get-mob-by-id mob-id)
         do
@@ -291,10 +382,10 @@
   (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))  
   )
 
-(defun draw-fov (cx cy cz r func &optional (limit-z nil))
+(defun draw-fov (cx cy cz r func &key (limit-z nil) (LOS-start-func #'(lambda () nil)))
   (declare (optimize (speed 3)))
   (declare (type fixnum cx cy cz r)
-           (type function func))
+           (type function func LOS-start-func))
   (let ((target-cells nil)
         (max-z (if limit-z
                  (if (>= (+ cz r) (array-dimension (terrain (level *world*)) 2))
@@ -339,8 +430,8 @@
   
     ;; check LOS for all perimeter cells
     (loop for (tx ty tz) in target-cells do
-      (line-of-sight cx cy cz tx ty tz func)
-          )
+      (funcall LOS-start-func)
+      (line-of-sight cx cy cz tx ty tz func))
     
     ))
 

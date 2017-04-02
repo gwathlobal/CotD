@@ -26,7 +26,8 @@
                ((= effect +mob-effect-cursed+) (sdl:draw-string-solid-* "Cursed" x y1 :color (sdl:color :r 139 :g 69 :b 19)))
                ((= effect +mob-effect-blind+) (sdl:draw-string-solid-* "Blind" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
                ((= effect +mob-effect-fear+) (sdl:draw-string-solid-* "Fear" x y1 :color sdl:*magenta*))
-               ((= effect +mob-effect-climbing-mode+) (sdl:draw-string-solid-* "Climbing" x y1 :color (sdl:color :r 100 :g 100 :b 100))))
+               ((= effect +mob-effect-climbing-mode+) (sdl:draw-string-solid-* "Climbing" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
+               ((= effect +mob-effect-alertness+) (sdl:draw-string-solid-* "On alert" x y1 :color sdl:*red*)))
              (incf y1 (sdl:get-font-height))))
 
 (defun show-char-properties (x y idle-calcing)
@@ -34,7 +35,7 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A~A~A"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A~A~A~%Visibility: ~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
@@ -66,6 +67,7 @@
                                                              )
                                                              
                           "")
+                        (get-mob-visibility *player*)
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
     
@@ -111,24 +113,28 @@
 (defun show-visible-mobs (x y w h &key (mob *player*))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
     (sdl:fill-surface sdl:*black* :template a-rect))
-  (loop with visible-mobs = (copy-list (visible-mobs mob))
+  
+  (loop with visible-mobs = (stable-sort (copy-list (visible-mobs mob))
+                                         #'(lambda (a b)
+                                             (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
+                                                    (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
+                                               t
+                                               nil))
+                                         :key #'get-mob-by-id)
         with y1 = y
-          initially
-             (setf visible-mobs (stable-sort visible-mobs #'(lambda (a b)
-                                                              (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
-                                                                     (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
-                                                                t
-                                                                nil))
-                                             :key #'get-mob-by-id))
         for mob-id in visible-mobs
         for vmob = (get-mob-by-id mob-id)
-        
         do
+           (when (and (> (length visible-mobs) (truncate h *glyph-h*))
+                      (> (+ y1 (* 1 *glyph-h*)) (+ y h)))
+             (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
+             (loop-finish))
            (draw-glyph x y1 (get-current-mob-glyph-idx vmob :x (x vmob) :y (y vmob) :z (z vmob))
                        :front-color (get-current-mob-glyph-color vmob)
                        :back-color (get-current-mob-back-color vmob))
-           (sdl:draw-string-solid-* (format nil "~A~A"
+           (sdl:draw-string-solid-* (format nil "~A [B:~A]~A"
                                             (visible-name vmob)
+                                            (get-mob-visibility vmob)
                                             (if (/= (- (z vmob) (z mob)) 0)
                                               (format nil " (~@d)" (- (z vmob) (z mob)))
                                               ""))
@@ -476,7 +482,7 @@
                           (swank::handle-requests connection t)))))
 
 (defun show-time-label (idle-calcing x y &optional (update nil))
-  (sdl:draw-string-solid-* (format nil "Time ~A"  (player-game-time *world*))
+  (sdl:draw-string-solid-* (format nil "~A [T: ~A]"  (show-date-time-short (player-game-time *world*)) (real-game-time *world*))
                            x y :color (cond ((eql idle-calcing :done) sdl:*white*)
                                             ((eql idle-calcing :in-progress) sdl:*yellow*)
                                             ((eql idle-calcing :npc-turn) sdl:*red*)))

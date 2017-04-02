@@ -26,7 +26,10 @@
                  (setf turn-finished nil)
                  (setf (made-turn mob) nil)
                  (set-message-this-turn nil)
+                 (calculate-mob-brightness mob)
+                 (setf (motion mob) 0)
                  (ai-function mob)
+                 (calculate-mob-brightness mob)
                  (when (get-message-this-turn) (add-message (format nil "~%")))
 
                  (when (eq mob *player*)
@@ -72,7 +75,7 @@
              ))
   )
   
-(defun init-game (layout-id weather-id faction-id)
+(defun init-game (layout-id weather-id tod-id faction-id)
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
@@ -92,7 +95,7 @@
 
   (setf *world* (make-instance 'world))
   
-  (create-world *world* layout-id weather-id faction-id)
+  (create-world *world* layout-id weather-id tod-id faction-id)
 
   (setf (name *player*) "Player")
 
@@ -100,130 +103,102 @@
   )  
 
 (defun main-menu ()
-
-  (if *cotd-release*
-    (progn
-      (setf *current-window* (make-instance 'start-game-window 
-                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military (as Chaplain)" "Join the Military (as Scout)" "Custom scenario" "Help" "Exit")
-                                            :menu-funcs (list #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-angels+))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-demons+))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-military-chaplain+))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-military-scout+))))
-                                                              #'(lambda (n)
-                                                                  (declare (ignore n))
-                                                                  (setf *current-window* (make-instance 'custom-scenario-window
-                                                                                                        :layout-list (get-all-scenario-features-by-type +scenario-feature-city-layout+ (not *cotd-release*))
-                                                                                                        :weather-list (get-all-scenario-features-by-type +scenario-feature-weather+ (not *cotd-release*))
-                                                                                                        :player-faction-list (get-all-scenario-features-by-type +scenario-feature-player-faction+ (not *cotd-release*))))
-                                                                  (setf (menu-items *current-window*) (populate-custom-scenario-win-menu *current-window* (cur-step *current-window*)))
-                                                                  (make-output *current-window*)
-                                                                  (multiple-value-bind (layout-id weather-id faction-id) (run-window *current-window*)
-                                                                    (when (and layout-id weather-id faction-id)
-                                                                      (return-from main-menu (values layout-id weather-id faction-id)))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (setf *current-window* (make-instance 'help-window))
-                                                                  (make-output *current-window*)
-                                                                  (run-window *current-window*))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (funcall *quit-func*))))))
-    (progn
-      (setf *current-window* (make-instance 'start-game-window 
-                                            :menu-items (list "Join the Heavenly Forces" "Join the Legions of Hell" "Join the Military (as Chaplain)" "Join the Military (as Scout)" "Custom scenario" "City with all-seeing"
-                                                              "Test level" "Help" "Exit")
-                                            :menu-funcs (list #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-angels+))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-demons+))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-military-chaplain+))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-military-scout+))))
-                                                              #'(lambda (n)
-                                                                  (declare (ignore n))
-                                                                  (setf *current-window* (make-instance 'custom-scenario-window
-                                                                                                        :layout-list (get-all-scenario-features-by-type +scenario-feature-city-layout+ (not *cotd-release*))
-                                                                                                        :weather-list (get-all-scenario-features-by-type +scenario-feature-weather+ (not *cotd-release*))
-                                                                                                        :player-faction-list (get-all-scenario-features-by-type +scenario-feature-player-faction+ (not *cotd-release*))))
-                                                                  (setf (menu-items *current-window*) (populate-custom-scenario-win-menu *current-window* (cur-step *current-window*)))
-                                                                  (make-output *current-window*)
-                                                                  (multiple-value-bind (layout-id weather-id faction-id) (run-window *current-window*)
-                                                                    (when (and layout-id weather-id faction-id)
-                                                                      (return-from main-menu (values layout-id weather-id faction-id)))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                                                        (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-
-                                                                    (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
-                                                                                                   (nth (random (length weather-types)) weather-types)
-                                                                                                   +player-faction-player+))))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (return-from main-menu (values +city-layout-test+
-                                                                                                 +weather-type-clear+
-                                                                                                 +player-faction-test+)))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (setf *current-window* (make-instance 'help-window))
-                                                                  (make-output *current-window*)
-                                                                  (run-window *current-window*))
-                                                              #'(lambda (n) 
-                                                                  (declare (ignore n))
-                                                                  (funcall *quit-func*)))))))
+  (let ((join-heaven-item (cons "Join the Heavenly Forces"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                      
+                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                     (nth (random (length weather-types)) weather-types)
+                                                                     (nth (random (length tod-types)) tod-types)
+                                                                     +player-faction-angels+))))))
+        (join-legion-item (cons "Join the Legions of Hell"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                      
+                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                     (nth (random (length weather-types)) weather-types)
+                                                                     (nth (random (length tod-types)) tod-types)
+                                                                     +player-faction-demons+))))))
+        (join-chaplain-item (cons "Join the Military (as Chaplain)"
+                                  #'(lambda (n) 
+                                      (declare (ignore n))
+                                      (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                            (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                            (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                        
+                                        (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                       (nth (random (length weather-types)) weather-types)
+                                                                       (nth (random (length tod-types)) tod-types)
+                                                                       +player-faction-military-chaplain+))))))
+        (join-scout-item (cons "Join the Military (as Scout)"
+                               #'(lambda (n) 
+                                   (declare (ignore n))
+                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                         (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                         (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                     
+                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                    (nth (random (length weather-types)) weather-types)
+                                                                    (nth (random (length tod-types)) tod-types)
+                                                                    +player-faction-military-scout+))))))
+        (custom-scenario-item (cons "Custom scenario"
+                                    #'(lambda (n)
+                                        (declare (ignore n))
+                                        (setf *current-window* (make-instance 'custom-scenario-window
+                                                                              :layout-list (get-all-scenario-features-by-type +scenario-feature-city-layout+ (not *cotd-release*))
+                                                                              :weather-list (get-all-scenario-features-by-type +scenario-feature-weather+ (not *cotd-release*))
+                                                                              :tod-list (get-all-scenario-features-by-type +scenario-feature-time-of-day+ (not *cotd-release*))
+                                                                              :player-faction-list (get-all-scenario-features-by-type +scenario-feature-player-faction+ (not *cotd-release*))))
+                                        (setf (menu-items *current-window*) (populate-custom-scenario-win-menu *current-window* (cur-step *current-window*)))
+                                        (make-output *current-window*)
+                                        (multiple-value-bind (layout-id weather-id tod-id faction-id) (run-window *current-window*)
+                                          (when (and layout-id weather-id tod-id faction-id)
+                                            (return-from main-menu (values layout-id weather-id tod-id faction-id)))))))
+        (help-item (cons "Help"
+                         #'(lambda (n) 
+                             (declare (ignore n))
+                             (setf *current-window* (make-instance 'help-window))
+                             (make-output *current-window*)
+                             (run-window *current-window*))))
+        (exit-item (cons "Exit"
+                         #'(lambda (n) 
+                             (declare (ignore n))
+                             (funcall *quit-func*))))
+        (all-see-item (cons "City with all-seeing"
+                            #'(lambda (n) 
+                                (declare (ignore n))
+                                (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                      (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                      (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                  
+                                  (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                 (nth (random (length weather-types)) weather-types)
+                                                                 (nth (random (length tod-types)) tod-types)
+                                                                 +player-faction-player+))))))
+        (test-level-item (cons "Test level"
+                               #'(lambda (n) 
+                                   (declare (ignore n))
+                                   (return-from main-menu (values +city-layout-test+
+                                                                  +weather-type-clear+
+                                                                  +tod-type-night+
+                                                                  +player-faction-test+))))))
+    (if *cotd-release*
+      (progn
+        (setf *current-window* (make-instance 'start-game-window 
+                                              :menu-items (list (car join-heaven-item) (car join-legion-item) (car join-chaplain-item) (car join-scout-item) (car custom-scenario-item) (car help-item) (car exit-item))
+                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-legion-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr custom-scenario-item) (cdr help-item) (cdr exit-item)))))
+      (progn
+        (setf *current-window* (make-instance 'start-game-window 
+                                              :menu-items (list (car join-heaven-item) (car join-legion-item) (car join-chaplain-item) (car join-scout-item) (car custom-scenario-item) (car all-see-item) (car test-level-item)
+                                                                (car help-item) (car exit-item))
+                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-legion-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
+                                                                (cdr help-item) (cdr exit-item)))))))
   
   (make-output *current-window*)
   (loop while t do
@@ -294,7 +269,7 @@
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (setf *start-func* #'(lambda () (go start-tag)))
      start-tag
-       (multiple-value-bind (layout-id weather-id faction-id) (main-menu)
+       (multiple-value-bind (layout-id weather-id tod-id faction-id) (main-menu)
          (setf *current-window* (make-instance 'loading-window 
                                                :update-func #'(lambda (win)
                                                                 (when (/= *max-progress-bar* 0) 
@@ -307,7 +282,7 @@
                                                                                                 (truncate (- (/ *window-height* 2) (/ 13 2)))
                                                                                                 :color sdl:*white*))
                                                                     )))))
-         (init-game layout-id weather-id faction-id))
+         (init-game layout-id weather-id tod-id faction-id))
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
        (let ((out *standard-output*))

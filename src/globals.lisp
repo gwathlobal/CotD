@@ -129,6 +129,7 @@
 (defconstant +mob-effect-blind+ 8)
 (defconstant +mob-effect-fear+ 9)
 (defconstant +mob-effect-climbing-mode+ 10)
+(defconstant +mob-effect-alertness+ 11)
 
 (defconstant +mob-order-follow+ 0)
 
@@ -162,6 +163,7 @@
 (defconstant +terrain-trait-slope-up+ 4)
 (defconstant +terrain-trait-slope-down+ 5)
 (defconstant +terrain-trait-not-climable+ 6)
+(defconstant +terrain-trait-light-source+ 7)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -205,6 +207,7 @@
 (defconstant +terrain-tree-oak-trunk-sw+ 39)
 (defconstant +terrain-tree-oak-trunk-ne+ 40)
 (defconstant +terrain-tree-oak-trunk-se+ 41)
+(defconstant +terrain-wall-lantern+ 42)
 
 (defparameter *faction-table* (make-hash-table))
 
@@ -231,7 +234,21 @@
 (defparameter *possessed-revolt-chance* 12)
 (defparameter *acc-loss-per-tile* 5)
 (defparameter *max-mob-sight* 10)
-(defparameter *base-mob-sight* 6)
+(defparameter *base-mob-sight* 8)
+
+(defparameter *base-light-radius* 6)
+(defparameter *light-power-faloff* 17)
+(defparameter *mob-visibility-threshold* 50)
+
+(defparameter *mob-motion-order* 20)
+(defparameter *mob-motion-move* 40)
+(defparameter *mob-motion-stand* 0)
+(defparameter *mob-motion-melee* 60)
+(defparameter *mob-motion-shoot* 30)
+(defparameter *mob-motion-reload* 40)
+(defparameter *mob-motion-ascend* 100)
+
+(defparameter *mob-exposure-alertness* 30)
 
 (defconstant +connect-room-none+ -1)
 

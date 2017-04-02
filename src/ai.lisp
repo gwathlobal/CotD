@@ -732,7 +732,7 @@
                 (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
                                 (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                 (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
-                                (and (get-mob-* (level *world*) rx ry (z mob))
+                                (and (get-mob-* (level *world*) rx ry rz)
                                      (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
                                 (/= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
                                                                                                            (map-size (get-mob-by-id (riding-mob-id mob)))

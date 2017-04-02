@@ -30,7 +30,7 @@
                                   "...#.....#............#####.......#####......................................."
                                   "...#######............#...............#......................................."
                                   "......................#...............-......................................."
-                                  "...#######...........u########'########u...T..............######.....######..."
+                                  "...#######...........u########'########u...|..............######.....######..."
                                   "...#.....#............#....#.....#....#...................#...............#..."
                                   "...#.....+............#....+.....+....-...................#...............#..."
                                   "...#.....#............#....#.....#....#...................#...............#..."
@@ -117,6 +117,7 @@
                            ((char= c #\u) (setf (aref template-level (1+ x) (1+ y) z) +terrain-slope-stone-up+))
                            ((char= c #\d) (setf (aref template-level (1+ x) (1+ y) z) +terrain-slope-stone-down+))
                            ((char= c #\T) (setf (aref template-level (1+ x) (1+ y) z) +terrain-tree-birch+))
+                           ((char= c #\|) (setf (aref template-level (1+ x) (1+ y) z) +terrain-wall-lantern+))
                            )
                          (incf x)
                       )))
@@ -132,7 +133,7 @@
   (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :x 35 :y 21 :z 2))
   (add-mob-to-level-list (level world) *player*)
   (let (;(soldier (make-instance 'mob :mob-type +mob-type-imp+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z 0))
-        (demon (make-instance 'mob :mob-type +mob-type-thief+ :x (+ (x *player*) 6) :y (- (y *player*) 1) :z 1))
+        (demon (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 6) :y (- (y *player*) 1) :z 1))
         )
     (setf (cur-fp *player*) 10)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)

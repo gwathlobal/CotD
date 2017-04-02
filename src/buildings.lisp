@@ -121,6 +121,7 @@
                ((char= c #\u) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-slope-stone-up+))
                ((char= c #\d) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-slope-stone-down+))
                ((char= c #\*) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-wall-bush+))
+               ((char= c #\|) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-wall-lantern+))
                )
              (incf x1)
           )))
