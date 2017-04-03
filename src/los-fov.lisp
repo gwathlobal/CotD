@@ -8,7 +8,7 @@
   (declare (type fixnum sx sy sz tx ty tz))
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)) (* (- sz tz) (- sz tz)))))
 
-(defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil))
+(defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil) (check-sound nil))
   ;(declare (optimize (speed 3)))
   (let ((terrain))
     (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
@@ -53,6 +53,10 @@
     
     (when (and check-projectile
                (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+))
+      (return-from check-LOS-propagate nil))
+
+    (when (and check-sound
+               (get-terrain-type-trait terrain +terrain-trait-blocks-sound+))
       (return-from check-LOS-propagate nil))
 
     t))
@@ -111,9 +115,99 @@
                                         exit-result))))
                  ))))))
 
-(defun calculate-mob-brightness (mob)
+(defstruct sound
+  (x -1)
+  (y -1)
+  (z -1))
+
+(defun general-direction-dir (sx sy tx ty)
+  (let ((a (round (* (atan (- sy ty) (- sx tx)) (/ 180 pi))))
+        (result 0))
+    (cond
+      ((and (> a 22.5) (<= a 67.5)) (setf result 7))
+      ((and (> a 67.5) (<= a 112.5)) (setf result 8))
+      ((and (> a 112.5) (<= a 157.5)) (setf result 9))
+      ((and (< a -22.5) (>= a -67.5)) (setf result 1))
+      ((and (< a -67.5) (>= a -112.5)) (setf result 2))
+      ((and (< a -112.5) (>= a -157.5)) (setf result 3))
+      ((or (> a 157.5) (< a -157.5)) (setf result 6))
+      ((or (> a -22.5) (<= a 22.5)) (setf result 4)))
+    result))
+
+(defun propagate-sound-from-location (target sx sy sz sound-power sound-str-func &key (force-sound nil) (source nil))
+  (let ((sound-pwr sound-power))
+    (line-of-sight sx sy sz (x target) (y target) (z target)
+                   #'(lambda (dx dy dz prev-cell)
+                       (declare (type fixnum dx dy dz)
+                                (ignore prev-cell))
+                       (let* ((exit-result t))   
+                         (block nil
+                           (if (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-sound+)
+                             (let ((pwr-decrease 0))
+                               (if (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-sound+) t)
+                                 (setf pwr-decrease 100)
+                                 (setf pwr-decrease (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-sound+)))
+                               (decf sound-pwr (truncate (* sound-power pwr-decrease) 100)))
+                             (decf sound-pwr *sound-power-falloff*))
+                           
+                           (when (<= sound-pwr 0)
+                             (setf sound-pwr 0)
+                             (setf exit-result 'exit)
+                             (return))
+                           )
+                         exit-result)))
+    (format t "SOUND-PWR ~A~%" sound-pwr)
+    (when (not (zerop sound-pwr))
+      (let ((sound-z (cond ((> sz (z target)) 1)
+                           ((< sz (z target)) -1)
+                           (t 0)))
+            (sound-dir (general-direction-dir (x target) (y target) sx sy))
+            (nx sx)
+            (ny sy)
+            (nz sz)
+            (dir-str))
+        (when (and (> sound-pwr 10)
+                   (or force-sound
+                       (null source)     
+                       (and source
+                            (not (check-mob-visibile source :observer target :complete-check t)))))
+          
+          (when (< sound-pwr 30)
+            (setf nx (+ sx 2 (* -1 (random 5))))
+            (when (< nx 0) (setf nx 0))
+            (when (>= nx (array-dimension (terrain (level *world*)) 0)) (setf nx (1- (array-dimension (terrain (level *world*)) 0))))
+            (setf ny (+ sy 2 (* -1 (random 5))))
+            (when (< ny 0) (setf ny 0))
+            (when (>= ny (array-dimension (terrain (level *world*)) 1)) (setf ny (1- (array-dimension (terrain (level *world*)) 1)))))
+          
+          (push (make-sound :x nx :y ny :z nz) (heard-sounds target))
+
+          (when (eq target *player*)
+            (setf dir-str (format nil "~A~A~A"
+                                  (cond
+                                    ((< (get-distance-3d sx sy sz (x target) (y target) (z target)) 3) " nearby")
+                                    ((> (get-distance-3d sx sy sz (x target) (y target) (z target)) 8) " in the distance")
+                                    (t ""))
+                                  (cond
+                                    ((= sound-dir 1) " to the southwest")
+                                    ((= sound-dir 2) " to the south")
+                                    ((= sound-dir 3) " to the southeast")
+                                    ((= sound-dir 4) " to the west")
+                                    ((= sound-dir 6) " to the east")
+                                    ((= sound-dir 7) " to the northwest")
+                                    ((= sound-dir 8) " to the north")
+                                    ((= sound-dir 9) " to the northeast")
+                                    (t ""))
+                                  (cond
+                                    ((= sound-z 1) " above")
+                                    ((= sound-z -1) " below")
+                                    (t ""))))
+            (add-message (funcall sound-str-func dir-str))))))))
+
+(defun calculate-mob-vision-hearing (mob)
   (setf (brightness mob) (+ (* *light-power-faloff* (cur-light mob))
                             (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob))))
+  (setf (hear-range-mobs mob) nil)
 
   ;; check through all the mobs
   (loop for mob-id in (mob-id-list (level *world*))
@@ -139,6 +233,9 @@
                                     (decf light-power *light-power-faloff*))
                                     
                                   exit-result))))
+             ;; set up mobs that potentially hear you
+             (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) *max-hearing-range*)
+               (pushnew mob-id (hear-range-mobs mob)))
         )
   ;; check through all stationary light sources
   (loop for (x y z light-radius) across (light-sources (level *world*))
@@ -166,30 +263,11 @@
   )
 
 (defun update-visible-mobs-normal (mob)
-  (setf (brightness mob) 0)
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
         for light-power = (* *light-power-faloff* (cur-light tmob))
         when (not (eq mob tmob))
           do
-             ;; set up mob brightness
-             ;(when (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (cur-light tmob))
-             ;  (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
-             ;               #'(lambda (dx dy dz prev-cell)
-             ;                   (declare (type fixnum dx dy dz))
-             ;                   (let* ((exit-result t)) 
-             ;                     (block nil
-             ;
-             ;                       (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
-             ;                         (setf exit-result 'exit)
-             ;                         (return))
-             ;                       
-             ;                       (when (and (get-mob-* (level *world*) dx dy dz) 
-             ;                                  (eq (get-mob-* (level *world*) dx dy dz) mob))
-             ;                         (incf (brightness mob) light-power))
-             ;                       (decf light-power *light-power-faloff*))
-             ;                       
-             ;                     exit-result))))
              ;; set up visible mobs
              (when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))
                (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)

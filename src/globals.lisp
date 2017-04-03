@@ -164,6 +164,7 @@
 (defconstant +terrain-trait-slope-down+ 5)
 (defconstant +terrain-trait-not-climable+ 6)
 (defconstant +terrain-trait-light-source+ 7)
+(defconstant +terrain-trait-blocks-sound+ 8)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -249,6 +250,11 @@
 (defparameter *mob-motion-ascend* 100)
 
 (defparameter *mob-exposure-alertness* 30)
+
+(defparameter *max-hearing-range* 12)
+(defparameter *sound-power-falloff* 10)
+
+(defparameter *mob-sound-move* 80)
 
 (defconstant +connect-room-none+ -1)
 

@@ -273,7 +273,11 @@
          
          (if (and (= (x (get-mob-by-id (mounted-by-mob-id mob))) x) (= (y (get-mob-by-id (mounted-by-mob-id mob))) y) (= (z (get-mob-by-id (mounted-by-mob-id mob))) z))
            (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-stand*)
-           (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-move*))
+           (progn
+             (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-move*)
+
+            
+             ))
          
          (funcall place-func mob)
          
@@ -288,7 +292,16 @@
          ;; set motion
          (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
            (incf (motion mob) *mob-motion-stand*)
-           (incf (motion mob) *mob-motion-move*))
+           (progn
+             (incf (motion mob) *mob-motion-move*)
+
+             ;; generate sound
+             (loop for mob-id in (hear-range-mobs mob)
+                   for tmob = (get-mob-by-id mob-id)
+                   do
+                      (propagate-sound-from-location tmob x y z *mob-sound-move* #'(lambda (str)
+                                                                                     (format nil "You hear somebody moving~A.~%" str))
+                                                     :source mob))))
          
          (funcall place-func mob))))
 
@@ -527,8 +540,8 @@
                                 (when (eq check-result-n t)
                                   (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                          (format nil "~A pushes ~A. " (visible-name mob) (visible-name target-mob)))
-                                  (incf (motion mob) 40)
-                                  (incf (motion target-mob) 40)
+                                  (incf (motion mob) *mob-motion-move*)
+                                  (incf (motion target-mob) *mob-motion-move*)
                                   (set-mob-location target-mob nx ny z)
                                   (set-mob-location mob x y z))
                                 ))

@@ -402,6 +402,8 @@
 
    ;(fov-map :initform (make-array (list (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)))) :accessor fov-map)
    (visible-mobs :initform nil :accessor visible-mobs)
+   (hear-range-mobs :initform nil :accessor hear-range-mobs)
+   (heard-sounds :initform nil :accessor heard-sounds)
 
    (path :initform nil :accessor path)
    (path-dst :initform nil :accessor path-dst) ;; is a actually a cons with coords (x y)
@@ -810,7 +812,12 @@
       (setf visibility 0))
     visibility))
 
-(defun check-mob-visibile (mob &key (observer nil))
+(defun check-mob-visibile (mob &key (observer nil) (complete-check nil))
+  (when (and complete-check
+             observer
+             (not (find (id mob) (visible-mobs observer))))
+    (return-from check-mob-visibile nil))
+  
   (let ((exposure (get-mob-visibility mob))
         (threshold *mob-visibility-threshold*)
         (result nil))
