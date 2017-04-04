@@ -203,6 +203,15 @@
     result))
       
 
+(defun generate-sound (source-mob sx sy sz sound-power str-func &key (force-sound nil))
+  (when (zerop sound-power)
+    (return-from generate-sound nil))
+  (loop for mob-id in (hear-range-mobs source-mob)
+        for tmob = (get-mob-by-id mob-id)
+        do
+           (propagate-sound-from-location tmob sx sy sz sound-power str-func
+                                          :source source-mob :force-sound force-sound)))
+
 (defun set-mob-location (mob x y z)
   
   (let ((place-func #'(lambda (nmob)
@@ -272,11 +281,18 @@
            (incf (motion mob) *mob-motion-move*))
          
          (if (and (= (x (get-mob-by-id (mounted-by-mob-id mob))) x) (= (y (get-mob-by-id (mounted-by-mob-id mob))) y) (= (z (get-mob-by-id (mounted-by-mob-id mob))) z))
-           (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-stand*)
+           (progn
+             (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-stand*)
+
+             ;; generate sound
+             (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-stand* #'(lambda (str)
+                                                                                                (format nil "You hear some scratching~A.~%" str))))
            (progn
              (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-move*)
 
-            
+             ;; generate sound
+             (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-move* #'(lambda (str)
+                                                                                                (format nil "You hear rustling~A.~%" str)))
              ))
          
          (funcall place-func mob)
@@ -291,17 +307,19 @@
        (progn
          ;; set motion
          (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
-           (incf (motion mob) *mob-motion-stand*)
+           (progn
+             (incf (motion mob) *mob-motion-stand*)
+
+             ;; generate sound
+             (generate-sound mob x y z *mob-sound-stand* #'(lambda (str)
+                                                             (format nil "You hear some scratching~A.~%" str))))
            (progn
              (incf (motion mob) *mob-motion-move*)
 
              ;; generate sound
-             (loop for mob-id in (hear-range-mobs mob)
-                   for tmob = (get-mob-by-id mob-id)
-                   do
-                      (propagate-sound-from-location tmob x y z *mob-sound-move* #'(lambda (str)
-                                                                                     (format nil "You hear somebody moving~A.~%" str))
-                                                     :source mob))))
+             (generate-sound mob x y z *mob-sound-move* #'(lambda (str)
+                                                            (format nil "You hear rustling~A.~%" str)))
+             ))
          
          (funcall place-func mob))))
 
@@ -589,7 +607,9 @@
   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                          (format nil "~A stumbles upon ~A! " (visible-name actor) (visible-name target)))
   (set-mob-effect actor +mob-effect-alertness+ 5)
-  (incf (motion target) 100))
+  (incf (motion target) 100)
+  (pushnew (id actor) (visible-mobs target))
+  (pushnew (id target) (visible-mobs actor)))
 
 (defmethod on-bump ((target mob) (actor mob))
   (if (eql target actor)
@@ -687,8 +707,10 @@
           (when (> 50 (random 100))
             (add-feature-to-level-list (level *world*) 
                                        (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy) :z (z target)))))))
-    
-    
+
+    (when (zerop (random 4))
+      (generate-sound target (x target) (y target) (z target) 80 #'(lambda (str)
+                                                                 (format nil "You hear gasps~A." str))))
     (print-visible-message (x target) (y target) (z target) (level *world*) 
                            (format nil "~A is scorched by ~A for ~A damage. " (name target) (name actor) cur-dmg))
     (when (check-dead target)
@@ -716,6 +738,10 @@
 
   ;; set motion
   (incf (motion actor) *mob-motion-reload*)
+
+  ;; generate sound
+  (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-reload* #'(lambda (str)
+                                                                             (format nil "You hear some clanking sounds~A." str)))
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -730,6 +756,10 @@
 
     ;; set motion
     (incf (motion actor) *mob-motion-shoot*)
+
+     ;; generate sound
+    (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-shoot* #'(lambda (str)
+                                                                               (format nil "You hear shooting~A." str)))
     
      ;; reduce the number of bullets in the magazine
     (if (> (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))
@@ -870,6 +900,10 @@
   ;; set motion
   (incf (motion actor) *mob-motion-melee*)
 
+  ;; generate sound
+  (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-melee* #'(lambda (str)
+                                                                            (format nil "You hear sounds of fighting~A." str)))
+  
   ;; if the target has keen senses - destroy the illusions
   (when (mob-ability-p target +mob-abil-keen-senses+)
     (when (mob-effect-p actor +mob-effect-divine-consealed+)
@@ -1193,6 +1227,9 @@
     )
 
   (incf (motion mob) *mob-motion-ascend*)
+
+  (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-ascend* #'(lambda (str)
+                                                                     (format nil "You hear some eerie sounds~A." str)))
   
   (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%")))
 

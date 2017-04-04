@@ -27,6 +27,7 @@
      (:file "lvl-features" :depends-on ("globals"))
      (:file "items" :depends-on ("globals"))
      (:file "los-fov" :depends-on ("globals" "world" "mobs"))
+     (:file "hearing" :depends-on ("los-fov"))
      (:file "animations" :depends-on ("globals"))
      (:file "base-methods" :depends-on ("message-box" "mobs" "world" "abilities" "terrain" "animations" "lvl-features" "los-fov"))
      (:file "buildings" :depends-on ("globals"))

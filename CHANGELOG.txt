@@ -6,6 +6,7 @@ CHANGELOG
 - Outdoor lighting depends on the time of day - at midnight you will need to rely on lamps, while at day time the sun will not let anybody hide outside buildings.
 - Time of day now changes dynamically as the time passes. 
 - Added scenario options regarding the starting time of the day - you may start at night, at noon, in the morning or in the evening.
+- Added hearing to the game! Characters' actions will generate sounds that others can hear and learn the general direction to the sound's origin. Most creatures will try to investigate what ot who produced the sound if they have no other pressing matters.
 - Added the Thief to the game.
 - Added Death from Above ability to the Thief. This allows the Thief to jump onto an enemy from an upper Z level and make a devastating blow.
 - Added Climbing ability to the Thief. It allows the Thief to go up and down along the Z level when clinging to walls.

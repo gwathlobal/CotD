@@ -117,6 +117,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 100 ())) :base-dodge 25
                                        :strength 1
+                                       :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t
                              ))
 
@@ -126,6 +127,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
                                        :strength 1
+                                       :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t
                              ))
 
@@ -135,6 +137,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
                                        :strength 1
+                                       :ai-curious t
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
                                        :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t :abil-independent t
                              ))
@@ -145,6 +148,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 70 ())) :base-dodge 25
                                        :strength 1
+                                       :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                              ))
 
@@ -154,6 +158,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 120 ())) :base-dodge 25
                                        :strength 1
+                                       :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-starts-with-horse t
                                        :abil-independent t :abil-detect-good t :abil-detect-evil t :abil-eagle-eye t
                              ))
@@ -167,7 +172,7 @@
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t
                                        :abil-heal-self 1 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
-                                       :ai-wants-bless t))
+                                       :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archangel+
                                        :name "Archangel"
@@ -178,7 +183,7 @@
                                        :strength 4
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t
                                        :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
-                                       :ai-wants-bless t))
+                                       :ai-wants-bless t :ai-curious t))
 
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-imp+
@@ -192,7 +197,7 @@
                                        :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t
                                        :abil-dominate-fiend t :abil-dismount t
-                                       :ai-horde t))
+                                       :ai-horde t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
                                        :name "Demon"
@@ -204,7 +209,8 @@
                                        :base-light-radius 0
                                        :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3
-                                       :abil-dominate-fiend t :abil-dismount t))
+                                       :abil-dominate-fiend t :abil-dismount t
+                                       :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archdemon+
                                        :name "Archdemon"
@@ -216,7 +222,8 @@
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t
-                                       :abil-dominate-fiend t :abil-dismount t))
+                                       :abil-dominate-fiend t :abil-dismount t
+                                       :ai-curious t))
 
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-horse+ 
@@ -235,7 +242,8 @@
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 35
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 2
-                                       :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2 :abil-fiend-can-be-ridden t :abil-loves-infighting t))
+                                       :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2 :abil-fiend-can-be-ridden t :abil-loves-infighting t
+                                       :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantaur+ 
                                        :name "Gargantaur"
@@ -245,7 +253,8 @@
                                        :armor (list (list +weapon-dmg-flesh+ 4 0) (list +weapon-dmg-iron+ 2 0) (list +weapon-dmg-vorpal+ 4 0) (list +weapon-dmg-fire+ 4 0))
                                        :strength 8 :base-sight 7
                                        :map-size 3
-                                       :abil-animal t :abil-angel t :abil-facing t :abil-immovable t :abil-loves-infighting t :abil-mind-burn t :abil-heal-self 1 :abil-gargantaur-teleport t :abil-detect-evil t))
+                                       :abil-animal t :abil-angel t :abil-facing t :abil-immovable t :abil-loves-infighting t :abil-mind-burn t :abil-heal-self 1 :abil-gargantaur-teleport t :abil-detect-evil t
+                                       :ai-curious t))
 
 
 (set-faction-relations +faction-type-humans+

@@ -26,6 +26,7 @@
    ;;   :ai-horde  - mob will attack only if the relative strength of allies in sight is more than the relative strength of enemies, otherwise it will flee
    ;;   :ai-wants-bless - mob will get to the nearest ally and bless it
    ;;   :ai-stop   - mob will stop all movement whenever it see an enemy
+   ;;   :ai-curious - mob will try to investigate sounds if it has nothing to do
       
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The following keys may be used in make-instance
@@ -94,7 +95,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-stop
+                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -117,6 +118,8 @@
     (setf (gethash +ai-pref-wants-bless+ (ai-prefs mob-type)) t))
   (when ai-stop
     (setf (gethash +ai-pref-stop+ (ai-prefs mob-type)) t))
+  (when ai-curious
+    (setf (gethash +ai-pref-curious+ (ai-prefs mob-type)) t))
 
   ;; set up abilities
   (when abil-can-possess
@@ -546,6 +549,9 @@
 
 (defmethod mob-ai-stop-p ((mob mob))
   (gethash +ai-pref-stop+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+
+(defmethod mob-ai-curious-p ((mob mob))
+  (gethash +ai-pref-curious+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
 
 (defun mob-effect-p (mob effect-id)
   (gethash effect-id (effects mob)))

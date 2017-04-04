@@ -14,6 +14,10 @@
                                                     (setf heal-pwr (- (max-hp actor) (cur-hp actor))))
                                                   (incf (cur-hp actor) heal-pwr)
                                                   (decf (cur-fp actor) (cost ability-type))
+
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                             (format nil "You hear some strange noise~A." str)))
+                                                  
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A invokes divine powers to heal itself for ~A. " (visible-name actor) heal-pwr))))
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -47,6 +51,8 @@
                                                 (declare (ignore ability-type target))
                                                 (set-mob-effect actor +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id actor) +mob-type-human+)
+                                                (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
+                                                                                                             (format nil "You hear some strange noise~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A invokes divine powers to disguise itself as a human. " (name actor))))
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -77,6 +83,8 @@
                                                 (declare (ignore ability-type target))
                                                 (rem-mob-effect actor +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id actor) (mob-type actor))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
+                                                                                                             (format nil "You hear some strange noise~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A reveals its true divine form. " (name actor))))
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -349,6 +357,8 @@
                                                   
                                                   (set-mob-effect actor +mob-effect-calling-for-help+ 2)
                                                   (decf (cur-fp actor) (cost ability-type))
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone reciting incantations~A." str)))
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A calls for reinforcements. " (visible-name actor))))
                                                 )
@@ -407,6 +417,8 @@
                                                           ;; free place found
                                                           (progn
                                                             (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the place to teleport (~A, ~A)~%" (name actor) (id actor) fx fy))
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A." str)))
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A disappeares in thin air. " (visible-name actor)))
                                                             ;; teleport the caster to the caller
@@ -427,6 +439,8 @@
                                                             )
                                                           (progn
                                                             (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] unable to the place to teleport~%" (name actor) (id actor)))
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A." str)))
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))
                                                             ;; no free place found - just remove the status from the called and the caller
@@ -437,6 +451,8 @@
                                                     (progn
                                                       ;; if none found, simply remove the "answer the call" status
                                                       (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] is unable to find the caller ~%" (name actor) (id actor)))
+                                                      (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A." str)))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))
                                                       (rem-mob-effect actor +mob-effect-called-for-help+)
@@ -476,6 +492,8 @@
                                                 
                                                 (logger (format nil "MOB-PRAYER-BLESS: ~A [~A] prays for smiting~%" (name actor) (id actor)))
 
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone praying~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A starts to pray. " (visible-name actor)))
 
@@ -553,6 +571,8 @@
                                                   
                                                   (set-mob-effect actor +mob-effect-calling-for-help+ 2)
                                                   (decf (cur-fp actor) (cost ability-type))
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone reciting incantations~A." str)))
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A murmurs some incantations. " (visible-name actor))))
                                                 )
@@ -584,6 +604,8 @@
                                                 
                                                 (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] prays for shielding~%" (name actor) (id actor)))
 
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone praying~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A prays for protection. " (visible-name actor)))
 
@@ -638,6 +660,8 @@
                                                 
                                                 (logger (format nil "MOB-CURSE: ~A [~A] incants the curses~%" (name actor) (id actor)))
 
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone laughing and cursing~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A laughs and curses maniacally. " (visible-name actor)))
 
@@ -716,6 +740,8 @@
                                                 
                                                 (logger (format nil "MOB-PRAYER-REVEAL: ~A [~A] prays for revealing supernatural beings~%" (name actor) (id actor)))
 
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone praying~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A prays for revelation. " (visible-name actor)))
 
@@ -763,7 +789,9 @@
                                  :motion 20
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
-                                                
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 10 #'(lambda (str)
+                                                                                                             (format nil "You hear someone shouting orders~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A orders nearby allies to follow him. " (visible-name actor)))
                                                 
@@ -873,7 +901,9 @@
                                  :motion 30
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
+                                                                                                             (format nil "You hear a roar~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A roars to fear its enemies. " (visible-name actor)))
                                                 (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
@@ -1434,12 +1464,18 @@
                                                   ;(format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry) (get-distance (x actor) (y actor) rx ry))
                                                   (if (not (zerop n))
                                                     (progn
+                                                      (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A." str)))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A disappeares in thin air. " (visible-name actor)))
                                                       (set-mob-location actor rx ry (z actor))
+                                                      (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A." str)))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A appears out of thin air. " (visible-name actor))))
                                                     (progn
+                                                      (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A." str)))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))))
                                                   ))

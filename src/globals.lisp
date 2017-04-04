@@ -69,6 +69,7 @@
 (defconstant +ai-pref-horde+ 1)
 (defconstant +ai-pref-wants-bless+ 2)
 (defconstant +ai-pref-stop+ 3)
+(defconstant +ai-pref-curious+ 4)
 
 (defconstant +mob-abil-heal-self+ 0)
 (defconstant +mob-abil-conseal-divine+ 1)
@@ -165,6 +166,7 @@
 (defconstant +terrain-trait-not-climable+ 6)
 (defconstant +terrain-trait-light-source+ 7)
 (defconstant +terrain-trait-blocks-sound+ 8)
+(defconstant +terrain-trait-blocks-sound-floor+ 9)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -254,7 +256,12 @@
 (defparameter *max-hearing-range* 12)
 (defparameter *sound-power-falloff* 10)
 
-(defparameter *mob-sound-move* 80)
+(defparameter *mob-sound-move* 50)
+(defparameter *mob-sound-stand* 0)
+(defparameter *mob-sound-melee* 80)
+(defparameter *mob-sound-reload* 50)
+(defparameter *mob-sound-shoot* 200)
+(defparameter *mob-sound-ascend* 60)
 
 (defconstant +connect-room-none+ -1)
 

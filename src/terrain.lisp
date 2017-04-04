@@ -19,6 +19,8 @@
    ;; :trait-slope-down - +terrain-trait-slope-down+
    ;; :trait-not-climable - +terrain-trait-not-climable+
    ;; :trait-light-source - +terrain-trait-light-source+
+   ;; :trait-blocks-sound - +terrain-trait-blocks-sound+
+   ;; :trait-blocks-sound-floor - +terrain-trait-blocks-sound-floor+
    ))
 
 
@@ -30,7 +32,8 @@
 (defun get-terrain-type-by-id (terrain-type-id)
   (aref *terrain-types* terrain-type-id))
 
-(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor trait-slope-up trait-slope-down trait-not-climable trait-light-source)
+(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor trait-slope-up trait-slope-down trait-not-climable trait-light-source
+                                                                        trait-blocks-sound trait-blocks-sound-floor)
   
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
@@ -48,6 +51,10 @@
     (setf (gethash +terrain-trait-not-climable+ (trait terrain-type)) t))
   (when trait-light-source
     (setf (gethash +terrain-trait-light-source+ (trait terrain-type)) trait-light-source))
+  (when trait-blocks-sound
+    (setf (gethash +terrain-trait-blocks-sound+ (trait terrain-type)) trait-blocks-sound))
+  (when trait-blocks-sound-floor
+    (setf (gethash +terrain-trait-blocks-sound-floor+ (trait terrain-type)) trait-blocks-sound-floor))
   )
 
 (defun get-terrain-type-trait (terrain-type-id key)
