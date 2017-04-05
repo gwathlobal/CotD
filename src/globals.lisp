@@ -64,6 +64,7 @@
 (defconstant +faction-type-military+ 4)
 (defconstant +faction-type-animals+ 5)
 (defconstant +faction-type-outsider-beasts+ 6)
+(defconstant +faction-type-criminals+ 7)
 
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)

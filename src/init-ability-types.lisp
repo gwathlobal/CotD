@@ -86,7 +86,7 @@
                                                 (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
                                                                                                              (format nil "You hear some strange noise~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A reveals its true divine form. " (name actor))))
+                                                                       (format nil "~@(~A~) reveals its true divine form. " (name actor))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-divine-consealed+)
@@ -121,7 +121,7 @@
                                                 (rem-mob-effect target +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id target) (mob-type target))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
+                                                                       (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-detect-good+)
@@ -137,7 +137,7 @@
                                                 (declare (ignore ability-type))
                                                 (unless (mob-effect-p target +mob-effect-reveal-true-form+)
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
+                                                                         (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                 (setf (face-mob-type-id target) (mob-type target))
                                                 (set-mob-effect target +mob-effect-reveal-true-form+ 5))
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -318,8 +318,9 @@
                                                   (incf (cur-hp actor) heal-pwr)
                                                        
                                                   (unless (zerop heal-pwr)
-                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                           (format nil "~A heals for ~A with the lifeforce of ~A. " (visible-name actor) heal-pwr (visible-name target))))
+                                                    (when (check-mob-visible actor :observer *player* :complete-check t)
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                             (format nil "~@(~A~) heals for ~A with the lifeforce of ~A. " (visible-name actor) heal-pwr (visible-name target)))))
                                                   )
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -516,7 +517,7 @@
                                                              (when (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-possessed+)
                                                                (unless (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+)
                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                        (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name (get-mob-by-id enemy-mob-id)))))
+                                                                                        (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name (get-mob-by-id enemy-mob-id)))))
                                                                (setf (face-mob-type-id (get-mob-by-id enemy-mob-id)) (mob-type (get-mob-by-id enemy-mob-id)))
                                                                (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+ 5))
                                                              (mob-burn-blessing actor (get-mob-by-id enemy-mob-id)))
@@ -755,11 +756,11 @@
                                                              (set-mob-effect target +mob-effect-reveal-true-form+ 5)
                                                              (setf (face-mob-type-id target) (mob-type target))
                                                              (print-visible-message (x target) (y target) (z actor) (level *world*) 
-                                                                                    (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
+                                                                                    (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                            (when (mob-effect-p target +mob-effect-possessed+)
                                                              (unless (mob-effect-p target +mob-effect-reveal-true-form+)
                                                                (print-visible-message (x target) (y target) (z actor) (level *world*) 
-                                                                                      (format nil "~A reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
+                                                                                      (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                              (setf (face-mob-type-id target) (mob-type target))
                                                              (set-mob-effect target +mob-effect-reveal-true-form+ 5))))                                                      
                                                 
@@ -1069,13 +1070,16 @@
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A mounts ~A. " (visible-name actor) (visible-name target)))
+                                                
 
                                                 (set-mob-location actor (x target) (y target) (z target))
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
 
+                                                (when (or (check-mob-visible actor :observer *player*)
+                                                          (check-mob-visible target :observer *player*))
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~@(~A~) mounts ~A. " (visible-name actor) (visible-name target))))
                                                 (adjust-dodge actor)
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -1144,14 +1148,16 @@
                                                 (let ((mount (get-mob-by-id (riding-mob-id actor))))
                                                   (logger (format nil "MOB-DISMOUNT: ~A [~A] dismounts ~A [~A].~%" (name actor) (id actor) (name mount) (id mount)))
                                                   
-                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A dismounts ~A. " (visible-name actor) (visible-name mount)))
-                                                  
                                                   (setf (mounted-by-mob-id mount) nil)
                                                   (setf (riding-mob-id actor) nil)
 
                                                   (set-mob-location actor (car target) (cdr target) (z target))
-                                                  (set-mob-location mount (x mount) (y mount) (z mount)))
+                                                  (set-mob-location mount (x mount) (y mount) (z mount))
+
+                                                  (when (or (check-mob-visible actor :observer *player*)
+                                                            (check-mob-visible mount :observer *player*)) 
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~@(~A~) dismounts ~A. " (visible-name actor) (visible-name mount)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -1217,14 +1223,15 @@
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A mounts ~A" (visible-name actor) (visible-name target)))
-
-                                                ;; reveal the true form of those who ride fiends
-                                                (when (and (slave-mob-id actor)
-                                                           (not (mob-effect-p actor +mob-effect-reveal-true-form+)))
+                                                (when (or (check-mob-visible actor :observer *player*)
+                                                          (check-mob-visible target :observer *player*))
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil " and reveals itself as ~A" (get-qualified-name actor))))
+                                                                         (format nil "~@(~A~) mounts ~A" (visible-name actor) (visible-name target)))
+                                                  ;; reveal the true form of those who ride fiends
+                                                  (when (and (slave-mob-id actor)
+                                                             (not (mob-effect-p actor +mob-effect-reveal-true-form+)))
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil " and reveals itself as ~A" (get-qualified-name actor)))))
                                                 
                                                 (set-mob-location actor (x target) (y target) (z target))
                                                 
@@ -1318,7 +1325,7 @@
                                                                (not (mob-effect-p target +mob-effect-reveal-true-form+))))
                                                   (progn
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                           (format nil "~A reveals the true form of ~A. " (visible-name actor) (visible-name target)))
+                                                                           (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (visible-name target)))
                                                     
                                                     (rem-mob-effect target +mob-effect-divine-consealed+)
                                                     (setf (face-mob-type-id target) (mob-type target))
@@ -1327,7 +1334,8 @@
                                                                            (format nil "It is ~A. " (get-qualified-name target))))
                                                   (progn
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                           (format nil "~A tries to reveal the true form of ~A. But ~A does not conseal anything. " (visible-name actor) (visible-name target) (visible-name target)))))
+                                                                           (format nil "~@(~A~) tries to reveal the true form of ~A. But ~A does not conseal anything. "
+                                                                                   (visible-name actor) (visible-name target) (visible-name target)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))

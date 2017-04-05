@@ -572,7 +572,8 @@
 
 (defun visible-name (mob)
   (when (and (not (eq *player* mob))
-             (mob-effect-p *player* +mob-effect-blind+))
+             (or ;(mob-effect-p *player* +mob-effect-blind+)
+                 (not (check-mob-visible mob :observer *player*))))
     (return-from visible-name "somebody"))
   (when (= (faction *player*) (faction mob))
     (return-from visible-name (name mob)))
@@ -818,15 +819,21 @@
       (setf visibility 0))
     visibility))
 
-(defun check-mob-visibile (mob &key (observer nil) (complete-check nil))
+(defun check-mob-visible (mob &key (observer nil) (complete-check nil))
   (when (and complete-check
              observer
              (not (find (id mob) (visible-mobs observer))))
-    (return-from check-mob-visibile nil))
+    (return-from check-mob-visible nil))
+
+  (when (mounted-by-mob-id mob)
+    (return-from check-mob-visible (check-mob-visible (get-mob-by-id (mounted-by-mob-id mob)))))
   
   (let ((exposure (get-mob-visibility mob))
         (threshold *mob-visibility-threshold*)
         (result nil))
+
+    (when (riding-mob-id mob)
+      (incf exposure (get-mob-visibility (get-mob-by-id (riding-mob-id mob)))))
 
     (when (and observer
                (mob-effect-p observer +mob-effect-alertness+))
@@ -837,7 +844,8 @@
       (setf result nil))
 
     ;; you always see people of you own faction
-    (when (get-faction-relation (faction mob) (faction observer))
+    (when (and observer
+               (get-faction-relation (faction mob) (faction observer)))
       (setf result t))
     
     result))

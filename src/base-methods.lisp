@@ -556,12 +556,15 @@
                                      (ny (+ (cdr (momentum-dir mob)) (y target-mob)))
                                      (check-result-n (check-move-on-level target-mob nx ny z)))
                                 (when (eq check-result-n t)
-                                  (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                         (format nil "~A pushes ~A. " (visible-name mob) (visible-name target-mob)))
+                                  
                                   (incf (motion mob) *mob-motion-move*)
                                   (incf (motion target-mob) *mob-motion-move*)
                                   (set-mob-location target-mob nx ny z)
-                                  (set-mob-location mob x y z))
+                                  (set-mob-location mob x y z)
+                                  (when (or (check-mob-visible mob :observer *player*)
+                                            (check-mob-visible target-mob :observer *player*))
+                                    (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                           (format nil "~@(~A~) pushes ~A. " (visible-name mob) (visible-name target-mob)))))
                                 ))
                             (on-bump target-mob mob)))
                       finally
@@ -604,12 +607,24 @@
 
 (defun stumble-upon-mob (actor target)
   (logger (format nil "STUMBLE-UPON-MOB: ~A [~A] stumbled upon ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
-  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                         (format nil "~A stumbles upon ~A! " (visible-name actor) (visible-name target)))
   (set-mob-effect actor +mob-effect-alertness+ 5)
   (incf (motion target) 100)
   (pushnew (id actor) (visible-mobs target))
-  (pushnew (id target) (visible-mobs actor)))
+  (when (riding-mob-id target)
+    (pushnew (id actor) (visible-mobs (get-mob-by-id (riding-mob-id target)))))
+  (when (mounted-by-mob-id target)
+    (pushnew (id actor) (visible-mobs (get-mob-by-id (mounted-by-mob-id target)))))
+  (pushnew (id target) (visible-mobs actor))
+  (when (riding-mob-id actor)
+    (pushnew (id target) (visible-mobs (get-mob-by-id (riding-mob-id actor)))))
+  (when (mounted-by-mob-id actor)
+    (pushnew (id target) (visible-mobs (get-mob-by-id (mounted-by-mob-id actor)))))
+  (when (or (check-mob-visible actor :observer *player* :complete-check t)
+            (check-mob-visible target :observer *player* :complete-check t))
+    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                           (format nil "~@(~A~) stumbles upon ~A! " (visible-name actor) (visible-name target))))
+  
+  )
 
 (defmethod on-bump ((target mob) (actor mob))
   (if (eql target actor)
@@ -625,7 +640,7 @@
           (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
           (return-from on-bump t))
 
-        (when (not (check-mob-visibile target :observer actor))
+        (when (not (check-mob-visible target :observer actor))
           (stumble-upon-mob actor target))
         
         ;; if the target is mounted, 50% chance that the actor will bump target's mount
@@ -741,7 +756,7 @@
 
   ;; generate sound
   (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-reload* #'(lambda (str)
-                                                                             (format nil "You hear some clanking sounds~A." str)))
+                                                                             (format nil "You hear some clanking sounds~A. " str)))
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -759,7 +774,7 @@
 
      ;; generate sound
     (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-shoot* #'(lambda (str)
-                                                                               (format nil "You hear shooting~A." str)))
+                                                                               (format nil "You hear shooting~A. " str)))
     
      ;; reduce the number of bullets in the magazine
     (if (> (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))
@@ -902,19 +917,21 @@
 
   ;; generate sound
   (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-melee* #'(lambda (str)
-                                                                            (format nil "You hear sounds of fighting~A." str)))
+                                                                            (format nil "You hear sounds of fighting~A. " str)))
   
   ;; if the target has keen senses - destroy the illusions
   (when (mob-ability-p target +mob-abil-keen-senses+)
     (when (mob-effect-p actor +mob-effect-divine-consealed+)
       (rem-mob-effect actor +mob-effect-divine-consealed+)
       (setf (face-mob-type-id actor) (mob-type actor))
-      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                             (format nil "~A reveals the true form of ~A. " (visible-name target) (get-qualified-name actor))))
+      (when (or (check-mob-visible actor :observer *player*)
+                (check-mob-visible target :observer *player*))
+        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                               (format nil "~@(~A~) reveals the true form of ~A. " (visible-name target) (get-qualified-name actor)))))
     (when (mob-effect-p actor +mob-effect-possessed+)
       (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A reveals the true form of ~A. " (visible-name target) (get-qualified-name actor))))
+                               (format nil "~@(~A~) reveals the true form of ~A. " (visible-name target) (get-qualified-name actor))))
       (setf (face-mob-type-id actor) (mob-type actor))
       (set-mob-effect actor +mob-effect-reveal-true-form+ 5)))
 
@@ -939,15 +956,19 @@
 
               (cond
                 ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
-                      (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                      (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                      (check-mob-visible actor :observer *player*)
+                      (check-mob-visible target :observer *player*))
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~@(~A~) attacks ~A, but ~A evades the attack. " (visible-name actor) (visible-name target) (visible-name target)))))
-                ((get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                      (check-mob-visible actor :observer *player*))
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~@(~A~) attacks somebody, but it evades the attack. " (visible-name actor)))))
-                ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                ((and (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                      (check-mob-visible target :observer *player*))
                  (progn
                    (print-visible-message (x target) (y target) (z target) (level *world*) 
                                           (format nil "Somebody attacks ~A, but ~A evades the attack. " (visible-name target) (visible-name target))))))

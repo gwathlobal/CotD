@@ -165,7 +165,11 @@
 
     (when (and (zerop (random 10))
                (mob-ability-p mob +mob-abil-human+))
-      (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A cries: \"Help! Help!\" " (visible-name mob))))
+      (generate-sound mob (x mob) (y mob) (z mob) 100 #'(lambda (str)
+                                                          (format nil "~A cries: \"Help! Help!\"~A. " (visible-name mob) str))
+                      :force-sound t)
+      ;(print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A cries: \"Help! Help!\" " (visible-name mob)))
+      )
     
     ;; if can't move away - try any random direction
     (unless (move-mob mob (x-y-into-dir step-x step-y))

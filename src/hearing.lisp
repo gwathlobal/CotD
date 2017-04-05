@@ -84,7 +84,13 @@
                    (or force-sound
                        (null source)     
                        (and source
-                            (not (check-mob-visibile source :observer target :complete-check t)))))
+                            (or (and (not (eq target *player*))
+                                     (not (check-mob-visible source :observer target :complete-check t)))
+                                (and (eq target *player*)
+                                     (not (get-single-memo-visibility (get-memo-* (level *world*) sx sy sz))))
+                                (and (eq target *player*)
+                                     (get-single-memo-visibility (get-memo-* (level *world*) sx sy sz))
+                                     (not (check-mob-visible source :observer target :complete-check nil)))))))
           
           (when (< sound-pwr 30)
             (setf nx (+ sx 2 (* -1 (random 5))))
