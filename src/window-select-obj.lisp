@@ -85,7 +85,7 @@
 			  ((sdl:key= key :sdl-key-escape) 
 			   (setf *current-window* (return-to win)) (go exit-func))
 			  ;; enter - select
-			  ((sdl:key= key :sdl-key-return)
+			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
 			   (funcall (enter-func win) (cur-sel win))
 			   (go exit-func)))
 			(go exit-func))

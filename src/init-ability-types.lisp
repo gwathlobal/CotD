@@ -16,7 +16,7 @@
                                                   (decf (cur-fp actor) (cost ability-type))
 
                                                   (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                             (format nil "You hear some strange noise~A." str)))
+                                                                                                             (format nil "You hear some strange noise~A. " str)))
                                                   
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A invokes divine powers to heal itself for ~A. " (visible-name actor) heal-pwr))))
@@ -52,9 +52,10 @@
                                                 (set-mob-effect actor +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id actor) +mob-type-human+)
                                                 (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
-                                                                                                             (format nil "You hear some strange noise~A." str)))
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A invokes divine powers to disguise itself as a human. " (name actor))))
+                                                                                                           (format nil "You hear some strange noise~A. " str)))
+                                                (when (check-mob-visible actor :observer *player*)
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A invokes divine powers to disguise itself as a human. " (name actor)))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (not (mob-effect-p actor +mob-effect-reveal-true-form+))
@@ -84,9 +85,10 @@
                                                 (rem-mob-effect actor +mob-effect-divine-consealed+)
                                                 (setf (face-mob-type-id actor) (mob-type actor))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
-                                                                                                             (format nil "You hear some strange noise~A." str)))
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~@(~A~) reveals its true divine form. " (name actor))))
+                                                                                                           (format nil "You hear some strange noise~A. " str)))
+                                                 (when (check-mob-visible actor :observer *player*)
+                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                          (format nil "~@(~A~) reveals its true divine form. " (name actor)))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (mob-effect-p actor +mob-effect-divine-consealed+)
@@ -359,9 +361,10 @@
                                                   (set-mob-effect actor +mob-effect-calling-for-help+ 2)
                                                   (decf (cur-fp actor) (cost ability-type))
                                                   (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear someone reciting incantations~A." str)))
-                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A calls for reinforcements. " (visible-name actor))))
+                                                                                                             (format nil "You hear someone reciting incantations~A. " str)))
+                                                  (when (check-mob-visible actor :observer *player*)
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~@(~A~) calls for reinforcements. " (visible-name actor)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -419,7 +422,7 @@
                                                           (progn
                                                             (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the place to teleport (~A, ~A)~%" (name actor) (id actor) fx fy))
                                                             (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A." str)))
+                                                                                                             (format nil "You hear crackling~A. " str)))
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A disappeares in thin air. " (visible-name actor)))
                                                             ;; teleport the caster to the caller
@@ -427,9 +430,9 @@
 
                                                             (if (get-faction-relation (faction called-ally) (faction *player*))
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                     (format nil "~A answers the call of ~A. " (visible-name actor) (visible-name called-ally)))
+                                                                                     (format nil "~@(~A~) answers the call of ~A. " (visible-name actor) (visible-name called-ally)))
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                     (format nil "~A appears out of thin air. " (visible-name actor))))
+                                                                                     (format nil "~@(~A~) appears out of thin air. " (visible-name actor))))
                                                             ;; remove the calling for help status from the called and the caller
                                                             (rem-mob-effect called-ally +mob-effect-calling-for-help+)
                                                             (rem-mob-effect actor +mob-effect-called-for-help+)
@@ -441,9 +444,9 @@
                                                           (progn
                                                             (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] unable to the place to teleport~%" (name actor) (id actor)))
                                                             (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A." str)))
+                                                                                                             (format nil "You hear crackling~A. " str)))
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A blinks for a second, but remains in place. " (visible-name actor)))
+                                                                                   (format nil "~@(~A~) blinks for a second, but remains in place. " (visible-name actor)))
                                                             ;; no free place found - just remove the status from the called and the caller
                                                             (rem-mob-effect called-ally +mob-effect-calling-for-help+)
                                                             (rem-mob-effect actor +mob-effect-called-for-help+)
@@ -573,9 +576,9 @@
                                                   (set-mob-effect actor +mob-effect-calling-for-help+ 2)
                                                   (decf (cur-fp actor) (cost ability-type))
                                                   (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear someone reciting incantations~A." str)))
+                                                                                                             (format nil "You hear someone reciting incantations~A. " str)))
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A murmurs some incantations. " (visible-name actor))))
+                                                                         (format nil "~@(~A~) murmurs some incantations. " (visible-name actor))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -904,9 +907,11 @@
                                                 (declare (ignore target))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
-                                                                                                             (format nil "You hear a roar~A." str)))
+                                                                                                            (format nil "You hear a roar~A. " str)))
+                                                
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A roars to fear its enemies. " (visible-name actor)))
+                                                                       (format nil "~@(~A~) roars to fear its enemies. " (visible-name actor))
+                                                                       :observed actor)
                                                 (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
                                                 ;; fear nearby visible enemy mobs
                                                 ;; fear can be resisted depending on the strength of the mob
@@ -917,11 +922,13 @@
                                                            (if (> (random (+ (strength mob) (mob-ability-p actor +mob-abil-instill-fear+))) (strength mob))
                                                              (progn
                                                                (set-mob-effect mob +mob-effect-fear+ 3)
-                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                      (format nil "~A is feared. " (visible-name mob))))
+                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                      (format nil "~@(~A~) is feared. " (visible-name mob))
+                                                                                      :observed mob))
                                                              (progn
-                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                      (format nil "~A resists fear. " (visible-name mob))))))
+                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                      (format nil "~@(~A~) resists fear. " (visible-name mob))
+                                                                                      :observed mob))))
                                                           
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
@@ -1232,6 +1239,8 @@
                                                              (not (mob-effect-p actor +mob-effect-reveal-true-form+)))
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil " and reveals itself as ~A" (get-qualified-name actor)))))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil ". "))
                                                 
                                                 (set-mob-location actor (x target) (y target) (z target))
                                                 
@@ -1243,8 +1252,7 @@
                                                 
                                                 (setf (face-mob-type-id actor) (mob-type actor))
                                                 (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil ". "))
+                                                
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -1522,17 +1530,19 @@
                                                   (if (<= (cur-hp actor) 0)
                                                     (progn
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                             (format nil "~A cringes with pain, taking ~A dmg, while trying to mount ~A. " (visible-name actor) cur-dmg (visible-name target)))
+                                                                             (format nil "~@(~A~) cringes with pain, taking ~A dmg, while trying to mount ~A. " (visible-name actor) cur-dmg (visible-name target)))
                                                       (make-dead actor :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))
                                                     (progn
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                             (format nil "~A cringes with pain, taking ~A dmg, and mounts ~A" (visible-name actor) cur-dmg (visible-name target)))
+                                                                             (format nil "~@(~A~) cringes with pain, taking ~A dmg, and mounts ~A" (visible-name actor) cur-dmg (visible-name target)))
 
                                                       ;; reveal the true form of those who ride fiends
                                                       (when (mob-effect-p actor +mob-effect-divine-consealed+)
                                                         (rem-mob-effect actor +mob-effect-divine-consealed+)
                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                (format nil " to reveal itself as ~A" (get-qualified-name actor))))
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                             (format nil ". "))
                                                       
                                                       (set-mob-location actor (x target) (y target) (z target))
                                                       
@@ -1544,8 +1554,7 @@
                                                       
                                                       (setf (face-mob-type-id actor) (mob-type actor))
                                                       (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
-                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                             (format nil ". "))
+                                                      
                                                       ))
                                                   ))
                                  :on-check-applic #'(lambda (ability-type actor target)

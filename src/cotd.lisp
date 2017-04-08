@@ -27,7 +27,7 @@
                  (setf (made-turn mob) nil)
                  (set-message-this-turn nil)
                  (calculate-mob-vision-hearing mob)
-                 (setf (motion mob) 0)
+                 (setf (motion-set-p mob) nil)
                  (ai-function mob)
                  (calculate-mob-vision-hearing mob)
                  (when (get-message-this-turn) (add-message (format nil "~%")))

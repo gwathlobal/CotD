@@ -88,8 +88,12 @@
           (t (funcall func (+ x dx) (+ y dy) (+ z dz))))))))
   
 
-(defun print-visible-message (x y z level str)
-  (when (get-single-memo-visibility (get-memo-* level x y z))
+(defun print-visible-message (x y z level str &key (observed nil))
+  (when (or (and (null observed)
+                 (get-single-memo-visibility (get-memo-* level x y z)))
+            (and observed
+                 (get-single-memo-visibility (get-memo-* level x y z))
+                 (check-mob-visible observed :observer *player*)))
     (set-message-this-turn t)
     (add-message str)))
 
@@ -258,12 +262,12 @@
 
          ;; set motion
          (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
-           (incf (motion mob) *mob-motion-stand*)
-           (incf (motion mob) *mob-motion-move*))
+           (incf-mob-motion mob *mob-motion-stand*)
+           (incf-mob-motion mob *mob-motion-move*))
          
          (if (and (= (x (get-mob-by-id (riding-mob-id mob))) x) (= (y (get-mob-by-id (riding-mob-id mob))) y) (= (z (get-mob-by-id (riding-mob-id mob))) z))
-           (incf (motion (get-mob-by-id (riding-mob-id mob))) *mob-motion-stand*)
-           (incf (motion (get-mob-by-id (riding-mob-id mob))) *mob-motion-move*))
+           (incf-mob-motion (get-mob-by-id (riding-mob-id mob)) *mob-motion-stand*)
+           (incf-mob-motion (get-mob-by-id (riding-mob-id mob)) *mob-motion-move*))
                 
          (funcall place-func (get-mob-by-id (riding-mob-id mob)))
 
@@ -277,18 +281,18 @@
 
          ;; set motion
          (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
-           (incf (motion mob) *mob-motion-stand*)
-           (incf (motion mob) *mob-motion-move*))
+           (incf-mob-motion mob *mob-motion-stand*)
+           (incf-mob-motion mob *mob-motion-move*))
          
          (if (and (= (x (get-mob-by-id (mounted-by-mob-id mob))) x) (= (y (get-mob-by-id (mounted-by-mob-id mob))) y) (= (z (get-mob-by-id (mounted-by-mob-id mob))) z))
            (progn
-             (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-stand*)
+             (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-stand*)
 
              ;; generate sound
              (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-stand* #'(lambda (str)
                                                                                                 (format nil "You hear some scratching~A.~%" str))))
            (progn
-             (incf (motion (get-mob-by-id (mounted-by-mob-id mob))) *mob-motion-move*)
+             (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-move*)
 
              ;; generate sound
              (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-move* #'(lambda (str)
@@ -308,13 +312,13 @@
          ;; set motion
          (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
            (progn
-             (incf (motion mob) *mob-motion-stand*)
+             (incf-mob-motion mob *mob-motion-stand*)
 
              ;; generate sound
              (generate-sound mob x y z *mob-sound-stand* #'(lambda (str)
                                                              (format nil "You hear some scratching~A.~%" str))))
            (progn
-             (incf (motion mob) *mob-motion-move*)
+             (incf-mob-motion mob *mob-motion-move*)
 
              ;; generate sound
              (generate-sound mob x y z *mob-sound-move* #'(lambda (str)
@@ -391,7 +395,7 @@
           (return-from move-mob nil)))
 
       ;; set motion
-      (incf (motion mob) *mob-motion-order*)
+      (incf-mob-motion mob *mob-motion-order*)
       
       (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
       (return-from move-mob t))
@@ -557,8 +561,8 @@
                                      (check-result-n (check-move-on-level target-mob nx ny z)))
                                 (when (eq check-result-n t)
                                   
-                                  (incf (motion mob) *mob-motion-move*)
-                                  (incf (motion target-mob) *mob-motion-move*)
+                                  (incf-mob-motion mob *mob-motion-move*)
+                                  (incf-mob-motion target-mob *mob-motion-move*)
                                   (set-mob-location target-mob nx ny z)
                                   (set-mob-location mob x y z)
                                   (when (or (check-mob-visible mob :observer *player*)
@@ -607,8 +611,11 @@
 
 (defun stumble-upon-mob (actor target)
   (logger (format nil "STUMBLE-UPON-MOB: ~A [~A] stumbled upon ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+
+  
+  
   (set-mob-effect actor +mob-effect-alertness+ 5)
-  (incf (motion target) 100)
+  (incf-mob-motion target 100)
   (pushnew (id actor) (visible-mobs target))
   (when (riding-mob-id target)
     (pushnew (id actor) (visible-mobs (get-mob-by-id (riding-mob-id target)))))
@@ -619,11 +626,13 @@
     (pushnew (id target) (visible-mobs (get-mob-by-id (riding-mob-id actor)))))
   (when (mounted-by-mob-id actor)
     (pushnew (id target) (visible-mobs (get-mob-by-id (mounted-by-mob-id actor)))))
-  (when (or (check-mob-visible actor :observer *player* :complete-check t)
+  
+  (when (or (eq *player* actor)
+            (eq *player* target)
+            (check-mob-visible actor :observer *player* :complete-check t)
             (check-mob-visible target :observer *player* :complete-check t))
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                            (format nil "~@(~A~) stumbles upon ~A! " (visible-name actor) (visible-name target))))
-  
   )
 
 (defmethod on-bump ((target mob) (actor mob))
@@ -752,7 +761,7 @@
   (logger (format nil "MOB-RELOAD: ~A [~A] reloads his ~A~%" (name actor) (id actor) (get-weapon-name actor)))
 
   ;; set motion
-  (incf (motion actor) *mob-motion-reload*)
+  (incf-mob-motion actor *mob-motion-reload*)
 
   ;; generate sound
   (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-reload* #'(lambda (str)
@@ -770,7 +779,7 @@
       (return-from mob-shoot-target nil))
 
     ;; set motion
-    (incf (motion actor) *mob-motion-shoot*)
+    (incf-mob-motion actor *mob-motion-shoot*)
 
      ;; generate sound
     (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-shoot* #'(lambda (str)
@@ -895,7 +904,7 @@
     (let ((ability-type (get-ability-type-by-id ability-type-id)))
       (funcall (on-invoke ability-type) ability-type actor target)
       (set-abil-cur-cd actor ability-type-id (abil-max-cd-p ability-type-id))
-      (incf (motion actor) (motion ability-type))
+      (incf-mob-motion actor (motion ability-type))
       (make-act actor (spd ability-type)))))
 
 (defun make-melee-attack (actor target &key (weapon nil) (acc 100) (no-dodge nil) (make-act t))
@@ -913,7 +922,7 @@
     (return-from make-melee-attack nil))
 
   ;; set motion
-  (incf (motion actor) *mob-motion-melee*)
+  (incf-mob-motion actor *mob-motion-melee*)
 
   ;; generate sound
   (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-melee* #'(lambda (str)
@@ -1247,7 +1256,7 @@
     (setf (slave-mob-id mob) nil)
     )
 
-  (incf (motion mob) *mob-motion-ascend*)
+  (incf-mob-motion mob *mob-motion-ascend*)
 
   (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-ascend* #'(lambda (str)
                                                                      (format nil "You hear some eerie sounds~A." str)))

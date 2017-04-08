@@ -442,6 +442,7 @@
    (brightness :initform 0 :accessor brightness)
    (cur-light :initform *base-light-radius* :initarg :cur-light :accessor cur-light)
    (motion :initform 0 :accessor motion)
+   (motion-set-p :initform nil :accessor motion-set-p) 
    (cur-stealth :initform 0 :accessor cur-stealth)
    
    (stat-kills :initform (make-hash-table) :accessor stat-kills)
@@ -809,6 +810,11 @@
   (cond
     ((mob-effect-p mob +mob-effect-climbing-mode+) +connect-map-move-climb+)
     (t +connect-map-move-walk+)))
+
+(defun incf-mob-motion (mob motion)
+  (if (motion-set-p mob)
+    (incf (motion mob) motion)
+    (setf (motion mob) motion (motion-set-p mob) t)))
 
 (defun get-mob-visibility (mob)
   (let ((visibility 0))

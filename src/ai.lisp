@@ -218,8 +218,9 @@
   (when (and (slave-mob-id mob)
              (zerop (random (* *possessed-revolt-chance* (mob-ability-p mob +mob-abil-can-possess+)))))
     (logger (format nil "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)))
-    (when (or (mob-effect-p mob +mob-effect-reveal-true-form+)
-              (get-faction-relation (faction mob) (faction *player*)))
+    (when (and (check-mob-visible mob :observer *player*)
+               (or (mob-effect-p mob +mob-effect-reveal-true-form+)
+                   (get-faction-relation (faction mob) (faction *player*))))
       (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                              (format nil "~A revolts against ~A. " (name (get-mob-by-id (slave-mob-id mob))) (name mob))))
     (setf (path mob) nil)
@@ -417,7 +418,7 @@
           (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to follow the leader to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x leader) (y leader) (z leader)))
           (setf nearest-target leader))
         ))
-          
+    
     ;; got to the nearest target
     (when nearest-target
       (logger (format nil "AI-FUNCTION: Target found ~A [~A]~%" (name nearest-target) (id nearest-target)))
@@ -434,7 +435,7 @@
         ((and (> (map-size mob) 1)
               (ai-find-move-around mob (x nearest-target) (y nearest-target)))
          (setf (path-dst mob) (ai-find-move-around mob (x nearest-target) (y nearest-target))))))
-    
+
     ;; if the mob is curious and it has nothing to do - move to the nearest sound, if any
     (when (and (mob-ai-curious-p mob)
                (null nearest-target)
@@ -460,13 +461,13 @@
                  (setf (path mob) nil)
                  (loop-finish)
             when (and (> (map-size mob) 1)
-                      (ai-find-move-around mob (x nearest-target) (y nearest-target)))
+                      (ai-find-move-around mob (sound-x sound) (sound-y sound)))
               do
                  (setf (path-dst mob) (ai-find-move-around mob (sound-x sound) (sound-y sound)))
                  (setf (path mob) nil)
                  (loop-finish)
             finally (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to investigate sound at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
-
+    
     ;; move to some random passable terrain
     (unless (path-dst mob)
       (let ((rx (- (+ 10 (x mob))

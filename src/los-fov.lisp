@@ -37,7 +37,7 @@
       (reveal-cell-on-map (level *world*) dx dy dz :reveal-mob (if (or (null (get-mob-* (level *world*) dx dy dz))
                                                                        (eq (get-mob-* (level *world*) dx dy dz) *player*))
                                                                  t
-                                                                 (check-mob-visibile (get-mob-* (level *world*) dx dy dz) :observer *player*))))
+                                                                 (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer *player*))))
     
     (setf terrain (get-terrain-* (level *world*) dx dy dz))
     (unless terrain
@@ -197,7 +197,8 @@
                                       
                                       (when (and (get-mob-* (level *world*) dx dy dz) 
                                                  (not (eq (get-mob-* (level *world*) dx dy dz) mob))
-                                                 (check-mob-visibile (get-mob-* (level *world*) dx dy dz) :observer mob))
+                                                 (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer mob))
+                                        (format t "VISIBILITY ~A ~A" (name (get-mob-* (level *world*) dx dy dz)) (get-mob-visibility (get-mob-* (level *world*) dx dy dz)))
                                         (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
                                         (pushnew mob-id (visible-mobs mob)))
                                       
@@ -318,7 +319,7 @@
                       
                       (when (and (get-mob-* level dx dy dz) 
                                  (not (eq (get-mob-* level dx dy dz) *player*))
-                                 (check-mob-visibile (get-mob-* level dx dy dz) :observer *player*)
+                                 (check-mob-visible (get-mob-* level dx dy dz) :observer *player*)
                                  )
                         (pushnew (id (get-mob-* level dx dy dz)) (visible-mobs *player*))
                         
