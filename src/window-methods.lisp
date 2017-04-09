@@ -225,9 +225,10 @@
 	(sdl:draw-string-solid-* "*" (- (+ x w) 12) (+ y (truncate (* h (/ cur-item (length item-list))))) :color sdl:*white*)))))
 
 (defun run-selection-list (key mod unicode cur-str)
+  (declare (ignore unicode))
   (cond
-    ((and (sdl:key= key :sdl-key-up) (= mod 0)) (decf cur-str))
-    ((and (sdl:key= key :sdl-key-down) (= mod 0)) (incf cur-str)))
+    ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (= mod 0)) (decf cur-str))
+    ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (= mod 0)) (incf cur-str)))
   cur-str)
 
 (defun adjust-selection-list (cur-str max-str)

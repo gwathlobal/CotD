@@ -54,6 +54,7 @@
      (:file "window-game-over" :depends-on ("window-methods"))
      (:file "window-help" :depends-on ("window-methods"))
      (:file "window-custom-scenario" :depends-on ("window-methods"))
+     (:file "window-inventory" :depends-on ("window-methods"))
      (:file "ai" :depends-on ("base-methods" "window-methods"))
      (:file "init-game-events" :depends-on ("game-events" "window-methods"))
      (:file "init-animation-types" :depends-on ("animations" "window-methods"))

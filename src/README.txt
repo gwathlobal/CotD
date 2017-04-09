@@ -81,11 +81,13 @@ KEYBINDINGS
  l                              - Look mode
  f                              - Fire mode
  r                              - Reload
+ p                              - Pick up an item
 
  Shift + ,                      - Look/Climb up
  Shift + .                      - Look/Climb down
 
  Shift + 2                      - Character screen
+ i                              - Inventory
  m                              - View messages
  ?                              - Help
  Shift + Q                      - Quit to main menu

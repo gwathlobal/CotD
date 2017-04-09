@@ -450,6 +450,8 @@
    (stat-calls :initform 0 :accessor stat-calls)
    (stat-answers :initform 0 :accessor stat-answers)
 
+   (inv :initform () :accessor inv)
+
    ))
 
 (defmethod initialize-instance :after ((mob mob) &key)
@@ -826,6 +828,10 @@
     visibility))
 
 (defun check-mob-visible (mob &key (observer nil) (complete-check nil))
+  ;; you can always see yourself
+  (when (eq mob observer)
+    (return-from check-mob-visible t))
+  
   (when (and complete-check
              observer
              (not (find (id mob) (visible-mobs observer))))

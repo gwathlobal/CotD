@@ -251,6 +251,7 @@
 (defparameter *mob-motion-shoot* 30)
 (defparameter *mob-motion-reload* 40)
 (defparameter *mob-motion-ascend* 100)
+(defparameter *mob-motion-pick-drop* 30)
 
 (defparameter *mob-exposure-alertness* 30)
 
@@ -263,6 +264,7 @@
 (defparameter *mob-sound-reload* 50)
 (defparameter *mob-sound-shoot* 200)
 (defparameter *mob-sound-ascend* 60)
+(defparameter *mob-sound-pick-drop* 40)
 
 (defconstant +connect-room-none+ -1)
 

@@ -911,7 +911,7 @@
                                                 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~@(~A~) roars to fear its enemies. " (visible-name actor))
-                                                                       :observed actor)
+                                                                       :observed-mob actor)
                                                 (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
                                                 ;; fear nearby visible enemy mobs
                                                 ;; fear can be resisted depending on the strength of the mob
@@ -924,11 +924,11 @@
                                                                (set-mob-effect mob +mob-effect-fear+ 3)
                                                                (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                       (format nil "~@(~A~) is feared. " (visible-name mob))
-                                                                                      :observed mob))
+                                                                                      :observed-mob mob))
                                                              (progn
                                                                (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                       (format nil "~@(~A~) resists fear. " (visible-name mob))
-                                                                                      :observed mob))))
+                                                                                      :observed-mob mob))))
                                                           
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )

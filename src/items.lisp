@@ -21,7 +21,9 @@
    (item-type :initform 0 :initarg :item-type :accessor item-type :type fixnum)
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)
-   (z :initarg :z :initform 0 :accessor z :type fixnum)))
+   (z :initarg :z :initform 0 :accessor z :type fixnum)
+   (inv-id :initform nil :accessor inv-id) ;; id of the mob that has this item in its inventory
+   ))
 
 (defmethod initialize-instance :after ((item item) &key)
   (setf (id item) (find-free-id *items*))
@@ -41,3 +43,26 @@
 
 (defmethod back-color ((item item))
   (back-color (get-item-type-by-id (item-type item))))
+
+(defun get-inv-item-by-id (inv item-id)
+  (if (find item-id inv)
+    (get-item-by-id item-id)
+    nil))
+
+(defun get-inv-item-by-pos (inv n)
+  (if (and (>= n 0)
+             (< n (length inv)))
+    (get-item-by-id (nth n inv))
+    nil))
+
+(defun add-to-inv (item inv inv-id)
+  (unless (inv-id item)
+    (remove-item-from-level-list (level *world*) item))
+  (unless (eq inv-id (inv-id item))
+    (push (id item) inv)
+    (setf (inv-id item) inv-id))
+  inv)
+
+(defun remove-from-inv (item inv)
+  (setf (inv-id item) nil)
+  (remove (id item) inv))

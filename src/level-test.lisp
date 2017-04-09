@@ -143,7 +143,11 @@
     (add-mob-to-level-list (level world) soldier)
     (add-mob-to-level-list (level world) demon)
 
-    ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 1)))
+    (mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))
+                   :spd nil)
+    (mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))
+                   :spd nil)
+    (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 0) :y (+ (y *player*) 3)))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-fiend+ :x (+ (x *player*) 8) :y (+ (y *player*) 0)))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 2) :y (+ (y *player*) 3)))

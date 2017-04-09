@@ -427,12 +427,56 @@
                             (progn
                               (add-message (format nil "Can't reload: this is not a ranged weapon.~%")))))
                         ;;------------------
+			;; view inventory - i
+                        (when (and (sdl:key= key :sdl-key-i) (= mod 0))
+                          (setf *current-window* (make-instance 'inventory-window :return-to *current-window*)))
+                        ;;------------------
+			;; pick item - p
+			(when (and (sdl:key= key :sdl-key-p) (= mod 0))
+
+                          (when (can-move-if-possessed *player*)
+                            (setf (can-move-if-possessed *player*) nil)
+                            (go exit-loop))
+                          
+			  ;; count the number of items and containers at the grid-cell
+			  (let ((item-line-list nil)
+                                (item-prompt-list)
+				(item-list (get-items-* (level *world*) (x *player*) (y *player*) (z *player*))))
+			    ;; 
+                            (setf item-line-list (loop for item-id in item-list
+                                                  for item = (get-item-by-id item-id)
+                                                  collect (name item)))
+                            ;; populate the ability prompt list
+                            (setf item-prompt-list (loop for item-id in item-list
+                                                         collect #'(lambda (cur-sel)
+                                                                     (declare (ignore cur-sel))
+                                                                     "[Enter] Pick up  [Escape] Cancel")))
+
+                            ;; a single item - just pick it up
+			    (when (= (length item-list) 1)
+			      (logger (format nil "PLAYER-ITEM-PICK: On item on the tile, pick it right away~%"))
+                              (clear-message-list *small-message-box*)
+			      (mob-pick-item *player* (get-inv-item-by-pos item-list 0)))
+			    ;; a several items - show selection window
+			    (when (> (length item-list) 1)
+			      (setf *current-window* (make-instance 'select-obj-window 
+								    :return-to *current-window* 
+								    :header-line "Choose an item to pick up:"
+								    :enter-func #'(lambda (cur-sel)
+                                                                                    (clear-message-list *small-message-box*)
+										    (mob-pick-item *player* (get-inv-item-by-pos item-list cur-sel))
+										    (setf *current-window* win)
+                                                                                    (set-idle-calcing win)
+                                                                                    (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t))
+								    :line-list item-line-list
+								    :prompt-list item-prompt-list)))
+			    ))
+                        ;;------------------
 			;; view messages - m
                         (when (and (sdl:key= key :sdl-key-m) (= mod 0))
 			  (setf *current-window* (make-instance 'message-window 
 								:return-to *current-window*))
-								
-			  (make-output *current-window*))
+                          (make-output *current-window*))
                         ;;------------------
 			;; quit to menu - Shift + q
                         (when (and (sdl:key= key :sdl-key-q) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
