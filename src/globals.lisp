@@ -145,6 +145,7 @@
 ;;-------------------- 
 
 (defconstant +item-type-body-part+ 0)
+(defconstant +item-type-coin+ 1)
 
 ;;--------------------
 ;; FEATURE-TYPE Constants

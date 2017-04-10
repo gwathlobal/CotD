@@ -1463,33 +1463,40 @@
     (progn
       ;(setf (aref (items (level *world*)) (x item) (y item) (z item))
       ;      (remove-from-inv item (get-items-* (level *world*) (x item) (y item) (z item))))
-      (remove-item-from-level-list (level *world*) item)
-      (setf (inv mob) (add-to-inv item (inv mob) (id mob)))
       (incf-mob-motion mob *mob-motion-pick-drop*)
       ;; generate sound
       (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
                                                                             (format nil "You hear rustling~A. " str)))
       (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                             (format nil "~A picks up ~A. " (visible-name mob) (name item))
+                             (format nil "~A picks up ~A~A. " (visible-name mob) (name item) (if (> (qty item) 1)
+                                                                                               (format nil " x~A" (qty item))
+                                                                                               ""))
                              :observed-mob mob)
+      (remove-item-from-level-list (level *world*) item)
+      (setf (inv mob) (add-to-inv item (inv mob) (id mob)))
+      
       (when spd
         (make-act mob spd)))
     (progn
       (logger (format nil "MOB-PICK-ITEM: Pick up failed, item is not on the ground!~%" )))))
 
-(defun mob-drop-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))))
+(defun mob-drop-item (mob item &key (qty (qty item)) (spd (move-spd (get-mob-type-by-id (mob-type mob)))))
   (logger (format nil "MOB-DROP-ITEM: ~A [~A] drops ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
   (if (eq (inv-id item) (id mob))
     (progn
-      (setf (inv mob) (remove-from-inv item (inv mob)))
+      
+      (setf (inv mob) (remove-from-inv item (inv mob) :qty qty))
       (setf (x item) (x mob) (y item) (y mob) (z item) (z mob))
       (add-item-to-level-list (level *world*) item)
+      
       (incf-mob-motion mob *mob-motion-pick-drop*)
       ;; generate sound
       (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
                                                                             (format nil "You hear rustling~A. " str)))
       (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                             (format nil "~A drops ~A. " (visible-name mob) (name item))
+                             (format nil "~A drops ~A~A. " (visible-name mob) (name item) (if (> (qty item) 1)
+                                                                                               (format nil " x~A" (qty item))
+                                                                                               ""))
                              :observed-mob mob)
       (when spd
         (make-act mob spd)))

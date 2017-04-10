@@ -68,16 +68,31 @@
 
 (defun add-item-to-level-list (level item)
   (pushnew (id item) (item-id-list level))
-  (push (id item) (aref (items level) (x item) (y item) (z item)))
+  (if (apply-gravity item)
+    (progn
+      (setf (z item) (apply-gravity item))
+      (setf (aref (items level) (x item) (y item) (z item))
+            (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil)))
+    (progn
+      (setf (aref (items level) (x item) (y item) (z item))
+            (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil)))))
+  
+  ;(setf (aref (items level) (x item) (y item) (z item))
+  ;      (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil))
+  ;(push (id item) (aref (items level) (x item) (y item) (z item)))
 
-  (when (apply-gravity item)
-    (remove-item-from-level-list level item)
-    (setf (z item) (apply-gravity item))
-    (add-item-to-level-list level item)))
+  ;(when (apply-gravity item)
+  ;  (setf item (remove-item-from-level-list level item))
+  ;  (setf (z item) (apply-gravity item))
+  ;  (add-item-to-level-list level item)))
 
 (defun remove-item-from-level-list (level item)
   (setf (item-id-list level) (remove (id item) (item-id-list level)))
-  (setf (aref (items level) (x item) (y item) (z item)) (remove (id item) (aref (items level) (x item) (y item) (z item)))))
+  (setf (aref (items level) (x item) (y item) (z item))
+        (remove-from-inv item (aref (items level) (x item) (y item) (z item))))
+  item
+  ;(setf (aref (items level) (x item) (y item) (z item)) (remove (id item) (aref (items level) (x item) (y item) (z item))))
+  )
 
 (defun get-terrain-* (level x y z)
   (when (or (< x 0) (>= x (array-dimension (terrain level) 0))

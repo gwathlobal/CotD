@@ -113,7 +113,11 @@
         (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
               for item = (get-item-by-id item-id)
               do
-                 (format str "~%~A" (name item)))
+                 (format str "~%~A~A"
+                         (name item)
+                         (if (> (qty item) 1)
+                           (format nil " x~A" (qty item))
+                           "")))
                          
                          
         )

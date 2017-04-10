@@ -30,11 +30,21 @@
   (let ((cur-str) (lst (make-list 0)) (color-list (make-list 0)))
     ;(when (= +inv-tab-inv+ (cur-tab win)) (setf selected t))
     (setf cur-str (cur-inv win))
-    (dotimes (i (length (inv *player*)))
-      (setf lst (append lst (list (name (get-inv-item-by-pos (inv *player*) i)))))
-      (if (= i cur-str)  
-	  (setf color-list (append color-list (list sdl:*yellow*)))
-	  (setf color-list (append color-list (list sdl:*white*)))))
+    (loop for i from 0 below (length (inv *player*))
+          for item = (get-inv-item-by-pos (inv *player*) i)
+          do
+             (push (format nil "~A~A"
+                           (name item)
+                           (if (> (qty item) 1)
+                             (format nil " x~A" (qty item))
+                             ""))
+                   lst)
+             (push (if (= i cur-str)
+                     sdl:*yellow*
+                     sdl:*white*)
+                   color-list))
+    (setf lst (reverse lst) color-list (reverse color-list))
+    
     (draw-selection-list lst cur-str (truncate 425 15) 20 20 color-list))
 
   ;; drawing selected item description
@@ -93,7 +103,7 @@
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                        ((and (sdl:key= key :sdl-key-d) (= mod 0))
                         (clear-message-list *small-message-box*)
-                        (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                        (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)) :qty 1)
                         (setf *current-window* (return-to win))
                         (make-output *current-window*)
                         (return-from run-window nil))
