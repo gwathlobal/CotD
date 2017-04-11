@@ -6,7 +6,8 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name item" :initarg :name :accessor name)
-   (max-stack-num :initform 1 :initarg :max-stack-num :accessor max-stack-num)))
+   (max-stack-num :initform 1 :initarg :max-stack-num :accessor max-stack-num)
+   (value :initform 0 :initarg :value :accessor value)))
 
 (defun get-item-type-by-id (mob-type-id)
   (aref *item-types* mob-type-id))
@@ -60,6 +61,9 @@
 
 (defmethod max-stack-num ((item item))
   (max-stack-num (get-item-type-by-id (item-type item))))
+
+(defmethod value ((item item))
+  (* (qty item) (value (get-item-type-by-id (item-type item)))))
 
 (defun get-inv-item-by-id (inv item-id)
   (if (find item-id inv)
@@ -130,3 +134,8 @@
           (if (> (qty item) 1)
             (format nil " x~A" (qty item))
             "")))
+
+(defun get-overall-value (inv)
+  (loop for item-id in inv
+        for item = (get-item-by-id item-id)
+        sum (value item)))

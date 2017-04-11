@@ -32,6 +32,7 @@
 (defconstant +tod-type-day+ 16)
 (defconstant +tod-type-morning+ 17)
 (defconstant +tod-type-evening+ 18)
+(defconstant +player-faction-thief+ 19)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -378,6 +379,14 @@
              (funcall placement-func world (make-instance 'mob :mob-type mob-template-id))))
   )
 
+(defun adjust-initial-visibility (world mob-template-list)
+  (declare (ignore mob-template-list))
+  ;(format t "ADJUST-INITIAL-VISIBILITY~%")
+  (loop for mob-id in (mob-id-list (level world))
+        for mob = (get-mob-by-id mob-id)
+        do
+           (calculate-mob-vision-hearing mob)))
+
 (defun find-unoccupied-place-around (world mob sx sy sz)
   (loop with min-x = sx
         with max-x = sx
@@ -431,8 +440,6 @@
         for y = (random max-y)
         for z = 2
         until (and (not (and (> x 7) (< x (- max-x 7)) (> y 7) (< y (- max-y 7))))
-                   ;(not (get-mob-* (level world) x y))
-                   ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
                    (eq (check-move-on-level mob x y z) t))
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
@@ -444,11 +451,25 @@
         for y = (random max-y)
         for z = 2
         until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
-                   (eq (check-move-on-level mob x y z) t)
-                   ;(not (get-mob-* (level world) x y))
-                   ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
-                   )
+                   (eq (check-move-on-level mob x y z) t))
         finally (setf (x mob) x (y mob) y (z mob) z)
+                (add-mob-to-level-list (level world) mob)))
+
+(defun find-unoccupied-place-on-top (world mob)
+  ;(setf (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
+  
+  (loop with max-x = (array-dimension (terrain (level *world*)) 0)
+        with max-y = (array-dimension (terrain (level *world*)) 1)
+        for x = (random max-x)
+        for y = (random max-y)
+        for z = (1- (array-dimension (terrain (level *world*)) 2))
+        do
+           (setf (x mob) x (y mob) y (z mob) z)
+        until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
+                   (apply-gravity mob)
+                   (> (apply-gravity mob) 2)
+                   (eq (check-move-on-level mob x y z) t))
+        finally (setf (x mob) x (y mob) y (z mob) (apply-gravity mob))
                 (add-mob-to-level-list (level world) mob)))
 
 (defun place-reserved-buildings-forest (reserved-level)
@@ -592,3 +613,5 @@
                    )))
 
   )
+
+()

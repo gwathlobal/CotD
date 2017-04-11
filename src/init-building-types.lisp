@@ -41,7 +41,8 @@
                                             (values (list (list +mob-type-man+ 4 5 z)
                                                           (list +mob-type-woman+ 3 2 (+ z 1))
                                                           (list +mob-type-child+ 5 5 (+ z 1)))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 3 2 (+ z 1) (+ 50 (random 51))))))))
 
 (set-building-type (make-building :id +building-city-house-2+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y z template-level)
@@ -82,7 +83,8 @@
                                             (values (list (list +mob-type-man+ 2 3 z)
                                                           (list +mob-type-woman+ 4 2 (+ z 1))
                                                           (list +mob-type-child+ 5 4 (+ z 1)))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 4 2 (+ z 1) (+ 50 (random 51))))))))
 
 (set-building-type (make-building :id +building-city-house-3+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y z template-level)
@@ -123,7 +125,8 @@
                                             (values (list (list +mob-type-man+ 5 4 z)
                                                           (list +mob-type-woman+ 2 2 (+ z 1))
                                                           (list +mob-type-child+ 2 4 (+ z 1)))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 2 2 (+ z 1) (+ 50 (random 51))))))))
 
 (set-building-type (make-building :id +building-city-house-4+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y z template-level)
@@ -164,7 +167,8 @@
                                             (values (list (list +mob-type-man+ 4 2 z)
                                                           (list +mob-type-woman+ 2 4 (+ z 1))
                                                           (list +mob-type-child+ 4 5 (+ z 1)))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 2 4 (+ z 1) (+ 50 (random 51))))))))
 
 (set-building-type (make-building :id +building-city-townhall-1+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -211,7 +215,8 @@
                                             (values (list (list +mob-type-clerk+ 7 8 (+ z 1))
                                                           (list +mob-type-clerk+ 7 8 z)
                                                           (list +mob-type-clerk+ 12 7 z))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 7 8 (+ z 1) (+ 100 (random 101))))))))
 
 (set-building-type (make-building :id +building-city-townhall-2+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -258,7 +263,8 @@
                                             (values (list (list +mob-type-clerk+ 3 3 z)
                                                           (list +mob-type-clerk+ 8 3 (+ z 1))
                                                           (list +mob-type-clerk+ 8 2 z))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 8 3 (+ z 1) (+ 100 (random 101))))))))
 
 (set-building-type (make-building :id +building-city-townhall-3+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -320,7 +326,8 @@
                                             (values (list (list +mob-type-clerk+ 2 8 (+ z 1))
                                                           (list +mob-type-clerk+ 2 13 z)
                                                           (list +mob-type-clerk+ 2 8 z))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 2 8 (+ z 1) (+ 100 (random 101))))))))
 
 (set-building-type (make-building :id +building-city-townhall-4+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -382,7 +389,8 @@
                                             (values (list (list +mob-type-clerk+ 7 2 z)
                                                           (list +mob-type-clerk+ 7 8 (+ z 1))
                                                           (list +mob-type-clerk+ 7 8 z))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 7 8 (+ z 1) (+ 100 (random 101))))))))
 
 (set-building-type (make-building :id +building-city-park-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
                                   :func #'(lambda (x y z template-level)
@@ -401,6 +409,7 @@
                                               )
                                             (values (list (list +mob-type-man+ 2 1 z)
                                                           (list +mob-type-woman+ 7 4 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-park-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
@@ -474,6 +483,7 @@
                                                                            (setf rx (random 10))
                                                                            (setf ry (random 10))
                                                                         ))
+                                                    nil
                                                     nil)
                                             
                                             
@@ -521,13 +531,12 @@
                                                           collect (loop with rx = (random 10)
                                                                         with ry = (random 10)
                                                                         until (not (get-terrain-type-trait (aref template-level (+ x rx) (+ y ry) z) +terrain-trait-blocks-move+))
-                                                                        ;(and (not (= (aref template-level (+ x rx) (+ y ry) z) +terrain-tree-birch+))
-                                                                        ;           (not (= (aref template-level (+ x rx) (+ y ry) z) +terrain-tree-birch-trunk+)))
                                                                         finally (return (list +mob-type-man+ rx ry z))
                                                                         do
                                                                            (setf rx (random 10))
                                                                            (setf ry (random 10))
                                                                         ))
+                                                    nil
                                                     nil)
                                             
                                             
@@ -577,7 +586,7 @@
                                                                                 (setf (aref template-level x y z) +terrain-border-grass+)
                                                                                 (setf (aref template-level x y z) +terrain-floor-grass+)))))))
                                                 
-                                                (values nil nil))))
+                                                (values nil nil nil))))
                                   ))
 
 (set-building-type (make-building :id +building-city-lake-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
@@ -619,7 +628,7 @@
                                               (translate-build-to-template x y (- z 1) build-template-z-1 template-level)
                                               (translate-build-to-template x y (- z 2) build-template-z-0 template-level)
                                               )
-                                            (values nil nil))))
+                                            (values nil nil nil))))
 
 (set-building-type (make-building :id +building-city-lake-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
                                   :func #'(lambda (x y z template-level)
@@ -660,7 +669,7 @@
                                               (translate-build-to-template x y (- z 1) build-template-z-1 template-level)
                                               (translate-build-to-template x y (- z 2) build-template-z-0 template-level)
                                               )
-                                            (values nil nil))))
+                                            (values nil nil nil))))
 
 (set-building-type (make-building :id +building-city-prison-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-prison+
                                   :func #'(lambda (x y z template-level)
@@ -737,6 +746,7 @@
                                                           (list +mob-type-criminal+ 14 6 (+ z 1))
                                                           (list +mob-type-policeman+ 8 5 (+ z 1))
                                                           (list +mob-type-policeman+ 14 8 (+ z 1)))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-church-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-church+
@@ -825,6 +835,7 @@
                                                           (list +mob-type-woman+ 10 7 z)
                                                           (list +mob-type-man+ 10 11 z)
                                                           (list +mob-type-woman+ 6 11 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-warehouse-1+ :grid-dim '(4 . 4) :act-dim '(20 . 20) :type +building-type-warehouse+
@@ -878,6 +889,7 @@
                                                           (list +mob-type-man+ 16 3 z)
                                                           (list +mob-type-man+ 3 16 z)
                                                           (list +mob-type-man+ 16 16 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-library-1+ :grid-dim '(4 . 3) :act-dim '(20 . 13) :type +building-type-library+
@@ -918,6 +930,7 @@
                                                           (list +mob-type-woman+ 10 6 z)
                                                           (list +mob-type-woman+ 13 8 z)
                                                           (list +mob-type-woman+ 16 10 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-satan-lair-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-satanists+
@@ -999,7 +1012,8 @@
                                                           (list +feature-blood-fresh+ 8 12 z)
                                                           (list +feature-blood-fresh+ 7 12 z)
                                                           (list +feature-blood-fresh+ 9 12 z)
-                                                          (list +feature-blood-old+ 9 13 z))))))
+                                                          (list +feature-blood-old+ 9 13 z))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-river+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
@@ -1009,6 +1023,7 @@
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-river+)
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-river+)))
                                             (values nil
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-bridge+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1019,6 +1034,7 @@
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-river+)
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-river+)))
                                             (values nil
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-pier+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1029,6 +1045,7 @@
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-sea+)
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-sea+)))
                                             (values nil
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-sea+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1039,6 +1056,7 @@
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-sea+)
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-sea+)))
                                             (values nil
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-warehouse-port-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
@@ -1070,6 +1088,7 @@
                                               )
                                             (values (list (list +mob-type-man+ 3 3 z)
                                                           (list +mob-type-man+ 6 6 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-warehouse-port-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
@@ -1101,6 +1120,7 @@
                                               )
                                             (values (list (list +mob-type-man+ 3 6 z)
                                                           (list +mob-type-man+ 6 3 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-island-ground-border+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1116,7 +1136,7 @@
                                                   (progn
                                                     (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-water-sea+)))))
 
-                                            (values nil nil)
+                                            (values nil nil nil)
                                             )))
 
 (set-building-type (make-building :id +building-city-barricade-ns+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1136,7 +1156,7 @@
                                               (setf (aref template-level (+ x dx) (+ y 2) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x dx) (+ y 3) z) +terrain-wall-barricade+))
                                             
-                                            (values nil nil)
+                                            (values nil nil nil)
                                             )))
 
 (set-building-type (make-building :id +building-city-barricade-se+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1150,7 +1170,7 @@
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))
                                             
-                                            (values nil nil)
+                                            (values nil nil nil)
                                             )))
 
 (set-building-type (make-building :id +building-city-barricade-sw+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1164,7 +1184,7 @@
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))
                                             
-                                            (values nil nil)
+                                            (values nil nil nil)
                                             )))
 
 (set-building-type (make-building :id +building-city-barricade-nw+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1178,7 +1198,7 @@
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))
                                             
-                                            (values nil nil)
+                                            (values nil nil nil)
                                             )))
 
 (set-building-type (make-building :id +building-city-barricade-ne+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1192,7 +1212,7 @@
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))
                                             
-                                            (values nil nil)
+                                            (values nil nil nil)
                                             )))
 
 (set-building-type (make-building :id +building-city-stables-1+ :grid-dim '(3 . 3) :act-dim '(14 . 15) :type +building-type-stables+
@@ -1245,6 +1265,7 @@
                                                           (list +mob-type-horse+ 11 8 z)
                                                           (list +mob-type-horse+ 11 10 z)
                                                           (list +mob-type-horse+ 11 12 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-mansion-1+ :grid-dim '(4 . 3) :act-dim '(18 . 14) :type +building-type-mansion+
@@ -1303,7 +1324,8 @@
                                                           (list +mob-type-woman+ 14 4 z)
                                                           (list +mob-type-child+ 4 8 (+ z 1))
                                                           (list +mob-type-man+ 5 4 (+ z 1)))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 5 4 (+ z 1) (+ 150 (random 151))))))))
 
 (set-building-type (make-building :id +building-city-mansion-2+ :grid-dim '(4 . 3) :act-dim '(18 . 14) :type +building-type-mansion+
                                   :func #'(lambda (x y z template-level)
@@ -1361,4 +1383,5 @@
                                                           (list +mob-type-woman+ 14 9 z)
                                                           (list +mob-type-child+ 4 4 (+ z 1))
                                                           (list +mob-type-man+ 5 9 (+ z 1)))
-                                                    nil))))
+                                                    nil
+                                                    (list (list +item-type-coin+ 5 9 (+ z 1) (+ 100 (random 101))))))))

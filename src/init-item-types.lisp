@@ -6,4 +6,4 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-coin+
                                          :name "Coin"
-                                         :glyph-idx 4 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 5))
+                                         :glyph-idx 4 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 10000 :value 1))

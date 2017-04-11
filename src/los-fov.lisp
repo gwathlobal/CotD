@@ -62,10 +62,13 @@
     t))
 
 (defun calculate-mob-vision-hearing (mob)
+  ;(format t "CALC-VISION-HEAR: ~A [~A]~%" (name mob) (id mob))
   (setf (brightness mob) (+ (* *light-power-faloff* (cur-light mob))
                             (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob))))
   (setf (hear-range-mobs mob) nil)
 
+  ;(format t "CALC-VISION-HEAR: ~A [~A]~%" (name mob) (id mob))
+  
   ;; check through all the mobs
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)

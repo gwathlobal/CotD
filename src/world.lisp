@@ -201,6 +201,7 @@
   )
 
 (defun get-outdoor-light-* (level x y z)
+  ;(format t "GET-OUTDOOR-LIGHT: ~A ~A ~A ~A" level x y z)
   (truncate (* (outdoor-light level)
                (aref (light-map level) x y z))
             100))

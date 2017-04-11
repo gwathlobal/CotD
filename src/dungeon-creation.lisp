@@ -18,6 +18,7 @@
   
   (let ((mob-template-result)
         (feature-template-result)
+        (item-template-result)
 	
 	(result-template)
 
@@ -43,7 +44,7 @@
 
     ;; apply city layout function, if any
     (when layout-func
-      (multiple-value-setq (result-template feature-template-result mob-template-result) (funcall layout-func)))
+      (multiple-value-setq (result-template feature-template-result mob-template-result item-template-result) (funcall layout-func)))
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
@@ -87,6 +88,9 @@
     
     ;; set up features
     (create-features-from-template (level world) feature-template-result)
+
+    ;; set up items
+    (create-items-from-template (level world) item-template-result)
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
@@ -148,6 +152,11 @@
   (loop for (feature-type-id x y z) in feature-template-list 
         do
            (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z))))
+
+(defun create-items-from-template (level item-template-list)
+  (loop for (item-type-id x y z qty) in item-template-list 
+        do
+           (add-item-to-level-list level (make-instance 'item :item-type item-type-id :x x :y y :z z :qty qty))))
 
 (defun create-level (&key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*))
   (let ((level))

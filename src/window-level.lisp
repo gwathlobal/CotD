@@ -35,11 +35,12 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A~A~A~%Visibility: ~A"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A~A~A~%Visibility: ~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
                         (if (mob-ability-p *player* +mob-abil-military-follow-me+) (format nil "Followers: ~A~%" (count-follower-list *player*)) "")
+                        (if (= (mob-type *player*) +mob-type-thief+) (format nil "Valuables: ~A$~%" (get-overall-value (inv *player*))) "")
                         (get-weapon-descr-line *player*)
                         (total-humans *world*)
                         (total-blessed *world*)

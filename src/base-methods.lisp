@@ -1114,8 +1114,10 @@
 (defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()))
   (let ((dead-msg-str (format nil "~A dies. " (visible-name mob))))
     
-    (unless (dead= mob)
-      (when (mob-ability-p mob +mob-abil-human+)
+    (when (dead= mob)
+      (return-from make-dead nil))
+    
+    (when (mob-ability-p mob +mob-abil-human+)
       (decf (total-humans *world*)))
     (when (mob-ability-p mob +mob-abil-demon+)
       (decf (total-demons *world*)))
@@ -1124,16 +1126,22 @@
     (when (mob-effect-p mob +mob-effect-blessed+)
       (decf (total-blessed *world*)))
 
+    ;; place the inventory on the ground
+    (loop for item-id in (inv mob)
+          for item = (get-item-by-id item-id)
+          do
+             (mob-drop-item mob item :spd nil :silent t))
+    
     ;; place the corpse
     (when corpse
       (let ((item) (r) (left-body-str))
         (setf r 0)
-
+        
         ;; determine which body part to sever (if any)
         (when (and aux-params
                    (find :chops-body-parts aux-params))
           (setf r (random 4)))
-
+        
         (cond
           ;; sever head
           ((= r 1) (progn
@@ -1155,14 +1163,14 @@
                        (setf dead-msg-str (format nil "~@(~A~) cuts ~A in half. " (visible-name killer) (visible-name mob))))))
           ;; do not sever anything
           (t (setf left-body-str "body")))
-
+        
         (setf item (make-instance 'item :item-type +item-type-body-part+ :x (x mob) :y (y mob) :z (z mob)))
         (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) left-body-str))
         (add-item-to-level-list (level *world*) item)
         (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob)))
         
         ))
-
+    
     (when msg
       (print-visible-message (x mob) (y mob) (z mob) (level *world*) dead-msg-str)
       (when msg-newline (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%"))))
@@ -1211,6 +1219,8 @@
       (setf (x (get-mob-by-id (riding-mob-id mob))) (x mob)
             (y (get-mob-by-id (riding-mob-id mob))) (y mob))
       (add-mob-to-level-list (level *world*) (get-mob-by-id (riding-mob-id mob))))
+
+    
     
     ;; place blood stain if req
     (when (and splatter (< (random 100) 75))
@@ -1457,21 +1467,20 @@
     (when nearest-enemy
       (setf (sense-good-id *player*) (id nearest-enemy)))))
 
-(defun mob-pick-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))))
+(defun mob-pick-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))) (silent nil))
   (logger (format nil "MOB-PICK-ITEM: ~A [~A] picks up ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
   (if (null (inv-id item))
     (progn
-      ;(setf (aref (items (level *world*)) (x item) (y item) (z item))
-      ;      (remove-from-inv item (get-items-* (level *world*) (x item) (y item) (z item))))
-      (incf-mob-motion mob *mob-motion-pick-drop*)
-      ;; generate sound
-      (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
-                                                                            (format nil "You hear rustling~A. " str)))
-      (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                             (format nil "~A picks up ~A~A. " (visible-name mob) (name item) (if (> (qty item) 1)
-                                                                                               (format nil " x~A" (qty item))
-                                                                                               ""))
-                             :observed-mob mob)
+      (unless silent
+        (incf-mob-motion mob *mob-motion-pick-drop*)
+        ;; generate sound
+        (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
+                                                                              (format nil "You hear rustling~A. " str)))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*)
+                               (format nil "~A picks up ~A~A. " (visible-name mob) (name item) (if (> (qty item) 1)
+                                                                                                 (format nil " x~A" (qty item))
+                                                                                                 ""))
+                               :observed-mob mob))
       (remove-item-from-level-list (level *world*) item)
       (setf (inv mob) (add-to-inv item (inv mob) (id mob)))
       
@@ -1480,7 +1489,7 @@
     (progn
       (logger (format nil "MOB-PICK-ITEM: Pick up failed, item is not on the ground!~%" )))))
 
-(defun mob-drop-item (mob item &key (qty (qty item)) (spd (move-spd (get-mob-type-by-id (mob-type mob)))))
+(defun mob-drop-item (mob item &key (qty (qty item)) (spd (move-spd (get-mob-type-by-id (mob-type mob)))) silent)
   (logger (format nil "MOB-DROP-ITEM: ~A [~A] drops ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
   (if (eq (inv-id item) (id mob))
     (progn
@@ -1488,16 +1497,17 @@
       (setf (inv mob) (remove-from-inv item (inv mob) :qty qty))
       (setf (x item) (x mob) (y item) (y mob) (z item) (z mob))
       (add-item-to-level-list (level *world*) item)
-      
-      (incf-mob-motion mob *mob-motion-pick-drop*)
-      ;; generate sound
-      (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
-                                                                            (format nil "You hear rustling~A. " str)))
-      (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                             (format nil "~A drops ~A~A. " (visible-name mob) (name item) (if (> (qty item) 1)
-                                                                                               (format nil " x~A" (qty item))
-                                                                                               ""))
-                             :observed-mob mob)
+
+      (unless silent
+        (incf-mob-motion mob *mob-motion-pick-drop*)
+        ;; generate sound
+        (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
+                                                                              (format nil "You hear rustling~A. " str)))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*)
+                               (format nil "~A drops ~A~A. " (visible-name mob) (name item) (if (> (qty item) 1)
+                                                                                              (format nil " x~A" (qty item))
+                                                                                              ""))
+                             :observed-mob mob))
       (when spd
         (make-act mob spd)))
     (progn
