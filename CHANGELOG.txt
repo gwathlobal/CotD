@@ -11,6 +11,7 @@ CHANGELOG
 - Added Death from Above ability to the Thief. This allows the Thief to jump onto an enemy from an upper Z level and make a devastating blow.
 - Added Climbing ability to the Thief. It allows the Thief to go up and down along the Z level when clinging to walls.
 - Added trees spanning across several Z levels.
+- Added inventories to characters. You are now able to pick up, carry and drop items.
 
 --------------------
 Mar 25, 2017 v1.0.9

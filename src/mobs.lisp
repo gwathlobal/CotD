@@ -573,7 +573,7 @@
     (slot-value mob 'name)
     (name (get-mob-type-by-id (mob-type mob)))))
 
-(defun visible-name (mob)
+(defmethod visible-name ((mob mob))
   (when (and (not (eq *player* mob))
              (or ;(mob-effect-p *player* +mob-effect-blind+)
                  (not (check-mob-visible mob :observer *player*))))

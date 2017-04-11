@@ -23,9 +23,8 @@
   ;; a pane for displaying commands
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 10 :y 455 :w 620 :h 13))
     (sdl:fill-surface sdl:*black* :template a-rect)
-    (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-      (sdl:draw-string-solid-* "[d] Drop  [Esc] Exit" 10 455 :color sdl:*white*)))
-  
+    (sdl:draw-string-solid-* "[d] Drop all  [Ctrl+d] Drop  [Esc] Exit" 10 455 :color sdl:*white*))
+
   ;; drawing the inventory list
   (let ((cur-str) (lst (make-list 0)) (color-list (make-list 0)))
     ;(when (= +inv-tab-inv+ (cur-tab win)) (setf selected t))
@@ -33,12 +32,7 @@
     (loop for i from 0 below (length (inv *player*))
           for item = (get-inv-item-by-pos (inv *player*) i)
           do
-             (push (format nil "~A~A"
-                           (name item)
-                           (if (> (qty item) 1)
-                             (format nil " x~A" (qty item))
-                             ""))
-                   lst)
+             (push (visible-name item) lst)
              (push (if (= i cur-str)
                      sdl:*yellow*
                      sdl:*white*)
@@ -103,14 +97,41 @@
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                        ((and (sdl:key= key :sdl-key-d) (= mod 0))
                         (clear-message-list *small-message-box*)
-                        (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)) :qty 1)
+                        (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                         (setf *current-window* (return-to win))
                         (make-output *current-window*)
                         (return-from run-window nil))
-                       ;((and (sdl:key= key :sdl-key-d) (/= (logand mod sdl-cffi::sdl-key-mod-ctrl) 0)) 
-                       ; (progn
-                       ;   (setf *current-window* (make-instance 'drop-window :return-to *current-window* :item (get-item-inv (cur-inv win) *player*) :act-type :drop))
-                       ;   ))
+                       ((and (sdl:key= key :sdl-key-d) (/= (logand mod sdl-cffi::sdl-key-mod-ctrl) 0)) 
+                        (progn
+                          
+                          (setf *current-window* (make-instance 'input-str-window 
+                                                                :init-input "1"
+                                                                :header-str (format nil "Dropping ~A" (visible-name (get-inv-item-by-pos (inv *player*) (cur-inv win))))
+                                                                :main-str "Enter the quantity to drop"
+                                                                :prompt-str "[Enter] Drop [Escape] Cancel [a] All"
+                                                                :all-func #'(lambda () (format nil "~A" (qty (get-inv-item-by-pos (inv *player*) (cur-inv win)))))
+                                                                :input-check-func #'(lambda (char)
+                                                                                      (let ((i (parse-integer (string char) :junk-allowed t)))
+                                                                                        (if (and (not (null i))
+                                                                                                 (<= 1 i (qty (get-inv-item-by-pos (inv *player*) (cur-inv win)))))
+                                                                                          t
+                                                                                          nil)))
+                                                                :final-check-func #'(lambda (full-input-str)
+                                                                                      (let ((i (parse-integer full-input-str :junk-allowed t)))
+                                                                                        (if (and (not (null i))
+                                                                                                 (<= 1 i (qty (get-inv-item-by-pos (inv *player*) (cur-inv win)))))
+                                                                                          t
+                                                                                          nil)))
+                                                                ))
+                          (make-output *current-window*)
+                          (let ((qty (run-window *current-window*)))
+                            (when qty
+                              (clear-message-list *small-message-box*)
+                              (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)) :qty (parse-integer qty :junk-allowed nil))
+                              (setf *current-window* (return-to win))
+                              (make-output *current-window*)
+                              (return-from run-window nil)))
+                          ))
                        ;((sdl:key= key :sdl-key-return) (on-use (get-item-inv (cur-inv win) *player*) *player*))
 		       ;  ((and (sdl:key= key :sdl-key-e) (= mod 0)) (eject-ammo *player* (get-item-inv (cur-inv win) *player*)))
                        )

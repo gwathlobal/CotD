@@ -123,3 +123,10 @@
       (setf (inv-id item) nil)
       (remove (id item) inv)))
   )
+
+(defmethod visible-name ((item item))
+  (format nil "~A~A"
+          (name item)
+          (if (> (qty item) 1)
+            (format nil " x~A" (qty item))
+            "")))

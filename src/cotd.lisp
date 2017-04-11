@@ -274,15 +274,14 @@
          (setf *current-window* (make-instance 'loading-window 
                                                :update-func #'(lambda (win)
                                                                 (when (/= *max-progress-bar* 0) 
-                                                                  (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-                                                                    (let ((str (format nil "~A... ~3D%"
-                                                                                       (cur-str win)
-                                                                                       (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
-                                                                      (sdl:draw-string-solid-*  str
-                                                                                                (truncate (- (/ *window-width* 2) (/ (* (length str) 6) 2)))
-                                                                                                (truncate (- (/ *window-height* 2) (/ 13 2)))
-                                                                                                :color sdl:*white*))
-                                                                    )))))
+                                                                  (let ((str (format nil "~A... ~3D%"
+                                                                                     (cur-str win)
+                                                                                     (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
+                                                                    (sdl:draw-string-solid-*  str
+                                                                                              (truncate (- (/ *window-width* 2) (/ (* (length str) (sdl:char-width sdl:*default-font*)) 2)))
+                                                                                              (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
+                                                                                              :color sdl:*white*))
+                                                                  ))))
          (init-game layout-id weather-id tod-id faction-id))
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
