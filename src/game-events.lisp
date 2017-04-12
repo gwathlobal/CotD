@@ -15,6 +15,7 @@
 (defconstant +game-event-military-arrive-island+ 10)
 (defconstant +game-event-lose-game-possessed+ 11)
 (defconstant +game-event-adjust-outdoor-ligth+ 12)
+(defconstant +game-event-win-for-thief+ 13)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

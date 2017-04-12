@@ -1227,7 +1227,6 @@
       (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob) :z (z mob))))
     
     (setf (dead= mob) t)))
-  )
 
 (defun mob-evolve (mob)
   (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A assumes a superior form of ~A! " (name mob) (name (get-mob-type-by-id (evolve-into mob)))))

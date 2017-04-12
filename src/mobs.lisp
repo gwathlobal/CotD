@@ -27,6 +27,8 @@
    ;;   :ai-wants-bless - mob will get to the nearest ally and bless it
    ;;   :ai-stop   - mob will stop all movement whenever it see an enemy
    ;;   :ai-curious - mob will try to investigate sounds if it has nothing to do
+   ;;   :ai-kleptomaniac - mob will try to collect as much valuable items as possible
+   ;;   :ai-cautious - mob will not attack smb of higher strength
       
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The following keys may be used in make-instance
@@ -95,7 +97,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious
+                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -120,6 +122,10 @@
     (setf (gethash +ai-pref-stop+ (ai-prefs mob-type)) t))
   (when ai-curious
     (setf (gethash +ai-pref-curious+ (ai-prefs mob-type)) t))
+  (when ai-kleptomaniac
+    (setf (gethash +ai-pref-kleptomaniac+ (ai-prefs mob-type)) t))
+  (when ai-cautious
+    (setf (gethash +ai-pref-cautious+ (ai-prefs mob-type)) t))
 
   ;; set up abilities
   (when abil-can-possess
@@ -555,6 +561,12 @@
 
 (defmethod mob-ai-curious-p ((mob mob))
   (gethash +ai-pref-curious+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+
+(defmethod mob-ai-kleptomaniac-p ((mob mob))
+  (gethash +ai-pref-kleptomaniac+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+
+(defmethod mob-ai-cautious-p ((mob mob))
+  (gethash +ai-pref-cautious+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
 
 (defun mob-effect-p (mob effect-id)
   (gethash effect-id (effects mob)))

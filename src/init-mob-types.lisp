@@ -108,6 +108,7 @@
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-human t :abil-death-from-above t :abil-climbing t
+                                       :ai-kleptomaniac t :ai-cautious t
                              ))
 
 
@@ -170,7 +171,6 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 2
-                                       :base-light-radius 0
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t
                                        :abil-heal-self 1 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
                                        :ai-wants-bless t :ai-curious t))
@@ -280,5 +280,5 @@
                        (cons +faction-type-outsider-beasts+ nil)
                        (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil))
 (set-faction-relations +faction-type-criminals+
-                       (cons +faction-type-criminals+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t)
+                       (cons +faction-type-criminals+ t) (cons +faction-type-angels+ nil) (cons +faction-type-animals+ t)
                        (cons +faction-type-humans+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) )

@@ -71,6 +71,8 @@
 (defconstant +ai-pref-wants-bless+ 2)
 (defconstant +ai-pref-stop+ 3)
 (defconstant +ai-pref-curious+ 4)
+(defconstant +ai-pref-kleptomaniac+ 5)
+(defconstant +ai-pref-cautious+ 6)
 
 (defconstant +mob-abil-heal-self+ 0)
 (defconstant +mob-abil-conseal-divine+ 1)
@@ -266,6 +268,8 @@
 (defparameter *mob-sound-shoot* 200)
 (defparameter *mob-sound-ascend* 60)
 (defparameter *mob-sound-pick-drop* 40)
+
+(defparameter *thief-win-value* 1500)
 
 (defconstant +connect-room-none+ -1)
 

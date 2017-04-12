@@ -5,6 +5,7 @@
 (defconstant +game-over-angels-won+ 2)
 (defconstant +game-over-military-won+ 3)
 (defconstant +game-over-player-possessed+ 4)
+(defconstant +game-over-thief-won+ 5)
 
 (defclass final-stats-window (window)
   ((game-over-type :initarg :game-over-type :accessor game-over-type)))
@@ -21,7 +22,8 @@
       ((= (game-over-type win) +game-over-demons-won+) (setf str (format nil "LEGIONS OF HELL WON")) (setf color sdl:*green*))
       ((= (game-over-type win) +game-over-angels-won+) (setf str (format nil "THE HEAVENLY FORCES WON")) (setf color sdl:*green*))
       ((= (game-over-type win) +game-over-military-won+) (setf str (format nil "THE MILITARY WON")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-player-possessed+) (setf str (format nil "YOU ARE POSSESSED")) (setf color sdl:*red*)))
+      ((= (game-over-type win) +game-over-player-possessed+) (setf str (format nil "YOU ARE POSSESSED")) (setf color sdl:*red*))
+      ((= (game-over-type win) +game-over-thief-won+) (setf str (format nil "YOU HAVE COLLECTED ENOUGH VALUABLES AND MANAGED TO ESCAPE THE CITY")) (setf color sdl:*green*)))
     (sdl:draw-string-solid-* str  (truncate *window-width* 2) 10 :justify :center :color color)
     )
   

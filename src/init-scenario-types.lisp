@@ -116,6 +116,7 @@
                                                        (push #'test-level-place-mobs mob-func-list)
                                                                                                              
                                                        (push +game-event-lose-game-died+ game-event-list)
+                                                       (push +game-event-win-for-thief+ game-event-list)
                                                        ;(push +game-event-lose-game-possessed+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -126,6 +127,12 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 thief
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                                                                           #'find-unoccupied-place-on-top))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
@@ -177,6 +184,12 @@
                                                                          do
                                                                             (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 thief
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                                                                           #'find-unoccupied-place-on-top))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
@@ -233,6 +246,12 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 thief
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                                                                           #'find-unoccupied-place-on-top))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
                                                                                                        (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
@@ -285,6 +304,12 @@
                                                                  ;; remove the glitch from (0, 0, 0)
                                                                  (setf (aref (mobs (level world)) 0 0 0) nil)
                                                                  )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 thief
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                                                                           #'find-unoccupied-place-on-top))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
@@ -375,6 +400,12 @@
                                                                  ;; remove the glitch from (0, 0, 0)
                                                                  (setf (aref (mobs (level world)) 0 0 0) nil)
                                                                  )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 thief
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                                                                           #'find-unoccupied-place-on-top))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
@@ -488,7 +519,7 @@
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
                                                        (push +game-event-lose-game-possessed+ game-event-list)
-                                                       (push +game-event-win-for-humans+ game-event-list)
+                                                       (push +game-event-win-for-thief+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 

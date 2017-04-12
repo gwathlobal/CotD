@@ -460,16 +460,19 @@
   
   (loop with max-x = (array-dimension (terrain (level *world*)) 0)
         with max-y = (array-dimension (terrain (level *world*)) 1)
+        with nz = nil
         for x = (random max-x)
         for y = (random max-y)
         for z = (1- (array-dimension (terrain (level *world*)) 2))
         do
            (setf (x mob) x (y mob) y (z mob) z)
+           (setf nz (apply-gravity mob)) 
         until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
-                   (apply-gravity mob)
-                   (> (apply-gravity mob) 2)
-                   (eq (check-move-on-level mob x y z) t))
-        finally (setf (x mob) x (y mob) y (z mob) (apply-gravity mob))
+                   (get-terrain-type-trait (get-terrain-* (level world) x y nz) +terrain-trait-opaque-floor+)
+                   nz
+                   (> nz 2)
+                   (eq (check-move-on-level mob x y nz) t))
+        finally (setf (x mob) x (y mob) y (z mob) nz)
                 (add-mob-to-level-list (level world) mob)))
 
 (defun place-reserved-buildings-forest (reserved-level)
