@@ -38,7 +38,7 @@ Some units (a Gargantaur) are so huge that they occupy several tiles on the leve
  - They will not be able to get into narrow spaces (like some streets or the inside of the houses).
  - They are much easier to be hit with ranged weapons (even if the bullets disperse, this are still likely to land on a tile which the creature occupies).
  - They are able to move only in the direction they face (unlike smaller creatures). So if they first move south and then want to go north, it will require of them to make a 180-degree turn.
- - They can melee attack several enemies at the same time. For example, a Gargantaur has the size of 3x3 and can crush up to 3 units standing next to it.
+ - They can melee attack several enemies at the same time. For example, a Gargantaur of size  3x3 can crush up to 3 units standing next to it.
  
 Multi-tile units may also serve as mounts (for example, Angels can dominate Gargantaurs). Riding one will give excellent protection against melee attacks, but you will still have to cope with the creature's size and the necessity to turn it around to move in the desired direction.
 
@@ -46,3 +46,29 @@ Multi-tile units may also serve as mounts (for example, Angels can dominate Garg
 GRAVITY
 
 When you step into a tile with no floor in it (like empty air), you will fall down until you hit something solid. If the distance that you have traveled while falling is more than 1 Z level, you will take 5 damage for each level beyond 1.
+
+
+STEALTH
+
+Stealth is an ability to render oneself invisible for others. You visibility is determined by two componenets - the amount of light that falls on you and the amount of motion you make. Every light source produces a certain amount light that is distributed around it. The farther the tile - the less light it will receive. Some characters (like citizens, military units and the Angels) are their own light sources and illuminate themselves and everything around them. 
+Characters also become more visible the more they move. Every action produces a certain amount of motion that is added to the unit's visibility. Some actions produce more motion (like attacking somebody in melee), some - less (like picking or dropping items), but you generate no motion only if you stand completely still.
+A unit becomes visible to others if its visibility reaches 50. That means that if you are not specifically keen on stealth, you will be quite easiliy detected if you move, especially if even a little bit of light is shed on your location.
+
+
+TIME OF DAY
+
+There is dynamic change of the time of day on the level. All outdoor tiles (that is all tiles that do not have a solid floor above them) will have their inherent lighting cycle in synch with the current time - from 0 light at midnight to 100 light at noon.
+That means that you will not be able to hide in the streets during the day.
+
+
+HEARING
+
+Apart from motion, every character action also produces sounds that others can hear. If you do not see the source of the sound you will be indicated the general direction to it and the nature of the sound. Some actions are very loud (like gun shots), others won't be heard unless you stand nearby (like somebody's moving). Sounds are able to propagate through walls but they lose their loudness while doing so.
+When hearing something, most characters will try to investigate the source of the sound if they have no other pressing matters.
+
+
+CLIMBING
+
+The Thief is the only character who can traverse space vertically practically anywhere he wants. To climb up or down, he needs to be in the climbing mode, be positioned next to a wall or a floor and his destination tile should have a wall or a floor tile nearby. This means that some bushes or trees may not be climable as they lack a floor above them that the Thief can cling to. 
+Note that if you decide to switch off the climibing mode while having no solid floor in the tile you find yourself, you will immediately drop down.
+This ability provides the Thief with unprecedented protection as nobody will be able to follow him if he decides to get upon a roof (but some will be able to shoot him there nontheless).  

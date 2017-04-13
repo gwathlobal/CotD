@@ -4,7 +4,7 @@ CITY OF THE DAMNED
 --------------------
 OVERVIEW
 
-The year is 1915. The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain. Choose your side and join the fray!
+The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain. Choose your side and join the fray!
 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
@@ -27,11 +27,12 @@ FEATURES
  - Mounted combat
  - Multi-tile monsters
  - 3D map
+ - Stealth gameplay
 
 --------------------
 GENERAL TIPS
 
- - You can side either with Angels or with Demons. Though mankind is allied with angels, it is mainly stuck in the conflict between the parties.
+ - The two primary sides are Angels and Demons. Though mankind is allied with the Angels, it is mainly stuck in the conflict between the parties.
  - You are not alone and should not be able to overcome all obstacles by yourself, some enemies will require aid from your allies.
  - Your enemies are able to hide their true appearance, so observe and learn their tactics to avoid nasty surprises.
  - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.
@@ -68,6 +69,15 @@ THE MILITARY
  - The Chaplain can lead troops, reveal disguised enemies and provide divine protection to allies.
  - The Scout starts with a horse, can also reveal disguised enemies and is armed with a powerful rifle.
  - To win, kill all demons. But do not let angels stand in your way.
+
+--------------------
+THE CRIMINALS
+
+ - The criminals (who are opposed to the citizens and the military, but will not attack the Angels) are kept mainly in the prison.
+ - You may start as the Thief, who is found somewhere on the rooftops of the City.
+ - The Thief's primary weapons are stealth and an ability to climb walls. Unlike all other characters, he is able to evade any conflict by hiding in the shadows or getting some place he can not be reached.
+ - The Thief's goal is to get hold of enough gold and leave this accursed City.
+ - But beware - the Thief is rather frail and is not immune to possession.  
 
 --------------------
 KEYBINDINGS

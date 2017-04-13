@@ -165,9 +165,13 @@
 
     (when (and (zerop (random 10))
                (mob-ability-p mob +mob-abil-human+))
-      (generate-sound mob (x mob) (y mob) (z mob) 100 #'(lambda (str)
-                                                          (format nil "~A cries: \"Help! Help!\"~A. " (visible-name mob) str))
-                      :force-sound t)
+      (if (check-mob-visible mob :observer *player* :complete-check t)
+        (generate-sound mob (x mob) (y mob) (z mob) 100 #'(lambda (str)
+                                                            (format nil "~A cries: \"Help! Help!\"~A. " (visible-name mob) str))
+                        :force-sound t)
+        (generate-sound mob (x mob) (y mob) (z mob) 100 #'(lambda (str)
+                                                            (format nil "Somebody cries: \"Help! Help!\"~A. " str))
+                      :force-sound t))
       ;(print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A cries: \"Help! Help!\" " (visible-name mob)))
       )
     
@@ -429,7 +433,7 @@
     
     ;; got to the nearest target
     (when nearest-target
-      (logger (format nil "AI-FUNCTION: Target found ~A [~A]~%" (name nearest-target) (id nearest-target)))
+      (logger (format nil "AI-FUNCTION: Target found ~A [~A] (~A ~A ~A)~%" (name nearest-target) (id nearest-target) (x nearest-target) (y nearest-target) (z nearest-target)))
       (cond
         ((= (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
                                                                                    (map-size (get-mob-by-id (riding-mob-id mob)))
@@ -439,10 +443,12 @@
                                                                                                                     (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                                                                     (map-size mob))
                                          (get-mob-move-mode mob)))
-         (setf (path-dst mob) (list (x nearest-target) (y nearest-target) (z nearest-target))))
+         (setf (path-dst mob) (list (x nearest-target) (y nearest-target) (z nearest-target)))
+         (setf (path mob) nil))
         ((and (> (map-size mob) 1)
               (ai-find-move-around mob (x nearest-target) (y nearest-target)))
-         (setf (path-dst mob) (ai-find-move-around mob (x nearest-target) (y nearest-target))))))
+         (setf (path-dst mob) (ai-find-move-around mob (x nearest-target) (y nearest-target)))
+         (setf (path mob) nil))))
 
     ;; if the mob is curious and it has nothing to do - move to the nearest sound, if any
     (when (and (mob-ai-curious-p mob)
@@ -657,6 +663,20 @@
     (sense-good))
   (when (mob-ability-p *player* +mob-abil-detect-evil+)
     (sense-evil))
+
+  ;; print out the items on the player's tile
+  (loop for item-id in (get-items-* (level *world*) (x *player*) (y *player*) (z *player*))
+        for item = (get-item-by-id item-id)
+        with n = 0
+        do
+           (when (zerop n)
+             (add-message "You see "))
+           (when (not (zerop n))
+             (add-message ", "))
+           (add-message (format nil "~A" (visible-name item)))
+           (incf n)
+        finally (when (not (zerop n))
+                  (add-message (format nil ".~%"))))
   
   (make-output *current-window*) 
 

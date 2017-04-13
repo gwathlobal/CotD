@@ -1,5 +1,5 @@
 THE PLOT
-The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain.
+The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain.
 Choose your side and join the fray!
 
 GENERAL TIPS
@@ -49,3 +49,12 @@ THE MILITARY
  - Chaplains are accompanied by a host of loyal troops. 
  - Scouts start alone but compensate that with unsurpassed speed. Be careful, though - unlike a Chaplain, you do not have protection from possession. So if a demon traps you in your own body, the game is over for you.
  - To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.
+ 
+ THE CRIMINALS
+ - The criminals (who are opposed to the citizens and the military, but will not attack the Angels) are kept mainly in the prison (except for the Thief).
+ - You may start as the Thief, who is found somewhere on the rooftops of the City.
+ - Though the Thief is armed with a knife, his primary weapons are stealth and an ability to climb walls. Unlike all other characters, he is able to evade any conflict by hiding in the shadows or getting some place he can not be reached.
+ - Note that the citizens, the Angels and the military radiate light, while the Demons do not. 
+ - As the Thief, you always start at night but a new day will come eventually that will severely hinder your ability to hide. 
+ - To win, grab enough gold and get to the edge of the map to leave this accursed City.
+ - But beware - the Thief is rather frail and is not immune to possession.
