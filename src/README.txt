@@ -77,7 +77,6 @@ THE CRIMINALS
  - You may start as the Thief, who is found somewhere on the rooftops of the City.
  - The Thief's primary weapons are stealth and an ability to climb walls. Unlike all other characters, he is able to evade any conflict by hiding in the shadows or getting some place he can not be reached.
  - The Thief's goal is to get hold of enough gold and leave this accursed City.
- - But beware - the Thief is rather frail and is not immune to possession.  
 
 --------------------
 KEYBINDINGS

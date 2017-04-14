@@ -50,14 +50,14 @@ When you step into a tile with no floor in it (like empty air), you will fall do
 
 STEALTH
 
-Stealth is an ability to render oneself invisible for others. You visibility is determined by two componenets - the amount of light that falls on you and the amount of motion you make. Every light source produces a certain amount light that is distributed around it. The farther the tile - the less light it will receive. Some characters (like citizens, military units and the Angels) are their own light sources and illuminate themselves and everything around them. 
+Stealth is an ability to render oneself invisible for others. Your visibility is determined by two components - the amount of light that falls on you and the amount of motion you make. Every light source produces a certain amount light that is distributed around it. The farther the tile - the less light it will receive. Some characters (like citizens, military units, and the Angels) are their own light sources and illuminate themselves and everything around them. 
 Characters also become more visible the more they move. Every action produces a certain amount of motion that is added to the unit's visibility. Some actions produce more motion (like attacking somebody in melee), some - less (like picking or dropping items), but you generate no motion only if you stand completely still.
-A unit becomes visible to others if its visibility reaches 50. That means that if you are not specifically keen on stealth, you will be quite easiliy detected if you move, especially if even a little bit of light is shed on your location.
+A unit becomes visible to others if its visibility reaches 50. That means that if you are not specifically keen on stealth, you will be quite easily detected if you move, especially if even a little bit of light is shed on your location.
 
 
 TIME OF DAY
 
-There is dynamic change of the time of day on the level. All outdoor tiles (that is all tiles that do not have a solid floor above them) will have their inherent lighting cycle in synch with the current time - from 0 light at midnight to 100 light at noon.
+There is a dynamic change of the time of day on the level. All outdoor tiles (that is all tiles that do not have a solid floor above them) will have their inherent lighting cycle in synch with the current time - from 0 light at midnight to 100 light at noon.
 That means that you will not be able to hide in the streets during the day.
 
 
@@ -69,6 +69,6 @@ When hearing something, most characters will try to investigate the source of th
 
 CLIMBING
 
-The Thief is the only character who can traverse space vertically practically anywhere he wants. To climb up or down, he needs to be in the climbing mode, be positioned next to a wall or a floor and his destination tile should have a wall or a floor tile nearby. This means that some bushes or trees may not be climable as they lack a floor above them that the Thief can cling to. 
-Note that if you decide to switch off the climibing mode while having no solid floor in the tile you find yourself, you will immediately drop down.
-This ability provides the Thief with unprecedented protection as nobody will be able to follow him if he decides to get upon a roof (but some will be able to shoot him there nontheless).  
+The Thief is the only character who can traverse space vertically practically anywhere he wants. To climb up or down, he needs to be in the climbing mode, be positioned next to a wall or a floor and his destination tile should have a wall or a floor tile nearby. This means that some bushes or trees may not be climbable as they lack a floor above them that the Thief can cling to. 
+Note that if you decide to switch off the climbing mode while having no solid floor in the tile you find yourself, you will immediately drop down.
+This ability provides the Thief with unprecedented protection as nobody will be able to follow him if he decides to get up on a roof (but some will be able to shoot him there nonetheless).  

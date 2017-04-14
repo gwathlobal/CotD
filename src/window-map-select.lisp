@@ -93,9 +93,10 @@
         ;;(format t "HERE~%")
         (when lof-blocked
           (format str "Line of fire blocked!~%"))
-        (format str "~A (~A, ~A, ~A) [~A] [~A]" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (view-x *player*) (view-y *player*) (view-z *player*)
-                (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))
-                (aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*)))
+        (format str "~A (~A, ~A, ~A)" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (view-x *player*) (view-y *player*) (view-z *player*)
+                ;;(aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))
+                ;;(aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*))
+                )
         (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
         (dolist (feature feature-list)
           (format str ", ~A" (name (get-feature-by-id feature))))

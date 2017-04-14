@@ -972,7 +972,7 @@
                                                 (logger (format nil "MOB-CHARGE: ~A [~A] charges to ~A.~%" (name actor) (id actor) target))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A charges. " (visible-name actor)))
+                                                                       (format nil "~@(~A~) charges. " (visible-name actor)))
                                                 
                                                 (let ((path-line nil) (cur-ap) (game-time) (dx1) (dy1) (target1 (cons (car target) (cdr target))))
                                                   (setf dx1 (- (car target) (x actor)))
@@ -1005,7 +1005,7 @@
                                                            (setf charge-result (move-mob actor (x-y-into-dir dx dy) :push t))
                                                            (when (eq charge-result nil)
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                    (format nil "~A hits an obstacle. " (visible-name actor))))
+                                                                                    (format nil "~@(~A~) hits an obstacle. " (visible-name actor))))
                                                            (unless (eq charge-result t)
                                                              (loop-finish))
                                                         )
