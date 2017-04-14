@@ -1,5 +1,7 @@
 CHANGELOG
 
+--------------------
+Apr 15, 2017 v1.1.0
 
 - Added stealth to the game! Remaining in shadows will render you invisible to your enemies while moving through illuminated terrain (and moving in general) will expose you.  
 - To counter stealth, Citizens of the City carry lanterns and Angels radiate light (note that Demons do not have a portable light source). Moreover, stationary light sources were added to the houses and some streets.

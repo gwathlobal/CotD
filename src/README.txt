@@ -9,13 +9,19 @@ The year is 1915. The Great War thunders in the west, but the Hinterland is not 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.0.9
+LATEST CHANGES v1.1.0
 
-- The 3rd dimension was added to the map! Buildings now have several floors, mobs can go up and down the slopes.
-- Gravity added! You can step off the ledges and fall down. You can drop one Z level without any consequences but any distance greater than that and you will take increasing falling damage.
-- Mobs will now recognize the gravity and will short-cut off the ledges if they see they won't take any damage without finding the nearest slope down.
-- Added mansions to the building types.
-- Removed support of small tiles.
+- Added stealth to the game! Remaining in shadows will render you invisible to your enemies while moving through illuminated terrain (and moving in general) will expose you.  
+- To counter stealth, Citizens of the City carry lanterns and Angels radiate light (note that Demons do not have a portable light source). Moreover, stationary light sources were added to the houses and some streets.
+- Outdoor lighting depends on the time of day - at midnight you will need to rely on lamps, while at day time the sun will not let anybody hide outside buildings.
+- Time of day now changes dynamically as the time passes. 
+- Added scenario options regarding the starting time of the day - you may start at night, at noon, in the morning or in the evening.
+- Added hearing to the game! Characters' actions will generate sounds that others can hear and learn the general direction to the sound's origin. Most creatures will try to investigate what or who produced the sound if they have no other pressing matters.
+- Added the Thief to the game.
+- Added Death from Above ability to the Thief. This allows the Thief to jump onto an enemy from an upper Z level and make a devastating blow.
+- Added Climbing ability to the Thief. It allows the Thief to go up and down along the Z level when clinging to walls.
+- Added trees spanning across several Z levels.
+- Added inventories to characters. You are now able to pick up, carry and drop items.
 
 --------------------
 FEATURES
