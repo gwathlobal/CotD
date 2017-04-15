@@ -196,6 +196,30 @@
                  (pushnew (list item-id (+ (* gx *level-grid-size*) px lx) (+ (* gy *level-grid-size*) py ly) lz qty) 
                           item-list)))
           )
+
+    ;; restore borders
+    (loop for x from 0 below max-x do
+      (loop for z from 0 below max-z
+            for y-0 = 0
+            for y-max = (1- (array-dimension template-level 1))
+            do
+        (cond
+          ((= (aref template-level x y-0 z) +terrain-floor-air+) (setf (aref template-level x y-0 z) +terrain-border-air+))
+          ((= (aref template-level x y-0 z) +terrain-water-liquid+) (setf (aref template-level x y-0 z) +terrain-border-water+)))
+        (cond
+          ((= (aref template-level x y-max z) +terrain-floor-air+) (setf (aref template-level x y-max z) +terrain-border-air+))
+          ((= (aref template-level x y-max z) +terrain-water-liquid+) (setf (aref template-level x y-max z) +terrain-border-water+)))))
+    (loop for y from 0 below max-y do
+      (loop for z from 0 below max-z
+            for x-0 = 0
+            for x-max = (1- (array-dimension template-level 0))
+            do
+        (cond
+          ((= (aref template-level x-0 y z) +terrain-floor-air+) (setf (aref template-level x-0 y z) +terrain-border-air+))
+          ((= (aref template-level x-0 y z) +terrain-water-liquid+) (setf (aref template-level x-0 y z) +terrain-border-water+)))
+        (cond
+          ((= (aref template-level x-max y z) +terrain-floor-air+) (setf (aref template-level x-max y z) +terrain-border-air+))
+          ((= (aref template-level x-max y z) +terrain-water-liquid+) (setf (aref template-level x-max y z) +terrain-border-water+)))))
     
     (values template-level feature-list mob-list item-list)
     ))

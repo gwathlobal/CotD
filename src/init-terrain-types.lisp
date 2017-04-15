@@ -18,8 +18,8 @@
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-dirt-bright+ :glyph-idx 95 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Dirt"
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
-(set-terrain-type (make-instance 'terrain-type :id +terrain-water-lake+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "Lake"
-                                               :trait-blocks-move t :trait-not-climable t :trait-blocks-sound-floor 10 :trait-blocks-sound 10))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "Water"
+                                               :trait-not-climable t :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor 1.5))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-window+ :glyph-idx 13 :glyph-color (sdl:color :r 0 :g 0 :b 200) :back-color sdl:*black* :name "Window"
                                                :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-sound 20 :trait-blocks-sound-floor 20 :trait-opaque-floor t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-chair+ :glyph-idx 100 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Chair"
@@ -47,14 +47,14 @@
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t :trait-blocks-sound-floor 20))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-ice+ :glyph-idx 94 :glyph-color (sdl:color :r 0 :g 100 :b 255) :back-color sdl:*black* :name "Ice"
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
-(set-terrain-type (make-instance 'terrain-type :id +terrain-water-river+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "River"
-                                               :trait-blocks-move t :trait-blocks-sound 10 :trait-blocks-sound-floor 10 :trait-not-climable t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-border-water+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "Water"
+                                               :trait-blocks-move t :trait-blocks-sound 10 :trait-blocks-sound-floor 10 :trait-not-climable t :trait-water t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bridge+ :glyph-idx 96 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :name "Bridge"
                                                :trait-opaque-floor t :trait-blocks-sound-floor 10))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-pier+ :glyph-idx 96 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :name "Pier"
                                                :trait-opaque-floor t :trait-blocks-sound-floor 10))
-(set-terrain-type (make-instance 'terrain-type :id +terrain-water-sea+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "Sea"
-                                               :trait-blocks-move t :trait-blocks-sound 10 :trait-blocks-sound-floor 10 :trait-not-climable t))
+(set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid-nofreeze+ :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* :name "Water"
+                                               :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor 1.5))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-grass+ :glyph-idx 95 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* :name "Grass"
                                                :trait-blocks-move t :trait-blocks-projectiles t :trait-opaque-floor t :trait-not-climable t :trait-blocks-sound t :trait-blocks-sound-floor t))
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-barricade+ :glyph-idx 3 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :name "Barricade"

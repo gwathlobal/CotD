@@ -80,6 +80,7 @@
    ;;   :abil-gargantaurs-mind-burn - +mob-abil-gargantaurs-mind-burn+
    ;;   :abil-death-from-above - +mob-abil-death-from-above+
    ;;   :abil-climbing - +mob-abil-climbing+
+   ;;   :abil-no-breath - +mob-abil-no-breathe+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -105,7 +106,7 @@
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
-                                                                abil-gargantaurs-mind-burn abil-death-from-above abil-climbing)
+                                                                abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -222,6 +223,8 @@
     (setf (gethash +mob-abil-death-from-above+ (abilities mob-type)) t))
   (when abil-climbing
     (setf (gethash +mob-abil-climbing+ (abilities mob-type)) t))
+  (when abil-no-breathe
+    (setf (gethash +mob-abil-no-breathe+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -450,6 +453,8 @@
    (motion :initform 0 :accessor motion)
    (motion-set-p :initform nil :accessor motion-set-p) 
    (cur-stealth :initform 0 :accessor cur-stealth)
+
+   (cur-oxygen :initform *max-oxygen-level* :accessor cur-oxygen)
    
    (stat-kills :initform (make-hash-table) :accessor stat-kills)
    (stat-blesses :initform 0 :accessor stat-blesses)

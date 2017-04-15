@@ -25,8 +25,37 @@
           (return-from check-move-for-ai nil))
 
         (setf move-result nil)
+
+        ;; can go anywhere horizontally or directly up/below if the current tile is water
+        (when (and (or (= (- cz dz) 0)
+                       (and (/= (- cz dz) 0)
+                            (= nx cx)
+                            (= ny cy))
+                       )
+                   (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-water+)
+                   (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-water+))
+          (setf move-result t))
         
-        ;; can go from down to up if the source tile is slope up and the landing tile has floor and is not directly above the the source tile
+        ;; can go from down to up if the source tile is water and the landing tile has floor and is not directly above the source tile
+        (when (and (> (- dz cz) 0)
+                   (not (and (= cx nx)
+                             (= cy ny)))
+                   (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+))
+                   (get-terrain-type-trait (get-terrain-* (level *world*) nx ny cz) +terrain-trait-blocks-move+)
+                   (get-terrain-type-trait (get-terrain-* (level *world*) cx cy cz) +terrain-trait-water+)
+                   (not (get-terrain-type-trait (get-terrain-* (level *world*) cx cy (1+ cz)) +terrain-trait-opaque-floor+)))
+          (setf move-result t))
+
+        ;; can go from up to down if the landing tile is water and is not directly below the source tile
+        (when (and (< (- dz cz) 0)
+                   (or (/= (- dx cx) 0)
+                       (/= (- dy cy) 0))
+                   (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-water+)
+                   (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny cz) +terrain-trait-opaque-floor+))
+                   (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny cz) +terrain-trait-water+)))
+          (setf move-result t))
+        
+        ;; can go from down to up if the source tile is slope up and the landing tile has floor and is not directly above the source tile
         (when (and (> (- dz cz) 0)
                    (not (and (= cx nx)
                              (= cy ny)))
@@ -598,7 +627,12 @@
                                #'(lambda (dx dy dz cx cy cz) 
                                    ;; checking for impassable objects
                                    (check-move-for-ai mob dx dy dz cx cy cz :final-dst (path-dst mob))
-                                   )))
+                                   )
+                               #'(lambda (dx dy dz)
+                                   ;; a magic hack here - as values of more than 10 give an unexplainable slowdown
+                                   (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
+                                      (move-spd (get-mob-type-by-id (mob-type mob)))
+                                      1/10))))
                     
           (pop path)
           (logger (format nil "AI-FUNCTION: Set mob path - ~A~%" path))
@@ -829,7 +863,12 @@
                                     #'(lambda (dx dy dz cx cy cz) 
                                         ;; checking for impassable objects
                                         (check-move-for-ai mob dx dy dz cx cy cz)
-                                        )))
+                                        )
+                                    #'(lambda (dx dy dz)
+                                        ;; a magic hack here - as values of more than 10 give an unexplainable slowdown
+                                        (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
+                                           (move-spd (get-mob-type-by-id (mob-type mob)))
+                                           1/10))))
                  
                  (pop path)
                  (logger (format nil "THREAD: Set mob path - ~A~%" path) stream)

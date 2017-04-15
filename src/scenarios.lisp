@@ -201,7 +201,7 @@
 (defun change-level-to-snow (template-level)
   (loop for x from 0 below (array-dimension template-level 0) do
     (loop for y from 0 below (array-dimension template-level 1) do
-      (loop for z from 0 below (array-dimension template-level 2) do
+      (loop for z from (1- (array-dimension template-level 2)) downto 0 do
         (cond
           ((= (aref template-level x y z) +terrain-border-floor+) (setf (aref template-level x y z) +terrain-border-floor-snow+))
           ((= (aref template-level x y z) +terrain-border-grass+) (setf (aref template-level x y z) +terrain-border-floor-snow+))
@@ -209,7 +209,9 @@
           ((= (aref template-level x y z) +terrain-floor-dirt-bright+) (setf (aref template-level x y z) +terrain-floor-snow+))
           ((= (aref template-level x y z) +terrain-floor-grass+) (setf (aref template-level x y z) +terrain-floor-snow+))
           ((= (aref template-level x y z) +terrain-tree-birch+) (setf (aref template-level x y z) +terrain-tree-birch-snow+))
-          ((= (aref template-level x y z) +terrain-water-lake+) (setf (aref template-level x y z) +terrain-water-ice+))
+          ((= (aref template-level x y z) +terrain-water-liquid+) (progn (setf (aref template-level x y z) +terrain-water-ice+)
+                                                                         (when (< z (1- (array-dimension template-level 2)))
+                                                                           (setf (aref template-level x y (1+ z)) +terrain-water-ice+))))
           ((= (aref template-level x y z) +terrain-floor-leaves+) (setf (aref template-level x y z) +terrain-floor-leaves-snow+))))))
   template-level)
 
@@ -419,7 +421,7 @@
                  when (and (>= x 0) (< x max-x-level) (>= y 0) (< y max-y-level)
                            (eq (check-move-on-level mob x y sz) t)
                            ;(not (get-mob-* (level world) x y))
-                           ;(not (get-terrain-type-trait (get-terrain-* (level world) x y) +terrain-trait-blocks-move+))
+                           (get-terrain-type-trait (get-terrain-* (level world) x y sz) +terrain-trait-opaque-floor+)
                            )
                    do
                       (setf (x mob) x (y mob) y (z mob) sz)
@@ -440,7 +442,8 @@
         for y = (random max-y)
         for z = 2
         until (and (not (and (> x 7) (< x (- max-x 7)) (> y 7) (< y (- max-y 7))))
-                   (eq (check-move-on-level mob x y z) t))
+                   (eq (check-move-on-level mob x y z) t)
+                   (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+))
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 
@@ -451,7 +454,8 @@
         for y = (random max-y)
         for z = 2
         until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
-                   (eq (check-move-on-level mob x y z) t))
+                   (eq (check-move-on-level mob x y z) t)
+                   (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+))
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 
@@ -616,5 +620,3 @@
                    )))
 
   )
-
-()

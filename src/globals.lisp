@@ -121,6 +121,7 @@
 (defconstant +mob-abil-gargantaurs-mind-burn+ 44)
 (defconstant +mob-abil-death-from-above+ 45)
 (defconstant +mob-abil-climbing+ 46)
+(defconstant +mob-abil-no-breathe+ 47)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -171,13 +172,15 @@
 (defconstant +terrain-trait-light-source+ 7)
 (defconstant +terrain-trait-blocks-sound+ 8)
 (defconstant +terrain-trait-blocks-sound-floor+ 9)
+(defconstant +terrain-trait-water+ 10)
+(defconstant +terrain-trait-move-cost-factor+ 11)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
 (defconstant +terrain-wall-stone+ 2)
 (defconstant +terrain-tree-birch+ 3)
 (defconstant +terrain-floor-grass+ 4)
-(defconstant +terrain-water-lake+ 5)
+(defconstant +terrain-water-liquid+ 5)
 (defconstant +terrain-floor-dirt+ 6)
 (defconstant +terrain-wall-window+ 7)
 (defconstant +terrain-floor-dirt-bright+ 8)
@@ -192,10 +195,10 @@
 (defconstant +terrain-floor-snow-prints+ 17)
 (defconstant +terrain-tree-birch-snow+ 18)
 (defconstant +terrain-water-ice+ 19)
-(defconstant +terrain-water-river+ 20)
+(defconstant +terrain-border-water+ 20)
 (defconstant +terrain-floor-bridge+ 21)
 (defconstant +terrain-floor-pier+ 22)
-(defconstant +terrain-water-sea+ 23)
+(defconstant +terrain-water-liquid-nofreeze+ 23)
 (defconstant +terrain-border-grass+ 24)
 (defconstant +terrain-wall-barricade+ 25)
 (defconstant +terrain-door-closed+ 26)
@@ -270,6 +273,9 @@
 (defparameter *mob-sound-pick-drop* 40)
 
 (defparameter *thief-win-value* 1500)
+
+(defparameter *max-oxygen-level* 5)
+(defparameter *lack-oxygen-dmg* 5)
 
 (defconstant +connect-room-none+ -1)
 

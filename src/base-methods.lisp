@@ -154,16 +154,22 @@
     (t t)))
 
 (defmethod apply-gravity ((mob mob))
-  (let ((result nil))
+  (let ((result 0))
     (loop for z from (z mob) downto 0 
           for check-result = (check-move-on-level mob (x mob) (y mob) z)
           do
              ;(format t "Z ~A FLOOR ~A~%" z (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
              (when (eq check-result t)
                (setf result z))
+
+             (format t "MOB ~A, Z = ~A, Z MOB = ~A, WATER = ~A~%" (name mob) z (z mob) (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+))
              
              ;; stop falling if
              (when (or (not (eq check-result t))
+                       ;; if there is water in the current tile
+                       (and (/= z (z mob))
+                            (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+)
+                            )
                        ;; there is floor on this tile
                        (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+)
                        ;; there is no floor on this tile, but the mob is in climbing mode and there is a wall or a floor nearby
@@ -185,10 +191,11 @@
     result))
 
 (defmethod apply-gravity ((feature feature))
-  (let ((result nil))
+  (let ((result 0))
     (loop for z from (z feature) downto 0 
           do
-             (when (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-opaque-floor+)
+             (when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-opaque-floor+)
+                       (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-water+))
                (setf result z)
                (loop-finish)))
     (when (eq result (z feature))
@@ -196,7 +203,7 @@
     result))
 
 (defmethod apply-gravity ((item item))
-  (let ((result nil))
+  (let ((result 0))
     (loop for z from (z item) downto 0 
           do
              (when (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) z) +terrain-trait-opaque-floor+)
@@ -216,7 +223,7 @@
            (propagate-sound-from-location tmob sx sy sz sound-power str-func
                                           :source source-mob :force-sound force-sound)))
 
-(defun set-mob-location (mob x y z)
+(defun set-mob-location (mob x y z &key (apply-gravity t))
   
   (let ((place-func #'(lambda (nmob)
                         (let ((sx) (sy))
@@ -328,9 +335,10 @@
          (funcall place-func mob))))
 
     ;; apply gravity
-    (when (apply-gravity mob)
+    (when (and apply-gravity
+               (apply-gravity mob))
       (let ((init-z (z mob)) (cur-dmg 0))
-        (set-mob-location mob (x mob) (y mob) (apply-gravity mob))
+        (set-mob-location mob (x mob) (y mob) (apply-gravity mob) :apply-gravity nil)
         (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
         (decf (cur-hp mob) cur-dmg)
         (when (> cur-dmg 0)
@@ -342,7 +350,8 @@
     ;; apply gravity to the mob, standing on your head, if any
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
                (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+))
-               (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)))
+               (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))
+               (not (eq mob (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)))))
       (set-mob-location (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)) orig-x orig-y (1+ orig-z)))
     ))
 
@@ -483,25 +492,43 @@
     (when (mob-ability-p mob +mob-abil-momentum+)
       (setf dx (car (momentum-dir mob)))
       (setf dy (cdr (momentum-dir mob))))
+
+    
     
     (loop repeat (if (zerop (momentum-spd mob))
                    1
                    (momentum-spd mob))
           for move-result = nil
+          for move-spd = (truncate (* (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-move-cost-factor+)
+                                      (move-spd (get-mob-type-by-id (mob-type mob)))))
           for x = (+ (x mob) dx)
           for y = (+ (y mob) dy)
           for z = (cond
+                    ;; if the current cell is water and the cell along the direction is a wall - increase target z level, so that the mob can climb up
+                    ((and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+)
+                          (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-blocks-move+))
+                     (1+ (z mob)))
                     ;; if the current cell is slope up and the cell along the direction is a wall - increase the target z level, so that the mob can go up
-                    ((and 
-                          (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-slope-up+)
+                    ((and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-slope-up+)
                           (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-blocks-move+))
                      (1+ (z mob)))
                     ;; if the target cell is slope down - decrease the target z level, so that the mob can go down
                     ((and (not (mob-effect-p mob +mob-effect-climbing-mode+))
-                         (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-slope-down+))
+                          (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-slope-down+))
                      (1- (z mob)))
                     ;; otherwise the z level in unchanged
                     (t (+ (z mob) dir-z)))
+          for apply-gravity = (if (or ;(not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+                                      ;(not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+))
+                                   (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)))
+                                   (and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+)
+                                           (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)
+                                           (= z (z mob))
+                                           (= dx 0)
+                                           (= dy 0)))
+                                t
+                                nil)
           for check-result = (if (check-move-along-z (x mob) (y mob) (z mob) x y z)
                                (check-move-on-level mob x y z)
                                nil)
@@ -512,7 +539,13 @@
                ;; all clear - move freely
                ((eq check-result t)
 
-                (set-mob-location mob x y z)
+                (when (and (= z (z mob))
+                           (= x (x mob))
+                           (= y (y mob)))
+                  (setf move-spd (move-spd (get-mob-type-by-id (mob-type mob)))))
+                (format t "APPLY-GRAVITY ~A~%" apply-gravity)
+                (set-mob-location mob x y z :apply-gravity apply-gravity)
+                
                 (setf move-result t)
                 
                 )
@@ -531,7 +564,7 @@
                           (and (mob-ability-p mob +mob-abil-facing+)
                                (/= c-dir (x-y-into-dir dx dy)))
                           )
-                  (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
+                  (make-act mob move-spd))
                 (setf move-result nil)
                 (loop-finish)
                 )
@@ -563,8 +596,13 @@
                                   
                                   (incf-mob-motion mob *mob-motion-move*)
                                   (incf-mob-motion target-mob *mob-motion-move*)
-                                  (set-mob-location target-mob nx ny z)
-                                  (set-mob-location mob x y z)
+                                  (set-mob-location target-mob nx ny z :apply-gravity (if (and (get-terrain-type-trait (get-terrain-* (level *world*) (x target-mob) (y target-mob) (z target-mob)) +terrain-trait-water+)
+                                                                                               (= z (+ (z target-mob) dir-z))
+                                                                                               (= dx 0)
+                                                                                               (= dy 0))
+                                                                                        t
+                                                                                        nil))
+                                  (set-mob-location mob x y z :apply-gravity apply-gravity)
                                   (when (or (check-mob-visible mob :observer *player*)
                                             (check-mob-visible target-mob :observer *player*))
                                     (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
@@ -595,7 +633,7 @@
                (t (setf (momentum-dir mob) (cons 0 0))))
              
              (when (eq move-result t)
-               (make-act mob (move-spd (get-mob-type-by-id (mob-type mob)))))
+               (make-act mob move-spd))
              
              (return-from move-mob move-result))
     )
@@ -1273,8 +1311,6 @@
   
   (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%")))
 
-(defgeneric on-tick (mob))
-
 (defmethod on-tick ((mob mob))
 
   ;; increase cur-ap by max-ap
@@ -1321,6 +1357,26 @@
   (when (and (mob-ability-p mob +mob-abil-climbing+)
              (not (mob-effect-p mob +mob-effect-climbing-mode+)))
     (set-mob-effect mob +mob-effect-climbing-mode+))
+
+  (if (or (mob-ability-p mob +mob-abil-no-breathe+)
+          (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+          (and (< (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
+               (not (or (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (1+ (z mob))) +terrain-trait-water+)
+                        (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (1+ (z mob))) +terrain-trait-opaque-floor+)
+                        (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (1+ (z mob))) +terrain-trait-blocks-move+)))))
+    (progn
+      (setf (cur-oxygen mob) *max-oxygen-level*))
+    (progn
+      (when (> (cur-oxygen mob) 0)
+        (decf (cur-oxygen mob)))
+      (when (zerop (cur-oxygen mob))
+        (decf (cur-hp mob) *lack-oxygen-dmg*)
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~@(~A~) can not breath and takes ~A dmg. " (visible-name mob) *lack-oxygen-dmg*) :observed-mob *player*)
+        (when (check-dead mob)
+          (make-dead mob :splatter nil :msg t))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%") :observed-mob *player*))))
+  
+  
   )
   
 

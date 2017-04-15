@@ -8,18 +8,18 @@
   (y-pos 0 :type fixnum)
   (z-pos 0 :type fixnum)
   (parent nil)
-  (g-val 0 :type fixnum)
-  (f-val 0 :type fixnum))
+  (g-val 0)
+  (f-val 0))
    
 (defvar *h-func*)
 
-(defun make-new-node (parent x y z end-x end-y end-z)
-  (declare (type fixnum x y end-x end-y))
+(defun make-new-node (parent x y z end-x end-y end-z g-val)
+  (declare (type fixnum x y z end-x end-y end-z))
   (make-node :x-pos x :y-pos y :z-pos z :parent parent 
              :g-val (if parent 
-                      (+ (node-g-val parent) 1)
+                      (+ (node-g-val parent) g-val)
                       0)
-             :f-val (+ (if parent (+ (node-g-val parent) 1) 0) (funcall *h-func* x y z end-x end-y end-z))))
+             :f-val (+ (if parent (+ (node-g-val parent) g-val) 0) (funcall *h-func* x y z end-x end-y end-z))))
 
 (defun pos-equal (node-a node-b)
   "Returns true if node-a references the same position as node-b.  Otherwise, returns NIL."
@@ -33,9 +33,9 @@
 	     (and (= (node-x-pos node) x) (= (node-y-pos node) y) (= (node-z-pos node) z)))
 	   node-list))
 
-(defun a-star (start-coord goal-coord valid-func)
+(defun a-star (start-coord goal-coord valid-func cost-func)
   (declare (optimize (speed 3))
-           (type function valid-func))
+           (type function valid-func cost-func))
   "   An implementation of the A* pathfinding algorithm by Daniel Lowe.
 Given a 2 element list of START-COORD and GOAL-COORD, returns a list
 of coordinates which form a path between them.  VALID-FUNC should
@@ -51,14 +51,18 @@ the goal, and may depend on many factors"
                                 (third start-coord)
 				(first goal-coord)
 				(second goal-coord)
-                                (third goal-coord)))
+                                (third goal-coord)
+                                (funcall cost-func (first start-coord) (second start-coord) (third start-coord))
+                                ))
 	 (goal-node (make-new-node nil
 			       (first goal-coord)
 			       (second goal-coord)
                                (third goal-coord)
 			       (first goal-coord)
 			       (second goal-coord)
-                               (third goal-coord))))
+                               (third goal-coord)
+                               (funcall cost-func (first goal-coord) (second goal-coord) (third goal-coord))
+                               )))
     (declare (type list open-nodes closed-nodes))
     ;; The list of open nodes starts with the beginning coordinate
     (push start-node open-nodes)
@@ -84,7 +88,9 @@ the goal, and may depend on many factors"
                               unless (find-node-with-coords x y z open-nodes)
                               ;; only check valid coordinates
                               when (funcall valid-func x y z (node-x-pos node) (node-y-pos node) (node-z-pos node)) do
-                                (push (make-new-node node x y z (first goal-coord) (second goal-coord) (third goal-coord)) open-nodes))))
+                                (push (make-new-node node x y z (first goal-coord) (second goal-coord) (third goal-coord) (funcall cost-func x y z)
+                                                     )
+                                      open-nodes))))
             ;; We exhausted the possibilities of this node, so add it
             ;; to the closed nodes
             (push node closed-nodes)

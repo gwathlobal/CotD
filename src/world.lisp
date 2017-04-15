@@ -33,7 +33,7 @@
 
   (when (apply-gravity mob)
       (let ((init-z (z mob)) (cur-dmg 0))
-        (set-mob-location mob (x mob) (y mob) (apply-gravity mob))
+        (set-mob-location mob (x mob) (y mob) (apply-gravity mob) :apply-gravity nil)
         (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
         (decf (cur-hp mob) cur-dmg)
         (when (> cur-dmg 0)

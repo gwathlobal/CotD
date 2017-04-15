@@ -245,6 +245,56 @@
                                                                      ;; magic starts here
                                                                      (setf result nil)
 
+                                                                     (when (and (or (= (- cz z) 0)
+                                                                                    (and (/= (- cz z) 0)
+                                                                                         (= nx cx)
+                                                                                         (= ny cy))
+                                                                                    )
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
+                                                                       (setf result t))
+                                                                     
+                                                                     ;; the following case is connected
+                                                                     ;; on floor z = 1 -> | |p| |
+                                                                     ;;    floor z = 1 -> | |.| |
+                                                                     ;; on floor z = 0 -> | |x| |
+                                                                     ;;    floor z = 0 -> | |w| |
+                                                                     ;; where
+                                                                     ;;    w - water
+                                                                     ;;    . - air (no floor, no wall, no water)
+                                                                     ;;    p - starting cell
+                                                                     ;;    x - current cell
+                                                                     (when (and (not result)
+                                                                                (< (- z cz) 0)
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
+                                                                                (and (= cx nx)
+                                                                                     (= cy ny))
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+))
+                                                                       (setf result t))
+                                                                     
+                                                                     ;; the following case is connected
+                                                                     ;; on floor z = 1 -> | | |x|
+                                                                     ;;    floor z = 1 -> | | |#|
+                                                                     ;; on floor z = 0 -> | |p| |
+                                                                     ;;    floor z = 0 -> | |w| |
+                                                                     ;; where
+                                                                     ;;    # - floor
+                                                                     ;;    . - air
+                                                                     ;;    w - water
+                                                                     ;;    p - starting cell
+                                                                     ;;    x - current cell
+                                                                     (when (and (> (- z cz) 0)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+)
+                                                                                (not (and (= cx nx)
+                                                                                          (= cy ny)))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
+                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)
+                                                                                    (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)))
+                                                                       ;(format t "FLOOD FILL HERE~%")
+                                                                       (setf result t))
+                                                                     
                                                                      ;; the following case is connected
                                                                      ;; on floor z = 1 -> | | |x|
                                                                      ;;    floor z = 1 -> | | |#|
@@ -350,6 +400,56 @@
                                                                      
                                                                      ;; magic starts here
                                                                      (setf result nil)
+
+                                                                     (when (and (or (= (- cz z) 0)
+                                                                                    (and (/= (- cz z) 0)
+                                                                                         (= nx cx)
+                                                                                         (= ny cy))
+                                                                                    )
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
+                                                                       (setf result t))
+                                                                     
+                                                                     ;; the following case is connected
+                                                                     ;; on floor z = 1 -> | |p| |
+                                                                     ;;    floor z = 1 -> | |.| |
+                                                                     ;; on floor z = 0 -> | |x| |
+                                                                     ;;    floor z = 0 -> | |w| |
+                                                                     ;; where
+                                                                     ;;    w - water
+                                                                     ;;    . - air (no floor, no wall, no water)
+                                                                     ;;    p - starting cell
+                                                                     ;;    x - current cell
+                                                                     (when (and (not result)
+                                                                                (< (- z cz) 0)
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
+                                                                                (and (= cx nx)
+                                                                                     (= cy ny))
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+))
+                                                                       (setf result t))
+                                                                     
+                                                                     ;; the following case is connected
+                                                                     ;; on floor z = 1 -> | | |x|
+                                                                     ;;    floor z = 1 -> | | |#|
+                                                                     ;; on floor z = 0 -> | |p| |
+                                                                     ;;    floor z = 0 -> | |w| |
+                                                                     ;; where
+                                                                     ;;    # - floor
+                                                                     ;;    . - air
+                                                                     ;;    w - water
+                                                                     ;;    p - starting cell
+                                                                     ;;    x - current cell
+                                                                     (when (and (> (- z cz) 0)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+)
+                                                                                (not (and (= cx nx)
+                                                                                          (= cy ny)))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
+                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)
+                                                                                    (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)))
+                                                                       ;(format t "FLOOD FILL HERE~%")
+                                                                       (setf result t))
 
                                                                      ;; the following case is connected
                                                                      ;; on floor z = 0 -> | |x|p|

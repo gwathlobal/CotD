@@ -592,14 +592,14 @@
 (set-building-type (make-building :id +building-city-lake-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",```````,,"
-                                                                            "``_`___``,"
-                                                                            "`_______`,"
-                                                                            "`______``,"
-                                                                            "``_____``,"
-                                                                            "``______``"
-                                                                            "`________`"
-                                                                            "`________`"
-                                                                            "```_____``"
+                                                                            "`` `   ``,"
+                                                                            "`       `,"
+                                                                            "`      ``,"
+                                                                            "``     ``,"
+                                                                            "``      ``"
+                                                                            "`        `"
+                                                                            "`        `"
+                                                                            "```     ``"
                                                                             ",,```````,"))
                                                   
                                                   (build-template-z-1 (list "0000000000"
@@ -633,14 +633,14 @@
 (set-building-type (make-building :id +building-city-lake-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",````````,"
-                                                                            "``___`__``"
-                                                                            "`________`"
-                                                                            "`_______``"
-                                                                            "`______```"
-                                                                            "``_____`T`"
-                                                                            ",`_____```"
-                                                                            ",`______`,"
-                                                                            ",``__`__`,"
+                                                                            "``   `  ``"
+                                                                            "`        `"
+                                                                            "`       ``"
+                                                                            "`      ```"
+                                                                            "``     `T`"
+                                                                            ",`     ```"
+                                                                            ",`      `,"
+                                                                            ",``  `  `,"
                                                                             ",,```````,"))
 
                                                   (build-template-z-1 (list "0000000000"
@@ -1019,9 +1019,9 @@
                                   :func #'(lambda (x y z template-level)
                                             (loop for x1 from 0 below 5 do
                                               (loop for y1 from 0 below 5 do
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-water-river+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-river+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-river+)))
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-floor-air+)
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid-nofreeze+)
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid-nofreeze+)))
                                             (values nil
                                                     nil
                                                     nil))))
@@ -1031,8 +1031,8 @@
                                             (loop for x1 from 0 below 5 do
                                               (loop for y1 from 0 below 5 do
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-floor-bridge+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-river+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-river+)))
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid-nofreeze+)
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid-nofreeze+)))
                                             (values nil
                                                     nil
                                                     nil))))
@@ -1042,8 +1042,8 @@
                                             (loop for x1 from 0 below 5 do
                                               (loop for y1 from 0 below 5 do
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-floor-pier+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-sea+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-sea+)))
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid+)
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid+)))
                                             (values nil
                                                     nil
                                                     nil))))
@@ -1052,9 +1052,9 @@
                                   :func #'(lambda (x y z template-level)
                                             (loop for x1 from 0 below 5 do
                                               (loop for y1 from 0 below 5 do
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-water-sea+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-sea+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-sea+)))
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-floor-air+)
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid-nofreeze+)
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid-nofreeze+)))
                                             (values nil
                                                     nil
                                                     nil))))
@@ -1134,7 +1134,7 @@
                                                       (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-dirt-bright+)
                                                       (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-dirt+)))
                                                   (progn
-                                                    (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-water-sea+)))))
+                                                    (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-air+)))))
 
                                             (values nil nil nil)
                                             )))
