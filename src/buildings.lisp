@@ -105,7 +105,7 @@
                ((char= c #\,) (setf (aref template-level (+ x x1) (+ y y1) z) (if (< (random 100) 20)
                                                                                 +terrain-floor-dirt-bright+
                                                                                 +terrain-floor-dirt+)))
-               ((char= c #\_) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-water-lake+))
+               ((char= c #\_) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-water-liquid+))
                ((char= c #\`) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-grass+))
                ((char= c #\-) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-wall-window+))
                ((char= c #\h) (setf (aref template-level (+ x x1) (+ y y1) z) +terrain-floor-chair+))

@@ -118,7 +118,7 @@
                            ((char= c #\d) (setf (aref template-level (1+ x) (1+ y) z) +terrain-slope-stone-down+))
                            ((char= c #\T) (setf (aref template-level (1+ x) (1+ y) z) +terrain-tree-birch+))
                            ((char= c #\|) (setf (aref template-level (1+ x) (1+ y) z) +terrain-wall-lantern+))
-                           ((char= c #\_) (setf (aref template-level (1+ x) (1+ y) z) +terrain-water-lake+))
+                           ((char= c #\_) (setf (aref template-level (1+ x) (1+ y) z) +terrain-water-liquid+))
                            )
                          (incf x)
                       )))

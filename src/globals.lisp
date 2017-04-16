@@ -277,6 +277,8 @@
 (defparameter *max-oxygen-level* 5)
 (defparameter *lack-oxygen-dmg* 5)
 
+(defparameter *water-move-factor* 1.5)
+
 (defconstant +connect-room-none+ -1)
 
 ;; Connect map indices for various movement types
