@@ -17,6 +17,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-toggle-light t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-man+ 
@@ -27,6 +28,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-toggle-light t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-woman+ 
@@ -37,6 +39,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-toggle-light t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-child+ 
@@ -47,6 +50,7 @@
                                        :strength 0
                                        :base-light-radius 3
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-toggle-light t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-clerk+ 
@@ -57,6 +61,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-toggle-light t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-criminal+ 
@@ -67,6 +72,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-toggle-light t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-policeman+ 
@@ -77,6 +83,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-toggle-light t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-priest+ 
@@ -86,7 +93,8 @@
                                        :weapon (list "Cross" (list +weapon-dmg-iron+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-can-be-blessed t :abil-detect-evil t :abil-prayer-bless t :abil-prayer-shield t :abil-human t
+                                       :abil-can-be-blessed t :abil-detect-evil t :abil-human t
+                                       :abil-toggle-light t  :abil-prayer-bless t :abil-prayer-shield t
                                        :ai-stop t
                              ))
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 
@@ -96,7 +104,8 @@
                                        :weapon (list "Burning touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 1
                                        :base-light-radius 4
-                                       :abil-detect-good t :abil-human t :abil-unholy t :abil-call-for-help t :abil-free-call t :abil-curse t
+                                       :abil-detect-good t :abil-human t :abil-unholy t
+                                       :abil-call-for-help t :abil-free-call t :abil-curse t :abil-toggle-light t
                              ))
 
 
@@ -107,7 +116,7 @@
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 30
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t
+                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-toggle-light t
                                        :ai-kleptomaniac t :ai-cautious t
                              ))
 
@@ -119,7 +128,8 @@
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 100 ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sergeant+ 
@@ -129,7 +139,8 @@
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
@@ -140,7 +151,7 @@
                                        :strength 1
                                        :ai-curious t
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
-                                       :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t :abil-independent t
+                                       :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t :abil-independent t :abil-toggle-light t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
@@ -151,6 +162,7 @@
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
+                                       :abil-toggle-light t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scout+ 
@@ -171,8 +183,8 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t
-                                       :abil-heal-self 1 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-no-breathe t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t
+                                       :abil-heal-self 1 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archangel+
@@ -182,8 +194,8 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 5 9 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 4
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t
-                                       :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-no-breathe t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t
+                                       :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :ai-wants-bless t :ai-curious t))
 
 
@@ -197,7 +209,7 @@
                                        :base-light-radius 0
                                        :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t
                                        :ai-horde t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
@@ -209,7 +221,7 @@
                                        :strength 3
                                        :base-light-radius 0
                                        :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t
-                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3 :abil-no-breathe t
+                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3 :abil-no-breathe t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t
                                        :ai-curious t))
 
@@ -223,7 +235,7 @@
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t
                                        :ai-curious t))
 
 

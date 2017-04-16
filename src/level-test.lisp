@@ -29,8 +29,8 @@
                                   "...#.....#................................................######.....######..."
                                   "...#.....#............#####.......#####......................................."
                                   "...#######............#...............-......................................."
-                                  "......................#...............#u......................................"
-                                  "...#######...........u########'#########..................######.....######..."
+                                  "......................#...............#u......|..............................."
+                                  "...#######...........u########+#########..................######.....######..."
                                   "...#.....#............#....#.....#____##..................#...............#..."
                                   "...#.....+............#....+....###___##..................#...............#..."
                                   "...#.....#............#....#....#_#___##..................#...............#..."
@@ -131,13 +131,13 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-archangel+ :x 35 :y 19 :z 2))
+  (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :x 46 :y 15 :z 0))
   (add-mob-to-level-list (level world) *player*)
   (let (;(soldier (make-instance 'mob :mob-type +mob-type-angel+ :x (+ (x *player*) 7) :y (+ (y *player*) 0) :z 0))
-        (demon (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 2) :y (- (y *player*) 0) :z 2))
+        (demon (make-instance 'mob :mob-type +mob-type-angel+ :x (+ (x *player*) 2) :y (- (y *player*) 0) :z 2))
         )
     (setf (cur-fp *player*) 10)
-    (setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
+    ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
     ;(set-mob-effect *player* +mob-effect-called-for-help+ 10)
     ;(set-mob-effect demon +mob-effect-calling-for-help+ 100)

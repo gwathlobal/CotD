@@ -197,7 +197,7 @@
                                    (declare (ignore n))
                                    (return-from main-menu (values +city-layout-test+
                                                                   +weather-type-clear+
-                                                                  +tod-type-day+
+                                                                  +tod-type-night+
                                                                   +player-faction-test+))))))
     (if *cotd-release*
       (progn

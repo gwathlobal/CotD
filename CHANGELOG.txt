@@ -1,6 +1,7 @@
 CHANGELOG
 
 - Water is now traversable, albeit more slowly than normal terrain. You can swim through it horizontally as well as up and down, but beware of lack of oxygen. This will kill you quickly. Angels and Demons do not need to breathe.
+- All Angels, Demons and humans now have an ability to switch on and off stationary lights if they happen to be near one.
 
 --------------------
 Apr 15, 2017 v1.1.0

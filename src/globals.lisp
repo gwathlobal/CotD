@@ -122,6 +122,8 @@
 (defconstant +mob-abil-death-from-above+ 45)
 (defconstant +mob-abil-climbing+ 46)
 (defconstant +mob-abil-no-breathe+ 47)
+(defconstant +mob-abil-open-close-door+ 48)
+(defconstant +mob-abil-toggle-light+ 49)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -218,6 +220,7 @@
 (defconstant +terrain-tree-oak-trunk-ne+ 40)
 (defconstant +terrain-tree-oak-trunk-se+ 41)
 (defconstant +terrain-wall-lantern+ 42)
+(defconstant +terrain-wall-lantern-off+ 43)
 
 (defparameter *faction-table* (make-hash-table))
 

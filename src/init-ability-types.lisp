@@ -1803,3 +1803,101 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-open-close-door+ :name "Use map feature" :descr "Use a map feature. The exact kind of action depends on the type of the feature. You can open or close doors, toggle the lights, etc." 
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                ;; check if the 
+                                                (set-terrain-* (level *world*) (first target) (second target) (third target) +terrain-wall-lantern-off+)
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-open-close-door+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  ;; TO DO
+                                                  (if (and (mob-ability-p actor +mob-abil-open-close-door+)
+                                                           (can-invoke-ability actor actor +mob-abil-open-close-door+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-toggle-light+ :name "Toggle light" :descr "Switch a light on or off (depending on the current status of the light source in question)." 
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 10
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target here is list of (x y z) coordinates for the tile to be toggled
+                                                (multiple-value-bind (x y z) (values-list target)
+                                                  (when (get-terrain-on-use (get-terrain-* (level *world*) x y z))
+                                                    (funcall (get-terrain-on-use (get-terrain-* (level *world*) x y z)) actor x y z))
+                                                  (if (or (null (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-light-source+))
+                                                          (eq 0 (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-light-source+)))
+                                                    (print-visible-message x y z (level *world*) (format nil "~@(~A~) switches off the light. " (visible-name actor)) :observed-mob actor)
+                                                    (print-visible-message x y z (level *world*) (format nil "~@(~A~) switches on the light. " (visible-name actor)) :observed-mob actor)))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-toggle-light+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  ;; if you can toggle lights and you happen to be nearby, and you do not radiate light yourself - switch it off
+                                                  ;; if you can toggle lights and you happen to be nearby, and you do radiate light yourself - switch it on
+                                                  (let ((light-source nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (or (and (zerop (cur-light actor))
+                                                                                                                          (get-terrain-type-trait terrain +terrain-trait-light-source+)
+                                                                                                                          (not (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+))))
+                                                                                                                     (and (not (zerop (cur-light actor)))
+                                                                                                                          (get-terrain-type-trait terrain +terrain-trait-light-source+)
+                                                                                                                          (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+)))))
+                                                                                                        (setf light-source (list dx dy (z actor)))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-toggle-light+)
+                                                             (can-invoke-ability actor actor +mob-abil-toggle-light+)
+                                                             light-source)
+                                                      t
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (let ((light-source nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (or (and (zerop (cur-light actor))
+                                                                                                                          (get-terrain-type-trait terrain +terrain-trait-light-source+)
+                                                                                                                          (not (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+))))
+                                                                                                                     (and (not (zerop (cur-light actor)))
+                                                                                                                          (get-terrain-type-trait terrain +terrain-trait-light-source+)
+                                                                                                                          (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+)))))
+                                                                                                        (setf light-source (list dx dy (z actor)))))))
+                                                     (when light-source
+                                                       (mob-invoke-ability actor light-source (id ability-type))))
+                                                   )
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (= (view-z *player*) (z *player*))
+                                                                 (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*))
+                                                                 (get-terrain-type-trait terrain +terrain-trait-light-source+))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

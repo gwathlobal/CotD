@@ -218,4 +218,27 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern+ :name "Lantern"
                                                :glyph-idx 92 :glyph-color sdl:*yellow* :back-color sdl:*black*
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 6 :trait-blocks-sound 20 :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 6 :trait-blocks-sound 20 :trait-blocks-sound-floor 20
+                                               :on-use #'(lambda (mob x y z)
+                                                           (declare (ignore mob))
+                                                           (set-terrain-* (level *world*) x y z +terrain-wall-lantern-off+)
+                                                           (loop for (nx ny nz light-radius) across (light-sources (level *world*))
+                                                                 for i from 0 below (length (light-sources (level *world*)))
+                                                                 when (and (= x nx) (= y ny) (= z nz))
+                                                                   do
+                                                                      (setf (fourth (aref (light-sources (level *world*)) i)) (get-terrain-type-trait +terrain-wall-lantern-off+ +terrain-trait-light-source+))
+                                                                      (loop-finish)))))
+
+;; light sources that are off, but can be toggled on - should have the +terrain-trait-light-source+ set to 0, as opposed to non-light-sources, where it is set to nil
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern-off+ :name "Lantern (off)"
+                                               :glyph-idx 92 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black*
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 0 :trait-blocks-sound 20 :trait-blocks-sound-floor 20
+                                               :on-use #'(lambda (mob x y z)
+                                                           (declare (ignore mob))
+                                                           (set-terrain-* (level *world*) x y z +terrain-wall-lantern+)
+                                                           (loop for (nx ny nz light-radius) across (light-sources (level *world*))
+                                                                 for i from 0 below (length (light-sources (level *world*)))
+                                                                 when (and (= x nx) (= y ny) (= z nz))
+                                                                   do
+                                                                      (setf (fourth (aref (light-sources (level *world*)) i)) (get-terrain-type-trait +terrain-wall-lantern+ +terrain-trait-light-source+))
+                                                                      (loop-finish)))))

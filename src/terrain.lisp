@@ -9,7 +9,8 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name terrain" :initarg :name :accessor name)
-   (on-step :initform nil :initarg :on-step :accessor on-step)
+   (on-step :initform nil :initarg :on-step :accessor on-step) ;; a function that takes (mob x y z)
+   (on-use :initform nil :initarg :on-use :accessor on-use) ;; a funcation that takes (mob x y z)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-move - +terrain-trait-blocks-move+
    ;; :trait-blocks-vision - +terrain-trait-blocks-vision+
@@ -68,5 +69,11 @@
 
 (defun get-terrain-name (terrain-type-id)
   (name (get-terrain-type-by-id terrain-type-id)))
+
+(defun get-terrain-on-step (terrain-type-id)
+  (on-step (get-terrain-type-by-id terrain-type-id)))
+
+(defun get-terrain-on-use (terrain-type-id)
+  (on-use (get-terrain-type-by-id terrain-type-id)))
 
 
