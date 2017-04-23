@@ -162,7 +162,7 @@
              (when (eq check-result t)
                (setf result z))
 
-             (format t "MOB ~A, Z = ~A, Z MOB = ~A, WATER = ~A~%" (name mob) z (z mob) (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+))
+             ;(format t "MOB ~A, Z = ~A, Z MOB = ~A, WATER = ~A~%" (name mob) z (z mob) (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+))
              
              ;; stop falling if
              (when (or (not (eq check-result t))

@@ -193,6 +193,9 @@
   )
 
 (defun level-cells-connected-p (level sx sy sz tx ty tz map-size move-mode)
+  (when (or (< sx 0) (< sy 0) (< sz 0) (>= sx (array-dimension (terrain level) 0)) (>= sy (array-dimension (terrain level) 1)) (>= sz (array-dimension (terrain level) 2))
+            (< tx 0) (< ty 0) (< tz 0) (>= tx (array-dimension (terrain level) 0)) (>= ty (array-dimension (terrain level) 1)) (>= tz (array-dimension (terrain level) 2)))
+    (return-from level-cells-connected-p nil))
   (let ((connect-map-value-start (get-level-connect-map-value level sx sy sz map-size move-mode))
         (connect-map-value-end (get-level-connect-map-value level tx ty tz map-size move-mode)))
     (if (or (= connect-map-value-start connect-map-value-end)

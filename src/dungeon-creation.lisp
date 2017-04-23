@@ -241,7 +241,7 @@
                                                                      
                                                                      (when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+)
-                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-openable+))
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-openable-door+))
                                                                        (setf result nil)
                                                                        (return-from from-result))
                                                                      
@@ -399,7 +399,7 @@
                                                                    for ny of-type fixnum = (+ sy off-y) do
                                                                      (when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+)
-                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-openable+))
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-openable-door+))
                                                                        (setf result nil)
                                                                        (return-from from-result))
                                                                      
@@ -522,7 +522,7 @@
     (loop for x from 1 below (1- max-x) do
       (loop for y from 1 below (1- max-y) do
         (loop for z from 0 below max-z do
-          (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-openable+)
+          (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-openable-door+)
             (let ((func #'(lambda (&key map-size move-mode)
                             (let ((room-id-list nil))
                               (check-surroundings x y nil #'(lambda (dx dy)

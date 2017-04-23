@@ -19,15 +19,25 @@
         ;; cant move beyond level borders 
         (when (or (< nx 0) (< ny 0) (< dz 0) (>= nx (array-dimension (terrain (level *world*)) 0)) (>= ny (array-dimension (terrain (level *world*)) 1)) (>= dz (array-dimension (terrain (level *world*)) 2)))
           (return-from check-move-for-ai nil))
-        
-        ;; checking for terrain obstacle
-        (when (and (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+)
-                   (or (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-openable+))
-                       ;(and (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-openable+)
-                       ;     (not (mob-ability-p mob +mob-abil-open-close-door+)))
-                       ))
-          (return-from check-move-for-ai nil))
 
+        (setf move-result nil)
+
+        ;; can move if not impassable 
+        (when (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+))
+          (setf move-result t))
+
+        ;; can move if a door (not important if open or closed)
+        (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-openable-door+)
+          (setf move-result t))
+
+        ;; can move if a window & you can open windows
+        (when (and (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-openable-window+)
+                   (mob-ability-p mob +mob-abil-open-close-window+))
+          (setf move-result t))
+
+        (unless move-result
+          (return-from check-move-for-ai nil))
+        
         (setf move-result nil)
 
         ;; can go anywhere horizontally or directly up/below if the current tile is water
@@ -576,20 +586,31 @@
         (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
                         (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
-                        (and (get-mob-* (level *world*) rx ry rz)
-                             (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
+                        ;(and (get-mob-* (level *world*) rx ry rz)
+                        ;     (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
                         (not (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)
                                                                                                          (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                                                          (map-size mob))
                                                       (get-mob-move-mode mob)))
                         )
               do
+                 (logger (format nil "AI-FUNCTION: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                 rx ry rz
+                                 (get-terrain-* (level *world*) rx ry rz)
+                                 (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
+                                                                        (id (get-mob-* (level *world*) rx ry rz))
+                                                                        nil)
+                                 (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)
+                                                                                                             (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                             (map-size mob))
+                                                          (get-mob-move-mode mob))))
                  (setf rx (- (+ 10 (x mob))
                              (1+ (random 20))))
                  (setf ry (- (+ 10 (y mob))
                              (1+ (random 20))))
                  (setf rz (- (+ 5 (z mob))
-                             (1+ (random 10)))))
+                             (1+ (random 10))))
+              (logger (format nil "AI-FUNCTION: NEW R (~A ~A ~A)~%" rx ry rz)))
         (setf (path-dst mob) (list rx ry rz))
         (logger (format nil "AI-FUNCTION: Mob's destination is randomly set to (~A, ~A, ~A)~%" (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
     

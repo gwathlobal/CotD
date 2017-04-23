@@ -83,6 +83,7 @@
    ;;   :abil-no-breath - +mob-abil-no-breathe+
    ;;   :abil-open-close-door - +mob-abil-open-close-door+
    ;;   :abil-toggle-light - +mob-abil-toggle-light+
+   ;;   :abil-open-close-window - +mob-abil-open-close-window+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -108,7 +109,7 @@
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
-                                                                abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light)
+                                                                abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -231,6 +232,8 @@
     (setf (gethash +mob-abil-open-close-door+ (abilities mob-type)) t))
   (when abil-toggle-light
     (setf (gethash +mob-abil-toggle-light+ (abilities mob-type)) t))
+  (when abil-open-close-window
+    (setf (gethash +mob-abil-open-close-window+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

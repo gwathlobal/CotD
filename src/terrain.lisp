@@ -24,7 +24,8 @@
    ;; :trait-blocks-sound-floor - +terrain-trait-blocks-sound-floor+
    ;; :trait-water - +terrain-trait-water+
    ;; :trait-move-cost-factor - +terrain-trait-move-cost-factor+
-   ;; :trait-openable - +terrain-trait-openable+
+   ;; :trait-openable-door - +terrain-trait-openable-door+
+   ;; :trait-openable-window - +terrain-trait-openable-window+
    ))
 
 
@@ -37,7 +38,7 @@
   (aref *terrain-types* terrain-type-id))
 
 (defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor trait-slope-up trait-slope-down trait-not-climable trait-light-source
-                                                                        trait-blocks-sound trait-blocks-sound-floor trait-water (trait-move-cost-factor 1) trait-openable)
+                                                                        trait-blocks-sound trait-blocks-sound-floor trait-water (trait-move-cost-factor 1) trait-openable-door trait-openable-window)
   
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
@@ -63,8 +64,10 @@
     (setf (gethash +terrain-trait-water+ (trait terrain-type)) trait-water))
   (when trait-move-cost-factor
     (setf (gethash +terrain-trait-move-cost-factor+ (trait terrain-type)) trait-move-cost-factor))
-  (when trait-openable
-    (setf (gethash +terrain-trait-openable+ (trait terrain-type)) trait-openable))
+  (when trait-openable-door
+    (setf (gethash +terrain-trait-openable-door+ (trait terrain-type)) trait-openable-door))
+  (when trait-openable-window
+    (setf (gethash +terrain-trait-openable-window+ (trait terrain-type)) trait-openable-window))
   )
 
 (defun get-terrain-type-trait (terrain-type-id key)

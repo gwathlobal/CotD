@@ -124,6 +124,7 @@
 (defconstant +mob-abil-no-breathe+ 47)
 (defconstant +mob-abil-open-close-door+ 48)
 (defconstant +mob-abil-toggle-light+ 49)
+(defconstant +mob-abil-open-close-window+ 50)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -176,7 +177,8 @@
 (defconstant +terrain-trait-blocks-sound-floor+ 9)
 (defconstant +terrain-trait-water+ 10)
 (defconstant +terrain-trait-move-cost-factor+ 11)
-(defconstant +terrain-trait-openable+ 12)
+(defconstant +terrain-trait-openable-door+ 12)
+(defconstant +terrain-trait-openable-window+ 13)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -222,6 +224,7 @@
 (defconstant +terrain-tree-oak-trunk-se+ 41)
 (defconstant +terrain-wall-lantern+ 42)
 (defconstant +terrain-wall-lantern-off+ 43)
+(defconstant +terrain-wall-window-opened+ 44)
 
 (defparameter *faction-table* (make-hash-table))
 

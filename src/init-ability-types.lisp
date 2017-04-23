@@ -1806,7 +1806,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-open-close-door+ :name "Open/close door" :descr "Open or close door (depending on the current status of the door in question)." 
-                                 :cost 0 :spd (truncate +normal-ap+ 1) :passive nil
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
@@ -1913,6 +1913,51 @@
                                                                  (= (view-z *player*) (z *player*))
                                                                  (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*))
                                                                  (get-terrain-type-trait terrain +terrain-trait-light-source+))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-open-close-window+ :name "Open/close window" :descr "Open or close window (depending on the current status of the door in question)." 
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target here is list of (x y z) coordinates for the tile to be toggled
+                                                (multiple-value-bind (x y z) (values-list target)
+                                                  (when (get-terrain-on-use (get-terrain-* (level *world*) x y z))
+                                                    (funcall (get-terrain-on-use (get-terrain-* (level *world*) x y z)) actor x y z))
+                                                  (if (= (get-terrain-* (level *world*) x y z) +terrain-wall-window-opened+)
+                                                    (print-visible-message x y z (level *world*) (format nil "~@(~A~) opens the window. " (visible-name actor)) :observed-mob actor)
+                                                    (print-visible-message x y z (level *world*) (format nil "~@(~A~) closes the window. " (visible-name actor)) :observed-mob actor)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-open-close-window+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-open-close-window+)
+                                                           (can-invoke-ability actor actor +mob-abil-open-close-window+)
+                                                           (path actor)
+                                                           (= (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-wall-window+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor (first (path actor)) (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (= (view-z *player*) (z *player*))
+                                                                 (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*))
+                                                                 (or (= terrain +terrain-wall-window+)
+                                                                     (= terrain +terrain-wall-window-opened+)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
