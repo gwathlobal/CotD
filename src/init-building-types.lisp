@@ -933,86 +933,78 @@
                                                     nil
                                                     nil))))
 
-(set-building-type (make-building :id +building-city-satan-lair-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-satanists+
+(set-building-type (make-building :id +building-city-satan-lair-1+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-satanists+
                                   :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,"
-                                                                            ",##-##-##-##..##,"
-                                                                            ",#bh#bh#bh#....#,"
-                                                                            ",-t.#t.#t.#....-,"
-                                                                            ",##.##.##.#...|#,"
-                                                                            ",-.............-,"
-                                                                            ",#.###########.#,"
-                                                                            ",#.###########.#,"
-                                                                            ",#.#####.#####.#,"
-                                                                            ",#.####...####.#,"
-                                                                            ",#.##.......##.#,"
-                                                                            ",#.####...####.#,"
-                                                                            ",#.#####.#####.#,"
-                                                                            ",#.#####.#####.#,"
-                                                                            ",#.............#,"
-                                                                            ",###############,"
-                                                                            ",,,,,,,,,,,,,,,,,"))
+                                            (let ((build-template-z-0 (list "000000000"
+                                                                            "0#######0"
+                                                                            "0#u#|###0"
+                                                                            "0#.....#0"
+                                                                            "0#.....#0"
+                                                                            "0##...##0"
+                                                                            "0###.###0"
+                                                                            "0#######0"
+                                                                            "000000000"))
 
-                                                  (build-template-z-3 (list "                 "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            " ............... "
-                                                                            "                 ")))
+                                                  (build-template-z-1 (list "000000000"
+                                                                            "0#######0"
+                                                                            "0#d.#.h#0"
+                                                                            "0#..+.b#0"
+                                                                            "0#.|####0"
+                                                                            "0#..+.b#0"
+                                                                            "0##u#.h#0"
+                                                                            "0#######0"
+                                                                            "000000000"))
+                                                  
+                                                  (build-template-z-2 (list ",,,,,,,,,"
+                                                                            ",#+#####,"
+                                                                            ",#..#.h#,"
+                                                                            ",#..+.b#,"
+                                                                            ",-.|####,"
+                                                                            ",#..+.b#,"
+                                                                            ",#.d#.h#,"
+                                                                            ",#######,"
+                                                                            ",,,,,,,,,"))
+
+                                                  (build-template-z-3 (list "         "
+                                                                            " ....... "
+                                                                            " ....... "
+                                                                            " ....... "
+                                                                            " ....... "
+                                                                            " ....... "
+                                                                            " ....... "
+                                                                            " ....... "
+                                                                            "         ")))
                                               ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z -2) build-template-z-0 template-level)
+                                              (translate-build-to-template x y (+ z -1) build-template-z-1 template-level)
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
                                               )
-                                            (values (list (list +mob-type-satanist+ 3 2 z)
-                                                          (list +mob-type-satanist+ 6 2 z)
-                                                          (list +mob-type-satanist+ 9 2 z)
-                                                          (list +mob-type-satanist+ 8 10 z))
-                                                    (list (list +feature-blood-stain+ 8 10 z)
-                                                          (list +feature-blood-stain+ 8 8 z)
-                                                          (list +feature-blood-stain+ 6 10 z)
-                                                          (list +feature-blood-fresh+ 8 7 z)
-                                                          (list +feature-blood-fresh+ 9 7 z)
-                                                          (list +feature-blood-old+ 7 7 z)
-                                                          (list +feature-blood-old+ 7 8 z)
-                                                          (list +feature-blood-fresh+ 6 9 z)
-                                                          (list +feature-blood-fresh+ 9 8 z)
-                                                          (list +feature-blood-fresh+ 6 8 z)
-                                                          (list +feature-blood-stain+ 10 10 z)
-                                                          (list +feature-blood-old+ 9 10 z)
-                                                          (list +feature-blood-fresh+ 7 10 z)
-                                                          (list +feature-blood-old+ 8 11 z)
-                                                          (list +feature-blood-fresh+ 8 9 z)
-                                                          (list +feature-blood-old+ 9 11 z)
-                                                          (list +feature-blood-old+ 7 11 z)
-                                                          (list +feature-blood-fresh+ 9 9 z)
-                                                          (list +feature-blood-old+ 7 9 z)
-                                                          (list +feature-blood-fresh+ 5 10 z)
-                                                          (list +feature-blood-old+ 11 10 z)
-                                                          (list +feature-blood-old+ 12 10 z)
-                                                          (list +feature-blood-fresh+ 11 11 z)
-                                                          (list +feature-blood-fresh+ 11 9 z)
-                                                          (list +feature-blood-fresh+ 10 9 z)
-                                                          (list +feature-blood-old+ 10 11 z)
-                                                          (list +feature-blood-old+ 4 10 z)
-                                                          (list +feature-blood-fresh+ 5 9 z)
-                                                          (list +feature-blood-fresh+ 6 9 z)
-                                                          (list +feature-blood-fresh+ 6 11 z)
-                                                          (list +feature-blood-old+ 5 9 z)
-                                                          (list +feature-blood-fresh+ 8 12 z)
-                                                          (list +feature-blood-fresh+ 7 12 z)
-                                                          (list +feature-blood-fresh+ 9 12 z)
-                                                          (list +feature-blood-old+ 9 13 z))
+                                            (values (list (list +mob-type-satanist+ 5 2 (+ z 0))
+                                                          (list +mob-type-satanist+ 5 5 (+ z 0))
+                                                          (list +mob-type-satanist+ 5 2 (+ z -1))
+                                                          (list +mob-type-satanist+ 5 5 (+ z -1)))
+                                                    (list (list +feature-blood-stain+ 4 6 (+ z -2))
+                                                          (list +feature-blood-stain+ 2 4 (+ z -2))
+                                                          (list +feature-blood-stain+ 6 4 (+ z -2))
+                                                          (list +feature-blood-fresh+ 4 5 (+ z -2))
+                                                          (list +feature-blood-fresh+ 4 7 (+ z -2))
+                                                          (list +feature-blood-fresh+ 3 6 (+ z -2))
+                                                          (list +feature-blood-fresh+ 5 6 (+ z -2))
+                                                          (list +feature-blood-old+ 3 4 (+ z -2))
+                                                          (list +feature-blood-old+ 2 3 (+ z -2))
+                                                          (list +feature-blood-fresh+ 1 4 (+ z -2))
+                                                          (list +feature-blood-fresh+ 2 5 (+ z -2))
+                                                          (list +feature-blood-old+ 6 4 (+ z -2))
+                                                          (list +feature-blood-fresh+ 7 4 (+ z -2))
+                                                          (list +feature-blood-old+ 5 4 (+ z -2))
+                                                          (list +feature-blood-old+ 6 3 (+ z -2))
+                                                          (list +feature-blood-fresh+ 6 5 (+ z -2))
+                                                          (list +feature-blood-fresh+ 4 4 (+ z -2))
+                                                          (list +feature-blood-old+ 3 5 (+ z -2))
+                                                          (list +feature-blood-old+ 5 5 (+ z -2))
+                                                          (list +feature-blood-fresh+ 3 7 (+ z -2))
+                                                          (list +feature-blood-fresh+ 5 7 (+ z -2)))
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-river+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1042,8 +1034,8 @@
                                             (loop for x1 from 0 below 5 do
                                               (loop for y1 from 0 below 5 do
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-floor-pier+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid+)))
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid-nofreeze+)
+                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid-nofreeze+)))
                                             (values nil
                                                     nil
                                                     nil))))

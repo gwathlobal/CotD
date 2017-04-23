@@ -1463,21 +1463,22 @@
                                                              (1+ (random 160)))) 
                                                       (ry (- (+ 80 (y actor))
                                                              (1+ (random 160))))
-                                                      (n 200))
-                                                  ;; 200 hundred tries to find a suitable place for teleport
+                                                      (n 2000))
+                                                  ;; 2000 hundred tries to find a suitable place for teleport
                                                   (loop while (or (< rx 0) (< ry 0) (>= rx max-x) (>= ry max-y)
-                                                                  (< (get-distance (x actor) (y actor) rx ry) 40)
+                                                                  (< (get-distance (x actor) (y actor) rx ry) 80)
+                                                                  (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry (z actor)) +terrain-trait-opaque-floor+))
                                                                   (not (eq (check-move-on-level actor rx ry (z actor)) t)))
                                                         do
                                                            
                                                            (decf n)
                                                            (when (zerop n)
                                                              (loop-finish))
-                                                           (setf rx (- (+ 40 (x actor))
-                                                                       (1+ (random 80))))
-                                                           (setf ry (- (+ 40 (y actor))
-                                                                       (1+ (random 80)))))
-                                                  ;(format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry) (get-distance (x actor) (y actor) rx ry))
+                                                           (setf rx (- (+ 80 (x actor))
+                                                                       (1+ (random 160))))
+                                                           (setf ry (- (+ 80 (y actor))
+                                                                       (1+ (random 160)))))
+                                                  (format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry (z actor)) (get-distance (x actor) (y actor) rx ry))
                                                   (if (not (zerop n))
                                                     (progn
                                                       (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
