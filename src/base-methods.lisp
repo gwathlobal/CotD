@@ -578,7 +578,7 @@
                   (setf (momentum-spd mob) 0)
                   (setf (momentum-dir mob) (cons 0 0)))
                 (setf (order-for-next-turn mob) 5)
-                
+
                 ;; if the obstacle is bumpable - bump & exit
                 (when (and (eq (first check-result) :obstacles)
                            (get-terrain-on-bump (get-terrain-* (level *world*) x y z))

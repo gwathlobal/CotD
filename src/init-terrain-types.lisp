@@ -281,7 +281,15 @@
                                                                  when (and (= x nx) (= y ny) (= z nz))
                                                                    do
                                                                       (setf (fourth (aref (light-sources (level *world*)) i)) (get-terrain-type-trait +terrain-wall-lantern-off+ +terrain-trait-light-source+))
-                                                                      (loop-finish)))))
+                                                                      (loop-finish)))
+                                               :on-bump-terrain #'(lambda (mob x y z)
+                                                                    (if (and (mob-ability-p mob +mob-abil-toggle-light+)
+                                                                             (can-invoke-ability mob mob +mob-abil-toggle-light+)
+                                                                             (= (get-terrain-* (level *world*) x y z) +terrain-wall-lantern+))
+                                                                      (progn
+                                                                        (mob-invoke-ability mob (list x y z) +mob-abil-toggle-light+)
+                                                                        t)
+                                                                      nil))))
 
 ;; light sources that are off, but can be toggled on - should have the +terrain-trait-light-source+ set to 0, as opposed to non-light-sources, where it is set to nil
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern-off+ :name "Lantern (off)"
@@ -295,4 +303,12 @@
                                                                  when (and (= x nx) (= y ny) (= z nz))
                                                                    do
                                                                       (setf (fourth (aref (light-sources (level *world*)) i)) (get-terrain-type-trait +terrain-wall-lantern+ +terrain-trait-light-source+))
-                                                                      (loop-finish)))))
+                                                                      (loop-finish)))
+                                               :on-bump-terrain #'(lambda (mob x y z)
+                                                                    (if (and (mob-ability-p mob +mob-abil-toggle-light+)
+                                                                             (can-invoke-ability mob mob +mob-abil-toggle-light+)
+                                                                             (= (get-terrain-* (level *world*) x y z) +terrain-wall-lantern-off+))
+                                                                      (progn
+                                                                        (mob-invoke-ability mob (list x y z) +mob-abil-toggle-light+)
+                                                                        t)
+                                                                      nil))))

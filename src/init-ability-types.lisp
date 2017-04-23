@@ -1811,7 +1811,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-open-close-door+ :name "Open/close door" :descr "Open or close door (depending on the current status of the door in question)." 
+                                 :id +mob-abil-open-close-door+ :name "Open/close door" :descr "Open or close door (depending on the current status of the door in question). You can also open a closed door by walking into it." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -1858,7 +1858,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-toggle-light+ :name "Toggle light" :descr "Switch a light on or off (depending on the current status of the light source in question)." 
+                                 :id +mob-abil-toggle-light+ :name "Toggle light" :descr "Switch a light on or off (depending on the current status of the light source in question). You can also toggle a light by walking into it." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
@@ -1930,7 +1930,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-open-close-window+ :name "Open/close window" :descr "Open or close window (depending on the current status of the door in question)." 
+                                 :id +mob-abil-open-close-window+ :name "Open/close window" :descr "Open or close window (depending on the current status of the door in question). You can also open a closed window by walking into it." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)

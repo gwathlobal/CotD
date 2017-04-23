@@ -33,7 +33,7 @@ OUTSIDER BEASTS
  - The Gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win. Angels may dominate these at the cost of their own health, but in return, they will be able to invoke Gargantaur's mind burn.
  
 CITIZENS OF THE CITY
- - Humans are frail and week. Citizens of the City will try to flee whenever they see an enemy.
+ - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.
  - Priests will preach to smite their foes or grant allies divine shield. Smiting applies minor damage to all enemies in sight, while divine shield gives a one-time protection from any harm.
  - Satanists are allied with demons. They are able to call demons to them for free and curse all enemies in sight with inaccuracy.
  

@@ -19,7 +19,7 @@ Note that only weapon damage is mitigated by armor. Other sources of damage (lik
 MOUNTED COMBAT
 
 Some units (horses and fiends) move in a special way - they have momentum. That means they have speed and direction where they move. The following rules apply:
- - If a unit starts to move in a certain direction it gains speed. 
+ - If a unit starts to move in a certain direction, it gains speed. 
  - If a unit skips a turn, it will continue to move in the chosen direction. 
  - If a unit tries to move in the opposite direction, it will lose speed. 
  - If a unit tries to move sideways at high speed, it will change direction somewhat but will lose speed at the same time. 
@@ -38,7 +38,7 @@ Some units (a Gargantaur) are so huge that they occupy several tiles on the leve
  - They will not be able to get into narrow spaces (like some streets or the inside of the houses).
  - They are much easier to be hit with ranged weapons (even if the bullets disperse, this are still likely to land on a tile which the creature occupies).
  - They are able to move only in the direction they face (unlike smaller creatures). So if they first move south and then want to go north, it will require of them to make a 180-degree turn.
- - They can melee attack several enemies at the same time. For example, a Gargantaur of size  3x3 can crush up to 3 units standing next to it.
+ - They can melee attack several enemies at the same time. For example, a Gargantaur of size 3x3 can crush up to 3 units standing next to it.
  
 Multi-tile units may also serve as mounts (for example, Angels can dominate Gargantaurs). Riding one will give excellent protection against melee attacks, but you will still have to cope with the creature's size and the necessity to turn it around to move in the desired direction.
 
@@ -69,7 +69,7 @@ When hearing something, most characters will try to investigate the source of th
 
 CLIMBING
 
-The Thief is the only character who can traverse space vertically practically anywhere he wants. To climb up or down, he needs to be in the climbing mode, be positioned next to a wall or a floor and his destination tile should have a wall or a floor tile nearby. This means that some bushes or trees may not be climbable as they lack a floor above them that the Thief can cling to. 
+The Thief is the only character who can traverse space vertically practically anywhere he wants. To climb up or down, he needs to be in the climbing mode, be positioned next to a wall or a floor and his destination tile should also have a wall or a floor tile nearby. This means that some bushes or trees may not be climbable as they lack a floor above them that the Thief can cling to. 
 Note that if you decide to switch off the climbing mode while having no solid floor in the tile you find yourself, you will immediately drop down.
 This ability provides the Thief with unprecedented protection as nobody will be able to follow him if he decides to get up on a roof (but some will be able to shoot him there nonetheless).  
 
