@@ -31,9 +31,9 @@
                                   "...#######............#...............-......................................."
                                   "......................#...............#u......|..............................."
                                   "...#######...........u######-#+#########..................######.....######..."
-                                  "...#.....#............#....#.....#____##..................#...............#..."
-                                  "...#.....+............#....+....###___##..................#...............#..."
-                                  "...#.....#............#....#....#_#___##..................#...............#..."
+                                  "...#.....#............#....#.....#_____#..................#...............#..."
+                                  "...#.....+............#....+....###____#..................#...............#..."
+                                  "...#.....#............#....#....#_#____#..................#...............#..."
                                   "...#######............##################..................#################..."
                                   ".............................................................................."
                                   ".............................................................................."))
@@ -153,8 +153,8 @@
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 105))
     (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-blood-fresh+  :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 75))
-    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-fiend+ :x 33 :y 18 :z 0))
-    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-fiend+ :x (+ (x *player*) 8) :y (+ (y *player*) 0)))
-    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 2) :y (+ (y *player*) 3)))
-    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 3) :y (+ (y *player*) 5)))
+    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-thief+ :x 33 :y 18 :z 0))
+    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-horse+ :x 37 :y 19 :z 0))
+    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x 35 :y 19 :z 2))
+    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x 40 :y 17 :z 2))
     ))

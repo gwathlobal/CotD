@@ -61,6 +61,45 @@
     (logger (format nil "Creating actual level ~A~%" 0))
     (setf (level world) (create-level-from-template result-template))
 
+    ;; check map for connectivity
+    
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* "Creating connectivity maps (walk)")
+    
+    (create-connect-map-walk (level world) 1)
+
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* nil)
+    
+    (create-connect-map-walk (level world) 3)
+
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* nil)
+    
+    (create-connect-map-walk (level world) 5)
+
+    ;(time (progn
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* "Creating connectivity maps (climb)")
+    
+    (create-connect-map-climb (level world) 1)
+
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* nil)
+    
+    (create-connect-map-climb (level world) 3)
+
+    ;; adjusting the progress bar
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* nil)
+    
+    (create-connect-map-climb (level world) 5)
+
     ;; creating light map
     (funcall (sf-func (get-scenario-feature-by-id tod-id)) (level world))
 
@@ -103,44 +142,7 @@
     ;; set the game events
     (setf (game-events world) game-event-list)
 
-    ;; check map for connectivity
     
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* "Creating connectivity maps (walk)")
-    
-    (create-connect-map-walk (level world) 1)
-
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-walk (level world) 3)
-
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-walk (level world) 5)
-
-    ;(time (progn
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* "Creating connectivity maps (climb)")
-    
-    (create-connect-map-climb (level world) 1)
-
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-climb (level world) 3)
-
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-climb (level world) 5)
     
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
@@ -352,6 +354,12 @@
                                                                                 )
                                                                        (setf result t))
 
+                                                                     ;; if you are large, you can move only if all you tiles have opaque floor
+                                                                     (when (and (> mob-size 1)
+                                                                                (= (- z cz) 0)
+                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)))
+                                                                       (setf result nil))
+
                                                                      ;; all other cases are disconnected 
                                                                      (unless result
                                                                        (return-from from-result))
@@ -490,6 +498,12 @@
                                                                                                result))))
                                                                        (setf result t))
 
+                                                                     ;; if you are large, you can move only if all you tiles have opaque floor
+                                                                     (when (and (> mob-size 1)
+                                                                                (= (- z cz) 0)
+                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)))
+                                                                       (setf result nil))
+                                                                     
                                                                      ;; all other cases are disconnected 
                                                                      (unless result
                                                                        (return-from from-result))

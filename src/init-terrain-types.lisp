@@ -174,8 +174,15 @@
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-walk+))
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-climb+))
-                                                           
-                                                           )))
+                                                           )
+                                               :on-bump-terrain #'(lambda (mob x y z)
+                                                                    (if (and (mob-ability-p mob +mob-abil-open-close-window+)
+                                                                               (can-invoke-ability mob mob +mob-abil-open-close-window+)
+                                                                               (= (get-terrain-* (level *world*) x y z) +terrain-wall-window+))
+                                                                      (progn
+                                                                        (mob-invoke-ability mob (list x y z) +mob-abil-open-close-window+)
+                                                                        t)
+                                                                      nil))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-window-opened+ :name "Opened window"
                                                :glyph-idx 15 :glyph-color (sdl:color :r 0 :g 0 :b 200) :back-color sdl:*black* 
@@ -213,8 +220,15 @@
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-walk+))
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-climb+))
-                                                           
-                                                           )))
+                                                           )
+                                               :on-bump-terrain #'(lambda (mob x y z)
+                                                                    (if (and (mob-ability-p mob +mob-abil-open-close-door+)
+                                                                             (can-invoke-ability mob mob +mob-abil-open-close-door+)
+                                                                             (= (get-terrain-* (level *world*) x y z) +terrain-door-closed+))
+                                                                      (progn
+                                                                        (mob-invoke-ability mob (list x y z) +mob-abil-open-close-door+)
+                                                                        t)
+                                                                      nil))))
 
 ;;--------------------
 ;; Water & Ice

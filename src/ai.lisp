@@ -583,9 +583,12 @@
             )
         (declare (type fixnum rx ry rz))
         (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to go to a random nearby place~%" (x mob) (y mob) (z mob)))
+        (logger (format nil "AI-FUNCTION: TERRAIN ~A~%" (get-terrain-* (level *world*) (x mob) (y mob) (z mob))))
         (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
                         (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
-                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                        (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+                             (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+)))
+                        
                         ;(and (get-mob-* (level *world*) rx ry rz)
                         ;     (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
                         (not (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)
@@ -643,7 +646,7 @@
     ;; if the mob has its path set - move along it
     (when (path mob)
 
-        (let ((step) (step-x) (step-y) (step-z))
+        (let ((step) (step-x) (step-y) (step-z) (move-result nil))
         
           (logger (format nil "AI-FUNCTION: Move mob along the path - ~A~%" (path mob)))
           (setf step (pop (path mob)))
@@ -665,17 +668,23 @@
             (setf (path-dst mob) nil)
             (return-from ai-function))
           
-          (move-mob mob (x-y-into-dir step-x step-y) :dir-z step-z)
+          (setf move-result (move-mob mob (x-y-into-dir step-x step-y) :dir-z step-z))
 
           (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A ~A)~%" (path-dst mob) (x mob) (y mob) (z mob)))
+          (if move-result
+            (progn
+              (when (and (path-dst mob)
+                         (= (x mob) (first (path-dst mob)))
+                         (= (y mob) (second (path-dst mob)))
+                         (= (z mob) (third (path-dst mob))))
+                (setf (path-dst mob) nil))
+              (return-from ai-function))
+            (progn
+              (logger (format nil "AI-FUNCTION: Move failed ~A~%" move-result))
+              (setf (path-dst mob) nil)
+              (setf (path mob) nil)))
           
-          (when (and (path-dst mob)
-                     (= (x mob) (first (path-dst mob)))
-                     (= (y mob) (second (path-dst mob)))
-                     (= (z mob) (third (path-dst mob))))
-            (setf (path-dst mob) nil))
-          
-          (return-from ai-function)))
+          ))
     
     ;; if there are no hostile mobs move randomly
     ;; pester the AI until it makes some meaningful action
@@ -832,8 +841,8 @@
                 (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
                                 (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                 (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
-                                (and (get-mob-* (level *world*) rx ry rz)
-                                     (not (eq (get-mob-* (level *world*) rx ry rz) mob)))
+                                (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+)))
                                 (not (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)
                                                                                                                  (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                                                                  (map-size mob))

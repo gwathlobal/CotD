@@ -103,7 +103,8 @@
 
 (defun check-move-on-level (mob dx dy dz)
   (let ((sx) (sy)
-        (mob-list nil))
+        (mob-list nil)
+        (obst-list nil))
     ;; calculate the coords of the mob's NE corner
     (setf sx (- dx (truncate (1- (map-size mob)) 2)))
     (setf sy (- dy (truncate (1- (map-size mob)) 2)))
@@ -116,9 +117,12 @@
         
         ;; checking for obstacle
         (when (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move+)
-          (return-from check-move-on-level nil)
-          ;(return-from check-move-on-level (list :obstacles ()))
+          ;(return-from check-move-on-level nil)
+          (pushnew (list nx ny dz) obst-list)
           )
+
+        (when obst-list
+          (return-from check-move-on-level (list :obstacles obst-list)))
         
         ;; checking for mobs
         (when (and (get-mob-* (level *world*) nx ny dz)
@@ -339,11 +343,17 @@
                (apply-gravity mob))
       (let ((init-z (z mob)) (cur-dmg 0))
         (set-mob-location mob (x mob) (y mob) (apply-gravity mob) :apply-gravity nil)
+        ()
         (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
         (decf (cur-hp mob) cur-dmg)
         (when (> cur-dmg 0)
-          (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                                 (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
+          (if (eq mob *player*)
+            (progn
+              ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
+              (set-message-this-turn t)
+              (add-message (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
+            (print-visible-message (x mob) (y mob) (z mob) (level *world*)
+                                   (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg) :observed-mob *player*)))
         (when (check-dead mob)
           (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))))
     
@@ -415,7 +425,7 @@
     (when (mob-ability-p mob +mob-abil-momentum+)
       (setf push t))
 
-    (logger (format nil "MOVE-MOB: ~A - spd ~A, c-dir ~A, dir ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir along-dir not-along-dir opposite-dir))
+    (logger (format nil "MOVE-MOB: ~A - spd ~A, c-dir ~A, dir ~A, dir-z ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir dir-z along-dir not-along-dir opposite-dir))
     (cond
       ;; NB: all this is necessary to introduce movement with momentum (for horses and the like)
       ;; (-1.-1) ( 0.-1) ( 1.-1)
@@ -493,7 +503,8 @@
       (setf dx (car (momentum-dir mob)))
       (setf dy (cdr (momentum-dir mob))))
 
-    
+    (when (/= dir 5)
+      (setf dir-z 0))
     
     (loop repeat (if (zerop (momentum-spd mob))
                    1
@@ -516,6 +527,12 @@
                     ((and (not (mob-effect-p mob +mob-effect-climbing-mode+))
                           (get-terrain-type-trait (get-terrain-* (level *world*) x y (z mob)) +terrain-trait-slope-down+))
                      (1- (z mob)))
+                    ((and (< dir-z 0)
+                          (= (z mob) 0))
+                     0)
+                    ((and (> dir-z 0)
+                          (= (z mob) (1- (array-dimension (terrain (level *world*)) 2))))
+                     0)
                     ;; otherwise the z level in unchanged
                     (t (+ (z mob) dir-z)))
           for apply-gravity = (if (or ;(not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
@@ -523,10 +540,12 @@
                                    (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)))
                                    (and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+)
-                                           (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)
-                                           (= z (z mob))
-                                           (= dx 0)
-                                           (= dy 0)))
+                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)))
+                                   (and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+)
+                                        (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)
+                                        (= z (z mob))
+                                        (= dx 0)
+                                        (= dy 0)))
                                 t
                                 nil)
           for check-result = (if (check-move-along-z (x mob) (y mob) (z mob) x y z)
@@ -534,7 +553,7 @@
                                nil)
           
           do
-             (logger (format nil "MOVE-MOB: CHECK-MOVE ~A~%" check-result))
+             (logger (format nil "MOVE-MOB: CHECK-MOVE ~A, XYZ = (~A ~A ~A)~%" check-result x y z))
              (cond
                ;; all clear - move freely
                ((eq check-result t)
@@ -545,6 +564,9 @@
                   (setf move-spd (move-spd (get-mob-type-by-id (mob-type mob)))))
                 (format t "APPLY-GRAVITY ~A~%" apply-gravity)
                 (set-mob-location mob x y z :apply-gravity apply-gravity)
+
+                (when (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+                  (setf dir-z 0))
                 
                 (setf move-result t)
                 
@@ -552,11 +574,18 @@
                ;; bumped into an obstacle or the map border
                ((or (eq check-result nil) (eq (first check-result) :obstacles))
 
-                (when (mob-ability-p mob +mob-abil-momentum+)
+                 (when (mob-ability-p mob +mob-abil-momentum+)
                   (setf (momentum-spd mob) 0)
                   (setf (momentum-dir mob) (cons 0 0)))
                 (setf (order-for-next-turn mob) 5)
-
+                
+                ;; if the obstacle is bumpable - bump & exit
+                (when (and (eq (first check-result) :obstacles)
+                           (get-terrain-on-bump (get-terrain-* (level *world*) x y z))
+                           (funcall (get-terrain-on-bump (get-terrain-* (level *world*) x y z)) mob x y z))
+                  (setf move-result :ability-invoked)
+                  (loop-finish))
+                
                 ;; a precaution so that horses finish their turn when they made a move and bumped into an obstacle
                 ;; while not finishing their turn if they try to move into an obstacle standing next to it
                 (when (or (/= sx (x mob))

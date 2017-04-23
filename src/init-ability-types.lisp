@@ -1468,7 +1468,12 @@
                                                   (loop while (or (< rx 0) (< ry 0) (>= rx max-x) (>= ry max-y)
                                                                   (< (get-distance (x actor) (y actor) rx ry) 80)
                                                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry (z actor)) +terrain-trait-opaque-floor+))
-                                                                  (not (eq (check-move-on-level actor rx ry (z actor)) t)))
+                                                                  (not (eq (check-move-on-level actor rx ry (z actor)) t))
+                                                                  (= (get-level-connect-map-value (level *world*) rx ry (z actor) (if (riding-mob-id actor)
+                                                                                                                                  (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                  (map-size actor))
+                                                                                                  (get-mob-move-mode actor))
+                                                                      +connect-room-none+))
                                                         do
                                                            
                                                            (decf n)
@@ -1829,7 +1834,8 @@
                                                   (if (and (mob-ability-p actor +mob-abil-open-close-door+)
                                                            (can-invoke-ability actor actor +mob-abil-open-close-door+)
                                                            (path actor)
-                                                           (= (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-door-closed+))
+                                                           (= (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-door-closed+)
+                                                           (null (get-mob-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor))))))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -1840,6 +1846,7 @@
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  (= (view-z *player*) (z *player*))
                                                                  (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*))
+                                                                 (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  (or (= terrain +terrain-door-closed+)
                                                                      (= terrain +terrain-door-open+)))
                                                           (progn
@@ -1946,7 +1953,8 @@
                                                   (if (and (mob-ability-p actor +mob-abil-open-close-window+)
                                                            (can-invoke-ability actor actor +mob-abil-open-close-window+)
                                                            (path actor)
-                                                           (= (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-wall-window+))
+                                                           (= (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-wall-window+)
+                                                           (null (get-mob-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor))))))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -1957,6 +1965,7 @@
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  (= (view-z *player*) (z *player*))
                                                                  (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*))
+                                                                 (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  (or (= terrain +terrain-wall-window+)
                                                                      (= terrain +terrain-wall-window-opened+)))
                                                           (progn

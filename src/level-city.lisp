@@ -205,10 +205,12 @@
             do
         (cond
           ((= (aref template-level x y-0 z) +terrain-floor-air+) (setf (aref template-level x y-0 z) +terrain-border-air+))
-          ((= (aref template-level x y-0 z) +terrain-water-liquid+) (setf (aref template-level x y-0 z) +terrain-border-water+)))
+          ((= (aref template-level x y-0 z) +terrain-water-liquid+) (setf (aref template-level x y-0 z) +terrain-border-water+))
+          ((= (aref template-level x y-0 z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x y-0 z) +terrain-border-water+)))
         (cond
           ((= (aref template-level x y-max z) +terrain-floor-air+) (setf (aref template-level x y-max z) +terrain-border-air+))
-          ((= (aref template-level x y-max z) +terrain-water-liquid+) (setf (aref template-level x y-max z) +terrain-border-water+)))))
+          ((= (aref template-level x y-max z) +terrain-water-liquid+) (setf (aref template-level x y-max z) +terrain-border-water+))
+          ((= (aref template-level x y-max z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x y-max z) +terrain-border-water+)))))
     (loop for y from 0 below max-y do
       (loop for z from 0 below max-z
             for x-0 = 0
@@ -216,10 +218,12 @@
             do
         (cond
           ((= (aref template-level x-0 y z) +terrain-floor-air+) (setf (aref template-level x-0 y z) +terrain-border-air+))
-          ((= (aref template-level x-0 y z) +terrain-water-liquid+) (setf (aref template-level x-0 y z) +terrain-border-water+)))
+          ((= (aref template-level x-0 y z) +terrain-water-liquid+) (setf (aref template-level x-0 y z) +terrain-border-water+))
+          ((= (aref template-level x-0 y z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x-0 y z) +terrain-border-water+)))
         (cond
           ((= (aref template-level x-max y z) +terrain-floor-air+) (setf (aref template-level x-max y z) +terrain-border-air+))
-          ((= (aref template-level x-max y z) +terrain-water-liquid+) (setf (aref template-level x-max y z) +terrain-border-water+)))))
+          ((= (aref template-level x-max y z) +terrain-water-liquid+) (setf (aref template-level x-max y z) +terrain-border-water+))
+          ((= (aref template-level x-max y z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x-max y z) +terrain-border-water+)))))
     
     (values template-level feature-list mob-list item-list)
     ))
