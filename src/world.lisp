@@ -15,6 +15,9 @@
    (feature-id-list :initarg :feature-id-list :initform (make-list 0) :accessor feature-id-list)
    (connect-map :initform (make-array '(6) :initial-element nil) :accessor connect-map :type simple-array) ; an array that holds connection maps (which are arrays themselves) for all sizes of mobs,
                                                                                                            ; note that sizes can only be odd numbers, so some indices of the array will hold nil 
+   (aux-connect-map :initform (make-array '(6) :initial-element nil) :accessor aux-connect-map :type simple-array) ; an array that holds hash maps for all sizes of mobs (same as connect-map)
+                                                                                                                   ; hash-maps hold connections between different rooms 
+                                                                                                                   ; (so that opening/closing of doors does not require flood fills)
    (light-map :accessor light-map)
    (outdoor-light :initform 0 :accessor outdoor-light)
    (light-sources :initform (make-array '(0) :adjustable t) :accessor light-sources)
@@ -76,23 +79,12 @@
     (progn
       (setf (aref (items level) (x item) (y item) (z item))
             (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil)))))
-  
-  ;(setf (aref (items level) (x item) (y item) (z item))
-  ;      (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil))
-  ;(push (id item) (aref (items level) (x item) (y item) (z item)))
-
-  ;(when (apply-gravity item)
-  ;  (setf item (remove-item-from-level-list level item))
-  ;  (setf (z item) (apply-gravity item))
-  ;  (add-item-to-level-list level item)))
 
 (defun remove-item-from-level-list (level item)
   (setf (item-id-list level) (remove (id item) (item-id-list level)))
   (setf (aref (items level) (x item) (y item) (z item))
         (remove-from-inv item (aref (items level) (x item) (y item) (z item))))
-  item
-  ;(setf (aref (items level) (x item) (y item) (z item)) (remove (id item) (aref (items level) (x item) (y item) (z item))))
-  )
+  item)
 
 (defun get-terrain-* (level x y z)
   (when (or (< x 0) (>= x (array-dimension (terrain level) 0))
@@ -199,6 +191,75 @@
     (setf (aref move-mode-array move-mode) value)
     )
   )
+
+(defun level-cells-connected-p (level sx sy sz tx ty tz map-size move-mode)
+  (let ((connect-map-value-start (get-level-connect-map-value level sx sy sz map-size move-mode))
+        (connect-map-value-end (get-level-connect-map-value level tx ty tz map-size move-mode)))
+    (if (or (= connect-map-value-start connect-map-value-end)
+            (level-aux-map-connect-p level connect-map-value-start connect-map-value-end map-size move-mode))
+      t
+      nil))
+  )
+
+(defun level-aux-map-connect-p (level room-id-start room-id-end map-size move-mode)
+  ;; TODO: add recursion so that it could be possible to connect rooms through several intermediate connections
+  (unless (aref (aux-connect-map level) map-size)
+    (return-from level-aux-map-connect-p nil))
+  (unless (aref (aref (aux-connect-map level) map-size) move-mode)
+    (return-from level-aux-map-connect-p nil))
+  
+  (let ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode)))
+    (if (find-if #'(lambda (a)
+                     (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
+                             (and (= (first a) room-id-end) (= (second a) room-id-start)))
+                       t
+                       nil))
+                 connect-list)
+      t
+      nil)))
+
+(defun set-aux-map-connection (level room-id-start room-id-end map-size move-mode)
+  (unless (aref (aux-connect-map level) map-size)
+    (setf (aref (aux-connect-map level) map-size) (make-array (list (1+ move-mode)) :initial-element nil :adjustable t)))
+  (when (>= move-mode (length (aref (aux-connect-map level) map-size)))
+    (adjust-array (aref (aux-connect-map level) map-size) (list (1+ move-mode)) :initial-element nil))
+  ;(unless (aref (aref (aux-connect-map level) map-size) move-mode)
+  ;  (setf (aref (aref (aux-connect-map level) map-size) move-mode) (make-hash-table)))
+  (let* ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode))
+         (connection (find-if #'(lambda (a)
+                                  (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
+                                          (and (= (first a) room-id-end) (= (second a) room-id-start)))
+                                    t
+                                    nil))
+                              connect-list)))
+    ;; connection is (<room-id-start> <room-id-end> <number of links between rooms>)
+    (if connection
+      (progn
+        (incf (third connection)))
+      (progn
+        (push (list room-id-start room-id-end 1) (aref (aref (aux-connect-map level) map-size) move-mode))))
+    ))
+
+(defun delete-aux-map-connection (level room-id-start room-id-end map-size move-mode)
+  (unless (aref (aux-connect-map level) map-size)
+    (setf (aref (aux-connect-map level) map-size) (make-array (list (1+ move-mode)) :initial-element nil :adjustable t)))
+  (when (>= move-mode (length (aref (aux-connect-map level) map-size)))
+    (adjust-array (aref (aux-connect-map level) map-size) (list (1+ move-mode))))
+  ;(unless (aref (aref (aux-connect-map level) map-size) move-mode)
+  ;  (setf (aref (aref (aux-connect-map level) map-size) move-mode) (make-hash-table)))
+  (let* ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode))
+         (connection (find-if #'(lambda (a)
+                                  (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
+                                          (and (= (first a) room-id-end) (= (second a) room-id-start)))
+                                    t
+                                    nil))
+                              connect-list)))
+    (when connection
+      (decf (third connection))
+      (when (zerop (third connection))
+        (setf (aref (aref (aux-connect-map level) map-size) move-mode)
+              (remove connection connect-list))))
+    ))
 
 (defun get-outdoor-light-* (level x y z)
   ;(format t "GET-OUTDOOR-LIGHT: ~A ~A ~A ~A" level x y z)

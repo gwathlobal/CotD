@@ -176,6 +176,7 @@
 (defconstant +terrain-trait-blocks-sound-floor+ 9)
 (defconstant +terrain-trait-water+ 10)
 (defconstant +terrain-trait-move-cost-factor+ 11)
+(defconstant +terrain-trait-openable+ 12)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)

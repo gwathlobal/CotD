@@ -145,6 +145,8 @@
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Finalizing")
+
+    (create-connect-map-aux (level world))
     
     world))
 
@@ -238,7 +240,8 @@
                                                                    for ny of-type fixnum = (+ sy off-y) do
                                                                      
                                                                      (when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
-                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+)
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-openable+))
                                                                        (setf result nil)
                                                                        (return-from from-result))
                                                                      
@@ -369,7 +372,8 @@
             (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
               )))
-    (setf (aref (connect-map level) mob-size) connect-map)))
+    (setf (aref (connect-map level) mob-size) connect-map)
+    ))
 
 (defun create-connect-map-climb (level mob-size)
   (declare (optimize (speed 3))
@@ -394,7 +398,8 @@
                                                              (loop for off-y of-type fixnum from (- half-size) to (+ half-size)
                                                                    for ny of-type fixnum = (+ sy off-y) do
                                                                      (when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
-                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+)
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-openable+))
                                                                        (setf result nil)
                                                                        (return-from from-result))
                                                                      
@@ -505,4 +510,29 @@
             (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
               )))
+    
     (setf (aref (connect-map level) mob-size) connect-map)))
+
+
+(defun create-connect-map-aux (level)
+  ;; make auxiliary links
+  (let ((max-x (array-dimension (terrain level) 0))
+        (max-y (array-dimension (terrain level) 1))
+        (max-z (array-dimension (terrain level) 2)))
+    (loop for x from 1 below (1- max-x) do
+      (loop for y from 1 below (1- max-y) do
+        (loop for z from 0 below max-z do
+          (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-openable+)
+            (let ((func #'(lambda (&key map-size move-mode)
+                            (let ((room-id-list nil))
+                              (check-surroundings x y nil #'(lambda (dx dy)
+                                                              (when (/= (get-level-connect-map-value level dx dy z map-size move-mode) +connect-room-none+)
+                                                                (pushnew (get-level-connect-map-value level dx dy z map-size move-mode)
+                                                                         room-id-list))))
+                              (loop for room-id-start in room-id-list do
+                                (loop for room-id-end in room-id-list do
+                                  (when (/= room-id-start room-id-end)
+                                    (set-aux-map-connection level room-id-start room-id-end map-size move-mode))))))))
+              (funcall func :map-size 1 :move-mode +connect-map-move-walk+)
+              (funcall func :map-size 1 :move-mode +connect-map-move-climb+)
+              )))))))

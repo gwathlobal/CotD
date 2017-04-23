@@ -170,11 +170,29 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-open+ :name "Open door"
                                                :glyph-idx 7 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black*
-                                               :trait-opaque-floor t :trait-blocks-sound-floor 10))
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 10 :trait-openable t
+                                               :on-use #'(lambda (mob x y z)
+                                                           (declare (ignore mob))
+                                                           (set-terrain-* (level *world*) x y z +terrain-door-closed+)
+                                                           
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-walk+
+                                                                                  +connect-room-none+)
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
+                                                                                  +connect-room-none+)
+                                                           )))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-closed+ :name "Closed door"
                                                :glyph-idx 11 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-vision t :trait-opaque-floor t :trait-blocks-sound 15 :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-vision t :trait-opaque-floor t :trait-blocks-sound 15 :trait-blocks-sound-floor 20 :trait-openable t
+                                               :on-use #'(lambda (mob x y z)
+                                                           ;; TODO: add connections change for size 3 
+                                                           (set-terrain-* (level *world*) x y z +terrain-door-open+)
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-walk+
+                                                                                  (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-walk+))
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
+                                                                                  (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-climb+))
+                                                           
+                                                           )))
 
 ;;--------------------
 ;; Water & Ice
