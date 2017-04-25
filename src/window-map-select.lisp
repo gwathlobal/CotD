@@ -68,7 +68,8 @@
         ;; adjust color depending on the target
         (if (and (not lof-blocked)
                  (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) 
-                 (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                 (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                 (check-mob-visible (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) :observer *player*))
           (setf color sdl:*red*)
           (setf color sdl:*yellow*))
         
@@ -94,17 +95,18 @@
         (when lof-blocked
           (format str "Line of fire blocked!~%"))
         (format str "~A (~A, ~A, ~A) ~A ~A ~A" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (view-x *player*) (view-y *player*) (view-z *player*)
-                (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))
-                (aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*))
-                (level-cells-connected-p (level *world*) (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*) (if (riding-mob-id *player*)
+                (if *cotd-release* "" (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*)))
+                (if *cotd-release* "" (aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*)))
+                (if *cotd-release* "" (level-cells-connected-p (level *world*) (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*) (if (riding-mob-id *player*)
                                                                                                                                                              (map-size (get-mob-by-id (riding-mob-id *player*)))
                                                                                                                                                         (map-size *player*))
-                                         (get-mob-move-mode *player*))
+                                         (get-mob-move-mode *player*)))
                 )
         (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
         (dolist (feature feature-list)
           (format str ", ~A" (name (get-feature-by-id feature))))
-        (when mob
+        (when (and mob
+                   (check-mob-visible mob :observer *player*))
           (format str "~%~A~A~A"
                   (get-current-mob-name mob)
                   (if (riding-mob-id mob)

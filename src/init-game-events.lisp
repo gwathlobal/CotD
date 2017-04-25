@@ -120,9 +120,9 @@
                                                            ;; four groups are created - north-east, south-east, north-west and south-west
                                                            ;; place the units
                                                            (let ((placement-list-horiz (list (cons 1 1)                                        ;; north-east
-                                                                                             (cons 1 (- *max-y-level* 2))                      ;; south-east
-                                                                                             (cons (- *max-x-level* 15) 1)                     ;; north-west
-                                                                                             (cons (- *max-x-level* 15) (- *max-y-level* 2)))) ;; south-west
+                                                                                             (cons 1 (- (array-dimension (terrain (level world)) 1) 2))                      ;; south-east
+                                                                                             (cons (- (array-dimension (terrain (level world)) 0) 15) 1)                     ;; north-west
+                                                                                             (cons (- (array-dimension (terrain (level world)) 0) 15) (- (array-dimension (terrain (level world)) 1) 2)))) ;; south-west
                                                                  )
                                                                  
 
@@ -162,14 +162,15 @@
 
                                                            ;; find the suitable place on the northern piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for y from 0 below *max-y-level*
+                                                           (loop for y from 0 below (array-dimension (terrain (level world)) 1)
                                                                  with max-units = 40
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for x from 0 below *max-x-level*
+                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)
@@ -188,14 +189,15 @@
 
                                                            ;; find the suitable place on the southern piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for y from (1- *max-y-level*) downto 0
+                                                           (loop for y from (1- (array-dimension (terrain (level world)) 1)) downto 0
                                                                  with max-units = 40
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for x from 0 below *max-x-level*
+                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)
@@ -214,14 +216,15 @@
 
                                                            ;; find the suitable place on the western piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for x from 0 below *max-x-level*
+                                                           (loop for x from 0 below (array-dimension (terrain (level world)) 0)
                                                                  with max-units = 40
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for y from 0 below *max-y-level*
+                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)
@@ -240,14 +243,15 @@
 
                                                            ;; find the suitable place on the eastern piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for x from (1- *max-x-level*) downto 0 
+                                                           (loop for x from (1- (array-dimension (terrain (level world)) 0)) downto 0 
                                                                  with max-units = 40
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for y from 0 below *max-y-level*
+                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)
@@ -266,14 +270,15 @@
 
                                                            ;; find the suitable place on the eastern piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for x from (1- *max-x-level*) downto 0 
+                                                           (loop for x from (1- (array-dimension (terrain (level world)) 0)) downto 0 
                                                                  with max-units = 10
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for y from 0 below *max-y-level*
+                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)
@@ -282,14 +287,15 @@
 
                                                            ;; find the suitable place on the western piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for x from 0 below *max-x-level*
+                                                           (loop for x from 0 below (array-dimension (terrain (level world)) 0)
                                                                  with max-units = 10
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for y from 0 below *max-y-level*
+                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)
@@ -298,14 +304,15 @@
 
                                                            ;; find the suitable place on the southern piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for y from (1- *max-y-level*) downto 0
+                                                           (loop for y from (1- (array-dimension (terrain (level world)) 1)) downto 0
                                                                  with max-units = 10
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for x from 0 below *max-x-level*
+                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)
@@ -314,14 +321,15 @@
 
                                                            ;; find the suitable place on the northern piers for the military
                                                            ;; place the units until the total number is reached
-                                                           (loop for y from 0 below *max-y-level*
+                                                           (loop for y from 0 below (array-dimension (terrain (level world)) 1)
                                                                  with max-units = 10
                                                                  with military-list = *game-events-military-list*
                                                                  do
-                                                                    (loop for x from 0 below *max-x-level*
+                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
                                                                           for military-picked = (nth (random (length military-list)) military-list)
                                                                           when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+)))
+                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
+                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
                                                                             do
                                                                                (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
                                                                                (decf max-units)

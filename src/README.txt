@@ -98,8 +98,9 @@ KEYBINDINGS
  r                              - Reload
  p                              - Pick up an item
 
- Shift + ,                      - Look/Climb up
- Shift + .                      - Look/Climb down
+ Shift + ,                      - Look/Climb/Swim up
+
+ Shift + .                      - Look/Climb/Swim down
 
  Shift + 2                      - Character screen
  i                              - Inventory

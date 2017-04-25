@@ -457,7 +457,7 @@
    (cur-dodge :initform 5 :initarg :cur-dodge :accessor cur-dodge)
    (cur-armor :initform 0 :initarg :cur-armor :accessor cur-armor)
 
-   (brightness :initform 0 :accessor brightness)
+   (brightness :initform 100 :accessor brightness)
    (cur-light :initform *base-light-radius* :initarg :cur-light :accessor cur-light)
    (motion :initform 0 :accessor motion)
    (motion-set-p :initform nil :accessor motion-set-p) 

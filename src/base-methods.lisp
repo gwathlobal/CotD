@@ -562,7 +562,7 @@
                            (= x (x mob))
                            (= y (y mob)))
                   (setf move-spd (move-spd (get-mob-type-by-id (mob-type mob)))))
-                (format t "APPLY-GRAVITY ~A~%" apply-gravity)
+                ;;(format t "APPLY-GRAVITY ~A~%" apply-gravity)
                 (set-mob-location mob x y z :apply-gravity apply-gravity)
 
                 (when (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
