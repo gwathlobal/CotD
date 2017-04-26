@@ -157,7 +157,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures. Possessed creatures may sometimes revolt. Higher-ranking demons are better at supressing the victim's willpower. You can not possess mortals while mounted." 
+                                 :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures. Possessed creatures may sometimes revolt. Higher-ranking demons are better at supressing the victim's willpower. You need to be in the \"Ready to possess\" mode (see \"Toggle possession mode\" ability). You can not possess mortals while mounted." 
                                  :passive t :cost 0 :spd +normal-ap+ 
                                  :final t :on-touch t
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -173,6 +173,7 @@
                                                 (set-mob-effect actor +mob-effect-possessed+)
                                                 (set-mob-effect target +mob-effect-possessed+)
                                                 (setf (face-mob-type-id actor) (mob-type target))
+                                                (rem-mob-effect actor +mob-effect-ready-to-possess+)
 
                                                 ;; when the target is riding something - replace the rider with the actor
                                                 (when (riding-mob-id target)
@@ -187,6 +188,7 @@
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-can-possess+)
                                                                (mob-ability-p target +mob-abil-possessable+)
+                                                               (mob-effect-p actor +mob-effect-ready-to-possess+)
                                                                (not (mob-effect-p target +mob-effect-blessed+))
                                                                (not (mob-effect-p target +mob-effect-divine-shield+))
                                                                (not (mob-effect-p actor +mob-effect-possessed+))
@@ -1975,3 +1977,80 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-can-possess-toggle+ :name "Toggle possession mode" :descr "Toggle your ability to possess other creatures. If switched off, you will attack a possessable target instead of possessing it. You can toggle the possession mode at any time." 
+                                 :cost 0 :spd 0 :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (if (mob-effect-p actor +mob-effect-ready-to-possess+)
+                                                  (progn
+                                                    (when (eq actor *player*)
+                                                      (add-message "You toggle off the possession mode. "))
+                                                    (rem-mob-effect actor +mob-effect-ready-to-possess+))
+                                                  (progn
+                                                    (when (eq actor *player*)
+                                                      (add-message "You toggle on the possession mode. "))
+                                                    (set-mob-effect actor +mob-effect-ready-to-possess+))))
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-can-possess-toggle+)
+                                                               (null (slave-mob-id actor))
+                                                               (null (riding-mob-id actor)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-can-possess-toggle+)
+                                                           (can-invoke-ability actor actor +mob-abil-can-possess-toggle+)
+                                                           (not (mob-effect-p actor +mob-effect-ready-to-possess+)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-sacrifice-host+ :name "Sacrifice host" :descr "Sacrifice the human you are currently possessing to gain health and power. However, killing the human host will (obviously) show your true face." 
+                                 :cost 0 :spd 5 :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                (let ((target (get-mob-by-id (slave-mob-id actor))))
+                                                  ;; target here is the slave mob
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~@(~A~) destroys its host. " (visible-name actor)) :observed-mob actor)
+                                                  (setf (cur-hp target) 0)
+                                                  (make-dead target :splatter t :msg t :killer actor :corpse nil :aux-params ())
+                                                  
+                                                  (loop repeat 8
+                                                        for (dx dy) = (multiple-value-list (x-y-dir (1+ (random 9))))
+                                                        do
+                                                           (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ dx (x actor)) :y (+ dy (y actor)) :z (z actor))))
+                                                  (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x actor) :y (y actor) :z (z actor)))
+                                                  (rem-mob-effect actor +mob-effect-possessed+)
+                                                  (setf (face-mob-type-id actor) (mob-type actor))
+                                                  (setf (master-mob-id target) nil)
+                                                  (setf (slave-mob-id actor) nil)
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                             (format nil "You hear a scream and ripping of flesh~A." str)))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-sacrifice-host+)
+                                                               (slave-mob-id actor))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-sacrifice-host+)
+                                                           (can-invoke-ability actor actor +mob-abil-sacrifice-host+)
+                                                           (< (/ (cur-hp actor) (max-hp actor)) 
+                                                              0.25))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor (get-mob-by-id (slave-mob-id actor)) (id ability-type)))))

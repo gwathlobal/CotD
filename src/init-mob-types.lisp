@@ -211,7 +211,7 @@
                                        :base-light-radius 0
                                        :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t
                                        :ai-horde t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
@@ -224,7 +224,7 @@
                                        :base-light-radius 0
                                        :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3 :abil-no-breathe t :abil-toggle-light t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archdemon+

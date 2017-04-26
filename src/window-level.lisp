@@ -27,7 +27,8 @@
                ((= effect +mob-effect-blind+) (sdl:draw-string-solid-* "Blind" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
                ((= effect +mob-effect-fear+) (sdl:draw-string-solid-* "Fear" x y1 :color sdl:*magenta*))
                ((= effect +mob-effect-climbing-mode+) (sdl:draw-string-solid-* "Climbing" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
-               ((= effect +mob-effect-alertness+) (sdl:draw-string-solid-* "On alert" x y1 :color sdl:*red*)))
+               ((= effect +mob-effect-alertness+) (sdl:draw-string-solid-* "On alert" x y1 :color sdl:*red*))
+               ((= effect +mob-effect-ready-to-possess+) (sdl:draw-string-solid-* "Ready to possess" x y1 :color (sdl:color :r 100 :g 100 :b 100))))
              (incf y1 (sdl:get-font-height))))
 
 (defun show-char-properties (x y idle-calcing)

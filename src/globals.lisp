@@ -125,6 +125,8 @@
 (defconstant +mob-abil-open-close-door+ 48)
 (defconstant +mob-abil-toggle-light+ 49)
 (defconstant +mob-abil-open-close-window+ 50)
+(defconstant +mob-abil-can-possess-toggle+ 51)
+(defconstant +mob-abil-sacrifice-host+ 52)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -138,6 +140,7 @@
 (defconstant +mob-effect-fear+ 9)
 (defconstant +mob-effect-climbing-mode+ 10)
 (defconstant +mob-effect-alertness+ 11)
+(defconstant +mob-effect-ready-to-possess+ 12)
 
 (defconstant +mob-order-follow+ 0)
 

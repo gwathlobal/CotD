@@ -353,7 +353,7 @@
               (set-message-this-turn t)
               (add-message (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
             (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                                   (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg) :observed-mob *player*)))
+                                   (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg) :observed-mob mob)))
         (when (check-dead mob)
           (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))))
     
@@ -1273,8 +1273,13 @@
                 do
                    (mob-invoke-ability killer mob abil-type-id))
         )) 
-    
-    (remove-mob-from-level-list (level *world*) mob)
+
+    (when (or (and (null (master-mob-id mob))
+                   (null (slave-mob-id mob)))
+              (and (null (master-mob-id mob))
+                   (slave-mob-id mob)))
+      (remove-mob-from-level-list (level *world*) mob))
+    ;;(remove-mob-from-level-list (level *world*) mob)
 
     ;; if the target is being ridden, dismount the rider
     (when (mounted-by-mob-id mob)
@@ -1400,10 +1405,10 @@
         (decf (cur-oxygen mob)))
       (when (zerop (cur-oxygen mob))
         (decf (cur-hp mob) *lack-oxygen-dmg*)
-        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~@(~A~) can not breath and takes ~A dmg. " (visible-name mob) *lack-oxygen-dmg*) :observed-mob *player*)
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~@(~A~) can not breath and takes ~A dmg. " (visible-name mob) *lack-oxygen-dmg*) :observed-mob mob)
         (when (check-dead mob)
           (make-dead mob :splatter nil :msg t))
-        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%") :observed-mob *player*))))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%") :observed-mob mob))))
   
   
   )
