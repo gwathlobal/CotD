@@ -16,6 +16,7 @@
 (defconstant +building-type-satanists+ 9)
 (defconstant +building-type-stables+ 10)
 (defconstant +building-type-mansion+ 11)
+(defconstant +building-type-bank+ 12)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -58,6 +59,7 @@
 (defconstant +building-city-mansion-1+ 35)
 (defconstant +building-city-mansion-2+ 36)
 (defconstant +building-city-park-4+ 37)
+(defconstant +building-city-bank-1+ 38)
 
 (defparameter *level-grid-size* 5)
 

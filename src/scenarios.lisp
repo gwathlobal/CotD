@@ -75,6 +75,7 @@
     (setf (gethash +building-type-library+ max-building-types) 1)
     (setf (gethash +building-type-prison+ max-building-types) 1)
     (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 4)
     max-building-types))
 
@@ -86,6 +87,7 @@
     (setf (gethash +building-type-library+ max-building-types) 1)
     (setf (gethash +building-type-prison+ max-building-types) 1)
     (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
     max-building-types))
 
@@ -97,6 +99,7 @@
     (setf (gethash +building-type-library+ max-building-types) 1)
     (setf (gethash +building-type-prison+ max-building-types) 1)
     (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
     max-building-types))
 
@@ -112,6 +115,7 @@
     (setf (gethash +building-type-library+ reserved-building-types) 1)
     (setf (gethash +building-type-prison+ reserved-building-types) 1)
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
+    (setf (gethash +building-type-bank+ reserved-building-types) 1)
     (setf (gethash +building-type-lake+ reserved-building-types) 2)
     reserved-building-types))
 
@@ -123,6 +127,7 @@
     (setf (gethash +building-type-library+ reserved-building-types) 1)
     (setf (gethash +building-type-prison+ reserved-building-types) 1)
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
+    (setf (gethash +building-type-bank+ reserved-building-types) 1)
     (setf (gethash +building-type-lake+ reserved-building-types) 0)
     reserved-building-types))
 
@@ -134,6 +139,7 @@
     (setf (gethash +building-type-library+ reserved-building-types) 1)
     (setf (gethash +building-type-prison+ reserved-building-types) 1)
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
+    (setf (gethash +building-type-bank+ reserved-building-types) 1)
     (setf (gethash +building-type-lake+ reserved-building-types) 0)
     reserved-building-types))
 

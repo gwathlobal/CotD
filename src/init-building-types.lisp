@@ -1,7 +1,16 @@
 (in-package :cotd)
 
+;;=====================
+;; Special Buildings
+;;=====================
+
 (set-building-type (make-building :id +building-city-free+ :grid-dim '(0 . 0) :act-dim '(0 . 0) :func nil))
 (set-building-type (make-building :id +building-city-reserved+ :grid-dim '(0 . 0) :act-dim '(0 . 0) :func nil))
+
+;;=====================
+;; Houses
+;;=====================
+
 (set-building-type (make-building :id +building-city-house-1+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,"
@@ -28,7 +37,7 @@
                                                                             " ....... "
                                                                             " ....... "
                                                                             " ....... "
-                                                                            " ....... "
+                                                                           " ....... "
                                                                             " ....... "
                                                                             " ....... "
                                                                             " ....... "
@@ -169,6 +178,10 @@
                                                           (list +mob-type-child+ 4 5 (+ z 1)))
                                                     nil
                                                     (list (list +item-type-coin+ 2 4 (+ z 1) (+ 50 (random 51))))))))
+
+;;=====================
+;; Townhalls
+;;=====================
 
 (set-building-type (make-building :id +building-city-townhall-1+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -392,6 +405,10 @@
                                                     nil
                                                     (list (list +item-type-coin+ 7 8 (+ z 1) (+ 100 (random 101))))))))
 
+;;=====================
+;; Parks
+;;=====================
+
 (set-building-type (make-building :id +building-city-park-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template (list ",,```,,```"
@@ -589,6 +606,10 @@
                                                 (values nil nil nil))))
                                   ))
 
+;;=====================
+;; Lakes
+;;=====================
+
 (set-building-type (make-building :id +building-city-lake-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-lake+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",```````,,"
@@ -671,6 +692,10 @@
                                               )
                                             (values nil nil nil))))
 
+;;=====================
+;; Prisons
+;;=====================
+
 (set-building-type (make-building :id +building-city-prison-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-prison+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,"
@@ -748,6 +773,10 @@
                                                           (list +mob-type-policeman+ 14 8 (+ z 1)))
                                                     nil
                                                     nil))))
+
+;;=====================
+;; Churches
+;;=====================
 
 (set-building-type (make-building :id +building-city-church-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-church+
                                   :func #'(lambda (x y z template-level)
@@ -838,6 +867,10 @@
                                                     nil
                                                     nil))))
 
+;;=====================
+;; Warehouses
+;;=====================
+
 (set-building-type (make-building :id +building-city-warehouse-1+ :grid-dim '(4 . 4) :act-dim '(20 . 20) :type +building-type-warehouse+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,,"
@@ -892,6 +925,10 @@
                                                     nil
                                                     nil))))
 
+;;=====================
+;; Libraries
+;;=====================
+
 (set-building-type (make-building :id +building-city-library-1+ :grid-dim '(4 . 3) :act-dim '(20 . 13) :type +building-type-library+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,,"
@@ -932,6 +969,10 @@
                                                           (list +mob-type-woman+ 16 10 z))
                                                     nil
                                                     nil))))
+
+;;=====================
+;; Satanists' lair
+;;=====================
 
 (set-building-type (make-building :id +building-city-satan-lair-1+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-satanists+
                                   :func #'(lambda (x y z template-level)
@@ -1007,6 +1048,10 @@
                                                           (list +feature-blood-fresh+ 5 7 (+ z -2)))
                                                     nil))))
 
+;;=====================
+;; River
+;;=====================
+
 (set-building-type (make-building :id +building-city-river+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
                                             (loop for x1 from 0 below 5 do
@@ -1017,6 +1062,10 @@
                                             (values nil
                                                     nil
                                                     nil))))
+
+;;=====================
+;; Bridge
+;;=====================
 
 (set-building-type (make-building :id +building-city-bridge+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
@@ -1029,6 +1078,10 @@
                                                     nil
                                                     nil))))
 
+;;=====================
+;; Pier
+;;=====================
+
 (set-building-type (make-building :id +building-city-pier+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
                                             (loop for x1 from 0 below 5 do
@@ -1040,6 +1093,10 @@
                                                     nil
                                                     nil))))
 
+;;=====================
+;; Pier
+;;=====================
+
 (set-building-type (make-building :id +building-city-sea+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
                                             (loop for x1 from 0 below 5 do
@@ -1050,6 +1107,10 @@
                                             (values nil
                                                     nil
                                                     nil))))
+
+;;=====================
+;; Port warehouses
+;;=====================
 
 (set-building-type (make-building :id +building-city-warehouse-port-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
@@ -1115,6 +1176,10 @@
                                                     nil
                                                     nil))))
 
+;;=====================
+;; Island ground border
+;;=====================
+
 (set-building-type (make-building :id +building-city-island-ground-border+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
                                             ;; randomly place the ground and sea tiles 
@@ -1130,6 +1195,10 @@
 
                                             (values nil nil nil)
                                             )))
+
+;;=====================
+;; Barricades
+;;=====================
 
 (set-building-type (make-building :id +building-city-barricade-ns+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
@@ -1207,6 +1276,10 @@
                                             (values nil nil nil)
                                             )))
 
+;;=====================
+;; Stables
+;;=====================
+
 (set-building-type (make-building :id +building-city-stables-1+ :grid-dim '(3 . 3) :act-dim '(14 . 15) :type +building-type-stables+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,"
@@ -1259,6 +1332,10 @@
                                                           (list +mob-type-horse+ 11 12 z))
                                                     nil
                                                     nil))))
+
+;;=====================
+;; Mansions
+;;=====================
 
 (set-building-type (make-building :id +building-city-mansion-1+ :grid-dim '(4 . 3) :act-dim '(18 . 14) :type +building-type-mansion+
                                   :func #'(lambda (x y z template-level)
@@ -1377,3 +1454,77 @@
                                                           (list +mob-type-man+ 5 9 (+ z 1)))
                                                     nil
                                                     (list (list +item-type-coin+ 5 9 (+ z 1) (+ 100 (random 101))))))))
+
+;;=====================
+;; Banks
+;;=====================
+
+(set-building-type (make-building :id +building-city-bank-1+ :grid-dim '(4 . 3) :act-dim '(19 . 14) :type +building-type-bank+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-1 (list "000000000000000"
+                                                                            "000000000000000"
+                                                                            "00###########00"
+                                                                            "00#h....h#u.#00"
+                                                                            "00#.........#00"
+                                                                            "00##+##|##|##00"
+                                                                            "00##.########00"
+                                                                            "00##+##|##|##00"
+                                                                            "00#.........#00"
+                                                                            "00#.........#00"
+                                                                            "00###########00"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"))
+                                                  
+                                                  (build-template-z-2 (list ",,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,"
+                                                                            ",,###########,,"
+                                                                            ",,#|......d##,,"
+                                                                            ",,#........|#,,"
+                                                                            ",,#+##+###+##,,"
+                                                                            ",,#.#...#...#,,"
+                                                                            ",,#.#.h.#.h.#,,"
+                                                                            ",,#+#|t##|t##,,"
+                                                                            ",,#.........-,,"
+                                                                            ",,-....hhhhh#,,"
+                                                                            ",,##++##-####,,"
+                                                                            ",,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,"))
+
+                                                  (build-template-z-3 (list "               "
+                                                                            "               "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "               "
+                                                                            "               "))
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z -1) build-template-z-1 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              )
+                                            (values (list (list +mob-type-clerk+ 6 7 z)
+                                                          (list +mob-type-clerk+ 10 7 z)
+                                                          
+                                                          (list +mob-type-policeman+ 3 3 (- z 1))
+                                                          (list +mob-type-policeman+ 8 3 (- z 1)))
+                                                    nil
+                                                    (list (list +item-type-coin+ 3 9 (- z 1) (+ 50 (random 251)))
+                                                          
+                                                          (list +item-type-coin+ 5 9 (- z 1) (+ 50 (random 251)))
+                                                          
+                                                          (list +item-type-coin+ 7 9 (- z 1) (+ 50 (random 251)))
+                                                          
+                                                          (list +item-type-coin+ 9 9 (- z 1) (+ 50 (random 251)))
+                                                          
+                                                          (list +item-type-coin+ 11 9 (- z 1) (+ 50 (random 251)))
+                                                          
+                                                          )))))

@@ -1,7 +1,8 @@
 CHANGELOG
 
-- Demons' ability to possess is now toggleable, so that you could kill humans instead of always possessing them first if you wish so.
+- Demons' ability to possess is now toggleable, so that you can kill humans instead of always possessing them first if you wish so.
 - Demons now have an ability to sacrifice their host on demand to gain power and health (as if they killed them in combat). 
+- Added a bank building to the city.
 
 --------------------
 Apr 25, 2017 v1.1.1
