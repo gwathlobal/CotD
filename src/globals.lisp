@@ -56,6 +56,10 @@
 (defconstant +mob-type-scout+ 21)
 (defconstant +mob-type-gargantaur+ 22)
 (defconstant +mob-type-thief+ 23)
+(defconstant +mob-type-reanimated-pwr-1+ 24)
+(defconstant +mob-type-reanimated-pwr-2+ 25)
+(defconstant +mob-type-reanimated-pwr-3+ 26)
+(defconstant +mob-type-reanimated-pwr-4+ 27)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -127,6 +131,7 @@
 (defconstant +mob-abil-open-close-window+ 50)
 (defconstant +mob-abil-can-possess-toggle+ 51)
 (defconstant +mob-abil-sacrifice-host+ 52)
+(defconstant +mob-abil-reanimate-corpse+ 53)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -153,8 +158,13 @@
 ;; ITEM-TYPE Constants
 ;;-------------------- 
 
-(defconstant +item-type-body-part+ 0)
-(defconstant +item-type-coin+ 1)
+(defconstant +item-abil-corpse+ 0)
+
+(defconstant +item-type-body-part-limb+ 0)
+(defconstant +item-type-body-part-half+ 1)
+(defconstant +item-type-body-part-body+ 2)
+(defconstant +item-type-body-part-full+ 3)
+(defconstant +item-type-coin+ 4)
 
 ;;--------------------
 ;; FEATURE-TYPE Constants

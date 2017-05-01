@@ -7,7 +7,15 @@
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name item" :initarg :name :accessor name)
    (max-stack-num :initform 1 :initarg :max-stack-num :accessor max-stack-num)
-   (value :initform 0 :initarg :value :accessor value)))
+   (value :initform 0 :initarg :value :accessor value)
+   (abilities :initform (make-hash-table) :accessor abilities)
+   ;; abil-corpse - +item-abil-corpse+
+   ))
+
+(defmethod initialize-instance :after ((item-type item-type) &key abil-corpse)
+  (when abil-corpse
+    (setf (gethash +item-abil-corpse+ (abilities item-type)) abil-corpse))
+  )
 
 (defun get-item-type-by-id (mob-type-id)
   (aref *item-types* mob-type-id))
@@ -139,3 +147,6 @@
   (loop for item-id in inv
         for item = (get-item-by-id item-id)
         sum (value item)))
+
+(defun item-ability-p (item ability-type-id)
+  (gethash ability-type-id (abilities (get-item-type-by-id (item-type item)))))

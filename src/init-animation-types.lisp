@@ -17,7 +17,8 @@
                                     :func #'(lambda (animation)
                                               (let ((tx) (ty) (tz) (rx) (ry) (item)
                                                     (mob (first (anim-params animation)))
-                                                    (body-part-str (second (anim-params animation))))
+                                                    (body-part-str (second (anim-params animation)))
+                                                    (body-part-type (third (anim-params animation))))
 
                                                 (setf rx (- (random 7) 3))
                                                 (setf ry (- (random 7) 3))
@@ -47,7 +48,7 @@
                                                                        )
                                                                      exit-result)))
                                                 
-                                                (setf item (make-instance 'item :item-type +item-type-body-part+ :x tx :y ty :z tz))
+                                                (setf item (make-instance 'item :item-type body-part-type :x tx :y ty :z tz))
                                                 (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) body-part-str))
                                                 (add-item-to-level-list (level *world*) item)
                                                 (reveal-cell-on-map (level *world*) tx ty tz)

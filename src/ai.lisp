@@ -252,6 +252,7 @@
     
   
   (update-visible-mobs mob)
+  (update-visible-items mob)
 
   ;; if the mob is blind - move in random direction
   (when (mob-effect-p mob +mob-effect-blind+)

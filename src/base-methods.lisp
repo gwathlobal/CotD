@@ -1202,7 +1202,7 @@
     
     ;; place the corpse
     (when corpse
-      (let ((item) (r) (left-body-str))
+      (let ((item) (r) (left-body-str) (left-body-type))
         (setf r 0)
         
         ;; determine which body part to sever (if any)
@@ -1213,26 +1213,26 @@
         (cond
           ;; sever head
           ((= r 1) (progn
-                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "head"))
-                     (setf left-body-str "multilated body")
+                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "head" +item-type-body-part-limb+))
+                     (setf left-body-str "multilated body" left-body-type +item-type-body-part-body+)
                      (when killer
                        (setf dead-msg-str (format nil "~@(~A~) chops off ~A's head. " (visible-name killer) (visible-name mob))))))
           ;; sever limb
           ((= r 2) (progn
-                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "limb"))
-                     (setf left-body-str "multilated body")
+                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "limb" +item-type-body-part-limb+))
+                     (setf left-body-str "multilated body" left-body-type +item-type-body-part-body+)
                      (when killer
                        (setf dead-msg-str (format nil "~@(~A~) severs ~A's limb. " (visible-name killer) (visible-name mob))))))
           ;; sever torso
           ((= r 3) (progn
-                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body"))
-                     (setf left-body-str "lower body")
+                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body" +item-type-body-part-half+))
+                     (setf left-body-str "lower body" left-body-type +item-type-body-part-half+)
                      (when killer
                        (setf dead-msg-str (format nil "~@(~A~) cuts ~A in half. " (visible-name killer) (visible-name mob))))))
           ;; do not sever anything
-          (t (setf left-body-str "body")))
+          (t (setf left-body-str "body" left-body-type +item-type-body-part-full+)))
         
-        (setf item (make-instance 'item :item-type +item-type-body-part+ :x (x mob) :y (y mob) :z (z mob)))
+        (setf item (make-instance 'item :item-type left-body-type :x (x mob) :y (y mob) :z (z mob)))
         (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) left-body-str))
         (add-item-to-level-list (level *world*) item)
         (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob)))

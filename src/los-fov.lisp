@@ -201,6 +201,32 @@
   (logger (format nil "UPDATE-VISIBLE-MOBS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-mobs mob)))
   )
 
+(defun update-visible-items (mob)
+  (setf (visible-items mob) nil)
+  
+  (loop for item-id in (item-id-list (level *world*))
+        for item = (get-item-by-id item-id)
+        when (< (get-distance-3d (x mob) (y mob) (z mob) (x item) (y item) (z item)) (cur-sight mob))
+          do
+             ;; set up visible mobs
+             (line-of-sight (x mob) (y mob) (z mob) (x item) (y item) (z item)
+                            #'(lambda (dx dy dz prev-cell)
+                                (declare (type fixnum dx dy dz))
+                                (let* ((exit-result t)) 
+                                  (block nil
+                                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    
+                                    (when (get-items-* (level *world*) dx dy dz) 
+                                      (loop for n-item-id in (get-items-* (level *world*) dx dy dz)
+                                            when (= item-id n-item-id)
+                                              do
+                                                 (pushnew n-item-id (visible-items mob))))
+                                    )
+                                  exit-result))))
+  (logger (format nil "UPDATE-VISIBLE-ITEMS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-items mob))))
+
 (defun reveal-cell-on-map (level map-x map-y map-z &key (reveal-mob t))
   ;; drawing terrain
   (let ((glyph-idx)

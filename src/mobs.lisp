@@ -86,6 +86,7 @@
    ;;   :abil-open-close-window - +mob-abil-open-close-window+
    ;;   :abil-can-possess-toggle - +mob-abil-can-possess-toggle+
    ;;   :abil-sacrifice-host - +mob-abil-sacrifice-host+
+   ;;   :abil-reanimate-corpse - +mob-abil-reanimate-corpse+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -112,7 +113,7 @@
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
-                                                                abil-can-possess-toggle abil-sacrifice-host)
+                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -241,6 +242,8 @@
     (setf (gethash +mob-abil-can-possess-toggle+ (abilities mob-type)) t))
   (when abil-sacrifice-host
     (setf (gethash +mob-abil-sacrifice-host+ (abilities mob-type)) t))
+  (when abil-reanimate-corpse
+    (setf (gethash +mob-abil-reanimate-corpse+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -432,6 +435,7 @@
    (visible-mobs :initform nil :accessor visible-mobs)
    (hear-range-mobs :initform nil :accessor hear-range-mobs)
    (heard-sounds :initform nil :accessor heard-sounds)
+   (visible-items :initform nil :accessor visible-items)
 
    (path :initform nil :accessor path)
    (path-dst :initform nil :accessor path-dst) ;; is a actually a cons with coords (x y)
