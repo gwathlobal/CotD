@@ -33,6 +33,7 @@
 (defconstant +tod-type-morning+ 17)
 (defconstant +tod-type-evening+ 18)
 (defconstant +player-faction-thief+ 19)
+(defconstant +player-faction-satanist+ 20)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -481,6 +482,38 @@
 
 (defun find-unoccupied-place-on-top (world mob)
   ;(setf (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
+  
+  (loop with max-x = (array-dimension (terrain (level *world*)) 0)
+        with max-y = (array-dimension (terrain (level *world*)) 1)
+        with nz = nil
+        for x = (random max-x)
+        for y = (random max-y)
+        for z = (1- (array-dimension (terrain (level *world*)) 2))
+        do
+           (setf (x mob) x (y mob) y (z mob) z)
+           (setf nz (apply-gravity mob)) 
+        until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
+                   (get-terrain-type-trait (get-terrain-* (level world) x y nz) +terrain-trait-opaque-floor+)
+                   nz
+                   (> nz 2)
+                   (eq (check-move-on-level mob x y nz) t)
+                   (/= (get-level-connect-map-value (level world) x y nz (if (riding-mob-id mob)
+                                                                          (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                          (map-size mob))
+                                                    (get-mob-move-mode mob))
+                       +connect-room-none+))
+        finally (setf (x mob) x (y mob) y (z mob) nz)
+                (add-mob-to-level-list (level world) mob)))
+
+(defun find-player-satanist-start-position (world mob)
+
+  (loop for feature-id in (feature-id-list (level world))
+        for feature = (get-feature-by-id feature-id)
+        when (= (feature-type feature) +feature-start-satanist-player+)
+          do
+             (setf (x mob) (x feature) (y mob) (y feature) (z mob) (z feature))
+             (add-mob-to-level-list (level world) mob)
+             (loop-finish)))
   
   (loop with max-x = (array-dimension (terrain (level *world*)) 0)
         with max-y = (array-dimension (terrain (level *world*)) 1)

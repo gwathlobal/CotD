@@ -129,6 +129,16 @@
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (= (feature-type lvl-feature) +feature-start-satanist-player+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 thief
                                                                  (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
                                                                                            #'find-unoccupied-place-on-top))
@@ -172,6 +182,16 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (= (feature-type lvl-feature) +feature-start-satanist-player+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                 )
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; adjust coordinates of all horses to their riders
@@ -233,6 +253,16 @@
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (= (feature-type lvl-feature) +feature-start-satanist-player+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; adjust coordinates of all horses to their riders
                                                                  (loop for mob-id in (mob-id-list (level world))
                                                                        for horse = (get-mob-by-id mob-id)
@@ -290,6 +320,16 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (= (feature-type lvl-feature) +feature-start-satanist-player+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                 )
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
@@ -388,6 +428,16 @@
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (= (feature-type lvl-feature) +feature-start-satanist-player+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
                                                                  (loop for mob-id in (mob-id-list (level world))
                                                                        for horse = (get-mob-by-id mob-id)
@@ -478,6 +528,16 @@
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (= (feature-type lvl-feature) +feature-start-satanist-player+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; adjust coordinates of all horses to their riders
                                                                  (loop for mob-id in (mob-id-list (level world))
                                                                        for horse = (get-mob-by-id mob-id)
@@ -520,6 +580,75 @@
                                                        (push +game-event-lose-game-died+ game-event-list)
                                                        (push +game-event-lose-game-possessed+ game-event-list)
                                                        (push +game-event-win-for-thief+ game-event-list)
+                                                       
+                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +player-faction-satanist+
+                                             :type +scenario-feature-player-faction+
+                                             :name "Satanist"
+                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
+                                                       ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
+                                                       (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (= (feature-type lvl-feature) +feature-start-satanist-player+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; adjust coordinates of all horses to their riders
+                                                                 (loop for mob-id in (mob-id-list (level world))
+                                                                       for horse = (get-mob-by-id mob-id)
+                                                                       for rider = (if (mounted-by-mob-id horse)
+                                                                                     (get-mob-by-id (mounted-by-mob-id horse))
+                                                                                     nil)
+                                                                       when rider
+                                                                         do
+                                                                            (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 thief
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                                                                           #'find-unoccupied-place-on-top))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
+                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                                           #'find-unoccupied-place-outside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-archdemon+ 1)
+                                                                                                       (cons +mob-type-demon+ 15)
+                                                                                                       (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'create-mobs-from-template mob-func-list)
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-satanist+))
+                                                                 (find-player-satanist-start-position world *player*))
+                                                             mob-func-list)
+                                                       
+                                                       (push +game-event-lose-game-died+ game-event-list)
+                                                       (push +game-event-lose-game-possessed+ game-event-list)
+                                                       (push +game-event-win-for-demons+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 

@@ -2056,7 +2056,7 @@
                                                    (mob-invoke-ability actor (get-mob-by-id (slave-mob-id actor)) (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-reanimate-corpse+ :name "Reanimate body" :descr "Invite an outworldly demon to enter a dead body (or a severed body part) and reanimate it. The strength of the reanimated corpse depends on its completeness - severed parts will reduce it." 
+                                 :id +mob-abil-reanimate-corpse+ :name "Reanimate body" :descr "Invite an outworldly demon to enter a dead body (or a severed body part) and reanimate it. The strength of the reanimated corpse depends on its completeness - missing parts will reduce it." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :cd 4 :motion 60

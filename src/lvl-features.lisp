@@ -40,6 +40,9 @@
 (defun get-feature-by-id (feature-id)
   (aref *lvl-features* feature-id))
 
+(defun remove-feature-from-world (feature)
+  (setf (aref *lvl-features* (id feature)) nil))
+
 (defmethod name ((feature feature))
   (name (get-feature-type-by-id (feature-type feature))))
 

@@ -1045,7 +1045,8 @@
                                                           (list +feature-blood-old+ 3 5 (+ z -2))
                                                           (list +feature-blood-old+ 5 5 (+ z -2))
                                                           (list +feature-blood-fresh+ 3 7 (+ z -2))
-                                                          (list +feature-blood-fresh+ 5 7 (+ z -2)))
+                                                          (list +feature-blood-fresh+ 5 7 (+ z -2))
+                                                          (list +feature-start-satanist-player+ 4 4 (+ z -2)))
                                                     nil))))
 
 ;;=====================

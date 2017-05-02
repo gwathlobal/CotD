@@ -173,6 +173,7 @@
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
 (defconstant +feature-blood-stain+ 2)
+(defconstant +feature-start-satanist-player+ 3)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
