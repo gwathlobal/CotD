@@ -1202,13 +1202,21 @@
     
     ;; place the corpse
     (when corpse
-      (let ((item) (r) (left-body-str) (left-body-type))
+      (let ((item) (r) (left-body-str) (left-body-type) (burns-corpse nil))
         (setf r 0)
         
         ;; determine which body part to sever (if any)
         (when (and aux-params
                    (find :chops-body-parts aux-params))
           (setf r (random 4)))
+
+        ;; if the mob in undead and weapon is fire - no chopping
+        (when (and aux-params
+                   (mob-ability-p mob +mob-abil-undead+)
+                   (find :is-fire aux-params))
+          (setf r 0)
+          (setf burns-corpse t)
+          (setf dead-msg-str (format nil "~A burns to ashes. " (visible-name mob))))
         
         (cond
           ;; sever head
@@ -1231,11 +1239,12 @@
                        (setf dead-msg-str (format nil "~@(~A~) cuts ~A in half. " (visible-name killer) (visible-name mob))))))
           ;; do not sever anything
           (t (setf left-body-str "body" left-body-type +item-type-body-part-full+)))
-        
-        (setf item (make-instance 'item :item-type left-body-type :x (x mob) :y (y mob) :z (z mob)))
-        (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) left-body-str))
-        (add-item-to-level-list (level *world*) item)
-        (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob)))
+
+        (unless burns-corpse 
+          (setf item (make-instance 'item :item-type left-body-type :x (x mob) :y (y mob) :z (z mob)))
+          (setf (name item) (format nil "~@(~A~)'s ~A" (name mob) left-body-str))
+          (add-item-to-level-list (level *world*) item)
+          (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob))))
         
         ))
     

@@ -102,6 +102,7 @@
                                        :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 5
                                        :faction +faction-type-demons+
                                        :weapon (list "Burning touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 20
+                                       :armor (list (list +weapon-dmg-vorpal+ 3 0))
                                        :strength 1
                                        :base-light-radius 4
                                        :abil-detect-good t :abil-human t :abil-unholy t
@@ -180,7 +181,7 @@
                                        :name "Angel"
                                        :glyph-idx 65 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 18 :max-fp 16
                                        :faction +faction-type-angels+ :evolve-mob-id +mob-type-archangel+
-                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
+                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t
@@ -192,7 +193,7 @@
                                        :name "Archangel"
                                        :glyph-idx 33 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 35 :max-fp 16
                                        :faction +faction-type-angels+
-                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 5 9 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
+                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 5 9 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 4
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t
@@ -244,44 +245,44 @@
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 3 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 10 :move-spd (truncate (* +normal-ap+ 1.2))
-                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 1 0))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-2+
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 4 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 10 :move-spd (truncate (* +normal-ap+ 1.2))
-                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 1 0))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-3+
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 5 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 4 +normal-ap+ 100 ()) nil) :base-dodge 10 :move-spd (truncate (* +normal-ap+ 1.2))
-                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 1 0))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-4+
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 6 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 10 :move-spd (truncate (* +normal-ap+ 1.2))
-                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 1 0))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
                                        ))
 
 

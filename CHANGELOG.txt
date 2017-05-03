@@ -1,7 +1,7 @@
 CHANGELOG
 
 - Satanists are now a playable faction. Their goal is to assist their demon masters and destroy all angelic forces.
-- Satanists are now able to reanimate corpses. The less severed body parts the corpse has - the stronger it will be after the reanimation.
+- Satanists are now able to reanimate corpses. The less severed body parts the corpse has - the stronger it will be after the reanimation. Reanimated corpses are slow-moving, have very little HP and will burn to ashes when killed by Angels.
 - Demons' ability to possess is now toggleable, so that you can kill humans instead of always possessing them first if you wish so.
 - Demons now have an ability to sacrifice their host on demand to gain power and health (as if they killed them in combat). 
 - Added a bank building to the city.

@@ -87,12 +87,14 @@
    ;;   :abil-can-possess-toggle - +mob-abil-can-possess-toggle+
    ;;   :abil-sacrifice-host - +mob-abil-sacrifice-host+
    ;;   :abil-reanimate-corpse - +mob-abil-reanimate-corpse+
+   ;;   :abil-undead - +mob-abil-undead+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
    ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <list of aux params>))
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
+   ;;   :is-fire
    
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
    (base-sight :initform *base-mob-sight* :initarg :base-sight :accessor base-sight)
@@ -113,7 +115,7 @@
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
-                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse)
+                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -244,6 +246,8 @@
     (setf (gethash +mob-abil-sacrifice-host+ (abilities mob-type)) t))
   (when abil-reanimate-corpse
     (setf (gethash +mob-abil-reanimate-corpse+ (abilities mob-type)) t))
+  (when abil-undead
+    (setf (gethash +mob-abil-undead+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -461,6 +465,7 @@
    ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <list of aux params>))
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
+   ;;   :is-fire
    
    (cur-sight :initform 6 :initarg :cur-sight :accessor cur-sight)
    (m-acc :initform +base-accuracy+ :initarg :m-acc :accessor m-acc)

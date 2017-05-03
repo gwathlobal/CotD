@@ -38,7 +38,7 @@
      (:file "init-scenario-types" :depends-on ("scenarios"))
      (:file "dungeon-creation" :depends-on ("level-test" "level-city" "init-scenario-types"))
      (:file "init-mob-types" :depends-on ("base-methods"))
-     (:file "init-ability-types" :depends-on ("base-methods"))
+     
      (:file "init-feature-types" :depends-on ("base-methods"))
      (:file "init-terrain-types" :depends-on ("base-methods"))
      (:file "init-item-types" :depends-on ("base-methods"))
@@ -59,5 +59,6 @@
      (:file "ai" :depends-on ("base-methods" "window-methods"))
      (:file "init-game-events" :depends-on ("game-events" "window-methods"))
      (:file "init-animation-types" :depends-on ("animations" "window-methods"))
+     (:file "init-ability-types" :depends-on ("base-methods" "window-methods"))
      (:file "cotd")
      ))

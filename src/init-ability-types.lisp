@@ -549,8 +549,8 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-free-call+ :name "Summon ally" :descr "Invoke hellish powers to summon one ally to your place. Remember that you may call but nobody is obliged to answer." 
-                                 :cost 0 :spd (truncate +normal-ap+ 3) :passive nil
-                                 :final t :on-touch nil
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil :cd 3
                                  :motion 30
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
@@ -558,11 +558,12 @@
                                                 (logger (format nil "MOB-FREE-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor)))
                                                 
                                                 (let ((allies-list))
-                                                  ;; collect all allies that are able to answer the call within the whole map
+                                                  ;; collect all allies that are able to answer the call within the 40 cell radius
                                                   (setf allies-list (loop for ally-mob-id in (mob-id-list (level *world*))
                                                                           when (and (not (eq actor (get-mob-by-id ally-mob-id)))
                                                                                     (get-faction-relation (faction actor) (faction (get-mob-by-id ally-mob-id)))
-                                                                                    (mob-ability-p (get-mob-by-id ally-mob-id) +mob-abil-free-call+)
+                                                                                    (mob-ability-p (get-mob-by-id ally-mob-id) +mob-abil-answer-the-call+)
+                                                                                    (<= (get-distance (x actor) (y actor) (x (get-mob-by-id ally-mob-id)) (y (get-mob-by-id ally-mob-id))) 40)
                                                                                     )
                                                                             collect ally-mob-id))
                                                   
@@ -579,8 +580,9 @@
                                                   (decf (cur-fp actor) (cost ability-type))
                                                   (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone reciting incantations~A. " str)))
+                                                  
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~@(~A~) murmurs some incantations. " (visible-name actor))))
+                                                                         (format nil "~@(~A~) calls for reinforcements. " (visible-name actor)) :observed-mob actor))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -2198,3 +2200,10 @@
                                                            (progn
                                                              nil))))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-undead+ :name "Undead" :descr "Your existance defies all logic - you are dead, yet you live. However, fire may burn your body to ashes." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

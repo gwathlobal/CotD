@@ -158,7 +158,7 @@
                                                                     (nth (random (length weather-types)) weather-types)
                                                                     +tod-type-evening+
                                                                     +player-faction-thief+))))))
-        (join-satanist-item (cons "Join as a Satanist"
+        (join-satanist-item (cons "Join the Satanists"
                                   #'(lambda (n) 
                                       (declare (ignore n))
                                       (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
