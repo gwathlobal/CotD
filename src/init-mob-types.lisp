@@ -184,7 +184,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-heal-self 1 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t
                                        :ai-wants-bless t :ai-curious t))
@@ -196,7 +196,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 5 9 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
                                        :strength 4
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-heal-self 2 :abil-conseal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :ai-wants-bless t :ai-curious t))
@@ -245,7 +245,7 @@
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 3 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
@@ -256,7 +256,7 @@
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 4 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
@@ -267,7 +267,7 @@
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 5 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
@@ -278,7 +278,7 @@
                                        :name "Reanimated body"
                                        :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 6 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0

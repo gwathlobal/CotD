@@ -133,6 +133,8 @@
         with y1 = y
         for mob-id in visible-mobs
         for vmob = (get-mob-by-id mob-id)
+        ;finally
+        ;   (format t "VISIBLE-MOBS ~A~%" visible-mobs)
         do
            (when (and (> (length visible-mobs) (truncate h *glyph-h*))
                       (> (+ y1 (* 1 *glyph-h*)) (+ y h)))

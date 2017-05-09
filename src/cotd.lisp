@@ -29,6 +29,7 @@
                  (calculate-mob-vision-hearing mob)
                  (setf (motion-set-p mob) nil)
                  (ai-function mob)
+                 (unless (eq mob *player*) (update-visible-mobs mob))
                  (calculate-mob-vision-hearing mob)
                  (when (get-message-this-turn) (add-message (format nil "~%")))
                  (setf (heard-sounds mob) nil)

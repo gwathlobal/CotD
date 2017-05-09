@@ -88,6 +88,7 @@
    ;;   :abil-sacrifice-host - +mob-abil-sacrifice-host+
    ;;   :abil-reanimate-corpse - +mob-abil-reanimate-corpse+
    ;;   :abil-undead - +mob-abil-undead+
+   ;;   :abil-shared-minds - +mob-abil-shared-minds+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -115,7 +116,7 @@
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
-                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead)
+                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -248,6 +249,8 @@
     (setf (gethash +mob-abil-reanimate-corpse+ (abilities mob-type)) t))
   (when abil-undead
     (setf (gethash +mob-abil-undead+ (abilities mob-type)) t))
+  (when abil-shared-minds
+    (setf (gethash +mob-abil-shared-minds+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -423,6 +426,7 @@
 (defclass mob ()
   ((id :initform 0 :initarg :id :accessor id :type fixnum)
    (name :initform nil :accessor name)
+   (alive-name :initform nil :accessor alive-name)
    (mob-type :initform 0 :initarg :mob-type :accessor mob-type :type fixnum)
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)
@@ -437,6 +441,8 @@
 
    ;(fov-map :initform (make-array (list (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)))) :accessor fov-map)
    (visible-mobs :initform nil :accessor visible-mobs)
+   (shared-visible-mobs :initform nil :accessor shared-visible-mobs)
+   (proper-visible-mobs :initform nil :accessor proper-visible-mobs)
    (hear-range-mobs :initform nil :accessor hear-range-mobs)
    (heard-sounds :initform nil :accessor heard-sounds)
    (visible-items :initform nil :accessor visible-items)
@@ -829,7 +835,8 @@
           (setf name-pick-n (random (length *cur-demon-names*)))
           (setf (name mob) (nth name-pick-n *cur-demon-names*))
           (setf *cur-demon-names* (remove (nth name-pick-n *cur-demon-names*) *cur-demon-names*))))
-    )))
+      ))
+  (setf (alive-name mob) (name mob)))
 
 (defun get-followers-list (mob)
   (loop for mob-id in (visible-mobs mob)

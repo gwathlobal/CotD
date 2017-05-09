@@ -133,6 +133,7 @@
 (defconstant +mob-abil-sacrifice-host+ 52)
 (defconstant +mob-abil-reanimate-corpse+ 53)
 (defconstant +mob-abil-undead+ 54)
+(defconstant +mob-abil-shared-minds+ 55)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

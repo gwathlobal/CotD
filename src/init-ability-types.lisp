@@ -659,7 +659,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-curse+ :name "Curse" :descr "Curse the enemy with diabolical incantations." 
+                                 :id +mob-abil-curse+ :name "Curse" :descr "Curse all visible enemies with diabolical incantations. A curse individual will have a 25% chance to miss. The curse has 1/2 chance for sucessfull invokation." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 40
@@ -674,8 +674,8 @@
                                                                        (format nil "~A laughs and curses maniacally. " (visible-name actor)))
 
                                                 (let ((enemy-list nil))
-                                                  (when (zerop (random 3))
-                                                    ;; 1/3th chance to do anything
+                                                  (when (zerop (random 2))
+                                                    ;; 1/2th chance to do anything
                                                     
                                                     ;; collect all unholy enemies in sight
                                                     (setf enemy-list (loop for enemy-mob-id in (visible-mobs actor)
@@ -2067,7 +2067,7 @@
                                                 ;; target here is the item to be reanimated
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~@(~A~) raises his hands and intones an incantation. " (visible-name actor)) :observed-mob actor)
                                                 (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                           (format nil "You hear somebody chanting~A." str)))
+                                                                                                           (format nil "You hear somebody chanting~A. " str)))
                                                 (let ((mob-corpse-type) (mob-corpse))
                                                   (cond
                                                     ((eq (item-ability-p target +item-abil-corpse+) 1) (setf mob-corpse-type +mob-type-reanimated-pwr-1+))
@@ -2076,6 +2076,7 @@
                                                     (t (setf mob-corpse-type +mob-type-reanimated-pwr-4+)))
                                                   (setf mob-corpse (make-instance 'mob :mob-type mob-corpse-type :x (x target) :y (y target) :z (z target)))
                                                   (setf (name mob-corpse) (format nil "Reanimated ~A" (name target)))
+                                                  (setf (alive-name mob-corpse) (name target))
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)
                                                   (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. " (name target)))
@@ -2203,6 +2204,13 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-undead+ :name "Undead" :descr "Your existance defies all logic - you are dead, yet you live. However, fire may burn your body to ashes." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-shared-minds+ :name "Shared minds" :descr "You share a single mind with you kind - you see what they see, they see what you see." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil

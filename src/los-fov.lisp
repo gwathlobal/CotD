@@ -128,7 +128,17 @@
         for light-power = (* *light-power-faloff* (cur-light tmob))
         when (not (eq mob tmob))
           do
-             ;; set up visible mobs
+             ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
+             (when (and (mob-ability-p mob +mob-abil-shared-minds+)
+                        (mob-ability-p tmob +mob-abil-shared-minds+)
+                        (= (faction mob) (faction tmob)))
+               (pushnew (id tmob) (shared-visible-mobs mob))
+               ;(format t "~A [~A] sees ~A~%" (name tmob) (id tmob) (visible-mobs tmob))
+               (loop for vmob-id in (proper-visible-mobs tmob) do
+                 (pushnew vmob-id (shared-visible-mobs mob)))
+               (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
+    
+              ;; set up visible mobs
              (when (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob))
                (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
                               #'(lambda (dx dy dz prev-cell)
@@ -147,10 +157,12 @@
                                                  (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer mob))
                                         ;(format t "VISIBILITY ~A ~A" (name (get-mob-* (level *world*) dx dy dz)) (get-mob-visibility (get-mob-* (level *world*) dx dy dz)))
                                         (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
-                                        (pushnew mob-id (visible-mobs mob)))
+                                        (pushnew mob-id (proper-visible-mobs mob)))
                                       
                                       )
-                                    exit-result))))))
+                                    exit-result)))))
+  (setf (visible-mobs mob) (append (proper-visible-mobs mob) (shared-visible-mobs mob)))
+  (setf (visible-mobs mob) (remove-duplicates (visible-mobs mob))))
 
 (defun update-visible-mobs-fov (mob)
   (declare (optimize (speed 3)))
@@ -188,6 +200,8 @@
 
 (defun update-visible-mobs (mob)
   (setf (visible-mobs mob) nil)
+  (setf (proper-visible-mobs mob) nil)
+  (setf (shared-visible-mobs mob) nil)
   
   
   (if (mob-ability-p mob +mob-abil-see-all+)
@@ -303,38 +317,54 @@
   ))
 
 (defun update-visible-area-normal (level x y z)
-
-  ;; set up player brightness
-  
-  
-    (draw-fov x y z (cur-sight *player*)
-              #'(lambda (dx dy dz prev-cell)
-                  (let ((exit-result t))
-                    (block nil
-                      
-                      (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
-                        (setf exit-result 'exit)
-                        (return))
-                      
-                      (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
-                        (setf exit-result 'exit)
-                        (return))
-                      
-                      (when (and (get-mob-* level dx dy dz) 
-                                 (not (eq (get-mob-* level dx dy dz) *player*))
-                                 (check-mob-visible (get-mob-* level dx dy dz) :observer *player*)
-                                 )
-                        (pushnew (id (get-mob-* level dx dy dz)) (visible-mobs *player*))
-                        
-                        )
+  (draw-fov x y z (cur-sight *player*)
+            #'(lambda (dx dy dz prev-cell)
+                (let ((exit-result t))
+                  (block nil
+                    
+                    (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
+                      (setf exit-result 'exit)
+                      (return))
+                    
+                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
+                      (setf exit-result 'exit)
+                      (return))
+                    
+                    (when (and (get-mob-* level dx dy dz) 
+                               (not (eq (get-mob-* level dx dy dz) *player*))
+                               (check-mob-visible (get-mob-* level dx dy dz) :observer *player*)
+                               )
+                      (pushnew (id (get-mob-* level dx dy dz)) (proper-visible-mobs *player*))
                       
                       )
-                    exit-result)) 
-              )
+                    
+                    )
+                  exit-result)) 
+            )
+
+  ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
+  ;(setf (shared-visible-mobs *player*) nil)
+  (when (mob-ability-p *player* +mob-abil-shared-minds+)
+    (loop for nmob-id in (mob-id-list (level *world*))
+          for nmob = (get-mob-by-id nmob-id)
+          when (and (mob-ability-p nmob +mob-abil-shared-minds+)
+                    (= (faction *player*) (faction nmob)))
+            do
+               (pushnew (id nmob) (shared-visible-mobs *player*))
+               ;;(format t "~A [~A] sees ~A~%" (name nmob) (id nmob) (visible-mobs nmob))
+               (loop for vmob-id in (proper-visible-mobs nmob) do
+                 (pushnew vmob-id (shared-visible-mobs *player*))))
+    (setf (shared-visible-mobs *player*) (remove (id *player*) (shared-visible-mobs *player*))))
+
+  ;;(format t "Player sees proper ~A~%" (proper-visible-mobs *player*))
+  ;;(format t "Player sees shared ~A~%" (shared-visible-mobs *player*))
+  (setf (visible-mobs *player*) (append (proper-visible-mobs *player*) (shared-visible-mobs *player*)))
+  (setf (visible-mobs *player*) (remove-duplicates (visible-mobs *player*)))
   
   (loop for mob-id in (visible-mobs *player*)
         for mob = (get-mob-by-id mob-id)
         do
+           (reveal-cell-on-map (level *world*) (x mob) (y mob) (z mob) :reveal-mob t)
            ;; if the terrain has no floor, you can see an indication that there is a mob on the tile below
            (when (and (< (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
                       (get-single-memo-visibility (get-memo-* level (x mob) (y mob) (1+ (z mob))))
@@ -367,6 +397,8 @@
       )))
 
   (setf (visible-mobs *player*) nil)
+  (setf (proper-visible-mobs *player*) nil)
+  (setf (shared-visible-mobs *player*) nil)
   
   (if (mob-ability-p *player* +mob-abil-see-all+)
     (update-visible-area-all level x y z)
