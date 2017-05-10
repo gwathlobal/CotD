@@ -29,7 +29,7 @@
                                    nil))
                              :key #'(lambda (mob-id)
                                       (get-mob-by-id mob-id))))
-    (format t "HOSTILE-MOBS ~A~%" hostile-mobs)
+    ;(format t "HOSTILE-MOBS ~A~%" hostile-mobs)
     (if hostile-mobs
       (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))) (view-z *player*) (z (get-mob-by-id (first hostile-mobs))))
       (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))

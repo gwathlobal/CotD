@@ -1,5 +1,5 @@
 THE PLOT
-The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain.
+The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Pandemonium Hierarchy invaded the City with the intention to slay its inhabitants. The Celestial Communion had to intervene. Now both sides are bent to fight each other until none of the opponents remain.
 Choose your side and join the fray!
 
 GENERAL TIPS
@@ -9,16 +9,16 @@ GENERAL TIPS
  - Angels and demons gain power when killing each other proportional to the strength of the slain adversary.
  - Stockpile power to get promoted or spend it on available abilities.
  
-THE HEAVENLY FORCES
- - The Heavenly Forces are represented with two units: Angel and Archangel.
+THE CELESTIAL COMMUNION
+ - The Celestial Communion is represented with two units: Angel and Archangel.
  - You start as an Angel who can easily dispatch lowly Imps. 
  - You can bless humans to gain power.
  - You are able to hide your divinity and disguise yourself as a human to lure enemies to you.
- - Your strength is the ability to heal yourself when needed.
+ - Your strength is the ability to heal yourself when needed. You are also able to see what all other Angels see.
  - To win, kill all demons or ascend beyond Archangel. Survival of mankind is not required.
  
-THE LEGIONS OF HELL
- - The Legions of Hell are represented with three units: Imp, Demon, and Archdemon.
+THE PANDEMONIUM HIERARCHY
+ - The Pandemonium Hierarchy is represented with three units: Imp, Demon, and Archdemon.
  - You start as a puny Imp who is no match for an Angel. Run or summon help when confronted by one.
  - Imps and Demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
@@ -35,7 +35,6 @@ OUTSIDER BEASTS
 CITIZENS OF THE CITY
  - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.
  - Priests will preach to smite their foes or grant allies divine shield. Smiting applies minor damage to all enemies in sight, while divine shield gives a one-time protection from any harm.
- - Satanists are allied with demons. They are able to call demons to them for free and curse all enemies in sight with inaccuracy.
  
 THE MILITARY 
  - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
@@ -50,7 +49,7 @@ THE MILITARY
  - Scouts start alone but compensate that with unsurpassed speed. Be careful, though - unlike a Chaplain, you do not have protection from possession. So if a demon traps you in your own body, the game is over for you.
  - To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.
  
- THE CRIMINALS
+THE CRIMINALS
  - The criminals (who are opposed to the citizens and the military, but will not attack the Angels) are kept mainly in the prison (except for the Thief).
  - You may start as the Thief, who is found somewhere on the rooftops of the City.
  - Though the Thief is armed with a knife, his primary weapons are stealth and an ability to climb walls. Unlike all other characters, he is able to evade any conflict by hiding in the shadows or getting some place he can not be reached.
@@ -58,3 +57,9 @@ THE MILITARY
  - As the Thief, you always start at night but a new day will come eventually that will severely hinder your ability to hide. 
  - To win, grab enough gold and get to the edge of the map to leave this accursed City.
  - But beware - the Thief is rather frail and is not immune to possession.
+ 
+THE SATANISTS
+ - Satanists are allied with demons. They are able to call demons to them for free, curse all enemies in sight with inaccuracy and raise dead.
+ - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
+ - You may play as a Satanist. But beware of the military - you will not be able to conseal the fact that you are an enemy of humankind.
+ - To win, kill all angels.

@@ -19,8 +19,8 @@
   (let ((str) (color))
     (cond
       ((= (game-over-type win) +game-over-player-dead+) (setf str (format nil "YOU ARE DEAD")) (setf color sdl:*red*))
-      ((= (game-over-type win) +game-over-demons-won+) (setf str (format nil "LEGIONS OF HELL WON")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-angels-won+) (setf str (format nil "THE HEAVENLY FORCES WON")) (setf color sdl:*green*))
+      ((= (game-over-type win) +game-over-demons-won+) (setf str (format nil "THE PANDEMONIUM HIERARCHY WON")) (setf color sdl:*green*))
+      ((= (game-over-type win) +game-over-angels-won+) (setf str (format nil "THE CELESTIAL COMMUNION WON")) (setf color sdl:*green*))
       ((= (game-over-type win) +game-over-military-won+) (setf str (format nil "THE MILITARY WON")) (setf color sdl:*green*))
       ((= (game-over-type win) +game-over-player-possessed+) (setf str (format nil "YOU ARE POSSESSED")) (setf color sdl:*red*))
       ((= (game-over-type win) +game-over-thief-won+) (setf str (format nil "YOU HAVE COLLECTED ENOUGH VALUABLES AND MANAGED TO ESCAPE THE CITY")) (setf color sdl:*green*)))

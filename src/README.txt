@@ -4,7 +4,7 @@ CITY OF THE DAMNED
 --------------------
 OVERVIEW
 
-The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Legions of Hell invaded the City with the intention to slay its inhabitants. The Heavenly Forces had to intervene. Now both sides are bent to fight each other until none of the opponents remain. Choose your side and join the fray!
+The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Pandemonium Hierarchy invaded the City with the intention to slay its inhabitants. The Celestial Communion had to intervene. Now both sides are bent to fight each other until none of the opponents remain. Choose your side and join the fray!
 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
@@ -41,14 +41,14 @@ GENERAL TIPS
  - You gain power proportional to the strength of killed enemies. Besides each party has other special ways to gain power.
 
 --------------------
-THE HEAVENLY FORCES
+THE CELESTIAL COMMUNION
 
  - You start as an Angel who can easily dispatch lowly Imps.
  - Bless humans to gain power.
  - To win, kill all demons or ascend beyond Archangel. Survival of mankind is not required.
  
 -------------------- 
-THE LEGIONS OF HELL
+THE PANDEMONIUM HIERARCHY
 
  - You start as a puny Imp who is no match for an Angel.
  - Kill humans to gain power. Beware of blessed ones. 
@@ -80,12 +80,20 @@ THE CRIMINALS
  - The Thief's goal is to get hold of enough gold and leave this accursed City.
 
 --------------------
+THE SATANISTS
+
+ - The satanists are those who opened the gates for the Hierarchy to enter. They are allied with Demons and thus are enemies of everyone else.
+ - Satanists are able to curse to cause inaccuracy and to raise dead. You may start one.
+ - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
+ - Satanists share the same goal with the Demons - to kill all Angels.
+
+ 
+--------------------
 KEYBINDINGS
 
  Arrow keys,                    - Movement
  Page Up, Page Down, Home, End,
  Numpad keys
- Shift + 2                      - Character screen
  
  a                              - Invoke ability
  l                              - Look mode

@@ -659,7 +659,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-curse+ :name "Curse" :descr "Curse all visible enemies with diabolical incantations. A curse individual will have a 25% chance to miss. The curse has 1/2 chance for sucessfull invokation." 
+                                 :id +mob-abil-curse+ :name "Curse" :descr "Curse all visible enemies with diabolical incantations. The cursed individuals will have a 25% chance to miss. You only have 1/2 chance to successfully invoke the curse." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 40

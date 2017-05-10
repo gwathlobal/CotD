@@ -99,7 +99,7 @@
                              ))
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 
                                        :name "Satanist"
-                                       :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 5
+                                       :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 0
                                        :faction +faction-type-demons+
                                        :weapon (list "Burning touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-vorpal+ 3 0))

@@ -105,7 +105,7 @@
   )  
 
 (defun main-menu ()
-  (let ((join-heaven-item (cons "Join the Heavenly Forces"
+  (let ((join-heaven-item (cons "Join the Celestial Communion"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -116,7 +116,7 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
                                                                      +player-faction-angels+))))))
-        (join-legion-item (cons "Join the Legions of Hell"
+        (join-legion-item (cons "Join the Pandemonium Hierarchy"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
