@@ -31,6 +31,7 @@
 (defclass item ()
   ((id :initform 0 :accessor id :type fixnum)
    (name :initform nil :accessor name)
+   (alive-name :initform "" :accessor alive-name)
    (item-type :initform 0 :initarg :item-type :accessor item-type :type fixnum)
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)

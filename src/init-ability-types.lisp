@@ -660,7 +660,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-curse+ :name "Curse" :descr "Curse all visible enemies with diabolical incantations. The cursed individuals will have a 25% chance to miss. You only have 1/2 chance to successfully invoke the curse." 
-                                 :cost 0 :spd +normal-ap+ :passive nil
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -1487,7 +1487,7 @@
                                                                        (1+ (random 160))))
                                                            (setf ry (- (+ 80 (y actor))
                                                                        (1+ (random 160)))))
-                                                  (format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry (z actor)) (get-distance (x actor) (y actor) rx ry))
+                                                  ;;(format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry (z actor)) (get-distance (x actor) (y actor) rx ry))
                                                   (if (not (zerop n))
                                                     (progn
                                                       (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
@@ -2076,7 +2076,7 @@
                                                     (t (setf mob-corpse-type +mob-type-reanimated-pwr-4+)))
                                                   (setf mob-corpse (make-instance 'mob :mob-type mob-corpse-type :x (x target) :y (y target) :z (z target)))
                                                   (setf (name mob-corpse) (format nil "Reanimated ~A" (name target)))
-                                                  (setf (alive-name mob-corpse) (name target))
+                                                  (setf (alive-name mob-corpse) (alive-name target))
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)
                                                   (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. " (name target)))

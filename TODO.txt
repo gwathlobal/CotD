@@ -1,0 +1,8 @@
+- Angels should have one unit, that can temporarily transform itself into an Archangel
+- Visibility should be made through light power, which can be diminished by going through leaves, smoke, non-clear windows and such
+- Add smoke as a feature that can reduce visibility. Smoke should move across the map and disperse if its density is too low in a given cell
+- Add smoke bombs to the Thief
+- Add an ability to lit grass on fire to Angels. Fire should damage those standing in it and produce smoke
+- Do something with the message code so that name are captalized (and not capitalized) properly.
+
+- Move display code to a separate entity (separate thread maybe?) so that you could have some basic movement animation going on (0,5 sec). This will alleviate the performance problem (the game will be still calculating AI while the player movement animation is played) and will generally look good.
