@@ -585,7 +585,7 @@
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-satanist+
                                              :type +scenario-feature-player-faction+
-                                             :name "Satanist"
+                                             :name "Satanists"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
