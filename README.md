@@ -5,14 +5,14 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-Apr 25, 2017 v1.1.1
+May 13, 2017 v1.1.2
 
-- Water is now traversable, albeit more slowly than normal terrain. You can swim through it horizontally as well as up and down, but beware of the lack of oxygen. This will kill you quickly. Angels and Demons do not need to breathe.
-- All Angels, Demons, and humans now have an ability to switch on and off stationary lights if they happen to be near one.
-- Added doors to the buildings of the city. All humanoids are able to open and close them.
-- Added ability to open/close windows to the Thief.
-- You can bump into doors, windows, and lanterns to active the respective ability (if you have one).
-- Made Satanists' lair less conspicuous.
+- All Angels now have a shared mind - each of them sees what others see.
+- Satanists are now a playable faction. Their goal is to assist their demon masters and destroy all angelic forces.
+- Satanists are now able to reanimate corpses. The less severed body parts the corpse has - the stronger it will be after the reanimation. Reanimated corpses are slow-moving, have very little HP and will burn to ashes when killed by Angels.
+- Demons' ability to possess is now toggleable, so that you can kill humans instead of always possessing them first if you wish so.
+- Demons now have an ability to sacrifice their host on demand to gain power and health (as if they killed them in combat). 
+- Added a bank building to the city.
 
 CURRENT CHANGELOG
 

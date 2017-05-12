@@ -9,14 +9,14 @@ The year is 1915. The Great War thunders in the west, but the Hinterland is not 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.1.1
+LATEST CHANGES v1.1.2
 
-- Water is now traversable, albeit more slowly than normal terrain. You can swim through it horizontally as well as up and down, but beware of the lack of oxygen. This will kill you quickly. Angels and Demons do not need to breathe.
-- All Angels, Demons, and humans now have an ability to switch on and off stationary lights if they happen to be near one.
-- Added doors to the buildings of the city. All humanoids are able to open and close them.
-- Added ability to open/close windows to the Thief.
-- You can bump into doors, windows, and lanterns to active the respective ability (if you have one).
-- Made Satanists' lair less conspicuous.
+- All Angels now have a shared mind - each of them sees what others see.
+- Satanists are now a playable faction. Their goal is to assist their demon masters and destroy all angelic forces.
+- Satanists are now able to reanimate corpses. The less severed body parts the corpse has - the stronger it will be after the reanimation. Reanimated corpses are slow-moving, have very little HP and will burn to ashes when killed by Angels.
+- Demons' ability to possess is now toggleable, so that you can kill humans instead of always possessing them first if you wish so.
+- Demons now have an ability to sacrifice their host on demand to gain power and health (as if they killed them in combat). 
+- Added a bank building to the city.
 
 --------------------
 FEATURES
@@ -82,7 +82,7 @@ THE CRIMINALS
 --------------------
 THE SATANISTS
 
- - The satanists are those who opened the gates for the Hierarchy to enter. They are allied with Demons and thus are enemies of everyone else.
+ - The Satanists are those who opened the gates for the Hierarchy to enter. They are allied with Demons and thus are enemies of everyone else.
  - Satanists are able to curse to cause inaccuracy and to raise dead. You may start one.
  - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
  - Satanists share the same goal with the Demons - to kill all Angels.

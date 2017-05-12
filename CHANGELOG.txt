@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+May 13, 2017 v1.1.2
+
 - All Angels now have a shared mind - each of them sees what others see.
 - Satanists are now a playable faction. Their goal is to assist their demon masters and destroy all angelic forces.
 - Satanists are now able to reanimate corpses. The less severed body parts the corpse has - the stronger it will be after the reanimation. Reanimated corpses are slow-moving, have very little HP and will burn to ashes when killed by Angels.
