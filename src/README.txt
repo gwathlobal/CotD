@@ -83,7 +83,7 @@ THE CRIMINALS
 THE SATANISTS
 
  - The Satanists are those who opened the gates for the Hierarchy to enter. They are allied with Demons and thus are enemies of everyone else.
- - Satanists are able to curse to cause inaccuracy and to raise dead. You may start one.
+ - Satanists are able to curse to cause inaccuracy, summon demons and raise dead. You may start as one.
  - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
  - Satanists share the same goal with the Demons - to kill all Angels.
 

@@ -172,10 +172,13 @@
 ;; FEATURE-TYPE Constants
 ;;-------------------- 
 
+(defconstant +feature-trait-blocks-vision+ 0)
+
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
 (defconstant +feature-blood-stain+ 2)
 (defconstant +feature-start-satanist-player+ 3)
+(defconstant +feature-smoke+ 4)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -286,6 +289,8 @@
 
 (defparameter *max-hearing-range* 12)
 (defparameter *sound-power-falloff* 10)
+
+(defparameter *vision-power-falloff* 1)
 
 (defparameter *mob-sound-move* 50)
 (defparameter *mob-sound-stand* 0)

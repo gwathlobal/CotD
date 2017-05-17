@@ -10,7 +10,8 @@
 
 (defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil) (check-sound nil))
   ;(declare (optimize (speed 3)))
-  (let ((terrain))
+  (let ((terrain)
+        (vision-block-power 0))
     (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
               (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
               (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
@@ -18,18 +19,25 @@
     
     ;; LOS does not propagate vertically through floors
     (when (and prev-cell
-               (/= (- (third prev-cell) dz) 0))
+               (/= (- (third prev-cell) dz) 0)
+               (or check-move
+                   check-vision
+                   check-projectile))
       (if (> (- (third prev-cell) dz) 0)
         ;; prev is up, the tile above current has opaque floor & the prev tile has opaque floor
         (when (and (get-terrain-* (level *world*) dx dy (third prev-cell))
-                   (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+)
-                   (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) +terrain-trait-opaque-floor+))
+                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+) t)
+                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+) 100))
+                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) +terrain-trait-opaque-floor+) t)
+                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) +terrain-trait-opaque-floor+) 100)))
           (return-from check-LOS-propagate nil))
         ;; prev is down
         (when (and (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz)
-                   (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) +terrain-trait-opaque-floor+)
+                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) +terrain-trait-opaque-floor+) t)
+                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) +terrain-trait-opaque-floor+) 100))
                    (get-terrain-* (level *world*) dx dy dz)
-                   (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+))
+                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+) t)
+                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+) 100)))
           (return-from check-LOS-propagate nil)))
       )
 
@@ -49,16 +57,32 @@
     
     (when (and check-vision
                (get-terrain-type-trait terrain +terrain-trait-blocks-vision+))
-      (return-from check-LOS-propagate nil))
+      (if (eq (get-terrain-type-trait terrain +terrain-trait-blocks-vision+) t)
+        (incf vision-block-power 100)
+        (incf vision-block-power (get-terrain-type-trait terrain +terrain-trait-blocks-vision+))))
     
     (when (and check-projectile
                (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+))
       (return-from check-LOS-propagate nil))
 
     (when (and check-sound
-               (get-terrain-type-trait terrain +terrain-trait-blocks-sound+))
+               (or (eq (get-terrain-type-trait terrain +terrain-trait-blocks-sound+) t)
+                   (eq (get-terrain-type-trait terrain +terrain-trait-blocks-sound+) 100)))
       (return-from check-LOS-propagate nil))
 
+    (loop for feature-id in (get-features-* (level *world*) dx dy dz)
+          for lvl-feature = (get-feature-by-id feature-id)
+          when (and check-vision
+                    (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+))
+            do
+               (if (eq (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+) t)
+                 (incf vision-block-power 100)
+                 (incf vision-block-power (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+)))
+          )
+
+    (when check-vision
+      (return-from check-LOS-propagate vision-block-power))
+    
     t))
 
 (defun calculate-mob-vision-hearing (mob)
@@ -73,6 +97,8 @@
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
         for light-power = (* *light-power-faloff* (cur-light tmob))
+        for vision-pwr = (cur-sight tmob)
+        for vision-power = (cur-sight tmob)
         when (not (eq mob tmob))
           do
              ;; set up mob brightness
@@ -80,17 +106,28 @@
                (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
-                                (let* ((exit-result t)) 
+                                (let* ((exit-result t) (pwr-decrease 0)) 
                                   (block nil
 
-                                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                    (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                    (unless pwr-decrease
                                       (setf exit-result 'exit)
                                       (return))
+                                    (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                    (decf vision-pwr)
+                                    
+                                    ;(unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                    ;  (setf exit-result 'exit)
+                                    ;  (return))
                                     
                                     (when (and (get-mob-* (level *world*) dx dy dz) 
                                                (eq (get-mob-* (level *world*) dx dy dz) mob))
                                       (incf (brightness mob) light-power))
-                                    (decf light-power *light-power-faloff*))
+                                    (decf light-power *light-power-faloff*)
+
+                                    (when (<= vision-pwr 0)
+                                      (setf exit-result 'exit)
+                                      (return)))
                                     
                                   exit-result))))
              ;; set up mobs that potentially hear you
@@ -100,23 +137,36 @@
   ;; check through all stationary light sources
   (loop for (x y z light-radius) across (light-sources (level *world*))
         for light-power = (* *light-power-faloff* light-radius)
+        for vision-pwr = light-radius
+        for vision-power = light-radius
         do
            ;; set up mob brightness
            (when (< (get-distance-3d x y z (x mob) (y mob) (z mob)) light-radius)
                (line-of-sight x y z (x mob) (y mob) (z mob)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
-                                (let* ((exit-result t)) 
+                                (let* ((exit-result t) (pwr-decrease 0)) 
                                   (block nil
 
-                                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                    (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                    (unless pwr-decrease
                                       (setf exit-result 'exit)
                                       (return))
+                                    (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                    (decf vision-pwr)
+                                    
+                                    ;(unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                    ;  (setf exit-result 'exit)
+                                    ;  (return))
                                     
                                     (when (and (get-mob-* (level *world*) dx dy dz) 
                                                (eq (get-mob-* (level *world*) dx dy dz) mob))
                                       (incf (brightness mob) light-power))
-                                    (decf light-power *light-power-faloff*))
+                                    (decf light-power *light-power-faloff*)
+
+                                    (when (<= vision-pwr 0)
+                                      (setf exit-result 'exit)
+                                      (return)))
                                     
                                   exit-result))))
         )
@@ -125,7 +175,9 @@
 (defun update-visible-mobs-normal (mob)
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
-        for light-power = (* *light-power-faloff* (cur-light tmob))
+        ;for light-power = (* *light-power-faloff* (cur-light tmob))
+        for vision-pwr = (cur-sight mob)
+        for vision-power = (cur-sight mob)
         when (not (eq mob tmob))
           do
              ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
@@ -143,14 +195,21 @@
                (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
                               #'(lambda (dx dy dz prev-cell)
                                   (declare (type fixnum dx dy dz))
-                                  (let* ((exit-result t) (mob-id 0)) 
+                                  (let* ((exit-result t) (mob-id 0) (pwr-decrease 0)) 
                                     (declare (type fixnum mob-id))
                                     
                                     (block nil
-                                      
-                                      (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+
+                                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                      (unless pwr-decrease
                                         (setf exit-result 'exit)
                                         (return))
+                                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                      (decf vision-pwr)
+                                      
+                                      ;(unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                      ;  (setf exit-result 'exit)
+                                      ;  (return))
                                       
                                       (when (and (get-mob-* (level *world*) dx dy dz) 
                                                  (not (eq (get-mob-* (level *world*) dx dy dz) mob))
@@ -158,6 +217,10 @@
                                         ;(format t "VISIBILITY ~A ~A" (name (get-mob-* (level *world*) dx dy dz)) (get-mob-visibility (get-mob-* (level *world*) dx dy dz)))
                                         (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
                                         (pushnew mob-id (proper-visible-mobs mob)))
+
+                                      (when (<= vision-pwr 0)
+                                        (setf exit-result 'exit)
+                                        (return))
                                       
                                       )
                                     exit-result)))))
@@ -220,23 +283,37 @@
   
   (loop for item-id in (item-id-list (level *world*))
         for item = (get-item-by-id item-id)
+        for vision-pwr = (cur-sight mob)
+        for vision-power = (cur-sight mob)
         when (< (get-distance-3d (x mob) (y mob) (z mob) (x item) (y item) (z item)) (cur-sight mob))
           do
              ;; set up visible mobs
              (line-of-sight (x mob) (y mob) (z mob) (x item) (y item) (z item)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
-                                (let* ((exit-result t)) 
+                                (let* ((exit-result t) (pwr-decrease 0)) 
                                   (block nil
-                                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+
+                                    (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                    (unless pwr-decrease
                                       (setf exit-result 'exit)
                                       (return))
+                                    (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                    (decf vision-pwr)
+                                    
+                                    ;(unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
+                                    ;  (setf exit-result 'exit)
+                                    ;  (return))
                                     
                                     (when (get-items-* (level *world*) dx dy dz) 
                                       (loop for n-item-id in (get-items-* (level *world*) dx dy dz)
                                             when (= item-id n-item-id)
                                               do
                                                  (pushnew n-item-id (visible-items mob))))
+
+                                    (when (<= vision-pwr 0)
+                                      (setf exit-result 'exit)
+                                      (return))
                                     )
                                   exit-result))))
   (logger (format nil "UPDATE-VISIBLE-ITEMS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-items mob))))
@@ -317,30 +394,44 @@
   ))
 
 (defun update-visible-area-normal (level x y z)
-  (draw-fov x y z (cur-sight *player*)
-            #'(lambda (dx dy dz prev-cell)
-                (let ((exit-result t))
-                  (block nil
-                    
-                    (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
-                      (setf exit-result 'exit)
-                      (return))
-                    
-                    (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
-                      (setf exit-result 'exit)
-                      (return))
-                    
-                    (when (and (get-mob-* level dx dy dz) 
-                               (not (eq (get-mob-* level dx dy dz) *player*))
-                               (check-mob-visible (get-mob-* level dx dy dz) :observer *player*)
-                               )
-                      (pushnew (id (get-mob-* level dx dy dz)) (proper-visible-mobs *player*))
+  (let ((vision-power (1+ (cur-sight *player*)))
+        (vision-pwr (1+ (cur-sight *player*))))
+    (draw-fov x y z (cur-sight *player*)
+              #'(lambda (dx dy dz prev-cell)
+                  (let ((exit-result t) (pwr-decrease))
+                    (block nil
+                      (when (> (get-distance-3d x y z dx dy dz) (1+ (cur-sight *player*)))
+                        (setf exit-result 'exit)
+                        (return))
                       
+                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t))
+                      (unless pwr-decrease
+                        (setf exit-result 'exit)
+                        (return))
+                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                      (decf vision-pwr)
+                      
+                      (when (and (get-mob-* level dx dy dz) 
+                                 (not (eq (get-mob-* level dx dy dz) *player*))
+                                 (check-mob-visible (get-mob-* level dx dy dz) :observer *player*)
+                                 )
+                        (pushnew (id (get-mob-* level dx dy dz)) (proper-visible-mobs *player*))
+                        
+                        )
+                      
+                      (when (<= vision-pwr 0)
+                        (setf exit-result 'exit)
+                        (return))
+                      
+                    ;(unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
+                    ;  (setf exit-result 'exit)
+                    ;  (return))
+                                          
                       )
-                    
-                    )
-                  exit-result)) 
-            )
+                    exit-result))
+              :LOS-start-func #'(lambda ()
+                                  (setf vision-pwr (1+ (cur-sight *player*))))
+              ))
 
   ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
   ;(setf (shared-visible-mobs *player*) nil)

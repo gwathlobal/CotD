@@ -44,11 +44,11 @@
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
   (when trait-blocks-vision
-    (setf (gethash +terrain-trait-blocks-vision+ (trait terrain-type)) t))
+    (setf (gethash +terrain-trait-blocks-vision+ (trait terrain-type)) trait-blocks-vision))
   (when trait-blocks-projectiles
     (setf (gethash +terrain-trait-blocks-projectiles+ (trait terrain-type)) t))
   (when trait-opaque-floor
-    (setf (gethash +terrain-trait-opaque-floor+ (trait terrain-type)) t))
+    (setf (gethash +terrain-trait-opaque-floor+ (trait terrain-type)) trait-opaque-floor))
   (when trait-slope-up
     (setf (gethash +terrain-trait-slope-up+ (trait terrain-type)) t))
   (when trait-slope-down

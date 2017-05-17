@@ -282,7 +282,8 @@
       
       (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
       
-      
+
+      (logger (format nil "current-dir = ~A~%" *current-dir*))
       (logger (format nil "path = ~A~%" (sdl:create-path tiles-path *current-dir*)))
       
       (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
@@ -347,6 +348,7 @@
   
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
+  (setf *current-dir* (remove #\^ *current-dir*))
   (setf *cotd-release* t)
 
   (sdl:with-init ()  
@@ -367,7 +369,7 @@
 
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
-  (setf *cotd-release* t)
+  (setf *cotd-release* nil)
   
   (sdl:with-init ()  
     (cotd-main))
@@ -381,7 +383,7 @@
 
 #+(and sbcl windows) 
 (defun make-exec ()
-  (sb-ext:save-lisp-and-die "cotd.exe" :toplevel #'cotd-exec :executable t :application-type :gui))
+  (sb-ext:save-lisp-and-die "cotd.exe" :toplevel #'cotd-exec :executable t :application-type :console))
 
 #+(and sbcl unix) 
 (defun make-exec ()

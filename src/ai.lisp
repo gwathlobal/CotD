@@ -515,9 +515,12 @@
                  (loop-finish)
             finally (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to investigate sound at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
 
+    
+    
     ;; when mob is kleptomaniac and has no target
     (when (and (mob-ai-kleptomaniac-p mob)
-               (null nearest-target))
+               (null nearest-target)
+               (visible-items mob))
       ;; if standing on an item of value > 0 - pick it up
       (loop for item-id in (get-items-* (level *world*) (x mob) (y mob) (z mob))
             for item = (get-item-by-id item-id)
@@ -525,53 +528,44 @@
               do
                  (mob-pick-item mob item)
                  (return-from ai-function))
-            
+
       ;; find all visible items with value > 0
       ;; go to the nearest such item
-      (let ((visible-items nil))
-        (loop for item-id in (item-id-list (level *world*))
+      (let ((visible-items (copy-list (visible-items mob))))
+        (setf visible-items (remove-if #'(lambda (item)
+                                           (zerop (value item)))
+                                       visible-items
+                                       :key #'get-item-by-id))
+        
+        (setf visible-items (stable-sort visible-items #'(lambda (a b)
+                                                         (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
+                                                                (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
+                                                           t
+                                                           nil))
+                                         :key #'get-item-by-id))
+
+        (loop for item-id in visible-items
               for item = (get-item-by-id item-id)
-              when (and (not (zerop (value item)))
-                        (<= (get-distance-3d (x mob) (y mob) (z mob) (x item) (y item) (z item)) (cur-sight mob)))
+              when (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) (x item) (y item) (z item) (if (riding-mob-id mob)
+                                                                                                                 (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                 (map-size mob))
+                                            (get-mob-move-mode mob))
                 do
-                   (line-of-sight (x mob) (y mob) (z mob) (x item) (y item) (z item)
-                                  #'(lambda (dx dy dz prev-cell)
-                                      (declare (type fixnum dx dy dz))
-                                      (let* ((exit-result t)) 
-                                        (block nil
-                                          (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
-                                            (setf exit-result 'exit)
-                                            (return))
-                                          
-                                          (when (and (= dx (x item))
-                                                     (= dy (y item))
-                                                     (= dz (z item)))
-                                            (pushnew item visible-items))
-                                          )
-                                        exit-result))))
-        (when visible-items
-          (setf visible-items (stable-sort visible-items #'(lambda (a b)
-                                                             (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
-                                                                    (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
-                                                               t
-                                                               nil))))
-          (loop for item in visible-items
-            when (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) (x item) (y item) (z item) (if (riding-mob-id mob)
-                                                                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
-                                                                                                               (map-size mob))
-                                          (get-mob-move-mode mob))
-              do
-                 (setf (path-dst mob) (list (x item) (y item) (z item)))
-                 (setf (path mob) nil)
-                 (loop-finish)
-            when (and (> (map-size mob) 1)
-                      (ai-find-move-around mob (x item) (y item)))
-              do
-                 (setf (path-dst mob) (ai-find-move-around mob (x item) (y item)))
-                 (setf (path mob) nil)
-                 (loop-finish)
-            finally (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (name item) (id item) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
-      ))
+                   (setf (path-dst mob) (list (x item) (y item) (z item)))
+                   (setf (path mob) nil)
+                   (loop-finish)
+              when (and (> (map-size mob) 1)
+                        (ai-find-move-around mob (x item) (y item)))
+                do
+                   (setf (path-dst mob) (ai-find-move-around mob (x item) (y item)))
+                   (setf (path mob) nil)
+                   (loop-finish)
+              finally
+                 (when item
+                   (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (name item) (id item) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
+        ))
+
+    
     
     ;; move to some random passable terrain
     (unless (path-dst mob)

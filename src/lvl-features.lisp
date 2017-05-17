@@ -10,7 +10,10 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name feature" :initarg :name :accessor name)
-   (func :initform nil :initarg :func :accessor func)))
+   (func :initform nil :initarg :func :accessor func)
+   (trait :initform (make-hash-table) :initarg :trait :accessor trait)
+   ;; :trait-blocks-vision - +feature-trait-blocks-vision+
+   ))
 
 (defun get-feature-type-by-id (feature-type-id)
   (aref *feature-types* feature-type-id))
@@ -19,6 +22,12 @@
   (when (>= (id feature-type) (length *feature-types*))
     (adjust-array *feature-types* (list (1+ (id feature-type)))))
   (setf (aref *feature-types* (id feature-type)) feature-type))
+
+(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision)
+  
+  (when trait-blocks-vision
+    (setf (gethash +feature-trait-blocks-vision+ (trait feature-type)) trait-blocks-vision))
+  )
 
 ;;--------------------
 ;; FEATURE
@@ -48,3 +57,7 @@
 
 (defmethod func ((feature feature))
   (func (get-feature-type-by-id (feature-type feature))))
+
+(defun get-feature-type-trait (feature feature-trait-id)
+  (gethash feature-trait-id (trait (get-feature-type-by-id (feature-type feature)))))
+

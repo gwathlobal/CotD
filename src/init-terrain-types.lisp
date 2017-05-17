@@ -106,11 +106,11 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-leaves+ :name "Tree leaves"
                                                :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* 
-                                               :trait-blocks-vision t))
+                                               :trait-blocks-vision 60))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-leaves-snow+ :name "Snow-covered tree leaves"
                                                :glyph-idx 3 :glyph-color sdl:*white* :back-color sdl:*black* 
-                                               :trait-blocks-vision t))
+                                               :trait-blocks-vision 60))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch-trunk+ :name "Mature birch"
                                                :glyph-idx 16 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
@@ -166,7 +166,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-window+ :name "Window"
                                                :glyph-idx 13 :glyph-color (sdl:color :r 0 :g 0 :b 200) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-sound 20 :trait-blocks-sound-floor 20 :trait-opaque-floor t :trait-openable-window t
+                                               :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-sound 20 :trait-blocks-sound-floor 20 :trait-blocks-vision 30 :trait-opaque-floor t :trait-openable-window t
                                                :on-use #'(lambda (mob x y z)
                                                            ;; TODO: add connections change for size 3 
                                                            (set-terrain-* (level *world*) x y z +terrain-wall-window-opened+)
