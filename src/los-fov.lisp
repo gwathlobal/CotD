@@ -86,19 +86,19 @@
     t))
 
 (defun calculate-mob-vision-hearing (mob)
-  ;(format t "CALC-VISION-HEAR: ~A [~A]~%" (name mob) (id mob))
+  (logger (format nil "CALC-VISION-HEAR: ~A [~A]~%" (name mob) (id mob)))
   (setf (brightness mob) (+ (* *light-power-faloff* (cur-light mob))
                             (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob))))
   (setf (hear-range-mobs mob) nil)
 
-  ;(format t "CALC-VISION-HEAR: ~A [~A]~%" (name mob) (id mob))
+  ;;(logger (format nil "CALC-VISION-HEAR: Starting to iterate for mob light~%"))
   
   ;; check through all the mobs
   (loop for mob-id in (mob-id-list (level *world*))
         for tmob = (get-mob-by-id mob-id)
         for light-power = (* *light-power-faloff* (cur-light tmob))
-        for vision-pwr = (cur-sight tmob)
-        for vision-power = (cur-sight tmob)
+        for vision-pwr = (cur-light tmob)
+        for vision-power = (cur-light tmob)
         when (not (eq mob tmob))
           do
              ;; set up mob brightness
@@ -134,17 +134,23 @@
              (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) *max-hearing-range*)
                (pushnew mob-id (hear-range-mobs mob)))
         )
+  (logger (format nil "CALC-VISION-HEAR: Starting to iterate for stationary light~%"))
+
   ;; check through all stationary light sources
   (loop for (x y z light-radius) across (light-sources (level *world*))
+        for i from 0 below (length (light-sources (level *world*)))
         for light-power = (* *light-power-faloff* light-radius)
         for vision-pwr = light-radius
         for vision-power = light-radius
         do
+           
+             
            ;; set up mob brightness
            (when (< (get-distance-3d x y z (x mob) (y mob) (z mob)) light-radius)
                (line-of-sight x y z (x mob) (y mob) (z mob)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
+                                
                                 (let* ((exit-result t) (pwr-decrease 0)) 
                                   (block nil
 
@@ -170,6 +176,7 @@
                                     
                                   exit-result))))
         )
+  (format t "HERE~%")
   )
 
 (defun update-visible-mobs-normal (mob)

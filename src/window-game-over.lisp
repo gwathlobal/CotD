@@ -33,6 +33,7 @@
     (format str "          Humans: total ~A, killed ~A, left ~A~%" (initial-humans *world*) (- (initial-humans *world*) (total-humans *world*)) (total-humans *world*))
     (format str "          Angels: total ~A, killed ~A, left ~A~%" (initial-angels *world*) (- (initial-angels *world*) (total-angels *world*)) (total-angels *world*))
     (format str "          Demons: total ~A, killed ~A, left ~A~%" (initial-demons *world*) (- (initial-demons *world*) (total-demons *world*)) (total-demons *world*))
+    (format str "          Undead: total ~A, killed ~A, left ~A~%" (initial-undead *world*) (- (initial-undead *world*) (total-undead *world*)) (total-undead *world*))
     (format str "~%")
     (format str "     The Butcher: ~A with ~A kills~%" (get-qualified-name (find-mob-with-max-kills)) (calculate-total-kills (find-mob-with-max-kills)))
     (format str " The Hand of God: ~A with ~A blessings~%" (get-qualified-name (find-mob-with-max-blesses)) (stat-blesses (find-mob-with-max-blesses)))
@@ -42,9 +43,9 @@
     
     
     
-    (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 9 (sdl:get-font-height)))))
+    (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 10 (sdl:get-font-height)))))
 
-  (show-message-box 6 (+ 40 (* 9 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 9 (sdl:get-font-height))) *full-message-box*)
+  (show-message-box 6 (+ 40 (* 10 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 10 (sdl:get-font-height))) *full-message-box*)
 
   (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] Exit game")
                            10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))

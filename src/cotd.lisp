@@ -20,6 +20,7 @@
            ;; iterate through all the mobs
            ;; those who are not dead and have cur-ap > 0 can make a move
            (loop for mob across *mobs* do
+             
              ;(format t "MOB ~A [~A] check-dead = ~A, cur-ap = ~A~%" (name mob) (id mob) (check-dead mob) (cur-ap mob))
              (unless (check-dead mob)    
                (when (> (cur-ap mob) 0)
@@ -51,6 +52,8 @@
 
                  (when (<= (cur-ap mob) 0)
                    (on-tick mob)))))
+
+           
                      
            (bt:with-lock-held ((path-lock *world*))
              (setf (cur-mob-path *world*) 0)

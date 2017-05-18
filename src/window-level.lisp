@@ -36,7 +36,7 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%~A~A~A~%~%Visibility: ~A"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~%~%Visibility: ~A"
                         (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
@@ -54,6 +54,7 @@
                         (total-blessed *world*)
                         (total-angels *world*)
                         (total-demons *world*)
+                        (total-undead *world*)
                         (sense-good-evil-str)
                         (if (or (mob-ability-p *player* +mob-abil-momentum+)
                                 (mob-ability-p *player* +mob-abil-facing+)) (format nil "~%Moving: ~A~A"

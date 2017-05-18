@@ -665,7 +665,7 @@
           
           (setf move-result (move-mob mob (x-y-into-dir step-x step-y) :dir-z step-z))
 
-          (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A ~A)~%" (path-dst mob) (x mob) (y mob) (z mob)))
+          (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A ~A), MOVE-RESULT ~A~%" (path-dst mob) (x mob) (y mob) (z mob) move-result))
           (if move-result
             (progn
               (when (and (path-dst mob)

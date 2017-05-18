@@ -131,9 +131,9 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :x 46 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-satanist+ :x 46 :y 15 :z 0))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-thief+ :x (+ (x *player*) 5) :y (+ (y *player*) 0) :z 0))
+  (let (;(soldier (make-instance 'mob :mob-type +mob-type-satanist+ :x (+ (x *player*) 5) :y (+ (y *player*) 0) :z 0))
         ;(demon (make-instance 'mob :mob-type +mob-type-man+ :x (+ (x *player*) 6) :y (- (y *player*) 0) :z 2))
         )
     (setf (cur-fp *player*) 10)
@@ -142,7 +142,7 @@
     ;(set-mob-effect *player* +mob-effect-called-for-help+ 10)
     ;(set-mob-effect demon +mob-effect-calling-for-help+ 100)
     ;(setf (cur-hp soldier) 15)
-    (add-mob-to-level-list (level world) soldier)
+    ;(add-mob-to-level-list (level world) soldier)
     ;(add-mob-to-level-list (level world) demon)
 
     ;(mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))

@@ -1188,6 +1188,8 @@
       (decf (total-humans *world*)))
     (when (mob-ability-p mob +mob-abil-demon+)
       (decf (total-demons *world*)))
+    (when (mob-ability-p mob +mob-abil-undead+)
+      (decf (total-undead *world*)))
     (when (and (mob-ability-p mob +mob-abil-angel+)
                (not (eq (mob-type mob) +mob-type-gargantaur+)))
       (decf (total-angels *world*)))

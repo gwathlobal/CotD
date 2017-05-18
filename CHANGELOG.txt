@@ -1,6 +1,7 @@
 CHANGELOG
 
 - Windows now ar not clear glass, so you will not see as far as you usually do when looking through windows. Leaves also obstruct your vision somewhat.
+- Undead now have their own counter.
 
 
 --------------------

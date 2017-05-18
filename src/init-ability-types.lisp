@@ -2210,7 +2210,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-shared-minds+ :name "Shared minds" :descr "You share a single mind with you kind - you see what they see, they see what you see." 
+                                 :id +mob-abil-shared-minds+ :name "Shared minds" :descr "You share a single mind with your kind - you see what they see, they see what you see." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil

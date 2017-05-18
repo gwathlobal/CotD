@@ -291,11 +291,13 @@
    (initial-humans :initform 0 :accessor initial-humans)
    (initial-demons :initform 0 :accessor initial-demons)
    (initial-angels :initform 0 :accessor initial-angels)
+   (initial-undead :initform 0 :accessor initial-undead)
    
    (total-humans :initform 0 :accessor total-humans)
    (total-demons :initform 0 :accessor total-demons)
    (total-angels :initform 0 :accessor total-angels)
    (total-blessed :initform 0 :accessor total-blessed)
+   (total-undead :initform 0 :accessor total-undead)
 
    (game-events :initform () :accessor game-events)
 
