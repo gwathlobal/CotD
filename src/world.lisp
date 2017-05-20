@@ -66,7 +66,8 @@
       (progn
         (pushnew (id feature) (feature-id-list level))
         (push (id feature) (aref (features level) (x feature) (y feature) (z feature)))
-        (when (apply-gravity feature)
+        (when (and (not (get-feature-type-trait feature +feature-trait-no-gravity+))
+                   (apply-gravity feature))
           (remove-feature-from-level-list level feature)
           (setf (z feature) (apply-gravity feature))
           (add-feature-to-level-list level feature))))

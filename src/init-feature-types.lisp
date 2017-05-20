@@ -82,7 +82,7 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-satanist-player+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Player Satanist Starting Position"))
 
-(set-feature-type (make-instance 'feature-type :id +feature-smoke-thin+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke" :trait-blocks-vision 60 :trait-smoke t
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-thin+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke" :trait-blocks-vision 60 :trait-smoke t :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)
                                                                    (let ((result nil))
                                                                      (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
@@ -114,7 +114,7 @@
                                                                      )
                                                                )))
 
-(set-feature-type (make-instance 'feature-type :id +feature-smoke-thick+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke" :trait-blocks-vision 80 :trait-smoke t
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-thick+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke" :trait-blocks-vision 80 :trait-smoke t :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)
                                                                    (let ((result nil))
                                                                      (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))

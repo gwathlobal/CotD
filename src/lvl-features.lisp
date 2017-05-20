@@ -14,6 +14,7 @@
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-vision - +feature-trait-blocks-vision+
    ;; :trait-smoke - +feature-trait-smoke+
+   ;; :trait-no-gravity - +feature-trait-no-gravity+
    (can-merge-func :initform #'(lambda (level feature-new)
                                  (let ((result nil))
                                    (loop for feat-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
@@ -46,12 +47,14 @@
     (adjust-array *feature-types* (list (1+ (id feature-type)))))
   (setf (aref *feature-types* (id feature-type)) feature-type))
 
-(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke)
+(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke trait-no-gravity)
   
   (when trait-blocks-vision
     (setf (gethash +feature-trait-blocks-vision+ (trait feature-type)) trait-blocks-vision))
   (when trait-smoke
     (setf (gethash +feature-trait-smoke+ (trait feature-type)) trait-smoke))
+  (when trait-no-gravity
+    (setf (gethash +feature-trait-no-gravity+ (trait feature-type)) trait-no-gravity))
   )
 
 ;;--------------------
@@ -71,7 +74,8 @@
   (setf (id feature) (find-free-id *lvl-features*))
   (setf (aref *lvl-features* (id feature)) feature)
 
-  (when (get-feature-type-trait feature +feature-trait-smoke+)
+  (when (and (zerop (counter feature))
+             (get-feature-type-trait feature +feature-trait-smoke+))
     (setf (counter feature) 1))
   )
 

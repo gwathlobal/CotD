@@ -329,8 +329,7 @@
   ;; drawing terrain
   (let ((glyph-idx)
         (glyph-color)
-        (back-color)
-        )
+        (back-color))
     (if (and (or (eq (get-terrain-* level map-x map-y map-z) +terrain-floor-air+)
                  (eq (get-terrain-* level map-x map-y map-z) +terrain-border-air+))
              (> map-z 0)
@@ -352,7 +351,8 @@
     (if (and (or (eq (get-terrain-* level map-x map-y map-z) +terrain-floor-air+)
                  (eq (get-terrain-* level map-x map-y map-z) +terrain-border-air+))
              (> map-z 0)
-             (get-terrain-type-trait (get-terrain-* level map-x map-y (1- map-z)) +terrain-trait-water+))
+             (get-terrain-type-trait (get-terrain-* level map-x map-y (1- map-z)) +terrain-trait-water+)
+             (null (get-features-* level map-x map-y map-z)))
       (progn
         (when (get-features-* level map-x map-y (1- map-z))
           (let ((ftr (get-feature-by-id (first (get-features-* level map-x map-y (1- map-z))))))

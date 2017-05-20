@@ -131,7 +131,7 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-satanist+ :x 41 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :x 41 :y 15 :z 0))
   (add-mob-to-level-list (level world) *player*)
   (let (;(soldier (make-instance 'mob :mob-type +mob-type-satanist+ :x (+ (x *player*) 5) :y (+ (y *player*) 0) :z 0))
         ;(demon (make-instance 'mob :mob-type +mob-type-man+ :x (+ (x *player*) 6) :y (- (y *player*) 0) :z 2))

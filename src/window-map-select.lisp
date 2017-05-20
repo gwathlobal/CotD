@@ -106,7 +106,9 @@
                 )
         (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
         (dolist (feature feature-list)
-          (format str ", ~A" (name (get-feature-by-id feature))))
+          (format str ", ~A~A"
+                  (name (get-feature-by-id feature))
+                  (if *cotd-release* "" (format nil " (~A)" (counter (get-feature-by-id feature))))))
         (when (and mob
                    (check-mob-visible mob :observer *player*))
           (format str "~%~A~A~A"

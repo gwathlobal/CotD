@@ -134,6 +134,7 @@
 (defconstant +mob-abil-reanimate-corpse+ 53)
 (defconstant +mob-abil-undead+ 54)
 (defconstant +mob-abil-shared-minds+ 55)
+(defconstant +mob-abil-smoke-bomb+ 56)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -174,6 +175,7 @@
 
 (defconstant +feature-trait-blocks-vision+ 0)
 (defconstant +feature-trait-smoke+ 1)
+(defconstant +feature-trait-no-gravity+ 2)
 
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)

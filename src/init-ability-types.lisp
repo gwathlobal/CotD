@@ -2215,3 +2215,51 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-smoke-bomb+ :name "Smoke bomb" :descr "Throw a bomb under your feet to conseal yourself in the clouds of smoke. Can not be used in water." 
+                                 :cd 30 :cost 0 :spd 5 :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                (let ((cell-list (list '(-1 -1 1) '(-1 0 1) '(-1 1 1) '(0 -1 1) '(0 0 1) '(0 1 1) '(1 -1 1) '(1 0 1) '(1 1 1)
+                                                                       '(-1 -1 0) '(-1 0 0) '(-1 1 0) '(0 -1 0) '(0 0 0) '(0 1 0) '(1 -1 0) '(1 0 0) '(1 1 0)
+                                                                       '(-1 -1 -1) '(-1 0 -1) '(-1 1 -1) '(0 -1 -1) '(0 0 -1) '(0 1 -1) '(1 -1 -1) '(1 0 -1) '(1 1 -1))))
+                                                  (loop for cell in cell-list
+                                                        for x = (+ (first cell) (x actor))
+                                                        for y = (+ (second cell) (y actor))
+                                                        for z = (+ (third cell) (z actor))
+                                                        do
+                                                           (format t "(~A ~A ~A)~%" x y z)
+                                                           (when (and (>= x 0) (>= y 0) (>= z 0)
+                                                                      (< x (array-dimension (terrain (level *world*)) 0)) (< y (array-dimension (terrain (level *world*)) 1)) (< z (array-dimension (terrain (level *world*)) 2))
+                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+))
+                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-projectiles+))
+                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+))
+                                                                      (or (= (third cell) 0)
+                                                                          (and (> (third cell) 0)
+                                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+)))
+                                                                          (and (< (third cell) 0)
+                                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) x y (z actor)) +terrain-trait-opaque-floor+)))))
+                                                             
+                                                             (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-thick+ :x x :y y :z z :counter 4)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-smoke-bomb+)
+                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-smoke-bomb+)
+                                                           (can-invoke-ability actor actor +mob-abil-smoke-bomb+)
+                                                           nearest-enemy
+                                                           (< (/ (cur-hp actor) (max-hp actor)) 
+                                                              0.4))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

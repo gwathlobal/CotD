@@ -74,7 +74,7 @@
              (loop for feature-id in (feature-id-list (level *world*))
                    for feature = (get-feature-by-id feature-id)
                    do
-                      (when (and (zerop (random 5))
+                      (when (and (zerop (random 3))
                                  (get-feature-type-trait feature +feature-trait-smoke+))
                         (if (= (counter feature) 1)
                           (progn
