@@ -1,5 +1,4 @@
 - Angels should have one unit, that can temporarily transform itself into an Archangel
-- Add smoke as a feature that can reduce visibility. Smoke should move across the map and disperse if its density is too low in a given cell
 - Add smoke bombs to the Thief
 - Add an ability to lit grass on fire to Angels. Fire should damage those standing in it and produce smoke
 - Add courtyard houses like Thief2RL

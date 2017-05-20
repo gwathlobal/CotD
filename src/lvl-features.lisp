@@ -13,6 +13,29 @@
    (func :initform nil :initarg :func :accessor func)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-vision - +feature-trait-blocks-vision+
+   ;; :trait-smoke - +feature-trait-smoke+
+   (can-merge-func :initform #'(lambda (level feature-new)
+                                 (let ((result nil))
+                                   (loop for feat-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                         for feat-old = (get-feature-by-id feat-old-id)
+                                         when (= (feature-type feature-new) (feature-type feat-old))
+                                           do
+                                              (setf result t)
+                                              (loop-finish)
+                                         )
+                                   result))
+                   :initarg :can-merge-func :accessor can-merge-func)
+   (merge-func :initform #'(lambda (level feature-new)
+                             (loop for feat-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                   for feat-old = (get-feature-by-id feat-old-id)
+                                   when (= (feature-type feature-new) (feature-type feat-old))
+                                     do
+                                        (remove-feature-from-level-list (level *world*) feature-new)
+                                        (remove-feature-from-world feature-new)
+                                        (loop-finish)
+                                   )
+                             )
+               :initarg :merge-func :accessor merge-func)
    ))
 
 (defun get-feature-type-by-id (feature-type-id)
@@ -23,10 +46,12 @@
     (adjust-array *feature-types* (list (1+ (id feature-type)))))
   (setf (aref *feature-types* (id feature-type)) feature-type))
 
-(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision)
+(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke)
   
   (when trait-blocks-vision
     (setf (gethash +feature-trait-blocks-vision+ (trait feature-type)) trait-blocks-vision))
+  (when trait-smoke
+    (setf (gethash +feature-trait-smoke+ (trait feature-type)) trait-smoke))
   )
 
 ;;--------------------
@@ -39,11 +64,15 @@
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)
    (z :initarg :z :initform 0 :accessor z :type fixnum)
+   (counter :initform 0 :initarg :counter :accessor counter :type fixnum)
    ))
 
 (defmethod initialize-instance :after ((feature feature) &key)
   (setf (id feature) (find-free-id *lvl-features*))
   (setf (aref *lvl-features* (id feature)) feature)
+
+  (when (get-feature-type-trait feature +feature-trait-smoke+)
+    (setf (counter feature) 1))
   )
 
 (defun get-feature-by-id (feature-id)
@@ -57,6 +86,12 @@
 
 (defmethod func ((feature feature))
   (func (get-feature-type-by-id (feature-type feature))))
+
+(defmethod can-merge-func ((feature feature))
+  (can-merge-func (get-feature-type-by-id (feature-type feature))))
+
+(defmethod merge-func ((feature feature))
+  (merge-func (get-feature-type-by-id (feature-type feature))))
 
 (defun get-feature-type-trait (feature feature-trait-id)
   (gethash feature-trait-id (trait (get-feature-type-by-id (feature-type feature)))))

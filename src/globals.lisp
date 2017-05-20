@@ -173,12 +173,14 @@
 ;;-------------------- 
 
 (defconstant +feature-trait-blocks-vision+ 0)
+(defconstant +feature-trait-smoke+ 1)
 
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
 (defconstant +feature-blood-stain+ 2)
 (defconstant +feature-start-satanist-player+ 3)
-(defconstant +feature-smoke+ 4)
+(defconstant +feature-smoke-thin+ 4)
+(defconstant +feature-smoke-thick+ 5)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

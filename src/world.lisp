@@ -57,13 +57,20 @@
         (setf (aref (mobs level) nx ny (z mob)) nil)))))
 
 (defun add-feature-to-level-list (level feature)
-  (pushnew (id feature) (feature-id-list level))
-  (push (id feature) (aref (features level) (x feature) (y feature) (z feature)))
-
-  (when (apply-gravity feature)
-    (remove-feature-from-level-list level feature)
-    (setf (z feature) (apply-gravity feature))
-    (add-feature-to-level-list level feature)))
+  (if (and (can-merge-func feature)
+           (funcall (can-merge-func feature) level feature)
+           (merge-func feature))
+      (progn
+        ;(format t "~A [~A] vs ~A [~A] ~A~%" (feature-type feature-old) (id feature-old) (feature-type feature) (id feature) (merge-func))
+        (funcall (merge-func feature) level feature))
+      (progn
+        (pushnew (id feature) (feature-id-list level))
+        (push (id feature) (aref (features level) (x feature) (y feature) (z feature)))
+        (when (apply-gravity feature)
+          (remove-feature-from-level-list level feature)
+          (setf (z feature) (apply-gravity feature))
+          (add-feature-to-level-list level feature))))
+  )
 
 (defun remove-feature-from-level-list (level feature)
   (setf (feature-id-list level) (remove (id feature) (feature-id-list level)))
