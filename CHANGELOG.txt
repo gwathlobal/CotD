@@ -3,6 +3,7 @@ CHANGELOG
 - Windows now ar not clear glass, so you will not see as far as you usually do when looking through windows. Leaves also obstruct your vision somewhat.
 - Undead now have their own counter.
 - Added smoke bombs to the Thief. Smoke will obstruct visibility and can help you escape.
+- Added an ability to ignite grass and furniture on fire to the Angels. Fire damages those standing in it and produces smoke.
 
 
 --------------------

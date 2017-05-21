@@ -135,6 +135,7 @@
 (defconstant +mob-abil-undead+ 54)
 (defconstant +mob-abil-shared-minds+ 55)
 (defconstant +mob-abil-smoke-bomb+ 56)
+(defconstant +mob-abil-ignite-the-fire+ 57)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -176,6 +177,7 @@
 (defconstant +feature-trait-blocks-vision+ 0)
 (defconstant +feature-trait-smoke+ 1)
 (defconstant +feature-trait-no-gravity+ 2)
+(defconstant +feature-trait-fire+ 3)
 
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
@@ -183,6 +185,7 @@
 (defconstant +feature-start-satanist-player+ 3)
 (defconstant +feature-smoke-thin+ 4)
 (defconstant +feature-smoke-thick+ 5)
+(defconstant +feature-fire+ 6)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -202,6 +205,7 @@
 (defconstant +terrain-trait-move-cost-factor+ 11)
 (defconstant +terrain-trait-openable-door+ 12)
 (defconstant +terrain-trait-openable-window+ 13)
+(defconstant +terrain-trait-flammable+ 14)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -248,6 +252,7 @@
 (defconstant +terrain-wall-lantern+ 42)
 (defconstant +terrain-wall-lantern-off+ 43)
 (defconstant +terrain-wall-window-opened+ 44)
+(defconstant +terrain-floor-ash+ 45)
 
 (defparameter *faction-table* (make-hash-table))
 

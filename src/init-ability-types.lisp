@@ -2263,3 +2263,71 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-ignite-the-fire+ :name "Ignite the fire" :descr "Set flammable furniture or grass on fire. Fire may damage those standing in it and produces smoke." 
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target here is list of (x y z) coordinates for the tile to be ignited
+                                                (multiple-value-bind (x y z) (values-list target)
+                                                  (print-visible-message x y z (level *world*) (format nil "~@(~A~) sets ~A on fire. " (visible-name actor) (get-terrain-name (get-terrain-* (level *world*) x y z)))
+                                                                         :observed-mob actor)
+                                                  (ignite-tile (level *world*) x y z (x actor) (y actor) (z actor))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-ignite-the-fire+)
+                                                               (get-melee-weapon-aux-param actor :is-fire))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((flammable-tile nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-flammable+)
+                                                                                                                 nearest-enemy
+                                                                                                                 (= dx (x nearest-enemy))
+                                                                                                                 (= dy (y nearest-enemy))
+                                                                                                                 (= (z actor) (z nearest-enemy))
+                                                                                                                 )
+                                                                                                        (setf flammable-tile (list dx dy (z actor)))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-ignite-the-fire+)
+                                                             (can-invoke-ability actor actor +mob-abil-ignite-the-fire+)
+                                                             flammable-tile
+                                                             (< (/ (cur-hp actor) (max-hp actor)) 
+                                                              0.6))
+                                                      
+                                                      t
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (let ((flammable-tile nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-flammable+)
+                                                                                                                 nearest-enemy
+                                                                                                                 (= dx (x nearest-enemy))
+                                                                                                                 (= dy (y nearest-enemy))
+                                                                                                                 (= (z actor) (z nearest-enemy))
+                                                                                                                 )
+                                                                                                        (setf flammable-tile (list dx dy (z actor)))))))
+                                                    (mob-invoke-ability actor flammable-tile (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (= (view-z *player*) (z *player*))
+                                                                 (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
+                                                                 (get-terrain-type-trait terrain +terrain-trait-flammable+))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

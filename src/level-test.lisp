@@ -27,9 +27,9 @@
                                   "...###+###................................................#...............#..."
                                   "...#.....#................................................#....#..........#..."
                                   "...#.....#................................................######.....######..."
-                                  "...#.....#............#####.......#####......................................."
-                                  "...#######............#...............-......................................."
-                                  "......................#...............#u......|..............................."
+                                  "...#.....#............#####.......#####.,,,..................................."
+                                  "...#######............#...............-.,,,..................................."
+                                  "......................#...............#u,,,...|..............................."
                                   "...#######...........u######-#+#########..................######.....######..."
                                   "...#.....#............#....#.....#_____#..................#...............#..."
                                   "...#.....+............#....+....###____#..................#...............#..."
@@ -109,6 +109,7 @@
                       do
                          (cond
                            ((char= c #\.) (setf (aref template-level (1+ x) (1+ y) z) +terrain-floor-stone+))
+                           ((char= c #\,) (setf (aref template-level (1+ x) (1+ y) z) +terrain-floor-grass+))
                            ((char= c #\#) (setf (aref template-level (1+ x) (1+ y) z) +terrain-wall-stone+))
                            ((char= c #\-) (setf (aref template-level (1+ x) (1+ y) z) +terrain-wall-window+))
                            ((char= c #\+) (setf (aref template-level (1+ x) (1+ y) z) +terrain-door-closed+))
@@ -131,7 +132,7 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :x 41 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-archangel+ :x 41 :y 15 :z 0))
   (add-mob-to-level-list (level world) *player*)
   (let (;(soldier (make-instance 'mob :mob-type +mob-type-satanist+ :x (+ (x *player*) 5) :y (+ (y *player*) 0) :z 0))
         ;(demon (make-instance 'mob :mob-type +mob-type-man+ :x (+ (x *player*) 6) :y (- (y *player*) 0) :z 2))
@@ -153,6 +154,7 @@
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 105))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-half+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-fire+  :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))

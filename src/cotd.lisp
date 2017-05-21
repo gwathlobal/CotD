@@ -69,43 +69,13 @@
              (setf (turn-finished *world*) t)
              (loop for mob across *mobs* do
                (unless (check-dead mob)
-                  ;; increase cur-ap by max-ap
+                 ;; increase cur-ap by max-ap
                  (incf (cur-ap mob) (max-ap mob))))
              (loop for feature-id in (feature-id-list (level *world*))
                    for feature = (get-feature-by-id feature-id)
+                   when (on-tick-func feature)
                    do
-                      (when (and (zerop (random 3))
-                                 (get-feature-type-trait feature +feature-trait-smoke+))
-                        (if (= (counter feature) 1)
-                          (progn
-                            (if (zerop (random 2))
-                              (progn
-                                (remove-feature-from-level-list (level *world*) feature)
-                                (remove-feature-from-world feature))
-                              (progn
-                                (let ((dir (1+ (random 9)))
-                                      (dx) (dy))
-                                  (multiple-value-setq (dx dy) (x-y-dir dir))
-                                  (setf dx (+ (x feature) dx) dy (+ (y feature) dy))
-                                  (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (z feature)) +terrain-trait-blocks-move+))
-                                             (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (z feature)) +terrain-trait-blocks-projectiles+)))
-                                    (remove-feature-from-level-list (level *world*) feature)
-                                    (setf (x feature) dx)
-                                    (setf (y feature) dy)
-                                    (add-feature-to-level-list (level *world*) feature))))))
-                          (progn
-                            (let ((feature-new nil)
-                                  (dir (1+ (random 9)))
-                                  (dx) (dy))
-                              (multiple-value-setq (dx dy) (x-y-dir dir))
-                              (setf dx (+ (x feature) dx) dy (+ (y feature) dy))
-                              (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (z feature)) +terrain-trait-blocks-move+))
-                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (z feature)) +terrain-trait-blocks-projectiles+)))
-                                (setf feature-new (make-instance 'feature :feature-type +feature-smoke-thin+ :x (x feature) :y (y feature) :z (z feature)))
-                                (decf (counter feature))
-                                (setf (x feature-new) dx)
-                                (setf (y feature-new) dy)
-                                (add-feature-to-level-list (level *world*) feature-new)))))))
+                      (funcall (on-tick-func feature) (level *world*) feature))
              ))
   )
   

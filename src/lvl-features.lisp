@@ -10,11 +10,11 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name feature" :initarg :name :accessor name)
-   (func :initform nil :initarg :func :accessor func)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-vision - +feature-trait-blocks-vision+
    ;; :trait-smoke - +feature-trait-smoke+
    ;; :trait-no-gravity - +feature-trait-no-gravity+
+   ;; :trait-fire - +feature-trait-fire+
    (can-merge-func :initform #'(lambda (level feature-new)
                                  (let ((result nil))
                                    (loop for feat-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
@@ -37,6 +37,7 @@
                                    )
                              )
                :initarg :merge-func :accessor merge-func)
+   (on-tick-func :initform nil :initarg :on-tick-func :accessor on-tick-func) ;; a funcation that takes (level feature)
    ))
 
 (defun get-feature-type-by-id (feature-type-id)
@@ -47,7 +48,7 @@
     (adjust-array *feature-types* (list (1+ (id feature-type)))))
   (setf (aref *feature-types* (id feature-type)) feature-type))
 
-(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke trait-no-gravity)
+(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke trait-no-gravity trait-fire)
   
   (when trait-blocks-vision
     (setf (gethash +feature-trait-blocks-vision+ (trait feature-type)) trait-blocks-vision))
@@ -55,6 +56,8 @@
     (setf (gethash +feature-trait-smoke+ (trait feature-type)) trait-smoke))
   (when trait-no-gravity
     (setf (gethash +feature-trait-no-gravity+ (trait feature-type)) trait-no-gravity))
+  (when trait-fire
+    (setf (gethash +feature-trait-fire+ (trait feature-type)) trait-fire))
   )
 
 ;;--------------------
@@ -75,7 +78,8 @@
   (setf (aref *lvl-features* (id feature)) feature)
 
   (when (and (zerop (counter feature))
-             (get-feature-type-trait feature +feature-trait-smoke+))
+             (or (get-feature-type-trait feature +feature-trait-smoke+)
+                 (get-feature-type-trait feature +feature-trait-fire+)))
     (setf (counter feature) 1))
   )
 
@@ -88,8 +92,8 @@
 (defmethod name ((feature feature))
   (name (get-feature-type-by-id (feature-type feature))))
 
-(defmethod func ((feature feature))
-  (func (get-feature-type-by-id (feature-type feature))))
+(defmethod on-tick-func ((feature feature))
+  (on-tick-func (get-feature-type-by-id (feature-type feature))))
 
 (defmethod can-merge-func ((feature feature))
   (can-merge-func (get-feature-type-by-id (feature-type feature))))
@@ -100,3 +104,35 @@
 (defun get-feature-type-trait (feature feature-trait-id)
   (gethash feature-trait-id (trait (get-feature-type-by-id (feature-type feature)))))
 
+(defun feature-smoke-on-tick (level feature)
+  (when (zerop (random 3))
+    (if (= (counter feature) 1)
+      (progn
+        (if (zerop (random 2))
+          (progn
+            (remove-feature-from-level-list level feature)
+            (remove-feature-from-world feature))
+          (progn
+            (let ((dir (1+ (random 9)))
+                  (dx) (dy))
+              (multiple-value-setq (dx dy) (x-y-dir dir))
+              (setf dx (+ (x feature) dx) dy (+ (y feature) dy))
+              (when (and (not (get-terrain-type-trait (get-terrain-* level dx dy (z feature)) +terrain-trait-blocks-move+))
+                         (not (get-terrain-type-trait (get-terrain-* level dx dy (z feature)) +terrain-trait-blocks-projectiles+)))
+                (remove-feature-from-level-list level feature)
+                (setf (x feature) dx)
+                (setf (y feature) dy)
+                (add-feature-to-level-list level feature))))))
+      (progn
+        (let ((feature-new nil)
+              (dir (1+ (random 9)))
+              (dx) (dy))
+          (multiple-value-setq (dx dy) (x-y-dir dir))
+          (setf dx (+ (x feature) dx) dy (+ (y feature) dy))
+          (when (and (not (get-terrain-type-trait (get-terrain-* level dx dy (z feature)) +terrain-trait-blocks-move+))
+                     (not (get-terrain-type-trait (get-terrain-* level dx dy (z feature)) +terrain-trait-blocks-projectiles+)))
+            (setf feature-new (make-instance 'feature :feature-type +feature-smoke-thin+ :x (x feature) :y (y feature) :z (z feature)))
+            (decf (counter feature))
+            (setf (x feature-new) dx)
+            (setf (y feature-new) dy)
+            (add-feature-to-level-list level feature-new)))))))

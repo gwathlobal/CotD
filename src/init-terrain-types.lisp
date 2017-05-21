@@ -39,7 +39,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-grass+ :name "Grass"
                                                :glyph-idx 95 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* 
-                                               :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-dirt+ :name "Dirt"
                                                :glyph-idx 95 :glyph-color (sdl:color :r 205 :g 103 :b 63) :back-color sdl:*black* 
@@ -68,6 +68,10 @@
                                                :glyph-idx 96 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black*
                                                :trait-opaque-floor t :trait-blocks-sound-floor 10))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-ash+ :name "Ash"
+                                               :glyph-idx 95 :glyph-color (sdl:color :r 70 :g 70 :b 70) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20))
+
 ;;--------------------
 ;; Walls
 ;;--------------------
@@ -86,7 +90,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-bush+ :name "Bush"
                                                :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3))
 
 ;;--------------------
 ;; Trees
@@ -138,19 +142,19 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-chair+ :name "Chair"
                                                :glyph-idx 100 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-table+ :name "Table"
                                                :glyph-idx 101 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 10))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bed+ :name "Bed"
                                                :glyph-idx 102 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 12))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-cabinet+ :name "Cabinet"
                                                :glyph-idx 103 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 8))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-crate+ :name "Crate"
                                                :glyph-idx 103 :glyph-color (sdl:color :r 112 :g 128 :b 144) :back-color sdl:*black*
@@ -158,7 +162,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bookshelf+ :name "Bookshelf"
                                                :glyph-idx 103 :glyph-color (sdl:color :r 165 :g 42 :b 42) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 8))
 
 ;;--------------------
 ;; Doors & Windows

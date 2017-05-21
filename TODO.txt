@@ -1,5 +1,4 @@
 - Angels should have one unit, that can temporarily transform itself into an Archangel
-- Add an ability to lit grass on fire to Angels. Fire should damage those standing in it and produce smoke
 - Add courtyard houses like Thief2RL
 - Do something with the message code so that name are captalized (and not capitalized) properly.
 - Add highscore table
