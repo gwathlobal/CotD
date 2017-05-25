@@ -152,9 +152,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
-                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                 ;; populate the world with the number of angels = humans / 10
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
                                                                                            #'find-unoccupied-place-outside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -220,9 +219,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
-                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                 ;; populate the world with the number of angels = humans / 10
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
                                                                                            #'find-unoccupied-place-outside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -289,9 +287,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
-                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                 ;; populate the world with the number of angels = humans / 10
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
                                                                                            #'find-unoccupied-place-outside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -375,9 +372,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
-                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                 ;; populate the world with the number of angels = humans / 10
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -481,9 +477,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
-                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                 ;; populate the world with the number of angels = humans / 10
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -558,9 +553,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
-                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                 ;; populate the world with the number of angels = humans / 10
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
                                                                                            #'find-unoccupied-place-outside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -627,9 +621,8 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
-                                                                 ;; populate the world with the number of angels = humans / 10, of which 1 will be an archangel
-                                                                 (populate-world-with-mobs world (list (cons +mob-type-archangel+ 1)
-                                                                                                       (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
+                                                                 ;; populate the world with the number of angels = humans / 10
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 10) 1)))
                                                                                            #'find-unoccupied-place-outside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)

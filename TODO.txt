@@ -1,4 +1,3 @@
-- Angels should have one unit, that can temporarily transform itself into an Archangel
 - Add courtyard houses like Thief2RL
 - Do something with the message code so that name are captalized (and not capitalized) properly.
 - Add highscore table

@@ -93,7 +93,7 @@
                  (get-single-memo-visibility (get-memo-* level x y z)))
             (and observed-mob
                  (get-single-memo-visibility (get-memo-* level x y z))
-                 (check-mob-visible observed-mob :observer *player*)))
+                 (check-mob-visible observed-mob :observer *player* :complete-check t)))
     (set-message-this-turn t)
     (add-message str)))
 
@@ -1382,7 +1382,30 @@
                (rem-mob-effect mob effect-id)
                (when (= effect-id +mob-effect-reveal-true-form+)
                  (when (slave-mob-id mob)
-                   (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob))))))))
+                   (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob))))))
+
+               (when (= effect-id +mob-effect-avatar-of-brilliance+)
+                 (let ((old-max-hp (max-hp mob)))
+                   (setf (mob-type mob) +mob-type-angel+)
+                   (setf (cur-hp mob) (round (* (cur-hp mob) (max-hp mob)) old-max-hp)))
+                 (setf (face-mob-type-id mob) (mob-type mob))
+                 (set-cur-weapons mob)
+                 (adjust-dodge mob)
+                 (adjust-armor mob)
+                 (adjust-m-acc mob)
+                 (adjust-r-acc mob)
+                 (adjust-sight mob)
+                 (set-name mob)
+                 
+                 ;; set up current abilities cooldowns
+                 (loop for ability-id being the hash-key in (abilities mob) do
+                   (setf (gethash ability-id (abilities-cd mob)) 0))
+                 
+                 (generate-sound mob (x mob) (y mob) (z mob) 60 #'(lambda (str)
+                                                                    (format nil "You hear some strange noise~A.~%" str)))
+                 
+                 (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                        (format nil "~A transforms itself back into Chrome Angel.~%" (visible-name mob))))))
 
   (loop for ability-id being the hash-key in (abilities-cd mob)
         when (not (zerop (abil-cur-cd-p mob ability-id)))

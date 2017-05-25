@@ -136,6 +136,7 @@
 (defconstant +mob-abil-shared-minds+ 55)
 (defconstant +mob-abil-smoke-bomb+ 56)
 (defconstant +mob-abil-ignite-the-fire+ 57)
+(defconstant +mob-abil-avatar-of-brilliance+ 58)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -150,6 +151,7 @@
 (defconstant +mob-effect-climbing-mode+ 10)
 (defconstant +mob-effect-alertness+ 11)
 (defconstant +mob-effect-ready-to-possess+ 12)
+(defconstant +mob-effect-avatar-of-brilliance+ 13)
 
 (defconstant +mob-order-follow+ 0)
 

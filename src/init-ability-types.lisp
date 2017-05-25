@@ -2280,7 +2280,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-ignite-the-fire+)
-                                                               (get-melee-weapon-aux-param actor :is-fire))
+                                                               (get-melee-weapon-aux-param actor :is-fire)
+                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2331,3 +2332,59 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into Avatar of Brilliance for 6 turns, significantly boosting your combat prowess." 
+                                 :cost 6 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (set-mob-effect actor +mob-effect-avatar-of-brilliance+ 6)
+                                                (let ((old-max-hp (max-hp actor)))
+                                                  (setf (mob-type actor) +mob-type-archangel+)
+                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                (setf (face-mob-type-id actor) (mob-type actor))
+                                                (set-cur-weapons actor)
+                                                (adjust-dodge actor)
+                                                (adjust-armor actor)
+                                                (adjust-m-acc actor)
+                                                (adjust-r-acc actor)
+                                                (adjust-sight actor)
+                                                (set-name actor)
+
+                                                (decf (cur-fp actor) (cost ability-type))
+
+                                                ;; set up current abilities cooldowns
+                                                (loop for ability-id being the hash-key in (abilities actor) do
+                                                  (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear some strange noise~A. " str)))
+                                                
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A transforms itself into Avatar of Brilliance. " (visible-name actor)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-avatar-of-brilliance+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+))
+                                                               (not (mob-effect-p actor +mob-effect-avatar-of-brilliance+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; if able to heal and less than 50% hp - heal
+                                                  (if (and (or (and nearest-enemy
+                                                                    (> (strength nearest-enemy) 
+                                                                       (strength actor)))
+                                                               (and nearest-enemy
+                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                       0.3)))
+                                                           (mob-ability-p actor +mob-abil-avatar-of-brilliance+)
+                                                           (can-invoke-ability actor actor +mob-abil-avatar-of-brilliance+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

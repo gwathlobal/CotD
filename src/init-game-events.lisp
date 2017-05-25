@@ -6,7 +6,7 @@
                                            :on-check #'(lambda (world)
                                                          (if (or (zerop (total-demons world))
                                                                  (and (mob-ability-p *player* +mob-abil-angel+)
-                                                                      (= (mob-type *player*) +mob-type-archangel+)
+                                                                      (= (mob-type *player*) +mob-type-angel+)
                                                                       (>= (cur-fp *player*) (max-fp *player*))))
                                                            t
                                                            nil))

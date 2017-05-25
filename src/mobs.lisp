@@ -91,6 +91,7 @@
    ;;   :abil-shared-minds - +mob-abil-shared-minds+
    ;;   :abil-smoke-bomb - +mob-abil-smoke-bomb+
    ;;   :abil-ignite-the-fire - +mob-abil-ignite-the-fire+
+   ;;   :abil-avatar-of-brilliance - +mob-abil-avatar-of-brilliance+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -118,7 +119,7 @@
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
-                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-smoke-bomb abil-ignite-the-fire)
+                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-smoke-bomb abil-ignite-the-fire abil-avatar-of-brilliance)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -257,6 +258,8 @@
     (setf (gethash +mob-abil-smoke-bomb+ (abilities mob-type)) t))
   (when abil-ignite-the-fire
     (setf (gethash +mob-abil-ignite-the-fire+ (abilities mob-type)) t))
+  (when abil-avatar-of-brilliance
+    (setf (gethash +mob-abil-avatar-of-brilliance+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -529,7 +532,7 @@
   ;; setting up name
   (set-name mob)
 
-   ;; set up current abilities cooldowns
+  ;; set up current abilities cooldowns
   (loop for ability-id being the hash-key in (abilities mob) do
     (setf (gethash ability-id (abilities-cd mob)) 0))
 
