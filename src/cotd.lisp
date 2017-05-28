@@ -4,6 +4,7 @@
   "Main game loop"
   (loop with turn-finished = t
         do
+           ;;(format t "GAME-LOOP: Start loop~%")
            (setf turn-finished t)
            
            ;; check all available game events
@@ -55,9 +56,10 @@
 
            
                      
-           (bt:with-lock-held ((path-lock *world*))
-             (setf (cur-mob-path *world*) 0)
-             (bt:condition-notify (path-cv *world*)))
+           ;(bt:with-lock-held ((path-lock *world*))
+           ;  (format t "THREAD: Start counting~%")
+           ;  (setf (cur-mob-path *world*) 0)
+           ;  (bt:condition-notify (path-cv *world*)))
 
            ;(bt:with-lock-held ((fov-lock *world*))
            ;  (setf (cur-mob-fov *world*) 0)

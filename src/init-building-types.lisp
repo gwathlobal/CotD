@@ -599,7 +599,8 @@
                                                     (when (= (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+)
                                                       (check-surroundings (+ x dx) (+ y dy) nil
                                                                           #'(lambda (x y)
-                                                                              (if (= (aref template-level x y z) +terrain-border-floor+)
+                                                                              (if (or (= (aref template-level x y z) +terrain-border-floor+)
+                                                                                      (= (aref template-level x y z) +terrain-border-grass+))
                                                                                 (setf (aref template-level x y z) +terrain-border-grass+)
                                                                                 (setf (aref template-level x y z) +terrain-floor-grass+)))))))
                                                 

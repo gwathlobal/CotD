@@ -244,9 +244,9 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-1+
                                        :name "Reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 3 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 6 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
@@ -255,9 +255,9 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-2+
                                        :name "Reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 4 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 7 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
@@ -266,9 +266,9 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-3+
                                        :name "Reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 5 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
@@ -277,9 +277,9 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-4+
                                        :name "Reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 9 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 0.9))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0

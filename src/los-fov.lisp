@@ -176,7 +176,7 @@
                                     
                                   exit-result))))
         )
-  (format t "HERE~%")
+  ;;(format t "HERE~%")
   )
 
 (defun update-visible-mobs-normal (mob)
