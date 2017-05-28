@@ -2381,6 +2381,7 @@
                                                                (and nearest-enemy
                                                                     (< (/ (cur-hp actor) (max-hp actor)) 
                                                                        0.3)))
+                                                           (null (riding-mob-id actor))
                                                            (mob-ability-p actor +mob-abil-avatar-of-brilliance+)
                                                            (can-invoke-ability actor actor +mob-abil-avatar-of-brilliance+))
                                                     t

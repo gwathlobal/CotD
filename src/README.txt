@@ -43,14 +43,14 @@ GENERAL TIPS
 --------------------
 THE CELESTIAL COMMUNION
 
- - You start as an Angel who can easily dispatch lowly Imps.
+ - You start as an Chrome Angel who can easily dispatch lowly Imps.
  - Bless humans to gain power.
- - To win, kill all demons or ascend beyond Archangel. Survival of mankind is not required.
+ - To win, kill all demons or ascend beyond the Chrome Angel. Survival of mankind is not required.
  
 -------------------- 
 THE PANDEMONIUM HIERARCHY
 
- - You start as a puny Imp who is no match for an Angel.
+ - You start as a puny Imp who is no match for a Chrome Angel.
  - Kill humans to gain power. Beware of blessed ones. 
  - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
 

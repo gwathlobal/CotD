@@ -6,20 +6,20 @@ GENERAL TIPS
  - You are not alone here - there are allies that can help.
  - Your enemies are able to hide their true appearance, so observe and learn their tactics to avoid nasty surprises.
  - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.
- - Angels and demons gain power when killing each other proportional to the strength of the slain adversary.
+ - Angels and Demons gain power when killing each other proportional to the strength of the slain adversary.
  - Stockpile power to get promoted or spend it on available abilities.
  
 THE CELESTIAL COMMUNION
- - The Celestial Communion is represented with two units: Angel and Archangel.
- - You start as an Angel who can easily dispatch lowly Imps. 
+ - The Celestial Communion is represented with one unit: Chrome Angel that can temporarily transform itself into Avatar of Brilliance.
+ - A Chrome Angel can easily dispatch lowly Imps. To deal with more powerful targets, invoke the Avatar of Brilliance powers. 
  - You can bless humans to gain power.
  - You are able to hide your divinity and disguise yourself as a human to lure enemies to you.
  - Your strength is the ability to heal yourself when needed. You are also able to see what all other Angels see.
- - To win, kill all demons or ascend beyond Archangel. Survival of mankind is not required.
+ - To win, kill all demons or ascend beyond Chrome Angel. Survival of mankind is not required.
  
 THE PANDEMONIUM HIERARCHY
  - The Pandemonium Hierarchy is represented with three units: Imp, Demon, and Archdemon.
- - You start as a puny Imp who is no match for an Angel. Run or summon help when confronted by one.
+ - You start as a puny Imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
  - Imps and Demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
@@ -50,10 +50,10 @@ THE MILITARY
  - To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.
  
 THE CRIMINALS
- - The criminals (who are opposed to the citizens and the military, but will not attack the Angels) are kept mainly in the prison (except for the Thief).
+ - The criminals (who are opposed to the citizens and the military, but will not attack the Communion) are kept mainly in the prison (except for the Thief).
  - You may start as the Thief, who is found somewhere on the rooftops of the City.
  - Though the Thief is armed with a knife, his primary weapons are stealth and an ability to climb walls. Unlike all other characters, he is able to evade any conflict by hiding in the shadows or getting some place he can not be reached.
- - Note that the citizens, the Angels, and the military radiate light, while the Demons do not. 
+ - Note that the citizens, the Communion units, and the military radiate light, while the Demons do not. 
  - As the Thief, you always start at night but a new day will come eventually that will severely hinder your ability to hide. 
  - To win, grab enough gold and get to the edge of the map to leave this accursed City.
  - But beware - the Thief is rather frail and is not immune to possession.
@@ -62,4 +62,4 @@ THE SATANISTS
  - Satanists are allied with demons. They are able to call demons to them for free, curse all enemies in sight with inaccuracy and raise dead.
  - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
  - You may play as a Satanist. But beware of the military - you will not be able to conceal the fact that you are an enemy of humankind.
- - To win, kill all angels.
+ - To win, destroy the Communion.
