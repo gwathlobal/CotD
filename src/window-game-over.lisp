@@ -40,15 +40,16 @@
     (format str "    The Summoner: ~A with ~A summons~%" (get-qualified-name (find-mob-with-max-calls)) (stat-calls (find-mob-with-max-calls)))
     (format str "      The Jumper: ~A with ~A summon answers~%" (get-qualified-name (find-mob-with-max-answers)) (stat-answers (find-mob-with-max-answers)))
     (format str "   The Berserker: ~A with ~A friendly kills~%" (get-qualified-name (find-mob-with-max-friendly-kills)) (calculate-total-friendly-kills (find-mob-with-max-friendly-kills)))
-    
-    
-    
-    (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 10 (sdl:get-font-height)))))
+    (format str "     The Scrooge: ~A~%" (if (zerop (calculate-total-value (find-mob-with-max-value)))
+                                                                   (format nil "None")
+                                                                   (format nil "~A with ~A$ worth of items" (get-qualified-name (find-mob-with-max-value)) (calculate-total-value (find-mob-with-max-value)))))
+        
+    (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 11 (sdl:get-font-height)))))
 
-  (show-message-box 6 (+ 40 (* 10 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 10 (sdl:get-font-height))) *full-message-box*)
+  (show-message-box 6 (+ 40 (* 11 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 12 (sdl:get-font-height))) *full-message-box*)
 
   (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] Exit game")
-                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+                           10 (- *window-height* 11 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))
 
@@ -119,3 +120,19 @@
              (when (> (calculate-total-friendly-kills mob) (calculate-total-friendly-kills mob-found))
                (setf mob-found mob))
              (setf mob-found mob))))
+
+(defun calculate-total-value (mob)
+  (if (and (check-dead mob) (eq mob *player*))
+    (stat-gold mob)
+    (get-overall-value (inv mob))))
+
+(defun find-mob-with-max-value ()
+  (loop for mob across *mobs*
+        with mob-found = nil
+        finally (return mob-found)
+        do
+           (if mob-found
+             (when (> (calculate-total-value mob) (calculate-total-value mob-found))
+               (setf mob-found mob))
+             (setf mob-found mob))))
+

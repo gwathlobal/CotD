@@ -7,7 +7,6 @@
 - Make $1500 a guaranteed sum on the map
 - Add achievement: The Necromancer (who raised the most zombies)
 - Add achievement: The Evil Spirit (most possessions)
-- Add achievement: The Scrooge (most gold collected)
 - Add wind to the map.
 - Add courtyard houses like Thief2RL
 - Do something with the message code so that name are captalized (and not capitalized) properly.

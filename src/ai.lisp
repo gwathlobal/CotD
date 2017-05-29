@@ -811,7 +811,7 @@
   (setf *time-at-end-of-player-turn* (get-internal-real-time)))
 
 
-(defun thread-path-loop-old (stream)
+(defun thread-path-loop (stream)
   (loop while t do
     (bt:with-lock-held ((path-lock *world*))      
       (if (and (< (cur-mob-path *world*) (length (mob-id-list (level *world*)))) (not (made-turn *player*)))
@@ -881,76 +881,3 @@
           (bt:condition-wait (path-cv *world*) (path-lock *world*)))
         
         ))))
-
-(defun thread-path-loop- (stream)
-  (loop while t do
-    (if (and (< (cur-mob-path *world*) (length (mob-id-list (level *world*)))) (not (made-turn *player*)))
-      (progn
-        (when (and (not (eq *player* (get-mob-by-id (cur-mob-path *world*))))
-                   (not (dead= (get-mob-by-id (cur-mob-path *world*))))
-                   (not (path (get-mob-by-id (cur-mob-path *world*)))))
-          (logger (format nil "~%THREAD: Mob ~A [~A] calculates paths~%" (name (get-mob-by-id (cur-mob-path *world*))) (id (get-mob-by-id (cur-mob-path *world*)))) stream)
-          (let* ((mob (get-mob-by-id (cur-mob-path *world*)))
-                 (rx (- (+ 10 (x mob))
-                        (1+ (random 20)))) 
-                 (ry (- (+ 10 (y mob))
-                        (1+ (random 20))))
-                 (rz (- (+ 5 (z mob))
-                        (1+ (random 10))))
-                 (path nil)
-                 )
-            (declare (type fixnum rx ry))
-            
-            ;; if the mob destination is not set, choose a random destination
-            (unless (path-dst mob)
-              (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
-                              (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
-                              (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
-                              (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
-                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+)))
-                              (not (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)
-                                                                                                               (map-size (get-mob-by-id (riding-mob-id mob)))
-                                                                                                               (map-size mob))
-                                                            (get-mob-move-mode mob)))
-                              )
-                    do
-                       (setf rx (- (+ 10 (x mob))
-                                   (1+ (random 20))))
-                       (setf ry (- (+ 10 (y mob))
-                                   (1+ (random 20))))
-                       (setf rz (- (+ 5 (z mob))
-                                   (1+ (random 10)))))
-              (setf (path-dst mob) (list rx ry rz)))
-            
-            (when (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)) (if (riding-mob-id mob)
-                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
-                                                                                                                                                           (map-size mob))
-                                           (get-mob-move-mode mob))
-              (logger (format nil "THREAD: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) stream)
-              (setf path (a-star (list (x mob) (y mob) (z mob)) (list (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) 
-                                 #'(lambda (dx dy dz cx cy cz) 
-                                     ;; checking for impassable objects
-                                     (check-move-for-ai mob dx dy dz cx cy cz)
-                                     )
-                                 #'(lambda (dx dy dz)
-                                     ;; a magic hack here - as values of more than 10 give an unexplainable slowdown
-                                     (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
-                                        (move-spd (get-mob-type-by-id (mob-type mob)))
-                                        1/10))))
-              
-              (pop path)
-              (logger (format nil "THREAD: Set mob path - ~A~%" path) stream)
-              (setf (path mob) path)
-              ))
-          )
-        (incf (cur-mob-path *world*))
-        (logger (format nil "THREAD: cur-mob-path - ~A~%" (cur-mob-path *world*)) stream)
-        (format stream "THREAD: cur-mob-path - ~A/~A~%" (cur-mob-path *world*) (length (mob-id-list (level *world*)))))
-      (progn
-        (logger (format nil "THREAD: Done calculating paths~%~%") stream)
-        (format stream "THREAD: Done calculating paths~%~%")
-        (setf (cur-mob-path *world*) (length (mob-id-list (level *world*))))
-        ;;(bt:condition-wait (path-cv *world*) (path-lock *world*))
-        (bt:destroy-thread *path-thread*))
-      
-      )))

@@ -1196,6 +1196,9 @@
     (when (mob-effect-p mob +mob-effect-blessed+)
       (decf (total-blessed *world*)))
 
+    ;; set stat-gold before dropping inventory
+    (setf (stat-gold mob) (get-overall-value (inv mob)))
+    
     ;; place the inventory on the ground
     (loop for item-id in (inv mob)
           for item = (get-item-by-id item-id)

@@ -56,10 +56,12 @@
 
            
                      
-           ;(bt:with-lock-held ((path-lock *world*))
-           ;  (format t "THREAD: Start counting~%")
-           ;  (setf (cur-mob-path *world*) 0)
-           ;  (bt:condition-notify (path-cv *world*)))
+           (bt:with-lock-held ((path-lock *world*))
+             (when (and *path-thread* (bt:thread-alive-p *path-thread*))
+               ;;(format t "THREAD: Destroy thread~%")
+               ;;(setf (cur-mob-path *world*) 0)
+               ;;(bt:condition-notify (path-cv *world*))
+               (bt:destroy-thread *path-thread*)))
 
            ;(bt:with-lock-held ((fov-lock *world*))
            ;  (setf (cur-mob-fov *world*) 0)

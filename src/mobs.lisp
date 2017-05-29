@@ -500,6 +500,7 @@
    (stat-blesses :initform 0 :accessor stat-blesses)
    (stat-calls :initform 0 :accessor stat-calls)
    (stat-answers :initform 0 :accessor stat-answers)
+   (stat-gold :initform 0 :accessor stat-gold)
 
    (inv :initform () :accessor inv)
 
