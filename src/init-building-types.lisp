@@ -50,8 +50,9 @@
                                             (values (list (list +mob-type-man+ 4 5 z)
                                                           (list +mob-type-woman+ 3 2 (+ z 1))
                                                           (list +mob-type-child+ 5 5 (+ z 1)))
+                                                    (list (list +feature-start-gold-small+ 3 2 (+ z 1)))
                                                     nil
-                                                    (list (list +item-type-coin+ 3 2 (+ z 1) (+ 50 (random 51))))))))
+                                                    ))))
 
 (set-building-type (make-building :id +building-city-house-2+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y z template-level)
@@ -92,8 +93,8 @@
                                             (values (list (list +mob-type-man+ 2 3 z)
                                                           (list +mob-type-woman+ 4 2 (+ z 1))
                                                           (list +mob-type-child+ 5 4 (+ z 1)))
-                                                    nil
-                                                    (list (list +item-type-coin+ 4 2 (+ z 1) (+ 50 (random 51))))))))
+                                                    (list (list +feature-start-gold-small+ 4 2 (+ z 1)))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-house-3+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y z template-level)
@@ -134,8 +135,8 @@
                                             (values (list (list +mob-type-man+ 5 4 z)
                                                           (list +mob-type-woman+ 2 2 (+ z 1))
                                                           (list +mob-type-child+ 2 4 (+ z 1)))
-                                                    nil
-                                                    (list (list +item-type-coin+ 2 2 (+ z 1) (+ 50 (random 51))))))))
+                                                    (list (list +feature-start-gold-small+ 2 2 (+ z 1)))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-house-4+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-house+
                                   :func #'(lambda (x y z template-level)
@@ -176,8 +177,8 @@
                                             (values (list (list +mob-type-man+ 4 2 z)
                                                           (list +mob-type-woman+ 2 4 (+ z 1))
                                                           (list +mob-type-child+ 4 5 (+ z 1)))
-                                                    nil
-                                                    (list (list +item-type-coin+ 2 4 (+ z 1) (+ 50 (random 51))))))))
+                                                    (list (list +feature-start-gold-small+ 2 4 (+ z 1)))
+                                                    nil))))
 
 ;;=====================
 ;; Townhalls
@@ -228,8 +229,8 @@
                                             (values (list (list +mob-type-clerk+ 7 8 (+ z 1))
                                                           (list +mob-type-clerk+ 7 8 z)
                                                           (list +mob-type-clerk+ 12 7 z))
-                                                    nil
-                                                    (list (list +item-type-coin+ 7 8 (+ z 1) (+ 100 (random 101))))))))
+                                                    (list (list +feature-start-gold-small+ 7 8 (+ z 1)))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-townhall-2+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -276,8 +277,8 @@
                                             (values (list (list +mob-type-clerk+ 3 3 z)
                                                           (list +mob-type-clerk+ 8 3 (+ z 1))
                                                           (list +mob-type-clerk+ 8 2 z))
-                                                    nil
-                                                    (list (list +item-type-coin+ 8 3 (+ z 1) (+ 100 (random 101))))))))
+                                                    (list (list +feature-start-gold-small+ 8 3 (+ z 1)))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-townhall-3+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -339,8 +340,8 @@
                                             (values (list (list +mob-type-clerk+ 2 8 (+ z 1))
                                                           (list +mob-type-clerk+ 2 13 z)
                                                           (list +mob-type-clerk+ 2 8 z))
-                                                    nil
-                                                    (list (list +item-type-coin+ 2 8 (+ z 1) (+ 100 (random 101))))))))
+                                                    (list (list +feature-start-gold-small+ 2 8 (+ z 1)))
+                                                    nil))))
 
 (set-building-type (make-building :id +building-city-townhall-4+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-townhall+
                                   :func #'(lambda (x y z template-level)
@@ -402,8 +403,8 @@
                                             (values (list (list +mob-type-clerk+ 7 2 z)
                                                           (list +mob-type-clerk+ 7 8 (+ z 1))
                                                           (list +mob-type-clerk+ 7 8 z))
-                                                    nil
-                                                    (list (list +item-type-coin+ 7 8 (+ z 1) (+ 100 (random 101))))))))
+                                                    (list (list +feature-start-gold-small+ 7 8 (+ z 1)))
+                                                    nil))))
 
 ;;=====================
 ;; Parks

@@ -188,6 +188,8 @@
 (defconstant +feature-smoke-thin+ 4)
 (defconstant +feature-smoke-thick+ 5)
 (defconstant +feature-fire+ 6)
+(defconstant +feature-start-gold-small+ 7)
+(defconstant +feature-start-gold-big+ 8)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

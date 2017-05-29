@@ -127,6 +127,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature
@@ -134,7 +135,8 @@
                                                                        for lvl-feature = (get-feature-by-id feature-id)
                                                                        when (= (feature-type lvl-feature) +feature-start-satanist-player+)
                                                                          do
-                                                                            (remove-feature-from-level-list (level world) lvl-feature))
+                                                                            (remove-feature-from-level-list (level world) lvl-feature)
+                                                                            (remove-feature-from-world lvl-feature))
                                                                  )
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -181,6 +183,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature
@@ -249,6 +252,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature
@@ -317,6 +321,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature
@@ -422,6 +427,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature
@@ -521,6 +527,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature
@@ -583,6 +590,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature

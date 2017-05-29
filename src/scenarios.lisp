@@ -655,3 +655,22 @@
                    )))
 
   )
+
+(defun replace-gold-features-with-items (world mob-template-list)
+  (declare (ignore mob-template-list))
+  ;; remove the gold starting feature and replace it with actual gold so that there are guaranteed 1500$ on the level
+  (let ((total-gold-items (loop for feature-id in (feature-id-list (level world))
+                                for lvl-feature = (get-feature-by-id feature-id)
+                                when (= (feature-type lvl-feature) +feature-start-gold-small+)
+                                  count lvl-feature)))
+    
+    (loop for feature-id in (feature-id-list (level world))
+          for lvl-feature = (get-feature-by-id feature-id)
+          when (= (feature-type lvl-feature) +feature-start-gold-small+)
+            do
+               (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (x lvl-feature) :y (y lvl-feature) :z (z lvl-feature)
+                                                                          :qty (+ (round 1250 total-gold-items) (random 51))))
+               (remove-feature-from-level-list (level world) lvl-feature)
+               (remove-feature-from-world lvl-feature)
+          )
+    ))
