@@ -40,16 +40,18 @@
     (format str "    The Summoner: ~A with ~A summons~%" (get-qualified-name (find-mob-with-max-calls)) (stat-calls (find-mob-with-max-calls)))
     (format str "      The Jumper: ~A with ~A summon answers~%" (get-qualified-name (find-mob-with-max-answers)) (stat-answers (find-mob-with-max-answers)))
     (format str "   The Berserker: ~A with ~A friendly kills~%" (get-qualified-name (find-mob-with-max-friendly-kills)) (calculate-total-friendly-kills (find-mob-with-max-friendly-kills)))
+    (format str " The Evil Spirit: ~A with ~A possessions~%" (get-qualified-name (find-mob-with-max-possessions)) (stat-possess (find-mob-with-max-possessions)))
+    (format str " The Necromancer: ~A with ~A reanimations~%" (get-qualified-name (find-mob-with-max-reanimations)) (stat-raised-dead (find-mob-with-max-reanimations)))
     (format str "     The Scrooge: ~A~%" (if (zerop (calculate-total-value (find-mob-with-max-value)))
                                                                    (format nil "None")
                                                                    (format nil "~A with ~A$ worth of items" (get-qualified-name (find-mob-with-max-value)) (calculate-total-value (find-mob-with-max-value)))))
         
-    (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 11 (sdl:get-font-height)))))
+    (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 13 (sdl:get-font-height)))))
 
-  (show-message-box 6 (+ 40 (* 11 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 12 (sdl:get-font-height))) *full-message-box*)
+  (show-message-box 6 (+ 40 (* 13 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 14 (sdl:get-font-height))) *full-message-box*)
 
   (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] Exit game")
-                           10 (- *window-height* 11 (sdl:char-height sdl:*default-font*)))
+                           10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))
 
@@ -136,3 +138,22 @@
                (setf mob-found mob))
              (setf mob-found mob))))
 
+(defun find-mob-with-max-possessions ()
+  (loop for mob across *mobs*
+        with mob-found = nil
+        finally (return mob-found)
+        do
+           (if mob-found
+             (when (> (stat-possess mob) (stat-possess mob-found))
+               (setf mob-found mob))
+             (setf mob-found mob))))
+
+(defun find-mob-with-max-reanimations ()
+  (loop for mob across *mobs*
+        with mob-found = nil
+        finally (return mob-found)
+        do
+           (if mob-found
+             (when (> (stat-raised-dead mob) (stat-raised-dead mob-found))
+               (setf mob-found mob))
+             (setf mob-found mob))))

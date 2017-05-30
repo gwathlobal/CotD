@@ -501,6 +501,8 @@
    (stat-calls :initform 0 :accessor stat-calls)
    (stat-answers :initform 0 :accessor stat-answers)
    (stat-gold :initform 0 :accessor stat-gold)
+   (stat-possess :initform 0 :accessor stat-possess)
+   (stat-raised-dead :initform 0 :accessor stat-raised-dead)
 
    (inv :initform () :accessor inv)
 
@@ -849,6 +851,19 @@
           (setf (name mob) (nth name-pick-n *cur-demon-names*))
           (setf *cur-demon-names* (remove (nth name-pick-n *cur-demon-names*) *cur-demon-names*))))
       ))
+  (when (and (not (eq mob *player*))
+             (eq (mob-type mob) +mob-type-satanist+))
+    (let ((name-pick-n)
+          (surname-pick-n))
+      (unless *cur-human-names*
+        (return-from set-name nil))
+      (unless *cur-human-surnames*
+        (return-from set-name nil))
+      (setf name-pick-n (random (length *cur-human-names*)))
+      (setf surname-pick-n (random (length *cur-human-surnames*)))
+      (setf (name mob) (format nil "~A ~A" (nth name-pick-n *cur-human-names*) (nth surname-pick-n *cur-human-surnames*)))
+      (setf *cur-human-names* (remove (nth name-pick-n *cur-human-names*) *cur-human-names*))
+      (setf *cur-human-surnames* (remove (nth surname-pick-n *cur-human-surnames*) *cur-human-surnames*))))
   (setf (alive-name mob) (name mob)))
 
 (defun get-followers-list (mob)

@@ -194,8 +194,8 @@
                                        :name "Avatar of Brilliance"
                                        :glyph-idx 33 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 36 :max-fp 32
                                        :faction +faction-type-angels+
-                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 5 9 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
-                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
+                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 6 9 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 4
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-heal-self 2 :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t

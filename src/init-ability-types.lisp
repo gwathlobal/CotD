@@ -174,6 +174,7 @@
                                                 (set-mob-effect target +mob-effect-possessed+)
                                                 (setf (face-mob-type-id actor) (mob-type target))
                                                 (rem-mob-effect actor +mob-effect-ready-to-possess+)
+                                                (incf (stat-possess actor))
 
                                                 ;; when the target is riding something - replace the rider with the actor
                                                 (when (riding-mob-id target)
@@ -2080,7 +2081,8 @@
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)
                                                   (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. " (name target)))
-                                                  (remove-item-from-world target))
+                                                  (remove-item-from-world target)
+                                                  (incf (stat-raised-dead actor)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -2334,13 +2336,13 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into Avatar of Brilliance for 6 turns, significantly boosting your combat prowess." 
-                                 :cost 6 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into Avatar of Brilliance for 8 turns, significantly boosting your combat prowess." 
+                                 :cost 4 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (set-mob-effect actor +mob-effect-avatar-of-brilliance+ 6)
+                                                (set-mob-effect actor +mob-effect-avatar-of-brilliance+ 8)
                                                 (let ((old-max-hp (max-hp actor)))
                                                   (setf (mob-type actor) +mob-type-archangel+)
                                                   (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))

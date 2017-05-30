@@ -6,7 +6,10 @@ CHANGELOG
 - Added an ability to ignite grass and furniture on fire to the Angels. Fire damages those standing in it and produces smoke.
 - Added ability to temporarily transform into Avatars of Brilliance (former Archangels) to Angels.
 - Added the Scrooge achievement - for those who hold the most gold at the end of the game.
+- Added the Evil Spirit achievement - for those who had the most possessions during the game.
+- Added the Necromancer achievement - for those who made the highest number of reanimations during the game.
 - Gold coins worth 1500$ are now guaranteed on the map.
+- Satanist now have unique names.
 
 --------------------
 May 13, 2017 v1.1.2

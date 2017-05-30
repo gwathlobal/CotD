@@ -4,8 +4,6 @@
 - Give Archdemons a ranged attack
 - Give consumables to soldiers: Medkit
 - Make Thief's smoke bombs a consumable item
-- Add achievement: The Necromancer (who raised the most zombies)
-- Add achievement: The Evil Spirit (most possessions)
 - Add wind to the map.
 - Add courtyard houses like Thief2RL
 - Do something with the message code so that name are captalized (and not capitalized) properly.

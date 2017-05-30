@@ -23,8 +23,14 @@
                                        "Pruflas" "Raum" "Rimmon" "Ronove" "Ronwe" "Shax" "Shalbriri" "Sonellion" "Stolas" "Succorbenoth" "Thamuz" "Ukobach" "Uphir" "Uvall" "Valafar" "Vepar" "Verdelet" "Verin" "Xaphan" "Zagan"
                                        "Zepar"))
 
+(defparameter *init-human-names* (list "Ivan" "Dmitry" "Alexey" "Nicolay" "Alexander" "Pyotr" "Pavel" "Vladimir" "Mikhail" "Fyodor" "Gavriil" "Vasiliy" "Denis" "Konstantin" "Sergey" "Vladislav"))
+(defparameter *init-human-surnames* (list "Grekov" "Plotnikov" "Strakhov" "Verkhovenskiy" "Shatov" "Stavrogin" "Kirillov" "Tushin" "Lebyadkin" "Liputin" "Virginskiy" "Lyamshin" "Tolkachenko" "Shigalev" "Karmazinov" "Nechayev"
+                                          "Lebedev" "Rogozhin" "Ivolgin" "Epanchin" "Ferdishchenko" "Totskiy" "Myshkin" "Pavlishchev" "Burdovskiy" "Radomskiy" "Molovtsov" "Terentyev" "Ptitsin"))
+
 (defparameter *cur-demon-names* nil)
 (defparameter *cur-angel-names* nil)
+(defparameter *cur-human-names* nil)
+(defparameter *cur-human-surnames* nil)
 
 ;;--------------------
 ;; MOB-TEMPLATE Constants

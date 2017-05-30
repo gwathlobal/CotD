@@ -93,6 +93,8 @@
   
   (setf *cur-angel-names* (copy-list *init-angel-names*))
   (setf *cur-demon-names* (copy-list *init-demon-names*))
+  (setf *cur-human-names* (copy-list *init-human-names*))
+  (setf *cur-human-surnames* (copy-list *init-human-surnames*))
 
   (setf *update-screen-closure* #'(lambda (str)
                                     (when (and str
