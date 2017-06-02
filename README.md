@@ -5,14 +5,18 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-May 13, 2017 v1.1.2
+June 02, 2017 v1.1.3
 
-- All Angels now have a shared mind - each of them sees what others see.
-- Satanists are now a playable faction. Their goal is to assist their demon masters and destroy all angelic forces.
-- Satanists are now able to reanimate corpses. The less severed body parts the corpse has - the stronger it will be after the reanimation. Reanimated corpses are slow-moving, have very little HP and will burn to ashes when killed by Angels.
-- Demons' ability to possess is now toggleable, so that you can kill humans instead of always possessing them first if you wish so.
-- Demons now have an ability to sacrifice their host on demand to gain power and health (as if they killed them in combat). 
-- Added a bank building to the city.
+- Windows now ar not clear glass, so you will not see as far as you usually do when looking through windows. Leaves also obstruct your vision somewhat.
+- Undead now have their own counter.
+- Added smoke bombs to the Thief. Smoke will obstruct visibility and can help you escape.
+- Added an ability to ignite grass and furniture on fire to the Angels. Fire damages those standing in it and produces smoke.
+- Added ability to temporarily transform into Avatars of Brilliance (former Archangels) to Angels.
+- Added the Scrooge achievement - for those who hold the most gold at the end of the game.
+- Added the Evil Spirit achievement - for those who had the most possessions during the game.
+- Added the Necromancer achievement - for those who made the highest number of reanimations during the game.
+- Gold coins worth 1500$ are now guaranteed on the map.
+- Satanist now have unique names.
 
 CURRENT CHANGELOG
 
