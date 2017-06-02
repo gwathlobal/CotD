@@ -2336,13 +2336,13 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into Avatar of Brilliance for 8 turns, significantly boosting your combat prowess." 
+                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into Avatar of Brilliance for 6 turns, significantly boosting your combat prowess." 
                                  :cost 4 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (set-mob-effect actor +mob-effect-avatar-of-brilliance+ 8)
+                                                (set-mob-effect actor +mob-effect-avatar-of-brilliance+ 6)
                                                 (let ((old-max-hp (max-hp actor)))
                                                   (setf (mob-type actor) +mob-type-archangel+)
                                                   (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))

@@ -356,7 +356,6 @@
   
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
-  (setf *current-dir* (remove #\^ *current-dir*))
   (setf *cotd-release* t)
 
   (sdl:with-init ()  
@@ -377,7 +376,7 @@
 
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
-  (setf *cotd-release* nil)
+  (setf *cotd-release* t)
   
   (sdl:with-init ()  
     (cotd-main))
@@ -391,7 +390,7 @@
 
 #+(and sbcl windows) 
 (defun make-exec ()
-  (sb-ext:save-lisp-and-die "cotd.exe" :toplevel #'cotd-exec :executable t :application-type :console))
+  (sb-ext:save-lisp-and-die "cotd.exe" :toplevel #'cotd-exec :executable t :application-type :gui))
 
 #+(and sbcl unix) 
 (defun make-exec ()
