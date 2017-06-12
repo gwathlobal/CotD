@@ -271,10 +271,12 @@
 (defparameter *terrain-types* (make-array (list 0) :adjustable t))
 (defparameter *mob-types* (make-array (list 0) :adjustable t))
 (defparameter *item-types* (make-array (list 0) :adjustable t))
+(defparameter *effect-types* (make-array (list 0) :adjustable t))
 
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))
 (defparameter *items* (make-array (list 0) :adjustable t))
+(defparameter *effects* (make-array (list 0) :adjustable t))
 
 (defparameter *world* nil)
 (defparameter *player* nil)

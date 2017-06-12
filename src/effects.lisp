@@ -1,0 +1,36 @@
+(in-package :cotd)
+
+(defclass effect-type ()
+  ((id :initarg :id :accessor id)
+   (name :initarg :name :accessor name)
+   (color :initarg :color :accessor color)
+   (on-add :initform #'(lambda (effect-type actor)
+                         (declare (ignore effect-type actor))
+                         nil)
+           :initarg :on-add :accessor on-add)
+   (on-remove :initform #'(lambda (effect-type actor)
+                            (declare (ignore effect-type actor))
+                            nil)
+              :initarg :on-remove :accessor on-remove)
+   ))
+
+(defun set-effect-type (effect-type)
+  (when (>= (id effect-type) (length *effect-types*))
+    (adjust-array *effect-types* (list (1+ (id effect-type)))))
+  (setf (aref *effect-types* (id effect-type)) effect-type))
+
+(defun get-effect-type-by-id (effect-type-id)
+  (aref *effect-types* effect-type-id)) 
+
+(defclass effect ()
+  ((id :initform 0 :accessor id :type fixnum)
+   (actor :initform nil :accessor actor)
+   (target :initform nil :accessor target)
+   (cd :initform 0 :accessor cd)
+   ))
+
+(defmethod initialize-instance :after ((effect effect) &key)
+  (setf (id effect) (find-free-id *effects*))
+  (setf (aref *effects* (id effect)) effect)
+
+  )

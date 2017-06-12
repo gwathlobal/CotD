@@ -8,29 +8,19 @@
    ))
 
 (defun show-char-effects (mob x y h)
-  (loop for effect being the hash-key in (effects mob)
+  (loop for effect-type-id being the hash-key in (effects mob)
         with y1 = y    
         do
            (when (and (> (hash-table-count (effects mob)) (truncate h (sdl:get-font-height)))
                       (> (+ y1 (* 2 (sdl:get-font-height))) (+ y h)))
              (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
              (loop-finish))
-           (cond
-               ((= effect +mob-effect-possessed+) (sdl:draw-string-solid-* "Possession" x y1 :color sdl:*red*))
-               ((= effect +mob-effect-blessed+) (sdl:draw-string-solid-* "Blessed" x y1 :color sdl:*blue*))
-               ((= effect +mob-effect-reveal-true-form+) (sdl:draw-string-solid-* "Revealed" x y1 :color sdl:*red*))
-               ((= effect +mob-effect-divine-consealed+) (sdl:draw-string-solid-* "Consealed" x y1 :color sdl:*cyan*))
-               ((= effect +mob-effect-calling-for-help+) (sdl:draw-string-solid-* "Summoning" x y1 :color sdl:*green*))
-               ((= effect +mob-effect-called-for-help+) (sdl:draw-string-solid-* "Called" x y1 :color sdl:*green*))
-               ((= effect +mob-effect-divine-shield+) (sdl:draw-string-solid-* "Divine shield" x y1 :color sdl:*yellow*))
-               ((= effect +mob-effect-cursed+) (sdl:draw-string-solid-* "Cursed" x y1 :color (sdl:color :r 139 :g 69 :b 19)))
-               ((= effect +mob-effect-blind+) (sdl:draw-string-solid-* "Blind" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
-               ((= effect +mob-effect-fear+) (sdl:draw-string-solid-* "Fear" x y1 :color sdl:*magenta*))
-               ((= effect +mob-effect-climbing-mode+) (sdl:draw-string-solid-* "Climbing" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
-               ((= effect +mob-effect-alertness+) (sdl:draw-string-solid-* "On alert" x y1 :color sdl:*red*))
-               ((= effect +mob-effect-ready-to-possess+) (sdl:draw-string-solid-* "Ready to possess" x y1 :color (sdl:color :r 100 :g 100 :b 100)))
-               ((= effect +mob-effect-avatar-of-brilliance+) (sdl:draw-string-solid-* (format nil "Avatar of Brilliance (~A)" (mob-effect-p mob effect)) x y1 :color sdl:*white*)))
-             (incf y1 (sdl:get-font-height))))
+           (sdl:draw-string-solid-* (format nil "~A~A" (name (get-effect-type-by-id effect-type-id)) (if (eq (mob-effect-p mob effect-type-id) t)
+                                                                                                          ""
+                                                                                                       (format nil " (~A)" (mob-effect-p mob effect-type-id))))
+                                    x y1 :color sdl:*red*)
+           
+           (incf y1 (sdl:get-font-height))))
 
 (defun show-char-properties (x y idle-calcing)
   (let* ((str)

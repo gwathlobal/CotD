@@ -625,11 +625,13 @@
 (defun mob-ability-p (mob ability-type-id)
   (gethash ability-type-id (abilities mob)))
 
-(defun set-mob-effect (mob effect-id &optional (value t))
-  (setf (gethash effect-id (effects mob)) value))
+(defun set-mob-effect (mob effect-type-id &optional (value t))
+  (funcall (on-add (get-effect-type-by-id effect-type-id)) (get-effect-type-by-id effect-type-id) mob)
+  (setf (gethash effect-type-id (effects mob)) value))
 
-(defun rem-mob-effect (mob effect-id)
-  (remhash effect-id (effects mob)))
+(defun rem-mob-effect (mob effect-type-id)
+  (funcall (on-remove (get-effect-type-by-id effect-type-id)) (get-effect-type-by-id effect-type-id) mob)
+  (remhash effect-type-id (effects mob)))
 
 (defmethod name ((mob mob))
   (if (slot-value mob 'name)

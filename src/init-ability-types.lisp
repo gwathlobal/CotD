@@ -2343,29 +2343,8 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 (set-mob-effect actor +mob-effect-avatar-of-brilliance+ 6)
-                                                (let ((old-max-hp (max-hp actor)))
-                                                  (setf (mob-type actor) +mob-type-archangel+)
-                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
-                                                (setf (face-mob-type-id actor) (mob-type actor))
-                                                (set-cur-weapons actor)
-                                                (adjust-dodge actor)
-                                                (adjust-armor actor)
-                                                (adjust-m-acc actor)
-                                                (adjust-r-acc actor)
-                                                (adjust-sight actor)
-                                                (set-name actor)
-
                                                 (decf (cur-fp actor) (cost ability-type))
-
-                                                ;; set up current abilities cooldowns
-                                                (loop for ability-id being the hash-key in (abilities actor) do
-                                                  (setf (gethash ability-id (abilities-cd actor)) 0))
                                                 
-                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                           (format nil "You hear some strange noise~A. " str)))
-                                                
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A transforms itself into Avatar of Brilliance. " (visible-name actor)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
