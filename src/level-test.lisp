@@ -132,9 +132,9 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-archdemon+ :x 41 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :x 41 :y 15 :z 0))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x (+ (x *player*) 5) :y (+ (y *player*) 0) :z 0))
+  (let (;(soldier (make-instance 'mob :mob-type +mob-type-angel+ :x (+ (x *player*) 5) :y (+ (y *player*) 0) :z 0))
         ;(demon (make-instance 'mob :mob-type +mob-type-man+ :x (+ (x *player*) 6) :y (- (y *player*) 0) :z 2))
         )
     (setf (cur-fp *player*) 32)
@@ -142,8 +142,8 @@
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
     ;(set-mob-effect *player* +mob-effect-called-for-help+ 10)
     ;(set-mob-effect demon +mob-effect-calling-for-help+ 100)
-    (setf (cur-fp soldier) 20)
-    (add-mob-to-level-list (level world) soldier)
+    ;(setf (cur-fp soldier) 20)
+    ;(add-mob-to-level-list (level world) soldier)
     ;(add-mob-to-level-list (level world) demon)
 
     ;(mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))
