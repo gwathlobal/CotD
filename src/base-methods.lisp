@@ -355,7 +355,13 @@
             (print-visible-message (x mob) (y mob) (z mob) (level *world*)
                                    (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg) :observed-mob mob)))
         (when (check-dead mob)
-          (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))))
+          (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())
+          (when (mob-effect-p mob +mob-effect-possessed+)
+            (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
+            (setf (x (get-mob-by-id (slave-mob-id mob))) (x mob)
+                  (y (get-mob-by-id (slave-mob-id mob))) (y mob)
+                  (z (get-mob-by-id (slave-mob-id mob))) (z mob))
+            (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())))))
     
     ;; apply gravity to the mob, standing on your head, if any
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
@@ -760,6 +766,9 @@
         (when (and (check-dead target)
                    (mob-effect-p target +mob-effect-possessed+))
           (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+          (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
+                (y (get-mob-by-id (slave-mob-id target))) (y target)
+                (z (get-mob-by-id (slave-mob-id target))) (z target))
           (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params nil))
         )))
                      
@@ -956,6 +965,9 @@
           
         (when (mob-effect-p a-target +mob-effect-possessed+)
           (setf (cur-hp (get-mob-by-id (slave-mob-id a-target))) 0)
+          (setf (x (get-mob-by-id (slave-mob-id a-target))) (x a-target)
+                (y (get-mob-by-id (slave-mob-id a-target))) (y a-target)
+                (z (get-mob-by-id (slave-mob-id a-target))) (z a-target))
           (make-dead (get-mob-by-id (slave-mob-id a-target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))
         ))
     
@@ -973,6 +985,14 @@
       (set-abil-cur-cd actor ability-type-id (abil-max-cd-p ability-type-id))
       (incf-mob-motion actor (motion ability-type))
       (make-act actor (spd ability-type)))))
+
+(defun mob-use-item (actor item)
+  (when (on-use item)
+    (funcall (on-use item) actor item)
+    (setf (inv actor) (remove-from-inv item (inv actor) :qty 1))
+    (remove-item-from-world item)
+    (incf-mob-motion actor *mob-motion-use-item*)
+    (make-act actor (truncate +normal-ap+ 2))))
 
 (defun make-melee-attack (actor target &key (weapon nil) (acc 100) (no-dodge nil) (make-act t))
   (logger (format nil "MAKE-MELEE-ATTACK: ~A attacks ~A~%" (name actor) (name target)))
@@ -1154,10 +1174,13 @@
       ))
 
   (when (check-dead target)
-    (if (mob-effect-p target +mob-effect-possessed+)
-      (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse nil :aux-params ())
-      (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-melee-weapon-aux-simple weapon)))
-                                                                                                   
+    (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-melee-weapon-aux-simple weapon))
+    (when (mob-effect-p target +mob-effect-possessed+)
+      (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+      (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
+            (y (get-mob-by-id (slave-mob-id target))) (y target)
+            (z (get-mob-by-id (slave-mob-id target))) (z target))
+      (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))                                                                                             
     )
   
   (when make-act (make-act actor (get-melee-weapon-speed-simple weapon)))
@@ -1420,7 +1443,13 @@
         (decf (cur-hp mob) *lack-oxygen-dmg*)
         (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~@(~A~) can not breath and takes ~A dmg. " (visible-name mob) *lack-oxygen-dmg*) :observed-mob mob)
         (when (check-dead mob)
-          (make-dead mob :splatter nil :msg t))
+          (make-dead mob :splatter nil :msg t)
+          (when (mob-effect-p mob +mob-effect-possessed+)
+            (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
+            (setf (x (get-mob-by-id (slave-mob-id mob))) (x mob)
+                  (y (get-mob-by-id (slave-mob-id mob))) (y mob)
+                  (z (get-mob-by-id (slave-mob-id mob))) (z mob))
+            (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())))
         (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%") :observed-mob mob))))
   
   

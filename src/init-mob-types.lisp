@@ -29,6 +29,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-woman+ 
@@ -40,6 +41,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-child+ 
@@ -62,6 +64,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-coin+ (+ 10 (random 10))))
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-criminal+ 
@@ -84,6 +87,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-priest+ 
@@ -117,8 +121,9 @@
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 30
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t :abil-smoke-bomb t
+                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t
                                        :ai-kleptomaniac t :ai-cautious t
+                                       :init-items (list (list +item-type-smoke-bomb+ 3))
                              ))
 
 
@@ -131,6 +136,7 @@
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-medkit+ 3))
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sergeant+ 
@@ -142,6 +148,7 @@
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-medkit+ 3))
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
@@ -153,6 +160,7 @@
                                        :ai-curious t
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
                                        :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t :abil-independent t :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-medkit+ 3))
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
@@ -164,6 +172,7 @@
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
                                        :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-medkit+ 3))
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scout+ 
@@ -175,6 +184,7 @@
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-starts-with-horse t
                                        :abil-independent t :abil-detect-good t :abil-detect-evil t :abil-eagle-eye t :abil-open-close-door t
+                                       :init-items (list (list +item-type-medkit+ 3))
                              ))
 
 

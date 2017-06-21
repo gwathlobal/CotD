@@ -6,10 +6,14 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name item" :initarg :name :accessor name)
+   (descr :initform nil :initarg :descr :accessor descr)
    (max-stack-num :initform 1 :initarg :max-stack-num :accessor max-stack-num)
    (value :initform 0 :initarg :value :accessor value)
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; abil-corpse - +item-abil-corpse+
+   (on-use :initform nil :initarg :on-use :accessor on-use)
+   (on-check-applic :initform nil :initarg :on-check-applic :accessor on-check-applic)
+   (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)
    ))
 
 (defmethod initialize-instance :after ((item-type item-type) &key abil-corpse)
@@ -73,6 +77,30 @@
 
 (defmethod value ((item item))
   (* (qty item) (value (get-item-type-by-id (item-type item)))))
+
+(defmethod on-use ((item item))
+  (on-use (get-item-type-by-id (item-type item))))
+
+(defmethod on-check-ai ((item item))
+  (on-check-ai (get-item-type-by-id (item-type item))))
+
+(defmethod on-check-applic ((item item))
+  (on-check-applic (get-item-type-by-id (item-type item))))
+
+(defmethod descr ((item item))
+  (descr (get-item-type-by-id (item-type item))))
+
+(defun get-item-descr (item)
+  (let ((str (create-string)))
+    (format str "~A~%~%~AQty: ~A~A" (name item)
+            (if (descr item)
+              (format nil "~A~%" (descr item))
+              "")
+            (qty item)
+            (if (not (zerop (value item)))
+              (format nil " Value: ~A" (value item))
+              ""))
+    str))
 
 (defun get-inv-item-by-id (inv item-id)
   (if (find item-id inv)

@@ -421,7 +421,32 @@
           (funcall ai-invoke-func (nth r ability-list) mob nearest-enemy nearest-ally))
         (return-from ai-function)
         )
-    )
+      )
+
+    ;; use an item if any
+    (let ((item-list) (r 0))
+      (declare (type fixnum r)
+               (type list item-list))
+               
+      ;; find all applicable items
+      (setf item-list (loop for item-id in (inv mob)
+                            for item = (get-item-by-id item-id)
+                            for ai-func of-type function = (on-check-ai item)
+                            for use-func of-type function = (on-use item) 
+                            when (and use-func
+                                      ai-func
+                                      (funcall ai-func mob item nearest-enemy nearest-ally))
+                              collect item))
+
+      
+      ;; randomly choose one of them and invoke it
+      (when item-list
+        (setf r (random (length item-list)))
+        (logger (format nil "AI-FUNCTION: ~A [~A] decides to use item ~A [~A]~%" (name mob) (id mob) (name (nth r item-list)) (id (nth r item-list))))
+        (mob-use-item mob (nth r item-list))
+        (return-from ai-function)
+        )
+      )
     
     ;; engage in ranged combat
     ;; if no bullets in magazine - reload

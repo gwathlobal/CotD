@@ -50,6 +50,7 @@
                                                 
                                                 (setf item (make-instance 'item :item-type body-part-type :x tx :y ty :z tz))
                                                 (setf (name item) (format nil "~@(~A~)'s ~A" (alive-name mob) body-part-str))
+                                                (setf (alive-name item) (format nil "~A" (alive-name mob)))
                                                 (add-item-to-level-list (level *world*) item)
                                                 (reveal-cell-on-map (level *world*) tx ty tz)
                                                 (display-cell-on-map tx ty tz)

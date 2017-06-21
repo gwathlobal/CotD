@@ -89,7 +89,6 @@
    ;;   :abil-reanimate-corpse - +mob-abil-reanimate-corpse+
    ;;   :abil-undead - +mob-abil-undead+
    ;;   :abil-shared-minds - +mob-abil-shared-minds+
-   ;;   :abil-smoke-bomb - +mob-abil-smoke-bomb+
    ;;   :abil-ignite-the-fire - +mob-abil-ignite-the-fire+
    ;;   :abil-avatar-of-brilliance - +mob-abil-avatar-of-brilliance+
    
@@ -107,6 +106,8 @@
    (move-spd :initform +normal-ap+ :initarg :move-spd :accessor move-spd)
    (base-light-radius :initform *base-light-radius* :initarg :base-light-radius :accessor base-light-radius)
    (base-stealth :initform 0 :initarg :base-stealth :accessor base-stealth)
+
+   (init-items :initform nil :initarg :init-items :accessor init-items)  ;; for initarg - ((<item-type-id> <item-qty>) ...)
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
@@ -119,7 +120,7 @@
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
-                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-smoke-bomb abil-ignite-the-fire abil-avatar-of-brilliance)
+                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -254,8 +255,6 @@
     (setf (gethash +mob-abil-undead+ (abilities mob-type)) t))
   (when abil-shared-minds
     (setf (gethash +mob-abil-shared-minds+ (abilities mob-type)) t))
-  (when abil-smoke-bomb
-    (setf (gethash +mob-abil-smoke-bomb+ (abilities mob-type)) t))
   (when abil-ignite-the-fire
     (setf (gethash +mob-abil-ignite-the-fire+ (abilities mob-type)) t))
   (when abil-avatar-of-brilliance
@@ -524,6 +523,21 @@
       (add-mob-to-level-list (level *world*) horse)
       (setf (mounted-by-mob-id horse) (id mob))
       (setf (riding-mob-id mob) (id horse))))
+
+  (loop for (item-type-id qty) in (init-items (get-mob-type-by-id (mob-type mob))) do
+    (mob-pick-item mob (make-instance 'item :item-type item-type-id :x (x mob) :y (y mob) :z (z mob) :qty qty)
+                   :spd nil :silent t))
+  
+  ;; if you belong to the military - add medkits
+  ;(when (and (mob-ability-p mob +mob-abil-human+)
+  ;           (eq (faction mob) +faction-type-military+))
+  ;  (mob-pick-item mob (make-instance 'item :item-type +item-type-medkit+ :x (x mob) :y (y mob) :z (z mob) :qty 3)
+  ;                 :spd nil :silent t))
+
+  ;; if you are a thief - add smoke bombs
+  ;(when (= (mob-type mob) +mob-type-thief+)
+  ;  (mob-pick-item mob (make-instance 'item :item-type +item-type-smoke-bomb+ :x (x mob) :y (y mob) :z (z mob) :qty 3)
+  ;                 :spd nil :silent t))
   
   (set-cur-weapons mob)
   (adjust-dodge mob)
@@ -557,7 +571,6 @@
     (incf (total-angels *world*))
     (incf (initial-angels *world*)))
 
- 
   )
 
 (defun get-mob-by-id (mob-id)

@@ -23,7 +23,21 @@
   ;; a pane for displaying commands
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 10 :y 455 :w 620 :h 13))
     (sdl:fill-surface sdl:*black* :template a-rect)
-    (sdl:draw-string-solid-* "[d] Drop all  [Ctrl+d] Drop  [Esc] Exit" 10 455 :color sdl:*white*))
+    (sdl:draw-string-solid-* (format nil "~A~A~A[Esc] Exit"
+                                     (if (> (length (inv *player*)) 0)
+                                       "[d] Drop all  "
+                                       "")
+                                     (if (and (> (length (inv *player*)) 0)
+                                              (> (qty (get-inv-item-by-pos (inv *player*) (cur-inv win))) 1))
+                                       "[Ctrl+d] Drop  "
+                                       "")
+                                     (if (and (> (length (inv *player*)) 0)
+                                              (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                                              (on-use (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                                              (funcall (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win))) *player* (get-inv-item-by-pos (inv *player*) (cur-inv win))))
+                                       "[u] Use  "
+                                       ""))
+                             10 455 :color sdl:*white*))
 
   ;; drawing the inventory list
   (let ((cur-str) (lst (make-list 0)) (color-list (make-list 0)))
@@ -42,10 +56,9 @@
     (draw-selection-list lst cur-str (truncate 425 15) 20 20 color-list))
 
   ;; drawing selected item description
-  ;(when (> (length (inv *player*)) 0)
-  ;  (let ((item (get-item-inv (cur-inv win) *player*)))
-  ;    (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-  ;	(write-text (get-med-descr item) (sdl:rectangle :x 330 :y 15 :w 295 :h 215)))))
+  (when (> (length (inv *player*)) 0)
+    (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win))))
+      (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w 295 :h 215))))
 
   ;; drawing some player chars
   ;(let ((str (make-array (list 0) :element-type 'character :adjustable t :fill-pointer t)))
@@ -132,6 +145,14 @@
                               (make-output *current-window*)
                               (return-from run-window nil)))
                           ))
+                       ((sdl:key= key :sdl-key-u)
+                        (when (and (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                                   (on-use (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                                   (funcall (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win))) *player* (get-inv-item-by-pos (inv *player*) (cur-inv win))))
+                          (mob-use-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                          (setf *current-window* (return-to win))
+                          (make-output *current-window*)
+                          (return-from run-window nil)))
                        ;((sdl:key= key :sdl-key-return) (on-use (get-item-inv (cur-inv win) *player*) *player*))
 		       ;  ((and (sdl:key= key :sdl-key-e) (= mod 0)) (eject-ammo *player* (get-item-inv (cur-inv win) *player*)))
                        )

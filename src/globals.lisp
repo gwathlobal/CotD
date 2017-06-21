@@ -140,7 +140,7 @@
 (defconstant +mob-abil-reanimate-corpse+ 53)
 (defconstant +mob-abil-undead+ 54)
 (defconstant +mob-abil-shared-minds+ 55)
-(defconstant +mob-abil-smoke-bomb+ 56)
+;(defconstant +mob-abil-smoke-bomb+ 56)
 (defconstant +mob-abil-ignite-the-fire+ 57)
 (defconstant +mob-abil-avatar-of-brilliance+ 58)
 
@@ -177,6 +177,8 @@
 (defconstant +item-type-body-part-body+ 2)
 (defconstant +item-type-body-part-full+ 3)
 (defconstant +item-type-coin+ 4)
+(defconstant +item-type-medkit+ 5)
+(defconstant +item-type-smoke-bomb+ 6)
 
 ;;--------------------
 ;; FEATURE-TYPE Constants
@@ -305,6 +307,7 @@
 (defparameter *mob-motion-reload* 40)
 (defparameter *mob-motion-ascend* 100)
 (defparameter *mob-motion-pick-drop* 30)
+(defparameter *mob-motion-use-item* 30)
 
 (defparameter *mob-exposure-alertness* 30)
 
