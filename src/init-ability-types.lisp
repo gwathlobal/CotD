@@ -49,7 +49,7 @@
                                  :motion 25
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
-                                                (set-mob-effect actor +mob-effect-divine-consealed+)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-divine-consealed+ :actor-id (id actor) :cd t)
                                                 (setf (face-mob-type-id actor) +mob-type-human+)
                                                 (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
                                                                                                            (format nil "You hear some strange noise~A. " str)))
@@ -141,7 +141,7 @@
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                 (setf (face-mob-type-id target) (mob-type target))
-                                                (set-mob-effect target +mob-effect-reveal-true-form+ 5))
+                                                (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-detect-evil+)
@@ -170,8 +170,8 @@
                                                                                                 
                                                 (setf (master-mob-id target) (id actor))
                                                 (setf (slave-mob-id actor) (id target))
-                                                (set-mob-effect actor +mob-effect-possessed+)
-                                                (set-mob-effect target +mob-effect-possessed+)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-possessed+ :actor-id (id actor))
+                                                (set-mob-effect target :effect-type-id +mob-effect-possessed+ :actor-id (id target))
                                                 (setf (face-mob-type-id actor) (mob-type target))
                                                 (rem-mob-effect actor +mob-effect-ready-to-possess+)
                                                 (incf (stat-possess actor))
@@ -231,7 +231,7 @@
                                                 
                                                 (logger (format nil "MOB-BLESS-TARGET: ~A [~A] blesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
-                                                (set-mob-effect target +mob-effect-blessed+)
+                                                (set-mob-effect target :effect-type-id +mob-effect-blessed+ :actor-id (id actor))
                                                 (incf (total-blessed *world*))
                                                 (incf (cur-fp actor))
                                                 (incf (stat-blesses actor))
@@ -359,9 +359,9 @@
                                                   ;; place the effect of "called for help" on the allies in the final list 
                                                   (loop for ally-mob-id in allies-list 
                                                         do
-                                                           (set-mob-effect (get-mob-by-id ally-mob-id) +mob-effect-called-for-help+ 2))
+                                                           (set-mob-effect (get-mob-by-id ally-mob-id) :effect-type-id +mob-effect-called-for-help+ :actor-id (id actor) :cd 2))
                                                   
-                                                  (set-mob-effect actor +mob-effect-calling-for-help+ 2)
+                                                  (set-mob-effect actor :effect-type-id +mob-effect-calling-for-help+ :actor-id (id actor) :cd 2)
                                                   (decf (cur-fp actor) (cost ability-type))
                                                   (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone reciting incantations~A. " str)))
@@ -525,7 +525,7 @@
                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                         (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name (get-mob-by-id enemy-mob-id)))))
                                                                (setf (face-mob-type-id (get-mob-by-id enemy-mob-id)) (mob-type (get-mob-by-id enemy-mob-id)))
-                                                               (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+ 5))
+                                                               (set-mob-effect (get-mob-by-id enemy-mob-id) :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5))
                                                              (mob-burn-blessing actor (get-mob-by-id enemy-mob-id)))
                                                     ))
                                                 )
@@ -575,9 +575,9 @@
                                                   ;; place the effect of "called for help" on the allies in the final list 
                                                   (loop for ally-mob-id in allies-list 
                                                         do
-                                                           (set-mob-effect (get-mob-by-id ally-mob-id) +mob-effect-called-for-help+ 2))
+                                                           (set-mob-effect (get-mob-by-id ally-mob-id) :effect-type-id +mob-effect-called-for-help+ :actor-id (id actor) :cd 2))
                                                   
-                                                  (set-mob-effect actor +mob-effect-calling-for-help+ 2)
+                                                  (set-mob-effect actor :effect-type-id +mob-effect-calling-for-help+ :actor-id (id actor) :cd 2)
                                                   (decf (cur-fp actor) (cost ability-type))
                                                   (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone reciting incantations~A. " str)))
@@ -635,7 +635,7 @@
                                                     (loop for ally-mob-id in ally-list
                                                           do
                                                              (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the ally ~A~%" (name actor) (id actor) (get-mob-by-id ally-mob-id)))
-                                                             (set-mob-effect (get-mob-by-id ally-mob-id) +mob-effect-divine-shield+ 99)
+                                                             (set-mob-effect (get-mob-by-id ally-mob-id) :effect-type-id +mob-effect-divine-shield+ :actor-id (id actor) :cd 99)
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A is granted divine shield. " (visible-name (get-mob-by-id ally-mob-id))))
                                                           )
@@ -707,7 +707,7 @@
                                                                  )
                                                                (progn
                                                                  (logger (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
-                                                                 (set-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-cursed+ 5)
+                                                                 (set-mob-effect (get-mob-by-id enemy-mob-id) :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                         (format nil "~A is cursed. " (visible-name (get-mob-by-id enemy-mob-id))))))
                                                           )
@@ -761,7 +761,7 @@
                                                         do
                                                            (when (mob-effect-p target +mob-effect-divine-consealed+)
                                                              (rem-mob-effect target +mob-effect-divine-consealed+)
-                                                             (set-mob-effect target +mob-effect-reveal-true-form+ 5)
+                                                             (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
                                                              (setf (face-mob-type-id target) (mob-type target))
                                                              (print-visible-message (x target) (y target) (z actor) (level *world*) 
                                                                                     (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
@@ -770,7 +770,7 @@
                                                                (print-visible-message (x target) (y target) (z actor) (level *world*) 
                                                                                       (format nil "~@(~A~) reveals the true form of ~A. " (visible-name actor) (get-qualified-name target))))
                                                              (setf (face-mob-type-id target) (mob-type target))
-                                                             (set-mob-effect target +mob-effect-reveal-true-form+ 5))))                                                      
+                                                             (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5))))                                                      
                                                 
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -865,7 +865,7 @@
                                                       for mob = (get-mob-by-id (nth i (visible-mobs actor)))
                                                       when (not (mob-ability-p mob +mob-abil-angel+))
                                                         do
-                                                           (set-mob-effect mob +mob-effect-blind+ 2)
+                                                           (set-mob-effect mob :effect-type-id +mob-effect-blind+ :actor-id (id actor) :cd 2)
                                                            (adjust-sight mob)
                                                            (if (eq *player* mob)
                                                              (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
@@ -926,7 +926,7 @@
                                                         do
                                                            (if (> (random (+ (strength mob) (mob-ability-p actor +mob-abil-instill-fear+))) (strength mob))
                                                              (progn
-                                                               (set-mob-effect mob +mob-effect-fear+ 3)
+                                                               (set-mob-effect mob :effect-type-id +mob-effect-fear+ :actor-id (id actor) :cd 3)
                                                                (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                       (format nil "~@(~A~) is feared. " (visible-name mob))
                                                                                       :observed-mob mob))
@@ -1256,7 +1256,7 @@
                                                 
                                                 
                                                 (setf (face-mob-type-id actor) (mob-type actor))
-                                                (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 4)
                                                 
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -1342,7 +1342,7 @@
                                                     
                                                     (rem-mob-effect target +mob-effect-divine-consealed+)
                                                     (setf (face-mob-type-id target) (mob-type target))
-                                                    (set-mob-effect target +mob-effect-reveal-true-form+ 5)
+                                                    (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil "It is ~A. " (get-qualified-name target))))
                                                   (progn
@@ -1567,7 +1567,7 @@
                                                       
                                                       
                                                       (setf (face-mob-type-id actor) (mob-type actor))
-                                                      (set-mob-effect actor +mob-effect-reveal-true-form+ 4)
+                                                      (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 4)
                                                       
                                                       ))
                                                   ))
@@ -1800,7 +1800,7 @@
                                                   (progn
                                                     (when (eq actor *player*)
                                                       (add-message "You toggle on the climbing mode. "))
-                                                    (set-mob-effect actor +mob-effect-climbing-mode+))))
+                                                    (set-mob-effect actor :effect-type-id +mob-effect-climbing-mode+ :actor-id (id actor) :cd t))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (mob-ability-p actor +mob-abil-climbing+)
@@ -2004,7 +2004,7 @@
                                                   (progn
                                                     (when (eq actor *player*)
                                                       (add-message "You toggle on the possession mode. "))
-                                                    (set-mob-effect actor +mob-effect-ready-to-possess+))))
+                                                    (set-mob-effect actor :effect-type-id +mob-effect-ready-to-possess+ :actor-id (id actor) :cd t))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-can-possess-toggle+)
@@ -2227,53 +2227,58 @@
                                  :on-invoke nil
                                  :on-check-applic nil))
 
-;(set-ability-type (make-instance 'ability-type 
-;                                 :id +mob-abil-smoke-bomb+ :name "Smoke bomb" :descr "Throw a bomb under your feet to conseal yourself in the clouds of smoke. Can not be used in water." 
-;                                 :cd 30 :cost 0 :spd 5 :passive nil
-;                                 :final t :on-touch nil
-;                                 :motion 60
-;                                 :on-invoke #'(lambda (ability-type actor target)
-;                                                (declare (ignore ability-type target))
-;                                                (let ((cell-list (list '(-1 -1 1) '(-1 0 1) '(-1 1 1) '(0 -1 1) '(0 0 1) '(0 1 1) '(1 -1 1) '(1 0 1) '(1 1 1)
-;                                                                       '(-1 -1 0) '(-1 0 0) '(-1 1 0) '(0 -1 0) '(0 0 0) '(0 1 0) '(1 -1 0) '(1 0 0) '(1 1 0)
-;                                                                       '(-1 -1 -1) '(-1 0 -1) '(-1 1 -1) '(0 -1 -1) '(0 0 -1) '(0 1 -1) '(1 -1 -1) '(1 0 -1) '(1 1 -1))))
-;                                                  (loop for cell in cell-list
-;                                                        for x = (+ (first cell) (x actor))
-;                                                        for y = (+ (second cell) (y actor))
-;                                                        for z = (+ (third cell) (z actor))
-;                                                        do
-;                                                           (format t "(~A ~A ~A)~%" x y z)
-;                                                           (when (and (>= x 0) (>= y 0) (>= z 0)
-;                                                                      (< x (array-dimension (terrain (level *world*)) 0)) (< y (array-dimension (terrain (level *world*)) 1)) (< z (array-dimension (terrain (level *world*)) 2))
-;                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+))
-;                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-projectiles+))
-;                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+))
-;                                                                      (or (= (third cell) 0)
-;                                                                          (and (> (third cell) 0)
-;                                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+)))
-;                                                                          (and (< (third cell) 0)
-;                                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) x y (z actor)) +terrain-trait-opaque-floor+)))))
-;                                                             
-;                                                             (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-thick+ :x x :y y :z z :counter 4)))))
-;                                                )
-;                                 :on-check-applic #'(lambda (ability-type actor target)
-;                                                      (declare (ignore ability-type target))
-;                                                      (if (and (mob-ability-p actor +mob-abil-smoke-bomb+)
-;                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)))
-;                                                        t
-;                                                        nil))
-;                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-;                                                  (declare (ignore ability-type nearest-ally))
-;                                                  (if (and (mob-ability-p actor +mob-abil-smoke-bomb+)
-;                                                           (can-invoke-ability actor actor +mob-abil-smoke-bomb+)
-;                                                           nearest-enemy
-;                                                           (< (/ (cur-hp actor) (max-hp actor)) 
-;                                                              0.4))
-;                                                    t
-;                                                    nil))
-;                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-;                                                   (declare (ignore nearest-enemy nearest-ally))
-;                                                   (mob-invoke-ability actor actor (id ability-type)))))
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-empower-undead+ :name "Empower undead" :descr "Link the demon inside a dead body with your own life force, enhancing its strength and making it follow you. You can only have one undead unit empowered at the same time." 
+                                 :cd 5 :cost 0 :spd 5 :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~@(~A~) raises his hands and intones an incantation. " (visible-name actor)) :observed-mob actor)
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear somebody chanting~A. " str)))
+                                                
+                                                ;; if the actor has already empowered a mob, remove the empower effect from it
+                                                (when (mob-effect-p actor +mob-effect-necrolink+)
+                                                  (let ((effect (get-effect-by-id (mob-effect-p actor +mob-effect-necrolink+))))
+                                                    (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-empowered-undead+)))
+                                                ;; target here is an undead mob
+                                                (set-mob-effect target :effect-type-id +mob-effect-empowered-undead+ :actor-id (id actor) :cd t :param1 (id actor))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-empower-undead+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-empower-undead+)
+                                                           (can-invoke-ability actor actor +mob-abil-empower-undead+)
+                                                           (not (mob-effect-p actor +mob-effect-necrolink+))
+                                                           nearest-ally
+                                                           (mob-ability-p nearest-ally +mob-abil-undead+)
+                                                           (not (mob-effect-p nearest-ally +mob-effect-empowered-undead+)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy))
+                                                   (mob-invoke-ability actor nearest-ally (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 target
+                                                                 (get-faction-relation (faction *player*) (faction target))
+                                                                 (mob-ability-p target +mob-abil-undead+)
+                                                                 (not (mob-effect-p target +mob-effect-empowered-undead+)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* target ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-ignite-the-fire+ :name "Ignite the fire" :descr "Set flammable furniture or grass on fire. Fire may damage those standing in it and produces smoke." 
@@ -2351,7 +2356,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (set-mob-effect actor +mob-effect-avatar-of-brilliance+ 6)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-avatar-of-brilliance+ :actor-id (id actor) :cd 6)
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 
                                                 )

@@ -8,16 +8,17 @@
    ))
 
 (defun show-char-effects (mob x y h)
-  (loop for effect-type-id being the hash-key in (effects mob)
+  (loop for effect-id being the hash-value in (effects mob)
+        for effect = (get-effect-by-id effect-id)
         with y1 = y    
         do
            (when (and (> (hash-table-count (effects mob)) (truncate h (sdl:get-font-height)))
                       (> (+ y1 (* 2 (sdl:get-font-height))) (+ y h)))
              (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
              (loop-finish))
-           (sdl:draw-string-solid-* (format nil "~A~A" (name (get-effect-type-by-id effect-type-id)) (if (eq (mob-effect-p mob effect-type-id) t)
-                                                                                                          ""
-                                                                                                       (format nil " (~A)" (mob-effect-p mob effect-type-id))))
+           (sdl:draw-string-solid-* (format nil "~A~A" (name (get-effect-type-by-id (effect-type effect))) (if (eq (cd effect) t)
+                                                                                                             ""
+                                                                                                             (format nil " (~A)" (cd effect))))
                                     x y1 :color sdl:*red*)
            
            (incf y1 (sdl:get-font-height))))

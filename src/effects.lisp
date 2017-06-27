@@ -4,12 +4,12 @@
   ((id :initarg :id :accessor id)
    (name :initarg :name :accessor name)
    (color :initarg :color :accessor color)
-   (on-add :initform #'(lambda (effect-type actor)
-                         (declare (ignore effect-type actor))
+   (on-add :initform #'(lambda (effect actor)
+                         (declare (ignore effect actor))
                          nil)
            :initarg :on-add :accessor on-add)
-   (on-remove :initform #'(lambda (effect-type actor)
-                            (declare (ignore effect-type actor))
+   (on-remove :initform #'(lambda (effect actor)
+                            (declare (ignore effect actor))
                             nil)
               :initarg :on-remove :accessor on-remove)
    ))
@@ -24,9 +24,11 @@
 
 (defclass effect ()
   ((id :initform 0 :accessor id :type fixnum)
-   (actor :initform nil :accessor actor)
-   (target :initform nil :accessor target)
-   (cd :initform 0 :accessor cd)
+   (effect-type :initarg :effect-type :accessor effect-type :type fixnum)
+   (actor-id :initform nil :initarg :actor-id :accessor actor-id)
+   (target-id :initform nil :initarg :target-id :accessor target-id)
+   (cd :initform 0 :initarg :cd :accessor cd)
+   (param1 :initform nil :initarg :param1 :accessor param1)
    ))
 
 (defmethod initialize-instance :after ((effect effect) &key)
@@ -34,3 +36,9 @@
   (setf (aref *effects* (id effect)) effect)
 
   )
+
+(defun get-effect-by-id (effect-id)
+  (aref *effects* effect-id))
+
+(defun remove-effect-from-world (effect)
+  (setf (aref *effects* (id effect)) nil))

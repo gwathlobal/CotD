@@ -687,7 +687,7 @@
 
   
   
-  (set-mob-effect actor +mob-effect-alertness+ 5)
+  (set-mob-effect actor :effect-type-id +mob-effect-alertness+ :actor-id (id actor) :cd 5)
   (incf-mob-motion target 100)
   (pushnew (id actor) (visible-mobs target))
   (when (riding-mob-id target)
@@ -1029,7 +1029,7 @@
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                (format nil "~@(~A~) reveals the true form of ~A. " (visible-name target) (get-qualified-name actor))))
       (setf (face-mob-type-id actor) (mob-type actor))
-      (set-mob-effect actor +mob-effect-reveal-true-form+ 5)))
+      (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)))
 
   (multiple-value-bind (dx dy) (x-y-dir (1+ (random 9)))
     (let* ((cur-dmg) (dodge-chance) (failed-dodge nil) 
@@ -1221,6 +1221,12 @@
 
     ;; set stat-gold before dropping inventory
     (setf (stat-gold mob) (get-overall-value (inv mob)))
+
+    ;; remove all effects on death
+    (loop for effect-id being the hash-value in (effects mob)
+          for effect = (get-effect-by-id effect-id)
+          do
+             (rem-mob-effect mob (effect-type effect)))
     
     ;; place the inventory on the ground
     (loop for item-id in (inv mob)
@@ -1396,16 +1402,19 @@
              (or (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-demon+)
                  (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-angel+))
              (eq (mob-effect-p mob +mob-effect-reveal-true-form+) 1))
-    (set-mob-effect mob +mob-effect-reveal-true-form+ 2))
-             
-  (loop for effect-id being the hash-key in (effects mob)
-        when (and (not (eq (mob-effect-p mob effect-id) t))
-                  (not (eq (mob-effect-p mob effect-id) nil)))
+    (if (mob-effect-p mob +mob-effect-reveal-true-form+)
+      (when (eq (cd (mob-effect-p mob +mob-effect-reveal-true-form+)) 1)
+        (setf (cd (mob-effect-p mob +mob-effect-reveal-true-form+)) 2))
+      (set-mob-effect mob :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id mob) :cd 2)))
+    
+  (loop for effect-id being the hash-value in (effects mob)
+        for effect = (get-effect-by-id effect-id)
+        when (not (eq (cd effect) t))
           do
-             (set-mob-effect mob effect-id (1- (mob-effect-p mob effect-id)))
-
-             (when (zerop (mob-effect-p mob effect-id))
-               (rem-mob-effect mob effect-id)
+             (decf (cd effect))
+             
+             (when (zerop (cd effect))
+               (rem-mob-effect mob (effect-type effect))
                ))
 
   (loop for ability-id being the hash-key in (abilities-cd mob)
@@ -1426,7 +1435,7 @@
   ;; if the mob has climbing ability - turn it on, if disabled
   (when (and (mob-ability-p mob +mob-abil-climbing+)
              (not (mob-effect-p mob +mob-effect-climbing-mode+)))
-    (set-mob-effect mob +mob-effect-climbing-mode+))
+    (set-mob-effect mob :effect-type-id +mob-effect-climbing-mode+ :actor-id (id mob) :cd t))
 
   (if (or (mob-ability-p mob +mob-abil-no-breathe+)
           (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))

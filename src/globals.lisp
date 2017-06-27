@@ -66,6 +66,7 @@
 (defconstant +mob-type-reanimated-pwr-2+ 25)
 (defconstant +mob-type-reanimated-pwr-3+ 26)
 (defconstant +mob-type-reanimated-pwr-4+ 27)
+(defconstant +mob-type-reanimated-empowered+ 28)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -140,7 +141,7 @@
 (defconstant +mob-abil-reanimate-corpse+ 53)
 (defconstant +mob-abil-undead+ 54)
 (defconstant +mob-abil-shared-minds+ 55)
-;(defconstant +mob-abil-smoke-bomb+ 56)
+(defconstant +mob-abil-empower-undead+ 56)
 (defconstant +mob-abil-ignite-the-fire+ 57)
 (defconstant +mob-abil-avatar-of-brilliance+ 58)
 
@@ -158,6 +159,8 @@
 (defconstant +mob-effect-alertness+ 11)
 (defconstant +mob-effect-ready-to-possess+ 12)
 (defconstant +mob-effect-avatar-of-brilliance+ 13)
+(defconstant +mob-effect-empowered-undead+ 14)
+(defconstant +mob-effect-necrolink+ 15)
 
 (defconstant +mob-order-follow+ 0)
 

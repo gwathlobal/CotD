@@ -91,6 +91,7 @@
    ;;   :abil-shared-minds - +mob-abil-shared-minds+
    ;;   :abil-ignite-the-fire - +mob-abil-ignite-the-fire+
    ;;   :abil-avatar-of-brilliance - +mob-abil-avatar-of-brilliance+
+   ;;   :abil-empower-undead - +mob-abil-empower-undead+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -120,7 +121,8 @@
                                                                 abil-momentum abil-animal abil-horseback-riding abil-horse-can-be-ridden abil-dismount abil-dominate-fiend abil-fiend-can-be-ridden
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
-                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance)
+                                                                abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
+                                                                abil-empower-undead)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -259,6 +261,8 @@
     (setf (gethash +mob-abil-ignite-the-fire+ (abilities mob-type)) t))
   (when abil-avatar-of-brilliance
     (setf (gethash +mob-abil-avatar-of-brilliance+ (abilities mob-type)) t))
+  (when abil-empower-undead
+    (setf (gethash +mob-abil-empower-undead+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -555,7 +559,7 @@
 
   ;; if the mob has climbing ability - start with it turned on
   (when (mob-ability-p mob +mob-abil-climbing+)
-    (set-mob-effect mob +mob-effect-climbing-mode+))
+    (set-mob-effect mob :effect-type-id +mob-effect-climbing-mode+ :actor-id (id mob) :cd t))
   
   (when (mob-ability-p mob +mob-abil-human+)
     (incf (total-humans *world*))
@@ -632,19 +636,29 @@
 (defmethod mob-ai-cautious-p ((mob mob))
   (gethash +ai-pref-cautious+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
 
-(defun mob-effect-p (mob effect-id)
-  (gethash effect-id (effects mob)))
+(defun mob-effect-p (mob effect-type-id)
+  (gethash effect-type-id (effects mob)))
 
 (defun mob-ability-p (mob ability-type-id)
   (gethash ability-type-id (abilities mob)))
 
-(defun set-mob-effect (mob effect-type-id &optional (value t))
-  (funcall (on-add (get-effect-type-by-id effect-type-id)) (get-effect-type-by-id effect-type-id) mob)
-  (setf (gethash effect-type-id (effects mob)) value))
+(defun set-mob-effect (mob &key effect-type-id actor-id (cd t) (param1 nil))
+  (if (mob-effect-p mob effect-type-id)
+    (progn
+      (setf (cd (get-effect-by-id (mob-effect-p mob effect-type-id))) cd)
+      (setf (actor-id (get-effect-by-id (mob-effect-p mob effect-type-id))) actor-id))
+    (progn
+      (let ((effect (make-instance 'effect :effect-type effect-type-id :actor-id actor-id :target-id (id mob) :cd cd :param1 param1)))
+        (funcall (on-add (get-effect-type-by-id (effect-type effect))) effect mob)
+        (setf (gethash (effect-type effect) (effects mob)) (id effect)))))
+  )
 
 (defun rem-mob-effect (mob effect-type-id)
-  (funcall (on-remove (get-effect-type-by-id effect-type-id)) (get-effect-type-by-id effect-type-id) mob)
-  (remhash effect-type-id (effects mob)))
+  (when (mob-effect-p mob effect-type-id)
+    (let ((effect (get-effect-by-id (mob-effect-p mob effect-type-id))))
+      (funcall (on-remove (get-effect-type-by-id effect-type-id)) effect mob)
+      (remove-effect-from-world effect)
+      (remhash effect-type-id (effects mob)))))
 
 (defmethod name ((mob mob))
   (if (slot-value mob 'name)
