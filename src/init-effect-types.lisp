@@ -132,3 +132,5 @@
                                                                                    (format nil "~A loses its power. " (visible-name actor))))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-necrolink+ :name "Necrolink" :color (sdl:color :r 100 :g 100 :b 100)))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-gravity-pull+ :name "Gravity pull" :color sdl:*red*))

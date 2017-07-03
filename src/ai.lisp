@@ -40,7 +40,7 @@
         
         (setf move-result nil)
 
-        ;; can go anywhere horizontally or directly up/below if the current tile is water
+        ;; can go anywhere horizontally or directly up/below if the current tile is water 
         (when (and (or (= (- cz dz) 0)
                        (and (/= (- cz dz) 0)
                             (= nx cx)
@@ -124,6 +124,13 @@
                                                                       (setf result t))))
                                   result))))
           (setf move-result t))
+
+        ;; you can not go directly up if the you are under effect of gravity pull
+        (when (and (and (< (- cz dz) 0)
+                        (= nx cx)
+                        (= ny cy))
+                   (mob-effect-p mob +mob-effect-gravity-pull+))
+          (setf move-result nil))
         
         (unless move-result
           (return-from check-move-for-ai nil))

@@ -27,9 +27,9 @@
                                   "...###+###................................................#...............#..."
                                   "...#.....#................................................#....#..........#..."
                                   "...#.....#................................................######.....######..."
-                                  "...#.....#............#####.......#####.,,,..................................."
+                                  "...#.....#............#####.......#####|,,,..................................."
                                   "...#######............#...............-.,,,..................................."
-                                  "......................#...............#u,,,...|..............................."
+                                  "......................#...............#u,,,..................................."
                                   "...#######...........u######-#+#########..................######.....######..."
                                   "...#.....#............#....#.....#_____#..................#...............#..."
                                   "...#.....+............#....+....###____#..................#...............#..."
@@ -54,11 +54,11 @@
                                   "   .......            .....       .....                                       "
                                   "   .......            .....       .....                                       "
                                   "                      .....      ......d                                      "
-                                  "   .......           d............######                  .................   "
+                                  "   .......           d............######|                 .................   "
                                   "   .......            ....u......u#____#                  .................   "
                                   "   .......            ..#####...###____#                  .................   "
                                   "   .......            ..#.......#_#____#                  .................   "
-                                  "   .......            ..################                  .................   "
+                                  "   .......            ..################|                 .................   "
                                   "                                                                              "
                                   "                                                                              "))
         
@@ -132,12 +132,12 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-demon+ :x 41 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-archdemon+ :x 41 :y 18 :z 1))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x (+ (x *player*) 5) :y (+ (y *player*) 0) :z 0))
-        (demon (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 2) :y (- (y *player*) 0) :z 0))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-thief+ :x 42 :y 15 :z 0))
+        ;(demon (make-instance 'mob :mob-type +mob-type-demon+ :x (+ (x *player*) 2) :y (- (y *player*) 0) :z 0))
         )
-    ;(setf (cur-fp *player*) 32)
+    (setf (cur-fp *player*) 22)
     
     ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
@@ -145,7 +145,7 @@
     ;(set-mob-effect demon +mob-effect-calling-for-help+ 100)
     (setf (cur-fp soldier) 4)
     (add-mob-to-level-list (level world) soldier)
-    (add-mob-to-level-list (level world) demon)
+    ;(add-mob-to-level-list (level world) demon)
     
 
     ;(mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))
@@ -157,16 +157,16 @@
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-half+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-fire+  :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-blood-fresh+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-blood-old+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 0) :y (+ (y *player*) 1) :z (+ (z *player*) 0) :qty 75))
-    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-reanimated-pwr-1+ :x 41 :y 18 :z 0))
-    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-reanimated-pwr-1+ :x 41 :y 19 :z 0))
+    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-reanimated-pwr-1+ :x 41 :y 18 :z 0))
+    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-reanimated-pwr-1+ :x 41 :y 19 :z 0))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x 35 :y 19 :z 2))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x 40 :y 17 :z 2))
     ))

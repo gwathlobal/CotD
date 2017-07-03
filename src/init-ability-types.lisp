@@ -2284,6 +2284,7 @@
                                  :id +mob-abil-ignite-the-fire+ :name "Ignite the fire" :descr "Set flammable furniture or grass on fire. Fire may damage those standing in it and produces smoke." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :motion 60
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the tile to be ignited
@@ -2384,3 +2385,70 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-gravity-chains+ :name "Gravity chains" :descr "Make your chains grab a target and inflict 2-4 dmg. If the target is flying or climbing, it is forced to the ground and will not be able to use respective abilities for 3 turns."
+                                 :cd 4 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (let ((cur-dmg (+ 2 (random 3))))
+                                                  (set-mob-effect target :effect-type-id +mob-effect-gravity-pull+ :actor-id (id actor) :cd 3)
+                                                  (decf (cur-hp target) cur-dmg)
+                                                  (generate-sound actor (x target) (y target) (z target) 80 #'(lambda (str)
+                                                                                                                (format nil "You hear metal clanking~A. " str)))
+                                                  
+                                                  (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                         (format nil "~A invokes gravity chains on ~A to inflict ~A dmg. " (visible-name actor) (visible-name target) cur-dmg))
+                                                  (rem-mob-effect target +mob-effect-climbing-mode+)
+                                                  (when (apply-gravity target)
+                                                    (set-mob-location target (x target) (y target) (z target)))
+                                                  (decf (cur-fp actor) (cost ability-type))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-gravity-chains+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((flammable-tile nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-flammable+)
+                                                                                                                 nearest-enemy
+                                                                                                                 (= dx (x nearest-enemy))
+                                                                                                                 (= dy (y nearest-enemy))
+                                                                                                                 (= (z actor) (z nearest-enemy))
+                                                                                                                 )
+                                                                                                        (setf flammable-tile (list dx dy (z actor)))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-gravity-chains+)
+                                                             (can-invoke-ability actor actor +mob-abil-gravity-chains+)
+                                                             nearest-enemy
+                                                             (not (mob-effect-p nearest-enemy +mob-effect-gravity-pull+))
+                                                             (or (and (= (z actor) (z nearest-enemy))
+                                                                      (> (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 1.5))
+                                                                 (and (/= (z actor) (z nearest-enemy))
+                                                                      (not (and (= (x actor) (x nearest-enemy))
+                                                                                (= (y actor) (y nearest-enemy)))))))
+                                                      
+                                                      t
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 
+                                                                 target
+                                                                 (not (eq *player* target)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* target ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

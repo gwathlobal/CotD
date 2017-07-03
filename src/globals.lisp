@@ -144,6 +144,7 @@
 (defconstant +mob-abil-empower-undead+ 56)
 (defconstant +mob-abil-ignite-the-fire+ 57)
 (defconstant +mob-abil-avatar-of-brilliance+ 58)
+(defconstant +mob-abil-gravity-chains+ 59)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -161,6 +162,7 @@
 (defconstant +mob-effect-avatar-of-brilliance+ 13)
 (defconstant +mob-effect-empowered-undead+ 14)
 (defconstant +mob-effect-necrolink+ 15)
+(defconstant +mob-effect-gravity-pull+ 16)
 
 (defconstant +mob-order-follow+ 0)
 

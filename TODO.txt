@@ -1,6 +1,5 @@
 - Avatars of Brilliance should be able to fly
 - Present shared mind better: full list of visible units, make units/messages visible through shared mind to be of a different color
-- Give Archdemons a ranged attack
 - Add wind to the map.
 - Add courtyard houses like Thief2RL
 - Do something with the message code so that name are captalized (and not capitalized) properly.

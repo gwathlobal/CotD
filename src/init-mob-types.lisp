@@ -249,7 +249,7 @@
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-gravity-chains t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-1+
