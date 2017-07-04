@@ -12,6 +12,10 @@
                             (declare (ignore effect actor))
                             nil)
               :initarg :on-remove :accessor on-remove)
+   (on-tick :initform #'(lambda (effect actor)
+                          (declare (ignore effect actor))
+                          nil)
+            :initarg :on-tick :accessor on-tick)
    ))
 
 (defun set-effect-type (effect-type)

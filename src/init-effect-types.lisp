@@ -45,6 +45,8 @@
                                                          (adjust-sight actor)
                                                          ;(set-name actor)
 
+                                                         (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor))
+
                                                           ;; set up current abilities cooldowns
                                                          (loop for ability-id being the hash-key in (abilities actor) do
                                                            (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -67,6 +69,8 @@
                                                             (adjust-r-acc actor)
                                                             (adjust-sight actor)
                                                             ;(set-name actor)
+
+                                                            
                                                             
                                                             ;; set up current abilities cooldowns
                                                             (loop for ability-id being the hash-key in (abilities actor) do
@@ -76,7 +80,13 @@
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A transforms itself back into Chrome Angel.~%" (visible-name actor))))))
+                                                                                   (format nil "~A transforms itself back into Chrome Angel.~%" (visible-name actor)))
+                                                            
+                                                            (rem-mob-effect actor +mob-effect-flying+))
+                                             :on-tick #'(lambda (effect actor)
+                                                          (declare (ignore effect))
+                                                          (when (not (mob-effect-p actor +mob-effect-gravity-pull+))
+                                                            (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor))))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-empowered-undead+ :name "Empowered" :color sdl:*green*
                                              :on-add #'(lambda (effect actor)
@@ -134,3 +144,5 @@
 (set-effect-type (make-instance 'effect-type :id +mob-effect-necrolink+ :name "Necrolink" :color (sdl:color :r 100 :g 100 :b 100)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-gravity-pull+ :name "Gravity pull" :color sdl:*red*))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-flying+ :name "Flying" :color sdl:*cyan*))

@@ -54,8 +54,7 @@
                  (when (<= (cur-ap mob) 0)
                    (on-tick mob)))))
 
-           
-                     
+
            (bt:with-lock-held ((path-lock *world*))
              (when (and *path-thread* (bt:thread-alive-p *path-thread*))
                ;;(format t "THREAD: Destroy thread~%")
@@ -66,7 +65,6 @@
            ;(bt:with-lock-held ((fov-lock *world*))
            ;  (setf (cur-mob-fov *world*) 0)
            ;  (bt:condition-notify (fov-cv *world*)))
-           
            
            (when turn-finished
              (incf (real-game-time *world*))

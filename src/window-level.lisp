@@ -19,7 +19,7 @@
            (sdl:draw-string-solid-* (format nil "~A~A" (name (get-effect-type-by-id (effect-type effect))) (if (eq (cd effect) t)
                                                                                                              ""
                                                                                                              (format nil " (~A)" (cd effect))))
-                                    x y1 :color sdl:*red*)
+                                    x y1 :color (color (get-effect-type-by-id (effect-type effect))))
            
            (incf y1 (sdl:get-font-height))))
 
@@ -247,7 +247,8 @@
 			;; move down - Shift + . (i.e., >)
                         (when (and (sdl:key= key :sdl-key-period) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)
                                    (or (mob-effect-p *player* +mob-effect-climbing-mode+)
-                                       (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-water+))
+                                       (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-water+)
+                                       (mob-effect-p *player* +mob-effect-flying+))
                                    (> (z *player*) 0))
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
@@ -268,8 +269,10 @@
                                                                                      (setf result t))))
                                                            result))))
                                        (and (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (1+ (z *player*))) +terrain-trait-water+)
-                                            (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-water+)))
-                                   (not (mob-effect-p *player* +mob-effect-gravity-pull+)))
+                                            (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-water+))
+                                       (mob-effect-p *player* +mob-effect-flying+))
+                                   (not (mob-effect-p *player* +mob-effect-gravity-pull+))
+                                   (< (z *player*) (1- (array-dimension (terrain (level *world*)) 2))))
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)

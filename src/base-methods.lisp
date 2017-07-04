@@ -159,36 +159,39 @@
 
 (defmethod apply-gravity ((mob mob))
   (let ((result 0))
-    (loop for z from (z mob) downto 0 
-          for check-result = (check-move-on-level mob (x mob) (y mob) z)
-          do
+    (if (and (mob-effect-p mob +mob-effect-flying+)
+             (not (eq (cd (get-effect-by-id (mob-effect-p mob +mob-effect-flying+))) 0)))
+      (setf result (z mob))
+      (loop for z from (z mob) downto 0 
+            for check-result = (check-move-on-level mob (x mob) (y mob) z)
+            do
              ;(format t "Z ~A FLOOR ~A~%" z (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
-             (when (eq check-result t)
-               (setf result z))
-
+               (when (eq check-result t)
+                 (setf result z))
+               
              ;(format t "MOB ~A, Z = ~A, Z MOB = ~A, WATER = ~A~%" (name mob) z (z mob) (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+))
-             
-             ;; stop falling if
-             (when (or (not (eq check-result t))
-                       ;; if there is water in the current tile
-                       (and (/= z (z mob))
-                            (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+)
-                            )
-                       ;; there is floor on this tile
-                       (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+)
-                       ;; there is no floor on this tile, but the mob is in climbing mode and there is a wall or a floor nearby
-                       (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
-                            (mob-effect-p mob +mob-effect-climbing-mode+)
-                            (funcall #'(lambda ()
-                                         (let ((result nil))
-                                           (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
-                                                                                       (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-not-climable+))
-                                                                                                  (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-opaque-floor+)
-                                                                                                      (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-blocks-move+)))
-                                                                                         (setf result t))))
-                                           result))))
-                       )
-               (loop-finish)))
+               
+               ;; stop falling if
+               (when (or (not (eq check-result t))
+                         ;; if there is water in the current tile
+                         (and (/= z (z mob))
+                              (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+)
+                              )
+                         ;; there is floor on this tile
+                         (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+)
+                         ;; there is no floor on this tile, but the mob is in climbing mode and there is a wall or a floor nearby
+                         (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
+                              (mob-effect-p mob +mob-effect-climbing-mode+)
+                              (funcall #'(lambda ()
+                                           (let ((result nil))
+                                             (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
+                                                                                         (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-not-climable+))
+                                                                                                    (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-opaque-floor+)
+                                                                                                        (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-blocks-move+)))
+                                                                                           (setf result t))))
+                                             result))))
+                         )
+                 (loop-finish))))
     (when (eq result (z mob))
       (setf result nil))
 
@@ -1406,16 +1409,36 @@
       (when (eq (cd (mob-effect-p mob +mob-effect-reveal-true-form+)) 1)
         (setf (cd (mob-effect-p mob +mob-effect-reveal-true-form+)) 2))
       (set-mob-effect mob :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id mob) :cd 2)))
+
+  (let ((was-flying (if (mob-effect-p mob +mob-effect-flying+)
+                      t
+                      nil)))
+  
+    (loop for effect-id being the hash-value in (effects mob)
+          for effect = (get-effect-by-id effect-id)
+          with was-flying = nil
+          when (not (eq (cd effect) t))
+            do
+               (decf (cd effect))
+               
+               (when (zerop (cd effect))
+                 (when (= (effect-type effect) +mob-effect-flying+)
+                   (setf was-flying t))
+                 (rem-mob-effect mob (effect-type effect))))
     
+    (when (and was-flying
+               (not (mob-effect-p mob +mob-effect-flying+))
+               (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+               (apply-gravity mob))
+      (format t "HERE~%")
+      (set-mob-location mob (x mob) (y mob) (z mob)))
+    )
+  
   (loop for effect-id being the hash-value in (effects mob)
         for effect = (get-effect-by-id effect-id)
-        when (not (eq (cd effect) t))
-          do
-             (decf (cd effect))
-             
-             (when (zerop (cd effect))
-               (rem-mob-effect mob (effect-type effect))
-               ))
+        do
+           (funcall (on-tick (get-effect-type-by-id (effect-type effect))) effect mob))
+           
 
   (loop for ability-id being the hash-key in (abilities-cd mob)
         when (not (zerop (abil-cur-cd-p mob ability-id)))

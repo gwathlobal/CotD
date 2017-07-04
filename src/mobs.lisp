@@ -919,6 +919,7 @@
 
 (defun get-mob-move-mode (mob)
   (cond
+    ((mob-effect-p mob +mob-effect-flying+) +connect-map-move-fly+)
     ((mob-effect-p mob +mob-effect-climbing-mode+) +connect-map-move-climb+)
     (t +connect-map-move-walk+)))
 

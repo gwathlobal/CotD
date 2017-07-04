@@ -163,6 +163,7 @@
 (defconstant +mob-effect-empowered-undead+ 14)
 (defconstant +mob-effect-necrolink+ 15)
 (defconstant +mob-effect-gravity-pull+ 16)
+(defconstant +mob-effect-flying+ 17)
 
 (defconstant +mob-order-follow+ 0)
 
@@ -341,6 +342,7 @@
 ;; Connect map indices for various movement types
 (defconstant +connect-map-move-walk+ 0)
 (defconstant +connect-map-move-climb+ 1)
+(defconstant +connect-map-move-fly+ 2)
 
 ;;---------------------------
 ;; Multithreading parameters

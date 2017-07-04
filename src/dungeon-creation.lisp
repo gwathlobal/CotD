@@ -75,13 +75,7 @@
     
     (create-connect-map-walk (level world) 3)
 
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-walk (level world) 5)
-
-    ;(time (progn
+    ;;(time (progn
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Creating connectivity maps (climb)")
@@ -94,11 +88,16 @@
     
     (create-connect-map-climb (level world) 3)
 
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* "Creating connectivity maps (fly)")
+    
+    (create-connect-map-fly (level world) 1)
+
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* nil)
     
-    (create-connect-map-climb (level world) 5)
+    (create-connect-map-fly (level world) 3)
 
     ;; creating light map
     (funcall (sf-func (get-scenario-feature-by-id tod-id)) (level world))
@@ -527,6 +526,146 @@
     
     (setf (aref (connect-map level) mob-size) connect-map)))
 
+(defun create-connect-map-fly (level mob-size)
+  (declare (optimize (speed 3))
+           (type fixnum mob-size))
+  (let* ((max-x (array-dimension (terrain level) 0))
+         (max-y (array-dimension (terrain level) 1))
+         (max-z (array-dimension (terrain level) 2))
+         (connect-map (if (aref (connect-map level) mob-size)
+                        (aref (connect-map level) mob-size)
+                        (make-array (list max-x max-y max-z) :initial-element nil)))
+         (room-id 0)
+         (check-func #'(lambda (x y z cx cy cz)
+                         (let* ((connect-id (get-connect-map-value connect-map x y z +connect-map-move-fly+))
+                                (half-size (truncate (1- mob-size) 2)))
+                           (declare (type fixnum connect-id half-size cx cy cz x y z))
+                           (if (and (= connect-id +connect-room-none+)
+                                    (funcall #'(lambda (sx sy)
+                                                 (let ((result t))
+                                                   (block from-result
+                                                     (loop for off-x of-type fixnum from (- half-size) to (+ half-size)
+                                                           for nx of-type fixnum = (+ sx off-x) do
+                                                             (loop for off-y of-type fixnum from (- half-size) to (+ half-size)
+                                                                   for ny of-type fixnum = (+ sy off-y) do
+                                                                     (when (or (< nx 0) (< ny 0) (>= nx max-x) (>= ny max-y)
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+)
+                                                                               (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-openable-door+))
+                                                                       (setf result nil)
+                                                                       (return-from from-result))
+                                                                     
+                                                                     ;; magic starts here
+                                                                     (setf result nil)
+
+                                                                     (when (and (or (= (- cz z) 0)
+                                                                                    (and (/= (- cz z) 0)
+                                                                                         (= nx cx)
+                                                                                         (= ny cy))
+                                                                                    )
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
+                                                                       (setf result t))
+                                                                     
+                                                                     ;; the following case is connected
+                                                                     ;; on floor z = 1 -> | |p| |
+                                                                     ;;    floor z = 1 -> | |.| |
+                                                                     ;; on floor z = 0 -> | |x| |
+                                                                     ;;    floor z = 0 -> | |w| |
+                                                                     ;; where
+                                                                     ;;    w - water
+                                                                     ;;    . - air (no floor, no wall, no water)
+                                                                     ;;    p - starting cell
+                                                                     ;;    x - current cell
+                                                                     (when (and (not result)
+                                                                                (< (- z cz) 0)
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
+                                                                                (and (= cx nx)
+                                                                                     (= cy ny))
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+))
+                                                                       (setf result t))
+                                                                     
+                                                                     ;; the following case is connected
+                                                                     ;; on floor z = 1 -> | | |x|
+                                                                     ;;    floor z = 1 -> | | |#|
+                                                                     ;; on floor z = 0 -> | |p| |
+                                                                     ;;    floor z = 0 -> | |w| |
+                                                                     ;; where
+                                                                     ;;    # - floor
+                                                                     ;;    . - air
+                                                                     ;;    w - water
+                                                                     ;;    p - starting cell
+                                                                     ;;    x - current cell
+                                                                     (when (and (> (- z cz) 0)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+)
+                                                                                (not (and (= cx nx)
+                                                                                          (= cy ny)))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
+                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)
+                                                                                    (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)))
+                                                                       ;(format t "FLOOD FILL HERE~%")
+                                                                       (setf result t))
+
+                                                                     ;; the following case is connected
+                                                                     ;; on floor z = 0 -> | |x|p|
+                                                                     ;;    floor z = 0 -> | |?|#|
+                                                                     ;; where
+                                                                     ;;    # - floor
+                                                                     ;;    ? - not important
+                                                                     ;;    p - starting cell
+                                                                     ;;    x - current cell
+                                                                     (when (and (= (- z cz) 0)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+)
+                                                                                )
+                                                                       (setf result t))
+
+                                                                     ;; check small mobs connectivity via flight
+                                                                     (when (and (not result)
+                                                                                (or (= (- cz z) 0)
+                                                                                    (and (/= (- cz z) 0)
+                                                                                         (= nx cx)
+                                                                                         (= ny cy))
+                                                                                    )
+                                                                                (check-move-along-z cx cy cz nx ny z)
+                                                                                )
+                                                                       (setf result t))
+
+                                                                     ;; check large mobs connectivity via flight
+                                                                     (when (and (not result)
+                                                                                (> mob-size 1)
+                                                                                (/= (- cz z) 0)
+                                                                                (check-move-along-z nx ny cz nx ny z))
+                                                                       (setf result t))
+
+                                                                     ;; if you are large, you can move only if all you tiles have opaque floor
+                                                                     ;(when (and (> mob-size 1)
+                                                                     ;           (= (- z cz) 0)
+                                                                     ;           (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)))
+                                                                     ;  (setf result nil))
+                                                                     
+                                                                     ;; all other cases are disconnected 
+                                                                     (unless result
+                                                                       (return-from from-result))
+                                                                   )))
+                                                   result))
+                                             x y))
+                             t
+                             nil))))
+         (make-func #'(lambda (x y z)
+                        (set-connect-map-value connect-map x y z +connect-map-move-fly+ room-id)
+                        )))
+    (declare (type fixnum max-x max-y max-z room-id))
+    
+    (loop for x from 0 below max-x do
+      (loop for y from 0 below max-y do
+        (loop for z from 0 below max-z do
+          (when (funcall check-func x y z x y z)
+            (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
+            (incf room-id))
+              )))
+    
+    (setf (aref (connect-map level) mob-size) connect-map)))
 
 (defun create-connect-map-aux (level)
   ;; make auxiliary links

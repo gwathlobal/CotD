@@ -2401,6 +2401,7 @@
                                                   (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                          (format nil "~A invokes gravity chains on ~A to inflict ~A dmg. " (visible-name actor) (visible-name target) cur-dmg))
                                                   (rem-mob-effect target +mob-effect-climbing-mode+)
+                                                  (rem-mob-effect target +mob-effect-flying+)
                                                   (when (apply-gravity target)
                                                     (set-mob-location target (x target) (y target) (z target)))
                                                   (decf (cur-fp actor) (cost ability-type))
@@ -2413,29 +2414,18 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
-                                                  (let ((flammable-tile nil))
-                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and terrain
-                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-flammable+)
-                                                                                                                 nearest-enemy
-                                                                                                                 (= dx (x nearest-enemy))
-                                                                                                                 (= dy (y nearest-enemy))
-                                                                                                                 (= (z actor) (z nearest-enemy))
-                                                                                                                 )
-                                                                                                        (setf flammable-tile (list dx dy (z actor)))))))
-                                                    (if (and (mob-ability-p actor +mob-abil-gravity-chains+)
-                                                             (can-invoke-ability actor actor +mob-abil-gravity-chains+)
-                                                             nearest-enemy
-                                                             (not (mob-effect-p nearest-enemy +mob-effect-gravity-pull+))
-                                                             (or (and (= (z actor) (z nearest-enemy))
-                                                                      (> (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 1.5))
-                                                                 (and (/= (z actor) (z nearest-enemy))
-                                                                      (not (and (= (x actor) (x nearest-enemy))
-                                                                                (= (y actor) (y nearest-enemy)))))))
-                                                      
-                                                      t
-                                                      nil)))
+                                                  (if (and (mob-ability-p actor +mob-abil-gravity-chains+)
+                                                           (can-invoke-ability actor actor +mob-abil-gravity-chains+)
+                                                           nearest-enemy
+                                                           (not (mob-effect-p nearest-enemy +mob-effect-gravity-pull+))
+                                                           (or (and (= (z actor) (z nearest-enemy))
+                                                                    (> (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 1.5))
+                                                               (and (/= (z actor) (z nearest-enemy))
+                                                                    (not (and (= (x actor) (x nearest-enemy))
+                                                                              (= (y actor) (y nearest-enemy)))))))
+                                                    
+                                                    t
+                                                    nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-ally))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))

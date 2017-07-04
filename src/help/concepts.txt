@@ -45,7 +45,7 @@ Multi-tile units may also serve as mounts (for example, Angels can dominate Garg
 
 GRAVITY
 
-When you step into a tile with no floor in it (like empty air), you will fall down until you hit something solid. If the distance that you have traveled while falling is more than 1 Z level, you will take 5 damage for each level beyond 1.
+When you step into a tile with no floor in it (like empty air), you will fall down until you hit something solid. If the distance that you have traveled while falling is more than 1 Z level, you will take 5 damage for each level beyond 1. Falling into water will not lessen the damage.
 
 
 STEALTH
