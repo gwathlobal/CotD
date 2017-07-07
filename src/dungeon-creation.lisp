@@ -688,4 +688,5 @@
                                     (set-aux-map-connection level room-id-start room-id-end map-size move-mode))))))))
               (funcall func :map-size 1 :move-mode +connect-map-move-walk+)
               (funcall func :map-size 1 :move-mode +connect-map-move-climb+)
+              (funcall func :map-size 1 :move-mode +connect-map-move-fly+)
               )))))))

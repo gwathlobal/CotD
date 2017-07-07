@@ -1680,8 +1680,27 @@
 (defun ignite-tile (level x y z src-x src-y src-z)
   (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-flammable+)
     (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-fire+ :x x :y y :z z :counter (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-flammable+)))
-    (set-terrain-* level x y z +terrain-floor-ash+)
-    (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-walk+
-                           (get-connect-map-value (aref (connect-map level) 1) src-x src-y src-z +connect-map-move-walk+))
-    (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-climb+
-                           (get-connect-map-value (aref (connect-map level) 1) src-x src-y src-z +connect-map-move-climb+))))
+    (if (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+      (progn
+        (set-terrain-* level x y z +terrain-floor-ash+)
+        ;(check-surroundings x y nil #'(lambda (dx dy)
+        ;                                (when (and (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-walk+)
+        ;                                           (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+))
+        ;                                  (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-walk+
+        ;                                                         (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-walk+)))
+        ;                                (when (and (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-climb+)
+        ;                                           (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+))
+        ;                                  (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-climb+
+        ;                                                         (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-climb+)))))
+       
+        )
+      (progn
+        (set-terrain-* level x y z +terrain-floor-air+)
+        ))
+     (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-walk+
+                            (get-connect-map-value (aref (connect-map level) 1) src-x src-y src-z +connect-map-move-walk+))
+     (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-climb+
+                            (get-connect-map-value (aref (connect-map level) 1) src-x src-y src-z +connect-map-move-climb+))
+     (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-fly+
+                            (get-connect-map-value (aref (connect-map level) 1) src-x src-y src-z +connect-map-move-fly+))
+    ))
