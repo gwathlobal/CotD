@@ -6,6 +6,7 @@ CHANGELOG
 - The Military now have medkit items to heal their wounds.
 - The Thief's ability Smoke bomb is now converted into a item with the same effect. The Thief starts with three of them.
 - Most citizens now have a small number of coins in their pockets.
+- You can now see which creatures you can see properly and which through shared mind
 
 --------------------
 June 02, 2017 v1.1.3

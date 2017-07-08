@@ -136,7 +136,10 @@
            (draw-glyph x y1 (get-current-mob-glyph-idx vmob :x (x vmob) :y (y vmob) :z (z vmob))
                        :front-color (get-current-mob-glyph-color vmob)
                        :back-color (get-current-mob-back-color vmob))
-           (sdl:draw-string-solid-* (format nil "~A~A~A"
+           (sdl:draw-string-solid-* (format nil "~A~A~A~A"
+                                            (if (find mob-id (proper-visible-mobs mob))
+                                              ""
+                                              "[M] ")
                                             (visible-name vmob)
                                             (if (riding-mob-id vmob)
                                               (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id vmob))))
