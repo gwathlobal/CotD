@@ -32,7 +32,7 @@
         (game-event-list)
 	)
     ;; resetting the progress bar
-    (setf *max-progress-bar* 11)
+    (setf *max-progress-bar* 10)
     (setf *cur-progress-bar* 0)
     
     (funcall *update-screen-closure* "Generating map")
@@ -62,42 +62,71 @@
     (setf (level world) (create-level-from-template result-template))
 
     ;; check map for connectivity
-    
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* "Creating connectivity maps (walk)")
-    
-    (create-connect-map-walk (level world) 1)
-
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-walk (level world) 3)
-
-    ;;(time (progn
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* "Creating connectivity maps (climb)")
-    
-    (create-connect-map-climb (level world) 1)
-
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-climb (level world) 3)
 
     (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* "Creating connectivity maps (fly)")
-    
-    (create-connect-map-fly (level world) 1)
+    (funcall *update-screen-closure* "Creating connectivity maps")
 
-    ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
-    
-    (create-connect-map-fly (level world) 3)
+    (setf *time-at-end-of-player-turn* (get-internal-real-time))
+    ;; start several parallel threads to speed up the conectivity calculations
+    (let* ((out *standard-output*)
+           (size-1-thread (bt:make-thread #'(lambda ()
+                                              (format out "SIZE 1~%")
+
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-walk (level world) 1)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER WALK 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-climb (level world) 1)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER CLIMB 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-fly (level world) 1)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER FLY 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+                                              )
+                                        :name "Connectivity map (size 1) thread"))
+           (size-3-thread (bt:make-thread #'(lambda ()
+                                              (format out "SIZE 3~%")
+                                              
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-walk (level world) 3)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER WALK 3: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+                                              
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-climb (level world) 3)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER CLIMB 3: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+
+                                              ;;(let ((start-time (get-internal-real-time)))
+                                              ;;  (create-connect-map-fly (level world) 3)
+                                              ;;  (incf *cur-progress-bar*)
+                                              ;;  (funcall *update-screen-closure* nil)
+                                              ;;  (format out "TIME-ELAPSED AFTER FLY 3: ~A~%" (- (get-internal-real-time) start-time))
+                                              ;;  )
+                                              )
+                                         :name "Connectivity map (size 3) thread"))
+           )
+      (bt:join-thread size-1-thread)
+      (logger (format nil "SIZE 1 CREATION FINISHED~%"))
+      (bt:join-thread size-3-thread)
+      (logger (format nil "SIZE 3 CREATION FINISHED~%"))
+      )
+
+    (logger (format nil "TIME-ELAPSED AFTER CREATION: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
 
     ;; creating light map
     (funcall (sf-func (get-scenario-feature-by-id tod-id)) (level world))
@@ -121,7 +150,7 @@
     (push +game-event-adjust-outdoor-ligth+ game-event-list)
     
     ;; adjusting the progress bar
-    (incf *cur-progress-bar*)
+    ;(incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Adding features")
     
     ;; set up features
