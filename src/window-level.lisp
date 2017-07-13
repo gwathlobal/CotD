@@ -76,7 +76,7 @@
     (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) (- (+ (- *window-height* *msg-box-window-height* 10) (* -3 (sdl:char-height sdl:*default-font*)))
                                                                                     (+ y (* (sdl:get-font-height) (1+ str-lines)))))
     
-    (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
+    (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 10) (* -3 (sdl:char-height sdl:*default-font*))))
     ))
 
 (defun show-message-box (x y w &optional (h *msg-box-window-height*) (message-box *small-message-box*))
@@ -150,6 +150,20 @@
                                     (+ x *glyph-w* 10) y1 :color sdl:*white*)
            (incf y1 *glyph-h*)))
 
+(defun show-level-weather (x y &key (level (level *world*)))
+  
+  (sdl:draw-string-solid-* (format nil "Wind: ~A" (cond
+                                                    ((eq (wind-dir level) 1) "SW")
+                                                    ((eq (wind-dir level) 2) "S")
+                                                    ((eq (wind-dir level) 3) "SE")
+                                                    ((eq (wind-dir level) 4) "W")
+                                                    ((eq (wind-dir level) 6) "E")
+                                                    ((eq (wind-dir level) 7) "NW")
+                                                    ((eq (wind-dir level) 8) "N")
+                                                    ((eq (wind-dir level) 9) "NE")
+                                                    (t "None")))
+                           x y :color sdl:*white*))
+
 (defun update-screen (win)
   
   ;; filling the background with black rectangle
@@ -160,6 +174,7 @@
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   (show-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 260 10))
   (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 10) 260 *msg-box-window-height*)
+  (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
     
   (sdl:update-display)
   
@@ -356,7 +371,8 @@
                                                                                             (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                             (setf *current-window* win)
                                                                                             (set-idle-calcing win)
-                                                                                            (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t))
+                                                                                            ;(show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                                                                                            )
                                                                                           (progn
                                                                                             (setf *current-window* (make-instance 'map-select-window 
                                                                                                                                   :return-to *current-window*
@@ -484,7 +500,8 @@
 										    (mob-pick-item *player* (get-inv-item-by-pos item-list cur-sel))
 										    (setf *current-window* win)
                                                                                     (set-idle-calcing win)
-                                                                                    (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t))
+                                                                                    ;(show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                                                                                    )
 								    :line-list item-line-list
 								    :prompt-list item-prompt-list)))
 			    ))
@@ -526,7 +543,7 @@
                  (set-idle-calcing win)
 
                  
-                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))) t)
+                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -3 (sdl:char-height sdl:*default-font*))) t)
               )
               
        (:video-expose-event () (make-output *current-window*)))

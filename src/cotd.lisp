@@ -78,6 +78,8 @@
                    when (on-tick-func feature)
                    do
                       (funcall (on-tick-func feature) (level *world*) feature))
+             (when (zerop (random 3))
+               (setf (wind-dir (level *world*)) (1+ (random 9))))
              ))
   )
   
