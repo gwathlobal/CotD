@@ -1403,11 +1403,10 @@
   ;; a special case for revealing demons & angels that ride fiends & gargantaur
   (when (and (riding-mob-id mob)
              (or (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-demon+)
-                 (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-angel+))
-             (eq (mob-effect-p mob +mob-effect-reveal-true-form+) 1))
+                 (mob-ability-p (get-mob-by-id (riding-mob-id mob)) +mob-abil-angel+)))
     (if (mob-effect-p mob +mob-effect-reveal-true-form+)
-      (when (eq (cd (mob-effect-p mob +mob-effect-reveal-true-form+)) 1)
-        (setf (cd (mob-effect-p mob +mob-effect-reveal-true-form+)) 2))
+      (when (eq (cd (get-effect-by-id (mob-effect-p mob +mob-effect-reveal-true-form+))) 1)
+        (setf (cd (get-effect-by-id (mob-effect-p mob +mob-effect-reveal-true-form+))) 2))
       (set-mob-effect mob :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id mob) :cd 2)))
 
   (let ((was-flying (if (mob-effect-p mob +mob-effect-flying+)
@@ -1430,7 +1429,6 @@
                (not (mob-effect-p mob +mob-effect-flying+))
                (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
                (apply-gravity mob))
-      (format t "HERE~%")
       (set-mob-location mob (x mob) (y mob) (z mob)))
     )
   

@@ -1163,9 +1163,11 @@
                                                   (setf (mounted-by-mob-id mount) nil)
                                                   (setf (riding-mob-id actor) nil)
 
-                                                  (set-mob-location actor (car target) (cdr target) (z target))
+                                                  
+                                                  (set-mob-location actor (car target) (cdr target) (z actor))
+                                                  
                                                   (set-mob-location mount (x mount) (y mount) (z mount))
-
+                                                  
                                                   (when (or (check-mob-visible actor :observer *player*)
                                                             (check-mob-visible mount :observer *player*)) 
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
