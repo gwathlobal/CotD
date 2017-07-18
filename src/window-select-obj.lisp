@@ -55,7 +55,7 @@
 	(if (= i cur-str) 
 	    (setf color-list (append color-list (list sdl:*yellow*)))
 	    (setf color-list (append color-list (list sdl:*white*)))))
-      (draw-selection-list (line-list win) cur-str (length (line-list win)) (- (truncate *window-width* 2) 150) (1+ y) color-list))
+      (draw-selection-list (line-list win) cur-str (length (line-list win)) (- (truncate *window-width* 2) 150) (1+ y) :color-list color-list))
 
     ;; drawing descriptions
     (when (descr-list win)

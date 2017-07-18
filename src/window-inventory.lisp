@@ -53,7 +53,7 @@
                    color-list))
     (setf lst (reverse lst) color-list (reverse color-list))
     
-    (draw-selection-list lst cur-str (truncate 425 15) 20 20 color-list))
+    (draw-selection-list lst cur-str (truncate 425 15) 20 20 :color-list color-list))
 
   ;; drawing selected item description
   (when (> (length (inv *player*)) 0)

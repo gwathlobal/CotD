@@ -112,18 +112,36 @@
       ((or (> a -22.5) (<= a 22.5)) (setf result "W")))
     result))
 
-(defun show-visible-mobs (x y w h &key (mob *player*))
+(defun draw-visible-mob-func (x y target-mob origin-mob color)
+  (let ((vmob target-mob)
+        (mob origin-mob))
+    (draw-glyph x y (get-current-mob-glyph-idx vmob :x (x vmob) :y (y vmob) :z (z vmob))
+                       :front-color (get-current-mob-glyph-color vmob)
+                       :back-color (get-current-mob-back-color vmob))
+    (sdl:draw-string-solid-* (format nil "~A~A~A~A"
+                                     (if (find (id vmob) (proper-visible-mobs mob))
+                                       ""
+                                       "[M] ")
+                                     (visible-name vmob)
+                                     (if (riding-mob-id vmob)
+                                       (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id vmob))))
+                                       "")
+                                     (if (/= (- (z vmob) (z mob)) 0)
+                                       (format nil " (~@d)" (- (z vmob) (z mob)))
+                                       ""))
+                             (+ x *glyph-w* 10) y :color color)))
+
+(defun show-visible-mobs (x y w h &key (mob *player*) (visible-mobs (stable-sort (copy-list (visible-mobs mob))
+                                                                                 #'(lambda (a b)
+                                                                                     (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
+                                                                                            (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
+                                                                                       t
+                                                                                       nil))
+                                                                                 :key #'get-mob-by-id)))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
     (sdl:fill-surface sdl:*black* :template a-rect))
   
-  (loop with visible-mobs = (stable-sort (copy-list (visible-mobs mob))
-                                         #'(lambda (a b)
-                                             (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
-                                                    (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
-                                               t
-                                               nil))
-                                         :key #'get-mob-by-id)
-        with y1 = y
+  (loop with y1 = y
         for mob-id in visible-mobs
         for vmob = (get-mob-by-id mob-id)
         ;finally
@@ -133,21 +151,7 @@
                       (> (+ y1 (* 1 *glyph-h*)) (+ y h)))
              (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
              (loop-finish))
-           (draw-glyph x y1 (get-current-mob-glyph-idx vmob :x (x vmob) :y (y vmob) :z (z vmob))
-                       :front-color (get-current-mob-glyph-color vmob)
-                       :back-color (get-current-mob-back-color vmob))
-           (sdl:draw-string-solid-* (format nil "~A~A~A~A"
-                                            (if (find mob-id (proper-visible-mobs mob))
-                                              ""
-                                              "[M] ")
-                                            (visible-name vmob)
-                                            (if (riding-mob-id vmob)
-                                              (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id vmob))))
-                                              "")
-                                            (if (/= (- (z vmob) (z mob)) 0)
-                                              (format nil " (~@d)" (- (z vmob) (z mob)))
-                                              ""))
-                                    (+ x *glyph-w* 10) y1 :color sdl:*white*)
+           (draw-visible-mob-func x y1 vmob mob sdl:*white*)
            (incf y1 *glyph-h*)))
 
 (defun show-level-weather (x y &key (level (level *world*)))
@@ -420,7 +424,8 @@
                                 (progn
                                   (setf *current-window* (make-instance 'map-select-window 
                                                                         :return-to *current-window*
-                                                                        :cmd-str "[Enter] Fire  [<] Look up  [>] Look down  "
+                                                                        :cmd-str (list "[Enter] Fire  [<] Look up  [>] Look down  "
+                                                                                       "")
                                                                         :check-lof t
                                                                         :exec-func #'(lambda ()
                                                                                        (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))

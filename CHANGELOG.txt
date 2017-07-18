@@ -6,8 +6,8 @@ CHANGELOG
 - The Military now have medkit items to heal their wounds.
 - The Thief's ability Smoke bomb is now converted into a item with the same effect. The Thief starts with three of them.
 - Most citizens now have a small number of coins in their pockets.
-- You can now see which creatures you can see properly and which through shared mind.
-- Added wind to the map that affect the direction in which smoke moves.
+- You can now see which creatures you can see properly and which through shared mind, as well as iterate through visible creatures in look mode.
+- Added wind to the map that affects the direction in which smoke moves.
 
 --------------------
 June 02, 2017 v1.1.3

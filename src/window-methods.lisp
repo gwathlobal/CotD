@@ -140,7 +140,10 @@
 (defvar *sel-y-offset* 0)
 (defvar *sel-x-offset* 4)
 
-(defun draw-selection-list (str-list cur-str str-per-page x y &optional (color-list ()))
+(defun draw-selection-list (str-list cur-str str-per-page x y &key (color-list ())
+                                                                   (char-height (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
+                                                                   (str-func #'(lambda (x y color str)
+                                                                                 (sdl:draw-string-solid-* str x y :color color))))
   (declare (type list color-list str-list))
   
   (unless str-list
@@ -154,12 +157,13 @@
       (setf str (nth (+ i list-start) str-list))
       ;; highlight the current selected item
       (if (eql color-list nil)
-	  (setf color sdl:*white*)
-	  (setf color (nth (+ i list-start) color-list)))
-      (sdl:draw-string-solid-* str (+ x (sdl:char-width sdl:*default-font*) *sel-x-offset*) (+ y (* i (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))) :color color))
+        (setf color sdl:*white*)
+        (setf color (nth (+ i list-start) color-list)))
+      (funcall str-func (+ x (sdl:char-width sdl:*default-font*) *sel-x-offset*) (+ y (* i char-height)) color str)
+      )
     ;; draw a scroll bar when necessary
     (when (> (length str-list) str-per-page)
-      (sdl:draw-string-solid-* "*" x (+ y (* (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*) (truncate (* (/ cur-str (length str-list)) str-per-page)))) :color sdl:*white*))))
+      (sdl:draw-string-solid-* "*" x (+ y (* char-height (truncate (* (/ cur-str (length str-list)) str-per-page)))) :color sdl:*white*))))
 
 (defun draw-multiline-selection-list (item-list cur-item x y w h &optional (color-list ()))
   (unless item-list

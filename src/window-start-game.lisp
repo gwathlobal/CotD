@@ -25,7 +25,7 @@
       (if (= i cur-str) 
         (setf color-list (append color-list (list sdl:*yellow*)))
         (setf color-list (append color-list (list sdl:*white*)))))
-    (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 30 20 (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) color-list))
+    (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 30 20 (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) :color-list color-list))
 
   (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Esc] Exit game")
                            10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))

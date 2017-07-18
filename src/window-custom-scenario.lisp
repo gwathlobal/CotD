@@ -77,7 +77,7 @@
         (if (= i cur-str) 
           (setf color-list (append color-list (list sdl:*yellow*)))
           (setf color-list (append color-list (list sdl:*white*)))))
-      (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 4 text-str-num))) color-list))
+      (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 4 text-str-num))) :color-list color-list))
     )
     
     (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* 10 (* 2 (sdl:char-height sdl:*default-font*))) :w (- *window-width* 20) :h (* 2 (sdl:char-height sdl:*default-font*))))

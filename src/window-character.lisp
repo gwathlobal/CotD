@@ -66,7 +66,7 @@
                                        sdl:*yellow*
                                        sdl:*white*)))
      
-      (draw-selection-list str-list cur-str (truncate h (sdl:get-font-height)) x y color-list))
+      (draw-selection-list str-list cur-str (truncate h (sdl:get-font-height)) x y :color-list color-list))
     )
 
   (let* ((x (+ (truncate *window-width* 2) 10))
