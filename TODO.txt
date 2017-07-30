@@ -1,5 +1,5 @@
 - Add courtyard houses like Thief2RL
-- Do something with the message code so that name are captalized (and not capitalized) properly.
+- Do something with the message code so that names are captalized (and not capitalized) properly.
 - Add highscore table
 - Add a Thief/Spy campaign
 - Display lit and shadowed tiles for the player

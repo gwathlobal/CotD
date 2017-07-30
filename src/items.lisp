@@ -30,6 +30,7 @@
   (setf (aref *item-types* (id item-type)) item-type))
 
 (defun remove-item-from-world (item)
+  (setf (item-id-list (level *world*)) (remove (id item) (item-id-list (level *world*))))
   (setf (aref *items* (id item)) nil))
 
 (defclass item ()
