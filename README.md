@@ -5,18 +5,16 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-June 02, 2017 v1.1.3
+July 31, 2017 v1.1.4
 
-- Windows now ar not clear glass, so you will not see as far as you usually do when looking through windows. Leaves also obstruct your vision somewhat.
-- Undead now have their own counter.
-- Added smoke bombs to the Thief. Smoke will obstruct visibility and can help you escape.
-- Added an ability to ignite grass and furniture on fire to the Angels. Fire damages those standing in it and produces smoke.
-- Added ability to temporarily transform into Avatars of Brilliance (former Archangels) to Angels.
-- Added the Scrooge achievement - for those who hold the most gold at the end of the game.
-- Added the Evil Spirit achievement - for those who had the most possessions during the game.
-- Added the Necromancer achievement - for those who made the highest number of reanimations during the game.
-- Gold coins worth 1500$ are now guaranteed on the map.
-- Satanist now have unique names.
+- Avatars of Brilliance are now able to fly for the duration of the transformation.
+- Archdemons now have a ranged attack that inflicts minor damage and pulls enemies to the ground.
+- Satanists can now empower an undead unit and make it permanently follow them.
+- The Military now have medkit items to heal their wounds.
+- The Thief's ability Smoke bomb is now converted into an item with the same effect. The Thief starts with three of them.
+- Most citizens now have a small number of coins in their pockets.
+- You can now see which creatures you can see properly and which through a shared mind, as well as iterate through visible creatures in look mode.
+- Added wind to the map that affects the direction in which smoke moves.
 
 CURRENT CHANGELOG
 
