@@ -79,3 +79,8 @@ WATER
 All characters are able to swim. You can traverse water horizontally and swim directly up and down. To get onto the shore, move against a wall with a floor above it while inside a lake or a river.
 Swimming takes more time than walking so jumping straight into a lake for a shortcut might not always be a good idea.
 Remember that humans need to breathe. Your oxygen supply will start to diminish when you are in the water and there is no air tile directly above you. Once you are out of oxygen, you will start to take damage and will eventually die.
+
+
+FLYING
+
+Avatars of Brilliance are able to fly directly up and down (as well as the usual horizontal movemeny). But beware that once the transformation is over, you will fall and have to suffer full effects of gravity.
