@@ -29,7 +29,7 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
       (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~%~%Visibility: ~A"
-                        (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
+                        (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
                         (if (mob-ability-p *player* +mob-abil-military-follow-me+) (format nil "Followers: ~A~%" (count-follower-list *player*)) "")
@@ -122,9 +122,9 @@
                                      (if (find (id vmob) (proper-visible-mobs mob))
                                        ""
                                        "[M] ")
-                                     (visible-name vmob)
+                                     (capitalize-name (visible-name vmob))
                                      (if (riding-mob-id vmob)
-                                       (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id vmob))))
+                                       (format nil ", riding ~A" (capitalize-name (visible-name (get-mob-by-id (riding-mob-id vmob)))))
                                        "")
                                      (if (/= (- (z vmob) (z mob)) 0)
                                        (format nil " (~@d)" (- (z vmob) (z mob)))

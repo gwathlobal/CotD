@@ -87,6 +87,7 @@
   (aref *lvl-features* feature-id))
 
 (defun remove-feature-from-world (feature)
+  (setf (feature-id-list (level *world*)) (remove (id feature) (feature-id-list (level *world*))))
   (setf (aref *lvl-features* (id feature)) nil))
 
 (defmethod name ((feature feature))

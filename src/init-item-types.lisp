@@ -1,27 +1,27 @@
 (in-package :cotd)
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-limb+
-                                         :name "Body part"
+                                         :name "body part"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 1))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-half+
-                                         :name "Body part"
+                                         :name "body part"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 2))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-body+
-                                         :name "Body part"
+                                         :name "body part"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 3))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-full+
-                                         :name "Body part"
+                                         :name "body part"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 4))
 
 (set-item-type (make-instance 'item-type :id +item-type-coin+
-                                         :name "Coin"
+                                         :name "coin"
                                          :glyph-idx 4 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 10000 :value 1))
 
 (set-item-type (make-instance 'item-type :id +item-type-medkit+
-                                         :name "Medkit"
+                                         :name "medkit"
                                          :descr "A medkit that can heal 3-5 HP. Usable by humans only. Unusable underwater."
                                          :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor item)
@@ -36,7 +36,7 @@
                                                                                                                   (format nil "You hear some rustling sounds~A. " str)))
                                                        
                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                              (format nil "~A uses a Medkit to heal itself for ~A. " (visible-name actor) heal-pwr))))
+                                                                              (format nil "~A uses a medkit to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr))))
                                          :on-check-applic #'(lambda (actor item)
                                                               (declare (ignore item))
                                                               (if (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
@@ -56,7 +56,7 @@
                                                             nil))))
 
 (set-item-type (make-instance 'item-type :id +item-type-smoke-bomb+
-                                         :name "Smoke bomb"
+                                         :name "smoke bomb"
                                          :descr "A bomb that emits clouds of smoke to conseal you. Usable only by humans. Can not be used in water."
                                          :glyph-idx 1 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor item)
@@ -88,7 +88,7 @@
                                                                                                                     (format nil "You hear some hiss~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A uses a Smoke bomb. " (visible-name actor))))))
+                                                                                (format nil "~A uses a smoke bomb. " (capitalize-name (visible-name actor)))))))
                                          :on-check-applic (lambda (actor item)
                                                               (declare (ignore item))
                                                               (if (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))

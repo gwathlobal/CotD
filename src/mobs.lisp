@@ -860,7 +860,7 @@
 
 (defmethod get-qualified-name ((mob mob))
   (if (slot-value mob 'name)
-    (format nil "~A the ~A" (name mob) (name (get-mob-type-by-id (mob-type mob))))
+    (format nil "~A the ~A" (name mob) (capitalize-name (name (get-mob-type-by-id (mob-type mob)))))
     (format nil "nameless ~A" (name mob))))
 
 (defun set-name (mob)

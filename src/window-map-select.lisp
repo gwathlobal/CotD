@@ -118,14 +118,14 @@
         (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
         (dolist (feature feature-list)
           (format str ", ~A~A"
-                  (name (get-feature-by-id feature))
+                  (capitalize-name (name (get-feature-by-id feature)))
                   (if *cotd-release* "" (format nil " (~A)" (counter (get-feature-by-id feature))))))
         (when (and mob
                    (check-mob-visible mob :observer *player*))
           (format str "~%~A~A~A"
-                  (get-current-mob-name mob)
+                  (capitalize-name (get-current-mob-name mob))
                   (if (riding-mob-id mob)
-                    (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id mob))))
+                    (format nil ", riding ~A" (capitalize-name (visible-name (get-mob-by-id (riding-mob-id mob)))))
                     "")
                   (if (and (check-lof win) (not lof-blocked))
                     (format nil " (hit: ~D%)" (if (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
@@ -136,7 +136,7 @@
               for item = (get-item-by-id item-id)
               do
                  (format str "~%~A~A"
-                         (name item)
+                         (capitalize-name (name item))
                          (if (> (qty item) 1)
                            (format nil " x~A" (qty item))
                            "")))

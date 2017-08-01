@@ -46,7 +46,7 @@
     (loop for i from 0 below (length (inv *player*))
           for item = (get-inv-item-by-pos (inv *player*) i)
           do
-             (push (visible-name item) lst)
+             (push (capitalize-name (visible-name item)) lst)
              (push (if (= i cur-str)
                      sdl:*yellow*
                      sdl:*white*)
