@@ -173,7 +173,17 @@
   ;; filling the background with black rectangle
   (fill-background-tiles)
    
-  (update-map-area)
+  (update-map-area :post-func #'(lambda (x y x1 y1)
+                                  (loop for sound in (heard-sounds *player*) 
+                                        when (and (= (sound-x sound) x)
+                                                  (= (sound-y sound) y)
+                                                  (= (sound-z sound) (z *player*)))
+                                          do
+                                             (draw-glyph x1
+                                                         y1
+                                                         31
+                                                         :front-color sdl:*white*
+                                                         :back-color sdl:*black*))))
     
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   (show-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 260 10))

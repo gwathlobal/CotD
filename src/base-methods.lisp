@@ -325,8 +325,11 @@
          ))
       (t
        (progn
-         ;; set motion
-         (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
+                 
+         (funcall place-func mob)
+         
+          ;; set motion
+         (if (and (= orig-x x) (= orig-y y) (= orig-z z))
            (progn
              (incf-mob-motion mob *mob-motion-stand*)
 
@@ -340,8 +343,7 @@
              (generate-sound mob x y z *mob-sound-move* #'(lambda (str)
                                                             (format nil "You hear rustling~A. " str)))
              ))
-         
-         (funcall place-func mob))))
+         )))
 
     ;; apply gravity
     (when (and apply-gravity

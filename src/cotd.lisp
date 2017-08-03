@@ -394,4 +394,4 @@
 
 #+(and sbcl unix) 
 (defun make-exec ()
-  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t))
+  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t :compression t))

@@ -75,7 +75,7 @@
       (let ((sound-z (cond ((> sz (z target)) 1)
                            ((< sz (z target)) -1)
                            (t 0)))
-            (sound-dir (general-direction-dir (x target) (y target) sx sy))
+            (sound-dir)
             (nx sx)
             (ny sy)
             (nz sz)
@@ -101,7 +101,7 @@
             (when (>= ny (array-dimension (terrain (level *world*)) 1)) (setf ny (1- (array-dimension (terrain (level *world*)) 1)))))
           
           (push (make-sound :x nx :y ny :z nz) (heard-sounds target))
-
+          (setf sound-dir (general-direction-dir (x target) (y target) nx ny))
           (when (eq target *player*)
             (setf dir-str (format nil "~A~A~A"
                                   (cond

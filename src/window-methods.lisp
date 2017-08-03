@@ -47,7 +47,8 @@
      ;;(format t "rel = (~A, ~A), s = (~A, ~A)~%" rel-x rel-y sx sy)
      (values sx sy max-x max-y)))
 
-(defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*))
+(defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*)
+                             (post-func #'(lambda (x y x1 y1) (declare (ignore x y x1 y1)) nil)))
   (declare (optimize (speed 3)))
    ;; draw the level
    (let* ((x1 0) (y1 0) (glyph-w *glyph-w*) (glyph-h *glyph-h*) (single-memo))
@@ -72,7 +73,9 @@
 	   
 	   (draw-glyph x1 y1 (get-single-memo-glyph-idx single-memo) 
 		       :front-color (get-single-memo-glyph-color single-memo) 
-		       :back-color (get-single-memo-back-color single-memo)))))))
+		       :back-color (get-single-memo-back-color single-memo))
+
+           (funcall post-func (+ sx x) (+ sy y) x1 y1))))))
 
 (defun display-animation-on-map (map-x map-y map-z glyph-idx glyph-color back-color)
   (let ((scr-x 0) (scr-y 0))

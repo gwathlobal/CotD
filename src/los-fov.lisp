@@ -440,18 +440,23 @@
                                   (setf vision-pwr (1+ (cur-sight *player*))))
               ))
 
+  ;(loop for sound in (heard-sounds *player*) do
+  ;  (set-single-memo-* level (sound-x sound) (sound-y sound) (sound-z sound) :glyph-idx 31 :glyph-color sdl:*white* :back-color sdl:*black*))
+  
   ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
-  ;(setf (shared-visible-mobs *player*) nil)
   (when (mob-ability-p *player* +mob-abil-shared-minds+)
     (loop for nmob-id in (mob-id-list (level *world*))
           for nmob = (get-mob-by-id nmob-id)
           when (and (mob-ability-p nmob +mob-abil-shared-minds+)
-                    (= (faction *player*) (faction nmob)))
+                    (= (faction *player*) (faction nmob))
+                    (not (check-dead nmob)))
             do
                (pushnew (id nmob) (shared-visible-mobs *player*))
                ;;(format t "~A [~A] sees ~A~%" (name nmob) (id nmob) (visible-mobs nmob))
-               (loop for vmob-id in (proper-visible-mobs nmob) do
-                 (pushnew vmob-id (shared-visible-mobs *player*))))
+               (loop for vmob-id in (proper-visible-mobs nmob)
+                     when (not (check-dead (get-mob-by-id vmob-id)))
+                       do
+                          (pushnew vmob-id (shared-visible-mobs *player*))))
     (setf (shared-visible-mobs *player*) (remove (id *player*) (shared-visible-mobs *player*))))
 
   ;;(format t "Player sees proper ~A~%" (proper-visible-mobs *player*))

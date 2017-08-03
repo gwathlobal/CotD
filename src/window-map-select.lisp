@@ -47,7 +47,18 @@
     )))
 
 (defun map-select-update (win)
-  (update-map-area :rel-x (view-x *player*) :rel-y (view-y *player*) :rel-z (view-z *player*))
+  (update-map-area :rel-x (view-x *player*) :rel-y (view-y *player*) :rel-z (view-z *player*)
+                   :post-func #'(lambda (x y x1 y1)
+                                  (loop for sound in (heard-sounds *player*) 
+                                        when (and (= (sound-x sound) x)
+                                                  (= (sound-y sound) y)
+                                                  (= (sound-z sound) (view-z *player*)))
+                                          do
+                                             (draw-glyph x1
+                                                         y1
+                                                         31
+                                                         :front-color sdl:*white*
+                                                         :back-color sdl:*black*))))
 
   ;; drawing the highlighting rectangle around the viewed grid-cell
   (let ((lof-blocked t))

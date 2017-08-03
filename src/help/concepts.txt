@@ -65,6 +65,7 @@ HEARING
 
 Apart from motion, every character action also produces sounds that others can hear. If you do not see the source of the sound you will be indicated the general direction to it and the nature of the sound. Some actions are very loud (like gun shots), others won't be heard unless you stand nearby (like somebody's moving). Sounds are able to propagate through walls but they lose their loudness while doing so.
 When hearing something, most characters will try to investigate the source of the sound if they have no other pressing matters.
+Sounds are indicated as question marks on the map.
 
 
 CLIMBING
