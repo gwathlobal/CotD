@@ -2446,3 +2446,10 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-flying+ :name "Can fly" :descr "You can fly permanently." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

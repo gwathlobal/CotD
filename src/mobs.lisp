@@ -123,7 +123,7 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains)
+                                                                abil-empower-undead abil-gravity-chains abil-flying)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -266,6 +266,8 @@
     (setf (gethash +mob-abil-empower-undead+ (abilities mob-type)) t))
   (when abil-gravity-chains
     (setf (gethash +mob-abil-gravity-chains+ (abilities mob-type)) t))
+  (when abil-flying
+    (setf (gethash +mob-abil-flying+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -535,16 +537,9 @@
     (mob-pick-item mob (make-instance 'item :item-type item-type-id :x (x mob) :y (y mob) :z (z mob) :qty qty)
                    :spd nil :silent t))
   
-  ;; if you belong to the military - add medkits
-  ;(when (and (mob-ability-p mob +mob-abil-human+)
-  ;           (eq (faction mob) +faction-type-military+))
-  ;  (mob-pick-item mob (make-instance 'item :item-type +item-type-medkit+ :x (x mob) :y (y mob) :z (z mob) :qty 3)
-  ;                 :spd nil :silent t))
-
-  ;; if you are a thief - add smoke bombs
-  ;(when (= (mob-type mob) +mob-type-thief+)
-  ;  (mob-pick-item mob (make-instance 'item :item-type +item-type-smoke-bomb+ :x (x mob) :y (y mob) :z (z mob) :qty 3)
-  ;                 :spd nil :silent t))
+  ;; add permanent flying effect, if the mob can fly
+  (when (mob-ability-p mob +mob-abil-flying+)
+    (set-mob-effect mob :effect-type-id +mob-effect-flying+ :actor-id (id mob)))
   
   (set-cur-weapons mob)
   (adjust-dodge mob)
@@ -574,7 +569,7 @@
     (incf (total-undead *world*))
     (incf (initial-undead *world*)))
   (when (and (mob-ability-p mob +mob-abil-angel+)
-             (not (= (mob-type mob) +mob-type-gargantaur+)))
+             (not (mob-ability-p mob +mob-abil-animal+)))
     (incf (total-angels *world*))
     (incf (initial-angels *world*)))
 

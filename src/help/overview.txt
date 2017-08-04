@@ -31,6 +31,7 @@ OUTSIDER BEASTS
  - Outsider beasts are half-sentient creatures of various origin that will actively attack everything in sight, including their own kin.
  - The demonic invasion has attracted Fiends. If a demon gets near one, it will be able to dominate and ride it as a mount.
  - The Gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win. Angels may dominate these at the cost of their own health, but in return, they will be able to invoke Gargantaur's mind burn.
+ - The wisps have been exposed to the celestial light for so long that they are completely blind. Yet they navigate using their hearing and are able to fly. Wisps will not attack each other and the Angels.
  
 CITIZENS OF THE CITY
  - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.

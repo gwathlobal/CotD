@@ -67,6 +67,7 @@
 (defconstant +mob-type-reanimated-pwr-3+ 26)
 (defconstant +mob-type-reanimated-pwr-4+ 27)
 (defconstant +mob-type-reanimated-empowered+ 28)
+(defconstant +mob-type-wisp+ 29)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -76,6 +77,7 @@
 (defconstant +faction-type-animals+ 5)
 (defconstant +faction-type-outsider-beasts+ 6)
 (defconstant +faction-type-criminals+ 7)
+(defconstant +faction-type-outsider-wisps+ 8)
 
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)
@@ -145,6 +147,7 @@
 (defconstant +mob-abil-ignite-the-fire+ 57)
 (defconstant +mob-abil-avatar-of-brilliance+ 58)
 (defconstant +mob-abil-gravity-chains+ 59)
+(defconstant +mob-abil-flying+ 60)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

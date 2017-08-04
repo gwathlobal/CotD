@@ -149,7 +149,8 @@
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -217,7 +218,8 @@
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -286,7 +288,8 @@
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -357,7 +360,8 @@
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -463,7 +467,8 @@
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -555,7 +560,8 @@
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
@@ -624,7 +630,8 @@
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
                                                                                            #'find-unoccupied-place-inside))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)

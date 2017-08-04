@@ -276,53 +276,60 @@
        (progn
          ;; it is imperative the a 1-tile mob rides a multi-tile mob and not vice versa
 
-         ;; set motion
-         (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
-           (incf-mob-motion mob *mob-motion-stand*)
-           (incf-mob-motion mob *mob-motion-move*))
-         
          (if (and (= (x (get-mob-by-id (riding-mob-id mob))) x) (= (y (get-mob-by-id (riding-mob-id mob))) y) (= (z (get-mob-by-id (riding-mob-id mob))) z))
            (incf-mob-motion (get-mob-by-id (riding-mob-id mob)) *mob-motion-stand*)
            (incf-mob-motion (get-mob-by-id (riding-mob-id mob)) *mob-motion-move*))
-                
+         
          (funcall place-func (get-mob-by-id (riding-mob-id mob)))
 
          ;; place the rider
          (setf (x mob) x (y mob) y (z mob) z)
          (setf (aref (mobs (level *world*)) x y z) (id mob))
+
+          ;; set motion
+         (if (and (= orig-x x) (= orig-y y) (= orig-z z))
+           (incf-mob-motion mob *mob-motion-stand*)
+           (incf-mob-motion mob *mob-motion-move*))
+         
          ))
       ((mounted-by-mob-id mob)
        (progn
          ;; it is imperative the a 1-tile mob rides a multi-tile mob and not vice versa
 
-         ;; set motion
-         (if (and (= (x mob) x) (= (y mob) y) (= (z mob) z))
-           (incf-mob-motion mob *mob-motion-stand*)
-           (incf-mob-motion mob *mob-motion-move*))
-         
-         (if (and (= (x (get-mob-by-id (mounted-by-mob-id mob))) x) (= (y (get-mob-by-id (mounted-by-mob-id mob))) y) (= (z (get-mob-by-id (mounted-by-mob-id mob))) z))
-           (progn
-             (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-stand*)
+         (let ((rider-orig-x (x (get-mob-by-id (mounted-by-mob-id mob))))
+               (rider-orig-y (y (get-mob-by-id (mounted-by-mob-id mob))))
+               (rider-orig-z (z (get-mob-by-id (mounted-by-mob-id mob)))))
 
-             ;; generate sound
-             (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-stand* #'(lambda (str)
-                                                                                                (format nil "You hear some scratching~A. " str))))
-           (progn
-             (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-move*)
-
-             ;; generate sound
-             (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-move* #'(lambda (str)
-                                                                                                (format nil "You hear rustling~A. " str)))
-             ))
-         
-         (funcall place-func mob)
-         
-         ;; place the rider
-         (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
-               (y (get-mob-by-id (mounted-by-mob-id mob))) y
-               (z (get-mob-by-id (mounted-by-mob-id mob))) z)
-         (setf (aref (mobs (level *world*)) (x mob) (y mob) (z mob)) (mounted-by-mob-id mob))
-         ))
+           (funcall place-func mob)
+           
+           ;; place the rider
+           (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
+                 (y (get-mob-by-id (mounted-by-mob-id mob))) y
+                 (z (get-mob-by-id (mounted-by-mob-id mob))) z)
+           (setf (aref (mobs (level *world*)) (x mob) (y mob) (z mob)) (mounted-by-mob-id mob))
+           
+           ;; set motion
+           (if (and (= orig-x x) (= orig-y y) (= orig-z z))
+             (incf-mob-motion mob *mob-motion-stand*)
+             (incf-mob-motion mob *mob-motion-move*))
+           
+           (if (and (= rider-orig-x x) (= rider-orig-y y) (= rider-orig-z z))
+             (progn
+               (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-stand*)
+               
+               ;; generate sound
+               (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-stand* #'(lambda (str)
+                                                                                                   (format nil "You hear some scratching~A. " str))))
+             (progn
+               (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-move*)
+               
+               ;; generate sound
+               (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-move* #'(lambda (str)
+                                                                                                  (format nil "You hear rustling~A. " str)))
+               ))
+           
+           
+           )))
       (t
        (progn
                  
@@ -1221,7 +1228,7 @@
     (when (mob-ability-p mob +mob-abil-undead+)
       (decf (total-undead *world*)))
     (when (and (mob-ability-p mob +mob-abil-angel+)
-               (not (eq (mob-type mob) +mob-type-gargantaur+)))
+               (not (mob-ability-p mob +mob-abil-animal+)))
       (decf (total-angels *world*)))
     (when (mob-effect-p mob +mob-effect-blessed+)
       (decf (total-blessed *world*)))

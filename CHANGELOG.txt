@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Added Wisps to the map. These are flying angelic beings that are able to navigate using their hearing.
+
 --------------------
 July 31, 2017 v1.1.4
 
