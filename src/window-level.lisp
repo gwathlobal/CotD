@@ -121,7 +121,7 @@
     (sdl:draw-string-solid-* (format nil "~A~A~A~A"
                                      (if (find (id vmob) (proper-visible-mobs mob))
                                        ""
-                                       "[M] ")
+                                       "(M) ")
                                      (capitalize-name (visible-name vmob))
                                      (if (riding-mob-id vmob)
                                        (format nil ", riding ~A" (capitalize-name (visible-name (get-mob-by-id (riding-mob-id vmob)))))
@@ -390,7 +390,8 @@
                                                                                           (progn
                                                                                             (setf *current-window* (make-instance 'map-select-window 
                                                                                                                                   :return-to *current-window*
-                                                                                                                                  :cmd-str "[Enter] Invoke  "
+                                                                                                                                  :cmd-str (list "[Enter] Invoke  "
+                                                                                                                                                 "")
                                                                                                                                   :exec-func #'(lambda ()
                                                                                                                                                  (if (funcall (map-select-func (get-ability-type-by-id (nth cur-sel mob-abilities)))
                                                                                                                                                               (nth cur-sel mob-abilities))
@@ -416,7 +417,8 @@
 			(when (and (sdl:key= key :sdl-key-l) (= mod 0))
 			  (setf *current-window* (make-instance 'map-select-window 
 								:return-to *current-window*
-								:cmd-str "[<] Look up  [>] Look down  "
+								:cmd-str (list "[<] Look up  [>] Look down  "
+                                                                               "")
 								:exec-func #'(lambda ()
 									       nil)))
 			  (make-output *current-window*))
