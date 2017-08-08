@@ -154,17 +154,17 @@
                          
                          
         )
-      (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 10) :w (- *window-width* 260 10) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height)))))
+      (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 20) :w (- *window-width* 260 10) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height)))))
         (write-text str rect)))
   
     ;; drawing the propmt line
-    (let ((x 10) (y (- *window-height* 10 (sdl:char-height sdl:*default-font*))) (w (- *window-width* 260 10)) (h (sdl:get-font-height)))
+    (let ((x 10) (y (- *window-height* 5 (sdl:char-height sdl:*default-font*))) (w (- *window-width* 260 10)) (h (sdl:get-font-height)))
       (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
         (sdl:fill-surface sdl:*black* :template a-rect)
         (cond
           ((= (cur-tab win) +map-select-win-mobs+) (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Ctrl+l] Map select  [Esc] Quit") x y :color sdl:*white*))
           ((and (= (cur-tab win) +map-select-win-map+) (sel-list win)) (sdl:draw-string-solid-* (format nil "~A[Ctrl+l] Mob select  [Esc] Quit" (nth +map-select-win-map+ (cmd-str win))) x y :color sdl:*white*))
-          (t (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white*)))
+          (t (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (first (cmd-str win))) x y :color sdl:*white*)))
         
         ))))
 
@@ -173,7 +173,7 @@
   
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   ;(show-small-message-box *glyph-w* (- *window-height* *msg-box-window-height* 10) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
-  (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
+  (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
   (cond
     ((and (= (cur-tab win) +map-select-win-mobs+) (sel-list win))
      (progn
@@ -184,7 +184,7 @@
            (if (= i (cur-sel win)) 
              (setf color-list (append color-list (list sdl:*yellow*)))
              (setf color-list (append color-list (list sdl:*white*)))))
-         (draw-selection-list (sel-list win) (cur-sel win) 6 (- *window-width* 260) (- *window-height* *msg-box-window-height* 10)
+         (draw-selection-list (sel-list win) (cur-sel win) 6 (- *window-width* 260) (- *window-height* *msg-box-window-height* 20)
                               :color-list color-list
                               :char-height (if (> *glyph-h* (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
                                                   *glyph-h*
@@ -204,7 +204,7 @@
                                               (progn
                                                 (draw-visible-mob-func x y (get-mob-by-id str) *player* color))))
                               :use-letters t))))
-    (t (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 10) 260 *msg-box-window-height* :mob *player* :visible-mobs (sel-list win))))
+    (t (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height* :mob *player* :visible-mobs (sel-list win))))
   
   (map-select-update win)
   

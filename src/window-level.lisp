@@ -73,10 +73,10 @@
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))
     
-    (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) (- (+ (- *window-height* *msg-box-window-height* 10) (* -3 (sdl:char-height sdl:*default-font*)))
+    (show-char-effects *player* x (+ y (* (sdl:get-font-height) (1+ str-lines))) (- (+ (- *window-height* *msg-box-window-height* 20) (* -3 (sdl:char-height sdl:*default-font*)))
                                                                                     (+ y (* (sdl:get-font-height) (1+ str-lines)))))
     
-    (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 10) (* -3 (sdl:char-height sdl:*default-font*))))
+    (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 20) (* -3 (sdl:char-height sdl:*default-font*))))
     ))
 
 (defun show-message-box (x y w &optional (h *msg-box-window-height*) (message-box *small-message-box*))
@@ -186,8 +186,8 @@
                                                          :back-color sdl:*black*))))
     
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
-  (show-message-box 10 (- *window-height* *msg-box-window-height* 10) (- *window-width* 260 10))
-  (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 10) 260 *msg-box-window-height*)
+  (show-message-box 10 (- *window-height* *msg-box-window-height* 20) (- *window-width* 260 10))
+  (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height*)
   (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
     
   (sdl:update-display)
@@ -560,7 +560,7 @@
                  (set-idle-calcing win)
 
                  
-                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -3 (sdl:char-height sdl:*default-font*))) t)
+                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -3 (sdl:char-height sdl:*default-font*))) t)
               )
               
        (:video-expose-event () (make-output *current-window*)))

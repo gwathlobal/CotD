@@ -1245,9 +1245,10 @@
                                                   (when (and (slave-mob-id actor)
                                                              (not (mob-effect-p actor +mob-effect-reveal-true-form+)))
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                           (format nil " and reveals itself as ~A" (get-qualified-name actor)))))
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil ". "))
+                                                                           (format nil " and reveals itself as ~A" (get-qualified-name actor))))
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil ". ")))
+                                                
                                                 
                                                 (set-mob-location actor (x target) (y target) (z target))
                                                 
