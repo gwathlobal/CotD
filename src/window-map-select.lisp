@@ -162,8 +162,8 @@
       (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
         (sdl:fill-surface sdl:*black* :template a-rect)
         (cond
-          ((= (cur-tab win) +map-select-win-mobs+) (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [l] Map select  [Esc] Quit") x y :color sdl:*white*))
-          ((and (= (cur-tab win) +map-select-win-map+) (sel-list win)) (sdl:draw-string-solid-* (format nil "~A[l] Mob select  [Esc] Quit" (cmd-str win)) x y :color sdl:*white*))
+          ((= (cur-tab win) +map-select-win-mobs+) (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Ctrl+l] Map select  [Esc] Quit") x y :color sdl:*white*))
+          ((and (= (cur-tab win) +map-select-win-map+) (sel-list win)) (sdl:draw-string-solid-* (format nil "~A[Ctrl+l] Mob select  [Esc] Quit" (nth +map-select-win-map+ (cmd-str win))) x y :color sdl:*white*))
           (t (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (cmd-str win)) x y :color sdl:*white*)))
         
         ))))
@@ -189,9 +189,21 @@
                               :char-height (if (> *glyph-h* (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
                                                   *glyph-h*
                                                   (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
-                              :str-func #'(lambda (x y color str)
+                              :str-func #'(lambda (x y color str use-letters)
                                             ;; the list of strings to display is basically a list of visible mob IDs, so 'str' param is a mob ID here
-                                            (draw-visible-mob-func x y (get-mob-by-id str) *player* color))))))
+                                            ;; use-letters here can be
+                                            ;;   nil
+                                            ;;   (list i str-per-page)
+                                            (if use-letters
+                                              (progn
+                                                (sdl:draw-string-solid-* (if (< (first use-letters) (second use-letters))
+                                                                           (format nil "[~A]  " (nth (first use-letters) *char-list*))
+                                                                           (format nil "     "))
+                                                                         x y :color color)
+                                                (draw-visible-mob-func (+ x (* 5 (sdl:char-width sdl:*default-font*))) y (get-mob-by-id str) *player* color))
+                                              (progn
+                                                (draw-visible-mob-func x y (get-mob-by-id str) *player* color))))
+                              :use-letters t))))
     (t (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 10) 260 *msg-box-window-height* :mob *player* :visible-mobs (sel-list win))))
   
   (map-select-update win)
@@ -207,10 +219,10 @@
 			(cond
                           ((= (cur-tab win) +map-select-win-mobs+)
                            (progn
-                             (when (sdl:key= key :sdl-key-l)
+                             (when (and (sdl:key= key :sdl-key-l) (/= (logand mod sdl-cffi::sdl-key-mod-ctrl) 0))
                                (setf (cur-tab win) +map-select-win-map+))
 
-                             (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
+                             (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win) :start-page (truncate (cur-sel win) 6) :max-str-per-page 6))
                              (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (sel-list win))))
                              (when (sel-list win)
                                (setf (view-x *player*) (x (get-mob-by-id (nth (cur-sel win) (sel-list win))))
@@ -218,7 +230,7 @@
                                      (view-z *player*) (z (get-mob-by-id (nth (cur-sel win) (sel-list win))))))
                              ))
                           (t (progn
-                               (when (and (sdl:key= key :sdl-key-l) (sel-list win))
+                               (when (and (sdl:key= key :sdl-key-l) (/= (logand mod sdl-cffi::sdl-key-mod-ctrl) 0) (sel-list win))
                                  (setf (cur-tab win) +map-select-win-mobs+)
                                  (when (sel-list win)
                                    (setf (view-x *player*) (x (get-mob-by-id (nth (cur-sel win) (sel-list win))))

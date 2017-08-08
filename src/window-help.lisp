@@ -80,9 +80,9 @@
          (if (= i cur-str) 
            (setf color-list (append color-list (list sdl:*yellow*)))
            (setf color-list (append color-list (list sdl:*white*)))))
-       (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 10) :color-list color-list))
+       (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 10) :color-list color-list :use-letters t))
 
-     (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Esc] Exit")
+     (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
                            10 (- *window-height* 10 (sdl:char-height sdl:*default-font*))))
     )
 
@@ -96,7 +96,7 @@
     (:key-down-event (:key key :mod mod :unicode unicode)
                      
                      (when (= (cur-page win) +win-help-page-menu+)
-                       (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
+                       (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win) :start-page (truncate (cur-sel win) (length (menu-items win))) :max-str-per-page (length (menu-items win))))
                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win)))))
                      
                      (cond

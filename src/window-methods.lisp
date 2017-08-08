@@ -143,14 +143,30 @@
 (defvar *sel-y-offset* 0)
 (defvar *sel-x-offset* 4)
 
+;; most likely I am doing it wrong but I need a sequence of letters in alphabetical order
+(defvar *char-list* (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"))
+
 (defun draw-selection-list (str-list cur-str str-per-page x y &key (color-list ())
                                                                    (char-height (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
-                                                                   (str-func #'(lambda (x y color str)
-                                                                                 (sdl:draw-string-solid-* str x y :color color))))
+                                                                   (str-func #'(lambda (x y color str use-letters)
+                                                                                 ;; use-letters here can be
+                                                                                 ;;   nil
+                                                                                 ;;   (list i str-per-page)
+                                                                                 (sdl:draw-string-solid-* (if use-letters
+                                                                                                            (if (< (first use-letters) (second use-letters))
+                                                                                                              (format nil "[~A]  ~A" (nth (first use-letters) *char-list*) str)
+                                                                                                              (format nil "     ~A" str))
+                                                                                                            str)
+                                                                                                          x y :color color)))
+                                                                   (use-letters nil))
   (declare (type list color-list str-list))
   
   (unless str-list
     (return-from draw-selection-list nil))
+
+  
+  (when (and use-letters (> str-per-page (length *char-list*)))
+    (setf str-per-page (length *char-list*)))
   
   (let* ((color) (str)
 	 (list-start (* (truncate cur-str str-per-page) str-per-page))
@@ -162,7 +178,9 @@
       (if (eql color-list nil)
         (setf color sdl:*white*)
         (setf color (nth (+ i list-start) color-list)))
-      (funcall str-func (+ x (sdl:char-width sdl:*default-font*) *sel-x-offset*) (+ y (* i char-height)) color str)
+      (funcall str-func (+ x (sdl:char-width sdl:*default-font*) *sel-x-offset*) (+ y (* i char-height)) color str (if use-letters
+                                                                                                                     (list i str-per-page)
+                                                                                                                     nil))
       )
     ;; draw a scroll bar when necessary
     (when (> (length str-list) str-per-page)
@@ -231,11 +249,45 @@
       (when is-more-than-one-screen
 	(sdl:draw-string-solid-* "*" (- (+ x w) 12) (+ y (truncate (* h (/ cur-item (length item-list))))) :color sdl:*white*)))))
 
-(defun run-selection-list (key mod unicode cur-str)
+(defun run-selection-list (key mod unicode cur-str &key (start-page 0) (max-str-per-page -1))
   (declare (ignore unicode))
   (cond
     ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (= mod 0)) (decf cur-str))
-    ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (= mod 0)) (incf cur-str)))
+    ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (= mod 0)) (incf cur-str))
+    ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+     (if (= max-str-per-page -1)
+       (decf cur-str 10)
+       (decf cur-str max-str-per-page)))
+    ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+     (if (= max-str-per-page -1)
+       (incf cur-str 10)
+       (incf cur-str max-str-per-page)))
+    ((and (sdl:key= key :sdl-key-a) (= mod 0) (< 0 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 0)))
+    ((and (sdl:key= key :sdl-key-b) (= mod 0) (< 1 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 1)))
+    ((and (sdl:key= key :sdl-key-c) (= mod 0) (< 2 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 2)))
+    ((and (sdl:key= key :sdl-key-d) (= mod 0) (< 3 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 3)))
+    ((and (sdl:key= key :sdl-key-e) (= mod 0) (< 4 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 4)))
+    ((and (sdl:key= key :sdl-key-f) (= mod 0) (< 5 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 5)))
+    ((and (sdl:key= key :sdl-key-g) (= mod 0) (< 6 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 6)))
+    ((and (sdl:key= key :sdl-key-h) (= mod 0) (< 7 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 7)))
+    ((and (sdl:key= key :sdl-key-i) (= mod 0) (< 8 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 8)))
+    ((and (sdl:key= key :sdl-key-j) (= mod 0) (< 9 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 9)))
+    ((and (sdl:key= key :sdl-key-k) (= mod 0) (< 10 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 10)))
+    ((and (sdl:key= key :sdl-key-l) (= mod 0) (< 11 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 11)))
+    ((and (sdl:key= key :sdl-key-m) (= mod 0) (< 12 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 12)))
+    ((and (sdl:key= key :sdl-key-n) (= mod 0) (< 13 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 13)))
+    ((and (sdl:key= key :sdl-key-o) (= mod 0) (< 14 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 14)))
+    ((and (sdl:key= key :sdl-key-p) (= mod 0) (< 15 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 15)))
+    ((and (sdl:key= key :sdl-key-q) (= mod 0) (< 16 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 16)))
+    ((and (sdl:key= key :sdl-key-r) (= mod 0) (< 17 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 17)))
+    ((and (sdl:key= key :sdl-key-s) (= mod 0) (< 18 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 18)))
+    ((and (sdl:key= key :sdl-key-t) (= mod 0) (< 19 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 19)))
+    ((and (sdl:key= key :sdl-key-u) (= mod 0) (< 20 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 20)))
+    ((and (sdl:key= key :sdl-key-v) (= mod 0) (< 21 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 21)))
+    ((and (sdl:key= key :sdl-key-w) (= mod 0) (< 22 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 22)))
+    ((and (sdl:key= key :sdl-key-x) (= mod 0) (< 23 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 23)))
+    ((and (sdl:key= key :sdl-key-y) (= mod 0) (< 24 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 24)))
+    ((and (sdl:key= key :sdl-key-z) (= mod 0) (< 25 max-str-per-page)) (setf cur-str (+ (* start-page max-str-per-page) 25))))
   cur-str)
 
 (defun adjust-selection-list (cur-str max-str)

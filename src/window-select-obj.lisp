@@ -55,7 +55,7 @@
 	(if (= i cur-str) 
 	    (setf color-list (append color-list (list sdl:*yellow*)))
 	    (setf color-list (append color-list (list sdl:*white*)))))
-      (draw-selection-list (line-list win) cur-str (length (line-list win)) (- (truncate *window-width* 2) 150) (1+ y) :color-list color-list))
+      (draw-selection-list (line-list win) cur-str (length (line-list win)) (- (truncate *window-width* 2) 150) (1+ y) :color-list color-list :use-letters t))
 
     ;; drawing descriptions
     (when (descr-list win)
@@ -77,7 +77,7 @@
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
 			
-			(setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win)))
+			(setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win) :start-page (truncate (cur-sel win) (length (line-list win))) :max-str-per-page (length (line-list win))))
                         (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (line-list win))))
 
                         (cond
