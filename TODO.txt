@@ -1,4 +1,3 @@
-- Investigate the issue with connectivity for flight after terrain destruction
 - Add courtyard houses like Thief2RL
 - Add highscore table
 - Add a Thief/Spy campaign

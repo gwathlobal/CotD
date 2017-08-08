@@ -178,6 +178,8 @@
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-walk+))
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-climb+))
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-fly+
+                                                                                  (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-fly+))
                                                            )
                                                :on-bump-terrain #'(lambda (mob x y z)
                                                                     (if (and (mob-ability-p mob +mob-abil-open-close-window+)
@@ -199,6 +201,8 @@
                                                                                   +connect-room-none+)
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
                                                                                   +connect-room-none+)
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-fly+
+                                                                                  +connect-room-none+)
                                                            )))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-open+ :name "Open door"
@@ -212,6 +216,8 @@
                                                                                   +connect-room-none+)
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
                                                                                   +connect-room-none+)
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-fly+
+                                                                                  +connect-room-none+)
                                                            )))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-closed+ :name "Closed door"
@@ -224,6 +230,8 @@
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-walk+))
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-climb+
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-climb+))
+                                                           (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-fly+
+                                                                                  (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-fly+))
                                                            )
                                                :on-bump-terrain #'(lambda (mob x y z)
                                                                     (if (and (mob-ability-p mob +mob-abil-open-close-door+)
