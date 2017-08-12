@@ -110,6 +110,8 @@
   (setf (name *player*) "Player")
 
   (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%"))
+
+  (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
   )  
 
 (defun main-menu ()

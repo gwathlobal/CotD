@@ -3,6 +3,7 @@ CHANGELOG
 - Added Wisps to the map. These are flying angelic beings that are able to navigate using their hearing.
 - Sound sources can now be seen on map.
 - All menu options now have letter shortcuts.
+- Lit and shadowed tiles are now displayed on screen.
 - Fixed a bug with severed body parts animation showing when the player should not be able to see it.
 
 --------------------

@@ -57,7 +57,7 @@
                                                                      exit-result)))
                                                 
                                                 (setf item (make-instance 'item :item-type body-part-type :x tx :y ty :z tz))
-                                                (setf (name item) (format nil "~@(~A~)'s ~A" (alive-name mob) body-part-str))
+                                                (setf (name item) (format nil "~A's ~A" (alive-name mob) body-part-str))
                                                 (setf (alive-name item) (format nil "~A" (alive-name mob)))
                                                 (add-item-to-level-list (level *world*) item)
                                                 (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)

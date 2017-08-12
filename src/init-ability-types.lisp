@@ -2077,6 +2077,7 @@
                                  :cd 4 :motion 60
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
+                                                (logger (format nil "MOB-REANIMATE-BODY: ~A [~A] reanimates ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
                                                 ;; target here is the item to be reanimated
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                        (format nil "~A raises his hands and intones an incantation. " (capitalize-name (visible-name actor))) :observed-mob actor)
@@ -2094,6 +2095,7 @@
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)
                                                   (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. " (capitalize-name (visible-name target))))
+                                                  (logger (format nil "MOB-REANIMATE-BODY: ~A [~A] is reanimated at (~A ~A ~A).~%" (name actor) (id actor) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
                                                   (remove-item-from-world target)
                                                   (incf (stat-raised-dead actor)))
                                                 )

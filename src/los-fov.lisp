@@ -121,8 +121,9 @@
                                     ;  (return))
                                     
                                     (when (and (get-mob-* (level *world*) dx dy dz) 
-                                               (eq (get-mob-* (level *world*) dx dy dz) mob))
-                                      (incf (brightness mob) light-power))
+                                               (eq (get-mob-* (level *world*) dx dy dz) mob)
+                                               (> light-power (brightness mob)))
+                                      (setf (brightness mob) light-power))
                                     (decf light-power *light-power-faloff*)
 
                                     (when (<= vision-pwr 0)
@@ -143,8 +144,6 @@
         for vision-pwr = light-radius
         for vision-power = light-radius
         do
-           
-             
            ;; set up mob brightness
            (when (< (get-distance-3d x y z (x mob) (y mob) (z mob)) light-radius)
                (line-of-sight x y z (x mob) (y mob) (z mob)
@@ -166,8 +165,9 @@
                                     ;  (return))
                                     
                                     (when (and (get-mob-* (level *world*) dx dy dz) 
-                                               (eq (get-mob-* (level *world*) dx dy dz) mob))
-                                      (incf (brightness mob) light-power))
+                                               (eq (get-mob-* (level *world*) dx dy dz) mob)
+                                               (> light-power (brightness mob)))
+                                      (setf (brightness mob) light-power))
                                     (decf light-power *light-power-faloff*)
 
                                     (when (<= vision-pwr 0)
@@ -177,7 +177,92 @@
                                   exit-result))))
         )
   ;;(format t "HERE~%")
+  (when (eq mob *player*)
+    (calc-lit-tiles-for-player *player*))
+
+  (when (> (get-single-memo-light (get-memo-* (level *world*) (x mob) (y mob) (z mob)))
+           (brightness mob))
+    (setf (brightness mob) (get-single-memo-light (get-memo-* (level *world*) (x mob) (y mob) (z mob)))))
   )
+
+(defun calc-lit-tiles-for-player (mob)
+  (logger (format nil "CALC-LIT-TILES: ~A [~A]~%" (name mob) (id mob)))
+
+  (dotimes (x1 (array-dimension (memo (level *world*)) 0))
+    (dotimes (y1 (array-dimension (memo (level *world*)) 1))
+      (dotimes (z1 (array-dimension (memo (level *world*)) 2))
+        (set-single-memo-* (level *world*) x1 y1 z1 :light 0)
+        )))
+    
+  (loop for (tx ty tz) in (visible-tile-list mob) do
+    
+    ;; check through all the mobs
+    (loop for mob-id in (mob-id-list (level *world*))
+          for tmob = (get-mob-by-id mob-id)
+          for light-power = (* *light-power-faloff* (cur-light tmob))
+          for vision-pwr = (cur-light tmob)
+          for vision-power = (cur-light tmob)
+          do
+            (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) tx ty tz) (cur-light tmob))
+               (line-of-sight (x tmob) (y tmob) (z tmob) tx ty tz
+                              #'(lambda (dx dy dz prev-cell)
+                                  (declare (type fixnum dx dy dz))
+                                  (let* ((exit-result t) (pwr-decrease 0)) 
+                                    (block nil
+                                      
+                                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                      (unless pwr-decrease
+                                        (setf exit-result 'exit)
+                                        (return))
+                                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                      (decf vision-pwr)
+                                      
+                                      ;; insert set light function here
+                                      (when (> light-power (get-single-memo-light (get-memo-* (level *world*) dx dy dz)))
+                                        (set-single-memo-* (level *world*) dx dy dz :light light-power))
+                                      
+                                      (decf light-power *light-power-faloff*)
+
+                                      (when (<= vision-pwr 0)
+                                        (setf exit-result 'exit)
+                                        (return)))
+                                    
+                                    exit-result))))
+          )
+    ;; check through all stationary light sources
+    (loop for (x y z light-radius) across (light-sources (level *world*))
+          for i from 0 below (length (light-sources (level *world*)))
+          for light-power = (* *light-power-faloff* light-radius)
+          for vision-pwr = light-radius
+          for vision-power = light-radius
+          do
+             (when (< (get-distance-3d x y z tx ty tz) light-radius)
+               (line-of-sight x y z tx ty tz
+                            #'(lambda (dx dy dz prev-cell)
+                                (declare (type fixnum dx dy dz))
+                                
+                                (let* ((exit-result t) (pwr-decrease 0)) 
+                                  (block nil
+
+                                    (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                    (unless pwr-decrease
+                                      (setf exit-result 'exit)
+                                      (return))
+                                    (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                    (decf vision-pwr)
+
+                                    ;; insert set light func here
+                                    (when (> light-power (get-single-memo-light (get-memo-* (level *world*) dx dy dz)))
+                                        (set-single-memo-* (level *world*) dx dy dz :light light-power))
+                                    
+                                    (decf light-power *light-power-faloff*)
+
+                                    (when (<= vision-pwr 0)
+                                      (setf exit-result 'exit)
+                                      (return)))
+                                    
+                                  exit-result)))))
+        ))
 
 (defun update-visible-mobs-normal (mob)
   (loop for mob-id in (mob-id-list (level *world*))
@@ -341,7 +426,11 @@
       (progn
         (setf glyph-idx (glyph-idx (get-terrain-type-by-id (get-terrain-* level map-x map-y map-z))))
         (setf glyph-color (glyph-color (get-terrain-type-by-id (get-terrain-* level map-x map-y map-z))))
-        (setf back-color (back-color (get-terrain-type-by-id (get-terrain-* level map-x map-y map-z))))))
+        (setf back-color (back-color (get-terrain-type-by-id (get-terrain-* level map-x map-y map-z))))
+        (when (< (+ (get-single-memo-light (get-memo-* level map-x map-y map-z))
+                    (get-outdoor-light-* level map-x map-y map-z))
+                 *mob-visibility-threshold*)
+          (setf glyph-color (sdl:color :r 25 :g 25 :b 112)))))
     
     ;(setf glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
     ;(setf glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
@@ -369,7 +458,11 @@
             (when (glyph-idx (get-feature-type-by-id (feature-type ftr)))
               (setf glyph-idx (glyph-idx (get-feature-type-by-id (feature-type ftr))))) 
             (when (glyph-color (get-feature-type-by-id (feature-type ftr)))
-              (setf glyph-color (glyph-color (get-feature-type-by-id (feature-type ftr)))))
+              (setf glyph-color (glyph-color (get-feature-type-by-id (feature-type ftr))))
+              (when (< (+ (get-single-memo-light (get-memo-* level map-x map-y map-z))
+                    (get-outdoor-light-* level map-x map-y map-z))
+                       *mob-visibility-threshold*)
+                (setf glyph-color (sdl:color :r 25 :g 25 :b 112))))
             (when (back-color (get-feature-type-by-id (feature-type ftr)))
               (setf back-color (back-color (get-feature-type-by-id (feature-type ftr)))))
             ))))
@@ -381,6 +474,10 @@
         (setf glyph-idx (glyph-idx vitem))
         (setf glyph-color (glyph-color vitem))
         (setf back-color (back-color vitem))
+        (when (< (+ (get-single-memo-light (get-memo-* level map-x map-y map-z))
+                    (get-outdoor-light-* level map-x map-y map-z))
+                       *mob-visibility-threshold*)
+                (setf glyph-color (sdl:color :r 25 :g 25 :b 112)))
         ))
     
     ;; finally mob, if any
@@ -403,6 +500,7 @@
 (defun update-visible-area-normal (level x y z)
   (let ((vision-power (1+ (cur-sight *player*)))
         (vision-pwr (1+ (cur-sight *player*))))
+    (setf (visible-tile-list *player*) nil)
     (draw-fov x y z (cur-sight *player*)
               #'(lambda (dx dy dz prev-cell)
                   (let ((exit-result t) (pwr-decrease))
@@ -425,6 +523,8 @@
                         (pushnew (id (get-mob-* level dx dy dz)) (proper-visible-mobs *player*))
                         
                         )
+
+                      (push (list dx dy dz) (visible-tile-list *player*))
                       
                       (when (<= vision-pwr 0)
                         (setf exit-result 'exit)
@@ -439,6 +539,14 @@
               :LOS-start-func #'(lambda ()
                                   (setf vision-pwr (1+ (cur-sight *player*))))
               ))
+
+  (setf (visible-tile-list *player*) (remove-duplicates (visible-tile-list *player*)
+                                                        :test #'(lambda (a b)
+                                                                  (if (and (= (first a) (first b))
+                                                                           (= (second a) (second b))
+                                                                           (= (third a) (third b)))
+                                                                    t
+                                                                    nil))))
 
   ;(loop for sound in (heard-sounds *player*) do
   ;  (set-single-memo-* level (sound-x sound) (sound-y sound) (sound-z sound) :glyph-idx 31 :glyph-color sdl:*white* :back-color sdl:*black*))

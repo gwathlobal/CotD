@@ -214,7 +214,9 @@
   (let ((result 0))
     (loop for z from (z item) downto 0 
           do
-             (when (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) z) +terrain-trait-opaque-floor+)
+             (when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) z) +terrain-trait-opaque-floor+)
+                       (and (>= (1- z) 0)
+                            (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) (1- z)) +terrain-trait-blocks-move+)))
                (setf result z)
                (loop-finish)))
     (when (eq result (z item))
@@ -1293,7 +1295,7 @@
           (setf (name item) (format nil "~A's ~A" (alive-name mob) left-body-str))
           (setf (alive-name item) (format nil "~A" (alive-name mob)))
           (add-item-to-level-list (level *world*) item)
-          (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob))))
+          (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob) (z mob))))
         
         ))
     

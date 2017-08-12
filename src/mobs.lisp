@@ -981,7 +981,8 @@
    (view-z :initform 0 :accessor view-z)
    (sense-evil-id :initform nil :accessor sense-evil-id)
    (sense-good-id :initform nil :accessor sense-good-id)
-   (can-move-if-possessed :initform t :accessor can-move-if-possessed)))
+   (can-move-if-possessed :initform t :accessor can-move-if-possessed)
+   (visible-tile-list :initform () :accessor visible-tile-list)))
  
 ;;---------------------- 
 ;; FACTIONS

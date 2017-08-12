@@ -1,7 +1,6 @@
 - Add courtyard houses like Thief2RL
 - Add highscore table
 - Add a Thief/Spy campaign
-- Display lit and shadowed tiles for the player
 - Move display code to a separate entity (separate thread maybe?) so that you could have some basic movement animation going on (0,5 sec). This will alleviate the performance problem (the game will be still calculating AI while the player movement animation is played) and will generally look good.
 - Optimize connectivity map creation
 - Recalculate connectivity after terrain destruction

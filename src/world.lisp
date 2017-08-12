@@ -134,8 +134,8 @@
 (defun set-memo-* (level x y z single-memo)
   (setf (aref (memo level) x y z) single-memo))
 
-(defun create-single-memo (glyph-idx glyph-color back-color visibility revealed)
-  (list glyph-idx glyph-color back-color visibility revealed))
+(defun create-single-memo (glyph-idx glyph-color back-color visibility revealed light)
+  (list glyph-idx glyph-color back-color visibility revealed light))
 
 (defun get-single-memo-glyph-idx (single-memo)
   (nth 0 single-memo))
@@ -152,12 +152,16 @@
 (defun get-single-memo-revealed (single-memo)
   (nth 4 single-memo))
 
+(defun get-single-memo-light (single-memo)
+  (nth 5 single-memo))
+
 (defun set-single-memo-* (level x y z &key (glyph-idx (get-single-memo-glyph-idx (get-memo-* level x y z)))
                                            (glyph-color (get-single-memo-glyph-color (get-memo-* level x y z))) 
                                            (back-color (get-single-memo-back-color (get-memo-* level x y z))) 
                                            (visibility (get-single-memo-visibility (get-memo-* level x y z)))
-                                           (revealed (get-single-memo-revealed (get-memo-* level x y z))))
-  (set-memo-* level x y z (create-single-memo glyph-idx glyph-color back-color visibility revealed)))
+                                           (revealed (get-single-memo-revealed (get-memo-* level x y z)))
+                                           (light (get-single-memo-light (get-memo-* level x y z))))
+  (set-memo-* level x y z (create-single-memo glyph-idx glyph-color back-color visibility revealed light)))
 
 (defun get-connect-map-value (connect-map x y z move-mode)
   (let ((move-mode-array (aref connect-map x y z)))

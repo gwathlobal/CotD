@@ -117,7 +117,8 @@
         ;;(format t "HERE~%")
         (when lof-blocked
           (format str "Line of fire blocked!~%"))
-        (format str "~A (~A, ~A, ~A)~A~A~A" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (view-x *player*) (view-y *player*) (view-z *player*)
+        (format str "~A (~A, ~A, ~A)~A~A~A~A" (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (view-x *player*) (view-y *player*) (view-z *player*)
+                (if *cotd-release* "" (format nil " Light: ~A" (get-single-memo-light (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))))
                 (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))))
                 (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*))))
                 (if *cotd-release* "" (format nil " ~A" (level-cells-connected-p (level *world*) (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
