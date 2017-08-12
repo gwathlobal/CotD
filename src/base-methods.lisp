@@ -99,9 +99,8 @@
     (set-message-this-turn t)
     (add-message str)))
 
-(defun place-visible-animation (x y z level animation-type-id &key (params nil))
-  (when (get-single-memo-visibility (get-memo-* level x y z))
-    (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue *world*))))
+(defun place-animation (x y z animation-type-id &key (params nil))
+  (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue *world*)))
 
 (defun check-move-on-level (mob dx dy dz)
   (let ((sx) (sy)
@@ -927,7 +926,7 @@
                                     )
                                   exit-result)))
              ;; place a fire dot if the dest point is visible
-             (place-visible-animation tx ty tz (level *world*) +anim-type-fire-dot+ :params ())
+             (place-animation tx ty tz +anim-type-fire-dot+ :params ())
              
              (setf target1 (get-mob-* (level *world*) tx ty tz))
 
@@ -1265,23 +1264,23 @@
           (setf r 0)
           (setf burns-corpse t)
           (setf dead-msg-str (format nil "~A burns to ashes. " (capitalize-name (visible-name mob)))))
-        
+
         (cond
           ;; sever head
           ((= r 1) (progn
-                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "head" +item-type-body-part-limb+))
+                     (place-animation (x mob) (y mob) (z mob) +anim-type-severed-body-part+ :params (list mob "head" +item-type-body-part-limb+))
                      (setf left-body-str "multilated body" left-body-type +item-type-body-part-body+)
                      (when killer
                        (setf dead-msg-str (format nil "~A chops off ~A's head. " (capitalize-name (visible-name killer)) (visible-name mob))))))
           ;; sever limb
           ((= r 2) (progn
-                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "limb" +item-type-body-part-limb+))
+                     (place-animation (x mob) (y mob) (z mob) +anim-type-severed-body-part+ :params (list mob "limb" +item-type-body-part-limb+))
                      (setf left-body-str "multilated body" left-body-type +item-type-body-part-body+)
                      (when killer
                        (setf dead-msg-str (format nil "~A severs ~A's limb. " (capitalize-name (visible-name killer)) (visible-name mob))))))
           ;; sever torso
           ((= r 3) (progn
-                     (place-visible-animation (x mob) (y mob) (z mob) (level *world*) +anim-type-severed-body-part+ :params (list mob "upper body" +item-type-body-part-half+))
+                     (place-animation (x mob) (y mob) (z mob) +anim-type-severed-body-part+ :params (list mob "upper body" +item-type-body-part-half+))
                      (setf left-body-str "lower body" left-body-type +item-type-body-part-half+)
                      (when killer
                        (setf dead-msg-str (format nil "~A cuts ~A in half. " (capitalize-name (visible-name killer)) (visible-name mob))))))

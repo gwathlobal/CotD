@@ -105,24 +105,25 @@
           for z from 0 to 2 do
             (loop for y from 0 below (length level) do
               (loop for c across (nth y level)
-                    with x = 0
+                    for x from 0
+                    for tt = (case c
+                               (#\. +terrain-floor-stone+)
+                               (#\, +terrain-floor-grass+)
+                               (#\# +terrain-wall-stone+)
+                               (#\- +terrain-wall-window+)
+                               (#\+ +terrain-door-closed+)
+                               (#\' +terrain-door-open+)
+                               (#\Space +terrain-floor-air+)
+                               (#\u +terrain-slope-stone-up+)
+                               (#\d +terrain-slope-stone-down+)
+                               (#\T +terrain-tree-birch+)
+                               (#\| +terrain-wall-lantern+)
+                               (#\_ +terrain-water-liquid+))
+                           
+                    when tt
                       do
-                         (cond
-                           ((char= c #\.) (setf (aref template-level (1+ x) (1+ y) z) +terrain-floor-stone+))
-                           ((char= c #\,) (setf (aref template-level (1+ x) (1+ y) z) +terrain-floor-grass+))
-                           ((char= c #\#) (setf (aref template-level (1+ x) (1+ y) z) +terrain-wall-stone+))
-                           ((char= c #\-) (setf (aref template-level (1+ x) (1+ y) z) +terrain-wall-window+))
-                           ((char= c #\+) (setf (aref template-level (1+ x) (1+ y) z) +terrain-door-closed+))
-                           ((char= c #\') (setf (aref template-level (1+ x) (1+ y) z) +terrain-door-open+))
-                           ((char= c #\Space) (setf (aref template-level (1+ x) (1+ y) z) +terrain-floor-air+))
-                           ((char= c #\u) (setf (aref template-level (1+ x) (1+ y) z) +terrain-slope-stone-up+))
-                           ((char= c #\d) (setf (aref template-level (1+ x) (1+ y) z) +terrain-slope-stone-down+))
-                           ((char= c #\T) (setf (aref template-level (1+ x) (1+ y) z) +terrain-tree-birch+))
-                           ((char= c #\|) (setf (aref template-level (1+ x) (1+ y) z) +terrain-wall-lantern+))
-                           ((char= c #\_) (setf (aref template-level (1+ x) (1+ y) z) +terrain-water-liquid+))
-                           )
-                         (incf x)
-                      )))
+                         (setf (aref template-level (1+ x) (1+ y) z) tt)
+                    )))
     
     
     
@@ -132,10 +133,10 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-wisp+ :x 43 :y 18 :z 1))
+  (setf *player* (make-instance 'player :mob-type +mob-type-soldier+ :x 38 :y 13 :z 0))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 42 :y 15 :z 1))
-        ;(demon (make-instance 'mob :mob-type +mob-type-soldier+ :x (+ (x *player*) 5) :y (- (y *player*) 0) :z 0))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-soldier+ :x 43 :y 18 :z 1))
+        (demon (make-instance 'mob :mob-type +mob-type-angel+ :x 42 :y 15 :z 0))
         )
     (setf (cur-fp *player*) 22)
     
@@ -146,7 +147,7 @@
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-flying+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
-    ;(add-mob-to-level-list (level world) demon)
+    (add-mob-to-level-list (level world) demon)
     
 
     ;(mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))

@@ -77,6 +77,14 @@
 
            (funcall post-func (+ sx x) (+ sy y) x1 y1))))))
 
+(defun check-tile-on-map (map-x map-y map-z sx sy max-x-view max-y-view view-z)
+  (if (and (>= map-x sx) (>= map-y sy)
+           (< map-x (+ sx max-x-view))
+           (< map-y (+ sy max-y-view))
+           (= view-z map-z))
+    t
+    nil))
+
 (defun display-animation-on-map (map-x map-y map-z glyph-idx glyph-color back-color)
   (let ((scr-x 0) (scr-y 0))
     (declare (type fixnum scr-x scr-y))

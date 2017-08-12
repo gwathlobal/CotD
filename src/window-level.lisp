@@ -188,7 +188,7 @@
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   (show-message-box 10 (- *window-height* *msg-box-window-height* 20) (- *window-width* 260 10))
   (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height*)
-  (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 10) (* -2 (sdl:char-height sdl:*default-font*))))
+  (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
     
   (sdl:update-display)
   
