@@ -197,8 +197,12 @@
     (setf (mobs level) (make-array (list max-x max-y max-z) :initial-element nil))
     (setf (items level) (make-array (list max-x max-y max-z) :initial-element nil))
     (setf (features level) (make-array (list max-x max-y max-z) :initial-element nil))
-    (setf (memo level) (make-array (list max-x max-y max-z) :initial-element (create-single-memo 0 sdl:*white* sdl:*black* nil nil 0)))
+    (setf (memo level) (make-array (list max-x max-y max-z)))
     (setf (light-map level) (make-array (list max-x max-y max-z) :initial-element 0))
+    (loop for x from 0 below max-x do
+      (loop for y from 0 below max-y do
+        (loop for z from 0 below max-z do
+          (set-memo-* level x y z (create-single-memo 0 sdl:*white* sdl:*black* nil nil 0)))))
     level))
 
 (defun create-level-from-template (template-level)
