@@ -148,6 +148,7 @@
 (defconstant +mob-abil-avatar-of-brilliance+ 58)
 (defconstant +mob-abil-gravity-chains+ 59)
 (defconstant +mob-abil-flying+ 60)
+(defconstant +mob-abil-no-corpse+ 61)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

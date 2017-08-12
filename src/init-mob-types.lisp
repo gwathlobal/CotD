@@ -309,7 +309,7 @@
 
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-horse+ 
-                                       :name "Horse"
+                                       :name "horse"
                                        :glyph-idx 72 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :max-hp 12 :max-fp 0
                                        :faction +faction-type-animals+
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
@@ -330,7 +330,7 @@
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantaur+ 
-                                       :name "gargantaur"
+                                       :name "Gargantaur"
                                        :glyph-idx 39 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 25 :max-fp 2
                                        :faction +faction-type-outsider-beasts+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 6 10 +normal-ap+ 100 ()) nil) :base-dodge 0
@@ -348,7 +348,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 1
                                        :base-light-radius 6 :base-sight 0
-                                       :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t 
+                                       :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t 
                                        :ai-curious t))
 
 

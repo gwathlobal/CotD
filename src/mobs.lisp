@@ -93,6 +93,7 @@
    ;;   :abil-avatar-of-brilliance - +mob-abil-avatar-of-brilliance+
    ;;   :abil-empower-undead - +mob-abil-empower-undead+
    ;;   :abil-gravity-chains - +mob-abil-gravity-chains+
+   ;;   :abil-no-corpse - +mob-abil-no-corpse+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -123,7 +124,7 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains abil-flying)
+                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -268,6 +269,8 @@
     (setf (gethash +mob-abil-gravity-chains+ (abilities mob-type)) t))
   (when abil-flying
     (setf (gethash +mob-abil-flying+ (abilities mob-type)) t))
+  (when abil-no-corpse
+    (setf (gethash +mob-abil-no-corpse+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

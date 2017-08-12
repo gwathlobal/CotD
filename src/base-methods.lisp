@@ -1248,7 +1248,8 @@
              (mob-drop-item mob item :spd nil :silent t))
     
     ;; place the corpse
-    (when corpse
+    (when (and corpse
+               (not (mob-ability-p mob +mob-abil-no-corpse+)))
       (let ((item) (r) (left-body-str) (left-body-type) (burns-corpse nil))
         (setf r 0)
         
