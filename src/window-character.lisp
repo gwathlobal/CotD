@@ -31,7 +31,7 @@
       (sdl:fill-surface sdl:*black* :template a-rect)
     
     (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%~A~%Dodge chance: ~A~%~A~A"
-                        (name *player*) (name (get-mob-type-by-id (mob-type *player*)))
+                        (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
                         (if (mob-ability-p *player* +mob-abil-military-follow-me+) (format nil "Followers: ~A~%" (count-follower-list *player*)) "")

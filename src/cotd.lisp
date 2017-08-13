@@ -256,13 +256,17 @@
       (if (probe-file (merge-pathnames "options.cfg" *current-dir*))
         (progn
           (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :input)
-            (loop for s-expr = (read file nil) 
-                  while s-expr do
-                    (read-options s-expr *options*))))   
+            (handler-case
+                (loop for s-expr = (read file nil) 
+                      while s-expr do
+                        (read-options s-expr *options*))
+              (t ()
+                (logger "OPTIONS.CFG: Error occured while reading the options.cfg. Overwriting with defaults.~%")
+                (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
+                  (format file "~A" (create-options-file-string *options*)))))))   
         (progn 
           (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
-            (format file "~%;; TILES: Changes the size of tiles~%;; Format (tiles <size>)~%;; <size> can be (without quotes) \"large\"~%(tiles large)~%")
-            (format file "~%;; FONT: Changes the size of text font~%;; Format (font <font type>)~%;; <font type> can be (without quotes) \"font-6x13\" or \"font-8x13\"~%(font font-6x13)")))
+            (format file "~A" (create-options-file-string *options*))))
         )
       
       ;; set parameters depending on options
@@ -273,6 +277,10 @@
       (cond
         ((equal (options-font *options*) 'font-8x13) (sdl:initialise-default-font sdl:*font-8x13*))
         (t (sdl:initialise-default-font sdl:*font-6x13*)))
+      ;; name
+      (cond
+        ((options-player-name *options*) nil)
+        (t (setf (options-player-name *options*) "Player")))
       
 
       (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
@@ -332,6 +340,32 @@
          )
        (bt:condition-notify (path-cv *world*))
        (bt:condition-notify (fov-cv *world*))
+
+       ;; let player enter his\her name
+       (setf *current-window* (make-instance 'input-str-window 
+                                             :init-input (options-player-name *options*)
+                                             :header-str "Choose name"
+                                             :main-str "Enter you name"
+                                             :prompt-str "[Enter] Confirm"
+                                             :all-func nil
+                                             :no-escape t
+                                             :input-check-func #'(lambda (char)
+                                                                   (if (and (not (null char))
+                                                                            (or (find (string-downcase (string char)) *char-list* :test #'string=)
+                                                                                (char= char #\Space)
+                                                                                (char= char #\-)))
+                                                                       t
+                                                                       nil))
+                                             :final-check-func #'(lambda (full-input-str)
+                                                                   (if (not (null full-input-str))
+                                                                       t
+                                                                       nil))
+                                             ))
+       (make-output *current-window*)
+       (setf (options-player-name *options*) (run-window *current-window*))
+       (setf (name *player*) (options-player-name *options*))
+       (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
+         (format file "~A" (create-options-file-string *options*)))
        
        (setf *current-window* (make-instance 'cell-window))
        (make-output *current-window*)

@@ -9,7 +9,8 @@
    (prompt-str :initarg :prompt-str :accessor prompt-str)
    (all-func :initform nil :initarg :all-func :accessor all-func) ;; a function that takes no args and returns a string with a predefined value that means "all" in the context
    (input-check-func :initform #'(lambda (char) (declare (ignore char)) t) :initarg :input-check-func :accessor input-check-func)
-   (final-check-func :initform nil :initarg :final-check-func :accessor final-check-func)) ;; a funcation that takes the full input string and checks if its value is valid in the context before the window can return it
+   (final-check-func :initform nil :initarg :final-check-func :accessor final-check-func) ;; a funcation that takes the full input string and checks if its value is valid in the context before the window can return it
+   (no-escape :initform nil :initarg :no-escape :accessor no-escape))
   )
 
 (defmethod initialize-instance :after ((win input-str-window) &key)
@@ -53,7 +54,7 @@
     (:key-down-event (:key key :mod mod :unicode unicode)
                      
                      (cond
-                       ((sdl:key= key :sdl-key-escape) 
+                       ((and (not (no-escape win)) (sdl:key= key :sdl-key-escape)) 
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                        ((sdl:key= key :sdl-key-backspace) (when (> (fill-pointer (input win)) 0) (decf (fill-pointer (input win)))))
                        ;; a - select all

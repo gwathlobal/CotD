@@ -151,9 +151,6 @@
 (defvar *sel-y-offset* 0)
 (defvar *sel-x-offset* 4)
 
-;; most likely I am doing it wrong but I need a sequence of letters in alphabetical order
-(defvar *char-list* (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"))
-
 (defun draw-selection-list (str-list cur-str str-per-page x y &key (color-list ())
                                                                    (char-height (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
                                                                    (str-func #'(lambda (x y color str use-letters)
