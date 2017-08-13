@@ -12,6 +12,7 @@
 (defparameter *max-y-view* 25)
 
 (defvar *options*)
+(defvar *highscores*)
 
 ;; most likely I am doing it wrong but I need a sequence of letters in alphabetical order
 (defvar *char-list* (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"))
@@ -34,6 +35,8 @@
 (defparameter *cur-angel-names* nil)
 (defparameter *cur-human-names* nil)
 (defparameter *cur-human-surnames* nil)
+
+(defparameter *max-player-name-length* 20)
 
 ;;--------------------
 ;; MOB-TEMPLATE Constants

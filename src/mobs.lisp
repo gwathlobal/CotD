@@ -982,7 +982,10 @@
    (sense-evil-id :initform nil :accessor sense-evil-id)
    (sense-good-id :initform nil :accessor sense-good-id)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)
-   (visible-tile-list :initform () :accessor visible-tile-list)))
+   (visible-tile-list :initform () :accessor visible-tile-list)
+   (killed-by :initform nil :accessor killed-by)
+   (faction-name :initform nil :accessor faction-name)
+   (cur-score :initform 0 :accessor cur-score)))
  
 ;;---------------------- 
 ;; FACTIONS

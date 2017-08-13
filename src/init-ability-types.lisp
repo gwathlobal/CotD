@@ -235,6 +235,8 @@
                                                 (incf (total-blessed *world*))
                                                 (incf (cur-fp actor))
                                                 (incf (stat-blesses actor))
+                                                (when (eq *player* actor)
+                                                  (incf (cur-score *player*) 5))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A blesses ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
                                                 )
@@ -1548,6 +1550,8 @@
                                                     (progn
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A cringes with pain, taking ~A dmg, while trying to mount ~A. " (capitalize-name (visible-name actor)) cur-dmg (visible-name target)))
+                                                      (when (eq actor *player*)
+                                                        (setf (killed-by *player*) "trying to dominate Gargantaur"))
                                                       (make-dead actor :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))
                                                     (progn
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 

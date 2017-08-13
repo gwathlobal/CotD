@@ -185,6 +185,8 @@
                                                                          (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                 (format nil "~@(~A~) takes ~A fire damage.~%" (visible-name target) cur-dmg))))
                                                                      (when (check-dead target)
+                                                                       (when (eq target *player*)
+                                                                         (setf (killed-by *player*) "fire"))
                                                                        (if (mob-effect-p target +mob-effect-possessed+)
                                                                          (make-dead target :splatter t :msg t :msg-newline nil :killer nil :corpse nil :aux-params '(:is-fire))
                                                                          (make-dead target :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params '(:is-fire)))

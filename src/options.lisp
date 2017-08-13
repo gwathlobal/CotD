@@ -32,9 +32,10 @@
   (logger (format nil "SET-OPTIONS-NAME: S-EXPR = ~A~%" s-expr))
   (loop for c across (second s-expr)
         with str = ""
-        when (or (find (string-downcase (string c)) *char-list* :test #'string=)
-                 (char= c #\Space)
-                 (char= c #\-))
+        when (and (or (find (string-downcase (string c)) *char-list* :test #'string=)
+                      (char= c #\Space)
+                      (char= c #\-))
+                  (< (length str) *max-player-name-length*))
           do
              (setf str (format nil "~A~A" str (string c)))
         finally (setf (options-player-name options) str))

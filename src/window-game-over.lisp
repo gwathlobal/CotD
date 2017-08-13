@@ -50,7 +50,7 @@
 
   (show-message-box 6 (+ 40 (* 13 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 14 (sdl:get-font-height))) *full-message-box*)
 
-  (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] Exit game")
+  (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] High Scores")
                            10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))
@@ -62,9 +62,12 @@
        (:key-down-event (:key key :mod mod :unicode unicode)
                         (declare (ignore mod unicode))
                         (cond
-			  ;; escape - quit
+			  ;; escape - high scores
 			  ((sdl:key= key :sdl-key-escape) 
-                           (funcall (quit-func *current-window*)))
+                           (setf *current-window* (make-instance 'highscores-window))
+                           (make-output *current-window*)
+                           (run-window *current-window*)
+                           (funcall *start-func*))
                           ;; m - main menu
                           ((sdl:key= key :sdl-key-m) 
                            (funcall *start-func*))

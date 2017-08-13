@@ -366,7 +366,8 @@
             (progn
               ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
               (set-message-this-turn t)
-              (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (visible-name mob)) cur-dmg)))
+              (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (visible-name mob)) cur-dmg))
+              (when (check-dead mob) (setf (killed-by *player*) "falling")))
             (print-visible-message (x mob) (y mob) (z mob) (level *world*)
                                    (format nil "~A falls and takes ~A damage. " (capitalize-name (visible-name mob)) cur-dmg) :observed-mob mob)))
         (when (check-dead mob)
@@ -1221,6 +1222,17 @@
     
     (when (dead= mob)
       (return-from make-dead nil))
+
+    (when (and (eq mob *player*)
+               killer)
+      (setf (killed-by *player*) (get-qualified-name killer)))
+
+    (when (and killer
+               (eq killer *player*))
+      (incf (cur-score *player*) (* 10 (strength mob)))
+      (when (and (mob-ability-p *player* +mob-abil-demon+)
+                 (= (strength mob) 0))
+        (incf (cur-score *player*) 5)))
     
     (when (mob-ability-p mob +mob-abil-human+)
       (decf (total-humans *world*)))
@@ -1486,6 +1498,8 @@
         (decf (cur-hp mob) *lack-oxygen-dmg*)
         (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A can not breath and takes ~A dmg. " (capitalize-name (visible-name mob)) *lack-oxygen-dmg*) :observed-mob mob)
         (when (check-dead mob)
+          (when (eq mob *player*)
+            (setf (killed-by *player*) "drowning"))
           (make-dead mob :splatter nil :msg t)
           (when (mob-effect-p mob +mob-effect-possessed+)
             (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
@@ -1715,3 +1729,14 @@
      (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-fly+
                             (get-connect-map-value (aref (connect-map level) 1) src-x src-y src-z +connect-map-move-fly+))
     ))
+
+(defun calculate-player-score (bonus)
+  (let ((score (+ (cur-score *player*) bonus (- (if (> (real-game-time *world*) 200)
+                                                  (- (real-game-time *world*) 200)
+                                                  0))
+                  (if (= (mob-type *player*) +mob-type-thief+)
+                    (calculate-total-value *player*)
+                    0))))
+    (when (< score 0)
+      (setf score 0))
+    score))

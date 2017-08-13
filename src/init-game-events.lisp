@@ -11,7 +11,18 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (declare (ignore world))
+                                                           ;; write highscores
+                                                           (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                        (calculate-player-score 100)
+                                                                                                        (faction-name *player*)
+                                                                                                        (real-game-time world)
+                                                                                                        (cond
+                                                                                                          ((zerop (total-demons world)) "Enemies eliminated")
+                                                                                                          ((>= (cur-fp *player*) (max-fp *player*)) "Ascended"))
+                                                                                                        (level-layout (level world)))
+                                                                                 *highscores*)
+                                                           (write-highscores-to-file *highscores*)
+                                                           
                                                            (add-message (format nil "~%"))
                                                            (add-message (format nil "Congratulations! You have won the game!~%"))
                                                            (setf *current-window* (make-instance 'cell-window))
@@ -33,7 +44,18 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (declare (ignore world))
+                                                           ;; write highscores
+                                                           (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                        (calculate-player-score 100)
+                                                                                                        (faction-name *player*)
+                                                                                                        (real-game-time world)
+                                                                                                        (cond
+                                                                                                          ((zerop (total-angels world)) "Enemies eliminated")
+                                                                                                          ((>= (cur-fp *player*) (max-fp *player*)) "Ascended"))
+                                                                                                        (level-layout (level world)))
+                                                                                 *highscores*)
+                                                           (write-highscores-to-file *highscores*)
+                                                           
                                                            (add-message (format nil "~%"))
                                                            (add-message (format nil "Congratulations! You have won the game!~%"))
                                                            (setf *current-window* (make-instance 'cell-window))
@@ -52,7 +74,18 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (declare (ignore world))
+                                                           ;; write highscores
+                                                           (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                        (calculate-player-score 100)
+                                                                                                        (faction-name *player*)
+                                                                                                        (real-game-time world)
+                                                                                                        (cond
+                                                                                                          ((zerop (total-demons world)) "Enemies eliminated")
+                                                                                                          )
+                                                                                                        (level-layout (level world)))
+                                                                                 *highscores*)
+                                                           (write-highscores-to-file *highscores*)
+                                                           
                                                            (add-message (format nil "~%"))
                                                            (add-message (format nil "Congratulations! You have won the game!~%"))
                                                            (setf *current-window* (make-instance 'cell-window))
@@ -72,7 +105,18 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (declare (ignore world))
+                                                           ;; write highscores
+                                                           (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                        (calculate-player-score 0)
+                                                                                                        (faction-name *player*)
+                                                                                                        (real-game-time world)
+                                                                                                        (if (null (killed-by *player*))
+                                                                                                          "Killed by unknown forces."
+                                                                                                          (format nil "Killed by ~A." (killed-by *player*)))
+                                                                                                        (level-layout (level world)))
+                                                                                 *highscores*)
+                                                           (write-highscores-to-file *highscores*)
+                                                           
                                                            (add-message (create-string "~%"))
                                                            (add-message (create-string "You are dead.~%"))
                                                            (setf *current-window* (make-instance 'cell-window))
@@ -83,7 +127,8 @@
                                                              (:key-down-event () 
                                                                               (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-player-dead+))
                                                                               (make-output *current-window*)
-                                                                              (run-window *current-window*))
+                                                                              (run-window *current-window*)
+                                                                              )
                                                              (:video-expose-event () (make-output *current-window*))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-lose-game-possessed+ :disabled nil
@@ -94,7 +139,16 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (declare (ignore world))
+                                                           ;; write highscores
+                                                           (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                        (calculate-player-score 0)
+                                                                                                        (faction-name *player*)
+                                                                                                        (real-game-time world)
+                                                                                                        (format nil "Possessed by ~A" (get-qualified-name (get-mob-by-id (master-mob-id *player*))))
+                                                                                                        (level-layout (level world)))
+                                                                                 *highscores*)
+                                                           (write-highscores-to-file *highscores*)
+                                                           
                                                            (add-message (create-string "~%"))
                                                            (add-message (create-string "You are possessed.~%"))
                                                            (setf *current-window* (make-instance 'cell-window))
@@ -355,7 +409,16 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (declare (ignore world))
+                                                            ;; write highscores
+                                                           (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                        (calculate-player-score 100)
+                                                                                                        (faction-name *player*)
+                                                                                                        (real-game-time world)
+                                                                                                        (format nil "Escaped with $~A" (calculate-total-value *player*))
+                                                                                                        (level-layout (level world)))
+                                                                                 *highscores*)
+                                                           (write-highscores-to-file *highscores*)
+                                                           
                                                            (add-message (format nil "~%"))
                                                            (add-message (format nil "Congratulations! You have won the game!~%"))
                                                            (setf *current-window* (make-instance 'cell-window))

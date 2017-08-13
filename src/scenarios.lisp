@@ -13,6 +13,8 @@
 ;; SCENARIO-FEATURE Constants
 ;;---------------------------------
 
+;; layout constants are used in highscores, so old ones should not be edited otherwise the the information presented from highscores table will be retroactively changed
+
 (defconstant +weather-type-clear+ 0)
 (defconstant +weather-type-snow+ 1)
 (defconstant +city-layout-test+ 2)

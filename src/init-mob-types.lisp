@@ -351,7 +351,6 @@
                                        :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t 
                                        :ai-curious t))
 
-
 (set-faction-relations +faction-type-humans+
                        (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t) (cons +faction-type-military+ t)
                        (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil))

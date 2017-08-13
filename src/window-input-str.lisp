@@ -8,7 +8,7 @@
    (main-str :initarg :main-str :accessor main-str)
    (prompt-str :initarg :prompt-str :accessor prompt-str)
    (all-func :initform nil :initarg :all-func :accessor all-func) ;; a function that takes no args and returns a string with a predefined value that means "all" in the context
-   (input-check-func :initform #'(lambda (char) (declare (ignore char)) t) :initarg :input-check-func :accessor input-check-func)
+   (input-check-func :initform #'(lambda (char cur-str) (declare (ignore char cur-str)) t) :initarg :input-check-func :accessor input-check-func)
    (final-check-func :initform nil :initarg :final-check-func :accessor final-check-func) ;; a funcation that takes the full input string and checks if its value is valid in the context before the window can return it
    (no-escape :initform nil :initarg :no-escape :accessor no-escape))
   )
@@ -66,7 +66,7 @@
                                                          (setf *current-window* (return-to win))
                                                          (make-output *current-window*)
                                                          (return-from run-window (input win))))
-                       (t (when (funcall (input-check-func win) (code-char unicode))
+                       (t (when (funcall (input-check-func win) (code-char unicode) (input win))
                             (setf (input win) (get-text-input (input win) key mod unicode)))
                           ))
                      (make-output *current-window*))

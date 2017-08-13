@@ -193,6 +193,12 @@
                                         (multiple-value-bind (layout-id weather-id tod-id faction-id) (run-window *current-window*)
                                           (when (and layout-id weather-id tod-id faction-id)
                                             (return-from main-menu (values layout-id weather-id tod-id faction-id)))))))
+        (highscores-item (cons "High Scores"
+                               #'(lambda (n) 
+                                   (declare (ignore n))
+                                   (setf *current-window* (make-instance 'highscores-window))
+                                   (make-output *current-window*)
+                                   (run-window *current-window*))))
         (help-item (cons "Help"
                          #'(lambda (n) 
                              (declare (ignore n))
@@ -225,17 +231,17 @@
       (progn
         (setf *current-window* (make-instance 'start-game-window 
                                               :menu-items (list (car join-heaven-item) (car join-legion-item) (car join-chaplain-item) (car join-scout-item) (car join-thief-item) (car join-satanist-item)
-                                                                (car custom-scenario-item) (car help-item) (car exit-item))
+                                                                (car custom-scenario-item) (car highscores-item) (car help-item) (car exit-item))
                                               :menu-funcs (list (cdr join-heaven-item) (cdr join-legion-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item) (cdr join-satanist-item)
-                                                                (cdr custom-scenario-item) (cdr help-item) (cdr exit-item)))))
+                                                                (cdr custom-scenario-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))))
       (progn
         (setf *current-window* (make-instance 'start-game-window 
                                               :menu-items (list (car join-heaven-item) (car join-legion-item) (car join-chaplain-item) (car join-scout-item) (car join-thief-item) (car join-satanist-item)
                                                                 (car custom-scenario-item) (car all-see-item) (car test-level-item)
-                                                                (car help-item) (car exit-item))
+                                                                (car highscores-item) (car help-item) (car exit-item))
                                               :menu-funcs (list (cdr join-heaven-item) (cdr join-legion-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item) (cdr join-satanist-item)
                                                                 (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
-                                                                (cdr help-item) (cdr exit-item)))))))
+                                                                (cdr highscores-item) (cdr help-item) (cdr exit-item)))))))
   
   (make-output *current-window*)
   (loop while t do
@@ -281,12 +287,31 @@
       (cond
         ((options-player-name *options*) nil)
         (t (setf (options-player-name *options*) "Player")))
+
+      ;; create default highscores
+      (setf *highscores* (make-highscores))
+
+      (if (probe-file (merge-pathnames "scenario-highscores" *current-dir*))
+        (progn
+          (with-open-file (file (merge-pathnames "scenario-highscores" *current-dir*) :direction :input)
+            (handler-case
+                (loop for s-expr = (read file nil) 
+                      while s-expr do
+                        (add-highscore-record (read-highscore-record s-expr) *highscores*))
+              (t ()
+                (logger "OPTIONS.CFG: Error occured while reading the scenario-highscores. Overwriting with defaults.~%")
+                (write-highscores-to-file *highscores*)
+                ))))   
+        (progn 
+          (write-highscores-to-file *highscores*)
+          )
+        )
       
 
       (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
       (setf *random-state* (make-random-state t))
 
-      (setf *window-width* (+ 200 100 (+ 30 (* *glyph-w* *max-x-view*))) 
+      (setf *window-width* (+ 300 (+ 30 (* *glyph-w* *max-x-view*))) 
             *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (sdl:char-height sdl:*default-font*)))
 
       (when (<= *window-height* 384)
@@ -349,11 +374,12 @@
                                              :prompt-str "[Enter] Confirm"
                                              :all-func nil
                                              :no-escape t
-                                             :input-check-func #'(lambda (char)
+                                             :input-check-func #'(lambda (char cur-str)
                                                                    (if (and (not (null char))
                                                                             (or (find (string-downcase (string char)) *char-list* :test #'string=)
                                                                                 (char= char #\Space)
-                                                                                (char= char #\-)))
+                                                                                (char= char #\-))
+                                                                            (< (length cur-str) *max-player-name-length*))
                                                                        t
                                                                        nil))
                                              :final-check-func #'(lambda (full-input-str)

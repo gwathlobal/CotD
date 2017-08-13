@@ -239,7 +239,8 @@
                                                        (push #'create-mobs-from-template mob-func-list)
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-angel+))
-                                                                 (find-unoccupied-place-outside world *player*))
+                                                                 (find-unoccupied-place-outside world *player*)
+                                                                 (setf (faction-name *player*) "Chrome Angel"))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
@@ -309,7 +310,8 @@
                                                        (push #'create-mobs-from-template mob-func-list)
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-imp+))
-                                                                 (find-unoccupied-place-inside world *player*))
+                                                                 (find-unoccupied-place-inside world *player*)
+                                                                 (setf (faction-name *player*) "Imp"))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
@@ -397,6 +399,7 @@
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+))
                                                                  (find-unoccupied-place-outside world *player*)
+                                                                 (setf (faction-name *player*) "Military Chaplain")
                                                                  ;; place the first group of military around the player
                                                                  (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
                                                                                                        (cons +mob-type-scout+ 1)
@@ -504,6 +507,7 @@
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-scout+))
                                                                  (find-unoccupied-place-outside world *player*)
+                                                                 (setf (faction-name *player*) "Military Scout")
                                                                  )
                                                              mob-func-list)
 
@@ -581,7 +585,8 @@
                                                        (push #'create-mobs-from-template mob-func-list)
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-thief+))
-                                                                 (find-unoccupied-place-on-top world *player*))
+                                                                 (find-unoccupied-place-on-top world *player*)
+                                                                 (setf (faction-name *player*) "Thief"))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
@@ -651,7 +656,8 @@
                                                        (push #'create-mobs-from-template mob-func-list)
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-satanist+))
-                                                                 (find-player-satanist-start-position world *player*))
+                                                                 (find-player-satanist-start-position world *player*)
+                                                                 (setf (faction-name *player*) "Satanist"))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)

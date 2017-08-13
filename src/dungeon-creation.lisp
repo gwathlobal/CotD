@@ -61,6 +61,8 @@
     (logger (format nil "Creating actual level ~A~%" 0))
     (setf (level world) (create-level-from-template result-template))
 
+    (setf (level-layout (level world)) layout-id)
+    
     ;; check map for connectivity
 
     (incf *cur-progress-bar*)

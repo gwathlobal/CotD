@@ -123,7 +123,8 @@
                                                                 :main-str "Enter the quantity to drop"
                                                                 :prompt-str "[Enter] Drop [Escape] Cancel [a] All"
                                                                 :all-func #'(lambda () (format nil "~A" (qty (get-inv-item-by-pos (inv *player*) (cur-inv win)))))
-                                                                :input-check-func #'(lambda (char)
+                                                                :input-check-func #'(lambda (char cur-str)
+                                                                                      (declare (ignore cur-str))
                                                                                       (let ((i (parse-integer (string char) :junk-allowed t)))
                                                                                         (if (and (not (null i))
                                                                                                  (<= 1 i (qty (get-inv-item-by-pos (inv *player*) (cur-inv win)))))
