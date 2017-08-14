@@ -94,6 +94,10 @@
   (sdl:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
+
+                      ;; normalize mod
+                     (loop while (>= mod sdl-key-mod-num) do
+                       (decf mod sdl-key-mod-num))
                      
                      (when (= (cur-page win) +win-help-page-menu+)
                        (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win) :start-page (truncate (cur-sel win) (length (menu-items win))) :max-str-per-page (length (menu-items win))))

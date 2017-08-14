@@ -1,11 +1,13 @@
 CHANGELOG
 
+- Added high scores.
 - Added Wisps to the map. These are flying angelic beings that are able to navigate using their hearing.
 - Sound sources can now be seen on map.
 - All menu options now have letter shortcuts.
 - Lit and shadowed tiles are now displayed on the screen.
 - Player is now able to set his or her name.
 - Fixed a bug with severed body parts animation showing when the player should not be able to see it.
+- Fixed a bug with num lock interfering with arrow keys.
 
 --------------------
 July 31, 2017 v1.1.4

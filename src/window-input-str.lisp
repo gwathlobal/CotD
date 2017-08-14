@@ -52,7 +52,11 @@
   (sdl:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
-                     
+
+                      ;; normalize mod
+                     (loop while (>= mod sdl-key-mod-num) do
+                       (decf mod sdl-key-mod-num))
+  
                      (cond
                        ((and (not (no-escape win)) (sdl:key= key :sdl-key-escape)) 
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))

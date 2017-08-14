@@ -34,7 +34,11 @@
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
                         (declare (ignore unicode))
-                        
+
+                         ;; normalize mod
+                        (loop while (>= mod sdl-key-mod-num) do
+                          (decf mod sdl-key-mod-num))
+  
                         (cond
                           ((and (sdl:key= key :sdl-key-up) (= mod 0))
                            (decf (cur-str win)))

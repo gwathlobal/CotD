@@ -254,8 +254,16 @@
       (when is-more-than-one-screen
 	(sdl:draw-string-solid-* "*" (- (+ x w) 12) (+ y (truncate (* h (/ cur-item (length item-list))))) :color sdl:*white*)))))
 
+;; I might do something wrong here but I am not sure how I can access this enum otherwise
+(defconstant SDL-KEY-MOD-NUM (cffi:foreign-enum-value sdl-cffi::'Sdl-Mod :SDL-KEY-MOD-NUM))
+
 (defun run-selection-list (key mod unicode cur-str &key (start-page 0) (max-str-per-page -1))
   (declare (ignore unicode))
+
+  ;; normalize mod
+  (loop while (>= mod sdl-key-mod-num) do
+    (decf mod sdl-key-mod-num))
+  
   (cond
     ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (= mod 0)) (decf cur-str))
     ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (= mod 0)) (incf cur-str))

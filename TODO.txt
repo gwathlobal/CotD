@@ -1,5 +1,4 @@
 - Add courtyard houses like Thief2RL
-- Add highscore table
 - Add the Manyfaced Outsider faction
 - Add the Inquisition faction
 - Add a Thief/Spy campaign

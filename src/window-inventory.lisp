@@ -101,6 +101,10 @@
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
 
+                      ;; normalize mod
+                     (loop while (>= mod sdl-key-mod-num) do
+                       (decf mod sdl-key-mod-num))
+  
                      ;; adjusting the inventory selection
                      (cond
                        ((= (cur-tab win) +inv-tab-inv+) (progn (setf (cur-inv win) (run-selection-list key mod unicode (cur-inv win)))
