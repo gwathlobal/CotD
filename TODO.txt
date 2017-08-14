@@ -1,3 +1,4 @@
+- Omptimize simple pathfiding so that it produces more meaningful directions
 - Add courtyard houses like Thief2RL
 - Add the Manyfaced Outsider faction
 - Add the Inquisition faction

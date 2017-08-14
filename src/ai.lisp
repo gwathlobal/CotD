@@ -671,6 +671,7 @@
     
     ;; calculate path to the destination
     (when (and (path-dst mob)
+               (not (mob-ai-simple-pathfinding-p mob))
                (or (null (path mob))
                    (mob-ability-p mob +mob-abil-momentum+)))
       (let ((path nil))

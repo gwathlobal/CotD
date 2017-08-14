@@ -29,6 +29,7 @@
    ;;   :ai-curious - mob will try to investigate sounds if it has nothing to do
    ;;   :ai-kleptomaniac - mob will try to collect as much valuable items as possible
    ;;   :ai-cautious - mob will not attack smb of higher strength
+   ;;   :ai-simple-pathfinding - mob will not use Astar pathfinding and will move in the general direction towards the target
       
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The following keys may be used in make-instance
@@ -114,7 +115,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious
+                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious ai-simple-pathfinding
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -145,6 +146,8 @@
     (setf (gethash +ai-pref-kleptomaniac+ (ai-prefs mob-type)) t))
   (when ai-cautious
     (setf (gethash +ai-pref-cautious+ (ai-prefs mob-type)) t))
+  (when ai-simple-pathfinding
+    (setf (gethash +ai-pref-simple-pathfinding+ (ai-prefs mob-type)) t))
 
   ;; set up abilities
   (when abil-can-possess
@@ -636,6 +639,9 @@
 
 (defmethod mob-ai-cautious-p ((mob mob))
   (gethash +ai-pref-cautious+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+
+(defmethod mob-ai-simple-pathfinding-p ((mob mob))
+  (gethash +ai-pref-simple-pathfinding+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
 
 (defun mob-effect-p (mob effect-type-id)
   (gethash effect-type-id (effects mob)))

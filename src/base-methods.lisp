@@ -647,10 +647,12 @@
                                   
                                   (incf-mob-motion mob *mob-motion-move*)
                                   (incf-mob-motion target-mob *mob-motion-move*)
-                                  (set-mob-location target-mob nx ny z :apply-gravity (if (and (get-terrain-type-trait (get-terrain-* (level *world*) (x target-mob) (y target-mob) (z target-mob)) +terrain-trait-water+)
-                                                                                               (= z (+ (z target-mob) dir-z))
-                                                                                               (= dx 0)
-                                                                                               (= dy 0))
+                                  (set-mob-location target-mob nx ny z :apply-gravity (if
+                                                                                          (or (not (get-terrain-type-trait (get-terrain-* (level *world*) (x target-mob) (y target-mob) (z target-mob)) +terrain-trait-water+))
+                                                                                              (and (get-terrain-type-trait (get-terrain-* (level *world*) (x target-mob) (y target-mob) (z target-mob)) +terrain-trait-water+)
+                                                                                                   (= z (+ (z target-mob) dir-z))
+                                                                                                   (= dx 0)
+                                                                                                   (= dy 0)))
                                                                                         t
                                                                                         nil))
                                   (set-mob-location mob x y z :apply-gravity apply-gravity)

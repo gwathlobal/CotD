@@ -92,6 +92,7 @@
 (defconstant +ai-pref-curious+ 4)
 (defconstant +ai-pref-kleptomaniac+ 5)
 (defconstant +ai-pref-cautious+ 6)
+(defconstant +ai-pref-simple-pathfinding+ 7)
 
 (defconstant +mob-abil-heal-self+ 0)
 (defconstant +mob-abil-conseal-divine+ 1)

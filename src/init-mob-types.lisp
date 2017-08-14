@@ -18,7 +18,7 @@
                                        :strength 0
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :ai-coward t))
+                                       :ai-coward t :ai-simple-pathfinding t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-man+ 
                                        :name "man"
@@ -30,7 +30,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
-                                       :ai-coward t))
+                                       :ai-coward t :ai-simple-pathfinding t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-woman+ 
                                        :name "woman"
@@ -42,7 +42,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
-                                       :ai-coward t))
+                                       :ai-coward t :ai-simple-pathfinding t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-child+ 
                                        :name "child"
@@ -53,7 +53,7 @@
                                        :base-light-radius 3
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :ai-coward t))
+                                       :ai-coward t :ai-simple-pathfinding t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-clerk+ 
                                        :name "clerk"
@@ -65,7 +65,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ (+ 10 (random 10))))
-                                       :ai-coward t))
+                                       :ai-coward t :ai-simple-pathfinding t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-criminal+ 
                                        :name "criminal"
@@ -349,7 +349,7 @@
                                        :strength 1
                                        :base-light-radius 6 :base-sight 0
                                        :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t 
-                                       :ai-curious t))
+                                       :ai-curious t :ai-simple-pathfinding t))
 
 (set-faction-relations +faction-type-humans+
                        (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t) (cons +faction-type-military+ t)
