@@ -670,6 +670,21 @@
         (logger (format nil "AI-FUNCTION: Mob's destination is randomly set to (~A, ~A, ~A)~%" (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
     
     ;; calculate path to the destination
+    ;(cond
+    ;  ((mob-ai-simple-pathfinding-p mob)
+    ;   (progn
+    ;     (when (path-dst mob)
+    ;      (when (and (/= (z mob) (third (path-dst mob)))
+    ;                  (mob-effect-p mob +mob-effect-flying+))
+    ;         (if (> (z mob) (third (path-dst mob)))
+    ;           (progn
+    ;             (when (check-move-on-level mob (x mob) (y mob) (1- (z mob)))
+    ;               ))
+    ;           (progn)))
+    ;       (general-direction-dir (x mob) (y mob) (first (path-dst mob)) (second (path-dst mob))))))
+    ;  (t
+    ;   (progn
+    ;     )))
     (when (and (path-dst mob)
                (not (mob-ai-simple-pathfinding-p mob))
                (or (null (path mob))
