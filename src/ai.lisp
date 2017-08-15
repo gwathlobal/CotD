@@ -768,6 +768,7 @@
   
   (format t "~%TIME-ELAPSED BEFORE: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
 
+  (update-visible-mobs player)
   (update-visible-area (level *world*) (x player) (y player) (z player))
 
   (format t "TIME-ELAPSED AFTER: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))

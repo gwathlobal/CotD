@@ -2094,7 +2094,7 @@
                                                     ((eq (item-ability-p target +item-abil-corpse+) 3) (setf mob-corpse-type +mob-type-reanimated-pwr-3+))
                                                     (t (setf mob-corpse-type +mob-type-reanimated-pwr-4+)))
                                                   (setf mob-corpse (make-instance 'mob :mob-type mob-corpse-type :x (x target) :y (y target) :z (z target)))
-                                                  (setf (name mob-corpse) (format nil "Reanimated ~A" (name target)))
+                                                  (setf (name mob-corpse) (format nil "reanimated ~A" (name target)))
                                                   (setf (alive-name mob-corpse) (alive-name target))
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)

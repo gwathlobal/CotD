@@ -28,17 +28,15 @@
                  (setf turn-finished nil)
                  (setf (made-turn mob) nil)
                  (set-message-this-turn nil)
-                 (calculate-mob-vision-hearing mob)
                  (setf (motion-set-p mob) nil)
                  (ai-function mob)
-                 (unless (eq mob *player*) (update-visible-mobs mob))
-                 (calculate-mob-vision-hearing mob)
                  (when (get-message-this-turn) (add-message (format nil "~%")))
                  (setf (heard-sounds mob) nil)
-
+                 
                  (when (eq mob *player*)
-                   (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+                   (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*) :no-z t)
                    (update-map-area))
+                 (update-visible-mobs mob)
                  
                  ;; process animations for this turn if any
                  (when (animation-queue *world*)

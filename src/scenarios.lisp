@@ -396,7 +396,7 @@
   (loop for mob-id in (mob-id-list (level world))
         for mob = (get-mob-by-id mob-id)
         do
-           (calculate-mob-vision-hearing mob)))
+           (update-visible-mobs mob)))
 
 (defun find-unoccupied-place-around (world mob sx sy sz)
   (loop with min-x = sx

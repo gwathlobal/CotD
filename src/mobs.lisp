@@ -864,7 +864,9 @@
 
 (defmethod get-qualified-name ((mob mob))
   (if (slot-value mob 'name)
-    (format nil "~A the ~A" (name mob) (capitalize-name (name (get-mob-type-by-id (mob-type mob)))))
+    (if (mob-ability-p mob +mob-abil-undead+)
+      (format nil "~A" (name mob))
+      (format nil "~A the ~A" (name mob) (capitalize-name (name (get-mob-type-by-id (mob-type mob))))))
     (format nil "nameless ~A" (name mob))))
 
 (defun set-name (mob)
@@ -991,7 +993,9 @@
    (visible-tile-list :initform () :accessor visible-tile-list)
    (killed-by :initform nil :accessor killed-by)
    (faction-name :initform nil :accessor faction-name)
-   (cur-score :initform 0 :accessor cur-score)))
+   (cur-score :initform 0 :accessor cur-score)
+   (nearby-light-mobs :initform () :accessor nearby-light-mobs)
+   (nearby-light-sources :initform () :accessor nearby-light-sources)))
  
 ;;---------------------- 
 ;; FACTIONS
