@@ -13,7 +13,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                        (calculate-player-score 100)
+                                                                                                        (calculate-player-score 1400)
                                                                                                         (faction-name *player*)
                                                                                                         (real-game-time world)
                                                                                                         (cond
@@ -46,7 +46,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                        (calculate-player-score 100)
+                                                                                                        (calculate-player-score 1450)
                                                                                                         (faction-name *player*)
                                                                                                         (real-game-time world)
                                                                                                         (cond
@@ -76,7 +76,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                        (calculate-player-score 100)
+                                                                                                        (calculate-player-score (+ 1500 (* 10 (total-humans world))))
                                                                                                         (faction-name *player*)
                                                                                                         (real-game-time world)
                                                                                                         (cond
@@ -411,7 +411,7 @@
                                            :on-trigger #'(lambda (world)
                                                             ;; write highscores
                                                            (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                        (calculate-player-score 100)
+                                                                                                        (calculate-player-score 0)
                                                                                                         (faction-name *player*)
                                                                                                         (real-game-time world)
                                                                                                         (format nil "Escaped with $~A" (calculate-total-value *player*))
