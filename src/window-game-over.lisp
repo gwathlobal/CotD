@@ -8,7 +8,8 @@
 (defconstant +game-over-thief-won+ 5)
 
 (defclass final-stats-window (window)
-  ((game-over-type :initarg :game-over-type :accessor game-over-type)))
+  ((game-over-type :initarg :game-over-type :accessor game-over-type)
+   (highscores-place :initform nil :initarg :highscores-place :accessor highscores-place)))
 
 (defmethod make-output ((win final-stats-window))
   ;; fill the screen black
@@ -64,7 +65,7 @@
                         (cond
 			  ;; escape - high scores
 			  ((sdl:key= key :sdl-key-escape) 
-                           (setf *current-window* (make-instance 'highscores-window))
+                           (setf *current-window* (make-instance 'highscores-window :highscores-place (highscores-place win)))
                            (make-output *current-window*)
                            (run-window *current-window*)
                            (funcall *start-func*))

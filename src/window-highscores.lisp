@@ -1,7 +1,7 @@
 (in-package :cotd)
 
 (defclass highscores-window (window)
-  ())
+  ((highscores-place :initform nil :initarg :highscores-place :accessor highscores-place)))
 
 (defmethod make-output ((win highscores-window))
   ;; fill the screen black
@@ -12,14 +12,27 @@
 
   (loop for record in (highscores-highscore-records *highscores*)
         for n from 0
-        with str = (create-string)
+        with str = nil
+        with color = sdl:*white*
         do
-           (format str "  ~3<~A.~> ~A~%" (1+ n) (write-highscores-to-str record))
+           (setf str (format nil "  ~3<~A.~> ~A~%~%" (1+ n) (write-highscores-to-str record)))
+           (if (and (highscores-place win)
+                    (= (highscores-place win) n))
+             (setf color sdl:*yellow*)
+             (setf color sdl:*white*))
+           (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y (+ 30 (* n (sdl:char-height sdl:*default-font*) 3)) :w *window-width* :h (* (sdl:char-height sdl:*default-font*) 2)))
+             (write-text str rect :color color))
         finally
            (when (highscores-additional-record *highscores*)
-             (format str "  ---~%  ~3<11.~> ~A~%" (write-highscores-to-str (highscores-additional-record *highscores*))))
-           (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (- *window-height* (* 3 (sdl:char-height sdl:*default-font*)))))
-             (write-text str rect)))
+             (sdl:draw-string-solid-* "  ---" 0 (+ 30 (* 10 (sdl:char-height sdl:*default-font*) 3)) :color sdl:*white*)
+             (setf str (format nil "  ~3<11.~> ~A~%" (write-highscores-to-str (highscores-additional-record *highscores*))))
+             (if (and (highscores-place win)
+                      (= (highscores-place win) 10))
+             (setf color sdl:*yellow*)
+             (setf color sdl:*white*))
+             (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y (+ 30 (sdl:char-height sdl:*default-font*) (* 10 (sdl:char-height sdl:*default-font*) 3)) :w *window-width* :h (* (sdl:char-height sdl:*default-font*) 2)))
+               (write-text str rect :color color)))
+           )
   
   (sdl:draw-string-solid-* (format nil "[Esc] Quit")
                            10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))

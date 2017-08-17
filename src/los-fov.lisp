@@ -224,8 +224,10 @@
                       (= (faction mob) (faction tmob)))
              (pushnew (id tmob) (shared-visible-mobs mob))
                ;(format t "~A [~A] sees ~A~%" (name tmob) (id tmob) (visible-mobs tmob))
-             (loop for vmob-id in (proper-visible-mobs tmob) do
-               (pushnew vmob-id (shared-visible-mobs mob)))
+             (loop for vmob-id in (proper-visible-mobs tmob)
+                   when (not (check-dead (get-mob-by-id vmob-id)))
+                     do
+                        (pushnew vmob-id (shared-visible-mobs mob)))
              (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
     
            ;; set up visible mobs

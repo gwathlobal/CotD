@@ -28,16 +28,30 @@
            (>= (nth 1 (first (last (highscores-highscore-records highscores))))
                (nth 1 record)))
     (progn
-      (setf (highscores-additional-record highscores) record))
+      (setf (highscores-additional-record highscores) record)
+      (return-from add-highscore-record 10))
     (progn
-      (push record (highscores-highscore-records highscores))
-      (setf (highscores-highscore-records highscores) (stable-sort (highscores-highscore-records highscores) #'(lambda (a b)
-                                                                                                                 (if (> (nth 1 a)
-                                                                                                                        (nth 1 b))
-                                                                                                                   t
-                                                                                                                   nil))))
-      (when (> (length (highscores-highscore-records highscores)) 10)
-        (setf (highscores-highscore-records highscores) (butlast (highscores-highscore-records highscores)))))))
+      (if (highscores-highscore-records highscores)
+        (progn
+          (loop for elem in (highscores-highscore-records highscores)
+                for n from 1
+                with list = (highscores-highscore-records highscores)
+                when (< (second elem) (second record))
+                  do
+                     (setf (highscores-highscore-records highscores)
+                           (concatenate 'list
+                                        (subseq list 0 (1- n))
+                                        (list record)
+                                        (nthcdr (1- n) list)))
+                     (when (> (length (highscores-highscore-records highscores)) 10)
+                       (setf (highscores-highscore-records highscores) (butlast (highscores-highscore-records highscores))))
+                     (return-from add-highscore-record (1- n)))
+          (setf (highscores-highscore-records highscores) (append (highscores-highscore-records highscores) (list record)))
+          (return-from add-highscore-record (1- (length (highscores-highscore-records highscores)))))
+        (progn
+          (push record (highscores-highscore-records highscores))
+          (return-from add-highscore-record 0)))
+      )))
 
 (defun make-highscore-record (name score faction turns status layout)
   (list name score faction turns status layout))
