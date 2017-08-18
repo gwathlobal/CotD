@@ -5,16 +5,16 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-July 31, 2017 v1.1.4
+August 18, 2017 v1.2.0
 
-- Avatars of Brilliance are now able to fly for the duration of the transformation.
-- Archdemons now have a ranged attack that inflicts minor damage and pulls enemies to the ground.
-- Satanists can now empower an undead unit and make it permanently follow them.
-- The Military now have medkit items to heal their wounds.
-- The Thief's ability Smoke bomb is now converted into an item with the same effect. The Thief starts with three of them.
-- Most citizens now have a small number of coins in their pockets.
-- You can now see which creatures you can see properly and which through a shared mind, as well as iterate through visible creatures in look mode.
-- Added wind to the map that affects the direction in which smoke moves.
+- Added high scores.
+- Added Wisps to the map. These are flying angelic beings that are able to navigate using their hearing.
+- Sound sources can now be seen on the map.
+- All menu options now have letter shortcuts.
+- Lit and shadowed tiles are now displayed on the screen.
+- The player is now able to set his or her name.
+- Fixed a bug with severed body parts animation showing when the player should not be able to see it.
+- Fixed a bug with num lock interfering with arrow keys.
 
 CURRENT CHANGELOG
 
