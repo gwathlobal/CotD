@@ -17,8 +17,8 @@
                                                                                                                                 (faction-name *player*)
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
-                                                                                                                                  ((zerop (total-demons world)) "Enemies eliminated")
-                                                                                                                                  ((>= (cur-fp *player*) (max-fp *player*)) "Ascended"))
+                                                                                                                                  ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                                                                                  ((>= (cur-fp *player*) (max-fp *player*)) "Ascended."))
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                            
@@ -51,8 +51,8 @@
                                                                                                                                 (faction-name *player*)
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
-                                                                                                                                  ((zerop (total-angels world)) "Enemies eliminated")
-                                                                                                                                  ((>= (cur-fp *player*) (max-fp *player*)) "Ascended"))
+                                                                                                                                  ((zerop (total-angels world)) "Enemies eliminated.")
+                                                                                                                                  ((>= (cur-fp *player*) (max-fp *player*)) "Ascended."))
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
@@ -81,7 +81,7 @@
                                                                                                                                 (faction-name *player*)
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
-                                                                                                                                  ((zerop (total-demons world)) "Enemies eliminated")
+                                                                                                                                  ((zerop (total-demons world)) "Enemies eliminated.")
                                                                                                                                   )
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
@@ -145,7 +145,7 @@
                                                                                                                                 (calculate-player-score 0)
                                                                                                                                 (faction-name *player*)
                                                                                                                                 (real-game-time world)
-                                                                                                                                (format nil "Possessed by ~A" (get-qualified-name (get-mob-by-id (master-mob-id *player*))))
+                                                                                                                                (format nil "Possessed by ~A." (get-qualified-name (get-mob-by-id (master-mob-id *player*))))
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
@@ -415,7 +415,7 @@
                                                                                                                                 (calculate-player-score 0)
                                                                                                                                 (faction-name *player*)
                                                                                                                                 (real-game-time world)
-                                                                                                                                (format nil "Escaped with $~A" (calculate-total-value *player*))
+                                                                                                                                (format nil "Escaped with $~A." (calculate-total-value *player*))
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
