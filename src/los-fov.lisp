@@ -136,7 +136,8 @@
           for vision-pwr = light-radius
           for vision-power = light-radius
           do
-             (when (< (get-distance-3d x y z tx ty tz) light-radius)
+             (when (and (not (zerop light-radius))
+                        (< (get-distance-3d x y z tx ty tz) light-radius))
                (line-of-sight x y z tx ty tz
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
@@ -165,6 +166,7 @@
         ))
 
 (defun update-visible-mobs-normal (mob)
+  (setf (brightness mob) 0)
   (when (eq mob *player*)
     (setf (nearby-light-mobs *player*) nil)
     (setf (nearby-light-sources *player*) nil))
@@ -177,7 +179,8 @@
         for vision-power = light-radius
         do
            ;; set up mob brightness
-           (when (< (get-distance-3d x y z (x mob) (y mob) (z mob)) light-radius)
+           (when (and (not (zerop light-radius))
+                      (< (get-distance-3d x y z (x mob) (y mob) (z mob)) light-radius))
                (line-of-sight x y z (x mob) (y mob) (z mob)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
