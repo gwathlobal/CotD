@@ -97,8 +97,8 @@
                                        :weapon (list "Cross" (list +weapon-dmg-iron+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-can-be-blessed t :abil-detect-evil t :abil-human t
-                                       :abil-toggle-light t  :abil-prayer-bless t :abil-prayer-shield t :abil-open-close-door t
+                                       :abil-can-be-blessed t :abil-detect-evil t :abil-human t :abil-independent t
+                                       :abil-toggle-light t  :abil-prayer-bless t :abil-prayer-shield t :abil-open-close-door t :abil-smite t
                                        :ai-stop t
                              ))
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 

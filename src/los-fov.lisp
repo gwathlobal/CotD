@@ -427,10 +427,6 @@
                  *mob-visibility-threshold*)
           (setf glyph-color (sdl:color :r 25 :g 25 :b 112)))))
     
-    ;(setf glyph-idx (glyph-idx (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
-    ;(setf glyph-color (glyph-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
-    ;(setf back-color (back-color (get-terrain-type-by-id (aref (terrain level) map-x map-y map-z))))
-    
     ;; then feature, if any
     (if (and (or (eq (get-terrain-* level map-x map-y map-z) +terrain-floor-air+)
                  (eq (get-terrain-* level map-x map-y map-z) +terrain-border-air+))
@@ -544,27 +540,6 @@
                                                                     t
                                                                     nil))))
 
-  ;(loop for sound in (heard-sounds *player*) do
-  ;  (set-single-memo-* level (sound-x sound) (sound-y sound) (sound-z sound) :glyph-idx 31 :glyph-color sdl:*white* :back-color sdl:*black*))
-  
-  ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
-  ;(when (mob-ability-p *player* +mob-abil-shared-minds+)
-  ;  (loop for nmob-id in (mob-id-list (level *world*))
-  ;        for nmob = (get-mob-by-id nmob-id)
-  ;        when (and (mob-ability-p nmob +mob-abil-shared-minds+)
-  ;                  (= (faction *player*) (faction nmob))
-  ;                  (not (check-dead nmob)))
-  ;          do
-  ;             (pushnew (id nmob) (shared-visible-mobs *player*))
-  ;             ;;(format t "~A [~A] sees ~A~%" (name nmob) (id nmob) (visible-mobs nmob))
-  ;             (loop for vmob-id in (proper-visible-mobs nmob)
-  ;                   when (not (check-dead (get-mob-by-id vmob-id)))
-  ;                     do
-  ;                        (pushnew vmob-id (shared-visible-mobs *player*))))
-  ;  (setf (shared-visible-mobs *player*) (remove (id *player*) (shared-visible-mobs *player*))))
-
-  ;;(format t "Player sees proper ~A~%" (proper-visible-mobs *player*))
-  ;;(format t "Player sees shared ~A~%" (shared-visible-mobs *player*))
   (setf (visible-mobs *player*) (append (proper-visible-mobs *player*) (shared-visible-mobs *player*)))
   (setf (visible-mobs *player*) (remove-duplicates (visible-mobs *player*)))
   

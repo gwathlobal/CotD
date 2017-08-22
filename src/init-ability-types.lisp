@@ -492,7 +492,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-prayer-bless+ :name "Prayer" :descr "Pray to God for help." 
+                                 :id +mob-abil-prayer-bless+ :name "Pray for wrath" :descr "Pray to reveal unholy creatures (1/3rd chance only) and burn them for 1-2 dmg." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 20
@@ -528,6 +528,7 @@
                                                                                         (format nil "~A reveals the true form of ~A. " (capitalize-name (visible-name actor)) (get-qualified-name (get-mob-by-id enemy-mob-id)))))
                                                                (setf (face-mob-type-id (get-mob-by-id enemy-mob-id)) (mob-type (get-mob-by-id enemy-mob-id)))
                                                                (set-mob-effect (get-mob-by-id enemy-mob-id) :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5))
+                                                             (incf (brightness actor) 50)
                                                              (mob-burn-blessing actor (get-mob-by-id enemy-mob-id)))
                                                     ))
                                                 )
@@ -2469,3 +2470,80 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-smite+ :name "Smite" :descr "Pray to cast down celestial retribution onto an unholy enemy inflicting 1-2 dmg for each visible human character around." 
+                                 :cd 5 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 10
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-SMITE: ~A [~A] uses smite on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone praying~A." str)))
+                                                (if (mob-ability-p target +mob-abil-unholy+)
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~A smites ~A" (capitalize-name (visible-name actor)) (visible-name target)))
+
+                                                    (when (mob-effect-p target +mob-effect-possessed+)
+                                                      (setf (face-mob-type-id target) (mob-type target))
+                                                      (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                             (format nil " and reveals it to be ~A" (get-qualified-name target))))
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil ". "))
+                                                    (loop for mob-id in (append (list (id actor)) (visible-mobs actor))
+                                                          for mob = (get-mob-by-id mob-id)
+                                                          with cur-dmg = 0
+                                                          when (and (not (check-dead mob))
+                                                                    (mob-ability-p mob +mob-abil-human+))
+                                                            do
+                                                               (incf cur-dmg (1+ (random 2)))
+                                                          finally (when (not (zerop cur-dmg))
+                                                                    (decf (cur-hp target) cur-dmg)
+                                                                    (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                                           (format nil "~A is for ~A damage. " (capitalize-name (name target)) cur-dmg))
+                                                                    (when (check-dead target)
+                                                                      (when (mob-effect-p target +mob-effect-possessed+)
+                                                                        (mob-depossess-target target))
+                                                                      
+                                                                      (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (list :is-fire))
+                                                                      )))
+                                                    )
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~A prays, but nothing happens. "
+                                                                                   (capitalize-name (visible-name actor))))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-smite+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  ;; a little bit of cheating here
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (mob-effect-p nearest-enemy +mob-effect-possessed+)
+                                                           (mob-effect-p nearest-enemy +mob-effect-reveal-true-form+)
+                                                           (mob-ability-p nearest-enemy +mob-abil-unholy+))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy))
+                                                   (mob-invoke-ability actor nearest-ally (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

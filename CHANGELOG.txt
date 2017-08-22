@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Add Smite to priests. Smite is a single target damage ability that gets better the more humans are around the caster.
+
 --------------------
 August 18, 2017 v1.2.0
 
