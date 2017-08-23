@@ -96,6 +96,7 @@
    ;;   :abil-gravity-chains - +mob-abil-gravity-chains+
    ;;   :abil-no-corpse - +mob-abil-no-corpse+
    ;;   :abil-smite - +mob-abil-smite+
+   ;;   :abil-slow - +mob-abil-slow+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -126,7 +127,7 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite)
+                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -277,6 +278,8 @@
     (setf (gethash +mob-abil-no-corpse+ (abilities mob-type)) t))
   (when abil-smite
     (setf (gethash +mob-abil-smite+ (abilities mob-type)) t))
+  (when abil-slow
+    (setf (gethash +mob-abil-slow+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -504,6 +507,7 @@
    (r-acc :initform +base-accuracy+ :initarg :r-acc :accessor r-acc)
    (cur-dodge :initform 5 :initarg :cur-dodge :accessor cur-dodge)
    (cur-armor :initform 0 :initarg :cur-armor :accessor cur-armor)
+   (cur-speed :initform 100 :initarg :cur-speed :accessor cur-speed)
 
    (brightness :initform 0 :accessor brightness)
    (cur-light :initform *base-light-radius* :initarg :cur-light :accessor cur-light)

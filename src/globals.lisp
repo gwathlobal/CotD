@@ -157,6 +157,7 @@
 (defconstant +mob-abil-flying+ 60)
 (defconstant +mob-abil-no-corpse+ 61)
 (defconstant +mob-abil-smite+ 62)
+(defconstant +mob-abil-slow+ 63)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -176,6 +177,7 @@
 (defconstant +mob-effect-necrolink+ 15)
 (defconstant +mob-effect-gravity-pull+ 16)
 (defconstant +mob-effect-flying+ 17)
+(defconstant +mob-effect-slow+ 18)
 
 (defconstant +mob-order-follow+ 0)
 

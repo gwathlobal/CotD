@@ -146,3 +146,13 @@
 (set-effect-type (make-instance 'effect-type :id +mob-effect-gravity-pull+ :name "Gravity pull" :color sdl:*red*))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-flying+ :name "Flying" :color sdl:*cyan*))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-slow+ :name "Slowed" :color sdl:*red*
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (incf (cur-speed actor) 50)
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (decf (cur-speed actor) 50)
+                                                            )))

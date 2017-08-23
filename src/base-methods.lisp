@@ -695,7 +695,7 @@
 (defun make-act (mob speed)
   (logger (format nil "MAKE-ACT: ~A SPD ~A~%" (name mob) speed))
   (when (zerop speed) (return-from make-act nil))
-  (decf (cur-ap mob) speed)
+  (decf (cur-ap mob) (truncate (* speed (cur-speed mob)) 100))
   (setf (made-turn mob) t)
   (when (eq mob *player*)
     (incf (player-game-time *world*) (truncate (* speed +normal-ap+) (max-ap mob)))))
