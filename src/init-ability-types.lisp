@@ -492,7 +492,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-prayer-bless+ :name "Pray for righteousness" :descr "Pray to reveal unholy creatures (1/3rd chance only) and burn them for 1-2 dmg, as well as to grant divine protection (1/3rd chance only) to all humans in the area. Divine protection prevents the next harmful action against you." 
+                                 :id +mob-abil-prayer-bless+ :name "Pray for righteousness" :descr "Pray to reveal unholy creatures (1/3rd chance only) and burn them for 1-2 dmg, as well as to grant divine protection (1/3rd chance only) to all humans in the area also causing them to follow you. Divine protection prevents one harmful action from affecting the shielded target." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 20
@@ -537,7 +537,7 @@
                                                     
                                                     ;; collect all allies in sight
                                                     (setf ally-list (loop for ally-mob-id in (visible-mobs actor)
-                                                                          when (get-faction-relation (faction actor) (faction (get-mob-by-id ally-mob-id)))
+                                                                          when (mob-ability-p (get-mob-by-id ally-mob-id) +mob-abil-human+)
                                                                             collect ally-mob-id))
                                                     ;; do not forget self
                                                     (pushnew (id actor) ally-list)
@@ -546,11 +546,27 @@
                                                     
                                                     ;; grant all allies invulnerability for 99 turns
                                                     (loop for ally-mob-id in ally-list
+                                                          for mob = (get-mob-by-id ally-mob-id)
                                                           do
-                                                             (logger (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the ally ~A~%" (name actor) (id actor) (get-mob-by-id ally-mob-id)))
-                                                             (set-mob-effect (get-mob-by-id ally-mob-id) :effect-type-id +mob-effect-divine-shield+ :actor-id (id actor) :cd 99)
+                                                             (logger (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the ally ~A~%" (name actor) (id actor) mob))
+                                                             (set-mob-effect mob :effect-type-id +mob-effect-divine-shield+ :actor-id (id actor) :cd 99)
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                    (format nil "~A is granted divine shield. " (capitalize-name (visible-name (get-mob-by-id ally-mob-id)))))
+                                                                                    (format nil "~A is granted divine shield" (capitalize-name (visible-name mob))))
+                                                             (when (and (not (eq mob actor))
+                                                                        (mob-ability-p mob +mob-abil-human+)
+                                                                        (not (mob-ability-p mob +mob-abil-independent+))
+                                                                        (or (not (order mob))
+                                                                            (and (order mob)
+                                                                                 (= (first (order mob)) +mob-order-follow+)
+                                                                                 (/= (second (order mob)) (id actor))
+                                                                                 (zerop (random 2)))
+                                                                            (and (order mob)
+                                                                                 (/= (first (order mob)) +mob-order-follow+))))
+                                                               (setf (order mob) (list +mob-order-follow+ (id actor)))
+                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                      (format nil " and starts to follow ~A" (visible-name actor))))
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                    (format nil ". "))
                                                           )
                                                     
                                                     ))
@@ -565,8 +581,9 @@
                                                   ;; if able to pray - do it
                                                   (if (and (mob-ability-p actor +mob-abil-prayer-bless+)
                                                            (can-invoke-ability actor actor +mob-abil-prayer-bless+)
-                                                           (not (zerop (length (visible-mobs actor))))
-                                                           (zerop (random 5)))
+                                                           (or (not (mob-effect-p actor +mob-effect-divine-shield+))
+                                                               (and (not (zerop (length (visible-mobs actor))))
+                                                                    (zerop (random 4)))))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -629,7 +646,7 @@
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-prayer-shield+ :name "Pray for protection" :descr "Pray to grant divine protection (1/3rd chance only) to all allies in the area. Divine protection prevents the next harmful action against you." 
+                                 :id +mob-abil-prayer-shield+ :name "Pray for protection" :descr "Pray to grant divine protection (1/3rd chance only) to all allies in the area. Divine protection prevents one harmful action from affecting the shielded target." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 20
@@ -2532,7 +2549,7 @@
                                                                     
                                                                     (decf (cur-hp target) cur-dmg)
                                                                     (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                           (format nil "~A is for ~A damage. " (capitalize-name (name target)) cur-dmg))
+                                                                                           (format nil "~A is hit for ~A damage. " (capitalize-name (name target)) cur-dmg))
                                                                     (when (check-dead target)
                                                                       (when (mob-effect-p target +mob-effect-possessed+)
                                                                         (mob-depossess-target target))
@@ -2557,9 +2574,11 @@
                                                   ;; a little bit of cheating here
                                                   (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
                                                            nearest-enemy
-                                                           (mob-effect-p nearest-enemy +mob-effect-possessed+)
-                                                           (mob-effect-p nearest-enemy +mob-effect-reveal-true-form+)
-                                                           (mob-ability-p nearest-enemy +mob-abil-unholy+))
+                                                           (or (and (mob-effect-p nearest-enemy +mob-effect-possessed+)
+                                                                    (mob-effect-p nearest-enemy +mob-effect-reveal-true-form+)
+                                                                    (mob-ability-p nearest-enemy +mob-abil-unholy+))
+                                                               (and (not (mob-effect-p nearest-enemy +mob-effect-possessed+))
+                                                                    (mob-ability-p nearest-enemy +mob-abil-unholy+))))
                                                       t
                                                       nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2579,7 +2598,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-slow+ :name "Slow" :descr "Pray to slow down one enemy causing them to take 50% more time when attempting any action." 
+                                 :id +mob-abil-slow+ :name "Slow" :descr "Pray to slow down one enemy causing it to take 50% more time when attempting any action." 
                                  :cd 5 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
@@ -2625,3 +2644,50 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-prayer-wrath+ :name "Pray for wrath" :descr "Pray to grant your followers holy touch for 3 turns. Holy touch is a melee fire based attack." 
+                                 :cd 5 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 20
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                
+                                                (logger (format nil "MOB-PRAYER-WRATH: ~A [~A] prays for wrath~%" (name actor) (id actor)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone praying~A." str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A prays for wrath. " (capitalize-name (visible-name actor))))
+
+                                                (loop for ally-mob-id in (append (visible-mobs actor) (list (id actor)))
+                                                      for mob = (get-mob-by-id ally-mob-id)
+                                                      when (or (eq mob actor)
+                                                               (and (order mob)
+                                                                    (= (first (order mob)) +mob-order-follow+)
+                                                                    (= (second (order mob)) (id actor))))
+                                                          do
+                                                             (logger (format nil "MOB-PRAYER-WRATH: ~A [~A] affects the ally ~A~%" (name actor) (id actor) mob))
+                                                             (set-mob-effect mob :effect-type-id +mob-effect-holy-touch+ :actor-id (id actor) :cd 3)
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                    (format nil "~A is granted holy touch. " (capitalize-name (visible-name mob))))
+                                                      )
+
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-prayer-wrath+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; if able to pray - do it
+                                                  (if (and (mob-ability-p actor +mob-abil-prayer-wrath+)
+                                                           (can-invoke-ability actor actor +mob-abil-prayer-wrath+)
+                                                           nearest-enemy)
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

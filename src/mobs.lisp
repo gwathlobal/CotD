@@ -97,6 +97,7 @@
    ;;   :abil-no-corpse - +mob-abil-no-corpse+
    ;;   :abil-smite - +mob-abil-smite+
    ;;   :abil-slow - +mob-abil-slow+
+   ;;   :abil-prayer-wrath - +mob-abil-prayer-wrath+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -127,7 +128,7 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow)
+                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -280,6 +281,8 @@
     (setf (gethash +mob-abil-smite+ (abilities mob-type)) t))
   (when abil-slow
     (setf (gethash +mob-abil-slow+ (abilities mob-type)) t))
+  (when abil-prayer-wrath
+    (setf (gethash +mob-abil-prayer-wrath+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -291,15 +294,13 @@
   (setf (aref *mob-types* (mob-type mob-type)) mob-type))
 
 (defmethod get-weapon-name ((mob-type mob-type))
-  (first (weapon mob-type)))
+  (get-weapon-name-simple (weapon mob-type)))
 
 (defun get-weapon-name-simple (weapon)
   (first weapon))
 
 (defmethod is-weapon-melee ((mob-type mob-type))
-  (if (second (weapon mob-type))
-    t
-    nil))
+  (is-weapon-melee-simple (weapon mob-type)))
 
 (defun is-weapon-melee-simple (weapon)
   (if (second weapon)
@@ -307,102 +308,126 @@
     nil))
 
 (defmethod get-melee-weapon-dmg-type ((mob-type mob-type))
-  (when (second (weapon mob-type))
-    (nth 0 (second (weapon mob-type)))))
+  (get-melee-weapon-dmg-type-simple (weapon mob-type)))
 
 (defun get-melee-weapon-dmg-type-simple (weapon)
   (when (second weapon)
     (nth 0 (second weapon))))
 
 (defmethod get-melee-weapon-dmg-min ((mob-type mob-type))
-  (when (second (weapon mob-type))
-    (nth 1 (second (weapon mob-type)))))
+  (get-melee-weapon-dmg-min-simple (weapon mob-type)))
 
 (defun get-melee-weapon-dmg-min-simple (weapon)
   (when (second weapon)
     (nth 1 (second weapon))))
 
 (defmethod get-melee-weapon-dmg-max ((mob-type mob-type))
-  (when (second (weapon mob-type))
-    (nth 2 (second (weapon mob-type)))))
+  (get-melee-weapon-dmg-max-simple (weapon mob-type)))
 
 (defun get-melee-weapon-dmg-max-simple (weapon)
   (when (second weapon)
     (nth 2 (second weapon))))
 
 (defmethod get-melee-weapon-speed ((mob-type mob-type))
-  (when (second (weapon mob-type))
-    (nth 3 (second (weapon mob-type)))))
+  (get-melee-weapon-speed-simple (weapon mob-type)))
 
 (defun get-melee-weapon-speed-simple (weapon)
   (when (second weapon)
     (nth 3 (second weapon))))
 
 (defmethod get-melee-weapon-acc ((mob-type mob-type))
-  (when (second (weapon mob-type))
-    (nth 4 (second (weapon mob-type)))))
+  (get-melee-weapon-acc-simple (weapon mob-type)))
 
 (defun get-melee-weapon-acc-simple (weapon)
   (when (second weapon)
     (nth 4 (second weapon))))
 
 (defmethod get-melee-weapon-aux ((mob-type mob-type))
-  (when (second (weapon mob-type))
-    (nth 5 (second (weapon mob-type)))))
+  (get-melee-weapon-aux-simple (weapon mob-type)))
 
 (defun get-melee-weapon-aux-simple (weapon)
   (when (second weapon)
     (nth 5 (second weapon))))
 
 (defmethod get-melee-weapon-aux-param ((mob-type mob-type) aux-feature)
-  (when (second (weapon mob-type))
-    (find aux-feature (nth 5 (second (weapon mob-type))))))
+  (get-melee-weapon-aux-param-simple (weapon mob-type) aux-feature))
 
 (defun get-melee-weapon-aux-param-simple (weapon aux-feature)
   (when (second weapon)
     (find aux-feature (nth 5 (second weapon)))))
 
 (defmethod is-weapon-ranged ((mob-type mob-type))
-  (if (third (weapon mob-type))
+  (is-weapon-ranged-simple (weapon mob-type)))
+
+(defun is-weapon-ranged-simple (weapon)
+  (if (third weapon)
     t
     nil))
 
 (defmethod get-ranged-weapon-dmg-type ((mob-type mob-type))
-  (when (third (weapon mob-type))
-    (nth 0 (third (weapon mob-type)))))
+  (get-ranged-weapon-dmg-type-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-dmg-type-simple (weapon)
+  (when (third weapon)
+    (nth 0 (third weapon))))
 
 (defmethod get-ranged-weapon-dmg-min ((mob-type mob-type))
-  (when (third (weapon mob-type))
-    (nth 1 (third (weapon mob-type)))))
+  (get-ranged-weapon-dmg-min-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-dmg-min-simple (weapon)
+  (when (third weapon)
+    (nth 1 (third weapon))))
 
 (defmethod get-ranged-weapon-dmg-max ((mob-type mob-type))
-  (when (third (weapon mob-type))
-    (nth 2 (third (weapon mob-type)))))
+  (get-ranged-weapon-dmg-max-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-dmg-max-simple (weapon)
+  (when (third weapon)
+    (nth 2 (third weapon))))
 
 (defmethod get-ranged-weapon-speed ((mob-type mob-type))
-  (when (third (weapon mob-type))
-    (nth 3 (third (weapon mob-type)))))
+  (get-ranged-weapon-speed-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-speed-simple (weapon)
+  (when (third weapon)
+    (nth 3 (third weapon))))
 
 (defmethod get-ranged-weapon-charges ((mob-type mob-type))
-  (when (third (weapon mob-type))
-    (nth 4 (third (weapon mob-type)))))
+  (get-ranged-weapon-charges-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-charges-simple (weapon)
+  (when (third weapon)
+    (nth 4 (third weapon))))
 
 (defmethod get-ranged-weapon-rof ((mob-type mob-type))
   ;; rate of fire - the number of charges the weapon consumes per shoot 
-  (when (third (weapon mob-type))
-    (nth 5 (third (weapon mob-type)))))
+  (get-ranged-weapon-rof-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-rof-simple (weapon)
+  ;; rate of fire - the number of charges the weapon consumes per shoot 
+  (when (third weapon)
+    (nth 5 (third weapon))))
 
 (defmethod get-ranged-weapon-acc ((mob-type mob-type))
-  (when (third (weapon mob-type))
-    (nth 6 (third (weapon mob-type)))))
+  (get-ranged-weapon-acc-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-acc-simple (weapon)
+  (when (third weapon)
+    (nth 6 (third weapon))))
 
 (defmethod get-ranged-weapon-aux ((mob-type mob-type))
-  (when (third (weapon mob-type))
-    (nth 7 (third (weapon mob-type)))))
+  (get-ranged-weapon-aux-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-aux-simple (weapon)
+  (when (third weapon)
+    (nth 7 (third weapon))))
 
 (defmethod get-ranged-weapon-aux-param ((mob-type mob-type) aux-feature)
-  (when (third (weapon mob-type))
-    (find aux-feature (nth 7 (third (weapon mob-type))))))
+  (get-ranged-weapon-aux-param-simple (weapon mob-type) aux-feature))
+
+(defun get-ranged-weapon-aux-param-simple (weapon aux-feature)
+  (when (third weapon)
+    (find aux-feature (nth 7 (third weapon)))))
 
 (defmethod get-weapon-descr-line ((mob-type mob-type))
   (let ((str (create-string)))
@@ -746,50 +771,49 @@
     (setf (r-acc mob) accuracy)))
 
 (defmethod get-weapon-name ((mob mob))
-  (get-weapon-name (get-mob-type-by-id (mob-type mob))))
+  (get-weapon-name-simple (weapon mob)))
 
 (defmethod is-weapon-melee ((mob mob))
-  (is-weapon-melee (get-mob-type-by-id (mob-type mob))))
+  (is-weapon-melee-simple (weapon mob)))
 
 (defmethod get-melee-weapon-dmg-type ((mob mob))
-  (get-melee-weapon-dmg-type (get-mob-type-by-id (mob-type mob))))
+  (get-melee-weapon-dmg-type-simple (weapon mob)))
 
 (defmethod get-melee-weapon-dmg-min ((mob mob))
-  (get-melee-weapon-dmg-min (get-mob-type-by-id (mob-type mob))))
+  (get-melee-weapon-dmg-min-simple (weapon mob)))
 
 (defmethod get-melee-weapon-dmg-max ((mob mob))
-  (get-melee-weapon-dmg-max (get-mob-type-by-id (mob-type mob))))
+  (get-melee-weapon-dmg-max-simple (weapon mob)))
 
 (defmethod get-melee-weapon-speed ((mob mob))
-  (get-melee-weapon-speed (get-mob-type-by-id (mob-type mob))))
+  (get-melee-weapon-speed-simple (weapon mob)))
 
 (defmethod get-melee-weapon-acc ((mob mob))
-  (get-melee-weapon-acc (get-mob-type-by-id (mob-type mob))))
+  (get-melee-weapon-acc-simple (weapon mob)))
 
 (defmethod get-melee-weapon-aux ((mob mob))
-  (get-melee-weapon-aux (get-mob-type-by-id (mob-type mob))))
+  (get-melee-weapon-aux-simple (weapon mob)))
 
 (defmethod get-melee-weapon-aux-param ((mob mob) aux-feature)
-  (get-melee-weapon-aux-param (get-mob-type-by-id (mob-type mob)) aux-feature))
+  (get-melee-weapon-aux-param-simple (weapon mob) aux-feature))
 
 (defmethod is-weapon-ranged ((mob mob))
-  (is-weapon-ranged (get-mob-type-by-id (mob-type mob))))
+  (is-weapon-ranged-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-dmg-type ((mob mob))
-  (get-ranged-weapon-dmg-type (get-mob-type-by-id (mob-type mob))))
+  (get-ranged-weapon-dmg-type-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-dmg-min ((mob mob))
-  (get-ranged-weapon-dmg-min (get-mob-type-by-id (mob-type mob))))
+  (get-ranged-weapon-dmg-min-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-dmg-max ((mob mob))
-  (get-ranged-weapon-dmg-max (get-mob-type-by-id (mob-type mob))))
+  (get-ranged-weapon-dmg-max-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-speed ((mob mob))
-  (get-ranged-weapon-speed (get-mob-type-by-id (mob-type mob))))
+  (get-ranged-weapon-speed-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-charges ((mob mob))
-  (when (third (weapon mob))
-    (nth 4 (third (weapon mob)))))
+  (get-ranged-weapon-charges-simple (weapon mob)))
 
 (defun set-ranged-weapon-charges (mob value)
   (when (third (weapon mob))
@@ -799,16 +823,16 @@
   (get-ranged-weapon-charges (get-mob-type-by-id (mob-type mob))))
 
 (defmethod get-ranged-weapon-rof ((mob mob))
-  (get-ranged-weapon-rof (get-mob-type-by-id (mob-type mob))))
+  (get-ranged-weapon-rof-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-acc ((mob mob))
-  (get-ranged-weapon-acc (get-mob-type-by-id (mob-type mob))))
+  (get-ranged-weapon-acc-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-aux ((mob mob))
-  (get-ranged-weapon-aux (get-mob-type-by-id (mob-type mob))))
+  (get-ranged-weapon-aux-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-aux-param ((mob mob) aux-feature)
-  (get-ranged-weapon-aux-param (get-mob-type-by-id (mob-type mob)) aux-feature))
+  (get-ranged-weapon-aux-param-simple (weapon mob) aux-feature))
 
 (defmethod get-weapon-descr-line ((mob mob))
   (let ((str (create-string)))

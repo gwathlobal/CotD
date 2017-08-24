@@ -158,6 +158,7 @@
 (defconstant +mob-abil-no-corpse+ 61)
 (defconstant +mob-abil-smite+ 62)
 (defconstant +mob-abil-slow+ 63)
+(defconstant +mob-abil-prayer-wrath+ 64)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -178,6 +179,7 @@
 (defconstant +mob-effect-gravity-pull+ 16)
 (defconstant +mob-effect-flying+ 17)
 (defconstant +mob-effect-slow+ 18)
+(defconstant +mob-effect-holy-touch+ 19)
 
 (defconstant +mob-order-follow+ 0)
 

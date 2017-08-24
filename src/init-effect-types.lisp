@@ -156,3 +156,12 @@
                                                             (declare (ignore effect))
                                                             (decf (cur-speed actor) 50)
                                                             )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-holy-touch+ :name "Holy touch" :color sdl:*white*
+                                             :on-add #'(lambda (effect actor)
+                                                         (setf (param1 effect) (weapon actor))
+                                                         (setf (weapon actor) (list "Holy touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 (list :is-fire)) nil))
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (setf (weapon actor) (param1 effect))
+                                                            )))

@@ -98,7 +98,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-can-be-blessed t :abil-detect-evil t :abil-human t :abil-independent t
-                                       :abil-toggle-light t  :abil-prayer-bless t :abil-open-close-door t :abil-smite t :abil-slow t
+                                       :abil-toggle-light t  :abil-prayer-bless t :abil-open-close-door t :abil-smite t :abil-slow t :abil-prayer-wrath t
                                        :ai-stop t
                              ))
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 

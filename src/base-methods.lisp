@@ -734,8 +734,10 @@
         (logger (format nil "ON-BUMP: ~A [~A] bumped into ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
         
         ;; if they are of the same faction and do not like infighting - do nothing
-        (when (and (= (faction actor) (faction target))
-                   (not (mob-ability-p actor +mob-abil-loves-infighting+)))
+        (when (or (and (= (faction actor) (faction target))
+                       (not (mob-ability-p actor +mob-abil-loves-infighting+)))
+                  (and (get-faction-relation (faction actor) (faction target))
+                       (mob-effect-p actor +mob-effect-holy-touch+)))
           (logger (format nil "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target)))
           (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
           (return-from on-bump t))
