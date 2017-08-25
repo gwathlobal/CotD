@@ -36,6 +36,7 @@
 (defconstant +tod-type-evening+ 18)
 (defconstant +player-faction-thief+ 19)
 (defconstant +player-faction-satanist+ 20)
+(defconstant +player-faction-church+ 21)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -461,13 +462,24 @@
                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                           (map-size mob))
                                                     (get-mob-move-mode mob))
-                       +connect-room-none+))
+                       +connect-room-none+)
+                   (or (not (mob-ability-p mob +mob-abil-demon+))
+                       (and (mob-ability-p mob +mob-abil-demon+)
+                            (loop for feature-id in (feature-id-list (level world))
+                                  for feature = (get-feature-by-id feature-id)
+                                  with result = t
+                                  when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                            (< (get-distance x y (x feature) (y feature)) 15))
+                                    do
+                                       (setf result nil)
+                                       (loop-finish)
+                                  finally (return result)))))
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 
 (defun find-unoccupied-place-inside (world mob)
-  (loop with max-x = (array-dimension (terrain (level *world*)) 0)
-        with max-y = (array-dimension (terrain (level *world*)) 1)
+  (loop with max-x = (array-dimension (terrain (level world)) 0)
+        with max-y = (array-dimension (terrain (level world)) 1)
         for x = (random max-x)
         for y = (random max-y)
         for z = 2
@@ -478,7 +490,18 @@
                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                           (map-size mob))
                                                     (get-mob-move-mode mob))
-                       +connect-room-none+))
+                       +connect-room-none+)
+                   (or (not (mob-ability-p mob +mob-abil-demon+))
+                       (and (mob-ability-p mob +mob-abil-demon+)
+                            (loop for feature-id in (feature-id-list (level world))
+                                  for feature = (get-feature-by-id feature-id)
+                                  with result = t
+                                  when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                            (< (get-distance x y (x feature) (y feature)) 15))
+                                    do
+                                       (setf result nil)
+                                       (loop-finish)
+                                  finally (return result)))))
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 
@@ -503,14 +526,25 @@
                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                           (map-size mob))
                                                     (get-mob-move-mode mob))
-                       +connect-room-none+))
+                       +connect-room-none+)
+                   (or (not (mob-ability-p mob +mob-abil-demon+))
+                       (and (mob-ability-p mob +mob-abil-demon+)
+                            (loop for feature-id in (feature-id-list (level world))
+                                  for feature = (get-feature-by-id feature-id)
+                                  with result = t
+                                  when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                            (< (get-distance x y (x feature) (y feature)) 15))
+                                    do
+                                       (setf result nil)
+                                       (loop-finish)
+                                  finally (return result)))))
         finally (setf (x mob) x (y mob) y (z mob) nz)
                 (add-mob-to-level-list (level world) mob)))
 
-(defun find-player-satanist-start-position (world mob)
+(defun find-player-start-position (world mob feature-type-id)
   (loop for feature-id in (feature-id-list (level world))
         for feature = (get-feature-by-id feature-id)
-        when (= (feature-type feature) +feature-start-satanist-player+)
+        when (= (feature-type feature) feature-type-id)
           do
              (setf (x mob) (x feature) (y mob) (y feature) (z mob) (z feature))
              (add-mob-to-level-list (level world) mob)

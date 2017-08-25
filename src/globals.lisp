@@ -27,9 +27,10 @@
                                        "Pruflas" "Raum" "Rimmon" "Ronove" "Ronwe" "Shax" "Shalbriri" "Sonellion" "Stolas" "Succorbenoth" "Thamuz" "Ukobach" "Uphir" "Uvall" "Valafar" "Vepar" "Verdelet" "Verin" "Xaphan" "Zagan"
                                        "Zepar"))
 
-(defparameter *init-human-names* (list "Ivan" "Dmitry" "Alexey" "Nicolay" "Alexander" "Pyotr" "Pavel" "Vladimir" "Mikhail" "Fyodor" "Gavriil" "Vasiliy" "Denis" "Konstantin" "Sergey" "Vladislav"))
+(defparameter *init-human-names* (list "Afanasiy" "Andrey" "Boris" "Ivan" "Dmitry" "Alexey" "Nicolay" "Alexander" "Pyotr" "Pavel" "Vladimir" "Mikhail" "Fyodor" "Gavriil" "Vasiliy" "Denis" "Konstantin" "Sergey" "Vladislav" "Victor"
+                                       "Vsevolod" "Grigoriy" "Daniil"))
 (defparameter *init-human-surnames* (list "Grekov" "Plotnikov" "Strakhov" "Verkhovenskiy" "Shatov" "Stavrogin" "Kirillov" "Tushin" "Lebyadkin" "Liputin" "Virginskiy" "Lyamshin" "Tolkachenko" "Shigalev" "Karmazinov" "Nechayev"
-                                          "Lebedev" "Rogozhin" "Ivolgin" "Epanchin" "Ferdishchenko" "Totskiy" "Myshkin" "Pavlishchev" "Burdovskiy" "Radomskiy" "Molovtsov" "Terentyev" "Ptitsin"))
+                                          "Lebedev" "Rogozhin" "Ivolgin" "Epanchin" "Ferdishchenko" "Totskiy" "Myshkin" "Pavlishchev" "Burdovskiy" "Radomskiy" "Molovtsov" "Terentyev" "Ptitsin" "Zhadov"))
 
 (defparameter *cur-demon-names* nil)
 (defparameter *cur-angel-names* nil)
@@ -210,6 +211,7 @@
 (defconstant +feature-trait-smoke+ 1)
 (defconstant +feature-trait-no-gravity+ 2)
 (defconstant +feature-trait-fire+ 3)
+(defconstant +feature-trait-remove-on-dungeon-generation+ 4)
 
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
@@ -220,6 +222,8 @@
 (defconstant +feature-fire+ 6)
 (defconstant +feature-start-gold-small+ 7)
 (defconstant +feature-start-gold-big+ 8)
+(defconstant +feature-start-church-player+ 9)
+(defconstant +feature-start-repel-demons+ 10)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

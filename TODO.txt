@@ -1,7 +1,7 @@
+- Movement on tiles with mobs should cost more
 - Add courtyard houses like Thief2RL
 - Add shadow imps faction
 - Add the Manyfaced Outsider faction
-- Add the Inquisition faction
 - Add the Revolutionaries faction
 - Add a Thief/Spy campaign
 - Move display code to a separate entity (separate thread maybe?) so that you could have some basic movement animation going on (0,5 sec). This will alleviate the performance problem (the game will be still calculating AI while the player movement animation is played) and will generally look good.

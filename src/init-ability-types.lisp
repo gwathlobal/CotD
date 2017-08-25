@@ -492,7 +492,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-prayer-bless+ :name "Pray for righteousness" :descr "Pray to reveal unholy creatures (1/3rd chance only) and burn them for 1-2 dmg, as well as to grant divine protection (1/3rd chance only) to all humans in the area also causing them to follow you. Divine protection prevents one harmful action from affecting the shielded target." 
+                                 :id +mob-abil-prayer-bless+ :name "Pray for righteousness" :descr "Pray to reveal unholy creatures (1/3rd chance only) and burn them for 1-2 dmg, as well as to grant divine protection (1/3rd chance only) to all humans & angels in the area also causing them to follow you. Divine protection prevents one harmful action from affecting the shielded target." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 20
@@ -537,7 +537,8 @@
                                                     
                                                     ;; collect all allies in sight
                                                     (setf ally-list (loop for ally-mob-id in (visible-mobs actor)
-                                                                          when (mob-ability-p (get-mob-by-id ally-mob-id) +mob-abil-human+)
+                                                                          when (or (mob-ability-p (get-mob-by-id ally-mob-id) +mob-abil-human+)
+                                                                                   (mob-ability-p (get-mob-by-id ally-mob-id) +mob-abil-angel+))
                                                                             collect ally-mob-id))
                                                     ;; do not forget self
                                                     (pushnew (id actor) ally-list)
@@ -925,7 +926,7 @@
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (declare (ignore ability-type nearest-ally))
                                                   ;; cast blindness when your power is less than the power of enemies around you
                                                   ;; or you have <= than 25% of max hp
                                                   (if (and (mob-ability-p actor +mob-abil-blindness+)
@@ -934,10 +935,12 @@
                                                                              for mob = (get-mob-by-id mob-id)
                                                                              when (not (mob-effect-p mob +mob-effect-blind+))
                                                                                count mob-id)))
-                                                           (or (<= (cur-hp actor) (truncate (max-hp actor) 4))
+                                                           (or (and (<= (cur-hp actor) (truncate (max-hp actor) 4))
+                                                                    nearest-enemy
+                                                                    (get-faction-relation (faction actor) (get-visible-faction nearest-enemy)))
                                                                (< (strength actor) (loop for mob-id in (visible-mobs actor)
                                                                                          for mob = (get-mob-by-id mob-id)
-                                                                                         when (not (get-faction-relation (faction actor) (faction mob)))
+                                                                                         when (not (get-faction-relation (faction actor) (get-visible-faction mob)))
                                                                                            sum (strength mob)))))
                                                     t
                                                     nil))
@@ -1456,21 +1459,26 @@
                                                 (logger (format nil "MOB-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (let ((cur-dmg))
-                                                  (setf cur-dmg (+ 2 (random 3)))
-                                                  (decf (cur-hp target) cur-dmg)
-                                                                                                    
-                                                  (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                         (format nil "~A burns the mind of ~A for ~A damage. " (capitalize-name (visible-name actor)) (visible-name target)  cur-dmg))
-                                                  (when (check-dead target)
-                                                    (make-dead target :splatter nil :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
-                                                    (when (mob-effect-p target +mob-effect-possessed+)
-                                                      (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
-                                                      (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
-                                                            (y (get-mob-by-id (slave-mob-id target))) (y target)
-                                                            (z (get-mob-by-id (slave-mob-id target))) (z target))
-                                                      (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))
+                                                  (if (mob-effect-p target +mob-effect-divine-shield+)
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                             (format nil "~A invokes mind burn on ~A, but ~A takes no harm. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))
+                                                      (rem-mob-effect target +mob-effect-divine-shield+))
+                                                    (progn
+                                                      (setf cur-dmg (+ 2 (random 3)))
+                                                      (decf (cur-hp target) cur-dmg)
+                                                      
+                                                      (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                             (format nil "~A burns the mind of ~A for ~A damage. " (capitalize-name (visible-name actor)) (visible-name target)  cur-dmg))
+                                                      (when (check-dead target)
+                                                        (make-dead target :splatter nil :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
+                                                        (when (mob-effect-p target +mob-effect-possessed+)
+                                                          (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+                                                          (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
+                                                                (y (get-mob-by-id (slave-mob-id target))) (y target)
+                                                                (z (get-mob-by-id (slave-mob-id target))) (z target))
+                                                          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))
                                                     )
-    
                                                   )
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -2446,17 +2454,24 @@
                                  :motion 60
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (let ((cur-dmg (+ 2 (random 3))))
-                                                  (set-mob-effect target :effect-type-id +mob-effect-gravity-pull+ :actor-id (id actor) :cd 3)
-                                                  (decf (cur-hp target) cur-dmg)
-                                                  (generate-sound actor (x target) (y target) (z target) 80 #'(lambda (str)
-                                                                                                                (format nil "You hear metal clanking~A. " str)))
+                                                  (if (mob-effect-p target +mob-effect-divine-shield+)
+                                                    (progn
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                             (format nil "~A invokes gravity chains on ~A, but ~A takes no harm. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))
+                                                      (rem-mob-effect target +mob-effect-divine-shield+))
+                                                    (progn
+                                                      (set-mob-effect target :effect-type-id +mob-effect-gravity-pull+ :actor-id (id actor) :cd 3)
+                                                      (decf (cur-hp target) cur-dmg)
+                                                      (generate-sound actor (x target) (y target) (z target) 80 #'(lambda (str)
+                                                                                                                    (format nil "You hear metal clanking~A. " str)))
+                                                      
+                                                      (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                             (format nil "~A invokes gravity chains on ~A to inflict ~A dmg. " (capitalize-name (visible-name actor)) (visible-name target) cur-dmg))
+                                                      (rem-mob-effect target +mob-effect-climbing-mode+)
+                                                      (rem-mob-effect target +mob-effect-flying+)
+                                                      (when (apply-gravity target)
+                                                        (set-mob-location target (x target) (y target) (z target)))))
                                                   
-                                                  (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                         (format nil "~A invokes gravity chains on ~A to inflict ~A dmg. " (capitalize-name (visible-name actor)) (visible-name target) cur-dmg))
-                                                  (rem-mob-effect target +mob-effect-climbing-mode+)
-                                                  (rem-mob-effect target +mob-effect-flying+)
-                                                  (when (apply-gravity target)
-                                                    (set-mob-location target (x target) (y target) (z target)))
                                                   (decf (cur-fp actor) (cost ability-type))
                                                   )
                                                 )
@@ -2527,10 +2542,12 @@
                                                                            (format nil "~A smites ~A" (capitalize-name (visible-name actor)) (visible-name target)))
 
                                                     (when (mob-effect-p target +mob-effect-possessed+)
+                                                      (unless (mob-effect-p target +mob-effect-reveal-true-form+)
+                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                               (format nil " and reveals it to be ~A" (get-qualified-name target))))
                                                       (setf (face-mob-type-id target) (mob-type target))
                                                       (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
-                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                             (format nil " and reveals it to be ~A" (get-qualified-name target))))
+                                                      )
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil ". "))
                                                     (loop for mob-id in (append (list (id actor)) (visible-mobs actor))

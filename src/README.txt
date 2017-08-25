@@ -64,6 +64,12 @@ CITIZENS OF THE CITY
  - But beware of the military that will arrive later in the battle.
 
 --------------------
+THE CHURCH
+
+ - Priests start in the church and are able to gain followers, grant divine protection, smite demons from afar and slow them.
+ - To win, kill all demons.
+
+--------------------
 THE MILITARY
 
  - The military is allied with the citizens of the City but opposes both angels and demons.

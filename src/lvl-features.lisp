@@ -15,6 +15,7 @@
    ;; :trait-smoke - +feature-trait-smoke+
    ;; :trait-no-gravity - +feature-trait-no-gravity+
    ;; :trait-fire - +feature-trait-fire+
+   ;; :trait-remove-on-dungeon-generation - +feature-trait-remove-on-dungeon-generation+
    (can-merge-func :initform #'(lambda (level feature-new)
                                  (let ((result nil))
                                    (loop for feat-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
@@ -48,7 +49,7 @@
     (adjust-array *feature-types* (list (1+ (id feature-type)))))
   (setf (aref *feature-types* (id feature-type)) feature-type))
 
-(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke trait-no-gravity trait-fire)
+(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke trait-no-gravity trait-fire trait-remove-on-dungeon-generation)
   
   (when trait-blocks-vision
     (setf (gethash +feature-trait-blocks-vision+ (trait feature-type)) trait-blocks-vision))
@@ -58,6 +59,8 @@
     (setf (gethash +feature-trait-no-gravity+ (trait feature-type)) trait-no-gravity))
   (when trait-fire
     (setf (gethash +feature-trait-fire+ (trait feature-type)) trait-fire))
+  (when trait-remove-on-dungeon-generation
+    (setf (gethash +feature-trait-remove-on-dungeon-generation+ (trait feature-type)) trait-remove-on-dungeon-generation))
   )
 
 ;;--------------------

@@ -921,7 +921,8 @@
           (setf *cur-demon-names* (remove (nth name-pick-n *cur-demon-names*) *cur-demon-names*))))
       ))
   (when (and (not (eq mob *player*))
-             (eq (mob-type mob) +mob-type-satanist+))
+             (or (eq (mob-type mob) +mob-type-satanist+)
+                 (eq (mob-type mob) +mob-type-priest+)))
     (let ((name-pick-n)
           (surname-pick-n))
       (unless *cur-human-names*

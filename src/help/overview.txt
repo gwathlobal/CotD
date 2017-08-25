@@ -35,7 +35,14 @@ OUTSIDER BEASTS
  
 CITIZENS OF THE CITY
  - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.
- - Priests will preach to smite their foes or grant allies divine shield. Smiting applies minor damage to all enemies in sight, while divine shield gives a one-time protection from any harm.
+
+THE CHURCH
+ - Priests have an array of divine abilities. They are able to grant divine shield to allies, scorch and reveal true form of all enemies in sight, slow and smite enemies. Divine shield gives a one-time protection from any harm.
+ - Whenever a priest gives humans divine shield, they will start to follow the preacher.
+ - Smiting damage increases with the number of humans the priest sees.
+ - Priests can also give fire-based melee attacks to themselves and their followers by praying for wrath.
+ - Priests start in the church.
+ - Their goal is to destroy all demons. 
  
 THE MILITARY 
  - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
