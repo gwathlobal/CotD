@@ -136,6 +136,8 @@
           for vision-pwr = light-radius
           for vision-power = light-radius
           do
+             (when (and (= tx 40) (= ty 14) (= tz 2))
+               (format t "HERE!~%"))
              (when (and (not (zerop light-radius))
                         (< (get-distance-3d x y z tx ty tz) light-radius))
                (line-of-sight x y z tx ty tz
@@ -266,7 +268,8 @@
                                   exit-result))))
            ;; set up mob brightness
            (when (and (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (cur-light tmob))
-                      (not (eq mob tmob)))
+                      ;(not (eq mob tmob))
+                      )
              (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
@@ -307,9 +310,7 @@
   (when (eq mob *player*)
     (calc-lit-tiles-for-player *player*))
   
-  (when (> (get-single-memo-light (get-memo-* (level *world*) (x mob) (y mob) (z mob)))
-           (brightness mob))
-    (setf (brightness mob) (get-single-memo-light (get-memo-* (level *world*) (x mob) (y mob) (z mob)))))
+  (incf (brightness mob) (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob)))
   
   (setf (visible-mobs mob) (append (proper-visible-mobs mob) (shared-visible-mobs mob)))
   (setf (visible-mobs mob) (remove-duplicates (visible-mobs mob))))

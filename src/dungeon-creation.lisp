@@ -145,7 +145,7 @@
       (when (= tod-id +tod-type-night+)
         (setf hour 0))
       (when (= tod-id +tod-type-morning+)
-        (setf hour 8))
+        (setf hour 7))
       (when (= tod-id +tod-type-evening+)
         (setf hour 19))
       (setf (player-game-time world) (set-current-date-time year month day hour min sec)))

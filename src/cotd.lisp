@@ -34,7 +34,7 @@
                  (setf (heard-sounds mob) nil)
                  
                  (when (eq mob *player*)
-                   (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*) :no-z t)
+                   (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                    (update-map-area))
                  (update-visible-mobs mob)
                  

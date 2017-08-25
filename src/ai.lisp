@@ -670,21 +670,6 @@
         (logger (format nil "AI-FUNCTION: Mob's destination is randomly set to (~A, ~A, ~A)~%" (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
     
     ;; calculate path to the destination
-    ;(cond
-    ;  ((mob-ai-simple-pathfinding-p mob)
-    ;   (progn
-    ;     (when (path-dst mob)
-    ;      (when (and (/= (z mob) (third (path-dst mob)))
-    ;                  (mob-effect-p mob +mob-effect-flying+))
-    ;         (if (> (z mob) (third (path-dst mob)))
-    ;           (progn
-    ;             (when (check-move-on-level mob (x mob) (y mob) (1- (z mob)))
-    ;               ))
-    ;           (progn)))
-    ;       (general-direction-dir (x mob) (y mob) (first (path-dst mob)) (second (path-dst mob))))))
-    ;  (t
-    ;   (progn
-    ;     )))
     (when (and (path-dst mob)
                (not (mob-ai-simple-pathfinding-p mob))
                (or (null (path mob))
@@ -702,7 +687,16 @@
                                    )
                                #'(lambda (dx dy dz)
                                    ;; a magic hack here - as values of more than 10 give an unexplainable slowdown
+                                   (format t "(~A ~A ~A) c=~A " dx dy dz (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
+                                                                            (if (get-mob-* (level *world*) dx dy dz)
+                                                                              2
+                                                                              1)
+                                                                            (move-spd (get-mob-type-by-id (mob-type mob)))
+                                                                            1/10))
                                    (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
+                                      (if (get-mob-* (level *world*) dx dy dz)
+                                        2
+                                        1)
                                       (move-spd (get-mob-type-by-id (mob-type mob)))
                                       1/10))))
                     

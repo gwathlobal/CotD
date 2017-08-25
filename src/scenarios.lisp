@@ -457,6 +457,7 @@
         for z = 2
         until (and (not (and (> x 7) (< x (- max-x 7)) (> y 7) (< y (- max-y 7))))
                    (eq (check-move-on-level mob x y z) t)
+                   (not (get-mob-* (level world) x y z))
                    (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
                    (/= (get-level-connect-map-value (level world) x y z (if (riding-mob-id mob)
                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
@@ -485,6 +486,7 @@
         for z = 2
         until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
                    (eq (check-move-on-level mob x y z) t)
+                   (not (get-mob-* (level world) x y z))
                    (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
                    (/= (get-level-connect-map-value (level world) x y z (if (riding-mob-id mob)
                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
@@ -521,6 +523,7 @@
                    (get-terrain-type-trait (get-terrain-* (level world) x y nz) +terrain-trait-opaque-floor+)
                    nz
                    (> nz 2)
+                   (not (get-mob-* (level world) x y nz))
                    (eq (check-move-on-level mob x y nz) t)
                    (/= (get-level-connect-map-value (level world) x y nz (if (riding-mob-id mob)
                                                                           (map-size (get-mob-by-id (riding-mob-id mob)))
