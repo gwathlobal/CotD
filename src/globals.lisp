@@ -75,6 +75,7 @@
 (defconstant +mob-type-reanimated-pwr-4+ 27)
 (defconstant +mob-type-reanimated-empowered+ 28)
 (defconstant +mob-type-wisp+ 29)
+(defconstant +mob-type-shadow-imp+ 30)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -160,6 +161,7 @@
 (defconstant +mob-abil-smite+ 62)
 (defconstant +mob-abil-slow+ 63)
 (defconstant +mob-abil-prayer-wrath+ 64)
+(defconstant +mob-abil-shadow-step+ 65)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

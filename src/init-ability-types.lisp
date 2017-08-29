@@ -2708,3 +2708,78 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-shadow-step+ :name "Shadow step" :descr "Dissolve into shadows and reform yourself at a destination tile. Can only be usable if both your origin tile and your destination tile are not lit." 
+                                 :cd 10 :cost 0 :spd (truncate (* +normal-ap+ 0.8)) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 30
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target here is list of (x y z) coordinates for the destination tile
+                                                (multiple-value-bind (x y z) (values-list target)
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A steps into the shadows and disappears. " (capitalize-name (visible-name actor)))
+                                                                         :observed-mob actor)
+                                                  (set-mob-location actor x y z :apply-gravity t)
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A steps out of the shadows. " (capitalize-name (visible-name actor)))
+                                                                         :observed-mob actor)
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-shadow-step+)
+                                                               (< (brightness actor) *mob-visibility-threshold*))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-shadow-step+)
+                                                             (can-invoke-ability actor actor +mob-abil-shadow-step+)
+                                                             nearest-enemy
+                                                             (or
+                                                              ;; offensive shadow step
+                                                              (and (> (/ (cur-hp actor) (max-hp actor)) 
+                                                                      0.7)
+                                                                   (> (strength actor) (strength nearest-enemy))
+                                                                   (progn (let ((free-tile-around nil))
+                                                                            (check-surroundings (x nearest-enemy) (y nearest-enemy) nil
+                                                                                                #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z nearest-enemy))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                 (not (get-mob-* (level *world*) dx dy (z nearest-enemy)))
+                                                                                                                 (< (calculate-single-tile-brightness (level *world*) dx dy (z nearest-enemy)) *mob-visibility-threshold*))
+                                                                                                        (setf free-tile-around (list dx dy (z nearest-enemy)))))))
+                                                                            free-tile-around)))
+                                                              )
+                                                             )
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (let ((free-tile-around nil))
+                                                    (check-surroundings (x nearest-enemy) (y nearest-enemy) nil
+                                                                        #'(lambda (dx dy)
+                                                                            (let ((terrain (get-terrain-* (level *world*) dx dy (z nearest-enemy))))
+                                                                              (when (and terrain
+                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                         (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                         (not (get-mob-* (level *world*) dx dy (z nearest-enemy)))
+                                                                                         (< (calculate-single-tile-brightness (level *world*) dx dy (z nearest-enemy)) *mob-visibility-threshold*))
+                                                                                (setf free-tile-around (list dx dy (z nearest-enemy)))))))
+                                                    (mob-invoke-ability actor free-tile-around (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                 (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (< (calculate-single-tile-brightness (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) *mob-visibility-threshold*)
+                                                                 )
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

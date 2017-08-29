@@ -98,6 +98,7 @@
    ;;   :abil-smite - +mob-abil-smite+
    ;;   :abil-slow - +mob-abil-slow+
    ;;   :abil-prayer-wrath - +mob-abil-prayer-wrath+
+   ;;   :abil-shadow-step - +mob-abil-shadow-step+
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -128,7 +129,7 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath)
+                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -283,6 +284,8 @@
     (setf (gethash +mob-abil-slow+ (abilities mob-type)) t))
   (when abil-prayer-wrath
     (setf (gethash +mob-abil-prayer-wrath+ (abilities mob-type)) t))
+  (when abil-shadow-step
+    (setf (gethash +mob-abil-shadow-step+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

@@ -85,26 +85,19 @@
     
     t))
 
-(defun calc-lit-tiles-for-player (mob)
-  (logger (format nil "CALC-LIT-TILES: ~A [~A]~%" (name mob) (id mob)))
-
-  (dotimes (x1 (array-dimension (memo (level *world*)) 0))
-    (dotimes (y1 (array-dimension (memo (level *world*)) 1))
-      (dotimes (z1 (array-dimension (memo (level *world*)) 2))
-        (set-single-memo-* (level *world*) x1 y1 z1 :light 0)
-        )))
-    
-  (loop for (tx ty tz) in (visible-tile-list mob) do
-    
-    ;; check through all the mobs
-    (loop for mob-id in (nearby-light-mobs mob)
+(defun calculate-single-tile-brightness (level x y z &key (calc-for-player nil))
+  (let ((brightness 0)) 
+    ;; iterate through all mobs
+    (loop for mob-id in (if calc-for-player
+                          (nearby-light-mobs *player*)
+                          (mob-id-list level))
           for tmob = (get-mob-by-id mob-id)
           for light-power = (* *light-power-faloff* (cur-light tmob))
           for vision-pwr = (cur-light tmob)
           for vision-power = (cur-light tmob)
           do
-            (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) tx ty tz) (cur-light tmob))
-               (line-of-sight (x tmob) (y tmob) (z tmob) tx ty tz
+            (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) x y z) (cur-light tmob))
+               (line-of-sight (x tmob) (y tmob) (z tmob) x y z
                               #'(lambda (dx dy dz prev-cell)
                                   (declare (type fixnum dx dy dz))
                                   (let* ((exit-result t) (pwr-decrease 0)) 
@@ -118,8 +111,11 @@
                                       (decf vision-pwr)
                                       
                                       ;; insert set light function here
-                                      (when (> light-power (get-single-memo-light (get-memo-* (level *world*) dx dy dz)))
-                                        (set-single-memo-* (level *world*) dx dy dz :light light-power))
+                                      (when (and (= x dx) (= y dy) (= z dz)
+                                                 (> light-power brightness))
+                                        (setf brightness light-power)
+                                        (setf exit-result 'exit)
+                                        (return))
                                       
                                       (decf light-power *light-power-faloff*)
 
@@ -128,19 +124,19 @@
                                         (return)))
                                     
                                     exit-result))))
-          )
+        )
 
-    ;; check through all stationary light sources
-    (loop for (x y z light-radius) in (nearby-light-sources mob)
+    ;; iterate through all stationary sources
+    (loop for (tx ty tz light-radius) in (if calc-for-player
+                                        (nearby-light-sources *player*)
+                                        (coerce (light-sources level) 'list))
           for light-power = (* *light-power-faloff* light-radius)
           for vision-pwr = light-radius
           for vision-power = light-radius
           do
-             (when (and (= tx 40) (= ty 14) (= tz 2))
-               (format t "HERE!~%"))
              (when (and (not (zerop light-radius))
-                        (< (get-distance-3d x y z tx ty tz) light-radius))
-               (line-of-sight x y z tx ty tz
+                        (< (get-distance-3d tx ty tz x y z) light-radius))
+               (line-of-sight tx ty tz x y z
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
                                 
@@ -155,8 +151,11 @@
                                     (decf vision-pwr)
 
                                     ;; insert set light func here
-                                    (when (> light-power (get-single-memo-light (get-memo-* (level *world*) dx dy dz)))
-                                        (set-single-memo-* (level *world*) dx dy dz :light light-power))
+                                    (when (and (= x dx) (= y dy) (= z dz)
+                                               (> light-power brightness))
+                                        (setf brightness light-power)
+                                        (setf exit-result 'exit)
+                                        (return))
                                     
                                     (decf light-power *light-power-faloff*)
 
@@ -165,6 +164,26 @@
                                       (return)))
                                     
                                   exit-result)))))
+    ;; increase brigtness by outdoor brightness
+    (incf brightness (get-outdoor-light-* level x y z))
+    brightness
+    ))
+
+(defun calc-lit-tiles-for-player (mob)
+  (logger (format nil "CALC-LIT-TILES: ~A [~A]~%" (name mob) (id mob)))
+
+  (dotimes (x1 (array-dimension (memo (level *world*)) 0))
+    (dotimes (y1 (array-dimension (memo (level *world*)) 1))
+      (dotimes (z1 (array-dimension (memo (level *world*)) 2))
+        (set-single-memo-* (level *world*) x1 y1 z1 :light 0)
+        )))
+    
+  (loop for (tx ty tz) in (visible-tile-list mob)
+        for brightness = (- (calculate-single-tile-brightness (level *world*) tx ty tz :calc-for-player t)
+                            (get-outdoor-light-* (level *world*) tx ty tz))
+        do
+           (when (> brightness (get-single-memo-light (get-memo-* (level *world*) tx ty tz)))
+             (set-single-memo-* (level *world*) tx ty tz :light brightness))
         ))
 
 (defun update-visible-mobs-normal (mob)

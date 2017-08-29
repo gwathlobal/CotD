@@ -72,7 +72,9 @@
                                                              )
                                                              
                           "")
-                        (get-mob-visibility *player*)
+                        (format nil "~A~A" (get-mob-visibility *player*) (if (> (brightness *player*) *mob-visibility-threshold*)
+                                                                           " (lit)"
+                                                                           ""))
                         (if *cotd-release* "" (format nil " (B: ~A)" (brightness *player*)))
                       ))
       (setf str-lines (write-text  str a-rect :color sdl:*white*)))

@@ -687,16 +687,7 @@
                                    )
                                #'(lambda (dx dy dz)
                                    ;; a magic hack here - as values of more than 10 give an unexplainable slowdown
-                                   (format t "(~A ~A ~A) c=~A " dx dy dz (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
-                                                                            (if (get-mob-* (level *world*) dx dy dz)
-                                                                              2
-                                                                              1)
-                                                                            (move-spd (get-mob-type-by-id (mob-type mob)))
-                                                                            1/10))
                                    (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
-                                      (if (get-mob-* (level *world*) dx dy dz)
-                                        2
-                                        1)
                                       (move-spd (get-mob-type-by-id (mob-type mob)))
                                       1/10))))
                     

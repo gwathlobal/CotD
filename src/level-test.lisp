@@ -133,10 +133,10 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 38 :y 13 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-shadow-imp+ :x 38 :y 13 :z 0))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-imp+ :x 43 :y 18 :z 1))
-        (demon (make-instance 'mob :mob-type +mob-type-imp+ :x 42 :y 15 :z 0))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-shadow-imp+ :x 43 :y 18 :z 1))
+        (demon (make-instance 'mob :mob-type +mob-type-shadow-imp+ :x 42 :y 15 :z 0))
         )
     (setf (cur-fp *player*) 22)
     

@@ -4,6 +4,10 @@
 ;; MOB-TEMPLATE Declarations
 ;;-------------------- 
 
+;;--------------------
+;; CITIZENS
+;;--------------------
+
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-player+ 
                                        :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 20 :max-fp 0
                                        :faction +faction-type-humans+
@@ -90,17 +94,26 @@
                                        :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
                              ))
 
+;;--------------------
+;; CHURCH
+;;--------------------
+
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-priest+ 
                                        :name "priest"
                                        :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-humans+
                                        :weapon (list "Cross" (list +weapon-dmg-iron+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 20
-                                       :strength 0
+                                       :strength 1
                                        :base-light-radius 6
                                        :abil-can-be-blessed t :abil-detect-evil t :abil-human t :abil-independent t
                                        :abil-toggle-light t  :abil-prayer-bless t :abil-open-close-door t :abil-smite t :abil-slow t :abil-prayer-wrath t
                                        :ai-stop t
                              ))
+
+;;--------------------
+;; SATANISTS
+;;--------------------
+
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 
                                        :name "satanist"
                                        :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 0
@@ -113,6 +126,9 @@
                                        :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t
                              ))
 
+;;--------------------
+;; CRIMINALS
+;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-thief+ 
                                        :name "thief"
@@ -126,6 +142,9 @@
                                        :init-items (list (list +item-type-smoke-bomb+ 3))
                              ))
 
+;;--------------------
+;; MILITARY
+;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-soldier+ 
                                        :name "soldier"
@@ -187,6 +206,9 @@
                                        :init-items (list (list +item-type-medkit+ 3))
                              ))
 
+;;--------------------
+;; ANGELS
+;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
                                        :name "Chrome Angel"
@@ -212,6 +234,9 @@
                                        :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t
                                        :ai-wants-bless t :ai-curious t))
 
+;;--------------------
+;; DEMONS
+;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-imp+
                                        :name "imp"
@@ -251,6 +276,24 @@
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-gravity-chains t
                                        :ai-curious t))
+
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-imp+
+                                       :name "shadow imp"
+                                       :glyph-idx 73 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 12 :max-fp 5
+                                       :faction +faction-type-demons+
+                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 5 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.9))
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
+                                       :strength 1
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t
+                                       :ai-horde t :ai-curious t))
+
+;;--------------------
+;; UNDEAD
+;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-1+
                                        :name "reanimated body"
@@ -307,6 +350,9 @@
                                        :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
                                        ))
 
+;;--------------------
+;; BEASTS
+;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-horse+ 
                                        :name "horse"
