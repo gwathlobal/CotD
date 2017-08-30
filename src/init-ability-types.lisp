@@ -2717,6 +2717,8 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the destination tile
+                                                (logger (format nil "MOB-SHADOW-STEP: ~A [~A] shadow steps to ~A~%" (name actor) (id actor) target))
+                                                
                                                 (multiple-value-bind (x y z) (values-list target)
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A steps into the shadows and disappears. " (capitalize-name (visible-name actor)))
                                                                          :observed-mob actor)
@@ -2776,6 +2778,73 @@
                                                                  (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  (< (calculate-single-tile-brightness (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) *mob-visibility-threshold*)
                                                                  )
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-extinguish-light+ :name "Extinguish light" :descr "Pronounce an incantation to reduce a character's light radius to 0 for 4 turns or to switch off a stationary light source at range." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 30
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                ;; target here is list of (x y z) coordinates for the tile to be toggled
+
+                                                (logger (format nil "MOB-EXTINGUISH-LIGHT: ~A [~A] extinguishes light at ~A~%" (name actor) (id actor) target))
+                                                
+                                                (multiple-value-bind (x y z) (values-list target)
+                                                  (if (get-mob-* (level *world*) x y z)
+                                                    (progn
+                                                      (setf target (get-mob-* (level *world*) x y z))
+                                                      (logger (format nil "MOB-EXTINGUISH-LIGHT: ~A [~A] extinguishes light of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+                                                      
+                                                      (set-mob-effect target :effect-type-id +mob-effect-extinguished-light+ :actor-id (id actor) :cd 4)
+
+                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                             (format nil "~A intones an incantation and darkness falls onto ~A. " (capitalize-name (visible-name actor)) (visible-name target))
+                                                                             :observed-mob actor))
+                                                    (progn
+                                                      (when (and (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-light-source+)
+                                                                 (> (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-light-source+) 0)
+                                                                 (get-terrain-on-use (get-terrain-* (level *world*) x y z)))
+                                                        (funcall (get-terrain-on-use (get-terrain-* (level *world*) x y z)) actor x y z)
+                                                        (print-visible-message x y z (level *world*) (format nil "~A intones an incantation and the light switches off. " (capitalize-name (visible-name actor)))
+                                                                               :observed-mob actor))
+                                                      )
+                                                    ))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear somebody chanting~A." str)))
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-extinguish-light+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-extinguish-light+)
+                                                             (can-invoke-ability actor actor +mob-abil-extinguish-light+)
+                                                             nearest-enemy
+                                                             (not (zerop (cur-light nearest-enemy)))
+                                                             (< (get-outdoor-light-* (level *world*) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) *mob-visibility-threshold*))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor (list (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) (id ability-type))
+                                                   )
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (or (and (get-terrain-type-trait terrain +terrain-trait-light-source+)
+                                                                          (not (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+))))
+                                                                     (and (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
+                                                                          (not (zerop (cur-light (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))))))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)

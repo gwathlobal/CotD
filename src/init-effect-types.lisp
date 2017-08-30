@@ -165,3 +165,13 @@
                                              :on-remove #'(lambda (effect actor)
                                                             (setf (weapon actor) (param1 effect))
                                                             )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-extinguished-light+ :name "Extinguished light" :color (sdl:color :r 100 :g 100 :b 100)
+                                             :on-add #'(lambda (effect actor)
+                                                         (setf (param1 effect) (cur-light actor))
+                                                         (setf (cur-light actor) 0)
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (setf (cur-light actor) (param1 effect))
+                                                            (update-visible-mobs actor)
+                                                            )))

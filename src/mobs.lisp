@@ -32,73 +32,14 @@
    ;;   :ai-simple-pathfinding - mob will not use Astar pathfinding and will move in the general direction towards the target
       
    (abilities :initform (make-hash-table) :accessor abilities)
-   ;; The following keys may be used in make-instance
-   ;;   :abil-heal-self - +mob-abil-heal-self+ (takes fixnum)
+   ;; The pattern of naming keys that may be used in make-instance is like <name of mob ability constant> minus the 'mob-' part
+   ;; For example,
    ;;   :abil-conceal-divine - +mob-abil-conceal-divine+
-   ;;   :abil-reveal-divine - +mob-abil-reveal-divine+
-   ;;   :abil-detect-good - +mob-abil-detect-evil+
-   ;;   :abil-detect-evil - +mob-abil-detect-evil+
+   ;; Usually the key takes a boolean parameter with the exception of the following cases
+   ;;   :abil-heal-self - +mob-abil-heal-self+ (takes fixnum)
    ;;   :abil-can-possess - +mob-abil-can-possess+ (takes fixnum)
-   ;;   :abil-possessable - +mob-abil-possessable+
-   ;;   :abil-purging-touch - +mob-abil-purging-touch+
-   ;;   :abil-blessing-touch - +mob-abil-blessing-touch+
-   ;;   :abil-can-be-blessed - +mob-abil-can-be-blessed+
-   ;;   :abil-unholy - +mob-abil-unholy+
-   ;;   :abil-detect-evil - +mob-abil-detect-evil+
-   ;;   :abil-human - +mob-abil-human+
-   ;;   :abil-demon - +mob-abil-demon+
-   ;;   :abil-angel - +mob-abil-angel+
-   ;;   :abil-see-all - +mob-abil-see-all+
-   ;;   :abil-lifesteal - +mob-abil-lifesteal+
-   ;;   :abil-call-for-help - +mob-abil-call-for-help+
-   ;;   :abil-answer-the-call - +mob-abil-answer-the-call+
-   ;;   :abil-loves-infighting - +mob-abil-loves-infighting+
-   ;;   :abil-prayer-bless - +mob-abil-prayer-bless+
-   ;;   :abil-free-call - +mob-abil-free-call+
-   ;;   :abil-prayer-shield - +mob-abil-prayer-shield+
-   ;;   :abil-curse - +mob-abil-curse+
-   ;;   :abil-keen-senses - +mob-abil-keen-senses+
-   ;;   :abil-prayer-reveal - +mob-abil-prayer-reveal+
-   ;;   :abil-military-follow-me - +mob-abil-military-follow-me+
-   ;;   :abil-blindness - +mob-abil-blindness+
-   ;;   :abil-instill-fear - +mob-abil-instill-fear+
-   ;;   :abil-charge - +mob-abil-charge+
    ;;   :abil-momentum - +mob-abil-momentum+ (takes fixnum)
-   ;;   :abil-animal - +mob-abil-animal+
-   ;;   :abil-horseback-riding - +mob-abil-horseback-riding+
-   ;;   :abil-horse-can-be-ridden - +mob-abil-horse-can-be-ridden+
-   ;;   :abil-dismount - +mob-abil-dismount+
-   ;;   :abil-dominate-fiend - +mob-abil-dominate-fiend+
-   ;;   :abil-fiend-can-be-ridden - +mob-abil-fiend-can-be-ridden+
-   ;;   :abil-starts-with-horse - +mob-abil-starts-with-horse+
-   ;;   :abil-independent - +mob-abil-independent+
-   ;;   :abil-eagle-eye - +mob-abil-eagle-eye+
-   ;;   :abil-facing - +mob-abil-facing+
-   ;;   :abil-immovable - +mob-abil-immovable+
-   ;;   :abil-mind-burn - +mob-abil-mind-burn+
-   ;;   :abil-gargantaur-teleport - +mob-abil-gargantaur-teleport+
-   ;;   :abil-dominate-gargantaur - +mob-abil-dominate-gargantaur+
-   ;;   :abil-gargantaurs-mind-burn - +mob-abil-gargantaurs-mind-burn+
-   ;;   :abil-death-from-above - +mob-abil-death-from-above+
-   ;;   :abil-climbing - +mob-abil-climbing+
-   ;;   :abil-no-breath - +mob-abil-no-breathe+
-   ;;   :abil-open-close-door - +mob-abil-open-close-door+
-   ;;   :abil-toggle-light - +mob-abil-toggle-light+
-   ;;   :abil-open-close-window - +mob-abil-open-close-window+
-   ;;   :abil-can-possess-toggle - +mob-abil-can-possess-toggle+
-   ;;   :abil-sacrifice-host - +mob-abil-sacrifice-host+
-   ;;   :abil-reanimate-corpse - +mob-abil-reanimate-corpse+
-   ;;   :abil-undead - +mob-abil-undead+
-   ;;   :abil-shared-minds - +mob-abil-shared-minds+
-   ;;   :abil-ignite-the-fire - +mob-abil-ignite-the-fire+
-   ;;   :abil-avatar-of-brilliance - +mob-abil-avatar-of-brilliance+
-   ;;   :abil-empower-undead - +mob-abil-empower-undead+
-   ;;   :abil-gravity-chains - +mob-abil-gravity-chains+
-   ;;   :abil-no-corpse - +mob-abil-no-corpse+
-   ;;   :abil-smite - +mob-abil-smite+
-   ;;   :abil-slow - +mob-abil-slow+
-   ;;   :abil-prayer-wrath - +mob-abil-prayer-wrath+
-   ;;   :abil-shadow-step - +mob-abil-shadow-step+
+   ;;   :abil-instill-fear - +mob-abil-instill-fear+ (takes fixnum)
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -129,7 +70,7 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step)
+                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -286,6 +227,8 @@
     (setf (gethash +mob-abil-prayer-wrath+ (abilities mob-type)) t))
   (when abil-shadow-step
     (setf (gethash +mob-abil-shadow-step+ (abilities mob-type)) t))
+  (when abil-extinguish-light
+    (setf (gethash +mob-abil-extinguish-light+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -725,6 +668,8 @@
 
 (defun adjust-sight (mob)
   (let ((light (base-light-radius mob)))
+    (when (mob-effect-p mob +mob-effect-extinguished-light+)
+      (setf light 0))
     (setf (cur-light mob) light))
   
   (let ((sight (base-sight mob)))
@@ -907,7 +852,8 @@
   (when (and (not (eq mob *player*))
              (not (mob-ability-p mob +mob-abil-human+))
              (not (mob-ability-p mob +mob-abil-animal+))
-             (not (= (mob-type mob) +mob-type-imp+)))
+             (not (= (mob-type mob) +mob-type-imp+))
+             (not (= (mob-type mob) +mob-type-shadow-imp+)))
     (let ((name-pick-n))
       (if (mob-ability-p mob +mob-abil-angel+)
         (progn

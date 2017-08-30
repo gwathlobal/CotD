@@ -281,7 +281,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-imp+
                                        :name "shadow imp"
                                        :glyph-idx 73 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 12 :max-fp 5
-                                       :faction +faction-type-demons+
+                                       :faction +faction-type-demons+ :evolve-mob-id +mob-type-shadow-demon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 5 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.9))
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
@@ -290,6 +290,19 @@
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t
                                        :ai-horde t :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-demon+
+                                       :name "shadow demon"
+                                       :glyph-idx 68 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 20 :max-fp 12
+                                       :faction +faction-type-demons+
+                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
+                                       :strength 3
+                                       :base-light-radius 0
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t :abil-toggle-light t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t
+                                       :ai-curious t))
 
 ;;--------------------
 ;; UNDEAD

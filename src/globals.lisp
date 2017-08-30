@@ -76,6 +76,7 @@
 (defconstant +mob-type-reanimated-empowered+ 28)
 (defconstant +mob-type-wisp+ 29)
 (defconstant +mob-type-shadow-imp+ 30)
+(defconstant +mob-type-shadow-demon+ 31)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -162,6 +163,7 @@
 (defconstant +mob-abil-slow+ 63)
 (defconstant +mob-abil-prayer-wrath+ 64)
 (defconstant +mob-abil-shadow-step+ 65)
+(defconstant +mob-abil-extinguish-light+ 66)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -183,6 +185,7 @@
 (defconstant +mob-effect-flying+ 17)
 (defconstant +mob-effect-slow+ 18)
 (defconstant +mob-effect-holy-touch+ 19)
+(defconstant +mob-effect-extinguished-light+ 20)
 
 (defconstant +mob-order-follow+ 0)
 
