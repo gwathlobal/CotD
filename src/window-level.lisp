@@ -250,7 +250,8 @@
                             (move-mob *player* 6)
                             )
                           )
-			(when (sdl:key= key :sdl-key-kp5)
+                        (when (or (sdl:key= key :sdl-key-kp5)
+                                  (sdl:key= key :sdl-key-period))
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -487,8 +488,10 @@
                         (when (and (sdl:key= key :sdl-key-i) (= mod 0))
                           (setf *current-window* (make-instance 'inventory-window :return-to *current-window*)))
                         ;;------------------
-			;; pick item - p
-			(when (and (sdl:key= key :sdl-key-p) (= mod 0))
+			;; pick item - p, g or ,
+			(when (or (and (sdl:key= key :sdl-key-p) (= mod 0))
+                                  (and (sdl:key= key :sdl-key-g) (= mod 0))
+                                  (and (sdl:key= key :sdl-key-comma) (= mod 0)))
 
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)

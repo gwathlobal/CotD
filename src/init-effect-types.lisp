@@ -10,7 +10,7 @@
                                                             (when (slave-mob-id actor)
                                                               (setf (face-mob-type-id actor) (mob-type (get-mob-by-id (slave-mob-id actor))))))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-consealed+ :name "Consealed" :color sdl:*cyan*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-concealed+ :name "Concealed" :color sdl:*cyan*))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-calling-for-help+ :name "Summoning" :color sdl:*green*))
 

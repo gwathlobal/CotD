@@ -1043,8 +1043,8 @@
   
   ;; if the target has keen senses - destroy the illusions
   (when (mob-ability-p target +mob-abil-keen-senses+)
-    (when (mob-effect-p actor +mob-effect-divine-consealed+)
-      (rem-mob-effect actor +mob-effect-divine-consealed+)
+    (when (mob-effect-p actor +mob-effect-divine-concealed+)
+      (rem-mob-effect actor +mob-effect-divine-concealed+)
       (setf (face-mob-type-id actor) (mob-type actor))
       (when (or (check-mob-visible actor :observer *player*)
                 (check-mob-visible target :observer *player*))

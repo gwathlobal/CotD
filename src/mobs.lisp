@@ -121,7 +121,7 @@
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
                                                                 ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious ai-simple-pathfinding
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
-                                                                abil-heal-self abil-conseal-divine abil-reveal-divine abil-detect-good abil-detect-evil
+                                                                abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
                                                                 abil-loves-infighting abil-prayer-bless abil-free-call abil-prayer-shield abil-curse
                                                                 abil-keen-senses abil-prayer-reveal abil-military-follow-me abil-blindness abil-instill-fear abil-charge
@@ -168,8 +168,8 @@
     (setf (gethash +mob-abil-unholy+ (abilities mob-type)) t))
   (when abil-heal-self
     (setf (gethash +mob-abil-heal-self+ (abilities mob-type)) abil-heal-self))
-  (when abil-conseal-divine
-    (setf (gethash +mob-abil-conseal-divine+ (abilities mob-type)) t))
+  (when abil-conceal-divine
+    (setf (gethash +mob-abil-conceal-divine+ (abilities mob-type)) t))
   (when abil-reveal-divine
     (setf (gethash +mob-abil-reveal-divine+ (abilities mob-type)) t))
   (when abil-detect-good

@@ -22,7 +22,7 @@
                                                                          (format nil "~A invokes divine powers to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-effect-p actor +mob-effect-divine-consealed+)
+                                                      (if (mob-effect-p actor +mob-effect-divine-concealed+)
                                                         nil
                                                         t))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -43,13 +43,13 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-conseal-divine+ :name "Conseal divinity" :descr "Disguise yourself as a human. Divine abilities do not work while in human form." 
+                                 :id +mob-abil-conceal-divine+ :name "Conceal divinity" :descr "Disguise yourself as a human. Divine abilities do not work while in human form." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 25
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
-                                                (set-mob-effect actor :effect-type-id +mob-effect-divine-consealed+ :actor-id (id actor) :cd t)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-divine-concealed+ :actor-id (id actor) :cd t)
                                                 (setf (face-mob-type-id actor) +mob-type-human+)
                                                 (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
                                                                                                            (format nil "You hear some strange noise~A. " str)))
@@ -59,7 +59,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (not (mob-effect-p actor +mob-effect-reveal-true-form+))
-                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+)))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -67,8 +67,8 @@
                                                   ;; if the dst is more than 3 tiles away - stealth, if possible
                                                   (if (and (path actor)
                                                            (> (length (path actor)) 3)
-                                                           (mob-ability-p actor +mob-abil-conseal-divine+)
-                                                           (can-invoke-ability actor actor +mob-abil-conseal-divine+))
+                                                           (mob-ability-p actor +mob-abil-conceal-divine+)
+                                                           (can-invoke-ability actor actor +mob-abil-conceal-divine+))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -82,7 +82,7 @@
                                  :motion 25
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
-                                                (rem-mob-effect actor +mob-effect-divine-consealed+)
+                                                (rem-mob-effect actor +mob-effect-divine-concealed+)
                                                 (setf (face-mob-type-id actor) (mob-type actor))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
                                                                                                            (format nil "You hear some strange noise~A. " str)))
@@ -91,7 +91,7 @@
                                                                           (format nil "~A reveals its true divine form. " (capitalize-name (name actor))))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-effect-p actor +mob-effect-divine-consealed+)
+                                                      (if (mob-effect-p actor +mob-effect-divine-concealed+)
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -104,7 +104,7 @@
                                                           (and (< (/ (cur-hp actor) (max-hp actor)) 
                                                                   0.5)
                                                                (mob-ability-p actor +mob-abil-heal-self+)
-                                                               (mob-effect-p actor +mob-effect-divine-consealed+)
+                                                               (mob-effect-p actor +mob-effect-divine-concealed+)
                                                                (mob-ability-p actor +mob-abil-reveal-divine+)
                                                                (can-invoke-ability actor actor +mob-abil-reveal-divine+)
                                                                (abil-applic-cost-p +mob-abil-heal-self+ actor)))
@@ -120,14 +120,14 @@
                                  :final nil :on-touch t
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (rem-mob-effect target +mob-effect-divine-consealed+)
+                                                (rem-mob-effect target +mob-effect-divine-concealed+)
                                                 (setf (face-mob-type-id target) (mob-type target))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A reveals the true form of ~A. " (capitalize-name (visible-name actor)) (get-qualified-name target))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-detect-good+)
-                                                               (mob-effect-p target +mob-effect-divine-consealed+))
+                                                               (mob-effect-p target +mob-effect-divine-concealed+))
                                                         t
                                                         nil))))
 
@@ -217,7 +217,7 @@
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-purging-touch+)
                                                                (mob-effect-p target +mob-effect-possessed+)
-                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+)))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                         t
                                                         nil))))
 
@@ -246,7 +246,7 @@
                                                                (mob-ability-p target +mob-abil-can-be-blessed+)
                                                                (get-faction-relation (faction actor) (faction target))
                                                                (not (mob-effect-p target +mob-effect-blessed+))
-                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+)))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                         t
                                                         nil))))
 
@@ -802,8 +802,8 @@
                                                   (loop for mob-id in (visible-mobs actor)
                                                         for target = (get-mob-by-id mob-id)
                                                         do
-                                                           (when (mob-effect-p target +mob-effect-divine-consealed+)
-                                                             (rem-mob-effect target +mob-effect-divine-consealed+)
+                                                           (when (mob-effect-p target +mob-effect-divine-concealed+)
+                                                             (rem-mob-effect target +mob-effect-divine-concealed+)
                                                              (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
                                                              (setf (face-mob-type-id target) (mob-type target))
                                                              (print-visible-message (x target) (y target) (z actor) (level *world*) 
@@ -922,7 +922,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-blindness+)
-                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+)))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -1381,14 +1381,14 @@
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-EAGLE-EYE: ~A [~A] uses eagle eye to reveal ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
-                                                (if (or (mob-effect-p target +mob-effect-divine-consealed+)
+                                                (if (or (mob-effect-p target +mob-effect-divine-concealed+)
                                                           (and (mob-effect-p target +mob-effect-possessed+)
                                                                (not (mob-effect-p target +mob-effect-reveal-true-form+))))
                                                   (progn
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                            (format nil "~A reveals the true form of ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
                                                     
-                                                    (rem-mob-effect target +mob-effect-divine-consealed+)
+                                                    (rem-mob-effect target +mob-effect-divine-concealed+)
                                                     (setf (face-mob-type-id target) (mob-type target))
                                                     (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -1408,7 +1408,7 @@
                                                   ;; a little bit of cheating here
                                                   (if (and (can-invoke-ability actor actor (id ability-type))
                                                            nearest-ally
-                                                           (or (mob-effect-p nearest-ally +mob-effect-divine-consealed+)
+                                                           (or (mob-effect-p nearest-ally +mob-effect-divine-concealed+)
                                                                (and (mob-effect-p nearest-ally +mob-effect-possessed+)
                                                                     (not (mob-effect-p nearest-ally +mob-effect-reveal-true-form+))))
                                                            (zerop (random 4)))
@@ -1426,7 +1426,7 @@
                                                                  (not (and (mob-ability-p mob +mob-abil-demon+)
                                                                            (not (mob-effect-p mob +mob-effect-possessed+))))
                                                                  (not (and (mob-ability-p mob +mob-abil-angel+)
-                                                                           (not (mob-effect-p mob +mob-effect-divine-consealed+)))))
+                                                                           (not (mob-effect-p mob +mob-effect-divine-concealed+)))))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -1606,8 +1606,8 @@
                                                                              (format nil "~A cringes with pain, taking ~A dmg, and mounts ~A" (capitalize-name (visible-name actor)) cur-dmg (visible-name target)))
 
                                                       ;; reveal the true form of those who ride fiends
-                                                      (when (mob-effect-p actor +mob-effect-divine-consealed+)
-                                                        (rem-mob-effect actor +mob-effect-divine-consealed+)
+                                                      (when (mob-effect-p actor +mob-effect-divine-concealed+)
+                                                        (rem-mob-effect actor +mob-effect-divine-concealed+)
                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                (format nil " to reveal itself as ~A" (get-qualified-name actor))))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -2359,7 +2359,7 @@
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-ignite-the-fire+)
                                                                (get-melee-weapon-aux-param actor :is-fire)
-                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+)))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2425,7 +2425,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-avatar-of-brilliance+)
-                                                               (not (mob-effect-p actor +mob-effect-divine-consealed+))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
                                                                (not (mob-effect-p actor +mob-effect-avatar-of-brilliance+)))
                                                         t
                                                         nil))

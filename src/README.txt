@@ -98,25 +98,43 @@ THE SATANISTS
 --------------------
 KEYBINDINGS
 
- Arrow keys,                    - Movement
- Page Up, Page Down, Home, End,
- Numpad keys
+ Arrow keys, Numpad keys,         - Movement
+
+ [Page Up], [Page Down], 
+
+ [Home], [End]
+
+
+
+ [5], [.]                         - Wait a turn
+
+ [a]                              - Invoke ability
  
- a                              - Invoke ability
- l                              - Look mode
- f                              - Fire mode
- r                              - Reload
- p                              - Pick up an item
+[l]                              - Look mode
+ 
+[f]                              - Fire mode
 
- Shift + ,                      - Look/Climb/Swim up
+ [r]                              - Reload
+ 
+[p], [g], [,]                    - Pick up an item
 
- Shift + .                      - Look/Climb/Swim down
 
- Shift + 2                      - Character screen
- i                              - Inventory
- m                              - View messages
- ?                              - Help
- Shift + Q                      - Quit to main menu
+
+ [Shift] + [,]                    - Look/Climb/Swim up
+ 
+[Shift] + [.]                    - Look/Climb/Swim down
+
+
+
+ [Shift] + [2]                    - Character screen
+ 
+[i]                              - Inventory
+
+ [m]                              - View messages
+
+ [?]                              - Help
+ 
+[Shift] + [q]                    - Quit to main menu
  
 --------------------
 CREDITS
@@ -124,4 +142,5 @@ CREDITS
 Created by Gwathlobal using Common Lisp
 Inspired by a 7DRL "City of the Condemned" by Tapio
 Tile set inspired by copx (Warp Rogue)
+Thanks to red_kangaroo for a bunch of useful ideas.
 Feel free to email bugs and suggestions to gwathlobal@yandex.ru

@@ -10,7 +10,7 @@ GENERAL TIPS
  - Stockpile power to get promoted or spend it on available abilities.
  
 THE CELESTIAL COMMUNION
- - The Celestial Communion is represented with one unit: Chrome Angel that can temporarily transform itself into Avatar of Brilliance.
+ - The Celestial Communion is represented with one unit: a Chrome Angel that can temporarily transform itself into an Avatar of Brilliance.
  - A Chrome Angel can easily dispatch lowly Imps. To deal with more powerful targets, invoke the Avatar of Brilliance powers. 
  - You can bless humans to gain power.
  - You are able to hide your divinity and disguise yourself as a human to lure enemies to you.
@@ -18,7 +18,7 @@ THE CELESTIAL COMMUNION
  - To win, kill all demons or ascend beyond Chrome Angel. Survival of mankind is not required.
  
 THE PANDEMONIUM HIERARCHY
- - The Pandemonium Hierarchy is represented with three units: Imp, Demon, and Archdemon.
+ - The Pandemonium Hierarchy is represented with three units: an Imp, Demon, and Archdemon.
  - You start as a puny Imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
  - Imps and Demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
@@ -37,8 +37,8 @@ CITIZENS OF THE CITY
  - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.
 
 THE CHURCH
- - Priests have an array of divine abilities. They are able to grant divine shield to allies, scorch and reveal true form of all enemies in sight, slow and smite enemies. Divine shield gives a one-time protection from any harm.
- - Whenever a priest gives humans divine shield, they will start to follow the preacher.
+ - Priests have an array of divine abilities. They are able to grant divine shield to allies, scorch and reveal true form of all enemies in sight, slow and smite enemies. The divine shield provides a one-time protection from any harm.
+ - Whenever a priest gives humans a divine shield, they will start to follow the preacher.
  - Smiting damage increases with the number of humans the priest sees.
  - Priests can also give fire-based melee attacks to themselves and their followers by praying for wrath.
  - Priests start in the church.

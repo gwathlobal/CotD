@@ -97,7 +97,7 @@
 (defconstant +ai-pref-simple-pathfinding+ 7)
 
 (defconstant +mob-abil-heal-self+ 0)
-(defconstant +mob-abil-conseal-divine+ 1)
+(defconstant +mob-abil-conceal-divine+ 1)
 (defconstant +mob-abil-reveal-divine+ 2)
 (defconstant +mob-abil-detect-good+ 3)
 (defconstant +mob-abil-detect-evil+ 4)
@@ -166,7 +166,7 @@
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
 (defconstant +mob-effect-reveal-true-form+ 2)
-(defconstant +mob-effect-divine-consealed+ 3)
+(defconstant +mob-effect-divine-concealed+ 3)
 (defconstant +mob-effect-calling-for-help+ 4)
 (defconstant +mob-effect-called-for-help+ 5)
 (defconstant +mob-effect-divine-shield+ 6)

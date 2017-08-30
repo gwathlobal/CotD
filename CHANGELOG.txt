@@ -1,9 +1,11 @@
 CHANGELOG
 
+- Added Shadow step to shadow demons. Shadow step is a short range teleport that works only if the source and destination tiles are not lit.
 - Added the Church as a playable faction. You start as a priest in a church and your aim is to destroy all demons.
 - Added Smite to priests. Smite is a single target damage ability that gets better the more humans are around the caster.
 - Added Slow to priests. Slow is a single target ability that causes the enemy to take more time when attempting any action.
 - Added Prayer of wrath to the priests. This ability grants a fire-based melee attack to those who follow you.
+- Added [g] and [,] command synonims for picking up items, and [.] command synonim for waiting a turn.
 
 --------------------
 August 18, 2017 v1.2.0
