@@ -52,7 +52,7 @@ THE CELESTIAL COMMUNION
 -------------------- 
 THE PANDEMONIUM HIERARCHY
 
- - You start as a puny Imp who is no match for a Chrome Angel.
+ - You start as a puny Imp or a Shadow imp who is no match for a Chrome Angel.
  - Kill humans to gain power. Beware of blessed ones. 
  - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
 

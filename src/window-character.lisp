@@ -38,7 +38,10 @@
                         (get-weapon-descr-long *player*)
                         (get-armor-descr *player*)
                         (cur-dodge *player*)
-                        (if (not (zerop (cur-light *player*))) (format nil "Light radius: ~A~%" (cur-light *player*)) "")
+                        (cond
+                          ((> (cur-light *player*) 0) (format nil "Light radius: ~A~%" (cur-light *player*)))
+                          ((< (cur-light *player*) 0) (format nil "Darkness radius: ~A~%" (abs (cur-light *player*))))
+                          (t ""))
                         (get-mob-stats-line *player*))
                 a-rect :color sdl:*white*)
       )

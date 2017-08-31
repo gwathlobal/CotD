@@ -133,7 +133,7 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-shadow-demon+ :x 38 :y 13 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-shadow-devil+ :x 38 :y 13 :z 0))
   (add-mob-to-level-list (level world) *player*)
   (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 43 :y 18 :z 1))
         (demon (make-instance 'mob :mob-type +mob-type-shadow-imp+ :x 42 :y 15 :z 0))
@@ -167,7 +167,7 @@
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-blood-fresh+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-blood-old+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 0) :y (+ (y *player*) 1) :z (+ (z *player*) 0) :qty 75))
-    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-imp+ :x 41 :y 18 :z 0))
+    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-imp+ :x 41 :y 18 :z 0))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-reanimated-pwr-1+ :x 41 :y 19 :z 0))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x 35 :y 19 :z 2))
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x 40 :y 17 :z 2))

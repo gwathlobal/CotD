@@ -2830,7 +2830,7 @@
                                                   (if (and (mob-ability-p actor +mob-abil-extinguish-light+)
                                                              (can-invoke-ability actor actor +mob-abil-extinguish-light+)
                                                              nearest-enemy
-                                                             (not (zerop (cur-light nearest-enemy)))
+                                                             (> (cur-light nearest-enemy) 0)
                                                              (< (get-outdoor-light-* (level *world*) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) *mob-visibility-threshold*))
                                                       t
                                                       nil))
@@ -2844,7 +2844,7 @@
                                                                  (or (and (get-terrain-type-trait terrain +terrain-trait-light-source+)
                                                                           (not (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+))))
                                                                      (and (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
-                                                                          (not (zerop (cur-light (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))))))
+                                                                          (> (cur-light (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) 0))))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
@@ -2852,3 +2852,10 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-umbral-aura+ :name "Umbral aura" :descr "You emit darkness around you." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

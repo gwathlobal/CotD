@@ -393,7 +393,7 @@
                                                            )
                                ))
 
-(set-game-event (make-instance 'game-event :id +game-event-adjust-outdoor-ligth+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-adjust-outdoor-light+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
                                                          t)

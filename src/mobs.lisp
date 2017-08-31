@@ -70,7 +70,7 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light)
+                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -229,6 +229,8 @@
     (setf (gethash +mob-abil-shadow-step+ (abilities mob-type)) t))
   (when abil-extinguish-light
     (setf (gethash +mob-abil-extinguish-light+ (abilities mob-type)) t))
+  (when abil-umbral-aura
+    (setf (gethash +mob-abil-umbral-aura+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -481,6 +483,7 @@
    (cur-speed :initform 100 :initarg :cur-speed :accessor cur-speed)
 
    (brightness :initform 0 :accessor brightness)
+   (darkness :initform 0 :accessor darkness)
    (cur-light :initform *base-light-radius* :initarg :cur-light :accessor cur-light)
    (motion :initform 0 :accessor motion)
    (motion-set-p :initform nil :accessor motion-set-p) 

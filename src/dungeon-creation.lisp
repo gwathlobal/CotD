@@ -149,7 +149,7 @@
       (when (= tod-id +tod-type-evening+)
         (setf hour 19))
       (setf (player-game-time world) (set-current-date-time year month day hour min sec)))
-    (push +game-event-adjust-outdoor-ligth+ game-event-list)
+    (push +game-event-adjust-outdoor-light+ game-event-list)
     
     ;; adjusting the progress bar
     ;(incf *cur-progress-bar*)

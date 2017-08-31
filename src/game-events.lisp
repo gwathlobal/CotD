@@ -14,7 +14,7 @@
 (defconstant +game-event-military-arrive-port-w+ 9)
 (defconstant +game-event-military-arrive-island+ 10)
 (defconstant +game-event-lose-game-possessed+ 11)
-(defconstant +game-event-adjust-outdoor-ligth+ 12)
+(defconstant +game-event-adjust-outdoor-light+ 12)
 (defconstant +game-event-win-for-thief+ 13)
 
 (defclass game-event ()

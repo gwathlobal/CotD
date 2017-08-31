@@ -294,14 +294,27 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-demon+
                                        :name "shadow demon"
                                        :glyph-idx 68 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 20 :max-fp 12
-                                       :faction +faction-type-demons+
+                                       :faction +faction-type-demons+ :evolve-mob-id +mob-type-shadow-devil+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
-                                       :base-light-radius 0
+                                       :base-light-radius 0 :base-stealth 10
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t
+                                       :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-devil+
+                                       :name "shadow devil"
+                                       :glyph-idx 36 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 30 :max-fp 16
+                                       :faction +faction-type-demons+
+                                       :weapon (list "Claws" (list +weapon-dmg-vorpal+ 5 8 +normal-ap+ 100 ()) nil) :base-dodge 20
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
+                                       :strength 5 
+                                       :base-light-radius -4 :base-stealth 10
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-charge t :abil-no-breathe t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-umbral-aura t
                                        :ai-curious t))
 
 ;;--------------------

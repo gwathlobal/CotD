@@ -77,6 +77,7 @@
 (defconstant +mob-type-wisp+ 29)
 (defconstant +mob-type-shadow-imp+ 30)
 (defconstant +mob-type-shadow-demon+ 31)
+(defconstant +mob-type-shadow-devil+ 32)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -164,6 +165,7 @@
 (defconstant +mob-abil-prayer-wrath+ 64)
 (defconstant +mob-abil-shadow-step+ 65)
 (defconstant +mob-abil-extinguish-light+ 66)
+(defconstant +mob-abil-umbral-aura+ 67)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -328,6 +330,7 @@
 
 (defparameter *base-light-radius* 6)
 (defparameter *light-power-faloff* 17)
+(defparameter *dark-power-faloff* 12)
 (defparameter *mob-visibility-threshold* 50)
 
 (defparameter *mob-motion-order* 20)

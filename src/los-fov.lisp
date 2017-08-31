@@ -86,17 +86,18 @@
     t))
 
 (defun calculate-single-tile-brightness (level x y z &key (calc-for-player nil))
-  (let ((brightness 0)) 
+  (let ((brightness 0)
+        (darkness 0)) 
     ;; iterate through all mobs
     (loop for mob-id in (if calc-for-player
                           (nearby-light-mobs *player*)
                           (mob-id-list level))
           for tmob = (get-mob-by-id mob-id)
-          for light-power = (* *light-power-faloff* (cur-light tmob))
-          for vision-pwr = (cur-light tmob)
-          for vision-power = (cur-light tmob)
+          for light-power = (* *light-power-faloff* (abs (cur-light tmob)))
+          for vision-pwr = (abs (cur-light tmob))
+          for vision-power = (abs (cur-light tmob))
           do
-            (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) x y z) (cur-light tmob))
+            (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) x y z) (abs (cur-light tmob)))
                (line-of-sight (x tmob) (y tmob) (z tmob) x y z
                               #'(lambda (dx dy dz prev-cell)
                                   (declare (type fixnum dx dy dz))
@@ -110,14 +111,25 @@
                                       (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
                                       (decf vision-pwr)
                                       
-                                      ;; insert set light function here
-                                      (when (and (= x dx) (= y dy) (= z dz)
-                                                 (> light-power brightness))
-                                        (setf brightness light-power)
-                                        (setf exit-result 'exit)
-                                        (return))
+                                      (if (> (cur-light tmob) 0)
+                                        (progn
+                                          ;; if the light emitted by a mob is positive - increase brightness
+                                          (when (and (= x dx) (= y dy) (= z dz)
+                                                     (> light-power brightness))
+                                            (setf brightness light-power)
+                                            (setf exit-result 'exit)
+                                            (return))
+                                          (decf light-power *light-power-faloff*))
+                                        (progn
+                                           ;; if the light emitted by a mob is negative - increase darkness
+                                          (when (and (= x dx) (= y dy) (= z dz)
+                                                     (> light-power darkness))
+                                            (setf darkness light-power)
+                                            (setf exit-result 'exit)
+                                            (return))
+                                          (decf light-power *dark-power-faloff*)))
                                       
-                                      (decf light-power *light-power-faloff*)
+                                      
 
                                       (when (<= vision-pwr 0)
                                         (setf exit-result 'exit)
@@ -166,6 +178,9 @@
                                   exit-result)))))
     ;; increase brigtness by outdoor brightness
     (incf brightness (get-outdoor-light-* level x y z))
+    (decf brightness darkness)
+    (when (< brightness 0)
+      (setf brightness 0))
     brightness
     ))
 
@@ -188,6 +203,7 @@
 
 (defun update-visible-mobs-normal (mob)
   (setf (brightness mob) 0)
+  (setf (darkness mob) 0)
   (when (eq mob *player*)
     (setf (nearby-light-mobs *player*) nil)
     (setf (nearby-light-sources *player*) nil))
@@ -237,9 +253,9 @@
         for tmob = (get-mob-by-id mob-id)
         for vision-pwr = (cur-sight mob)
         for vision-power = (cur-sight mob)
-        for light-power = (* *light-power-faloff* (cur-light tmob))
-        for light-pwr = (cur-light tmob)
-        for light-power-base = (cur-light tmob)
+        for light-power = (* *light-power-faloff* (abs (cur-light tmob)))
+        for light-pwr = (abs (cur-light tmob))
+        for light-power-base = (abs (cur-light tmob))
         do
            ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
            (when (and (not (eq mob tmob))
@@ -286,7 +302,7 @@
                                     )
                                   exit-result))))
            ;; set up mob brightness
-           (when (and (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (cur-light tmob))
+           (when (and (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (abs (cur-light tmob)))
                       ;(not (eq mob tmob))
                       )
              (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
@@ -302,11 +318,21 @@
                                     (decf light-pwr (truncate (* light-power-base pwr-decrease) 100))
                                     (decf light-pwr)
 
-                                    (when (and (get-mob-* (level *world*) dx dy dz) 
-                                               (eq (get-mob-* (level *world*) dx dy dz) mob)
-                                               (> light-power (brightness mob)))
-                                      (setf (brightness mob) light-power))
-                                    (decf light-power *light-power-faloff*)
+                                    (if (> (cur-light tmob) 0)
+                                      (progn
+                                        ;; if the light emitted by a mob is positive - increase brightness
+                                        (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                   (eq (get-mob-* (level *world*) dx dy dz) mob)
+                                                   (> light-power (brightness mob)))
+                                          (setf (brightness mob) light-power))
+                                        (decf light-power *light-power-faloff*))
+                                      (progn
+                                        ;; if the light emitted by a mob is positive - increase darkness
+                                        (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                   (eq (get-mob-* (level *world*) dx dy dz) mob)
+                                                   (> light-power (darkness mob)))
+                                          (setf (darkness mob) light-power))
+                                        (decf light-power *dark-power-faloff*)))
 
                                     (when (<= light-pwr 0)
                                       (setf exit-result 'exit)
@@ -330,6 +356,9 @@
     (calc-lit-tiles-for-player *player*))
   
   (incf (brightness mob) (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob)))
+  (decf (brightness mob) (darkness mob))
+  (when (< (brightness mob) 0)
+    (setf (brightness mob) 0))
   
   (setf (visible-mobs mob) (append (proper-visible-mobs mob) (shared-visible-mobs mob)))
   (setf (visible-mobs mob) (remove-duplicates (visible-mobs mob))))

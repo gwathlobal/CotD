@@ -37,6 +37,7 @@
 (defconstant +player-faction-thief+ 19)
 (defconstant +player-faction-satanist+ 20)
 (defconstant +player-faction-church+ 21)
+(defconstant +player-faction-shadows+ 22)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

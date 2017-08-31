@@ -57,7 +57,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-smoke-bomb+
                                          :name "smoke bomb"
-                                         :descr "A bomb that emits clouds of smoke to conseal you. Usable only by humans. Can not be used in water."
+                                         :descr "A bomb that emits clouds of smoke to conceal you. Usable only by humans. Can not be used in water."
                                          :glyph-idx 1 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor item)
                                                      (declare (ignore item))
@@ -70,7 +70,6 @@
                                                                for y = (+ (second cell) (y actor))
                                                                for z = (+ (third cell) (z actor))
                                                                do
-                                                                  (format t "(~A ~A ~A)~%" x y z)
                                                                   (when (and (>= x 0) (>= y 0) (>= z 0)
                                                                              (< x (array-dimension (terrain (level *world*)) 0)) (< y (array-dimension (terrain (level *world*)) 1)) (< z (array-dimension (terrain (level *world*)) 2))
                                                                              (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+))

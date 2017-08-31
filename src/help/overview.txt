@@ -1,5 +1,5 @@
 THE PLOT
-The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Pandemonium Hierarchy invaded the City with the intention to slay its inhabitants. The Celestial Communion had to intervene. Now both sides are bent to fight each other until none of the opponents remain.
+The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Pandemonium forces invaded the City with the intention to slay its inhabitants. The Celestial Communion had to intervene. Now both sides are bent to fight each other until none of the opponents remain.
 Choose your side and join the fray!
 
 GENERAL TIPS
@@ -17,16 +17,18 @@ THE CELESTIAL COMMUNION
  - Your strength is the ability to heal yourself when needed. You are also able to see what all other Angels see.
  - To win, kill all demons or ascend beyond Chrome Angel. Survival of mankind is not required.
  
-THE PANDEMONIUM HIERARCHY
+THE PANDEMONIUM HIERARCHY & THE PANDEMONIUM SHADES
  - The Pandemonium Hierarchy is represented with three units: an Imp, Demon, and Archdemon.
- - You start as a puny Imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
+ - The Pandemonium Shades are also represented with three units: a Shadow Imp, Shadow Demon, and Shadow Devil.
+ - You start as a puny Imp or a Shadow Imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
  - Imps and Demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
+ - Shadow creatures are unable to possess anybody but can teleport around unlit areas.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
  - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
  - Remember, "friendly fire" is allowed for your faction. Be cautious when walking side-by-side with your "friends".
- - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
-
+ - To win, kill all angels or ascend beyond Archdemon or Shadow Devil. Destruction of mankind is not enough.
+ 
 OUTSIDER BEASTS
  - Outsider beasts are half-sentient creatures of various origin that will actively attack everything in sight, including their own kin.
  - The demonic invasion has attracted Fiends. If a demon gets near one, it will be able to dominate and ride it as a mount.
