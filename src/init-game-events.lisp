@@ -14,7 +14,7 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 1400)
-                                                                                                                                (faction-name *player*)
+                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
                                                                                                                                   ((zerop (total-demons world)) "Enemies eliminated.")
@@ -48,7 +48,7 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 1450)
-                                                                                                                                (faction-name *player*)
+                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
                                                                                                                                   ((zerop (total-angels world)) "Enemies eliminated.")
@@ -78,7 +78,7 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score (+ 1500 (* 10 (total-humans world))))
-                                                                                                                                (faction-name *player*)
+                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
                                                                                                                                   ((zerop (total-demons world)) "Enemies eliminated.")
@@ -109,7 +109,7 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 0)
-                                                                                                                                (faction-name *player*)
+                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (if (null (killed-by *player*))
                                                                                                                                   "Killed by unknown forces."
@@ -143,7 +143,7 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 0)
-                                                                                                                                (faction-name *player*)
+                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (format nil "Possessed by ~A." (get-qualified-name (get-mob-by-id (master-mob-id *player*))))
                                                                                                                                 (level-layout (level world)))
@@ -413,7 +413,7 @@
                                                             ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 0)
-                                                                                                                                (faction-name *player*)
+                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (format nil "Escaped with $~A." (calculate-total-value *player*))
                                                                                                                                 (level-layout (level world)))

@@ -124,7 +124,7 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
                                                                      +player-faction-angels+))))))
-        (join-legion-item (cons "Join the Pandemonium Hierarchy"
+        (join-legion-item (cons "Join the Pandemonium Hierarchy (as an Crimson Imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -135,11 +135,10 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
                                                                      +player-faction-demons+))))))
-        (join-shadow-item (cons "Join the Pandemonium Shades"
+        (join-shadow-item (cons "Join the Pandemonium Hierarchy (as a Shadow Imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
                                           (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
                                       
                                       (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)

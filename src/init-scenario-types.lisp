@@ -340,7 +340,7 @@
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-imp+))
                                                                  (find-unoccupied-place-inside world *player*)
-                                                                 (setf (faction-name *player*) "Imp"))
+                                                                 (setf (faction-name *player*) "Crimson Imp"))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)

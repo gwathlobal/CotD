@@ -239,7 +239,7 @@
 ;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-imp+
-                                       :name "imp"
+                                       :name "crimson imp"
                                        :glyph-idx 73 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 12 :max-fp 5
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-demon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 5 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.8))
@@ -252,7 +252,7 @@
                                        :ai-horde t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
-                                       :name "demon"
+                                       :name "crimson demon"
                                        :glyph-idx 68 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 20 :max-fp 12
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-archdemon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
