@@ -78,6 +78,9 @@
 (defconstant +mob-type-shadow-imp+ 30)
 (defconstant +mob-type-shadow-demon+ 31)
 (defconstant +mob-type-shadow-devil+ 32)
+(defconstant +mob-type-star-singer+ 33)
+(defconstant +mob-type-star-gazer+ 34)
+(defconstant +mob-type-star-mender+ 35)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -166,6 +169,7 @@
 (defconstant +mob-abil-shadow-step+ 65)
 (defconstant +mob-abil-extinguish-light+ 66)
 (defconstant +mob-abil-umbral-aura+ 67)
+(defconstant +mob-abil-trinity-mimic+ 68)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

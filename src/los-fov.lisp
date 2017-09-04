@@ -192,14 +192,20 @@
       (dotimes (z1 (array-dimension (memo (level *world*)) 2))
         (set-single-memo-* (level *world*) x1 y1 z1 :light 0)
         )))
-    
-  (loop for (tx ty tz) in (visible-tile-list mob)
-        for brightness = (- (calculate-single-tile-brightness (level *world*) tx ty tz :calc-for-player t)
-                            (get-outdoor-light-* (level *world*) tx ty tz))
-        do
-           (when (> brightness (get-single-memo-light (get-memo-* (level *world*) tx ty tz)))
-             (set-single-memo-* (level *world*) tx ty tz :light brightness))
-        ))
+
+  (loop for tx from (- (x mob) (cur-sight mob)) to (+ (x mob) (cur-sight mob)) do
+    (loop for ty from (- (y mob) (cur-sight mob)) to (+ (y mob) (cur-sight mob)) do
+      (loop for tz from (- (z mob) (cur-sight mob)) to (+ (z mob) (cur-sight mob))
+            with brightness = 0
+            when (and (>= tx 0) (< tx (array-dimension (terrain (level *world*)) 0))
+                      (>= ty 0) (< ty (array-dimension (terrain (level *world*)) 1))
+                      (>= tz 0) (< tz (array-dimension (terrain (level *world*)) 2)))
+              do
+               (setf brightness (- (calculate-single-tile-brightness (level *world*) tx ty tz :calc-for-player t)
+                                  (get-outdoor-light-* (level *world*) tx ty tz)))
+                 (when (> brightness (get-single-memo-light (get-memo-* (level *world*) tx ty tz)))
+                   (set-single-memo-* (level *world*) tx ty tz :light brightness)))))
+  )
 
 (defun update-visible-mobs-normal (mob)
   (setf (brightness mob) 0)
@@ -258,10 +264,16 @@
         for light-power-base = (abs (cur-light tmob))
         do
            ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
+           ;; except for trinity mimic - they share minds only with their own union
            (when (and (not (eq mob tmob))
                       (mob-ability-p mob +mob-abil-shared-minds+)
                       (mob-ability-p tmob +mob-abil-shared-minds+)
-                      (= (faction mob) (faction tmob)))
+                      (= (faction mob) (faction tmob))
+                      (or (and (not (mob-ability-p mob +mob-abil-trinity-mimic+))
+                               (not (mob-ability-p tmob +mob-abil-trinity-mimic+)))
+                          (and (mob-ability-p mob +mob-abil-trinity-mimic+)
+                               (mob-ability-p tmob +mob-abil-trinity-mimic+)
+                               (find (id mob) (mimic-id-list tmob)))))
              (pushnew (id tmob) (shared-visible-mobs mob))
                ;(format t "~A [~A] sees ~A~%" (name tmob) (id tmob) (visible-mobs tmob))
              (loop for vmob-id in (proper-visible-mobs tmob)
@@ -540,7 +552,6 @@
 (defun update-visible-area-normal (level x y z &key (no-z nil))
   (let ((vision-power (1+ (cur-sight *player*)))
         (vision-pwr (1+ (cur-sight *player*))))
-    (setf (visible-tile-list *player*) nil)
     (draw-fov x y z (cur-sight *player*)
               #'(lambda (dx dy dz prev-cell)
                   (let ((exit-result t) (pwr-decrease))
@@ -564,30 +575,16 @@
                         
                         )
 
-                      (push (list dx dy dz) (visible-tile-list *player*))
-                      
                       (when (<= vision-pwr 0)
                         (setf exit-result 'exit)
                         (return))
-                      
-                    ;(unless (check-LOS-propagate dx dy dz prev-cell :check-vision t :player-reveal-cell t)
-                    ;  (setf exit-result 'exit)
-                    ;  (return))
-                                          
+                                         
                       )
                     exit-result))
               :LOS-start-func #'(lambda ()
                                   (setf vision-pwr (1+ (cur-sight *player*))))
               :no-z no-z
               ))
-
-  (setf (visible-tile-list *player*) (remove-duplicates (visible-tile-list *player*)
-                                                        :test #'(lambda (a b)
-                                                                  (if (and (= (first a) (first b))
-                                                                           (= (second a) (second b))
-                                                                           (= (third a) (third b)))
-                                                                    t
-                                                                    nil))))
 
   (setf (visible-mobs *player*) (append (proper-visible-mobs *player*) (shared-visible-mobs *player*)))
   (setf (visible-mobs *player*) (remove-duplicates (visible-mobs *player*)))

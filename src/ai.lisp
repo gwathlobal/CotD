@@ -753,6 +753,9 @@
   
   (format t "~%TIME-ELAPSED BEFORE: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
 
+  ;; this should be done in this order for the lit-unlit tiles to be displayed properly
+  ;; because update-visible-area actually sets the glyphs and colors of the player screen
+  ;; while update-visible-mobs prepares the lit-unlit status of the tiles
   (update-visible-mobs player)
   (update-visible-area (level *world*) (x player) (y player) (z player))
 

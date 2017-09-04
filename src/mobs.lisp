@@ -70,7 +70,8 @@
                                                                 abil-starts-with-horse abil-independent abil-eagle-eye abil-facing abil-immovable abil-mind-burn abil-gargantaur-teleport abil-dominate-gargantaur
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
-                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura)
+                                                                abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
+                                                                abil-trinity-mimic)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -231,6 +232,8 @@
     (setf (gethash +mob-abil-extinguish-light+ (abilities mob-type)) t))
   (when abil-umbral-aura
     (setf (gethash +mob-abil-umbral-aura+ (abilities mob-type)) t))
+  (when abil-trinity-mimic
+    (setf (gethash +mob-abil-trinity-mimic+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -448,6 +451,8 @@
    (hear-range-mobs :initform nil :accessor hear-range-mobs)
    (heard-sounds :initform nil :accessor heard-sounds)
    (visible-items :initform nil :accessor visible-items)
+
+   (mimic-id-list :initform () :accessor mimic-id-list)
 
    (path :initform nil :accessor path)
    (path-dst :initform nil :accessor path-dst) ;; is a actually a cons with coords (x y)
@@ -974,7 +979,6 @@
    (sense-evil-id :initform nil :accessor sense-evil-id)
    (sense-good-id :initform nil :accessor sense-good-id)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)
-   (visible-tile-list :initform () :accessor visible-tile-list)
    (killed-by :initform nil :accessor killed-by)
    (faction-name :initform nil :accessor faction-name)
    (cur-score :initform 0 :accessor cur-score)

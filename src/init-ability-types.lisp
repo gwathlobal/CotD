@@ -2859,3 +2859,10 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-trinity-mimic+ :name "Trinity mimic" :descr "You are not linked to the singlemind of the angelkind, but you have even tighter bonds with the select few of them." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

@@ -29,6 +29,13 @@
                  (setf (made-turn mob) nil)
                  (set-message-this-turn nil)
                  (setf (motion-set-p mob) nil)
+
+                 ;; for trinity mimics - set the current mob as the player
+                 (when (and (subtypep (type-of mob) 'player)
+                            (mob-ability-p mob +mob-abil-trinity-mimic+)
+                            (find (id mob) (mimic-id-list *player*)))
+                   (setf *player* mob))
+                 
                  (ai-function mob)
                  (when (get-message-this-turn) (add-message (format nil "~%")))
                  (setf (heard-sounds mob) nil)
@@ -109,11 +116,11 @@
 
   (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%"))
 
-  (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+  ;(update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
   )  
 
 (defun main-menu ()
-  (let ((join-heaven-item (cons "Join the Celestial Communion"
+  (let ((join-heaven-item (cons "Join the Celestial Communion (as a Chrome angel)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -124,6 +131,17 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
                                                                      +player-faction-angels+))))))
+        (join-trinity-item (cons "Join the Celestial Communion (as a Trinity mimic)"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                      
+                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                     (nth (random (length weather-types)) weather-types)
+                                                                     (nth (random (length tod-types)) tod-types)
+                                                                     +player-faction-trinity-mimics+))))))
         (join-legion-item (cons "Join the Pandemonium Hierarchy (as an Crimson Imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
@@ -249,20 +267,20 @@
     (if *cotd-release*
       (progn
         (setf *current-window* (make-instance 'start-game-window 
-                                              :menu-items (list (car join-heaven-item) (car join-legion-item) (car join-shadow-item) (car join-chaplain-item) (car join-scout-item) (car join-thief-item) (car join-satanist-item)
-                                                                (car join-church-item)
+                                              :menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-chaplain-item) (car join-scout-item) (car join-thief-item)
+                                                                (car join-satanist-item) (car join-church-item)
                                                                 (car custom-scenario-item) (car highscores-item) (car help-item) (car exit-item))
-                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-legion-item) (cadr join-shadow-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item) (cdr join-satanist-item)
-                                                                (cdr join-church-item)
+                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cadr join-shadow-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item)
+                                                                (cdr join-satanist-item) (cdr join-church-item)
                                                                 (cdr custom-scenario-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))))
       (progn
         (setf *current-window* (make-instance 'start-game-window 
-                                              :menu-items (list (car join-heaven-item) (car join-legion-item) (car join-shadow-item) (car join-chaplain-item) (car join-scout-item) (car join-thief-item) (car join-satanist-item)
-                                                                (car join-church-item)
+                                              :menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-chaplain-item) (car join-scout-item) (car join-thief-item)
+                                                                (car join-satanist-item) (car join-church-item)
                                                                 (car custom-scenario-item) (car all-see-item) (car test-level-item)
                                                                 (car highscores-item) (car help-item) (car exit-item))
-                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item) (cdr join-satanist-item)
-                                                                (cdr join-church-item)
+                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item)
+                                                                (cdr join-satanist-item) (cdr join-church-item)
                                                                 (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
                                                                 (cdr highscores-item) (cdr help-item) (cdr exit-item)))))))
   
@@ -412,7 +430,15 @@
                                              ))
        (make-output *current-window*)
        (setf (options-player-name *options*) (run-window *current-window*))
+
+       ;; set the same name for mimics if any
        (setf (name *player*) (options-player-name *options*))
+       (when (mob-ability-p *player* +mob-abil-trinity-mimic+)
+         (loop for mob-id in (mimic-id-list *player*)
+               for mob = (get-mob-by-id mob-id)
+               do
+                  (setf (name mob) (name *player*))))
+       
        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
          (format file "~A" (create-options-file-string *options*)))
        

@@ -211,7 +211,7 @@
 ;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
-                                       :name "Chrome Angel"
+                                       :name "chrome angel"
                                        :glyph-idx 65 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 18 :max-fp 32
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
@@ -232,6 +232,42 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-heal-self 2 :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
                                        :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t
+                                       :ai-wants-bless t :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer+
+                                       :name "star singer"
+                                       :glyph-idx 65 :glyph-color (sdl:color :r 0 :g 128 :b 128) :back-color sdl:*black* :max-hp 18 :max-fp 32
+                                       :faction +faction-type-angels+
+                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
+                                       :strength 2
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-heal-self 1 :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
+                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-avatar-of-brilliance t :abil-trinity-mimic t
+                                       :ai-wants-bless t :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-gazer+
+                                       :name "star gazer"
+                                       :glyph-idx 65 :glyph-color (sdl:color :r 32 :g 170 :b 170) :back-color sdl:*black* :max-hp 18 :max-fp 32
+                                       :faction +faction-type-angels+
+                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
+                                       :strength 2
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-heal-self 1 :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
+                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-avatar-of-brilliance t :abil-trinity-mimic t
+                                       :ai-wants-bless t :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-mender+
+                                       :name "star mender"
+                                       :glyph-idx 65 :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 18 :max-fp 32
+                                       :faction +faction-type-angels+
+                                       :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
+                                       :strength 2
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-heal-self 1 :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
+                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-avatar-of-brilliance t :abil-trinity-mimic t
                                        :ai-wants-bless t :ai-curious t))
 
 ;;--------------------

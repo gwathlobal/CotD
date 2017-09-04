@@ -133,13 +133,13 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-shadow-devil+ :x 38 :y 13 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-star-singer+ :x 30 :y 13 :z 0))
   (add-mob-to-level-list (level world) *player*)
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 43 :y 18 :z 1))
-        (demon (make-instance 'mob :mob-type +mob-type-shadow-imp+ :x 42 :y 15 :z 0))
+  (let ((soldier (make-instance 'player :mob-type +mob-type-star-gazer+ :x 40 :y 13 :z 0))
+        (demon (make-instance 'player :mob-type +mob-type-star-mender+ :x 50 :y 13 :z 0))
         )
     (setf (cur-fp *player*) 22)
-    
+
     ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
     ;(set-mob-effect *player* +mob-effect-called-for-help+ 10)
@@ -148,7 +148,12 @@
     ;(set-mob-effect soldier :effect-type-id +mob-effect-flying+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
     (add-mob-to-level-list (level world) demon)
-    
+
+    (setf (mimic-id-list *player*) (list (id *player*) (id soldier) (id demon)))
+    (setf (mimic-id-list soldier) (list (id *player*) (id soldier) (id demon)))
+    (setf (mimic-id-list demon) (list (id *player*) (id soldier) (id demon)))
+
+    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-angel+ :x 41 :y 18 :z 0))
 
     ;(mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))
     ;               :spd nil)
@@ -159,11 +164,11 @@
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-half+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-fire+  :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
-    (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
+    ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-smoke-thin+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-blood-fresh+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-blood-old+  :x (+ (x *player*) -1) :y (+ (y *player*) 0) :z (+ (z *player*) 0)))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 0) :y (+ (y *player*) 1) :z (+ (z *player*) 0) :qty 75))

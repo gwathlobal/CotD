@@ -38,6 +38,7 @@
 (defconstant +player-faction-satanist+ 20)
 (defconstant +player-faction-church+ 21)
 (defconstant +player-faction-shadows+ 22)
+(defconstant +player-faction-trinity-mimics+ 23)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -478,6 +479,53 @@
                                   finally (return result)))))
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
+
+(defun find-unoccupied-place-mimic (world mob1 mob2 mob3 &key (inside nil))
+  ;; function specifically for mimics
+  (loop with max-x = (array-dimension (terrain (level *world*)) 0)
+        with max-y = (array-dimension (terrain (level *world*)) 1)
+        for x = (random max-x)
+        for y = (random max-y)
+        for z = 2
+        until (and (if inside
+                     (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
+                     (not (and (> x 7) (< x (- max-x 7)) (> y 7) (< y (- max-y 7)))))
+                     
+                   (eq (check-move-on-level mob1 (1- x) (1- y) z) t)
+                   (eq (check-move-on-level mob2 (1+ x) (1- y) z) t)
+                   (eq (check-move-on-level mob3 x (1+ y) z) t)
+
+                   (not (get-mob-* (level world) (1- x) (1- y) z))
+                   (not (get-mob-* (level world) (1+ x) (1- y) z))
+                   (not (get-mob-* (level world) x (1+ y) z))
+
+                   (get-terrain-type-trait (get-terrain-* (level world) (1- x) (1- y) z) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* (level world) (1+ x) (1- y) z) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* (level world) x (1+ y) z) +terrain-trait-opaque-floor+)
+
+                   (/= (get-level-connect-map-value (level world) (1- x) (1- y) z (if (riding-mob-id mob1)
+                                                                          (map-size (get-mob-by-id (riding-mob-id mob1)))
+                                                                          (map-size mob1))
+                                                    (get-mob-move-mode mob1))
+                       +connect-room-none+)
+                   (/= (get-level-connect-map-value (level world) (1+ x) (1- y) z (if (riding-mob-id mob2)
+                                                                          (map-size (get-mob-by-id (riding-mob-id mob2)))
+                                                                          (map-size mob2))
+                                                    (get-mob-move-mode mob2))
+                       +connect-room-none+)
+                   (/= (get-level-connect-map-value (level world) x (1+ y) z (if (riding-mob-id mob3)
+                                                                          (map-size (get-mob-by-id (riding-mob-id mob3)))
+                                                                          (map-size mob3))
+                                                    (get-mob-move-mode mob3))
+                       +connect-room-none+)
+                   )
+        finally (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
+                (add-mob-to-level-list (level world) mob1)
+                (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
+                (add-mob-to-level-list (level world) mob2)
+                (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
+                (add-mob-to-level-list (level world) mob3)
+        ))
 
 (defun find-unoccupied-place-inside (world mob)
   (loop with max-x = (array-dimension (terrain (level world)) 0)
