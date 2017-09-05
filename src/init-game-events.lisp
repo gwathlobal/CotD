@@ -7,13 +7,35 @@
                                                          (if (or (zerop (total-demons world))
                                                                  (and (mob-ability-p *player* +mob-abil-angel+)
                                                                       (= (mob-type *player*) +mob-type-angel+)
-                                                                      (>= (cur-fp *player*) (max-fp *player*))))
+                                                                      (or (and (mob-ability-p *player* +mob-abil-trinity-mimic+)
+                                                                               (loop for mimic-id in (mimic-id-list *player*)
+                                                                                     for mimic = (get-mob-by-id mimic-id)
+                                                                                     with cur-fp = 0
+                                                                                     with max-fp = 0
+                                                                                     do
+                                                                                        (incf max-fp (max-fp mimic))
+                                                                                     when (not (check-dead mimic))
+                                                                                       do
+                                                                                          (incf cur-fp (cur-fp mimic))
+                                                                                     finally (return (>= cur-fp max-fp)))
+                                                                               )
+                                                                          (and (not (mob-ability-p *player* +mob-abil-trinity-mimic+))
+                                                                               (>= (cur-fp *player*) (max-fp *player*))))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                (calculate-player-score 1400)
+                                                                                                                                (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
+                                                                                                                                                                  0
+                                                                                                                                                                  (loop for mimic-id in (mimic-id-list *player*)
+                                                                                                                                                                        for mimic = (get-mob-by-id mimic-id)
+                                                                                                                                                                        with cur-score = 0
+                                                                                                                                                                        when (not (eq mimic *player*))
+                                                                                                                                                                          do
+                                                                                                                                                                             (incf cur-score (cur-score mimic))
+                                                                                                                                                                        finally (return cur-score
+                                                                                                                                                                                        )))))
                                                                                                                                 (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond

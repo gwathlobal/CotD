@@ -91,7 +91,7 @@
                                 (and (eq target *player*)
                                      (get-single-memo-visibility (get-memo-* (level *world*) sx sy sz))
                                      (not (check-mob-visible source :observer target :complete-check nil)))))))
-          
+          (format t "VISIBLE-MOBS of ~A [~A] are ~A~%" (name target) (id target) (visible-mobs target))
           (when (< sound-pwr 30)
             (setf nx (+ sx 2 (* -1 (random 5))))
             (when (< nx 0) (setf nx 0))

@@ -21,61 +21,54 @@
            ;; iterate through all the mobs
            ;; those who are not dead and have cur-ap > 0 can make a move
            (loop for mob across *mobs* do
-             
-             ;(format t "MOB ~A [~A] check-dead = ~A, cur-ap = ~A~%" (name mob) (id mob) (check-dead mob) (cur-ap mob))
-             (unless (check-dead mob)    
-               (when (> (cur-ap mob) 0)
-                 (setf turn-finished nil)
-                 (setf (made-turn mob) nil)
-                 (set-message-this-turn nil)
-                 (setf (motion-set-p mob) nil)
-
-                 ;; for trinity mimics - set the current mob as the player
-                 (when (and (subtypep (type-of mob) 'player)
-                            (mob-ability-p mob +mob-abil-trinity-mimic+)
-                            (find (id mob) (mimic-id-list *player*)))
-                   (setf *player* mob))
+             (when (and (not (check-dead mob))
+                        (> (cur-ap mob) 0)
+                        (not (mob-effect-p mob +mob-effect-melded+)))
+               
+               (setf turn-finished nil)
+               (setf (made-turn mob) nil)
+               (set-message-this-turn nil)
+               (setf (motion-set-p mob) nil)
+               
+               ;; for trinity mimics - set the current mob as the player
+               (when (and (subtypep (type-of mob) 'player)
+                          (mob-ability-p mob +mob-abil-trinity-mimic+)
+                          (find (id mob) (mimic-id-list *player*)))
+                 (setf *player* mob))
+               
+               (ai-function mob)
+               (when (get-message-this-turn) (add-message (format nil "~%")))
+               (setf (heard-sounds mob) nil)
+               
+               (when (eq mob *player*)
+                 (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+                 (update-map-area))
+               (update-visible-mobs mob)
+               
+               ;; process animations for this turn if any
+               (when (animation-queue *world*)
                  
-                 (ai-function mob)
-                 (when (get-message-this-turn) (add-message (format nil "~%")))
-                 (setf (heard-sounds mob) nil)
-                 
-                 (when (eq mob *player*)
-                   (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
-                   (update-map-area))
-                 (update-visible-mobs mob)
-                 
-                 ;; process animations for this turn if any
-                 (when (animation-queue *world*)
-                   
-                   (loop for animation in (animation-queue *world*)
-                         do
-                            (play-animation animation))
-                   (sdl:update-display)
-                   (sdl-cffi::sdl-delay 100)
-                   (setf (animation-queue *world*) nil)
-                   (update-map-area))
-
-                 (when (<= (cur-ap mob) 0)
-                   (on-tick mob)))))
-
-
+                 (loop for animation in (animation-queue *world*)
+                       do
+                          (play-animation animation))
+                 (sdl:update-display)
+                 (sdl-cffi::sdl-delay 100)
+                 (setf (animation-queue *world*) nil)
+                 (update-map-area))
+               
+               (when (<= (cur-ap mob) 0)
+                 (on-tick mob))))
+                      
            (bt:with-lock-held ((path-lock *world*))
              (when (and *path-thread* (bt:thread-alive-p *path-thread*))
-               ;;(format t "THREAD: Destroy thread~%")
-               ;;(setf (cur-mob-path *world*) 0)
-               ;;(bt:condition-notify (path-cv *world*))
                (bt:destroy-thread *path-thread*)))
-
-           ;(bt:with-lock-held ((fov-lock *world*))
-           ;  (setf (cur-mob-fov *world*) 0)
-           ;  (bt:condition-notify (fov-cv *world*)))
            
            (when turn-finished
              (incf (real-game-time *world*))
              (setf (turn-finished *world*) t)
              (loop for mob across *mobs* do
-               (unless (check-dead mob)
+               (when (and (not (check-dead mob))
+                          (not (mob-effect-p mob +mob-effect-melded+)))
                  ;; increase cur-ap by max-ap
                  (incf (cur-ap mob) (max-ap mob))))
              (loop for feature-id in (feature-id-list (level *world*))

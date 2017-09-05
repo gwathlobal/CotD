@@ -170,6 +170,8 @@
 (defconstant +mob-abil-extinguish-light+ 66)
 (defconstant +mob-abil-umbral-aura+ 67)
 (defconstant +mob-abil-trinity-mimic+ 68)
+(defconstant +mob-abil-meld+ 69)
+(defconstant +mob-abil-unmeld+ 70)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -192,6 +194,7 @@
 (defconstant +mob-effect-slow+ 18)
 (defconstant +mob-effect-holy-touch+ 19)
 (defconstant +mob-effect-extinguished-light+ 20)
+(defconstant +mob-effect-melded+ 21)
 
 (defconstant +mob-order-follow+ 0)
 

@@ -28,7 +28,7 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~%~%Visibility: ~A~A"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
@@ -51,6 +51,17 @@
                         (total-demons *world*)
                         (total-undead *world*)
                         (sense-good-evil-str)
+                        (if (melded-id-list *player*)
+                          (loop for mimic-id in (melded-id-list *player*)
+                                for mimic = (get-mob-by-id mimic-id)
+                                for i from 0
+                                with str = (create-string)
+                                do
+                                   (when (> i 0)
+                                     (format str ", "))
+                                   (format str "~A" (capitalize-name (name (get-mob-type-by-id (mob-type mimic)))))
+                                finally (return (format nil "~%~%Melded: ~A" str)))
+                          "")
                         (if (or (mob-ability-p *player* +mob-abil-momentum+)
                                 (mob-ability-p *player* +mob-abil-facing+)) (format nil "~%Moving: ~A~A"
                                                                                     (x-y-into-str (momentum-dir *player*))

@@ -71,7 +71,7 @@
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
-                                                                abil-trinity-mimic)
+                                                                abil-trinity-mimic abil-meld abil-unmeld)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -234,6 +234,10 @@
     (setf (gethash +mob-abil-umbral-aura+ (abilities mob-type)) t))
   (when abil-trinity-mimic
     (setf (gethash +mob-abil-trinity-mimic+ (abilities mob-type)) t))
+  (when abil-meld
+    (setf (gethash +mob-abil-meld+ (abilities mob-type)) t))
+  (when abil-unmeld
+    (setf (gethash +mob-abil-unmeld+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -452,7 +456,9 @@
    (heard-sounds :initform nil :accessor heard-sounds)
    (visible-items :initform nil :accessor visible-items)
 
+   ;; special vars for trinity mimics
    (mimic-id-list :initform () :accessor mimic-id-list)
+   (melded-id-list :initform () :accessor melded-id-list)
 
    (path :initform nil :accessor path)
    (path-dst :initform nil :accessor path-dst) ;; is a actually a cons with coords (x y)

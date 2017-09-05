@@ -175,3 +175,5 @@
                                                             (setf (cur-light actor) (param1 effect))
                                                             (update-visible-mobs actor)
                                                             )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-melded+ :name "Melded" :color sdl:*cyan*))

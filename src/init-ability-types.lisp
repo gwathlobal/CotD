@@ -2866,3 +2866,138 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-meld+ :name "Meld" :descr "Cause your bonded trinity mimic standing nearby to meld into you." 
+                                 :cost 0 :spd (truncate +normal-ap+ 1.4) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+
+                                                (logger (format nil "MOB-MELD: ~A [~A] melds with ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
+                                                                                                           (format nil "You hear some eerie sounds~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A melds with ~A. " (capitalize-name (visible-name target)) (visible-name actor)))
+
+                                                
+                                                (set-mob-effect target :effect-type-id +mob-effect-melded+ :actor-id (id actor))
+                                                
+                                                (setf (melded-id-list actor) (append (melded-id-list actor) (list (id target)) (melded-id-list target)))
+                                                (setf (melded-id-list target) nil)
+                                                (remove-mob-from-level-list (level *world*) target)
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-meld+)
+                                                               (not (mob-effect-p actor +mob-effect-melded+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type))
+                                                  (if (and (mob-ability-p actor +mob-abil-meld+)
+                                                             (can-invoke-ability actor actor +mob-abil-meld+)
+                                                             (not nearest-enemy)
+                                                             nearest-ally
+                                                             (find (id nearest-ally) (mimic-id-list actor))
+                                                             (not (mob-effect-p nearest-ally +mob-effect-melded+))
+                                                             (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
+                                                                2))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy))
+                                                   (mob-invoke-ability actor nearest-ally (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (< (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*)) 2)
+                                                                 target
+                                                                 (not (eq target *player*))
+                                                                 (find (id target) (mimic-id-list *player*))
+                                                                 (not (mob-effect-p target +mob-effect-melded+)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* target ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-unmeld+ :name "Unmeld" :descr "Cause all melded trinity mimics to unmeld into nearby tiles." 
+                                 :cost 0 :spd (truncate +normal-ap+ 1.4) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+
+                                                (logger (format nil "MOB-UNMELD: ~A [~A] unmelds ~A.~%" (name actor) (id actor) (loop for mimic-id in (melded-id-list actor)
+                                                                                                                                      for mimic = (get-mob-by-id mimic-id)
+                                                                                                                                      for i from 0
+                                                                                                                                      with str = (create-string)
+                                                                                                                                      do
+                                                                                                                                         (when (> i 0)
+                                                                                                                                           (format str ", "))
+                                                                                                                                         (format str "~A [~A]" (name mimic) (id mimic))
+                                                                                                                                      finally (return str))))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
+                                                                                                           (format nil "You hear some eerie sounds~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A unmelds all trinity mimics. " (capitalize-name (visible-name actor))))
+                                                
+                                                (let ((tile-list))
+                                                  (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                  (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor)))
+                                                                                                                 )
+                                                                                                        (push (list dx dy (z actor)) tile-list)))))
+
+                                                  (loop for mimic-id in (melded-id-list actor)
+                                                        for mimic = (get-mob-by-id mimic-id)
+                                                        for random-tile = (random (length tile-list))
+                                                        for (x y z) = (nth random-tile tile-list)
+                                                        do
+                                                           (setf tile-list (remove (nth random-tile tile-list)
+                                                                                   tile-list))
+                                                           (setf (x mimic) x (y mimic) y (z mimic) z)
+                                                           (rem-mob-effect mimic +mob-effect-melded+)
+                                                           (add-mob-to-level-list (level *world*) mimic))
+                                                  (setf (melded-id-list actor) nil)
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (let ((tile-list))
+                                                        (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                  (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor)))
+                                                                                                                 )
+                                                                                                        (push (list dx dy (z actor)) tile-list)))))
+                                                        
+                                                        (if (and (mob-ability-p actor +mob-abil-unmeld+)
+                                                                 (melded-id-list actor)
+                                                                 (>= (length tile-list) 2))
+                                                          t
+                                                          nil)))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-unmeld+)
+                                                           (can-invoke-ability actor actor +mob-abil-unmeld+)
+                                                           nearest-enemy)
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
