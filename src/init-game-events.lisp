@@ -36,7 +36,9 @@
                                                                                                                                                                              (incf cur-score (cur-score mimic))
                                                                                                                                                                         finally (return cur-score
                                                                                                                                                                                         )))))
-                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
+                                                                                                                                (if (mimic-id-list *player*)
+                                                                                                                                  (faction-name *player*)
+                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
                                                                                                                                   ((zerop (total-demons world)) "Enemies eliminated.")
@@ -70,7 +72,9 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 1450)
-                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
+                                                                                                                                (if (mimic-id-list *player*)
+                                                                                                                                  (faction-name *player*)
+                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
                                                                                                                                   ((zerop (total-angels world)) "Enemies eliminated.")
@@ -100,7 +104,9 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score (+ 1500 (* 10 (total-humans world))))
-                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
+                                                                                                                                (if (mimic-id-list *player*)
+                                                                                                                                  (faction-name *player*)
+                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (cond
                                                                                                                                   ((zerop (total-demons world)) "Enemies eliminated.")
@@ -124,14 +130,25 @@
 (set-game-event (make-instance 'game-event :id +game-event-lose-game-died+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
-                                                         (if (check-dead *player*)
+                                                         (if (or (and (not (mob-ability-p *player* +mob-abil-trinity-mimic+))
+                                                                      (check-dead *player*))
+                                                                 (and (mob-ability-p *player* +mob-abil-trinity-mimic+)
+                                                                      (loop for mimic-id in (mimic-id-list *player*)
+                                                                            for mimic = (get-mob-by-id mimic-id)
+                                                                            with dead = 0
+                                                                            when (check-dead mimic)
+                                                                              do
+                                                                                 (incf dead)
+                                                                            finally (return (= dead (length (mimic-id-list *player*)))))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 0)
-                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
+                                                                                                                                (if (mimic-id-list *player*)
+                                                                                                                                  (faction-name *player*)
+                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (if (null (killed-by *player*))
                                                                                                                                   "Killed by unknown forces."
@@ -165,7 +182,9 @@
                                                            ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 0)
-                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
+                                                                                                                                (if (mimic-id-list *player*)
+                                                                                                                                  (faction-name *player*)
+                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (format nil "Possessed by ~A." (get-qualified-name (get-mob-by-id (master-mob-id *player*))))
                                                                                                                                 (level-layout (level world)))
@@ -435,7 +454,9 @@
                                                             ;; write highscores
                                                            (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 (calculate-player-score 0)
-                                                                                                                                (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
+                                                                                                                                (if (mimic-id-list *player*)
+                                                                                                                                  (faction-name *player*)
+                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
                                                                                                                                 (format nil "Escaped with $~A." (calculate-total-value *player*))
                                                                                                                                 (level-layout (level world)))

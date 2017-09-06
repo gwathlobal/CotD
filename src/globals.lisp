@@ -172,6 +172,7 @@
 (defconstant +mob-abil-trinity-mimic+ 68)
 (defconstant +mob-abil-meld+ 69)
 (defconstant +mob-abil-unmeld+ 70)
+(defconstant +mob-abil-heal-other+ 71)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

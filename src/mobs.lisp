@@ -40,6 +40,7 @@
    ;;   :abil-can-possess - +mob-abil-can-possess+ (takes fixnum)
    ;;   :abil-momentum - +mob-abil-momentum+ (takes fixnum)
    ;;   :abil-instill-fear - +mob-abil-instill-fear+ (takes fixnum)
+   ;;   :abil-heal-other - +mob-abil-heal-other+ (takes fixnum)
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -71,7 +72,7 @@
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
-                                                                abil-trinity-mimic abil-meld abil-unmeld)
+                                                                abil-trinity-mimic abil-meld abil-unmeld abil-heal-other)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 4) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -238,6 +239,8 @@
     (setf (gethash +mob-abil-meld+ (abilities mob-type)) t))
   (when abil-unmeld
     (setf (gethash +mob-abil-unmeld+ (abilities mob-type)) t))
+  (when abil-heal-other
+    (setf (gethash +mob-abil-heal-other+ (abilities mob-type)) abil-heal-other))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

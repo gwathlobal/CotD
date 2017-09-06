@@ -3001,3 +3001,63 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-heal-other+ :name "Heal other" :descr "Invoke divine powers to heal your allies and yourself." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (logger (format nil "MOB-HEAL-OTHER: ~A [~A] heals ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (let ((heal-pwr (+ (* 4 (mob-ability-p actor +mob-abil-heal-other+))
+                                                                   (random (* 3 (mob-ability-p actor +mob-abil-heal-other+))))))
+                                                  (when (> (+ (cur-hp target) heal-pwr)
+                                                           (max-hp target))
+                                                    (setf heal-pwr (- (max-hp target) (cur-hp target))))
+                                                  (incf (cur-hp target) heal-pwr)
+                                                  (decf (cur-fp actor) (cost ability-type))
+
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                             (format nil "You hear some strange noise~A. " str)))
+                                                  
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A invokes divine powers to heal ~A for ~A. " (capitalize-name (visible-name actor)) (visible-name target) heal-pwr)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-heal-other+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-heal-other+)
+                                                           (can-invoke-ability actor actor +mob-abil-heal-other+)
+                                                           (or (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                  0.6)
+                                                               (and nearest-ally
+                                                                    (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
+                                                                       (cur-sight actor))
+                                                                    (< (/ (cur-hp nearest-ally) (max-hp nearest-ally)) 
+                                                                       0.6)))
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy))
+                                                   (let ((target))
+                                                     (cond
+                                                       (nearest-ally (setf target nearest-ally))
+                                                       (t (setf target actor)))
+                                                     (mob-invoke-ability actor target (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and target
+                                                                 (get-faction-relation (faction *player*) (faction target))
+                                                                 (check-mob-visible target :observer *player* :complete-check t))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* target ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                       )))

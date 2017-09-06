@@ -430,6 +430,7 @@
          (loop for mob-id in (mimic-id-list *player*)
                for mob = (get-mob-by-id mob-id)
                do
+                  (setf (faction-name mob) (faction-name *player*))
                   (setf (name mob) (name *player*))))
        
        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
