@@ -1233,6 +1233,11 @@
     (when (dead= mob)
       (return-from make-dead nil))
 
+    (loop for melded-id in (melded-id-list mob)
+          for melded-mob = (get-mob-by-id melded-id)
+          do
+             (setf (cur-hp melded-mob) 0))
+    
     (when (and (eq mob *player*)
                killer)
       (setf (killed-by *player*) (get-qualified-name killer)))
@@ -1253,9 +1258,7 @@
     (when (and (mob-ability-p mob +mob-abil-angel+)
                (not (mob-ability-p mob +mob-abil-animal+)))
       (decf (total-angels *world*)))
-    (when (mob-effect-p mob +mob-effect-blessed+)
-      (decf (total-blessed *world*)))
-
+    
     ;; set stat-gold before dropping inventory
     (setf (stat-gold mob) (get-overall-value (inv mob)))
 

@@ -2,15 +2,37 @@
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-possessed+ :name "Possessed" :color sdl:*red*))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-blessed+ :name "Blessed" :color sdl:*blue*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-blessed+ :name "Blessed" :color sdl:*blue*
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore actor))
+                                                         (incf (total-blessed *world*))
+                                                         (incf (stat-blesses (get-mob-by-id (actor-id effect))))
+                                                         (when (eq *player* (get-mob-by-id (actor-id effect)))
+                                                           (incf (cur-score *player*) 5))
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect actor))
+                                                            (decf (total-blessed *world*))
+                                                            )))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-reveal-true-form+ :name "Revealed" :color sdl:*red*
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (setf (face-mob-type-id actor) (mob-type actor))
+                                                         )
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (when (slave-mob-id actor)
                                                               (setf (face-mob-type-id actor) (mob-type (get-mob-by-id (slave-mob-id actor))))))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-concealed+ :name "Concealed" :color sdl:*cyan*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-concealed+ :name "Concealed" :color sdl:*cyan*
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (setf (face-mob-type-id actor) +mob-type-man+)
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (setf (face-mob-type-id actor) (mob-type actor)))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-calling-for-help+ :name "Summoning" :color sdl:*green*))
 
@@ -18,9 +40,25 @@
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-divine-shield+ :name "Divine shield" :color sdl:*yellow*))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-cursed+ :name "Cursed" :color (sdl:color :r 139 :g 69 :b 19)))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-cursed+ :name "Cursed" :color (sdl:color :r 139 :g 69 :b 19)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-m-acc actor)
+                                                         (adjust-r-acc actor)
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (adjust-m-acc actor)
+                                                            (adjust-r-acc actor))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-blind+ :name "Blind" :color (sdl:color :r 100 :g 100 :b 100)))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-blind+ :name "Blind" :color (sdl:color :r 100 :g 100 :b 100)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-sight actor)
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (adjust-sight actor))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-fear+ :name "Fear" :color sdl:*magenta*))
 
@@ -43,8 +81,7 @@
                                                          (adjust-m-acc actor)
                                                          (adjust-r-acc actor)
                                                          (adjust-sight actor)
-                                                         ;(set-name actor)
-
+                                                         
                                                          (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor))
 
                                                           ;; set up current abilities cooldowns
@@ -68,9 +105,6 @@
                                                             (adjust-m-acc actor)
                                                             (adjust-r-acc actor)
                                                             (adjust-sight actor)
-                                                            ;(set-name actor)
-
-                                                            
                                                             
                                                             ;; set up current abilities cooldowns
                                                             (loop for ability-id being the hash-key in (abilities actor) do
@@ -141,11 +175,17 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A loses its power. " (visible-name actor))))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-necrolink+ :name "Necrolink" :color (sdl:color :r 100 :g 100 :b 100)))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-necrolink+ :name "Necrolink" :color (sdl:color :r 100 :g 100 :b 100)
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (setf (order actor) nil))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-gravity-pull+ :name "Gravity pull" :color sdl:*red*))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-flying+ :name "Flying" :color sdl:*cyan*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-flying+ :name "Flying" :color sdl:*cyan*
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (apply-gravity actor))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-slow+ :name "Slowed" :color sdl:*red*
                                              :on-add #'(lambda (effect actor)
@@ -176,4 +216,76 @@
                                                             (update-visible-mobs actor)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-melded+ :name "Melded" :color sdl:*cyan*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-melded+ :name "Melded" :color sdl:*cyan*
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (let ((singer nil)
+                                                               (gazer nil)
+                                                               (mender nil)
+                                                               (cur-hp 0)
+                                                               (final-mob-type nil))
+                                                           (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                                 for mob = (get-mob-by-id mob-id)
+                                                                 do
+                                                                    (incf cur-hp (cur-hp mob))
+                                                                    (cond
+                                                                      ((= (mob-type mob) +mob-type-star-singer+) (setf singer t))
+                                                                      ((= (mob-type mob) +mob-type-star-gazer+) (setf gazer t))
+                                                                      ((= (mob-type mob) +mob-type-star-mender+) (setf mender t))))
+                                                                 
+                                                           (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                                 for mob = (get-mob-by-id mob-id)
+                                                                 do
+                                                                    (setf (is-melded mob) t)
+                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (melded-id-list actor))))))
+                                                           (setf (is-melded actor) nil)
+                                                           
+                                                           (cond
+                                                             ((and singer gazer mender) (setf final-mob-type +mob-type-star-singer-gazer-mender+))
+                                                             ((and singer mender) (setf final-mob-type +mob-type-star-singer-mender+))
+                                                             ((and singer gazer) (setf final-mob-type +mob-type-star-singer-gazer+))
+                                                             ((and gazer mender) (setf final-mob-type +mob-type-star-gazer-mender+)))
+
+                                                           (setf (mob-type actor) final-mob-type)
+                                                           (setf (face-mob-type-id actor) (mob-type actor))
+                                                           (set-cur-weapons actor)
+                                                           (adjust-dodge actor)
+                                                           (adjust-armor actor)
+                                                           (adjust-m-acc actor)
+                                                           (adjust-r-acc actor)
+                                                           (adjust-sight actor)
+                                                           
+                                                           ;; set up current abilities cooldowns
+                                                           (loop for ability-id being the hash-key in (abilities actor) do
+                                                             (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                           )
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (setf (mob-type actor) (param1 effect))
+                                                            (setf (face-mob-type-id actor) (mob-type actor))
+                                                            (set-cur-weapons actor)
+                                                            (adjust-dodge actor)
+                                                            (adjust-armor actor)
+                                                            (adjust-m-acc actor)
+                                                            (adjust-r-acc actor)
+                                                            (adjust-sight actor)
+
+                                                            ;; set up current abilities cooldowns
+                                                            (loop for ability-id being the hash-key in (abilities actor) do
+                                                              (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-righteous-fury+ :name "Righteous fury" :color (sdl:color :r 255 :g 140 :b 0)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (setf (weapon actor) (list "Flaming sword" (list +weapon-dmg-fire+ 4 7 (truncate +normal-ap+ 1.3) 100 (list :chops-body-parts :is-fire)) nil))
+                                                         
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A is filled with righteous fury. " (visible-name actor))))
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (set-cur-weapons actor)
+                                                            (set-mob-effect actor :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 3)
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "~A is no longer filled with righteous fury.~%" (visible-name actor))))
+                                             ))

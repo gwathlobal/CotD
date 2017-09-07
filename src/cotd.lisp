@@ -23,7 +23,7 @@
            (loop for mob across *mobs* do
              (when (and (not (check-dead mob))
                         (> (cur-ap mob) 0)
-                        (not (mob-effect-p mob +mob-effect-melded+)))
+                        (not (is-melded mob)))
                
                (setf turn-finished nil)
                (setf (made-turn mob) nil)
@@ -68,7 +68,7 @@
              (setf (turn-finished *world*) t)
              (loop for mob across *mobs* do
                (when (and (not (check-dead mob))
-                          (not (mob-effect-p mob +mob-effect-melded+)))
+                          (not (is-melded mob)))
                  ;; increase cur-ap by max-ap
                  (incf (cur-ap mob) (max-ap mob))))
              (loop for feature-id in (feature-id-list (level *world*))

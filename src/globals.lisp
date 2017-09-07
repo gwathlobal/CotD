@@ -81,6 +81,10 @@
 (defconstant +mob-type-star-singer+ 33)
 (defconstant +mob-type-star-gazer+ 34)
 (defconstant +mob-type-star-mender+ 35)
+(defconstant +mob-type-star-singer-mender+ 36)
+(defconstant +mob-type-star-singer-gazer+ 37)
+(defconstant +mob-type-star-gazer-mender+ 38)
+(defconstant +mob-type-star-singer-gazer-mender+ 39)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -173,6 +177,7 @@
 (defconstant +mob-abil-meld+ 69)
 (defconstant +mob-abil-unmeld+ 70)
 (defconstant +mob-abil-heal-other+ 71)
+(defconstant +mob-abil-righteous-fury+ 72)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -196,6 +201,7 @@
 (defconstant +mob-effect-holy-touch+ 19)
 (defconstant +mob-effect-extinguished-light+ 20)
 (defconstant +mob-effect-melded+ 21)
+(defconstant +mob-effect-righteous-fury+ 22)
 
 (defconstant +mob-order-follow+ 0)
 
