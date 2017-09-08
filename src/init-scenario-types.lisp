@@ -18,6 +18,14 @@
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
+(set-scenario-feature (make-scenario-feature :id +weather-type-rain+
+                                             :type +scenario-feature-weather+
+                                             :name "Rain"
+                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
+                                                       (pushnew +game-event-rain-falls+ game-event-list)
+                                                       
+                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+
 ;;======================
 ;; LAYOUT
 ;;======================
@@ -27,6 +35,7 @@
                                              :name "Test"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        (setf layout-func #'(lambda () (create-template-test-city *max-x-level* *max-y-level* *max-z-level* nil)))
+                                                       (pushnew +game-event-rain-falls+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 

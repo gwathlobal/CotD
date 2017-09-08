@@ -154,7 +154,7 @@
     (setf (mimic-id-list soldier) (list (id *player*) (id soldier) (id demon)))
     (setf (mimic-id-list demon) (list (id *player*) (id soldier) (id demon)))
 
-    ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-archdemon+ :x 35 :y 13 :z 0))
+    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-archdemon+ :x 35 :y 13 :z 0))
 
     ;(mob-pick-item *player* (make-instance 'item :item-type +item-type-body-part+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0))
     ;               :spd nil)

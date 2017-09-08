@@ -50,8 +50,7 @@
 (defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*)
                              (post-func #'(lambda (x y x1 y1) (declare (ignore x y x1 y1)) nil)))
   (declare (optimize (speed 3)))
-  (format t "HERE~%")
-   ;; draw the level
+  ;; draw the level
    (let* ((x1 0) (y1 0) (glyph-w *glyph-w*) (glyph-h *glyph-h*) (single-memo))
      (declare (type fixnum x1 y1 rel-x rel-y glyph-w glyph-h))
 

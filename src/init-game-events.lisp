@@ -474,3 +474,46 @@
                                                                                 (make-output *current-window*)
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
+
+(set-game-event (make-instance 'game-event :id +game-event-rain-falls+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (loop repeat (sqrt (* (array-dimension (terrain (level world)) 0) (array-dimension (terrain (level world)) 1)))
+                                                                 for x = (random (array-dimension (terrain (level world)) 0))
+                                                                 for y = (random (array-dimension (terrain (level world)) 1))
+                                                                 do
+                                                                    (loop for z from (1- (array-dimension (terrain (level world)) 2)) downto 0
+                                                                          when (or (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
+                                                                                   (and (> z 0)
+                                                                                        (get-terrain-type-trait (get-terrain-* (level world) x y (1- z)) +terrain-trait-water+))
+                                                                                   (and (> z 0)
+                                                                                        (get-terrain-type-trait (get-terrain-* (level world) x y (1- z)) +terrain-trait-blocks-move+))
+                                                                                   (get-mob-* (level world) x y z))
+                                                                            do
+                                                                               (logger (format nil "GAME-EVENT: Rain falls at (~A ~A ~A)~%" x y z))
+                                                                               (place-animation x y z +anim-type-rain-dot+)
+                                                                               (when (get-mob-* (level world) x y z)
+                                                                                 (set-mob-effect (get-mob-* (level world) x y z) :effect-type-id +mob-effect-wet+ :actor-id (id (get-mob-* (level world) x y z)) :cd 2))
+                                                                               (when (get-features-* (level world) x y z)
+                                                                                 (loop for feature-id in (get-features-* (level world) x y z)
+                                                                                       for feature = (get-feature-by-id feature-id)
+                                                                                       when (or (= (feature-type feature) +feature-blood-old+)
+                                                                                                (= (feature-type feature) +feature-blood-fresh+))
+                                                                                         do
+                                                                                            (remove-feature-from-level-list (level world) feature)
+                                                                                            (remove-feature-from-world feature)
+                                                                                       when (= (feature-type feature) +feature-blood-stain+)
+                                                                                         do
+                                                                                            (remove-feature-from-level-list (level world) feature)
+                                                                                            (remove-feature-from-world feature)
+                                                                                            (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-fresh+ :x x :y y :z z))
+                                                                                       when (= (feature-type feature) +feature-fire+)
+                                                                                         do
+                                                                                            (decf (counter feature) 2)
+                                                                                            (when (<= (counter feature) 0)
+                                                                                              (remove-feature-from-level-list (level world) feature)
+                                                                                              (remove-feature-from-world feature)))))
+                                                                )
+                                                           )))

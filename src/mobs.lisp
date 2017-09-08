@@ -710,7 +710,6 @@
   (let ((stealth (base-stealth mob)))
     (setf (cur-stealth mob) stealth))
 
-  (format t "~A~%" (armor (get-mob-type-by-id (mob-type mob))))
   (let ((armor (make-array (list (length (armor (get-mob-type-by-id (mob-type mob))))) :initial-element nil)))
     (loop for armor-type across (armor (get-mob-type-by-id (mob-type mob)))
           for i from 0 do
@@ -851,12 +850,14 @@
     nil))
 
 (defmethod get-armor-d-resist ((mob mob) dmg-type)
-  (when (aref (armor mob) dmg-type)
-    (first (aref (armor mob) dmg-type))))
+  (if (aref (armor mob) dmg-type)
+    (first (aref (armor mob) dmg-type))
+    0))
 
 (defmethod get-armor-%-resist ((mob mob) dmg-type)
-  (when (aref (armor mob) dmg-type)
-    (second (aref (armor mob) dmg-type))))
+  (if (aref (armor mob) dmg-type)
+    (second (aref (armor mob) dmg-type))
+    0))
 
 (defun set-armor-d-resist (mob dmg-type value)
   (if (aref (armor mob) dmg-type)

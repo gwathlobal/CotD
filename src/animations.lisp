@@ -2,6 +2,7 @@
 
 (defconstant +anim-type-fire-dot+ 0)
 (defconstant +anim-type-severed-body-part+ 1)
+(defconstant +anim-type-rain-dot+ 2)
 
 (defparameter *animation-types* (make-array (list 0) :adjustable t))
 
