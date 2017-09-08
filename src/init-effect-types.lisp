@@ -300,3 +300,13 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A is no longer filled with righteous fury.~%" (visible-name actor))))
                                              ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-wet+ :name "Wet" :color sdl:*blue*
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor)
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (adjust-armor actor)
+                                                            )))

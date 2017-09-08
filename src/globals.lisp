@@ -202,6 +202,7 @@
 (defconstant +mob-effect-extinguished-light+ 20)
 (defconstant +mob-effect-melded+ 21)
 (defconstant +mob-effect-righteous-fury+ 22)
+(defconstant +mob-effect-wet+ 23)
 
 (defconstant +mob-order-follow+ 0)
 

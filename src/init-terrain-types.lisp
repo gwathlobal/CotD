@@ -248,7 +248,10 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid+ :name "Water"
                                                :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* 
-                                               :trait-not-climable t :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*))
+                                               :trait-not-climable t :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*
+                                               :on-step #'(lambda (mob x y z)
+                                                            (declare (ignore x y z))
+                                                            (set-mob-effect mob :effect-type-id +mob-effect-wet+ :actor-id (id mob) :cd 4))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-ice+ :name "Ice"
                                                :glyph-idx 94 :glyph-color (sdl:color :r 0 :g 100 :b 255) :back-color sdl:*black*
@@ -256,7 +259,10 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid-nofreeze+ :name "Water"
                                                :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* 
-                                               :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*))
+                                               :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*
+                                               :on-step #'(lambda (mob x y z)
+                                                            (declare (ignore x y z))
+                                                            (set-mob-effect mob :effect-type-id +mob-effect-wet+ :actor-id (id mob) :cd 4))))
 
 ;;--------------------
 ;; Air

@@ -11,6 +11,7 @@ CHANGELOG
 - You can now wait a turn using [.], and pick items using [g] and [,].
 - The game now logs your current title instead of your initial title into a highscore entry.
 - The player is now highlighted on the map.
+- Dropping in water gives you a 'wet' effect, which means 25% of increased fire resistance.
 
 --------------------
 August 18, 2017 v1.2.0

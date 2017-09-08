@@ -1,6 +1,5 @@
 - Give angels some escape options
 - Give angels ressurection
-- Water should give fire resistance
 - Add articles to names
 - Movement on tiles with mobs should cost more so that they do not bump into each other that often
 - Add courtyard houses like Thief2RL
