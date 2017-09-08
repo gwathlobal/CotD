@@ -135,8 +135,8 @@
 (defun set-memo-* (level x y z single-memo)
   (setf (aref (memo level) x y z) single-memo))
 
-(defun create-single-memo (glyph-idx glyph-color back-color visibility revealed light)
-  (make-array (list 6) :initial-contents (list glyph-idx glyph-color back-color visibility revealed light))
+(defun create-single-memo (glyph-idx glyph-color back-color visibility revealed light player)
+  (make-array (list 7) :initial-contents (list glyph-idx glyph-color back-color visibility revealed light player))
   ;(list glyph-idx glyph-color back-color visibility revealed light)
   )
 
@@ -164,12 +164,17 @@
   ;(nth 5 single-memo)
   (aref single-memo 5))
 
+(defun get-single-memo-player (single-memo)
+  ;(nth 5 single-memo)
+  (aref single-memo 6))
+
 (defun set-single-memo-* (level x y z &key (glyph-idx (get-single-memo-glyph-idx (get-memo-* level x y z)))
                                            (glyph-color (get-single-memo-glyph-color (get-memo-* level x y z))) 
                                            (back-color (get-single-memo-back-color (get-memo-* level x y z))) 
                                            (visibility (get-single-memo-visibility (get-memo-* level x y z)))
                                            (revealed (get-single-memo-revealed (get-memo-* level x y z)))
-                                           (light (get-single-memo-light (get-memo-* level x y z))))
+                                           (light (get-single-memo-light (get-memo-* level x y z)))
+                                           (player (get-single-memo-player (get-memo-* level x y z))))
   ;(set-memo-* level x y z (create-single-memo glyph-idx glyph-color back-color visibility revealed light))
   (let ((single-memo (get-memo-* level x y z)))
     (setf (aref single-memo 0) glyph-idx)
@@ -177,7 +182,8 @@
     (setf (aref single-memo 2) back-color)
     (setf (aref single-memo 3) visibility)
     (setf (aref single-memo 4) revealed)
-    (setf (aref single-memo 5) light)))
+    (setf (aref single-memo 5) light)
+    (setf (aref single-memo 6) player)))
 
 (defun get-connect-map-value (connect-map x y z move-mode)
   (let ((move-mode-array (aref connect-map x y z)))

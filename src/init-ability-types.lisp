@@ -2850,8 +2850,8 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-meld+ :name "Meld" :descr "Cause your bonded trinity mimic standing nearby to meld into you. Melding is allowed only if the target is standing on the solid ground. The act of melding clears all effects from the target." 
-                                 :cost 0 :spd (truncate +normal-ap+ 1.4) :passive nil
+                                 :id +mob-abil-meld+ :name "Meld" :descr "Cause your bonded trinity mimic standing nearby to meld into you. Melding is allowed only if the target is standing on the solid ground. The act of melding clears all effects from the target. While being melded you will have your HP redistributed each turn with other melded mimics so that all of you have the same amount of HP." 
+                                 :cost 0 :spd (truncate +normal-ap+ 1.2) :passive nil
                                  :final t :on-touch nil
                                  :motion 100
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -2903,6 +2903,7 @@
                                                              nearest-ally
                                                              (find (id nearest-ally) (mimic-id-list actor))
                                                              (not (mob-effect-p nearest-ally +mob-effect-possessed+))
+                                                             (not (riding-mob-id nearest-ally))
                                                              (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-ally) (y nearest-ally) (z nearest-ally)) +terrain-trait-opaque-floor+)
                                                              (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
                                                                 2))
@@ -2918,6 +2919,7 @@
                                                                  (not (eq target *player*))
                                                                  (find (id target) (mimic-id-list *player*))
                                                                  (not (mob-effect-p target +mob-effect-possessed+))
+                                                                 (not (riding-mob-id target))
                                                                  (get-terrain-type-trait (get-terrain-* (level *world*) (x target) (y target) (z target)) +terrain-trait-opaque-floor+))
                                                           (progn
                                                             (clear-message-list *small-message-box*)

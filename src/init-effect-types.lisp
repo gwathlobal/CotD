@@ -272,8 +272,19 @@
 
                                                             ;; set up current abilities cooldowns
                                                             (loop for ability-id being the hash-key in (abilities actor) do
-                                                              (setf (gethash ability-id (abilities-cd actor)) 0))
-                                                            )))
+                                                              (setf (gethash ability-id (abilities-cd actor)) 0)))
+                                             :on-tick #'(lambda (effect actor)
+                                                          (declare (ignore effect))
+                                                          (let ((cur-hp 0))
+                                                            (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                                 for mob = (get-mob-by-id mob-id)
+                                                                 do
+                                                                    (incf cur-hp (cur-hp mob)))
+                                                                                                                                     
+                                                           (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                                 for mob = (get-mob-by-id mob-id)
+                                                                 do
+                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (melded-id-list actor))))))))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-righteous-fury+ :name "Righteous fury" :color (sdl:color :r 255 :g 140 :b 0)
                                              :on-add #'(lambda (effect actor)

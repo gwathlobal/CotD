@@ -10,6 +10,7 @@ CHANGELOG
 - Added Prayer of wrath to the priests. This ability grants a fire-based melee attack to those who follow you.
 - You can now wait a turn using [.], and pick items using [g] and [,].
 - The game now logs your current title instead of your initial title into a highscore entry.
+- The player is now highlighted on the map.
 
 --------------------
 August 18, 2017 v1.2.0

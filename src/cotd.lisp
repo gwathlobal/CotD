@@ -39,11 +39,13 @@
                (ai-function mob)
                (when (get-message-this-turn) (add-message (format nil "~%")))
                (setf (heard-sounds mob) nil)
-               
+
+               (update-visible-mobs mob)
                (when (eq mob *player*)
                  (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
-                 (update-map-area))
-               (update-visible-mobs mob)
+                 (update-map-area)
+                 )
+               
                
                ;; process animations for this turn if any
                (when (animation-queue *world*)

@@ -204,7 +204,7 @@
     (loop for x from 0 below max-x do
       (loop for y from 0 below max-y do
         (loop for z from 0 below max-z do
-          (set-memo-* level x y z (create-single-memo 0 sdl:*white* sdl:*black* nil nil 0)))))
+          (set-memo-* level x y z (create-single-memo 0 sdl:*white* sdl:*black* nil nil 0 nil)))))
     level))
 
 (defun create-level-from-template (template-level)

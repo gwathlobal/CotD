@@ -200,7 +200,8 @@
                                                          y1
                                                          31
                                                          :front-color sdl:*white*
-                                                         :back-color sdl:*black*))))
+                                                         :back-color sdl:*black*))
+                                  ))
     
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   (show-message-box 10 (- *window-height* *msg-box-window-height* 20) (- *window-width* 260 10))
@@ -209,7 +210,9 @@
     
   (sdl:update-display)
   
- )
+  )
+
+
 
 (defmethod make-output ((win cell-window))
   

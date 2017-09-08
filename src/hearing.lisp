@@ -65,10 +65,10 @@
                            )
                          exit-result)))
 
-    (logger (format nil "PROPAGATE-SOUND-FROM-LOCATION: Initial sound power ~A, final sound power ~A, Source ~A [~A] (~A ~A ~A), Target ~A [~A], Sound string ~A~%"
+    (logger (format nil "PROPAGATE-SOUND-FROM-LOCATION: Initial sound power ~A, final sound power ~A, Source ~A [~A] (~A ~A ~A), Target ~A [~A] (~A ~A ~A), Sound string ~A~%"
                     sound-power sound-pwr
                     (if source (name source) nil) (if source (id source) nil) sx sy sz
-                    (name target) (id target)
+                    (name target) (id target) (z target) (y target) (z target)
                     (funcall sound-str-func "")))
     
     (when (not (zerop sound-pwr))

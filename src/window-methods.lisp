@@ -50,6 +50,7 @@
 (defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*)
                              (post-func #'(lambda (x y x1 y1) (declare (ignore x y x1 y1)) nil)))
   (declare (optimize (speed 3)))
+  (format t "HERE~%")
    ;; draw the level
    (let* ((x1 0) (y1 0) (glyph-w *glyph-w*) (glyph-h *glyph-h*) (single-memo))
      (declare (type fixnum x1 y1 rel-x rel-y glyph-w glyph-h))
@@ -75,7 +76,42 @@
 		       :front-color (get-single-memo-glyph-color single-memo) 
 		       :back-color (get-single-memo-back-color single-memo))
 
-           (funcall post-func (+ sx x) (+ sy y) x1 y1))))))
+           (funcall post-func (+ sx x) (+ sy y) x1 y1)
+
+           (when (get-single-memo-player single-memo)
+             (highlight-map-tile x1 y1)))))))
+
+(defun highlight-map-tile (x1 y1)
+  (let ((color sdl:*green*))
+    ;; draw the rectangle
+    (sdl:draw-pixel-* (+ x1 1) y1 :color color)
+    (sdl:draw-pixel-* (+ x1 2) y1 :color color)
+    (sdl:draw-pixel-* x1 (+ y1 1) :color color)
+    (sdl:draw-pixel-* x1 (+ y1 2) :color color)
+
+    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 1) y1 :color color)
+    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 2) y1 :color color)
+    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (+ y1 1) :color color)
+    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (+ y1 2) :color color)
+
+    (sdl:draw-pixel-* (+ x1 1) (+ y1 (1- *glyph-h*)) :color color)
+    (sdl:draw-pixel-* (+ x1 2) (+ y1 (1- *glyph-h*)) :color color)
+    (sdl:draw-pixel-* x1 (- (+ y1 (1- *glyph-h*)) 1) :color color)
+    (sdl:draw-pixel-* x1 (- (+ y1 (1- *glyph-h*)) 2) :color color)
+
+    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 1) (+ y1 (1- *glyph-h*)) :color color)
+    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 2) (+ y1 (1- *glyph-h*)) :color color)
+    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (- (+ y1 (1- *glyph-h*)) 1) :color color)
+    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (- (+ y1 (1- *glyph-h*)) 2) :color color)
+  ;(sdl:with-rectangle (l-rect (sdl:rectangle :x x1 :y y1 :w 1 :h *glyph-h*))
+  ;  (sdl:fill-surface color :template l-rect))
+  ;(sdl:with-rectangle (r-rect (sdl:rectangle :x (+ x1 (1- *glyph-w*)) :y y1 :w 1 :h *glyph-h*))
+  ;  (sdl:fill-surface color :template r-rect))
+  ;(sdl:with-rectangle (t-rect (sdl:rectangle :x x1 :y y1 :w *glyph-w* :h 1))
+  ;  (sdl:fill-surface color :template t-rect))
+  ;(sdl:with-rectangle (b-rect (sdl:rectangle :x x1 :y (+ y1 (1- *glyph-h*)) :w *glyph-w* :h 1))
+  ;  (sdl:fill-surface color :template b-rect))
+    ))
 
 (defun check-tile-on-map (map-x map-y map-z sx sy max-x-view max-y-view view-z)
   (if (and (>= map-x sx) (>= map-y sy)

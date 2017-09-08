@@ -470,7 +470,8 @@
   ;; drawing terrain
   (let ((glyph-idx)
         (glyph-color)
-        (back-color))
+        (back-color)
+        (player nil))
     (if (and (or (eq (get-terrain-* level map-x map-y map-z) +terrain-floor-air+)
                  (eq (get-terrain-* level map-x map-y map-z) +terrain-border-air+))
              (> map-z 0)
@@ -539,6 +540,8 @@
         (setf glyph-idx (get-current-mob-glyph-idx vmob :x map-x :y map-y :z map-z))
         (setf glyph-color (get-current-mob-glyph-color vmob))
         (setf back-color (get-current-mob-back-color vmob))
+        (when (eq vmob *player*)
+          (setf player t))
         )
       )
     (set-single-memo-* level map-x map-y map-z
@@ -546,7 +549,8 @@
                        :glyph-color glyph-color
                        :back-color back-color
                        :visibility t
-                       :revealed t)
+                       :revealed t
+                       :player player)
   ))
 
 (defun update-visible-area-normal (level x y z &key (no-z nil))
