@@ -210,6 +210,7 @@
 (defconstant +weapon-dmg-iron+ 1)
 (defconstant +weapon-dmg-fire+ 2)
 (defconstant +weapon-dmg-vorpal+ 3)
+(defconstant +weapon-dmg-mind+ 4)
 
 ;;--------------------
 ;; ITEM-TYPE Constants

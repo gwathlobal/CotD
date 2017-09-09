@@ -160,38 +160,20 @@
                                                :on-tick-func #'(lambda (level feature)
                                                                  ;; damage mobs
                                                                  (when (get-mob-* level (x feature) (y feature) (z feature))
-                                                                   (let ((cur-dmg (1+ (random (counter feature))))
-                                                                         (target (get-mob-* level (x feature) (y feature) (z feature))))
+                                                                   (let ((target (get-mob-* level (x feature) (y feature) (z feature))))
 
-                                                                     ;; reduce damage by the amount of risistance to this damage type
-                                                                     ;; first reduce the damage directly
-                                                                     ;; then - by percent
-                                                                     (when (get-armor-resist target +weapon-dmg-fire+)
-                                                                       (decf cur-dmg (get-armor-d-resist target +weapon-dmg-fire+))
-                                                                       (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target +weapon-dmg-fire+))) 100)))
-                                                                     (when (< cur-dmg 0) (setf cur-dmg 0))
-                                                                     
-                                                                     ;; target under protection of divine shield - consume the shield and do not harm
-                                                                     (when (mob-effect-p target +mob-effect-divine-shield+)
-                                                                       (setf cur-dmg 0)
-                                                                       (rem-mob-effect target +mob-effect-divine-shield+))
-                                                                     
-                                                                     (decf (cur-hp target) cur-dmg)
-                                                                     (if (zerop cur-dmg)
-                                                                       (progn
-                                                                         (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                                (format nil "~@(~A~) is not harmed by fire.~%" (visible-name target))))
-                                                                       (progn
-                                                                         (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                                (format nil "~@(~A~) takes ~A fire damage.~%" (visible-name target) cur-dmg))))
+                                                                     (inflict-damage target :min-dmg 1 :max-dmg (counter feature) :dmg-type +weapon-dmg-fire+
+                                                                                            :att-spd nil :weapon-aux '(:is-fire) :acc 100 :add-blood nil :no-dodge t
+                                                                                            :actor nil
+                                                                                            :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                                          (format nil "~A takes ~A fire damage. " (capitalize-name (name target)) cur-dmg))
+                                                                                            :specific-no-dmg-string-func #'(lambda ()
+                                                                                                                             (format nil "~A takes no damage from fire. " (capitalize-name (name target)))))
+
                                                                      (when (check-dead target)
                                                                        (when (eq target *player*)
-                                                                         (setf (killed-by *player*) "fire"))
-                                                                       (if (mob-effect-p target +mob-effect-possessed+)
-                                                                         (make-dead target :splatter t :msg t :msg-newline nil :killer nil :corpse nil :aux-params '(:is-fire))
-                                                                         (make-dead target :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params '(:is-fire)))
-                                                                                                   
-                                                                       )))
+                                                                         (setf (killed-by *player*) "fire")))
+                                                                     ))
                                                                  ;; spread fire
                                                                  (let ((dir (1+ (random 9)))
                                                                        (dx) (dy))

@@ -823,30 +823,22 @@
     ))
 
 (defun mob-burn-blessing (actor target)
-  (let ((cur-dmg))
-    (setf cur-dmg (1+ (random 2)))
-    (decf (cur-hp target) cur-dmg)
-    ;; place a blood spattering
-    (when (> cur-dmg 0)
-      (let ((dir (1+ (random 9))))
-        (multiple-value-bind (dx dy) (x-y-dir dir) 				
-          (when (> 50 (random 100))
-            (add-feature-to-level-list (level *world*) 
-                                       (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target) dx) :y (+ (y target) dy) :z (z target)))))))
-
-    (when (zerop (random 4))
-      (generate-sound target (x target) (y target) (z target) 80 #'(lambda (str)
-                                                                 (format nil "You hear gasps~A." str))))
-    (print-visible-message (x target) (y target) (z target) (level *world*) 
-                           (format nil "~A is scorched by ~A for ~A damage. " (capitalize-name (name target)) (name actor) cur-dmg))
-    (when (check-dead target)
-      (when (mob-effect-p target +mob-effect-possessed+)
-        (mob-depossess-target target))
-      
-      (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params nil)
-      )
+  
+  (inflict-damage target :min-dmg 1 :max-dmg 2 :dmg-type +weapon-dmg-fire+
+                         :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
+                         :actor actor
+                         :specific-hit-string-func #'(lambda (cur-dmg)
+                                                       (format nil "~A is scorched by ~A for ~A damage. " (capitalize-name (name target)) (name actor) cur-dmg)))
+  (when (zerop (random 4))
+    (generate-sound target (x target) (y target) (z target) 80 #'(lambda (str)
+                                                                   (format nil "You hear gasps~A." str))))
+  (when (check-dead target)
+    (when (mob-effect-p target +mob-effect-possessed+)
+      (mob-depossess-target target))
     
-    ))
+    (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (list :is-fire))
+    )
+  )
 
 (defun mob-can-shoot (actor)
   (unless (is-weapon-ranged actor)
@@ -895,14 +887,6 @@
       (progn
         (setf bullets-left (get-ranged-weapon-charges actor))
         (set-ranged-weapon-charges actor 0)))
-    
-    ;; target under protection of divine shield - consume the shield and quit
-    (when (mob-effect-p target +mob-effect-divine-shield+)
-      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                             (format nil "~A shoots ~A. ~A takes no harm. " (capitalize-name (visible-name actor)) (visible-name target) (capitalize-name (visible-name target))))
-      (rem-mob-effect target +mob-effect-divine-shield+)
-      (make-act actor (get-ranged-weapon-speed actor))
-      (return-from mob-shoot-target nil))
 
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                            (format nil "~A shoots ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
@@ -943,36 +927,19 @@
              
              (setf target1 (get-mob-* (level *world*) tx ty tz))
 
-
              ;; if the target is mounted, 50% chance that the actor will hit target's mount
              (when (and target1
                         (riding-mob-id target1))
                (when (zerop (random 2))
                  (setf target1 (get-mob-by-id (riding-mob-id target1)))))
-             
-             (setf cur-dmg (+ (random (- (1+ (get-ranged-weapon-dmg-max actor)) (get-ranged-weapon-dmg-min actor))) 
-                              (get-ranged-weapon-dmg-min actor)))
-             
+                         
              (when target1
                (setf completely-missed nil)
-               
-               ;; reduce damage by the amount of risistance to this damage type
-               ;; first reduce the damage directly
-               ;; then - by percent
-               (when (get-armor-resist target1 (get-ranged-weapon-dmg-type actor))
-                 (decf cur-dmg (get-armor-d-resist target1 (get-ranged-weapon-dmg-type actor)))
-                 (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target1 (get-ranged-weapon-dmg-type actor)))) 100)))
-               (when (< cur-dmg 0) (setf cur-dmg 0))
-               
-               (decf (cur-hp target1) cur-dmg)
-               
-               ;; place a blood spattering
-               (when (> cur-dmg 0)
-                 (let ((dir (1+ (random 9))))
-                   (multiple-value-bind (dx dy) (x-y-dir dir) 				
-                     (add-feature-to-level-list (level *world*) 
-                                                (make-instance 'feature :feature-type +feature-blood-fresh+ :x (+ (x target1) dx) :y (+ (y target1) dy) :z (z target))))))
-               
+
+               (setf cur-dmg (inflict-damage target :min-dmg (get-ranged-weapon-dmg-min actor) :max-dmg (get-ranged-weapon-dmg-max actor) :dmg-type (get-ranged-weapon-dmg-type actor)
+                                                    :att-spd nil :weapon-aux (get-ranged-weapon-aux actor) :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
+                                                    :actor actor))
+                           
                (if (find target1 affected-targets :key #'(lambda (n) (car n)))
                  (incf (cdr (find target1 affected-targets :key #'(lambda (n) (car n)))) cur-dmg)
                  (push (cons target1 cur-dmg) affected-targets))
@@ -1020,37 +987,35 @@
     (incf-mob-motion actor *mob-motion-use-item*)
     (make-act actor (truncate +normal-ap+ 2))))
 
-(defun make-melee-attack (actor target &key (weapon nil) (acc 100) (no-dodge nil) (make-act t))
-  (logger (format nil "MAKE-MELEE-ATTACK: ~A attacks ~A~%" (name actor) (name target)))
+(defun inflict-damage (target &key (min-dmg 0) (max-dmg 0) (dmg-type +weapon-dmg-iron+) (att-spd nil) (weapon-aux nil) (actor nil) (acc 100) (no-dodge nil) (add-blood t) (no-hit-message nil) (no-check-dead nil)
+                                   (specific-hit-string-func nil) (specific-no-dmg-string-func nil))
+  ;; specific-hit-string-func is #'(lambda (cur-dmg) (return string))
+  ;; specific-no-dmg-string-func is #'(lambda () (return string))
+  (logger (format nil "INFLICT-DAMAGE: target = ~A [~A]~%" (name target) (id target)))
 
-  ;; no weapons - no attack
-  (unless weapon (return-from make-melee-attack nil))
-
-   ;; target under protection of divine shield - consume the shield and quit
+  ;; target under protection of divine shield - consume the shield and quit
   (when (mob-effect-p target +mob-effect-divine-shield+)
-    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A attacks ~A, but can not harm ~A. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))
+    (if actor
+      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                             (format nil "~A attacks ~A, but can not harm ~A. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))
+      (print-visible-message (x target) (y target) (z target) (level *world*) 
+                             (format nil "~A is not harmed. " (capitalize-name (visible-name target)))))
     (rem-mob-effect target +mob-effect-divine-shield+)
-    (when make-act (make-act actor (get-melee-weapon-speed actor)))
-    (return-from make-melee-attack nil))
-
-  ;; set motion
-  (incf-mob-motion actor *mob-motion-melee*)
-
-  ;; generate sound
-  (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-melee* #'(lambda (str)
-                                                                            (format nil "You hear sounds of fighting~A. " str)))
+    (when (and actor att-spd) (make-act actor att-spd))
+    (return-from inflict-damage nil))
   
   ;; if the target has keen senses - destroy the illusions
   (when (mob-ability-p target +mob-abil-keen-senses+)
-    (when (mob-effect-p actor +mob-effect-divine-concealed+)
+    (when (and actor
+               (mob-effect-p actor +mob-effect-divine-concealed+))
       (rem-mob-effect actor +mob-effect-divine-concealed+)
       (setf (face-mob-type-id actor) (mob-type actor))
       (when (or (check-mob-visible actor :observer *player*)
                 (check-mob-visible target :observer *player*))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                (format nil "~A reveals the true form of ~A. " (capitalize-name (visible-name target)) (get-qualified-name actor)))))
-    (when (mob-effect-p actor +mob-effect-possessed+)
+    (when (and actor
+               (mob-effect-p actor +mob-effect-possessed+))
       (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                (format nil "~A reveals the true form of ~A. " (capitalize-name (visible-name target)) (get-qualified-name actor))))
@@ -1058,7 +1023,7 @@
       (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)))
 
   (multiple-value-bind (dx dy) (x-y-dir (1+ (random 9)))
-    (let* ((cur-dmg) (dodge-chance) (failed-dodge nil) 
+    (let* ((cur-dmg) (dodge-chance) 
 	   (x (+ dx (x target))) (y (+ dy (y target)))
            (dodge-target (cur-dodge target))
 	   (check-result (check-move-on-level target x y (z target))))
@@ -1069,27 +1034,31 @@
           ;; check if the target dodged
           (setf dodge-chance (random 100))
 
-          (when no-dodge (setf dodge-target 0))
-          
           (if (and (> dodge-target dodge-chance) 
-                   (eq check-result t))
+                   (eq check-result t)
+                   (not no-dodge))
             ;; target dodged
             (progn
 
               (cond
-                ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                ((and actor
+                      (not no-hit-message)
+                      (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
                       (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
                       (check-mob-visible actor :observer *player*)
                       (check-mob-visible target :observer *player*))
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~A attacks ~A, but ~A evades the attack. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))))
-                ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                ((and actor
+                      (not no-hit-message)
+                      (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
                       (check-mob-visible actor :observer *player*))
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~A attacks somebody, but it evades the attack. " (capitalize-name (visible-name actor))))))
-                ((and (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                ((and (not no-hit-message)
+                      (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
                       (check-mob-visible target :observer *player*))
                  (progn
                    (print-visible-message (x target) (y target) (z target) (level *world*) 
@@ -1101,46 +1070,29 @@
               (setf (momentum-dir target) (cons 0 0))
               (setf (momentum-spd target) 0)
 
-              
               )
             ;; target did not dodge
             (progn
-              (setf failed-dodge nil)
-              (when (and (> dodge-target dodge-chance) (not (eq check-result t)))
-                (cond
-                  ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
-                        (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
-                   (progn
-                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                            (format nil "~A attacks ~A, and ~A failes to dodge. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))))
-                  ((get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
-                   (progn
-                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                            (format nil "~A attacks somebody, and it failes to dodge. " (capitalize-name (visible-name actor))))))
-                  ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
-                   (progn
-                     (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                            (format nil "Somebody attacks ~A, and ~A failes to dodge. " (visible-name target) (visible-name target))))))
-                
-                (setf failed-dodge t))
               ;; apply damage
-              (setf cur-dmg (+ (random (- (1+ (get-melee-weapon-dmg-max-simple weapon)) (get-melee-weapon-dmg-min-simple weapon))) 
-                               (get-melee-weapon-dmg-min-simple weapon)))
+              (setf cur-dmg (+ (random (- (1+ max-dmg) min-dmg)) 
+                               min-dmg))
               
-              (when (= (faction actor) (faction target))
-                (setf cur-dmg (get-melee-weapon-dmg-min-simple weapon)))
+              (when (and actor
+                         (= (faction actor) (faction target)))
+                (setf cur-dmg min-dmg))
 
               ;; reduce damage by the amount of risistance to this damage type
               ;; first reduce the damage directly
               ;; then - by percent
-              (when (get-armor-resist target (get-melee-weapon-dmg-type-simple weapon))
-                (decf cur-dmg (get-armor-d-resist target (get-melee-weapon-dmg-type-simple weapon)))
-                (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target (get-melee-weapon-dmg-type-simple weapon)))) 100)))
+              (when (get-armor-resist target dmg-type)
+                (decf cur-dmg (get-armor-d-resist target dmg-type))
+                (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target dmg-type))) 100)))
               (when (< cur-dmg 0) (setf cur-dmg 0))
 
               (decf (cur-hp target) cur-dmg)
               ;; place a blood spattering
-              (unless (zerop cur-dmg)
+              (when (and add-blood
+                         (not (zerop cur-dmg)))
                 (let ((dir (1+ (random 9))))
                   (multiple-value-bind (dx dy) (x-y-dir dir) 				
                     (when (> 50 (random 100))
@@ -1149,68 +1101,113 @@
               (if (zerop cur-dmg)
                 (progn
                   (cond
-                    ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                    ((and actor
+                          (not no-hit-message)
+                          (not specific-no-dmg-string-func)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                               (format nil "~A hits ~A, but ~A is not hurt. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))))
-                    ((get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                    ((and actor
+                          (not no-hit-message)
+                          (not specific-no-dmg-string-func)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                               (format nil "~A hits somebody, but it is not hurt. " (capitalize-name (visible-name actor))))))
-                    ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                    ((and actor
+                          (not no-hit-message)
+                          (not specific-no-dmg-string-func)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "Somebody hits ~A, but ~A is not hurt. " (visible-name target) (visible-name target)))))))
+                                              (format nil "Somebody hits ~A, but ~A is not hurt. " (visible-name target) (visible-name target)))))
+                    ((and (not actor)
+                          (not no-hit-message)
+                          (not specific-no-dmg-string-func)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                     (progn
+                       (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                              (format nil "~A is not hurt. " (capitalize-name (visible-name target))))))
+                    ((and specific-no-dmg-string-func
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                     (progn
+                       (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                              (funcall specific-no-dmg-string-func))))))
                 (progn
                   (cond
-                    ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                    ((and actor
+                          (not no-hit-message)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                               (format nil "~A hits ~A for ~A damage. " (capitalize-name (visible-name actor)) (visible-name target) cur-dmg))))
-                    ((get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                    ((and actor
+                          (not no-hit-message)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                               (format nil "~A hits somebody for ~A damage. " (capitalize-name (visible-name actor)) cur-dmg))))
-                    ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+                    ((and actor
+                          (not no-hit-message)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "Somebody hits ~A for ~A damage. " (visible-name target) cur-dmg))))))
+                                              (format nil "Somebody hits ~A for ~A damage. " (visible-name target) cur-dmg))))
+                    ((and (not actor)
+                          (not no-hit-message)
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                     (progn
+                       (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                              (format nil "~A takes ~A damage. " (capitalize-name (visible-name target)) cur-dmg))))
+                    ((and specific-hit-string-func
+                          (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
+                     (progn
+                       (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                              (funcall specific-hit-string-func cur-dmg))))))
                 )
               )))
         (progn
           ;; attacker missed
           (cond
-            ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+            ((and actor
+                  (not no-hit-message)
+                  (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
                   (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                       (format nil "~A misses ~A. " (capitalize-name (visible-name actor)) (visible-name target)))))
-            ((get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+            ((and actor
+                  (not no-hit-message)
+                  (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                       (format nil "~A misses somebody. " (capitalize-name (visible-name actor))))))
-            ((get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
+            ((and actor
+                  (not no-hit-message)
+                  (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
              (progn
                (print-visible-message (x target) (y target) (z target) (level *world*) 
                                       (format nil "Somebody misses ~A. " (visible-name target))))))
           
           ))
-      ))
 
-  (when (check-dead target)
-    (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-melee-weapon-aux-simple weapon))
-    (when (mob-effect-p target +mob-effect-possessed+)
-      (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
-      (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
-            (y (get-mob-by-id (slave-mob-id target))) (y target)
-            (z (get-mob-by-id (slave-mob-id target))) (z target))
-      (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))                                                                                             
-    )
+      (when (and (not no-check-dead)
+                 (check-dead target))
+        (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params weapon-aux)
+        (when (mob-effect-p target +mob-effect-possessed+)
+          (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+          (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
+                (y (get-mob-by-id (slave-mob-id target))) (y target)
+                (z (get-mob-by-id (slave-mob-id target))) (z target))
+          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))                                                                                             
+        )
   
-  (when make-act (make-act actor (get-melee-weapon-speed-simple weapon)))
-  
+      (when (and actor att-spd) (make-act actor att-spd))
+
+      cur-dmg))
   )
 
 (defun melee-target (attacker target)
@@ -1218,8 +1215,16 @@
   ;; no weapons - no attack
   (unless (weapon attacker) (return-from melee-target nil))
 
-  (make-melee-attack attacker target :weapon (weapon attacker) :acc (m-acc attacker) :make-act t)
+  ;; set motion
+  (incf-mob-motion attacker *mob-motion-melee*)
+  
+  ;; generate sound
+  (generate-sound attacker (x attacker) (y attacker) (z attacker) *mob-sound-melee* #'(lambda (str)
+                                                                                        (format nil "You hear sounds of fighting~A. " str)))
 
+  (inflict-damage target :min-dmg (get-melee-weapon-dmg-min attacker) :max-dmg (get-melee-weapon-dmg-max attacker) :dmg-type (get-melee-weapon-dmg-type attacker)
+                         :att-spd (get-melee-weapon-speed attacker) :weapon-aux (get-melee-weapon-aux-simple (weapon attacker)) :acc (m-acc attacker) :add-blood t 
+                         :actor attacker)
   )
 
 (defun check-dead (mob)

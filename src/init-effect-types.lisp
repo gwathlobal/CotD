@@ -298,7 +298,7 @@
                                                             (set-cur-weapons actor)
                                                             (set-mob-effect actor :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 3)
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A is no longer filled with righteous fury.~%" (visible-name actor))))
+                                                                                   (format nil "~A is no longer filled with righteous fury. " (visible-name actor))))
                                              ))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-wet+ :name "Wet" :color sdl:*blue*
