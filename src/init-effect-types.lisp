@@ -310,3 +310,12 @@
                                                             (declare (ignore effect))
                                                             (adjust-armor actor)
                                                             )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-source+ :name "Pain link" :color sdl:*white*
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore actor))
+                                                            ;; param1 - id of the mob, affected by the +mob-effect-pain-link-source+
+                                                            (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-pain-link-target+)
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-target+ :name "Pain link" :color sdl:*magenta*))

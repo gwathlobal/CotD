@@ -1081,6 +1081,20 @@
                          (= (faction actor) (faction target)))
                 (setf cur-dmg min-dmg))
 
+              ;; if the attacker is under pain link effect and the target is the caster of pain link then amplify the damage by 30% 
+              (when (and actor
+                         (mob-effect-p actor +mob-effect-pain-link-target+)
+                         (= (id target) (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-pain-link-target+)))))
+                (format t "PAIN LINK T-LINK ~A~%" (name (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-pain-link-target+))))))
+                (setf cur-dmg (truncate (* cur-dmg 1.3))))
+
+              ;; if the attacker is under pain link effect and the target is NOT the caster of pain link then decrease the damage by 30% 
+              (when (and actor
+                         (mob-effect-p actor +mob-effect-pain-link-target+)
+                         (/= (id target) (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-pain-link-target+)))))
+                (format t "PAIN LINK NON TARGET~%")
+                (setf cur-dmg (truncate (* cur-dmg 0.7))))
+
               ;; reduce damage by the amount of risistance to this damage type
               ;; first reduce the damage directly
               ;; then - by percent

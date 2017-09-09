@@ -72,9 +72,9 @@
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
-                                                                abil-trinity-mimic abil-meld abil-unmeld abil-heal-other abil-righteous-fury)
+                                                                abil-trinity-mimic abil-meld abil-unmeld abil-heal-other abil-righteous-fury abil-pain-link)
   ;; set up armor
-  (setf (armor mob-type) (make-array (list 4) :initial-element nil))
+  (setf (armor mob-type) (make-array (list 5) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
         (setf (aref (armor mob-type) dmg-type) (list dir-resist %-resist)))
   
@@ -243,6 +243,8 @@
     (setf (gethash +mob-abil-heal-other+ (abilities mob-type)) abil-heal-other))
   (when abil-righteous-fury
     (setf (gethash +mob-abil-righteous-fury+ (abilities mob-type)) t))
+  (when abil-pain-link
+    (setf (gethash +mob-abil-pain-link+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

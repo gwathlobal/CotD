@@ -3088,3 +3088,54 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-pain-link+ :name "Pain link" :descr "Link yourself with one of the enemies causing it to inflict 30% more damage to you for 10 turns, but 30% damage less to everyone else. Only one link may be present at a time." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 20
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (logger (format nil "MOB-PAIN-LINK: ~A [~A] uses pain link on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A applies pain link to ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
+
+
+                                                (rem-mob-effect actor +mob-effect-pain-link-source+)
+                                                (set-mob-effect target :effect-type-id +mob-effect-pain-link-target+ :actor-id (id actor) :cd 10)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-pain-link-source+ :actor-id (id actor) :cd 10 :param1 (id target))
+
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-pain-link+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor)))
+                                                           (not (mob-effect-p nearest-enemy +mob-effect-pain-link-target+))
+                                                           (not (mob-effect-p actor +mob-effect-pain-link-source+)))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
