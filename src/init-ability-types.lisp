@@ -2835,7 +2835,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-meld+ :name "Meld" :descr "Cause your bonded trinity mimic standing nearby to meld into you. Melding is allowed only if the target is standing on the solid ground. The act of melding clears all effects from the target. While being melded you will have your HP redistributed each turn with other melded mimics so that all of you have the same amount of HP." 
+                                 :id +mob-abil-meld+ :name "Meld" :descr "Cause your bonded trinity mimic standing nearby to meld into you. Melding is allowed only if the target is standing on the solid ground. The act of melding clears all effects from the target. While being melded you will have your HP redistributed each turn with other melded mimics so that all of you have the same amount of HP. Killing the amalgamated entity means killing all angels melded into it." 
                                  :cost 0 :spd (truncate +normal-ap+ 1.2) :passive nil
                                  :final t :on-touch nil
                                  :motion 100
@@ -2993,7 +2993,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-heal-other+ :name "Heal other" :descr "Invoke divine powers to heal your allies and yourself." 
+                                 :id +mob-abil-heal-other+ :name "Heal other" :descr "Invoke divine powers to heal one ally (including yourself)." 
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -3139,3 +3139,59 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-soul-reinforcement+ :name "Soul reinforcement" :descr "Invoke divine powers to reinforce the soul of an ally (inclduing yourself) for 3 turns. The reinforced soul will allow the target to remain in this world for a bit longer thus preventing the next fatal blow. In that case, the effect will be cancelled and the target will be left with 1 HP." 
+                                 :cost 3 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 30
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (logger (format nil "MOB-SOUL-REINFORCEMENT: ~A [~A] reinforces sould of ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear some eerie noises~A. " str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A invokes divine powers to reinforce the soul of ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
+                                                
+                                                (set-mob-effect target :effect-type-id +mob-effect-soul-reinforcement+ :actor-id (id actor) :cd 3)
+
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-soul-reinforcement+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-soul-reinforcement+)
+                                                           (can-invoke-ability actor actor +mob-abil-soul-reinforcement+)
+                                                           (or (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                  0.2)
+                                                               (and nearest-ally
+                                                                    (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
+                                                                       (cur-sight actor))
+                                                                    (< (/ (cur-hp nearest-ally) (max-hp nearest-ally)) 
+                                                                       0.2)))
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy))
+                                                   (let ((target))
+                                                     (cond
+                                                       (nearest-ally (setf target nearest-ally))
+                                                       (t (setf target actor)))
+                                                     (mob-invoke-ability actor target (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and target
+                                                                 (get-faction-relation (faction *player*) (faction target))
+                                                                 (check-mob-visible target :observer *player* :complete-check t))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* target ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                       )))

@@ -315,7 +315,17 @@
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             ;; param1 - id of the mob, affected by the +mob-effect-pain-link-source+
-                                                            (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-pain-link-target+)
+                                                            (when (param1 effect)
+                                                              (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-pain-link-target+))
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-target+ :name "Pain link" :color sdl:*magenta*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-target+ :name "Pain link" :color sdl:*magenta*
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore actor))
+                                                            ;; I need this otherwise there will be an infinite recursion 
+                                                            (when (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-pain-link-source+)
+                                                              (setf (param1 (get-effect-by-id (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-pain-link-source+))) nil))
+                                                            (rem-mob-effect (get-mob-by-id (actor-id effect)) +mob-effect-pain-link-source+)
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-soul-reinforcement+ :name "Reinforced soul" :color sdl:*cyan*))

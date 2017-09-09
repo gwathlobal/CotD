@@ -81,7 +81,7 @@
              (highlight-map-tile x1 y1)))))))
 
 (defun highlight-map-tile (x1 y1)
-  (let ((color sdl:*green*))
+  (let ((color (sdl:color :r 85 :g 107 :b 47)))
     ;; draw the rectangle
     (sdl:draw-pixel-* (+ x1 1) y1 :color color)
     (sdl:draw-pixel-* (+ x1 2) y1 :color color)

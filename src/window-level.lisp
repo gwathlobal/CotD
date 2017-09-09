@@ -51,16 +51,23 @@
                         (total-demons *world*)
                         (total-undead *world*)
                         (sense-good-evil-str)
-                        (if (melded-id-list *player*)
-                          (loop for mimic-id in (melded-id-list *player*)
+                        (if (mimic-id-list *player*)
+                          (loop for mimic-id in (mimic-id-list *player*)
                                 for mimic = (get-mob-by-id mimic-id)
-                                for i from 0
+                                with i = 0
                                 with str = (create-string)
+                                when (and (not (eq *player* mimic))
+                                          (not (is-melded mimic))
+                                          (not (check-dead mimic)))
                                 do
                                    (when (> i 0)
-                                     (format str ", "))
-                                   (format str "~A" (capitalize-name (name (get-mob-type-by-id (mob-type mimic)))))
-                                finally (return (format nil "~%~%Melded: ~A" str)))
+                                     (format str "~%"))
+                                   (format str "~A (HP: ~A, Pwr: ~A~A)" (capitalize-name (name (get-mob-type-by-id (mob-type mimic)))) (cur-hp mimic) (cur-fp mimic)
+                                           (if (find (id mimic) (melded-id-list *player*))
+                                             ", melded"
+                                             ""))
+                                   (incf i)
+                                finally (return (format nil "~%~A" str)))
                           "")
                         (if (or (mob-ability-p *player* +mob-abil-momentum+)
                                 (mob-ability-p *player* +mob-abil-facing+)) (format nil "~%Moving: ~A~A"

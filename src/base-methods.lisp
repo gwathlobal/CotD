@@ -1085,14 +1085,12 @@
               (when (and actor
                          (mob-effect-p actor +mob-effect-pain-link-target+)
                          (= (id target) (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-pain-link-target+)))))
-                (format t "PAIN LINK T-LINK ~A~%" (name (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-pain-link-target+))))))
                 (setf cur-dmg (truncate (* cur-dmg 1.3))))
 
               ;; if the attacker is under pain link effect and the target is NOT the caster of pain link then decrease the damage by 30% 
               (when (and actor
                          (mob-effect-p actor +mob-effect-pain-link-target+)
                          (/= (id target) (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-pain-link-target+)))))
-                (format t "PAIN LINK NON TARGET~%")
                 (setf cur-dmg (truncate (* cur-dmg 0.7))))
 
               ;; reduce damage by the amount of risistance to this damage type
@@ -1103,6 +1101,14 @@
                 (setf cur-dmg (truncate (* cur-dmg (- 100 (get-armor-%-resist target dmg-type))) 100)))
               (when (< cur-dmg 0) (setf cur-dmg 0))
 
+              ;; check for soul reinforcement on target
+              (when (and (mob-effect-p target +mob-effect-soul-reinforcement+)
+                         (<= (- (cur-hp target) cur-dmg) 0))
+                (setf cur-dmg (1- (cur-hp target)))
+                (rem-mob-effect target +mob-effect-soul-reinforcement+)
+                (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                       (format nil "Reinforced soul of ~A prevents a fatal blow. " (visible-name target))))
+              
               (decf (cur-hp target) cur-dmg)
               ;; place a blood spattering
               (when (and add-blood

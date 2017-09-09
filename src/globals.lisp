@@ -179,6 +179,7 @@
 (defconstant +mob-abil-heal-other+ 71)
 (defconstant +mob-abil-righteous-fury+ 72)
 (defconstant +mob-abil-pain-link+ 73)
+(defconstant +mob-abil-soul-reinforcement+ 74)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -206,6 +207,7 @@
 (defconstant +mob-effect-wet+ 23)
 (defconstant +mob-effect-pain-link-source+ 24)
 (defconstant +mob-effect-pain-link-target+ 25)
+(defconstant +mob-effect-soul-reinforcement+ 26)
 
 (defconstant +mob-order-follow+ 0)
 
