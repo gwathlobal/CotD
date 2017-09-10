@@ -329,3 +329,5 @@
                                                             )))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-soul-reinforcement+ :name "Reinforced soul" :color sdl:*cyan*))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-silence+ :name "Silenced" :color sdl:*cyan*))

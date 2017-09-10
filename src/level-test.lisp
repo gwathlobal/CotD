@@ -139,7 +139,8 @@
         (demon (make-instance 'player :mob-type +mob-type-star-mender+ :x 32 :y 13 :z 0))
         )
     (setf (cur-fp *player*) 22)
-    (setf (cur-fp demon) 22)
+    (setf (cur-fp demon) 5)
+    (setf (cur-fp soldier) 22)
 
     ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)

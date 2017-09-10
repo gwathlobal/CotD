@@ -22,9 +22,10 @@
                                                                          (format nil "~A invokes divine powers to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-effect-p actor +mob-effect-divine-concealed+)
-                                                        nil
-                                                        t))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-divine-concealed+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
                                                   ;; if able to heal and less than 50% hp - heal
@@ -58,7 +59,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (not (mob-effect-p actor +mob-effect-reveal-true-form+))
-                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -89,7 +91,8 @@
                                                                           (format nil "~A reveals its true divine form. " (capitalize-name (name actor))))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-effect-p actor +mob-effect-divine-concealed+)
+                                                      (if (and (mob-effect-p actor +mob-effect-divine-concealed+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -365,9 +368,10 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-effect-p actor +mob-effect-calling-for-help+)
-                                                        nil
-                                                        t))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-calling-for-help+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
                                                    ;; call for reinforcements if there is a threatening enemy in sight and hp < 50% and you are not the last one
@@ -461,7 +465,8 @@
                                                     ))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-effect-p actor +mob-effect-called-for-help+)
+                                                      (if (and (mob-effect-p actor +mob-effect-called-for-help+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -565,7 +570,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-prayer-bless+)
+                                                      (if (and (mob-ability-p actor +mob-abil-prayer-bless+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -621,9 +627,10 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-effect-p actor +mob-effect-calling-for-help+)
-                                                        nil
-                                                        t))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-calling-for-help+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
                                                   ;; for satanists: call for reinforcements whenever there is a threatening enemy in sight and there still demons out there
@@ -678,7 +685,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-prayer-shield+)
+                                                      (if (and (mob-ability-p actor +mob-abil-prayer-shield+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -750,7 +758,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-curse+)
+                                                      (if (and (mob-ability-p actor +mob-abil-curse+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -807,7 +816,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-prayer-reveal+)
+                                                      (if (and (mob-ability-p actor +mob-abil-prayer-reveal+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -860,7 +870,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-military-follow-me+)
+                                                      (if (and (mob-ability-p actor +mob-abil-military-follow-me+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -910,7 +921,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-blindness+)
-                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -972,7 +984,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-instill-fear+)
+                                                      (if (and (mob-ability-p actor +mob-abil-instill-fear+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2123,7 +2136,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-reanimate-corpse+)
+                                                      (if (and (mob-ability-p actor +mob-abil-reanimate-corpse+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2278,7 +2292,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-empower-undead+)
-                                                               )
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2394,7 +2408,8 @@
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-avatar-of-brilliance+)
                                                                (not (mob-effect-p actor +mob-effect-divine-concealed+))
-                                                               (not (mob-effect-p actor +mob-effect-avatar-of-brilliance+)))
+                                                               (not (mob-effect-p actor +mob-effect-avatar-of-brilliance+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2445,7 +2460,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-gravity-chains+)
+                                                      (if (and (mob-ability-p actor +mob-abil-gravity-chains+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2550,7 +2566,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-smite+)
+                                                      (if (and (mob-ability-p actor +mob-abil-smite+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2601,7 +2618,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-slow+)
+                                                      (if (and (mob-ability-p actor +mob-abil-slow+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2661,7 +2679,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-prayer-wrath+)
+                                                      (if (and (mob-ability-p actor +mob-abil-prayer-wrath+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -2789,7 +2808,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-extinguish-light+)
+                                                      (if (and (mob-ability-p actor +mob-abil-extinguish-light+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -3015,7 +3035,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-heal-other+)
+                                                      (if (and (mob-ability-p actor +mob-abil-heal-other+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -3069,7 +3090,8 @@
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-righteous-fury+)
                                                                (not (mob-effect-p actor +mob-effect-divine-concealed+))
-                                                               (not (mob-effect-p actor +mob-effect-slow+)))
+                                                               (not (mob-effect-p actor +mob-effect-slow+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -3112,7 +3134,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-pain-link+)
+                                                      (if (and (mob-ability-p actor +mob-abil-pain-link+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -3159,7 +3182,8 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-soul-reinforcement+)
+                                                      (if (and (mob-ability-p actor +mob-abil-soul-reinforcement+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -3195,3 +3219,52 @@
                                                           (progn
                                                             nil)))
                                                        )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-silence+ :name "Silence" :descr "Channel divine powers to silence an opponent for 3 turns. Silenced characters are not able to use abilities that require voice." 
+                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 30
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (logger (format nil "MOB-SILENCE: ~A [~A] uses silence on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A silences ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
+
+
+                                                (set-mob-effect target :effect-type-id +mob-effect-silence+ :actor-id (id actor) :cd 3)
+
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-silence+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor)))
+                                                           (not (mob-effect-p nearest-enemy +mob-effect-silence+)))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
