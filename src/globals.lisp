@@ -181,6 +181,7 @@
 (defconstant +mob-abil-pain-link+ 73)
 (defconstant +mob-abil-soul-reinforcement+ 74)
 (defconstant +mob-abil-silence+ 75)
+(defconstant +mob-abil-confuse+ 76)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -210,6 +211,7 @@
 (defconstant +mob-effect-pain-link-target+ 25)
 (defconstant +mob-effect-soul-reinforcement+ 26)
 (defconstant +mob-effect-silence+ 27)
+(defconstant +mob-effect-confuse+ 28)
 
 (defconstant +mob-order-follow+ 0)
 

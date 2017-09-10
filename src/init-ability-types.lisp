@@ -3135,6 +3135,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-pain-link+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
                                                                (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
@@ -3183,6 +3184,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-soul-reinforcement+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
                                                                (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
@@ -3242,6 +3244,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-silence+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
                                                                (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))
@@ -3251,6 +3254,60 @@
                                                            nearest-enemy
                                                            (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor)))
                                                            (not (mob-effect-p nearest-enemy +mob-effect-silence+)))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-confuse+ :name "Confuse" :descr "Channel divine powers to confuse an opponent for 4 turns. More powerful creatures may resist confusion. Confused characters have a 50% chance to make a random move instead of an intended action." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 40
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (logger (format nil "MOB-CONFUSE: ~A [~A] uses confuse on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (if (> (1+ (random 6)) (strength target))
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~A confuses ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
+                                                    
+                                                    (set-mob-effect target :effect-type-id +mob-effect-confuse+ :actor-id (id actor) :cd 4))
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A tries to confuse ~A, but ~A resists. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))))
+
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-confuse+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor)))
+                                                           (not (mob-effect-p nearest-enemy +mob-effect-confuse+)))
                                                       t
                                                       nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)

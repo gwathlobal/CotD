@@ -283,6 +283,15 @@
 
   ;; if the mob is blind - move in random direction
   (when (mob-effect-p mob +mob-effect-blind+)
+    (logger (format nil "AI-FUNCTION: ~A [~A] is blind, moving in random direction.~%" (name mob) (id mob)))
+    (ai-mob-random-dir mob)
+    (setf (path mob) nil)
+    (return-from ai-function nil))
+
+  ;; if the mob is confused - 33% chance to move in random direction
+  (when (and (mob-effect-p mob +mob-effect-confuse+)
+             (zerop (random 2)))
+    (logger (format nil "AI-FUNCTION: ~A [~A] is confused, moving in random direction.~%" (name mob) (id mob)))
     (ai-mob-random-dir mob)
     (setf (path mob) nil)
     (return-from ai-function nil))
@@ -814,6 +823,17 @@
           (get-input-player))
         (ai-mob-flee *player* nearest-enemy)
         (return-from ai-function nil))))
+
+  ;; if the player is confused and the RNG is right
+  ;; wait for a meaningful action and move randomly instead
+  (when (and (mob-effect-p *player* +mob-effect-confuse+)
+             (zerop (random 2)))
+    (logger (format nil "AI-FUNCTION: ~A [~A] is under effects of confusion.~%" (name player) (id player)))
+    (setf (can-move-if-possessed player) t)
+    (loop while (can-move-if-possessed player) do
+      (get-input-player))
+    (ai-mob-random-dir *player*)
+    (return-from ai-function nil))
   
   ;; if possessed & unable to revolt - wait till the player makes a meaningful action
   ;; then skip and invoke the master AI

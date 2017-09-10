@@ -255,7 +255,7 @@
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
-                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-meld t :abil-unmeld t :abil-silence t
+                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-meld t :abil-unmeld t :abil-silence t :abil-confuse t
                                        :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-mender+
@@ -292,7 +292,7 @@
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
-                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-meld t :abil-unmeld t :abil-righteous-fury t :abil-pain-link t :abil-silence t
+                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-meld t :abil-unmeld t :abil-righteous-fury t :abil-pain-link t :abil-silence t :abil-confuse t
                                        :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-gazer-mender+
@@ -304,7 +304,7 @@
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
-                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-meld t :abil-unmeld t :abil-heal-other 1 :abil-soul-reinforcement t :abil-silence t
+                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-meld t :abil-unmeld t :abil-heal-other 1 :abil-soul-reinforcement t :abil-silence t :abil-confuse t
                                        :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-gazer-mender+
@@ -317,7 +317,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-meld t :abil-unmeld t :abil-heal-other 1 :abil-righteous-fury t :abil-pain-link t
-                                       :abil-soul-reinforcement t :abil-silence t
+                                       :abil-soul-reinforcement t :abil-silence t :abil-confuse t
                                        :ai-wants-bless t :ai-curious t))
 
 ;;--------------------
