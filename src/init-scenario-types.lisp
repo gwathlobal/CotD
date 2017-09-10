@@ -35,7 +35,6 @@
                                              :name "Test"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        (setf layout-func #'(lambda () (create-template-test-city *max-x-level* *max-y-level* *max-z-level* nil)))
-                                                       (pushnew +game-event-rain-falls+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 

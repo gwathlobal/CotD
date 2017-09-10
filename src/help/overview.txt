@@ -10,12 +10,13 @@ GENERAL TIPS
  - Stockpile power to get promoted or spend it on available abilities.
  
 THE CELESTIAL COMMUNION
- - The Celestial Communion is represented with one unit: a Chrome Angel that can temporarily transform itself into an Avatar of Brilliance.
+ - The ranks of the Celestial Communion are filled with Chrome Angels who can temporarily transform themselves into Avatars of Brilliance.
  - A Chrome Angel can easily dispatch lowly Imps. To deal with more powerful targets, invoke the Avatar of Brilliance powers. 
+ - Some of the angels grow tired of the ever-humming singlemind and prefer more limited but deeper bonds. These are Trinity mimics, a group of three angels who act as one.
  - You can bless humans to gain power.
  - You are able to hide your divinity and disguise yourself as a human to lure enemies to you.
  - Your strength is the ability to heal yourself when needed. You are also able to see what all other Angels see.
- - To win, kill all demons or ascend beyond Chrome Angel. Survival of mankind is not required.
+ - To win, kill all demons or ascend beyond Chrome Angel (Trinity mimics need to fill the power meter on all of their alive characters). Survival of mankind is not required.
  
 THE PANDEMONIUM HIERARCHY
  - The Pandemonium Hierarchy is represented with two rows of units: an Crimson Imp, Crimson Demon, and Archdemon, on the one hand, and a Shadow Imp, Shadow Demon, and Shadow Devil, on the other.

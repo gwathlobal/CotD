@@ -216,7 +216,7 @@
                                                             (update-visible-mobs actor)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-melded+ :name "Melded" :color sdl:*cyan*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-merged+ :name "merged" :color sdl:*cyan*
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (let ((singer nil)
@@ -224,7 +224,7 @@
                                                                (mender nil)
                                                                (cur-hp 0)
                                                                (final-mob-type nil))
-                                                           (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                           (loop for mob-id in (append (list (id actor)) (merged-id-list actor))
                                                                  for mob = (get-mob-by-id mob-id)
                                                                  do
                                                                     (incf cur-hp (cur-hp mob))
@@ -233,12 +233,12 @@
                                                                       ((= (mob-type mob) +mob-type-star-gazer+) (setf gazer t))
                                                                       ((= (mob-type mob) +mob-type-star-mender+) (setf mender t))))
                                                                  
-                                                           (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                           (loop for mob-id in (append (list (id actor)) (merged-id-list actor))
                                                                  for mob = (get-mob-by-id mob-id)
                                                                  do
-                                                                    (setf (is-melded mob) t)
-                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (melded-id-list actor))))))
-                                                           (setf (is-melded actor) nil)
+                                                                    (setf (is-merged mob) t)
+                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (merged-id-list actor))))))
+                                                           (setf (is-merged actor) nil)
                                                            
                                                            (cond
                                                              ((and singer gazer mender) (setf final-mob-type +mob-type-star-singer-gazer-mender+))
@@ -276,15 +276,15 @@
                                              :on-tick #'(lambda (effect actor)
                                                           (declare (ignore effect))
                                                           (let ((cur-hp 0))
-                                                            (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                            (loop for mob-id in (append (list (id actor)) (merged-id-list actor))
                                                                  for mob = (get-mob-by-id mob-id)
                                                                  do
                                                                     (incf cur-hp (cur-hp mob)))
                                                                                                                                      
-                                                           (loop for mob-id in (append (list (id actor)) (melded-id-list actor))
+                                                           (loop for mob-id in (append (list (id actor)) (merged-id-list actor))
                                                                  for mob = (get-mob-by-id mob-id)
                                                                  do
-                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (melded-id-list actor))))))))))
+                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (merged-id-list actor))))))))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-righteous-fury+ :name "Righteous fury" :color (sdl:color :r 255 :g 140 :b 0)
                                              :on-add #'(lambda (effect actor)

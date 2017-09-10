@@ -1,5 +1,12 @@
 CHANGELOG
 
+- Added Trinity mimics as a playable faction. Trinity mimics are three mind-linked angels - the Star singer, Star gazer and Star mender. Each has a separate set of abilities and all of them can merge with each other. The player controls each mimic individually.
+- Added Righteous fury ability to the Star singer. Righteous fury is a berserk-like ability that lets attack harded and faster but at a cost of slowing you afterwards.
+- Added Pain link ability to the Star signer. Pain link makes the target deal increased damage to the caster, but decreased damage to everyone else.
+- Added Heal other ability to the Star mender. This ability allows to heal not only yourself but your allies as well.
+- Added Soul reinforcement ability to the Star mender. Soul reiforcement prevents a fatal blow that would otherwise kill the target.
+- Added Silence ability to the Star gazer. Silence prevents the target from casting.
+- Added Confuse ability to the Star gazer. Confused targets sometimes move in a random direction instead of an intended action.
 - Added Pandemonium Shades as a playable faction. Shadow creatures are unable to possess humans but get a number of shadow-related abilities. You start as a shadow imp.
 - Added Umbral aura to shadow devils. This makes shadow devils be not light, but darkness sources.
 - Added Extinguish light to shadow demons and shadow devils. This ranged ability will switch off a stationary light or cause an emeny to stop emitting light for short period.
@@ -41,7 +48,7 @@ July 31, 2017 v1.1.4
 --------------------
 June 02, 2017 v1.1.3
 
-- Windows now ar not clear glass, so you will not see as far as you usually do when looking through windows. Leaves also obstruct your vision somewhat.
+- Windows now are not clear glass, so you will not see as far as you usually do when looking through windows. Leaves also obstruct your vision somewhat.
 - Undead now have their own counter.
 - Added smoke bombs to the Thief. Smoke will obstruct visibility and can help you escape.
 - Added an ability to ignite grass and furniture on fire to the Angels. Fire damages those standing in it and produces smoke.

@@ -45,16 +45,17 @@ GENERAL TIPS
 --------------------
 THE CELESTIAL COMMUNION
 
- - You start as an Chrome Angel who can easily dispatch lowly Imps.
+ - You can start as an Chrome Angel who can easily dispatch lowly Imps.
+ - Alternatively, you can start a group of Trinity mimics, each having distinct role and abilities.
  - Bless humans to gain power.
- - To win, kill all demons or ascend beyond the Chrome Angel. Survival of mankind is not required.
+ - To win, kill all demons or ascend beyond the angel. Survival of mankind is not required.
  
 -------------------- 
 THE PANDEMONIUM HIERARCHY
 
  - You start as a puny Crimson or Shadow imp who is no match for a Chrome Angel.
  - Kill humans to gain power. Beware of blessed ones. 
- - To win, kill all angels or ascend beyond Archdemon. Destruction of mankind is not enough.
+ - To win, kill all angels or ascend beyond Archdemon or Shadow devil. Destruction of mankind is not enough.
 
 --------------------
 CITIZENS OF THE CITY

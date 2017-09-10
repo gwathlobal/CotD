@@ -433,6 +433,17 @@
       (logger (format nil "AI-FUNCTION: ~A [~A] is too cautious to attack ~A [~A] because STR ~A vs ~A.~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy) (strength mob) (strength nearest-enemy)))
       (setf nearest-target nil)
       (setf nearest-enemy nil))
+
+    ;; if the mob is a trinity mimic, assign the first one as a leader and make all others in the group follow it
+    (when (mob-ai-trinity-mimic-p mob)
+      (loop for mimic-id in (mimic-id-list mob)
+            for mimic = (get-mob-by-id mimic-id)
+            when (and (not (eq mimic mob))
+                      (not (check-dead mimic))
+                      (not (is-merged mimic)))
+              do
+                 (setf (order mob) (list +mob-order-follow+ mimic-id))
+                 (loop-finish)))
     
     ;; invoke abilities if any
     (let ((ability-list) (r 0))

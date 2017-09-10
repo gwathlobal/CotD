@@ -12,10 +12,9 @@
                                                                                      for mimic = (get-mob-by-id mimic-id)
                                                                                      with cur-fp = 0
                                                                                      with max-fp = 0
-                                                                                     do
-                                                                                        (incf max-fp (max-fp mimic))
                                                                                      when (not (check-dead mimic))
                                                                                        do
+                                                                                          (incf max-fp (max-fp mimic))
                                                                                           (incf cur-fp (cur-fp mimic))
                                                                                      finally (return (>= cur-fp max-fp)))
                                                                                )

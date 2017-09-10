@@ -1258,10 +1258,10 @@
     (when (dead= mob)
       (return-from make-dead nil))
 
-    (loop for melded-id in (melded-id-list mob)
-          for melded-mob = (get-mob-by-id melded-id)
+    (loop for merged-id in (merged-id-list mob)
+          for merged-mob = (get-mob-by-id merged-id)
           do
-             (setf (cur-hp melded-mob) 0))
+             (setf (cur-hp merged-mob) 0))
     
     (when (and (eq mob *player*)
                killer)

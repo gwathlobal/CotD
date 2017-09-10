@@ -57,14 +57,14 @@
                                 with i = 0
                                 with str = (create-string)
                                 when (and (not (eq *player* mimic))
-                                          (not (is-melded mimic))
+                                          (not (is-merged mimic))
                                           (not (check-dead mimic)))
                                 do
                                    (when (> i 0)
                                      (format str "~%"))
                                    (format str "~A (HP: ~A, Pwr: ~A~A)" (capitalize-name (name (get-mob-type-by-id (mob-type mimic)))) (cur-hp mimic) (cur-fp mimic)
-                                           (if (find (id mimic) (melded-id-list *player*))
-                                             ", melded"
+                                           (if (find (id mimic) (merged-id-list *player*))
+                                             ", merged"
                                              ""))
                                    (incf i)
                                 finally (return (format nil "~%~A" str)))

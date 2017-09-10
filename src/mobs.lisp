@@ -61,7 +61,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious ai-simple-pathfinding
+                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious ai-simple-pathfinding ai-trinity-mimic
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -72,7 +72,7 @@
                                                                 abil-gargantaurs-mind-burn abil-death-from-above abil-climbing abil-no-breathe abil-open-close-door abil-toggle-light abil-open-close-window
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
-                                                                abil-trinity-mimic abil-meld abil-unmeld abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse)
+                                                                abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 5) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -95,6 +95,8 @@
     (setf (gethash +ai-pref-cautious+ (ai-prefs mob-type)) t))
   (when ai-simple-pathfinding
     (setf (gethash +ai-pref-simple-pathfinding+ (ai-prefs mob-type)) t))
+  (when ai-trinity-mimic
+    (setf (gethash +ai-pref-trinity-mimic+ (ai-prefs mob-type)) t))
 
   ;; set up abilities
   (when abil-can-possess
@@ -235,10 +237,10 @@
     (setf (gethash +mob-abil-umbral-aura+ (abilities mob-type)) t))
   (when abil-trinity-mimic
     (setf (gethash +mob-abil-trinity-mimic+ (abilities mob-type)) t))
-  (when abil-meld
-    (setf (gethash +mob-abil-meld+ (abilities mob-type)) t))
-  (when abil-unmeld
-    (setf (gethash +mob-abil-unmeld+ (abilities mob-type)) t))
+  (when abil-merge
+    (setf (gethash +mob-abil-merge+ (abilities mob-type)) t))
+  (when abil-unmerge
+    (setf (gethash +mob-abil-unmerge+ (abilities mob-type)) t))
   (when abil-heal-other
     (setf (gethash +mob-abil-heal-other+ (abilities mob-type)) abil-heal-other))
   (when abil-righteous-fury
@@ -471,8 +473,8 @@
 
    ;; special vars for trinity mimics
    (mimic-id-list :initform () :accessor mimic-id-list)
-   (melded-id-list :initform () :accessor melded-id-list)
-   (is-melded :initform nil :accessor is-melded)
+   (merged-id-list :initform () :accessor merged-id-list)
+   (is-merged :initform nil :accessor is-merged)
 
    (path :initform nil :accessor path)
    (path-dst :initform nil :accessor path-dst) ;; is a actually a cons with coords (x y)
@@ -590,14 +592,6 @@
 (defun get-mob-by-id (mob-id)
   (aref *mobs* mob-id))
 
-(defgeneric mob-ai-coward-p (mob))
-
-(defgeneric mob-ai-horde-p (mob))
-
-(defgeneric mob-ai-wants-bless-p (mob))
-
-(defgeneric mob-ai-stop-p (mob))
-
 (defmethod faction ((mob mob))
   (faction (get-mob-type-by-id (mob-type mob))))
 
@@ -648,6 +642,9 @@
 
 (defmethod mob-ai-simple-pathfinding-p ((mob mob))
   (gethash +ai-pref-simple-pathfinding+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+
+(defmethod mob-ai-trinity-mimic-p ((mob mob))
+  (gethash +ai-pref-trinity-mimic+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
 
 (defun mob-effect-p (mob effect-type-id)
   (gethash effect-type-id (effects mob)))
