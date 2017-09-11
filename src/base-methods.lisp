@@ -10,6 +10,21 @@
 (defun capitalize-name (str)
   (string-upcase str :start 0 :end 1))
 
+(defun prepend-article-func (article name &rest args)
+  (let ((article-str (cond
+                       ((= article +article-a+) "a ")
+                       ((= article +article-the+) "the ")
+                       (t ""))))
+    (when (or (find +noun-proper+ args)
+              (and (find +noun-common+ args)
+                   (find +noun-plural+ args)
+                   (= article +article-a+)))
+      (setf article-str ""))
+    (format nil "~A~A" article-str name)))
+
+(defmacro prepend-article (article name-func)
+  `(multiple-value-call #'prepend-article-func ,article ,name-func))
+
 (defun x-y-into-dir (x y)
   (let ((xy (list x y)))
     (cond
@@ -997,9 +1012,12 @@
   (when (mob-effect-p target +mob-effect-divine-shield+)
     (if actor
       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                             (format nil "~A attacks ~A, but can not harm ~A. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))
+                             (format nil "~A attacks ~A, but can not harm ~A. "
+                                     (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                     (prepend-article +article-the+ (visible-name target))
+                                     (prepend-article +article-the+ (visible-name target))))
       (print-visible-message (x target) (y target) (z target) (level *world*) 
-                             (format nil "~A is not harmed. " (capitalize-name (visible-name target)))))
+                             (format nil "~A is not harmed. " (capitalize-name (prepend-article +article-the+ (visible-name target))))))
     (rem-mob-effect target +mob-effect-divine-shield+)
     (when (and actor att-spd) (make-act actor att-spd))
     (return-from inflict-damage nil))
@@ -1013,12 +1031,12 @@
       (when (or (check-mob-visible actor :observer *player*)
                 (check-mob-visible target :observer *player*))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A reveals the true form of ~A. " (capitalize-name (visible-name target)) (get-qualified-name actor)))))
+                               (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor))))))
     (when (and actor
                (mob-effect-p actor +mob-effect-possessed+))
       (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A reveals the true form of ~A. " (capitalize-name (visible-name target)) (get-qualified-name actor))))
+                               (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor)))))
       (setf (face-mob-type-id actor) (mob-type actor))
       (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)))
 
@@ -1049,20 +1067,25 @@
                       (check-mob-visible target :observer *player*))
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                          (format nil "~A attacks ~A, but ~A evades the attack. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))))
+                                          (format nil "~A attacks ~A, but ~A evades the attack. "
+                                                  (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                  (prepend-article +article-the+ (visible-name target))
+                                                  (prepend-article +article-the+ (visible-name target))))))
                 ((and actor
                       (not no-hit-message)
                       (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
                       (check-mob-visible actor :observer *player*))
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                          (format nil "~A attacks somebody, but it evades the attack. " (capitalize-name (visible-name actor))))))
+                                          (format nil "~A attacks somebody, but it evades the attack. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
                 ((and (not no-hit-message)
                       (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
                       (check-mob-visible target :observer *player*))
                  (progn
                    (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                          (format nil "Somebody attacks ~A, but ~A evades the attack. " (visible-name target) (visible-name target))))))
+                                          (format nil "Somebody attacks ~A, but ~A evades the attack. "
+                                                  (prepend-article +article-the+ (visible-name target))
+                                                  (prepend-article +article-the+ (visible-name target)))))))
               
               (set-mob-location target x y (z target))
 
@@ -1107,7 +1130,7 @@
                 (setf cur-dmg (1- (cur-hp target)))
                 (rem-mob-effect target +mob-effect-soul-reinforcement+)
                 (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                       (format nil "Reinforced soul of ~A prevents a fatal blow. " (visible-name target))))
+                                       (format nil "Reinforced soul of ~A prevents a fatal blow. " (prepend-article +article-the+ (visible-name target)))))
               
               (decf (cur-hp target) cur-dmg)
               ;; place a blood spattering
@@ -1128,28 +1151,31 @@
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                              (format nil "~A hits ~A, but ~A is not hurt. " (capitalize-name (visible-name actor)) (visible-name target) (visible-name target)))))
+                                              (format nil "~A hits ~A, but ~A is not hurt. "
+                                                      (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                      (prepend-article +article-the+ (visible-name target))
+                                                      (prepend-article +article-the+ (visible-name target))))))
                     ((and actor
                           (not no-hit-message)
                           (not specific-no-dmg-string-func)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                              (format nil "~A hits somebody, but it is not hurt. " (capitalize-name (visible-name actor))))))
+                                              (format nil "~A hits somebody, but it is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
                     ((and actor
                           (not no-hit-message)
                           (not specific-no-dmg-string-func)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "Somebody hits ~A, but ~A is not hurt. " (visible-name target) (visible-name target)))))
+                                              (format nil "Somebody hits ~A, but ~A is not hurt. " (prepend-article +article-the+ (visible-name target)) (prepend-article +article-the+ (visible-name target))))))
                     ((and (not actor)
                           (not no-hit-message)
                           (not specific-no-dmg-string-func)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "~A is not hurt. " (capitalize-name (visible-name target))))))
+                                              (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
                     ((and specific-no-dmg-string-func
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
@@ -1163,25 +1189,25 @@
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                              (format nil "~A hits ~A for ~A damage. " (capitalize-name (visible-name actor)) (visible-name target) cur-dmg))))
+                                              (format nil "~A hits ~A for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)) cur-dmg))))
                     ((and actor
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                              (format nil "~A hits somebody for ~A damage. " (capitalize-name (visible-name actor)) cur-dmg))))
+                                              (format nil "~A hits somebody for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) cur-dmg))))
                     ((and actor
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "Somebody hits ~A for ~A damage. " (visible-name target) cur-dmg))))
+                                              (format nil "Somebody hits ~A for ~A damage. " (prepend-article +article-the+ (visible-name target)) cur-dmg))))
                     ((and (not actor)
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "~A takes ~A damage. " (capitalize-name (visible-name target)) cur-dmg))))
+                                              (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg))))
                     ((and specific-hit-string-func
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
@@ -1198,19 +1224,19 @@
                   (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                      (format nil "~A misses ~A. " (capitalize-name (visible-name actor)) (visible-name target)))))
+                                      (format nil "~A misses ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target))))))
             ((and actor
                   (not no-hit-message)
                   (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                      (format nil "~A misses somebody. " (capitalize-name (visible-name actor))))))
+                                      (format nil "~A misses somebody. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
             ((and actor
                   (not no-hit-message)
                   (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
              (progn
                (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                      (format nil "Somebody misses ~A. " (visible-name target))))))
+                                      (format nil "Somebody misses ~A. " (prepend-article +article-the+ (visible-name target)))))))
           
           ))
 
@@ -1253,7 +1279,8 @@
   nil)
 
 (defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()))
-  (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (visible-name mob)))))
+  (logger (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)" (name mob) (id mob) (x mob) (y mob) (z mob)))
+  (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))))
     
     (when (dead= mob)
       (return-from make-dead nil))

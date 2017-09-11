@@ -575,6 +575,7 @@
                                  (not (eq (get-mob-* level dx dy dz) *player*))
                                  (check-mob-visible (get-mob-* level dx dy dz) :observer *player*)
                                  )
+                        (format t "~A [~A] (~A ~A ~A)~%" (name (get-mob-* level dx dy dz)) (id (get-mob-* level dx dy dz)) dx dy dz)
                         (pushnew (id (get-mob-* level dx dy dz)) (proper-visible-mobs *player*))
                         
                         )

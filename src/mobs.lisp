@@ -672,19 +672,19 @@
 
 (defmethod name ((mob mob))
   (if (slot-value mob 'name)
-    (slot-value mob 'name)
-    (name (get-mob-type-by-id (mob-type mob)))))
+    (values (slot-value mob 'name) +noun-proper+ +noun-singular+)
+    (values (name (get-mob-type-by-id (mob-type mob))) +noun-common+ +noun-singular+)))
 
 (defmethod visible-name ((mob mob))
   (when (and (not (eq *player* mob))
              (or ;(mob-effect-p *player* +mob-effect-blind+)
                  (not (check-mob-visible mob :observer *player*))))
-    (return-from visible-name "somebody"))
+    (return-from visible-name (values "somebody" +noun-proper+ +noun-singular+)))
   (when (= (faction *player*) (faction mob))
     (return-from visible-name (name mob)))
   (if (= (face-mob-type-id mob) (mob-type mob))
     (name mob)
-    (name (get-mob-type-by-id (face-mob-type-id mob)))))
+    (values (name (get-mob-type-by-id (face-mob-type-id mob))) +noun-common+ +noun-singular+)))
 
 (defmethod set-cur-weapons ((mob mob))
   (setf (weapon mob) (copy-list (weapon (get-mob-type-by-id (mob-type mob)))))
@@ -903,9 +903,9 @@
 (defmethod get-qualified-name ((mob mob))
   (if (slot-value mob 'name)
     (if (mob-ability-p mob +mob-abil-undead+)
-      (format nil "~A" (name mob))
-      (format nil "~A the ~A" (name mob) (capitalize-name (name (get-mob-type-by-id (mob-type mob))))))
-    (format nil "nameless ~A" (name mob))))
+      (name mob)
+      (values (format nil "~A the ~A" (name mob) (capitalize-name (name (get-mob-type-by-id (mob-type mob))))) +noun-proper+ +noun-singular+))
+    (values (format nil "nameless ~A" (name mob)) +noun-common+ +noun-singular+)))
 
 (defun set-name (mob)
   (when (and (not (eq mob *player*))
@@ -1035,7 +1035,10 @@
    (cur-score :initform 0 :accessor cur-score)
    (nearby-light-mobs :initform () :accessor nearby-light-mobs)
    (nearby-light-sources :initform () :accessor nearby-light-sources)))
- 
+
+(defmethod name ((mob player))
+  (values (slot-value mob 'name) +noun-proper+ +noun-singular+))
+
 ;;---------------------- 
 ;; FACTIONS
 ;;----------------------

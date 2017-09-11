@@ -92,7 +92,7 @@
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A transforms itself into Avatar of Brilliance. " (visible-name actor))))
+                                                                                (format nil "~A transforms itself into an Avatar of Brilliance. " (visible-name actor))))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (let ((old-max-hp (max-hp actor)))
@@ -213,10 +213,10 @@
                                                          )
                                              :on-remove #'(lambda (effect actor)
                                                             (setf (cur-light actor) (param1 effect))
-                                                            (update-visible-mobs actor)
+                                                            ;(update-visible-mobs actor)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-merged+ :name "merged" :color sdl:*cyan*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-merged+ :name "Merged" :color sdl:*cyan*
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (let ((singer nil)

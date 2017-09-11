@@ -488,7 +488,7 @@
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantaur+ 
-                                       :name "Gargantaur"
+                                       :name "gargantaur"
                                        :glyph-idx 39 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 25 :max-fp 2
                                        :faction +faction-type-outsider-beasts+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 6 10 +normal-ap+ 100 ()) nil) :base-dodge 0

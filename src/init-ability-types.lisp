@@ -263,8 +263,7 @@
                                                 (logger (format nil "MOB-CONSUME-BLESSING-ON-TARGET: ~A [~A] is scorched by blessing of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
                                                 (rem-mob-effect target +mob-effect-blessed+)
-                                                (decf (total-blessed *world*))
-
+                                                
                                                 (mob-burn-blessing target actor)
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -2862,7 +2861,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
-                                                (logger (format nil "MOB-MELD: ~A [~A] merges with ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (logger (format nil "MOB-MERGE: ~A [~A] merges with ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
                                                                                                            (format nil "You hear some eerie sounds~A." str)))

@@ -39,6 +39,15 @@
 
 (defparameter *max-player-name-length* 20)
 
+(defconstant +noun-proper+ 0)
+(defconstant +noun-common+ 1)
+(defconstant +noun-plural+ 2)
+(defconstant +noun-singular+ 3)
+
+(defconstant +article-none+ 0)
+(defconstant +article-a+ 1)
+(defconstant +article-the+ 2)
+
 ;;--------------------
 ;; MOB-TEMPLATE Constants
 ;;-------------------- 
