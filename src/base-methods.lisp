@@ -381,10 +381,10 @@
             (progn
               ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
               (set-message-this-turn t)
-              (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (visible-name mob)) cur-dmg))
+              (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))
               (when (check-dead mob) (setf (killed-by *player*) "falling")))
             (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                                   (format nil "~A falls and takes ~A damage. " (capitalize-name (visible-name mob)) cur-dmg) :observed-mob mob)))
+                                   (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg) :observed-mob mob)))
         (when (check-dead mob)
           (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())
           (when (mob-effect-p mob +mob-effect-possessed+)
@@ -674,7 +674,7 @@
                                   (when (or (check-mob-visible mob :observer *player*)
                                             (check-mob-visible target-mob :observer *player*))
                                     (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                           (format nil "~A pushes ~A. " (capitalize-name (visible-name mob)) (visible-name target-mob)))))
+                                                           (format nil "~A pushes ~A. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) (prepend-article +article-the+ (visible-name target-mob))))))
                                 ))
                             (on-bump target-mob mob)))
                       finally
@@ -738,7 +738,7 @@
             (check-mob-visible actor :observer *player* :complete-check t)
             (check-mob-visible target :observer *player* :complete-check t))
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A stumbles upon ~A! " (capitalize-name (visible-name actor)) (visible-name target))))
+                           (format nil "~A stumbles upon ~A! " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))))
   )
 
 (defmethod on-bump ((target mob) (actor mob))
@@ -833,7 +833,7 @@
       (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id target))) (id target)))
     
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A releases its possession of ~A. " (capitalize-name (name actor)) (name target)))
+                           (format nil "~A releases its possession of ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (name target))))
   
     ))
 
@@ -843,7 +843,7 @@
                          :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
                          :actor actor
                          :specific-hit-string-func #'(lambda (cur-dmg)
-                                                       (format nil "~A is scorched by ~A for ~A damage. " (capitalize-name (name target)) (name actor) cur-dmg)))
+                                                       (format nil "~A is scorched by ~A for ~A damage. " (capitalize-name (prepend-article +article-the+ (name target))) (prepend-article +article-the+ (visible-name actor)) cur-dmg)))
   (when (zerop (random 4))
     (generate-sound target (x target) (y target) (z target) 80 #'(lambda (str)
                                                                    (format nil "You hear gasps~A." str))))
@@ -878,7 +878,7 @@
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                         (format nil "~A reloads his ~(~A~). " (capitalize-name (visible-name actor)) (get-weapon-name actor)))
+                         (format nil "~A reloads his ~(~A~). " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-weapon-name actor)))
 
   (make-act actor +normal-ap+))
 
@@ -904,7 +904,7 @@
         (set-ranged-weapon-charges actor 0)))
 
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A shoots ~A. " (capitalize-name (visible-name actor)) (visible-name target)))
+                           (format nil "~A shoots ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target))))
     
     (loop repeat bullets-left
           with rx
@@ -965,9 +965,9 @@
     (loop for (a-target . dmg) in affected-targets do
       (if (zerop dmg)
           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                 (format nil "~A is not hurt. " (capitalize-name (visible-name a-target))))
+                                 (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name a-target)))))
           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                 (format nil "~A is hit for ~A damage. " (capitalize-name (visible-name a-target)) dmg)))
+                                 (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))) dmg)))
       (when (check-dead a-target)
         (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-ranged-weapon-aux actor))
           
@@ -981,7 +981,7 @@
     
     (when completely-missed
       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                             (format nil "~A misses. " (capitalize-name (visible-name actor))))
+                             (format nil "~A misses. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
       )
     (make-act actor (get-ranged-weapon-speed actor))
     ))
@@ -1343,7 +1343,7 @@
                    (find :is-fire aux-params))
           (setf r 0)
           (setf burns-corpse t)
-          (setf dead-msg-str (format nil "~A burns to ashes. " (capitalize-name (visible-name mob)))))
+          (setf dead-msg-str (format nil "~A burns to ashes. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))))
 
         (cond
           ;; sever head
@@ -1351,19 +1351,19 @@
                      (place-animation (x mob) (y mob) (z mob) +anim-type-severed-body-part+ :params (list mob "head" +item-type-body-part-limb+))
                      (setf left-body-str "multilated body" left-body-type +item-type-body-part-body+)
                      (when killer
-                       (setf dead-msg-str (format nil "~A chops off ~A's head. " (capitalize-name (visible-name killer)) (visible-name mob))))))
+                       (setf dead-msg-str (format nil "~A chops off ~A's head. " (capitalize-name (prepend-article +article-the+ (visible-name killer))) (visible-name mob))))))
           ;; sever limb
           ((= r 2) (progn
                      (place-animation (x mob) (y mob) (z mob) +anim-type-severed-body-part+ :params (list mob "limb" +item-type-body-part-limb+))
                      (setf left-body-str "multilated body" left-body-type +item-type-body-part-body+)
                      (when killer
-                       (setf dead-msg-str (format nil "~A severs ~A's limb. " (capitalize-name (visible-name killer)) (visible-name mob))))))
+                       (setf dead-msg-str (format nil "~A severs ~A's limb. " (capitalize-name (prepend-article +article-the+ (visible-name killer))) (visible-name mob))))))
           ;; sever torso
           ((= r 3) (progn
                      (place-animation (x mob) (y mob) (z mob) +anim-type-severed-body-part+ :params (list mob "upper body" +item-type-body-part-half+))
                      (setf left-body-str "lower body" left-body-type +item-type-body-part-half+)
                      (when killer
-                       (setf dead-msg-str (format nil "~A cuts ~A in half. " (capitalize-name (visible-name killer)) (visible-name mob))))))
+                       (setf dead-msg-str (format nil "~A cuts ~A in half. " (capitalize-name (prepend-article +article-the+ (visible-name killer))) (visible-name mob))))))
           ;; do not sever anything
           (t (setf left-body-str "body" left-body-type +item-type-body-part-full+)))
 
@@ -1439,7 +1439,7 @@
     (setf (dead= mob) t)))
 
 (defun mob-evolve (mob)
-  (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A assumes a superior form of ~A! " (capitalize-name (name mob)) (name (get-mob-type-by-id (evolve-into mob)))))
+  (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A assumes a superior form of ~A! " (capitalize-name (prepend-article +article-the+ (name mob))) (prepend-article +article-a+ (name (get-mob-type-by-id (evolve-into mob))))))
   
   (setf (mob-type mob) (evolve-into mob))
   (setf (cur-hp mob) (max-hp mob))
@@ -1561,7 +1561,7 @@
         (decf (cur-oxygen mob)))
       (when (zerop (cur-oxygen mob))
         (decf (cur-hp mob) *lack-oxygen-dmg*)
-        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A can not breath and takes ~A dmg. " (capitalize-name (visible-name mob)) *lack-oxygen-dmg*) :observed-mob mob)
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A can not breath and takes ~A dmg. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) *lack-oxygen-dmg*) :observed-mob mob)
         (when (check-dead mob)
           (when (eq mob *player*)
             (setf (killed-by *player*) "drowning"))
@@ -1731,9 +1731,11 @@
         (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
                                                                               (format nil "You hear rustling~A. " str)))
         (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                               (format nil "~A picks up ~A~A. " (capitalize-name (visible-name mob)) (name item) (if (> (qty item) 1)
-                                                                                                                   (format nil " x~A" (qty item))
-                                                                                                                   ""))
+                               (format nil "~A picks up ~A. "
+                                       (capitalize-name (prepend-article +article-the+ (visible-name mob)))
+                                       (cond
+                                         ((> (qty item) 1) (format nil "~A x~A" (name item) (qty item)))
+                                         (t (format nil "~A" (prepend-article +article-a+ (name item))))))
                                :observed-mob mob))
       (remove-item-from-level-list (level *world*) item)
       (setf (inv mob) (add-to-inv item (inv mob) (id mob)))
@@ -1758,9 +1760,11 @@
         (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-pick-drop* #'(lambda (str)
                                                                               (format nil "You hear rustling~A. " str)))
         (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                               (format nil "~A drops ~A~A. " (capitalize-name (visible-name mob)) (name item) (if (> (qty item) 1)
-                                                                                                                (format nil " x~A" (qty item))
-                                                                                                                ""))
+                               (format nil "~A drops ~A. "
+                                       (capitalize-name (prepend-article +article-the+ (visible-name mob)))
+                                       (cond
+                                         ((> (qty item) 1) (format nil "~A x~A" (name item) (qty item)))
+                                         (t (format nil "~A" (prepend-article +article-a+ (name item))))))
                              :observed-mob mob))
       (when spd
         (make-act mob spd)))
