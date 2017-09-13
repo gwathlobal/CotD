@@ -277,7 +277,8 @@
              (pushnew (id tmob) (shared-visible-mobs mob))
                ;(format t "~A [~A] sees ~A~%" (name tmob) (id tmob) (visible-mobs tmob))
              (loop for vmob-id in (proper-visible-mobs tmob)
-                   when (not (check-dead (get-mob-by-id vmob-id)))
+                   when (and (not (check-dead (get-mob-by-id vmob-id)))
+                             (not (is-merged (get-mob-by-id vmob-id))))
                      do
                         (pushnew vmob-id (shared-visible-mobs mob)))
              (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
@@ -575,7 +576,7 @@
                                  (not (eq (get-mob-* level dx dy dz) *player*))
                                  (check-mob-visible (get-mob-* level dx dy dz) :observer *player*)
                                  )
-                        (format t "~A [~A] (~A ~A ~A)~%" (name (get-mob-* level dx dy dz)) (id (get-mob-* level dx dy dz)) dx dy dz)
+                        ;(format t "~A [~A] (~A ~A ~A)~%" (name (get-mob-* level dx dy dz)) (id (get-mob-* level dx dy dz)) dx dy dz)
                         (pushnew (id (get-mob-* level dx dy dz)) (proper-visible-mobs *player*))
                         
                         )
