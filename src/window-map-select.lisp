@@ -149,11 +149,9 @@
         (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
               for item = (get-item-by-id item-id)
               do
-                 (format str "~%~A~A"
-                         (capitalize-name (name item))
-                         (if (> (qty item) 1)
-                           (format nil " x~A" (qty item))
-                           "")))
+                 (format str "~%~A"
+                         (capitalize-name (prepend-article +article-a+ (visible-name item)))
+                         ))
                          
                          
         )

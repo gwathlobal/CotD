@@ -2931,7 +2931,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-merge+)
-                                                               (not (mob-effect-p actor +mob-effect-possessed+)))
+                                                               (not (mob-effect-p actor +mob-effect-possessed+))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -3032,7 +3033,8 @@
                                                         
                                                         (if (and (mob-ability-p actor +mob-abil-unmerge+)
                                                                  (merged-id-list actor)
-                                                                 (>= (length tile-list) 2))
+                                                                 (>= (length tile-list) 2)
+                                                                 (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                           t
                                                           nil)))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)

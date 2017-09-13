@@ -46,7 +46,7 @@
     (loop for i from 0 below (length (inv *player*))
           for item = (get-inv-item-by-pos (inv *player*) i)
           do
-             (push (capitalize-name (visible-name item)) lst)
+             (push (capitalize-name (prepend-article +article-a+ (visible-name item))) lst)
              (push (if (= i cur-str)
                      sdl:*yellow*
                      sdl:*white*)
@@ -123,7 +123,7 @@
                           
                           (setf *current-window* (make-instance 'input-str-window 
                                                                 :init-input "1"
-                                                                :header-str (format nil "Dropping ~A" (visible-name (get-inv-item-by-pos (inv *player*) (cur-inv win))))
+                                                                :header-str (format nil "Dropping ~A" (prepend-article +article-a+ (visible-name (get-inv-item-by-pos (inv *player*) (cur-inv win)))))
                                                                 :main-str "Enter the quantity to drop"
                                                                 :prompt-str "[Enter] Drop [Escape] Cancel [a] All"
                                                                 :all-func #'(lambda () (format nil "~A" (qty (get-inv-item-by-pos (inv *player*) (cur-inv win)))))

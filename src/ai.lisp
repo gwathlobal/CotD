@@ -796,7 +796,7 @@
              (add-message "You see "))
            (when (not (zerop n))
              (add-message ", "))
-           (add-message (format nil "~A" (visible-name item)))
+           (add-message (format nil "~A" (prepend-article +article-a+ (visible-name item))))
            (incf n)
         finally (when (not (zerop n))
                   (add-message (format nil ".~%"))))

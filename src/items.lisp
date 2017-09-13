@@ -6,6 +6,7 @@
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name item" :initarg :name :accessor name)
+   (plural-name :initform nil :initarg :plural-name :accessor plural-name)
    (descr :initform nil :initarg :descr :accessor descr)
    (max-stack-num :initform 1 :initarg :max-stack-num :accessor max-stack-num)
    (value :initform 0 :initarg :value :accessor value)
@@ -49,7 +50,7 @@
   (setf (id item) (find-free-id *items*))
   (setf (aref *items* (id item)) item)
 
-  (setf (name item) (format nil "~A" (name (get-item-type-by-id (item-type item)))))
+  ;(setf (name item) (format nil "~A" (name (get-item-type-by-id (item-type item)))))
   (when (> (qty item) (max-stack-num item))
     (setf (qty item) (max-stack-num item)))
   )
@@ -57,7 +58,8 @@
 (defun copy-item (item)
   (let ((new-item))
     (setf new-item (make-instance 'item :item-type (item-type item) :x (x item) :y (y item) :z (z item) :qty (qty item)))
-    (setf (name new-item) (format nil "~A" (name item)))
+    (when (slot-value item 'name)
+      (setf (name new-item) (format nil "~A" (name item))))
     (setf (inv-id new-item) (inv-id item))
     new-item))
 
@@ -91,9 +93,19 @@
 (defmethod descr ((item item))
   (descr (get-item-type-by-id (item-type item))))
 
+(defmethod name ((item item))
+  (if (slot-value item 'name)
+    (values (slot-value item 'name) +noun-proper+ +noun-singular+)
+    (values (name (get-item-type-by-id (item-type item))) +noun-common+ +noun-singular+)))
+
+(defmethod plural-name ((item item))
+  (if (plural-name (get-item-type-by-id (item-type item)))
+    (plural-name (get-item-type-by-id (item-type item)))
+    (name item)))
+
 (defun get-item-descr (item)
   (let ((str (create-string)))
-    (format str "~A~%~%~AQty: ~A~A" (name item)
+    (format str "~A~%~%~AQty: ~A~A" (capitalize-name (prepend-article +article-a+ (name item)))
             (if (descr item)
               (format nil "~A~%" (descr item))
               "")
@@ -167,11 +179,21 @@
   )
 
 (defmethod visible-name ((item item))
-  (format nil "~A~A"
-          (name item)
-          (if (> (qty item) 1)
-            (format nil " x~A" (qty item))
-            "")))
+  (multiple-value-bind (item-name noun-proper noun-singular) (name item)
+    (values (format nil "~A~A"
+                    (if (> (qty item) 1)
+                      (progn
+                        (setf noun-singular +noun-plural+)
+                        (format nil "~A " (qty item)))
+                      "")
+                    (if (> (qty item) 1)
+                      (progn
+                        (setf noun-singular +noun-plural+)
+                        (plural-name item))
+                      item-name))
+            noun-proper
+            noun-singular)
+    ))
 
 (defun get-overall-value (inv)
   (loop for item-id in inv

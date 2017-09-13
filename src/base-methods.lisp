@@ -1734,7 +1734,7 @@
                                (format nil "~A picks up ~A. "
                                        (capitalize-name (prepend-article +article-the+ (visible-name mob)))
                                        (cond
-                                         ((> (qty item) 1) (format nil "~A x~A" (name item) (qty item)))
+                                         ((> (qty item) 1) (format nil "~A ~A" (qty item) (plural-name item)))
                                          (t (format nil "~A" (prepend-article +article-a+ (name item))))))
                                :observed-mob mob))
       (remove-item-from-level-list (level *world*) item)
@@ -1763,7 +1763,7 @@
                                (format nil "~A drops ~A. "
                                        (capitalize-name (prepend-article +article-the+ (visible-name mob)))
                                        (cond
-                                         ((> (qty item) 1) (format nil "~A x~A" (name item) (qty item)))
+                                         ((> (qty item) 1) (format nil "~A ~A" (qty item) (plural-name item)))
                                          (t (format nil "~A" (prepend-article +article-a+ (name item))))))
                              :observed-mob mob))
       (when spd

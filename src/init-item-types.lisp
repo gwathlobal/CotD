@@ -1,27 +1,27 @@
 (in-package :cotd)
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-limb+
-                                         :name "body part"
+                                         :name "body part" :plural-name "body parts"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 1))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-half+
-                                         :name "body part"
+                                         :name "body part" :plural-name "body parts"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 2))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-body+
-                                         :name "body part"
+                                         :name "body part" :plural-name "body parts"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 3))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-full+
-                                         :name "body part"
+                                         :name "body part" :plural-name "body parts"
                                          :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 4))
 
 (set-item-type (make-instance 'item-type :id +item-type-coin+
-                                         :name "coin"
+                                         :name "coin" :plural-name "coins"
                                          :glyph-idx 4 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 10000 :value 1))
 
 (set-item-type (make-instance 'item-type :id +item-type-medkit+
-                                         :name "medkit"
+                                         :name "medkit" :plural-name "medkits"
                                          :descr "A medkit that can heal 3-5 HP. Usable by humans only. Unusable underwater."
                                          :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor item)
@@ -56,7 +56,7 @@
                                                             nil))))
 
 (set-item-type (make-instance 'item-type :id +item-type-smoke-bomb+
-                                         :name "smoke bomb"
+                                         :name "smoke bomb" :plural-name "smoke bombs"
                                          :descr "A bomb that emits clouds of smoke to conceal you. Usable only by humans. Can not be used in water."
                                          :glyph-idx 1 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor item)

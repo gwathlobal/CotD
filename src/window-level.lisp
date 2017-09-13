@@ -525,11 +525,9 @@
 			    ;; 
                             (setf item-line-list (loop for item-id in item-list
                                                   for item = (get-item-by-id item-id)
-                                                       collect (format nil "~A~A"
-                                                                       (name item)
-                                                                       (if (> (qty item) 1)
-                                                                         (format nil " x~A" (qty item))
-                                                                         ""))))
+                                                       collect (format nil "~A"
+                                                                       (capitalize-name (prepend-article +article-a+ (visible-name item)))
+                                                                       )))
                             ;; populate the ability prompt list
                             (setf item-prompt-list (loop for item-id in item-list
                                                          collect #'(lambda (cur-sel)
