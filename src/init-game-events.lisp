@@ -513,6 +513,7 @@
                                                                                             (decf (counter feature) 2)
                                                                                             (when (<= (counter feature) 0)
                                                                                               (remove-feature-from-level-list (level world) feature)
-                                                                                              (remove-feature-from-world feature)))))
+                                                                                              (remove-feature-from-world feature))))
+                                                                               (loop-finish))
                                                                 )
                                                            )))

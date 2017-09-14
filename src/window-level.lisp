@@ -148,7 +148,7 @@
                                        "(M) ")
                                      (capitalize-name (visible-name vmob))
                                      (if (riding-mob-id vmob)
-                                       (format nil ", riding ~A" (capitalize-name (visible-name (get-mob-by-id (riding-mob-id vmob)))))
+                                       (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id vmob))))
                                        "")
                                      (if (/= (- (z vmob) (z mob)) 0)
                                        (format nil " (~@d)" (- (z vmob) (z mob)))

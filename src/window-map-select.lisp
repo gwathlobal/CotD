@@ -139,7 +139,7 @@
           (format str "~%~A~A~A"
                   (capitalize-name (get-current-mob-name mob))
                   (if (riding-mob-id mob)
-                    (format nil ", riding ~A" (capitalize-name (visible-name (get-mob-by-id (riding-mob-id mob)))))
+                    (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id mob))))
                     "")
                   (if (and (check-lof win) (not lof-blocked))
                     (format nil " (hit: ~D%)" (if (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)

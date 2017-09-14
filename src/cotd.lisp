@@ -137,7 +137,7 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
                                                                      +player-faction-trinity-mimics+))))))
-        (join-legion-item (cons "Join the Pandemonium Hierarchy (as an Crimson Imp)"
+        (join-legion-item (cons "Join the Pandemonium Hierarchy (as a Crimson Imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -158,7 +158,7 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      +tod-type-evening+
                                                                      +player-faction-shadows+))))))
-        (join-chaplain-item (cons "Join the Military (as Chaplain)"
+        (join-chaplain-item (cons "Join the Military (as a Chaplain)"
                                   #'(lambda (n) 
                                       (declare (ignore n))
                                       (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -169,7 +169,7 @@
                                                                        (nth (random (length weather-types)) weather-types)
                                                                        (nth (random (length tod-types)) tod-types)
                                                                        +player-faction-military-chaplain+))))))
-        (join-scout-item (cons "Join the Military (as Scout)"
+        (join-scout-item (cons "Join the Military (as a Scout)"
                                #'(lambda (n) 
                                    (declare (ignore n))
                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -347,7 +347,7 @@
       (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
       (setf *random-state* (make-random-state t))
 
-      (setf *window-width* (+ 300 (+ 30 (* *glyph-w* *max-x-view*))) 
+      (setf *window-width* (+ 350 (+ 30 (* *glyph-w* *max-x-view*))) 
             *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (sdl:char-height sdl:*default-font*)))
 
       (when (<= *window-height* 384)

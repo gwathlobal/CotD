@@ -544,7 +544,8 @@
                                                     (get-mob-move-mode mob))
                        +connect-room-none+)
                    (or (not (mob-ability-p mob +mob-abil-demon+))
-                       (and (mob-ability-p mob +mob-abil-demon+)
+                       (and (or (mob-ability-p mob +mob-abil-demon+)
+                                (= (mob-type mob) +mob-type-gargantaur+))
                             (loop for feature-id in (feature-id-list (level world))
                                   for feature = (get-feature-by-id feature-id)
                                   with result = t

@@ -440,7 +440,7 @@
                                                                                              (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                              (prepend-article +article-the+ (visible-name called-ally))))
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                     (format nil "~A appears out of thin air. " (prepend-article +article-the+ (capitalize-name (visible-name actor))))))
+                                                                                     (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                                             ;; remove the calling for help status from the called and the caller
                                                             (rem-mob-effect called-ally +mob-effect-calling-for-help+)
                                                             (rem-mob-effect actor +mob-effect-called-for-help+)
@@ -496,7 +496,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-prayer-bless+ :name "Pray for righteousness" :descr "Pray to reveal unholy creatures (1/3rd chance only) and burn them for 1-2 dmg, as well as to grant divine protection (1/3rd chance only) to all humans & angels in the area also causing them to follow you. Divine protection prevents one harmful action from affecting the shielded target." 
+                                 :id +mob-abil-prayer-bless+ :name "Pray for righteousness" :descr "Pray to reveal unholy creatures (1/3rd chance only) and burn them for 1-2 dmg, as well as to grant divine protection (1/3rd chance only) to all humans & angels. Affected humans in the area will also start to follow you. Divine protection prevents one harmful action from affecting the shielded target." 
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 20

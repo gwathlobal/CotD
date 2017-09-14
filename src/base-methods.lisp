@@ -10,21 +10,6 @@
 (defun capitalize-name (str)
   (string-upcase str :start 0 :end 1))
 
-(defun prepend-article-func (article name &rest args)
-  (let ((article-str (cond
-                       ((= article +article-a+) "a ")
-                       ((= article +article-the+) "the ")
-                       (t ""))))
-    (when (or (find +noun-proper+ args)
-              (and (find +noun-common+ args)
-                   (find +noun-plural+ args)
-                   (= article +article-a+)))
-      (setf article-str ""))
-    (format nil "~A~A" article-str name)))
-
-(defmacro prepend-article (article name-func)
-  `(multiple-value-call #'prepend-article-func ,article ,name-func))
-
 (defun x-y-into-dir (x y)
   (let ((xy (list x y)))
     (cond
