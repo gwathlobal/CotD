@@ -16,8 +16,8 @@
   :components
     ((:file "logger")
      (:file "astar")
-     (:file "message-box")
      (:file "globals")
+     (:file "message-box")
      (:file "options")
      (:file "game-events")
      (:file "world" :depends-on ("globals"))
