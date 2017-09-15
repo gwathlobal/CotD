@@ -5,16 +5,28 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-August 18, 2017 v1.2.0
+September 15, 2017 v1.2.1
 
-- Added high scores.
-- Added Wisps to the map. These are flying angelic beings that are able to navigate using their hearing.
-- Sound sources can now be seen on the map.
-- All menu options now have letter shortcuts.
-- Lit and shadowed tiles are now displayed on the screen.
-- The player is now able to set his or her name.
-- Fixed a bug with severed body parts animation showing when the player should not be able to see it.
-- Fixed a bug with num lock interfering with arrow keys.
+- Added Trinity mimics as a playable faction. Trinity mimics are three mind-linked angels - the Star singer, Star gazer, and Star mender. Each has a separate set of abilities and all of them can merge with each other. The player controls each mimic individually.
+- Added Righteous fury ability to the Star singer. Righteous fury is a berserk-like ability that lets you attack harder and faster but at a cost of slowing you afterwards.
+- Added Pain link ability to the Star signer. Pain link makes the target deal increased damage to the caster but decreased damage to everyone else.
+- Added Heal other ability to the Star mender. This ability allows healing not only yourself but your allies as well.
+- Added Soul reinforcement ability to the Star mender. Soul reinforcement prevents a fatal blow that would otherwise kill the target.
+- Added Silence ability to the Star gazer. Silence prevents the target from casting.
+- Added Confuse ability to the Star gazer. Confused targets sometimes move in a random direction instead of an intended action.
+- Added Pandemonium Shades as a playable faction. Shadow creatures are unable to possess humans but get a number of shadow-related abilities. You start as a shadow imp.
+- Added Umbral aura to shadow devils. This makes shadow devils be not light, but darkness sources.
+- Added Extinguish light to shadow demons and shadow devils. This ranged ability will switch off a stationary light or cause an enemy to stop emitting light for short period.
+- Added Shadow step to all shadow creatures. Shadow step is a short-range teleport that works only if the source and destination tiles are not lit.
+- Added the Church as a playable faction. You start as a priest in a church and your aim is to destroy all demons.
+- Added Smite to priests. Smite is a single target damage ability that gets better the more humans are around the caster.
+- Added Slow to priests. Slow is a single target ability that causes the enemy to take more time when attempting any action.
+- Added Prayer of wrath to the priests. This ability grants a fire-based melee attack to those who follow you.
+- You can now wait a turn using [.], and pick items using [g] and [,].
+- The game now logs your current title instead of your initial title into a high score entry.
+- The player is now highlighted on the map.
+- Dropping in water gives you a 'wet' effect, which means 25% of increased fire resistance.
+- Added rainy weather. Being caught in the rain will make characters wet, extinguish fires and clear blood.
 
 CURRENT CHANGELOG
 

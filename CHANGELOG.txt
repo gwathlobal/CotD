@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+September 15, 2017 v1.2.1
+
 - Added Trinity mimics as a playable faction. Trinity mimics are three mind-linked angels - the Star singer, Star gazer, and Star mender. Each has a separate set of abilities and all of them can merge with each other. The player controls each mimic individually.
 - Added Righteous fury ability to the Star singer. Righteous fury is a berserk-like ability that lets you attack harder and faster but at a cost of slowing you afterwards.
 - Added Pain link ability to the Star signer. Pain link makes the target deal increased damage to the caster but decreased damage to everyone else.
