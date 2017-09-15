@@ -1277,7 +1277,7 @@
     
     (when (and (eq mob *player*)
                killer)
-      (setf (killed-by *player*) (get-qualified-name killer)))
+      (setf (killed-by *player*) (multiple-value-list (get-qualified-name killer))))
 
     (when (and killer
                (eq killer *player*))

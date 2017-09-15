@@ -45,7 +45,7 @@ GENERAL TIPS
 --------------------
 THE CELESTIAL COMMUNION
 
- - You can start as an Chrome Angel who can easily dispatch lowly Imps.
+ - You can start as a Chrome Angel who can easily dispatch lowly Imps.
  - Alternatively, you can start a group of Trinity mimics, each having distinct role and abilities.
  - Bless humans to gain power.
  - To win, kill all demons or ascend beyond the angel. Survival of mankind is not required.
@@ -100,42 +100,25 @@ THE SATANISTS
 KEYBINDINGS
 
  Arrow keys, Numpad keys,         - Movement
-
  [Page Up], [Page Down], 
-
  [Home], [End]
-
-
-
  [5], [.]                         - Wait a turn
 
- [a]                              - Invoke ability
- 
-[l]                              - Look mode
- 
-[f]                              - Fire mode
+ [a]                              - Invoke ability 
+ [l]                              - Look mode
+ [f]                              - Fire mode
+ [r]                              - Reload 
+ [p], [g], [,]                    - Pick up an item
 
- [r]                              - Reload
- 
-[p], [g], [,]                    - Pick up an item
-
-
-
- [Shift] + [,]                    - Look/Climb/Swim up
- 
-[Shift] + [.]                    - Look/Climb/Swim down
-
-
+ [Shift] + [,]                    - Look/Climb/Swim up 
+ [Shift] + [.]                    - Look/Climb/Swim down
 
  [Shift] + [2]                    - Character screen
- 
-[i]                              - Inventory
-
+ [i]                              - Inventory
  [m]                              - View messages
-
  [?]                              - Help
  
-[Shift] + [q]                    - Quit to main menu
+ [Shift] + [q]                    - Quit to main menu
  
 --------------------
 CREDITS

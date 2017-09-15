@@ -265,7 +265,7 @@
                                               :menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-chaplain-item) (car join-scout-item) (car join-thief-item)
                                                                 (car join-satanist-item) (car join-church-item)
                                                                 (car custom-scenario-item) (car highscores-item) (car help-item) (car exit-item))
-                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cadr join-shadow-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item)
+                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-chaplain-item) (cdr join-scout-item) (cdr join-thief-item)
                                                                 (cdr join-satanist-item) (cdr join-church-item)
                                                                 (cdr custom-scenario-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))))
       (progn

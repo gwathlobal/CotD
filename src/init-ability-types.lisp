@@ -186,7 +186,7 @@
                                                   (setf (riding-mob-id target) nil))
                                                 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A possesses ~A. " (prepend-article +article-the+ (capitalize-name (name actor))) (prepend-article +article-the+ (visible-name target))))
+                                                                       (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))

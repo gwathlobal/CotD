@@ -151,7 +151,7 @@
                                                                                                                                 (real-game-time world)
                                                                                                                                 (if (null (killed-by *player*))
                                                                                                                                   "Killed by unknown forces."
-                                                                                                                                  (format nil "Killed by ~A." (killed-by *player*)))
+                                                                                                                                  (format nil "Killed by ~A." (prepend-article +article-a+ (values-list (killed-by *player*)))))
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)

@@ -19,7 +19,7 @@ THE CELESTIAL COMMUNION
  - To win, kill all demons or ascend beyond Chrome Angel (Trinity mimics need to fill the power meter on all of their alive characters). Survival of mankind is not required.
  
 THE PANDEMONIUM HIERARCHY
- - The Pandemonium Hierarchy is represented with two rows of units: an Crimson Imp, Crimson Demon, and Archdemon, on the one hand, and a Shadow Imp, Shadow Demon, and Shadow Devil, on the other.
+ - The Pandemonium Hierarchy is represented with two rows of units: a Crimson Imp, Crimson Demon, and Archdemon, on the one hand, and a Shadow Imp, Shadow Demon, and Shadow Devil, on the other.
  - You start as a puny Crimson or Shadow Imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
  - Imps and Demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
  - Shadow creatures are unable to possess anybody but can teleport around unlit areas.
@@ -39,7 +39,7 @@ CITIZENS OF THE CITY
  - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.
 
 THE CHURCH
- - Priests have an array of divine abilities. They are able to grant divine shield to allies, scorch and reveal true form of all enemies in sight, slow and smite enemies. The divine shield provides a one-time protection from any harm.
+ - Priests have an array of divine abilities. They are able to grant divine shield to allies, scorch and reveal the true form of all enemies in sight, slow and smite enemies. The divine shield provides a one-time protection from any harm.
  - Whenever a priest gives humans a divine shield, they will start to follow the preacher.
  - Smiting damage increases with the number of humans the priest sees.
  - Priests can also give fire-based melee attacks to themselves and their followers by praying for wrath.
@@ -48,7 +48,7 @@ THE CHURCH
  
 THE MILITARY 
  - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
- - The military is comprised of five units: Soldiers, Scouts, Sergeants, Machine-gunners and Chaplains. All of them are capable of ranged combat but do not gain power whatsoever.
+ - The military is comprised of five units: Soldiers, Scouts, Sergeants, Machine-gunners, and Chaplains. All of them are capable of ranged combat but do not gain power whatsoever.
  - Soldiers are armed with single-shot rifles and need to reload every other turn.
  - Scouts have a more powerful rifle than soldiers, are able to reveal the true form of a single enemy and enter the battle riding a horse.
  - Sergeants wield six-round revolvers that deal less damage than a rifle but do not need to be reloaded so often.

@@ -72,8 +72,6 @@
     ;; start several parallel threads to speed up the conectivity calculations
     (let* ((out *standard-output*)
            (size-1-thread (bt:make-thread #'(lambda ()
-                                              (format out "SIZE 1~%")
-
                                               (let ((start-time (get-internal-real-time)))
                                                 (create-connect-map-walk (level world) 1)
                                                 (incf *cur-progress-bar*)
@@ -97,8 +95,6 @@
                                               )
                                         :name "Connectivity map (size 1) thread"))
            (size-3-thread (bt:make-thread #'(lambda ()
-                                              (format out "SIZE 3~%")
-                                              
                                               (let ((start-time (get-internal-real-time)))
                                                 (create-connect-map-walk (level world) 3)
                                                 (incf *cur-progress-bar*)

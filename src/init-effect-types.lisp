@@ -92,7 +92,7 @@
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A transforms itself into an Avatar of Brilliance. " (prepend-article +article-the+ (visible-name actor)))))
+                                                                                (format nil "~A transforms itself into an Avatar of Brilliance. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (let ((old-max-hp (max-hp actor)))
@@ -114,7 +114,7 @@
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A transforms itself back into a chrome angel.~%" (prepend-article +article-the+ (visible-name actor))))
+                                                                                   (format nil "~A transforms itself back into a chrome angel.~%" (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                             
                                                             (rem-mob-effect actor +mob-effect-flying+))
                                              :on-tick #'(lambda (effect actor)
@@ -147,7 +147,7 @@
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A is empowered. " (prepend-article +article-the+ (visible-name actor)))))
+                                                                                (format nil "~A is empowered. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                              :on-remove #'(lambda (effect actor)
                                                             (let ((old-max-hp (max-hp actor)))
                                                               (setf (mob-type actor) (param1 effect))
@@ -173,7 +173,7 @@
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A loses its power. " (prepend-article +article-the+ (visible-name actor)))))))
+                                                                                   (format nil "~A loses its power. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-necrolink+ :name "Necrolink" :color (sdl:color :r 100 :g 100 :b 100)
                                              :on-remove #'(lambda (effect actor)
@@ -292,13 +292,13 @@
                                                          (setf (weapon actor) (list "Flaming sword" (list +weapon-dmg-fire+ 4 7 (truncate +normal-ap+ 1.3) 100 (list :chops-body-parts :is-fire)) nil))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A is filled with righteous fury. " (prepend-article +article-the+ (visible-name actor)))))
+                                                                                (format nil "~A is filled with righteous fury. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (set-cur-weapons actor)
                                                             (set-mob-effect actor :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 3)
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A is no longer filled with righteous fury. " (prepend-article +article-the+ (visible-name actor)))))
+                                                                                   (format nil "~A is no longer filled with righteous fury. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                              ))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-wet+ :name "Wet" :color sdl:*blue*
