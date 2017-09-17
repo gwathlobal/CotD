@@ -1,5 +1,8 @@
 CHANGELOG
 
+- Added graveyards to the building list.
+- Added flavor signs to some buildings.
+
 --------------------
 September 15, 2017 v1.2.1
 

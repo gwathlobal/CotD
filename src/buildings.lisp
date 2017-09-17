@@ -17,6 +17,7 @@
 (defconstant +building-type-stables+ 10)
 (defconstant +building-type-mansion+ 11)
 (defconstant +building-type-bank+ 12)
+(defconstant +building-type-graveyard+ 13)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -60,6 +61,7 @@
 (defconstant +building-city-mansion-2+ 36)
 (defconstant +building-city-park-4+ 37)
 (defconstant +building-city-bank-1+ 38)
+(defconstant +building-city-graveyard-1+ 39)
 
 (defparameter *level-grid-size* 5)
 
@@ -122,7 +124,8 @@
                      (#\u +terrain-slope-stone-up+)
                      (#\d +terrain-slope-stone-down+)
                      (#\* +terrain-wall-bush+)
-                     (#\| +terrain-wall-lantern+))
+                     (#\| +terrain-wall-lantern+)
+                     (#\G +terrain-wall-grave+))
           when tt
             do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
 

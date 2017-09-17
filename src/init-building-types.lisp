@@ -37,7 +37,7 @@
                                                                             " ....... "
                                                                             " ....... "
                                                                             " ....... "
-                                                                           " ....... "
+                                                                            " ....... "
                                                                             " ....... "
                                                                             " ....... "
                                                                             " ....... "
@@ -758,6 +758,9 @@
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
                                               (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
                                               )
+
+                                            (setf (aref template-level (+ x 7) (+ y 0) z) +terrain-floor-sign-prison+)
+                                            
                                             (values (list (list +mob-type-criminal+ 2 14 z)
                                                           (list +mob-type-criminal+ 5 14 z)
                                                           (list +mob-type-criminal+ 8 14 z)
@@ -859,6 +862,9 @@
                                               (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
                                               (translate-build-to-template x y (+ z 3) build-template-z-5 template-level)
                                               )
+
+                                            (setf (aref template-level (+ x 8) (+ y 16) z) +terrain-floor-sign-church+)
+                                            
                                             (values (list (list +mob-type-priest+ 8 4 z)
                                                           (list +mob-type-priest+ 3 4 z)
                                                           (list +mob-type-priest+ 12 4 z)
@@ -966,6 +972,9 @@
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
                                               )
+
+                                            (setf (aref template-level (+ x 2) (+ y 6) z) +terrain-floor-sign-library+)
+                                            
                                             (values (list (list +mob-type-man+ 3 2 z)
                                                           (list +mob-type-woman+ 10 6 z)
                                                           (list +mob-type-woman+ 13 8 z)
@@ -1515,6 +1524,9 @@
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
                                               )
+                                            
+                                            (setf (aref template-level (+ x 6) (+ y 12) z) +terrain-floor-sign-bank+)
+
                                             (values (list (list +mob-type-clerk+ 6 7 z)
                                                           (list +mob-type-clerk+ 10 7 z)
                                                           
@@ -1532,3 +1544,33 @@
                                                           (list +item-type-coin+ 11 9 (- z 1) (+ 50 (random 251)))
                                                           
                                                           )))))
+
+;;=====================
+;; Graveyards
+;;=====================
+
+(set-building-type (make-building :id +building-city-graveyard-1+ :grid-dim '(4 . 4) :act-dim '(16 . 16) :type +building-type-graveyard+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,"
+                                                                            ",*****,,,,*****,"
+                                                                            ",*,,,,,,,,,,,,*,"
+                                                                            ",*,G,,G,,G,,G,*,"
+                                                                            ",*,,,,,,,,,,,,*,"
+                                                                            ",*,,,,,,,,,,,,*,"
+                                                                            ",,,G,,G,,G,,G,,,"
+                                                                            ",,,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,,"
+                                                                            ",,,G,,G,,G,,G,,,"
+                                                                            ",*,,,,,,,,,,,,*,"
+                                                                            ",*,,,,,,,,,,,,*,"
+                                                                            ",*,G,,G,,G,,G,*,"
+                                                                            ",*,,,,,,,,,,,,*,"
+                                                                            ",*****,,,,*****,"
+                                                                            ",,,,,,,,,,,,,,,,"))
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))

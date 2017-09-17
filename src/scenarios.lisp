@@ -84,6 +84,7 @@
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 4)
+    (setf (gethash +building-type-graveyard+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-river ()
@@ -96,6 +97,7 @@
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
+    (setf (gethash +building-type-graveyard+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-port ()
@@ -108,6 +110,7 @@
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
+    (setf (gethash +building-type-bank+ max-building-types) 0)
     max-building-types))
 
 ;;---------------------------------
@@ -124,6 +127,7 @@
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
     (setf (gethash +building-type-bank+ reserved-building-types) 1)
     (setf (gethash +building-type-lake+ reserved-building-types) 2)
+    (setf (gethash +building-type-graveyard+ reserved-building-types) 1)
     reserved-building-types))
 
 (defun get-reserved-buildings-river ()
@@ -136,6 +140,7 @@
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
     (setf (gethash +building-type-bank+ reserved-building-types) 1)
     (setf (gethash +building-type-lake+ reserved-building-types) 0)
+    (setf (gethash +building-type-graveyard+ reserved-building-types) 1)
     reserved-building-types))
 
 (defun get-reserved-buildings-port ()
@@ -148,6 +153,7 @@
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
     (setf (gethash +building-type-bank+ reserved-building-types) 1)
     (setf (gethash +building-type-lake+ reserved-building-types) 0)
+    (setf (gethash +building-type-graveyard+ reserved-building-types) 0)
     reserved-building-types))
 
 ;;---------------------------------
@@ -543,9 +549,10 @@
                                                                           (map-size mob))
                                                     (get-mob-move-mode mob))
                        +connect-room-none+)
-                   (or (not (mob-ability-p mob +mob-abil-demon+))
+                   (or (and (not (mob-ability-p mob +mob-abil-demon+))
+                            (not (mob-ability-p mob +mob-abil-angel+)))
                        (and (or (mob-ability-p mob +mob-abil-demon+)
-                                (= (mob-type mob) +mob-type-gargantaur+))
+                                (mob-ability-p mob +mob-abil-angel+))
                             (loop for feature-id in (feature-id-list (level world))
                                   for feature = (get-feature-by-id feature-id)
                                   with result = t

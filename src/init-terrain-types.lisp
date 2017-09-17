@@ -72,6 +72,22 @@
                                                :glyph-idx 95 :glyph-color (sdl:color :r 70 :g 70 :b 70) :back-color sdl:*black* 
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-church+ :name "sign \"The Orthodox Church of the One\""
+                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-library+ :name "sign \"The Library of His Imperial Majesty\""
+                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-prison+ :name "sign \"City Prison\""
+                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-bank+ :name "sign \"Bank of Morozov and Sons\""
+                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
+
 ;;--------------------
 ;; Walls
 ;;--------------------
@@ -91,6 +107,10 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-bush+ :name "bush"
                                                :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-grave+ :name "grave"
+                                               :glyph-idx 121 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* 
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
 ;;--------------------
 ;; Trees
