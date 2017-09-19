@@ -1,4 +1,3 @@
-- Give angels ability to create an image and port into it
 - Give angels ressurection
 - Movement on tiles with mobs should cost more so that they do not bump into each other that often
 - Add courtyard houses like Thief2RL

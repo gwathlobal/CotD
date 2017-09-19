@@ -358,13 +358,38 @@
       (logger (format nil "AI-FUNCTION: ~A [~A] is a coward with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
       (ai-mob-flee mob nearest-enemy)      
       (return-from ai-function))
-      
 
     ;; if the mob is feared, move away from the nearest enemy
     (when (and nearest-enemy (mob-effect-p mob +mob-effect-fear+))
       (logger (format nil "AI-FUNCTION: ~A [~A] is in fear with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
       (ai-mob-flee mob nearest-enemy)      
       (return-from ai-function))
+    
+     ;; if the mob is a split soul, move away from the nearest enemy (without a random action)
+    (when (and nearest-enemy (mob-ai-split-soul-p mob))
+      (logger (format nil "AI-FUNCTION: ~A [~A] is trying to move away from the enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
+
+      (let ((farthest-tile nil))
+        (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
+                                                        (let ((terrain (get-terrain-* (level *world*) dx dy (z mob))))
+                                                          (when (and terrain
+                                                                     (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                         (get-terrain-type-trait terrain +terrain-trait-water+))
+                                                                     (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                     (not (get-mob-* (level *world*) dx dy (z mob)))
+                                                                     nearest-enemy)
+                                                            (unless farthest-tile
+                                                              (setf farthest-tile (list dx dy (z mob))))
+                                                            (when (> (get-distance dx dy (x nearest-enemy) (y nearest-enemy))
+                                                                     (get-distance (first farthest-tile) (second farthest-tile) (x nearest-enemy) (y nearest-enemy)))
+                                                              (setf farthest-tile (list dx dy (z mob))))))))
+        (if farthest-tile
+          (setf (path-dst mob) farthest-tile nearest-target nil)
+          (setf (path-dst mob) (list (x mob) (y mob) (z mob)) nearest-target nil))
+        ))
+      
+
+    
       
     ;; if the mob has horde behavior, compare relative strengths of allies to relative strength of enemies
     ;; if less - flee

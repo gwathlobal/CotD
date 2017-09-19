@@ -8,8 +8,8 @@
            (setf turn-finished t)
            
            ;; check all available game events
-           (loop for game-event-id in (game-events *world*)
-                 for game-event = (get-game-event-by-id game-event-id)
+           (loop for game-event-id of-type fixnum in (game-events *world*)
+                 for game-event of-type game-event = (get-game-event-by-id game-event-id)
                  when (and (not (disabled game-event))
                            (funcall (on-check game-event) *world*))
                    do
@@ -20,7 +20,7 @@
            
            ;; iterate through all the mobs
            ;; those who are not dead and have cur-ap > 0 can make a move
-           (loop for mob across *mobs* do
+           (loop for mob of-type mob across *mobs* do
              (when (and (not (check-dead mob))
                         (> (cur-ap mob) 0)
                         (not (is-merged mob)))
@@ -31,9 +31,14 @@
                (setf (motion-set-p mob) nil)
                
                ;; for trinity mimics - set the current mob as the player
-               (when (and (subtypep (type-of mob) 'player)
-                          (mob-ability-p mob +mob-abil-trinity-mimic+)
-                          (find (id mob) (mimic-id-list *player*)))
+               ;; for split soul - set the current mob as the player
+               (when (or (and (subtypep (type-of mob) 'player)
+                              (mob-ability-p mob +mob-abil-trinity-mimic+)
+                              (find (id mob) (mimic-id-list *player*)))
+                         (and (subtypep (type-of mob) 'player)
+                              (mob-effect-p mob +mob-effect-split-soul-target+))
+                         (and (subtypep (type-of mob) 'player)
+                              (mob-effect-p mob +mob-effect-split-soul-source+)))
                  (setf *player* mob))
                
                (ai-function mob)
@@ -68,13 +73,13 @@
            (when turn-finished
              (incf (real-game-time *world*))
              (setf (turn-finished *world*) t)
-             (loop for mob across *mobs* do
+             (loop for mob of-type mob across *mobs* do
                (when (and (not (check-dead mob))
                           (not (is-merged mob)))
                  ;; increase cur-ap by max-ap
                  (incf (cur-ap mob) (max-ap mob))))
-             (loop for feature-id in (feature-id-list (level *world*))
-                   for feature = (get-feature-by-id feature-id)
+             (loop for feature-id of-type fixnum in (feature-id-list (level *world*))
+                   for feature of-type feature = (get-feature-by-id feature-id)
                    when (on-tick-func feature)
                    do
                       (funcall (on-tick-func feature) (level *world*) feature))

@@ -219,7 +219,7 @@
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-heal-self 1 :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
-                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-avatar-of-brilliance t
+                                       :abil-open-close-door t :abil-ignite-the-fire t :abil-avatar-of-brilliance t :abil-split-soul t
                                        :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archangel+
@@ -231,7 +231,7 @@
                                        :strength 4
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-heal-self 2 :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
-                                       :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t :abil-split-soul t
                                        :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer+
@@ -319,6 +319,16 @@
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-righteous-fury t :abil-pain-link t
                                        :abil-soul-reinforcement t :abil-silence t :abil-confuse t
                                        :ai-wants-bless t :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel-image+
+                                       :name "stellar image"
+                                       :glyph-idx 65 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 1 :max-fp 0
+                                       :faction +faction-type-angels+
+                                       :weapon (list "Illusory fire" nil nil) :base-dodge 35
+                                       :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ 0 100))
+                                       :strength 0
+                                       :abil-angel t :abil-no-breathe t :abil-restore-soul t
+                                       :ai-split-soul t))
 
 ;;--------------------
 ;; DEMONS

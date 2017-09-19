@@ -333,3 +333,23 @@
 (set-effect-type (make-instance 'effect-type :id +mob-effect-silence+ :name "Silenced" :color sdl:*cyan*))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-confuse+ :name "Confused" :color sdl:*magenta*))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-split-soul-source+ :name "Split soul" :color sdl:*white*
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore actor))
+                                                            ;; param1 - id of the mob, affected by the +mob-effect-pain-link-source+
+                                                            (when (param1 effect)
+                                                              (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-split-soul-target+))
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-split-soul-target+ :name "Split soul" :color sdl:*white*
+                                             :on-remove #'(lambda (effect actor)
+                                                            ;; I need this otherwise there will be an infinite recursion 
+                                                            (when (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-split-soul-source+)
+                                                              (setf (param1 (get-effect-by-id (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-split-soul-source+))) nil))
+                                                            (rem-mob-effect (get-mob-by-id (actor-id effect)) +mob-effect-split-soul-source+)
+                                                            ;; have to avoid recursion in make-dead with this
+                                                            (rem-mob-effect-simple actor +mob-effect-split-soul-target+)
+                                                            (setf (cur-hp actor) 0)
+                                                            (make-dead actor :splatter nil :msg nil :msg-newline nil :killer nil :corpse nil :aux-params nil)
+                                                            )))

@@ -3374,3 +3374,173 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-split-soul+ :name "Split soul" :descr "Split your soul to create an image of yourself next to you. The image will last for 6 turns. You will be able to control the image and transfer yourself to your image's place. You can have only one image created at a time." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                ;; target here is list of (x y z) coordinates for the tile to be placed an image
+                                                (multiple-value-bind (x y z) (values-list target)
+                                                  (print-visible-message x y z (level *world*) (format nil "~A splits its soul. "
+                                                                                                       (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                         :observed-mob actor)
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear some eerie sounds~A." str)))
+                                                  (let ((image (make-instance (if (eq actor *player*)
+                                                                                'player
+                                                                                'mob)
+                                                                              :mob-type +mob-type-angel-image+ :x (first target) :y (second target) :z (third target))))
+                                                        (setf (name image) (format nil "~A's image" (name actor)))
+                                                        (set-mob-effect image :effect-type-id +mob-effect-split-soul-target+ :actor-id (id actor) :cd 6)
+                                                        (set-mob-effect actor :effect-type-id +mob-effect-split-soul-source+ :actor-id (id actor) :cd 6 :param1 (id image))
+                                                        (add-mob-to-level-list (level *world*) image))
+                                                  )
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-split-soul+)
+                                                               (not (mob-effect-p actor +mob-effect-split-soul-source+))
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((farthest-tile nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                     (get-terrain-type-trait terrain +terrain-trait-water+))
+                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor)))
+                                                                                                                 nearest-enemy)
+                                                                                                        (unless farthest-tile
+                                                                                                          (setf farthest-tile (list dx dy (z actor))))
+                                                                                                        (when (> (get-distance dx dy (x nearest-enemy) (y nearest-enemy))
+                                                                                                                 (get-distance (first farthest-tile) (second farthest-tile) (x nearest-enemy) (y nearest-enemy)))
+                                                                                                          (setf farthest-tile (list dx dy (z actor))))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-split-soul+)
+                                                             (can-invoke-ability actor actor +mob-abil-split-soul+)
+                                                             farthest-tile
+                                                             nearest-enemy
+                                                             (<= (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)
+                                                             (> (strength nearest-enemy) (strength actor)))
+                                                      t
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (let ((farthest-tile nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                     (get-terrain-type-trait terrain +terrain-trait-water+))
+                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor)))
+                                                                                                                 nearest-enemy)
+                                                                                                        (unless farthest-tile
+                                                                                                          (setf farthest-tile (list dx dy (z actor))))
+                                                                                                        (when (> (get-distance dx dy (x nearest-enemy) (y nearest-enemy))
+                                                                                                                 (get-distance (first farthest-tile) (second farthest-tile) (x nearest-enemy) (y nearest-enemy)))
+                                                                                                          (setf farthest-tile (list dx dy (z actor))))))))
+                                                    (mob-invoke-ability actor farthest-tile (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (= (view-z *player*) (z *player*))
+                                                                 (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
+                                                                 (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                     (get-terrain-type-trait terrain +terrain-trait-water+))
+                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-restore-soul+ :name "Restore soul" :descr "Transfer the rest of your soul to the location of your image, destroying the image in the process. You can not restore your soul if your soul source is riding a gargantaur." 
+                                 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+)))))
+                                                      (x (x actor))
+                                                      (y (y actor))
+                                                      (z (z actor)))
+                                                  (cond
+                                                    ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                                                          (get-single-memo-visibility (get-memo-* (level *world*) (x source) (y source) (z source)))
+                                                          (check-mob-visible actor :observer *player*)
+                                                          (check-mob-visible source :observer *player*))
+                                                     (progn
+                                                       (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                  (format nil "You hear some eerie sounds~A. " str)))
+                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                              (format nil "~A restores its soul to the location of its image. "
+                                                                                      (capitalize-name (prepend-article +article-the+ (visible-name source))))
+                                                                              :observed-mob actor)))
+                                                    ((and (get-single-memo-visibility (get-memo-* (level *world*) (x source) (y source) (z source)))
+                                                          (check-mob-visible source :observer *player*))
+                                                     (progn
+                                                       (generate-sound actor (x source) (y source) (z source) 60 #'(lambda (str)
+                                                                                                                     (format nil "You hear some eerie sounds~A. " str)))
+                                                       (print-visible-message (x source) (y source) (z source) (level *world*)
+                                                                              (format nil "~A restores its soul to the location of its image. "
+                                                                                      (capitalize-name (prepend-article +article-the+ (visible-name source))))
+                                                                              :observed-mob source)))
+                                                    ((and (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
+                                                          (check-mob-visible actor :observer *player*))
+                                                     (progn
+                                                       (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                     (format nil "You hear some eerie sounds~A. " str)))
+                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                              (format nil "~A restores its soul to the location of its image. "
+                                                                                      (capitalize-name (prepend-article +article-the+ (visible-name source))))
+                                                                              :observed-mob actor))))
+                                                  
+                                                  (rem-mob-effect actor +mob-effect-split-soul-target+)
+                                                  (set-mob-location source x y z :apply-gravity nil)
+                                                  (when (eq actor *player*)
+                                                    (setf *player* source))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
+                                                        (if (and (mob-ability-p actor +mob-abil-restore-soul+)
+                                                                 (mob-effect-p actor +mob-effect-split-soul-target+)
+                                                                 (mob-effect-p source +mob-effect-split-soul-source+)
+                                                                 (not (mob-effect-p actor +mob-effect-divine-concealed+))
+                                                                 (not (mob-effect-p actor +mob-effect-silence+))
+                                                                 (null (riding-mob-id source)))
+                                                          t
+                                                          nil)))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
+                                                    (format t "CHECK-AI-RESTORE-SOUL: ~A [~A], source ~A, cur-hp ~A, ratio ~A, nearest-enemy ~A, can-invoke ~A~%"
+                                                            (name actor) (id actor) (name source) (cur-hp source) (/ (cur-hp source) (max-hp source))
+                                                            (or (null nearest-enemy)
+                                                                (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
+                                                            (can-invoke-ability actor actor +mob-abil-restore-soul+))
+                                                    (if (and (< (/ (cur-hp source) (max-hp source)) 
+                                                                0.3)
+                                                             (null (riding-mob-id source))
+                                                             (or (null nearest-enemy)
+                                                                 (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
+                                                             (mob-ability-p actor +mob-abil-restore-soul+)
+                                                             (can-invoke-ability actor actor +mob-abil-restore-soul+))
+                                                      t
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

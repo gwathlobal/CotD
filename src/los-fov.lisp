@@ -89,13 +89,13 @@
   (let ((brightness 0)
         (darkness 0)) 
     ;; iterate through all mobs
-    (loop for mob-id in (if calc-for-player
+    (loop for mob-id of-type fixnum in (if calc-for-player
                           (nearby-light-mobs *player*)
                           (mob-id-list level))
-          for tmob = (get-mob-by-id mob-id)
-          for light-power = (* *light-power-faloff* (abs (cur-light tmob)))
-          for vision-pwr = (abs (cur-light tmob))
-          for vision-power = (abs (cur-light tmob))
+          for tmob of-type mob = (get-mob-by-id mob-id)
+          for light-power of-type fixnum = (* *light-power-faloff* (abs (cur-light tmob)))
+          for vision-pwr of-type fixnum = (abs (cur-light tmob))
+          for vision-power of-type fixnum = (abs (cur-light tmob))
           do
             (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) x y z) (abs (cur-light tmob)))
                (line-of-sight (x tmob) (y tmob) (z tmob) x y z
@@ -142,9 +142,9 @@
     (loop for (tx ty tz light-radius) in (if calc-for-player
                                         (nearby-light-sources *player*)
                                         (coerce (light-sources level) 'list))
-          for light-power = (* *light-power-faloff* light-radius)
-          for vision-pwr = light-radius
-          for vision-power = light-radius
+          for light-power of-type fixnum = (* *light-power-faloff* light-radius)
+          for vision-pwr of-type fixnum = light-radius
+          for vision-power of-type fixnum = light-radius
           do
              (when (and (not (zerop light-radius))
                         (< (get-distance-3d tx ty tz x y z) light-radius))
@@ -193,10 +193,10 @@
         (set-single-memo-* (level *world*) x1 y1 z1 :light 0)
         )))
 
-  (loop for tx from (- (x mob) (cur-sight mob)) to (+ (x mob) (cur-sight mob)) do
-    (loop for ty from (- (y mob) (cur-sight mob)) to (+ (y mob) (cur-sight mob)) do
-      (loop for tz from (- (z mob) (cur-sight mob)) to (+ (z mob) (cur-sight mob))
-            with brightness = 0
+  (loop for tx of-type fixnum from (- (x mob) (cur-sight mob)) to (+ (x mob) (cur-sight mob)) do
+    (loop for ty of-type fixnum from (- (y mob) (cur-sight mob)) to (+ (y mob) (cur-sight mob)) do
+      (loop for tz of-type fixnum from (- (z mob) (cur-sight mob)) to (+ (z mob) (cur-sight mob))
+            with brightness of-type fixnum = 0
             when (and (>= tx 0) (< tx (array-dimension (terrain (level *world*)) 0))
                       (>= ty 0) (< ty (array-dimension (terrain (level *world*)) 1))
                       (>= tz 0) (< tz (array-dimension (terrain (level *world*)) 2)))
@@ -208,6 +208,7 @@
   )
 
 (defun update-visible-mobs-normal (mob)
+  (declare (optimize (speed 3) (safety 0)))
   (setf (brightness mob) 0)
   (setf (darkness mob) 0)
   (when (eq mob *player*)
@@ -216,10 +217,10 @@
   
   ;; check through all stationary light sources
   (loop for (x y z light-radius) across (light-sources (level *world*))
-        for i from 0 below (length (light-sources (level *world*)))
-        for light-power = (* *light-power-faloff* light-radius)
-        for vision-pwr = light-radius
-        for vision-power = light-radius
+        for i of-type fixnum from 0 below (length (light-sources (level *world*)))
+        for light-power of-type fixnum = (* *light-power-faloff* light-radius) 
+        for vision-pwr of-type fixnum = light-radius
+        for vision-power of-type fixnum = light-radius
         do
            ;; set up mob brightness
            (when (and (not (zerop light-radius))
@@ -255,13 +256,13 @@
              (push (list x y z light-radius) (nearby-light-sources *player*)))
         )
   
-  (loop for mob-id in (mob-id-list (level *world*))
-        for tmob = (get-mob-by-id mob-id)
-        for vision-pwr = (cur-sight mob)
-        for vision-power = (cur-sight mob)
-        for light-power = (* *light-power-faloff* (abs (cur-light tmob)))
-        for light-pwr = (abs (cur-light tmob))
-        for light-power-base = (abs (cur-light tmob))
+  (loop for mob-id of-type fixnum in (mob-id-list (level *world*))
+        for tmob of-type mob = (get-mob-by-id mob-id)
+        for vision-pwr of-type fixnum = (cur-sight mob)
+        for vision-power of-type fixnum = (cur-sight mob)
+        for light-power of-type fixnum = (* *light-power-faloff* (abs (cur-light tmob)))
+        for light-pwr of-type fixnum = (abs (cur-light tmob))
+        for light-power-base of-type fixnum = (abs (cur-light tmob))
         do
            ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
            ;; except for trinity mimic - they share minds only with their own union

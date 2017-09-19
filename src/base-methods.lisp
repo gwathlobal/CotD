@@ -1244,7 +1244,9 @@
 (defun melee-target (attacker target)
   (logger (format nil "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target)))
   ;; no weapons - no attack
-  (unless (weapon attacker) (return-from melee-target nil))
+  (unless (weapon attacker)
+    (make-act attacker +normal-ap+)
+    (return-from melee-target nil))
 
   ;; set motion
   (incf-mob-motion attacker *mob-motion-melee*)

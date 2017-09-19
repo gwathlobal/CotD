@@ -219,7 +219,7 @@
     level))
 
 (defun flood-fill (first-cell &key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*) check-func make-func)
-  (declare (optimize (speed 3))
+  (declare (optimize (speed 3) (safety 0))
            (type function check-func make-func)
            (type fixnum max-x max-y max-z))
   
@@ -403,9 +403,9 @@
                         )))
     (declare (type fixnum max-x max-y max-z room-id))
     
-    (loop for x from 0 below max-x do
-      (loop for y from 0 below max-y do
-        (loop for z from 0 below max-z do
+    (loop for x of-type fixnum from 0 below max-x do
+      (loop for y of-type fixnum from 0 below max-y do
+        (loop for z of-type fixnum from 0 below max-z do
           (when (funcall check-func x y z x y z)
             (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
@@ -547,9 +547,9 @@
                         )))
     (declare (type fixnum max-x max-y max-z room-id))
     
-    (loop for x from 0 below max-x do
-      (loop for y from 0 below max-y do
-        (loop for z from 0 below max-z do
+    (loop for x of-type fixnum from 0 below max-x do
+      (loop for y of-type fixnum from 0 below max-y do
+        (loop for z of-type fixnum from 0 below max-z do
           (when (funcall check-func x y z x y z)
             (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
@@ -688,9 +688,9 @@
                         )))
     (declare (type fixnum max-x max-y max-z room-id))
     
-    (loop for x from 0 below max-x do
-      (loop for y from 0 below max-y do
-        (loop for z from 0 below max-z do
+    (loop for x of-type fixnum from 0 below max-x do
+      (loop for y of-type fixnum from 0 below max-y do
+        (loop for z of-type fixnum from 0 below max-z do
           (when (funcall check-func x y z x y z)
             (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
@@ -703,9 +703,9 @@
   (let ((max-x (array-dimension (terrain level) 0))
         (max-y (array-dimension (terrain level) 1))
         (max-z (array-dimension (terrain level) 2)))
-    (loop for x from 1 below (1- max-x) do
-      (loop for y from 1 below (1- max-y) do
-        (loop for z from 0 below max-z do
+    (loop for x of-type fixnum from 1 below (1- max-x) do
+      (loop for y of-type fixnum from 1 below (1- max-y) do
+        (loop for z of-type fixnum from 0 below max-z do
           (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-openable-door+)
             (let ((func #'(lambda (&key map-size move-mode)
                             (let ((room-id-list nil))

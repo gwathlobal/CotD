@@ -94,6 +94,7 @@
 (defconstant +mob-type-star-singer-gazer+ 37)
 (defconstant +mob-type-star-gazer-mender+ 38)
 (defconstant +mob-type-star-singer-gazer-mender+ 39)
+(defconstant +mob-type-angel-image+ 40)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -114,6 +115,7 @@
 (defconstant +ai-pref-cautious+ 6)
 (defconstant +ai-pref-simple-pathfinding+ 7)
 (defconstant +ai-pref-trinity-mimic+ 8)
+(defconstant +ai-pref-split-soul+ 9)
 
 (defconstant +mob-abil-heal-self+ 0)
 (defconstant +mob-abil-conceal-divine+ 1)
@@ -192,6 +194,8 @@
 (defconstant +mob-abil-soul-reinforcement+ 74)
 (defconstant +mob-abil-silence+ 75)
 (defconstant +mob-abil-confuse+ 76)
+(defconstant +mob-abil-split-soul+ 77)
+(defconstant +mob-abil-restore-soul+ 78)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -222,6 +226,8 @@
 (defconstant +mob-effect-soul-reinforcement+ 26)
 (defconstant +mob-effect-silence+ 27)
 (defconstant +mob-effect-confuse+ 28)
+(defconstant +mob-effect-split-soul-source+ 29)
+(defconstant +mob-effect-split-soul-target+ 30)
 
 (defconstant +mob-order-follow+ 0)
 
