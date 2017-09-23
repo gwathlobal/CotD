@@ -1092,7 +1092,7 @@
                                                                    
                                                                    (setf *player* mob1)
                                                                    (find-unoccupied-place-mimic world mob1 mob2 mob3 :inside nil)
-                                                                   (setf (faction-name *player*) "Trinity Mimic")))
+                                                                   (setf (faction-name *player*) "Trinity mimic")))
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)

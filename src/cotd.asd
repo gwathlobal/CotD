@@ -31,6 +31,7 @@
      (:file "hearing" :depends-on ("los-fov"))
      (:file "animations" :depends-on ("globals"))
      (:file "base-methods" :depends-on ("message-box" "mobs" "world" "abilities" "terrain" "animations" "lvl-features" "los-fov"))
+     (:file "character-dump" :depends-on ("base-methods"))
      (:file "buildings" :depends-on ("globals"))
      (:file "init-building-types" :depends-on ("buildings"))
      (:file "level-city" :depends-on ("init-building-types"))

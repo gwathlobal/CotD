@@ -142,7 +142,7 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
                                                                      +player-faction-trinity-mimics+))))))
-        (join-legion-item (cons "Join the Pandemonium Hierarchy (as a Crimson Imp)"
+        (join-legion-item (cons "Join the Pandemonium Hierarchy (as a Crimson imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -153,7 +153,7 @@
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
                                                                      +player-faction-demons+))))))
-        (join-shadow-item (cons "Join the Pandemonium Hierarchy (as a Shadow Imp)"
+        (join-shadow-item (cons "Join the Pandemonium Hierarchy (as a Shadow imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
