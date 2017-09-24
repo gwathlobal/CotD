@@ -72,7 +72,11 @@
                                                :glyph-idx 95 :glyph-color (sdl:color :r 70 :g 70 :b 70) :back-color sdl:*black* 
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
-(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-church+ :name "sign \"The Orthodox Church of the One\""
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-church-catholic+ :name "sign \"The Catholic Church of the One\""
+                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-church-orthodox+ :name "sign \"The Orthodox Church of the One\""
                                                :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 

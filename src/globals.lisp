@@ -340,10 +340,11 @@
 (defconstant +terrain-wall-window-opened+ 44)
 (defconstant +terrain-floor-ash+ 45)
 (defconstant +terrain-wall-grave+ 46)
-(defconstant +terrain-floor-sign-church+ 47)
+(defconstant +terrain-floor-sign-church-catholic+ 47)
 (defconstant +terrain-floor-sign-library+ 48)
 (defconstant +terrain-floor-sign-prison+ 49)
 (defconstant +terrain-floor-sign-bank+ 50)
+(defconstant +terrain-floor-sign-church-orthodox+ 51)
 
 (defparameter *faction-table* (make-hash-table))
 

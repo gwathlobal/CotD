@@ -14,8 +14,8 @@
     (setf sx (- dx (truncate (1- map-size) 2)))
     (setf sy (- dy (truncate (1- map-size) 2)))
 
-    (loop for nx from sx below (+ sx map-size) do
-      (loop for ny from sy below (+ sy map-size) do
+    (loop for nx of-type fixnum from sx below (+ sx map-size) do
+      (loop for ny of-type fixnum from sy below (+ sy map-size) do
         ;; cant move beyond level borders 
         (when (or (< nx 0) (< ny 0) (< dz 0) (>= nx (array-dimension (terrain (level *world*)) 0)) (>= ny (array-dimension (terrain (level *world*)) 1)) (>= dz (array-dimension (terrain (level *world*)) 2)))
           (return-from check-move-for-ai nil))

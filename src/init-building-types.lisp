@@ -863,7 +863,7 @@
                                               (translate-build-to-template x y (+ z 3) build-template-z-5 template-level)
                                               )
 
-                                            (setf (aref template-level (+ x 8) (+ y 16) z) +terrain-floor-sign-church+)
+                                            (setf (aref template-level (+ x 8) (+ y 16) z) +terrain-floor-sign-church-catholic+)
                                             
                                             (values (list (list +mob-type-priest+ 8 4 z)
                                                           (list +mob-type-priest+ 3 4 z)
@@ -873,6 +873,135 @@
                                                           (list +mob-type-man+ 10 11 z)
                                                           (list +mob-type-woman+ 6 11 z))
                                                     (list (list +feature-start-church-player+ 8 2 z)
+                                                          (list +feature-start-repel-demons+ 8 9 z))
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-church-2+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-church+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list "```,,,,,,,,,,,,,,"
+                                                                            "`T``#########```,"
+                                                                            "````#.......#`T`,"
+                                                                            ",```#.......#```,"
+                                                                            ",####.......####,"
+                                                                            ",#.............#,"
+                                                                            ",-.............-,"
+                                                                            ",#...#.....#...#,"
+                                                                            ",#.............#,"
+                                                                            ",#...#.....#...#,"
+                                                                            ",-.............-,"
+                                                                            ",#.............#,"
+                                                                            ",####.......####,"
+                                                                            ",```-.......-````"
+                                                                            "````#.......#``T`"
+                                                                            "`T``#-#+#+#-#````"
+                                                                            "```,,,,,,,,,,,,,,"))
+
+                                                  (build-template-z-3 (list "                 "
+                                                                            "    #########    "
+                                                                            "    #|     |#    "
+                                                                            "    #       #    "
+                                                                            " ####       #### "
+                                                                            " #             # "
+                                                                            " -   |     |   - "
+                                                                            " #   #     #   # "
+                                                                            " #             # "
+                                                                            " #   #     #   # "
+                                                                            " -   |     |   - "
+                                                                            " #             # "
+                                                                            " ####       #### "
+                                                                            "    -       -    "
+                                                                            "    #|     |#    "
+                                                                            "    ###+#+###    "
+                                                                            "                 "))
+
+                                                  (build-template-z-4 (list "                 "
+                                                                            "    .........    "
+                                                                            "    .........    "
+                                                                            "    .........    "
+                                                                            " ............... "
+                                                                            " .....#####..... "
+                                                                            " ....##   ##.... "
+                                                                            " ....#     #.... "
+                                                                            " ....#     #.... "
+                                                                            " ....#     #.... "
+                                                                            " ....##   ##.... "
+                                                                            " .....#####..... "
+                                                                            " ............... "
+                                                                            "    .........    "
+                                                                            "    .........    "
+                                                                            "    .........    "
+                                                                            "                 "))
+
+                                                  (build-template-z-5 (list "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "     #######     "
+                                                                            "    ##     ##    "
+                                                                            "    #       #    "
+                                                                            "    #       #    "
+                                                                            "    #       #    "
+                                                                            "    #       #    "
+                                                                            "    #       #    "
+                                                                            "    ##     ##    "
+                                                                            "     #######     "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "))
+                                                  (build-template-z-6 (list "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "      #####      "
+                                                                            "     ##   ##     "
+                                                                            "     #     #     "
+                                                                            "     #     #     "
+                                                                            "     #     #     "
+                                                                            "     ##   ##     "
+                                                                            "      #####      "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "))
+                                                  (build-template-z-7 (list "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "      .....      "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "     .......     "
+                                                                            "      .....      "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 "
+                                                                            "                 ")))
+                                              ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 3) build-template-z-5 template-level)
+                                              (translate-build-to-template x y (+ z 4) build-template-z-6 template-level)
+                                              (translate-build-to-template x y (+ z 5) build-template-z-7 template-level)
+                                              )
+
+                                            (setf (aref template-level (+ x 8) (+ y 16) z) +terrain-floor-sign-church-orthodox+)
+                                            
+                                            (values (list (list +mob-type-priest+ 8 4 z)
+                                                          (list +mob-type-priest+ 5 4 z)
+                                                          (list +mob-type-priest+ 11 4 z)
+                                                          (list +mob-type-man+ 6 7 z)
+                                                          (list +mob-type-woman+ 10 7 z)
+                                                          (list +mob-type-man+ 10 11 z)
+                                                          (list +mob-type-woman+ 6 11 z))
+                                                    (list (list +feature-start-church-player+ 8 6 z)
                                                           (list +feature-start-repel-demons+ 8 9 z))
                                                     nil))))
 

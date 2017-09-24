@@ -62,6 +62,7 @@
 (defconstant +building-city-park-4+ 37)
 (defconstant +building-city-bank-1+ 38)
 (defconstant +building-city-graveyard-1+ 39)
+(defconstant +building-city-church-2+ 40)
 
 (defparameter *level-grid-size* 5)
 
