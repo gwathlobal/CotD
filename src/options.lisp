@@ -41,20 +41,10 @@
         finally (setf (options-player-name options) str))
   )
 
-#+unix
 (defun create-options-file-string (options)
   (let ((str (create-string)))
-    (format str ";; FONT: Changes the size of text font~%;; Format (font <font type>)~%;; <font type> can be (without quotes) \"font-6x13\" or \"font-8x13\"~%")
-    (format str "(font ~A)~%~%" (string-downcase (string (options-font options))))
-    (format str ";; NAME: Sets the default name of the player~%;; Format (name \"<player name>\"). Only alphabetical ASCII characters, spaces and minuses are allowed in names.~%")
-    (format str "(name \"~A\")~%~%" (options-player-name options))
-    str))
-
-#+windows
-(defun create-options-file-string (options)
-  (let ((str (create-string)))
-    (format str ";; FONT: Changes the size of text font~%;; Format (font <font type>)~%;; <font type> can be (without quotes) \"font-6x13\" or \"font-8x13\"~C~%" #\return)
-    (format str "(font ~A)~C~%~C~%" (string-downcase (string (options-font options))) #\return #\return)
-    (format str ";; NAME: Sets the default name of the player~%;; Format (name \"<player name>\"). Only alphabetical ASCII characters, spaces and minuses are allowed in names.~C~%" #\return)
-    (format str "(name \"~A\")~C~%~C~%" (options-player-name options) #\return #\return)
+    (format str ";; FONT: Changes the size of text font~%;; Format (font <font type>)~%;; <font type> can be (without quotes) \"font-6x13\" or \"font-8x13\"~A~%" (new-line))
+    (format str "(font ~A)~A~%~A~%" (string-downcase (string (options-font options))) (new-line) (new-line))
+    (format str ";; NAME: Sets the default name of the player~%;; Format (name \"<player name>\"). Only alphabetical ASCII characters, spaces and minuses are allowed in names.~A~%" (new-line))
+    (format str "(name \"~A\")~A~%~A~%" (options-player-name options) (new-line) (new-line))
     str))

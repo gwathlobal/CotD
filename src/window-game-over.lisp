@@ -30,8 +30,8 @@
   
   ;; display scenario stats
   (let ((str (return-scenario-stats)))
-        
-    (write-text str (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 13 (sdl:get-font-height)))))
+    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 13 (sdl:get-font-height))))
+      (write-text str a-rect)))
 
   (show-message-box 6 (+ 40 (* 13 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 14 (sdl:get-font-height))) *full-message-box*)
 

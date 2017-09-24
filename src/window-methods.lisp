@@ -359,7 +359,8 @@
     (values cur-pos word-length eol)))
 
 (defun write-text (txt rect &key (surface sdl:*default-surface*) (justify :left) (color sdl:*white*) (font sdl:*default-font*) (count-only nil) (start-line 0))
-  (let ((txt-length (length txt)) (read-pos 0) (x (sdl:x rect)) (y (sdl:y rect)) (eol) (word-length) (row-length-in-pixels 0) (prev-pos) (cur-pos) (read-pos2) (cur-line 0))
+  (let ((txt-length (length txt)) (read-pos 0) (x (sdl:x rect)) (y (sdl:y rect)) (eol) (word-length) (row-length-in-pixels 0) (prev-pos) (cur-pos) (read-pos2) (cur-line 0)
+        (final-txt (create-string)))
     (loop until (or (>= read-pos txt-length) (>= y (+ (sdl:y rect) (sdl:height rect)))) do
 	 (setf prev-pos read-pos)
 	 (setf cur-pos prev-pos)
@@ -377,9 +378,11 @@
 	   ((eql justify ':left) (setf x (sdl:x rect)))
 	   ((eql justify ':center) (setf x (truncate (+ (sdl:x rect) (sdl:width rect)) 2)))
 	   ((eql justify ':right) (setf x (+ (sdl:x rect) (sdl:width rect)))))
+         (when (and (eql count-only t) (>= cur-line start-line))
+           (format final-txt "~A~A~%" (subseq txt prev-pos cur-pos) (new-line)))
 	 (when (and (eql count-only nil) (>= cur-line start-line))
 	   (sdl:draw-string-solid-* (subseq txt prev-pos cur-pos) x y :justify justify :surface surface :font font :color color)
 	   (incf y (sdl:char-height font)))
 	 (incf cur-line))
-    cur-line))
+    (values cur-line final-txt)))
 

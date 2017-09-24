@@ -24,28 +24,32 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
-                                                                                                                                                                  0
-                                                                                                                                                                  (loop for mimic-id in (mimic-id-list *player*)
-                                                                                                                                                                        for mimic = (get-mob-by-id mimic-id)
-                                                                                                                                                                        with cur-score = 0
-                                                                                                                                                                        when (not (eq mimic *player*))
-                                                                                                                                                                          do
-                                                                                                                                                                             (incf cur-score (cur-score mimic))
-                                                                                                                                                                        finally (return cur-score
-                                                                                                                                                                                        )))))
+                                                           (let* ((final-str (cond
+                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ((>= (cur-fp *player*) (max-fp *player*)) "Ascended.")))
+                                                                  (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
+                                                                                                           0
+                                                                                                           (loop for mimic-id in (mimic-id-list *player*)
+                                                                                                                 for mimic = (get-mob-by-id mimic-id)
+                                                                                                                 with cur-score = 0
+                                                                                                                 when (not (eq mimic *player*))
+                                                                                                                   do
+                                                                                                                      (incf cur-score (cur-score mimic))
+                                                                                                                 finally (return cur-score
+                                                                                                                                 ))))))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                 score
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
-                                                                                                                                (cond
-                                                                                                                                  ((zerop (total-demons world)) "Enemies eliminated.")
-                                                                                                                                  ((>= (cur-fp *player*) (max-fp *player*)) "Ascended."))
+                                                                                                                                final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                            
                                                              (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
@@ -69,18 +73,22 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                (calculate-player-score 1450)
+                                                           (let* ((final-str (cond
+                                                                               ((zerop (total-angels world)) "Enemies eliminated.")
+                                                                               ((>= (cur-fp *player*) (max-fp *player*)) "Ascended.")))
+                                                                  (score (calculate-player-score 1450))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                score
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
-                                                                                                                                (cond
-                                                                                                                                  ((zerop (total-angels world)) "Enemies eliminated.")
-                                                                                                                                  ((>= (cur-fp *player*) (max-fp *player*)) "Ascended."))
+                                                                                                                                final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
@@ -101,18 +109,22 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                (calculate-player-score (+ 1500 (* 10 (total-humans world))))
+                                                           (let* ((final-str (cond
+                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ))
+                                                                  (score (calculate-player-score (+ 1500 (* 10 (total-humans world)))))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                score
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
-                                                                                                                                (cond
-                                                                                                                                  ((zerop (total-demons world)) "Enemies eliminated.")
-                                                                                                                                  )
+                                                                                                                                final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
@@ -143,18 +155,22 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                (calculate-player-score 0)
+                                                           (let* ((final-str (if (null (killed-by *player*))
+                                                                               "Killed by unknown forces."
+                                                                               (format nil "Killed by ~A." (prepend-article +article-a+ (values-list (killed-by *player*))))))
+                                                                  (score (calculate-player-score 0))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                score
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
-                                                                                                                                (if (null (killed-by *player*))
-                                                                                                                                  "Killed by unknown forces."
-                                                                                                                                  (format nil "Killed by ~A." (prepend-article +article-a+ (values-list (killed-by *player*)))))
+                                                                                                                                final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (create-string "~%"))
                                                              (add-message (create-string "You are dead.~%"))
@@ -179,16 +195,20 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                (calculate-player-score 0)
+                                                           (let* ((final-str (format nil "Possessed by ~A." (get-qualified-name (get-mob-by-id (master-mob-id *player*)))))
+                                                                  (score (calculate-player-score 0))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                score
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
-                                                                                                                                (format nil "Possessed by ~A." (get-qualified-name (get-mob-by-id (master-mob-id *player*))))
+                                                                                                                                final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (create-string "~%"))
                                                              (add-message (create-string "You are possessed.~%"))
@@ -451,16 +471,20 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                             ;; write highscores
-                                                           (let ((highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                (calculate-player-score 0)
+                                                           (let* ((final-str (format nil "Escaped with $~A." (calculate-total-value *player*)))
+                                                                  (score (calculate-player-score 0))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                score
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (real-game-time world)
-                                                                                                                                (format nil "Escaped with $~A." (calculate-total-value *player*))
+                                                                                                                                final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
@@ -480,8 +504,8 @@
                                                          t)
                                            :on-trigger #'(lambda (world)
                                                            (loop repeat (sqrt (* (array-dimension (terrain (level world)) 0) (array-dimension (terrain (level world)) 1)))
-                                                                 for x = (random (array-dimension (terrain (level world)) 0))
-                                                                 for y = (random (array-dimension (terrain (level world)) 1))
+                                                                 for x of-type fixnum = (random (array-dimension (terrain (level world)) 0))
+                                                                 for y of-type fixnum = (random (array-dimension (terrain (level world)) 1))
                                                                  do
                                                                     (loop for z from (1- (array-dimension (terrain (level world)) 2)) downto 0
                                                                           when (or (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)

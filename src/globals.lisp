@@ -424,3 +424,15 @@
 
 (defparameter *path-thread* nil)
 (defparameter *fov-thread* nil)
+
+#+windows
+(defun new-line (&optional (on-screen nil))
+  (if on-screen
+    ""
+    #\return))
+
+#+unix
+(defun new-line (&optional (on-screen nil))
+  (if on-screen
+    ""
+    #\return))
