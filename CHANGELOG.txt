@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added a Ressurection ability to all angels. This ability allows you to ressurect other fallen angels and humans.
 - Added morgue files to characters.
 - Added a Split soul ability to the chrome angels. This ability lets the user create an image of themself that the user can later teleport to.
 - Added graveyards to the building list.

@@ -39,6 +39,7 @@
    (name :initform nil :accessor name)
    (alive-name :initform "" :accessor alive-name)
    (item-type :initform 0 :initarg :item-type :accessor item-type :type fixnum)
+   (dead-mob :initform nil :initarg :dead-mob :accessor dead-mob)
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)
    (z :initarg :z :initform 0 :accessor z :type fixnum)

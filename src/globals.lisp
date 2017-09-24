@@ -196,6 +196,7 @@
 (defconstant +mob-abil-confuse+ 76)
 (defconstant +mob-abil-split-soul+ 77)
 (defconstant +mob-abil-restore-soul+ 78)
+(defconstant +mob-abil-resurrection+ 79)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

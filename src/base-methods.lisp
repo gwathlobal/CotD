@@ -1358,6 +1358,8 @@
           (setf item (make-instance 'item :item-type left-body-type :x (x mob) :y (y mob) :z (z mob)))
           (setf (name item) (format nil "~A's ~A" (alive-name mob) left-body-str))
           (setf (alive-name item) (format nil "~A" (alive-name mob)))
+          (when (= left-body-type +item-type-body-part-full+)
+            (setf (dead-mob item) (id mob)))
           (add-item-to-level-list (level *world*) item)
           (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob) (z mob))))
         

@@ -3544,3 +3544,181 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-resurrection+ :name "Resurrection" :descr "Restore the original soul to the body and make it alive again. The resurrection is only possible for bodies that are not mangled or corrupted by demonic reanimations." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-RESURRECTION: ~A [~A] resurrects ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+                                                ;; target here is the item to be reanimated
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                       (format nil "~A channels divine energy. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))) :observed-mob actor)
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear somebody chanting~A. " str)))
+                                                (let ((mob-corpse))
+                                                  (setf mob-corpse (get-mob-by-id (dead-mob target)))
+                                                  (setf (x mob-corpse) (x target) (y mob-corpse) (y target) (z mob-corpse) (z target))
+                                                  (setf (dead= mob-corpse) nil)
+                                                  (setf (cur-hp mob-corpse) (max-hp mob-corpse))
+                                                  (setf (cur-fp mob-corpse) 0)
+                                                  (loop for mob-id in (merged-id-list mob-corpse)
+                                                        for mob = (get-mob-by-id mob-id)
+                                                        do
+                                                           (setf (dead= mob) nil)
+                                                           (setf (cur-hp mob) (max-hp mob))
+                                                           (setf (cur-fp mob) 0))
+                                                  (add-mob-to-level-list (level *world*) mob-corpse)
+                                                  (remove-item-from-level-list (level *world*) target)
+                                                  (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A stands up and walks. "
+                                                                                                                                              (capitalize-name (prepend-article +article-the+ (visible-name mob-corpse)))))
+                                                  (logger (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name actor) (id actor) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
+                                                  (remove-item-from-world target)
+                                                  (incf (stat-raised-dead actor))
+                                                  (when (eq actor *player*)
+                                                    (incf (cur-score *player*) 10)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-resurrection+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-resurrection+)
+                                                           (can-invoke-ability actor actor +mob-abil-resurrection+)
+                                                           (funcall #'(lambda ()
+                                                                        (let ((visible-items (copy-list (visible-items actor))))
+                                                                          (setf visible-items (remove-if #'(lambda (a)
+                                                                                                             (if (= (item-type a) +item-type-body-part-full+)
+                                                                                                               nil
+                                                                                                               t))
+                                                                                                         visible-items
+                                                                                                         :key #'get-item-by-id))
+                                                                          (setf visible-items (remove-if #'(lambda (a)
+                                                                                                             (if (get-mob-* (level *world*) (x a) (y a) (z a))
+                                                                                                               t
+                                                                                                               nil))
+                                                                                                         visible-items
+                                                                                                         :key #'get-item-by-id))
+                                                                          (setf visible-items (remove-if #'(lambda (a)
+                                                                                                             (if (and (dead-mob a)
+                                                                                                                      (mob-ability-p (get-mob-by-id (dead-mob a)) +mob-abil-angel+))
+                                                                                                               nil
+                                                                                                               t))
+                                                                                                         visible-items
+                                                                                                         :key #'get-item-by-id))
+                                                                          (setf visible-items (stable-sort visible-items #'(lambda (a b)
+                                                                                                                             (if (> (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
+                                                                                                                                    (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
+                                                                                                                               t
+                                                                                                                               nil))
+                                                                                                           :key #'get-item-by-id))
+                                                                          (if visible-items
+                                                                            (first visible-items)
+                                                                            nil))))
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (let ((item-id (funcall #'(lambda ()
+                                                                               (let ((visible-items (copy-list (visible-items actor))))
+                                                                                 (setf visible-items (remove-if #'(lambda (a)
+                                                                                                                    (if (= (item-type a) +item-type-body-part-full+)
+                                                                                                                      nil
+                                                                                                                      t))
+                                                                                                                visible-items
+                                                                                                                :key #'get-item-by-id))
+                                                                                 (setf visible-items (remove-if #'(lambda (a)
+                                                                                                                    (if (get-mob-* (level *world*) (x a) (y a) (z a))
+                                                                                                                      t
+                                                                                                                      nil))
+                                                                                                                visible-items
+                                                                                                                :key #'get-item-by-id))
+                                                                                 (setf visible-items (remove-if #'(lambda (a)
+                                                                                                                    (if (and (dead-mob a)
+                                                                                                                             (mob-ability-p (get-mob-by-id (dead-mob a)) +mob-abil-angel+))
+                                                                                                                      nil
+                                                                                                                      t))
+                                                                                                                visible-items
+                                                                                                                :key #'get-item-by-id))
+                                                                                 (setf visible-items (stable-sort visible-items #'(lambda (a b)
+                                                                                                                                    (if (> (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
+                                                                                                                                           (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
+                                                                                                                                      t
+                                                                                                                                      nil))
+                                                                                                                  :key #'get-item-by-id))
+                                                                                 (if visible-items
+                                                                                   (first visible-items)
+                                                                                   nil))))))
+                                                     (mob-invoke-ability actor (get-item-by-id item-id) (id ability-type))))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((items (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                            (exit-result nil))
+                                                        (setf items (remove-if #'(lambda (a)
+                                                                                   (if (= (item-type a) +item-type-body-part-full+)
+                                                                                     nil
+                                                                                     t))
+                                                                               items
+                                                                               :key #'get-item-by-id))
+                                                        (setf items (remove-if #'(lambda (a)
+                                                                                   (if (and (dead-mob a)
+                                                                                            (not (mob-ability-p (get-mob-by-id (dead-mob a)) +mob-abil-demon+)))
+                                                                                     nil
+                                                                                     t))
+                                                                               items
+                                                                               :key #'get-item-by-id))
+                                                        (cond
+                                                          ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (> (length items) 1))
+                                                           (progn
+                                                             (let ((item-line-list nil)
+                                                                   (item-prompt-list)
+                                                                   (item-list (copy-list items)))
+
+                                                               (setf item-line-list (loop for item-id in item-list
+                                                                                          for item = (get-item-by-id item-id)
+                                                                                          collect (format nil "~A"
+                                                                                                          (capitalize-name (prepend-article +article-a+ (visible-name item)))
+                                                                                                          )))
+                                                               ;; populate the ability prompt list
+                                                               (setf item-prompt-list (loop for item-id in item-list
+                                                                                            collect #'(lambda (cur-sel)
+                                                                                                        (declare (ignore cur-sel))
+                                                                                                        "[Enter] Resurrect  [Escape] Cancel")))
+                                                               
+                                                               ;; show selection window
+                                                               (setf *current-window* (make-instance 'select-obj-window 
+                                                                                                     :return-to *current-window* 
+                                                                                                     :header-line "Choose a body to resurrect:"
+                                                                                                     :enter-func #'(lambda (cur-sel)
+                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
+                                                                                                                     (setf *current-window* (return-to (return-to (return-to *current-window*))))
+                                                                                                                     ;(set-idle-calcing win)
+                                                                                                                     (make-output *current-window*)
+                                                                                                                     ;(show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                                                                                                                     (setf exit-result t))
+                                                                                                     :line-list item-line-list
+                                                                                                     :prompt-list item-prompt-list))
+                                                               (make-output *current-window*)
+                                                               (run-window *current-window*))
+                                                             exit-result)
+                                                           )
+                                                          ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (= (length items) 1)
+                                                                (item-ability-p (get-item-by-id (first items)) +item-abil-corpse+))
+                                                           (progn
+                                                             (clear-message-list *small-message-box*)
+                                                             (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
+                                                             t))
+                                                          (t
+                                                           (progn
+                                                             nil))))
+                                                      )))
