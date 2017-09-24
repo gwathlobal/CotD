@@ -3564,14 +3564,17 @@
                                                   (setf (dead= mob-corpse) nil)
                                                   (setf (cur-hp mob-corpse) (max-hp mob-corpse))
                                                   (setf (cur-fp mob-corpse) 0)
-                                                  (loop for mob-id in (merged-id-list mob-corpse)
-                                                        for mob = (get-mob-by-id mob-id)
-                                                        do
-                                                           (setf (dead= mob) nil)
-                                                           (setf (cur-hp mob) (max-hp mob))
-                                                           (setf (cur-fp mob) 0))
+                                                  (when (merged-id-list mob-corpse)
+                                                    (loop for mob-id in (merged-id-list mob-corpse)
+                                                          for mob = (get-mob-by-id mob-id)
+                                                          do
+                                                             (setf (dead= mob) nil)
+                                                             (setf (cur-hp mob) (max-hp mob))
+                                                             (setf (cur-fp mob) 0))
+                                                    (set-mob-effect mob-corpse :effect-type-id +mob-effect-merged+ :actor-id (id mob-corpse) :param1 (mob-type mob-corpse)))
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)
+
                                                   (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A stands up and walks. "
                                                                                                                                               (capitalize-name (prepend-article +article-the+ (visible-name mob-corpse)))))
                                                   (logger (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name actor) (id actor) (x mob-corpse) (y mob-corpse) (z mob-corpse)))

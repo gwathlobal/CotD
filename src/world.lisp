@@ -379,3 +379,9 @@
 (defun show-date-time-short (date-time)
   (multiple-value-bind (year month day hour min sec) (get-current-date-time date-time)
     (format nil "~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d:~2,'0d" year (1+ month) (1+ day) hour min sec)))
+
+(defun return-weather-type-str (world)
+  (cond
+    ((find +game-event-snow-falls+ (game-events world)) "Snow")
+    ((find +game-event-rain-falls+ (game-events world)) "Rain")
+    (t "Clear")))

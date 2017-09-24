@@ -181,16 +181,18 @@
 
 (defun show-level-weather (x y &key (level (level *world*)))
   
-  (sdl:draw-string-solid-* (format nil "Wind: ~A" (cond
-                                                    ((eq (wind-dir level) 1) "SW")
-                                                    ((eq (wind-dir level) 2) "S")
-                                                    ((eq (wind-dir level) 3) "SE")
-                                                    ((eq (wind-dir level) 4) "W")
-                                                    ((eq (wind-dir level) 6) "E")
-                                                    ((eq (wind-dir level) 7) "NW")
-                                                    ((eq (wind-dir level) 8) "N")
-                                                    ((eq (wind-dir level) 9) "NE")
-                                                    (t "None")))
+  (sdl:draw-string-solid-* (format nil "Wind: ~A, ~A"
+                                   (cond
+                                     ((eq (wind-dir level) 1) "SW")
+                                     ((eq (wind-dir level) 2) "S")
+                                     ((eq (wind-dir level) 3) "SE")
+                                     ((eq (wind-dir level) 4) "W")
+                                     ((eq (wind-dir level) 6) "E")
+                                     ((eq (wind-dir level) 7) "NW")
+                                     ((eq (wind-dir level) 8) "N")
+                                     ((eq (wind-dir level) 9) "NE")
+                                     (t "None"))
+                                   (return-weather-type-str *world*))
                            x y :color sdl:*white*))
 
 (defun update-screen (win)
