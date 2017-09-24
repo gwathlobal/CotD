@@ -62,7 +62,13 @@
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-fear+ :name "Fear" :color sdl:*magenta*))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-climbing-mode+ :name "Climbing" :color (sdl:color :r 100 :g 100 :b 100)))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-climbing-mode+ :name "Climbing" :color (sdl:color :r 100 :g 100 :b 100)
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (rem-mob-effect-simple actor +mob-effect-climbing-mode+)
+                                                            (when (apply-gravity actor)
+                                                              (set-mob-location actor (x actor) (y actor) (z actor))
+                                                              (make-act actor +normal-ap+)))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-alertness+ :name "On alert" :color sdl:*red*))
 
@@ -353,3 +359,16 @@
                                                             (setf (cur-hp actor) 0)
                                                             (make-dead actor :splatter nil :msg nil :msg-newline nil :killer nil :corpse nil :aux-params nil)
                                                             )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-sprint+ :name "Sprint" :color sdl:*green*
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (rem-mob-effect actor +mob-effect-climbing-mode+)
+                                                         (decf (cur-move-speed actor) 25)
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (incf (cur-move-speed actor) 25)
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-exerted+ :name "Exerted" :color sdl:*yellow*))

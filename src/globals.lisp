@@ -197,6 +197,8 @@
 (defconstant +mob-abil-split-soul+ 77)
 (defconstant +mob-abil-restore-soul+ 78)
 (defconstant +mob-abil-resurrection+ 79)
+(defconstant +mob-abil-sprint+ 80)
+(defconstant +mob-abil-jump+ 81)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -229,6 +231,8 @@
 (defconstant +mob-effect-confuse+ 28)
 (defconstant +mob-effect-split-soul-source+ 29)
 (defconstant +mob-effect-split-soul-target+ 30)
+(defconstant +mob-effect-sprint+ 31)
+(defconstant +mob-effect-exerted+ 32)
 
 (defconstant +mob-order-follow+ 0)
 

@@ -73,7 +73,7 @@
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
-                                                                abil-split-soul abil-restore-soul abil-resurrection)
+                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 5) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -262,6 +262,10 @@
     (setf (gethash +mob-abil-restore-soul+ (abilities mob-type)) t))
   (when abil-resurrection
     (setf (gethash +mob-abil-resurrection+ (abilities mob-type)) t))
+  (when abil-sprint
+    (setf (gethash +mob-abil-sprint+ (abilities mob-type)) t))
+  (when abil-jump
+    (setf (gethash +mob-abil-jump+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -517,6 +521,7 @@
    (cur-dodge :initform 5 :initarg :cur-dodge :accessor cur-dodge)
    (armor :initform nil :initarg :armor :accessor armor)
    (cur-speed :initform 100 :initarg :cur-speed :accessor cur-speed)
+   (cur-move-speed :initform 100 :initarg :cur-move-speed :accessor cur-move-speed)
 
    (brightness :initform 0 :accessor brightness)
    (darkness :initform 0 :accessor darkness)

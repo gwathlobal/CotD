@@ -138,6 +138,7 @@
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t
+                                       :abil-sprint t :abil-jump t
                                        :ai-kleptomaniac t :ai-cautious t
                                        :init-items (list (list +item-type-smoke-bomb+ 3))
                              ))

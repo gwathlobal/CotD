@@ -438,7 +438,7 @@
       ;; set motion
       (incf-mob-motion mob *mob-motion-order*)
       
-      (make-act mob (move-spd (get-mob-type-by-id (mob-type mob))))
+      (make-act mob (truncate (* (cur-move-speed mob) (move-spd (get-mob-type-by-id (mob-type mob)))) 100))
       (return-from move-mob t))
 
     (setf c-dir (x-y-into-dir (car (momentum-dir mob)) (cdr (momentum-dir mob))))
@@ -533,7 +533,7 @@
                    (momentum-spd mob))
           for move-result = nil
           for move-spd = (truncate (* (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-move-cost-factor+)
-                                      (move-spd (get-mob-type-by-id (mob-type mob)))))
+                                      (truncate (* (cur-move-speed mob) (move-spd (get-mob-type-by-id (mob-type mob)))) 100)))
           for x = (+ (x mob) dx)
           for y = (+ (y mob) dy)
           for z = (cond
@@ -583,7 +583,7 @@
                 (when (and (= z (z mob))
                            (= x (x mob))
                            (= y (y mob)))
-                  (setf move-spd (move-spd (get-mob-type-by-id (mob-type mob)))))
+                  (setf move-spd (truncate (* (cur-move-speed mob) (move-spd (get-mob-type-by-id (mob-type mob)))) 100)))
                 ;;(format t "APPLY-GRAVITY ~A~%" apply-gravity)
                 (set-mob-location mob x y z :apply-gravity apply-gravity)
 
@@ -728,8 +728,8 @@
 
 (defmethod on-bump ((target mob) (actor mob))
   (if (eql target actor)
-      (progn
-        (make-act actor (move-spd (get-mob-type-by-id (mob-type actor)))))
+    (progn
+      (make-act actor (truncate (* (cur-move-speed actor) (move-spd (get-mob-type-by-id (mob-type actor)))) 100)))
       (progn 
         (logger (format nil "ON-BUMP: ~A [~A] bumped into ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
         
@@ -745,7 +745,7 @@
                        (= (first (order target)) +mob-order-follow+)
                        (= (second (order actor)) (second (order target)))))
           (logger (format nil "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target)))
-          (make-act actor (move-spd (get-mob-type-by-id (mob-type actor))))
+          (make-act actor (truncate (* (cur-move-speed actor) (move-spd (get-mob-type-by-id (mob-type actor)))) 100))
           (return-from on-bump t))
 
         (when (not (check-mob-visible target :observer actor))
@@ -1534,7 +1534,8 @@
 
   ;; if the mob has climbing ability - turn it on, if disabled
   (when (and (mob-ability-p mob +mob-abil-climbing+)
-             (not (mob-effect-p mob +mob-effect-climbing-mode+)))
+             (not (mob-effect-p mob +mob-effect-climbing-mode+))
+             (not (mob-effect-p mob +mob-effect-sprint+)))
     (set-mob-effect mob :effect-type-id +mob-effect-climbing-mode+ :actor-id (id mob) :cd t))
 
   (if (or (mob-ability-p mob +mob-abil-no-breathe+)

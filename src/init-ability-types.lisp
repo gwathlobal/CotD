@@ -1069,7 +1069,9 @@
                                                         do
                                                            (decf charge-distance)
                                                            (setf charge-result (move-mob actor (x-y-into-dir dx dy) :push t))
-                                                           (when (eq charge-result nil)
+                                                           (when (or (eq charge-result nil)
+                                                                     (and (typep charge-result 'list)
+                                                                          (eq (first charge-result) :obstacles)))
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A hits an obstacle. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                                            (unless (eq charge-result t)
@@ -1853,17 +1855,15 @@
                                                   (progn
                                                     (when (eq actor *player*)
                                                       (add-message "You toggle off the climbing mode. "))
-                                                    (rem-mob-effect actor +mob-effect-climbing-mode+)
-                                                    (when (apply-gravity actor)
-                                                      (set-mob-location actor (x actor) (y actor) (z actor))
-                                                      (make-act actor +normal-ap+)))
+                                                    (rem-mob-effect actor +mob-effect-climbing-mode+))
                                                   (progn
                                                     (when (eq actor *player*)
                                                       (add-message "You toggle on the climbing mode. "))
                                                     (set-mob-effect actor :effect-type-id +mob-effect-climbing-mode+ :actor-id (id actor) :cd t))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (mob-ability-p actor +mob-abil-climbing+)
+                                                      (if (and (mob-ability-p actor +mob-abil-climbing+)
+                                                               (not (mob-effect-p actor +mob-effect-sprint+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -3547,7 +3547,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-resurrection+ :name "Resurrection" :descr "Restore the original soul to the body and make it alive again. The resurrection is only possible for bodies that are not mangled or corrupted by demonic reanimations." 
-                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :cost 6 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 60
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -3724,4 +3724,106 @@
                                                           (t
                                                            (progn
                                                              nil))))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-sprint+ :name "Sprint" :descr "Concenrate all your physical efforts, making yourself move 25% faster for 4 turns. However, spriniting denies you your ability to climb. You are unable to sprint while riding another creature." 
+                                 :cd 10 :spd 0 :passive nil
+                                 :final t :on-touch nil
+                                 :motion 0
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-sprint+ :actor-id (id actor) :cd 4)
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-sprint+)
+                                                               (not (mob-effect-p actor +mob-effect-exerted+))
+                                                               (not (riding-mob-id actor)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (or (and nearest-enemy
+                                                                    (> (strength nearest-enemy) 
+                                                                       (strength actor)))
+                                                               (and nearest-enemy
+                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                       0.3)))
+                                                           (mob-ability-p actor +mob-abil-sprint+)
+                                                           (can-invoke-ability actor actor +mob-abil-sprint+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-jump+ :name "Jump" :descr "Jump to a specified location up to 3 tiles away. Jumping lets you cling to walls if the destination allows it. Sprinting lets you jump 1 tile farther." 
+                                 :cd 0 :cost 0 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 10
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; here the target is not a mob, but a (cons x y)
+                                                (logger (format nil "MOB-JUMP: ~A [~A] jumps to ~A.~%" (name actor) (id actor) target))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A jumps. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                (let ((path-line nil))
+                                                                                                   
+                                                  (line-of-sight (x actor) (y actor) (z actor) (car target) (cdr target) (z actor) #'(lambda (dx dy dz prev-cell)
+                                                                                                                                         (declare (ignore dz prev-cell))
+                                                                                                                                         (let ((exit-result t))
+                                                                                                                                            (block nil
+                                                                                                                                              (push (cons dx dy) path-line)
+                                                                                                                                              exit-result))))
+                                                  (setf path-line (nreverse path-line))
+                                                  (pop path-line)
+                                                  
+                                                  (loop for (dx . dy) in path-line
+                                                        with charge-distance = (if (mob-effect-p actor +mob-effect-sprint+)
+                                                                                 2
+                                                                                 1)
+                                                        with charge-result = nil
+                                                        while (not (zerop charge-distance))
+                                                        do
+                                                           (decf charge-distance)
+                                                           (setf charge-result (check-move-on-level actor dx dy (z actor)))
+                                                           (when (not (eq charge-result t))
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                    (format nil "~A hits an obstacle. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                             (loop-finish))
+                                                        finally
+                                                           (rem-mob-effect actor +mob-effect-sprint+)
+                                                           (when (mob-ability-p actor +mob-abil-climbing+)
+                                                             (set-mob-effect actor :effect-type-id +mob-effect-climbing-mode+ :actor-id (id actor) :cd t))
+                                                           (set-mob-location actor dx dy (z actor) :apply-gravity t))
+                                                  (set-mob-effect actor :effect-type-id +mob-effect-exerted+ :actor-id (id actor) :cd 6)
+                                                  ))
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-jump+)
+                                                               (not (riding-mob-id actor))
+                                                               (not (mob-effect-p actor +mob-effect-exerted+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (mob-ability-p actor +mob-abil-jump+)
+                                                           (can-invoke-ability actor actor +mob-abil-jump+))
+                                                    nil
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor (cons (x nearest-enemy) (y nearest-enemy)) (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                        (progn
+                                                          nil)
+                                                        (progn
+                                                          (clear-message-list *small-message-box*)
+                                                          (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
+                                                          t))
                                                       )))
