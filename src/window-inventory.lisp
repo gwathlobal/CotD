@@ -21,7 +21,7 @@
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 325 :y 245 :w 305 :h 200))
     (sdl:fill-surface sdl:*black* :template a-rect))
   ;; a pane for displaying commands
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 10 :y 455 :w 620 :h 13))
+  (sdl:with-rectangle (a-rect (sdl:rectangle :x 10 :y (- *window-height* (* 2 (sdl:char-height sdl:*default-font*))) :w 620 :h 13))
     (sdl:fill-surface sdl:*black* :template a-rect)
     (sdl:draw-string-solid-* (format nil "~A~A~A[Esc] Exit"
                                      (if (> (length (inv *player*)) 0)
@@ -37,7 +37,7 @@
                                               (funcall (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win))) *player* (get-inv-item-by-pos (inv *player*) (cur-inv win))))
                                        "[u] Use  "
                                        ""))
-                             10 455 :color sdl:*white*))
+                             10 (sdl:y a-rect) :color sdl:*white*))
 
   ;; drawing the inventory list
   (let ((cur-str) (lst (make-list 0)) (color-list (make-list 0)))
@@ -58,7 +58,8 @@
   ;; drawing selected item description
   (when (> (length (inv *player*)) 0)
     (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win))))
-      (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w 295 :h 215))))
+      (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w (- *window-width* 330 20) :h 215))
+      ))
 
   ;; drawing some player chars
   ;(let ((str (make-array (list 0) :element-type 'character :adjustable t :fill-pointer t)))

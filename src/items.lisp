@@ -108,7 +108,7 @@
   (let ((str (create-string)))
     (format str "~A~%~%~AQty: ~A~A" (capitalize-name (prepend-article +article-a+ (name item)))
             (if (descr item)
-              (format nil "~A~%" (descr item))
+              (format nil "~A~%~%" (descr item))
               "")
             (qty item)
             (if (not (zerop (value item)))
