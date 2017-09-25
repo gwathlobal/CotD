@@ -128,8 +128,8 @@
         (format file "~A~%" (new-line))
         (let ((x 6)
               (y (+ 40 (* 13 (sdl:get-font-height))))
-              (w *window-width*)
-              (h (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 14 (sdl:get-font-height)))))
+              (w 800)
+              (h (- 520 40 10 (sdl:char-height sdl:*default-font*) (* 14 (sdl:get-font-height)))))
           (sdl:with-rectangle (rect (sdl:rectangle :x x
                                                    :y y
                                                    :w w

@@ -199,6 +199,7 @@
 (defconstant +mob-abil-resurrection+ 79)
 (defconstant +mob-abil-sprint+ 80)
 (defconstant +mob-abil-jump+ 81)
+(defconstant +mob-abil-bend-space+ 82)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

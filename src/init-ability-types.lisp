@@ -2925,7 +2925,16 @@
 
                                                 (set-mob-effect actor :effect-type-id +mob-effect-merged+ :actor-id (id actor) :param1 (mob-type actor))
 
-                                                
+                                                (when (zerop (random 20))
+                                                  (if (check-mob-visible actor :observer *player* :complete-check t)
+                                                    (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
+                                                                                                                (format nil "~A says: \"Power overwhelming!\"~A. "
+                                                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor))) str))
+                                                                    :force-sound t)
+                                                    (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
+                                                                                                                (format nil "Somebody says: \"Power overwhelming!\"~A. " str))
+                                                                    :force-sound t))
+                                                  )
                                                 
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -3759,7 +3768,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-jump+ :name "Jump" :descr "Jump to a specified location up to 3 tiles away. Jumping lets you cling to walls if the destination allows it. Sprinting lets you jump 1 tile farther." 
+                                 :id +mob-abil-jump+ :name "Jump" :descr "Jump to a specified location up to 3 tiles away. Jumping lets you cling to walls if the destination allows it. Sprinting lets you jump 1 tile farther and you will still be able to cling to a wall after the jump." 
                                  :cd 0 :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 10
@@ -3827,3 +3836,64 @@
                                                           (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                           t))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-bend-space+ :name "Bend space" :descr "Bend space around yourself instantly warping to some other place up to 6 tiles away." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (logger (format nil "MOB-BEND-SPACE: ~A [~A] invokes bend space.~%" (name actor) (id actor)))
+                                                (let ((applicable-tiles ())
+                                                      (dx) (dy) (dz) (r))
+                                                  (loop for dx of-type fixnum from (- (x actor) 6) to (+ (x actor) 6) do
+                                                    (loop for dy of-type fixnum from (- (y actor) 6) to (+ (y actor) 6) do
+                                                      (loop for dz of-type fixnum from (- (z actor) 6) to (+ (z actor) 6)
+                                                            when (and (>= dx 0) (< dx (array-dimension (terrain (level *world*)) 0))
+                                                                      (>= dy 0) (< dy (array-dimension (terrain (level *world*)) 1))
+                                                                      (>= dz 0) (< dz (array-dimension (terrain (level *world*)) 2))
+                                                                      (eq (check-move-on-level actor dx dy dz) t)
+                                                                      (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+)
+                                                                          (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-water+)))
+                                                              do
+                                                                 (push (list dx dy dz) applicable-tiles))))
+                                                  (when applicable-tiles
+                                                    (setf r (random (length applicable-tiles)))
+                                                    (setf dx (first (nth r applicable-tiles))
+                                                          dy (second (nth r applicable-tiles))
+                                                          dz (third (nth r applicable-tiles))))
+                                                  (logger (format nil "MOB-BEND-SPACE: ~A [~A] teleports to (~A ~A ~A).~%" (name actor) (id actor) dx dy dz))
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A. " str)))
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                  
+                                                  (set-mob-location actor dx dy dz)
+                                                  
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear crackling~A. " str)))
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                  )
+
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (and nearest-enemy
+                                                                (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                   0.5))
+                                                           (mob-ability-p actor +mob-abil-bend-space+)
+                                                           (can-invoke-ability actor actor +mob-abil-bend-space+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

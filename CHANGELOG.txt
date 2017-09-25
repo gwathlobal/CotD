@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added the Bend space ability to all crimson demons. This ability lets you teleport to a random location short distance away.
 - Added the Jump ability to the thief. This ability allows you to move 2 tiles away from you and cling to a wall next to a the destination tile.
 - Added the Sprint ability to the thief. This ability allows you to temporarily increase your movement speed.
 - Added the Ressurection ability to all angels. This ability allows you to ressurect other fallen angels and humans.

@@ -1,8 +1,10 @@
-- Give angels ressurection
+- Add the possessor faction
+- Add Malseraph's faction
+- Add eater of the dead faction
+- Add cast shadows to shadow demons
 - Movement on tiles with mobs should cost more so that they do not bump into each other that often
 - Add courtyard houses like Thief2RL
 - Add the Revolutionaries faction
-- Add the possessor faction
 - Add a Thief/Spy campaign
 - Move display code to a separate entity (separate thread maybe?) so that you could have some basic movement animation going on (0,5 sec). This will alleviate the performance problem (the game will be still calculating AI while the player movement animation is played) and will generally look good.
 - Optimize connectivity map creation
