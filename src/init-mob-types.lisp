@@ -386,7 +386,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-cast-shadow t
                                        :ai-horde t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-demon+
@@ -399,7 +399,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t :abil-toggle-light t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-cast-shadow t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-devil+
@@ -412,7 +412,7 @@
                                        :base-light-radius -4 :base-stealth 10
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-charge t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-umbral-aura t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-umbral-aura t :abil-cast-shadow t
                                        :ai-curious t))
 
 ;;--------------------

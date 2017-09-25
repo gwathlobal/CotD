@@ -179,6 +179,18 @@
     ;; increase brigtness by outdoor brightness
     (incf brightness (get-outdoor-light-* level x y z))
     (decf brightness darkness)
+
+    ;; find nearby mobs that are casting shadows and check if the tile in question is the tile they are casting shadows to
+    (when (>= brightness *mob-visibility-threshold*)
+      (check-surroundings x y nil #'(lambda (dx dy)
+                                      (when (and (>= dx 0) (< dx (array-dimension (terrain level) 0))
+                                                 (>= dy 0) (< dy (array-dimension (terrain level) 1))
+                                                 (get-mob-* level dx dy z)
+                                                 (mob-effect-p (get-mob-* level dx dy z) +mob-effect-casting-shadow+))
+                                        (let ((effect (get-effect-by-id (mob-effect-p (get-mob-* level dx dy z) +mob-effect-casting-shadow+))))
+                                          (when (and (= (+ dx (first (param1 effect))) x)
+                                                     (= (+ dy (second (param1 effect))) y))
+                                            (setf brightness (- *mob-visibility-threshold* 10))))))))
     (when (< brightness 0)
       (setf brightness 0))
     brightness
@@ -371,6 +383,19 @@
   
   (incf (brightness mob) (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob)))
   (decf (brightness mob) (darkness mob))
+
+  ;; find nearby mobs that are casting shadows and check if the tile in question is the tile they are casting shadows to
+  (when (>= (brightness mob) *mob-visibility-threshold*)
+    (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
+                                                (when (and (>= dx 0) (< dx (array-dimension (terrain (level *world*)) 0))
+                                                           (>= dy 0) (< dy (array-dimension (terrain (level *world*)) 1))
+                                                           (get-mob-* (level *world*) dx dy (z mob))
+                                                           (mob-effect-p (get-mob-* (level *world*) dx dy (z mob)) +mob-effect-casting-shadow+))
+                                                  (let ((effect (get-effect-by-id (mob-effect-p (get-mob-* (level *world*) dx dy (z mob)) +mob-effect-casting-shadow+))))
+                                                    (when (and (= (+ dx (first (param1 effect))) (x mob))
+                                                               (= (+ dy (second (param1 effect))) (y mob)))
+                                                      (setf (brightness mob) (- *mob-visibility-threshold* 10))))))))
+  
   (when (< (brightness mob) 0)
     (setf (brightness mob) 0))
   

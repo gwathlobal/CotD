@@ -200,6 +200,7 @@
 (defconstant +mob-abil-sprint+ 80)
 (defconstant +mob-abil-jump+ 81)
 (defconstant +mob-abil-bend-space+ 82)
+(defconstant +mob-abil-cast-shadow+ 83)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -234,6 +235,7 @@
 (defconstant +mob-effect-split-soul-target+ 30)
 (defconstant +mob-effect-sprint+ 31)
 (defconstant +mob-effect-exerted+ 32)
+(defconstant +mob-effect-casting-shadow+ 33)
 
 (defconstant +mob-order-follow+ 0)
 

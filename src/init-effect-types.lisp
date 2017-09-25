@@ -372,3 +372,5 @@
                                                             )))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-exerted+ :name "Exerted" :color sdl:*yellow*))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-casting-shadow+ :name "Casting shadows" :color (sdl:color :r 100 :g 100 :b 100)))

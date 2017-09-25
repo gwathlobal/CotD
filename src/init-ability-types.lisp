@@ -3897,3 +3897,57 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-cast-shadow+ :name "Cast shadow" :descr "Cause a character to cast unnatural shadows on an adjacent tile for 6 turns. These shadows are valid for the Shadow Step ability." 
+                                 :cd 2 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 40
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-CAST-SHADOW: ~A [~A] uses cast shadow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A causes ~A to cast unnatural shadows. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                               (prepend-article +article-the+ (visible-name target))))
+
+                                                (rem-mob-effect target +mob-effect-casting-shadow+)
+                                                (set-mob-effect target :effect-type-id +mob-effect-casting-shadow+ :actor-id (id actor) :cd 6 :param1 (let ((dx (x target))
+                                                                                                                                                            (dy (y target)))
+                                                                                                                                                        (loop for r = (1+ (random 9))
+                                                                                                                                                              while (= r 5)
+                                                                                                                                                              finally (multiple-value-setq (dx dy) (x-y-dir r)))
+                                                                                                                                                        (list dx dy)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-cast-shadow+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor)))
+                                                           (not (mob-effect-p nearest-enemy +mob-effect-casting-shadow+)))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
