@@ -118,7 +118,7 @@
         (when lof-blocked
           (format str "Line of fire blocked!~%"))
         (format str "~A (~A, ~A, ~A)~A~A~A~A" (capitalize-name (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))) (view-x *player*) (view-y *player*) (view-z *player*)
-                (if *cotd-release* "" (format nil " Light: ~A+~A"
+                (if *cotd-release* "" (format nil " Light: ~A-~A"
                                               (get-single-memo-light (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                               (get-outdoor-light-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                 (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))))
