@@ -20,7 +20,8 @@
    (on-kill :initform nil :initarg :on-kill :accessor on-kill :type boolean) ;; if the ability should be invoked when actor kills target
    (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)  ;; a function that checks for the AI if it can and should invoke the ability now
    (on-invoke-ai :initform nil :initarg :on-invoke-ai :accessor on-invoke-ai) ;; a function that invokes the ability for the ai
-   (map-select-func :initform nil :initarg :map-select-func :accessor map-select-func) ;; a function that is invoked when the player need to select the target for the ability, also indicates that this is a targeted ability 
+   (map-select-func :initform nil :initarg :map-select-func :accessor map-select-func) ;; a function that is invoked when the player needs to select the target for the ability, also indicates that this is a targeted ability
+   (obj-select-func :initform nil :initarg :obj-select-func :accessor obj-select-func) ;; a function that is invoked when the player needs to select some other object after choosing this ability
    ))
 
 (defun set-ability-type (ability-type)

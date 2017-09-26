@@ -73,7 +73,7 @@
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
-                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow)
+                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 5) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -270,6 +270,8 @@
     (setf (gethash +mob-abil-bend-space+ (abilities mob-type)) t))
   (when abil-cast-shadow
     (setf (gethash +mob-abil-cast-shadow+ (abilities mob-type)) t))
+  (when abil-cannibalize
+    (setf (gethash +mob-abil-cannibalize+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

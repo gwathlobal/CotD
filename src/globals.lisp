@@ -95,6 +95,8 @@
 (defconstant +mob-type-star-gazer-mender+ 38)
 (defconstant +mob-type-star-singer-gazer-mender+ 39)
 (defconstant +mob-type-angel-image+ 40)
+(defconstant +mob-type-eater-of-the-dead+ 41)
+
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -105,6 +107,7 @@
 (defconstant +faction-type-outsider-beasts+ 6)
 (defconstant +faction-type-criminals+ 7)
 (defconstant +faction-type-outsider-wisps+ 8)
+(defconstant +faction-type-eater+ 9)
 
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)
@@ -201,6 +204,7 @@
 (defconstant +mob-abil-jump+ 81)
 (defconstant +mob-abil-bend-space+ 82)
 (defconstant +mob-abil-cast-shadow+ 83)
+(defconstant +mob-abil-cannibalize+ 84)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

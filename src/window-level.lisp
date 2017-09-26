@@ -414,12 +414,39 @@
                                                                       :descr-list abil-descr-list
                                                                       :enter-func #'(lambda (cur-sel)
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
+                                                                                        (cond
+                                                                                          ((map-select-func (get-ability-type-by-id (nth cur-sel mob-abilities)))
+                                                                                           (progn
+                                                                                            (setf *current-window* (make-instance 'map-select-window 
+                                                                                                                                  :return-to *current-window*
+                                                                                                                                  :cmd-str (list "[Enter] Invoke  "
+                                                                                                                                                 "")
+                                                                                                                                  :exec-func #'(lambda ()
+                                                                                                                                                 (if (funcall (map-select-func (get-ability-type-by-id (nth cur-sel mob-abilities)))
+                                                                                                                                                              (nth cur-sel mob-abilities))
+                                                                                                                                                   (progn
+                                                                                                                                                     (setf *current-window* win)
+                                                                                                                                                     (make-output *current-window*)
+                                                                                                                                                     t)
+                                                                                                                                                   (progn
+                                                                                                                                                     nil)))
+                                                                                                                                  ))
+                                                                                            (make-output *current-window*)))
+                                                                                          ((obj-select-func (get-ability-type-by-id (nth cur-sel mob-abilities)))
+                                                                                           (progn
+                                                                                             (funcall (obj-select-func (get-ability-type-by-id (nth cur-sel mob-abilities)))
+                                                                                                      (nth cur-sel mob-abilities))
+                                                                                             (setf *current-window* win)
+                                                                                             (make-output *current-window*)))
+                                                                                          (t
+                                                                                           (progn
+                                                                                             (clear-message-list *small-message-box*)
+                                                                                             (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
+                                                                                             (setf *current-window* win)
+                                                                                             (set-idle-calcing win))))
                                                                                         (if (not (map-select-func (get-ability-type-by-id (nth cur-sel mob-abilities))))
                                                                                           (progn
-                                                                                            (clear-message-list *small-message-box*)
-                                                                                            (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
-                                                                                            (setf *current-window* win)
-                                                                                            (set-idle-calcing win)
+                                                                                            
                                                                                             ;(show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
                                                                                             )
                                                                                           (progn

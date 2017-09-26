@@ -88,6 +88,7 @@
 			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
 			   (funcall (enter-func win) (cur-sel win))
 			   (go exit-func)))
-			(go exit-func))
+                        (make-output *current-window*)
+			)
        (:video-expose-event () (make-output *current-window*)))
      exit-func (make-output *current-window*)))

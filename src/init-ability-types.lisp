@@ -2837,7 +2837,7 @@
                                                       )
                                                     ))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                           (format nil "You hear somebody chanting~A." str)))
+                                                                                                           (format nil "You hear somebody chanting~A. " str)))
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -3167,7 +3167,7 @@
                                                 (logger (format nil "MOB-PAIN-LINK: ~A [~A] uses pain link on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                           (format nil "You hear someone chanting~A." str)))
+                                                                                                           (format nil "You hear someone chanting~A. " str)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A applies pain link to ~A. "
@@ -3282,7 +3282,7 @@
                                                 (logger (format nil "MOB-SILENCE: ~A [~A] uses silence on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                           (format nil "You hear someone chanting~A." str)))
+                                                                                                           (format nil "You hear someone chanting~A. " str)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A silences ~A. "
@@ -3334,7 +3334,7 @@
                                                 (logger (format nil "MOB-CONFUSE: ~A [~A] uses confuse on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                           (format nil "You hear someone chanting~A." str)))
+                                                                                                           (format nil "You hear someone chanting~A. " str)))
 
                                                 (if (> (1+ (random 6)) (strength target))
                                                   (progn
@@ -3908,7 +3908,7 @@
                                                 (logger (format nil "MOB-CAST-SHADOW: ~A [~A] uses cast shadow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                           (format nil "You hear someone chanting~A." str)))
+                                                                                                           (format nil "You hear someone chanting~A. " str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A causes ~A to cast unnatural shadows. "
                                                                                (capitalize-name (prepend-article +article-the+ (visible-name actor)))
@@ -3951,3 +3951,112 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-cannibalize+ :name "Cannibalize" :descr "Eat the corpse you are standing on to gain 2 HP and 1 power." 
+                                 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-CANNIBALIZE: ~A [~A] invokes cannibalize on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone munching~A. " str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A devours ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-a+ (visible-name target))))
+                                                (remove-item-from-level-list (level *world*) target)
+                                                (remove-item-from-world target)
+
+                                                (incf (cur-hp actor) 2)
+                                                (when (> (cur-hp actor) (max-hp actor))
+                                                  (setf (cur-hp actor) (max-hp actor)))
+
+                                                (incf (cur-fp actor))
+                                                (when (> (cur-fp actor) (max-fp actor))
+                                                  (setf (cur-fp actor) (max-fp actor)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (loop for item-id in (get-items-* (level *world*) (x actor) (y actor) (z actor))
+                                                                for item = (get-item-by-id item-id)
+                                                                with corpses = nil
+                                                                when (item-ability-p item +item-abil-corpse+)
+                                                                  do
+                                                                     (push item corpses)
+                                                                finally (return (if corpses
+                                                                          t
+                                                                          nil))))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (and (not nearest-enemy)
+                                                                (or (< (cur-hp actor) (max-hp actor))
+                                                                    (< (cur-fp actor) (max-fp actor))))
+                                                           (mob-ability-p actor +mob-abil-cannibalize+)
+                                                           (can-invoke-ability actor actor +mob-abil-cannibalize+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (let ((target nil))
+                                                     (loop for item-id in (get-items-* (level *world*) (x actor) (y actor) (z actor))
+                                                           for item = (get-item-by-id item-id)
+                                                           with corpses = nil
+                                                           when (item-ability-p item +item-abil-corpse+)
+                                                             do
+                                                                (push item corpses)
+                                                           finally (return (first corpses)))
+                                                     (mob-invoke-ability actor target (id ability-type))))
+                                 :obj-select-func #'(lambda (ability-type-id)
+                                                      (let ((items (get-items-* (level *world*) (x *player*) (y *player*) (z *player*)))
+                                                            (exit-result nil))
+                                                        (setf items (remove-if #'(lambda (a)
+                                                                                   (if (item-ability-p (get-item-by-id a) +item-abil-corpse+)
+                                                                                     nil
+                                                                                     t))
+                                                                               items))
+                                                        (cond
+                                                          ((> (length items) 1)
+                                                           (progn
+                                                             (let ((item-line-list nil)
+                                                                   (item-prompt-list)
+                                                                   (item-list (copy-list items)))
+
+                                                               (setf item-line-list (loop for item-id in item-list
+                                                                                          for item = (get-item-by-id item-id)
+                                                                                          collect (format nil "~A~A"
+                                                                                                          (capitalize-name (name item))
+                                                                                                          (if (> (qty item) 1)
+                                                                                                            (format nil " x~A" (qty item))
+                                                                                                            ""))))
+                                                               ;; populate the ability prompt list
+                                                               (setf item-prompt-list (loop for item-id in item-list
+                                                                                            collect #'(lambda (cur-sel)
+                                                                                                        (declare (ignore cur-sel))
+                                                                                                        "[Enter] Devour  [Escape] Cancel")))
+                                                               
+                                                               ;; show selection window
+                                                               (setf *current-window* (make-instance 'select-obj-window 
+                                                                                                     :return-to *current-window* 
+                                                                                                     :header-line "Choose a body part to devour:"
+                                                                                                     :enter-func #'(lambda (cur-sel)
+                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
+                                                                                                                     (setf *current-window* (return-to (return-to (return-to *current-window*))))
+                                                                                                                     ;(set-idle-calcing win)
+                                                                                                                     (make-output *current-window*)
+                                                                                                                     ;(show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                                                                                                                     (setf exit-result t))
+                                                                                                     :line-list item-line-list
+                                                                                                     :prompt-list item-prompt-list))
+                                                               (make-output *current-window*)
+                                                               (run-window *current-window*))
+                                                             exit-result)
+                                                           )
+                                                          ((= (length items) 1)
+                                                           (progn
+                                                             (clear-message-list *small-message-box*)
+                                                             (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
+                                                             t))
+                                                          (t
+                                                           (progn
+                                                             nil)))))))
