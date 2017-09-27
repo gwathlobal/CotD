@@ -149,6 +149,12 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 thief
                                                                  (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
                                                                                            #'find-unoccupied-place-on-top))
@@ -237,6 +243,12 @@
                                                                          do
                                                                             (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
@@ -333,6 +345,12 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 thief
                                                                  (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
                                                                                            #'find-unoccupied-place-on-top))
@@ -424,6 +442,12 @@
                                                                  ;; remove the glitch from (0, 0, 0)
                                                                  (setf (aref (mobs (level world)) 0 0 0) nil)
                                                                  )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
@@ -557,6 +581,12 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 thief
                                                                  (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
                                                                                            #'find-unoccupied-place-on-top))
@@ -679,6 +709,12 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
                                                                  (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
                                                                                                        (cons +mob-type-fiend+ (truncate (total-humans world) 15))
@@ -763,6 +799,12 @@
                                                                          do
                                                                             (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
@@ -859,6 +901,12 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 thief
                                                                  (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
                                                                                            #'find-unoccupied-place-on-top))
@@ -949,6 +997,12 @@
                                                                          do
                                                                             (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                  )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
@@ -1045,6 +1099,12 @@
                                                              mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 eater of the dead
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                                                           #'find-unoccupied-place-water))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 thief
                                                                  (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
                                                                                            #'find-unoccupied-place-on-top))
@@ -1098,6 +1158,87 @@
                                                        (push +game-event-lose-game-died+ game-event-list)
                                                        (push +game-event-lose-game-possessed+ game-event-list)
                                                        (push +game-event-win-for-angels+ game-event-list)
+                                                       
+                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +player-faction-eater+
+                                             :type +scenario-feature-player-faction+
+                                             :name "Eater of the dead"
+                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
+                                                       ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
+                                                       (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; remove the player satanist starting feature
+                                                                 (loop for feature-id in (feature-id-list (level world))
+                                                                       for lvl-feature = (get-feature-by-id feature-id)
+                                                                       when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
+                                                                         do
+                                                                            (remove-feature-from-level-list (level world) lvl-feature)
+                                                                            (remove-feature-from-world lvl-feature))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; adjust coordinates of all horses to their riders
+                                                                 (loop for mob-id in (mob-id-list (level world))
+                                                                       for horse = (get-mob-by-id mob-id)
+                                                                       for rider = (if (mounted-by-mob-id horse)
+                                                                                     (get-mob-by-id (mounted-by-mob-id horse))
+                                                                                     nil)
+                                                                       when rider
+                                                                         do
+                                                                            (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+                                                                 )
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with 1 thief
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                                                                           #'find-unoccupied-place-on-top))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                                                                       (cons +mob-type-fiend+ (truncate (total-humans world) 15))
+                                                                                                       (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
+                                                                                           #'find-unoccupied-place-inside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of angels = humans / 11
+                                                                 (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 11) 1)))
+                                                                                           #'find-unoccupied-place-outside))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
+                                                                 ;; make some of them shadow demons if there is dark in the city
+                                                                 (multiple-value-bind (year month day hour min sec) (get-current-date-time (player-game-time world))
+                                                                   (declare (ignore year month day min sec))
+                                                                   (populate-world-with-mobs world (if (and (>= hour 19) (< hour 7))
+                                                                                                     (list (cons +mob-type-archdemon+ 1)
+                                                                                                           (cons +mob-type-demon+ 15)
+                                                                                                           (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                                                                     (list (if (zerop (random 2)) (cons +mob-type-archdemon+ 1) (cons +mob-type-shadow-devil+ 1))
+                                                                                                           (cons +mob-type-demon+ 7)
+                                                                                                           (cons +mob-type-shadow-demon+ 8)
+                                                                                                           (cons +mob-type-imp+ (- (truncate (total-humans world) 8) 16))
+                                                                                                           (cons +mob-type-shadow-imp+ (- (truncate (total-humans world) 8) 16))))
+                                                                                             #'find-unoccupied-place-inside)))
+                                                             mob-func-list)
+                                                       (push #'create-mobs-from-template mob-func-list)
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+))
+                                                                 (find-unoccupied-place-water world *player*)
+                                                                 (setf (faction-name *player*) "Eater of the dead"))
+                                                             mob-func-list)
+                                                       
+                                                       (push +game-event-lose-game-died+ game-event-list)
+                                                       (push +game-event-lose-game-possessed+ game-event-list)
+                                                       (push +game-event-win-for-eater+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 

@@ -541,3 +541,41 @@
                                                                                (loop-finish))
                                                                 )
                                                            )))
+
+(set-game-event (make-instance 'game-event :id +game-event-win-for-eater+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (zerop (total-demons world))
+                                                                  (zerop (total-angels world)))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           ;; write highscores
+                                                           (let* ((final-str (cond
+                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ))
+                                                                  (score (calculate-player-score 1430))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                 score
+                                                                                                                                 (if (mimic-id-list *player*)
+                                                                                                                                   (faction-name *player*)
+                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
+                                                                                                                                 (real-game-time world)
+                                                                                                                                 final-str
+                                                                                                                                 (level-layout (level world)))
+                                                                                                         *highscores*)))
+                                                           
+                                                             (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
+                                                             
+                                                             (add-message (format nil "~%"))
+                                                             (add-message (format nil "Congratulations! You have won the game!~%"))
+                                                             (setf *current-window* (make-instance 'cell-window))
+                                                             (make-output *current-window*)
+                                                             (sdl:with-events ()
+                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
+                                                               (:key-down-event () 
+                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-eater-won+ :highscores-place highscores-place))
+                                                                                (make-output *current-window*)
+                                                                                (run-window *current-window*))
+                                                               (:video-expose-event () (make-output *current-window*)))))))

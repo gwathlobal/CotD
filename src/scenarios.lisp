@@ -40,6 +40,7 @@
 (defconstant +player-faction-shadows+ 22)
 (defconstant +player-faction-trinity-mimics+ 23)
 (defconstant +weather-type-rain+ 24)
+(defconstant +player-faction-eater+ 25)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -610,6 +611,25 @@
              (setf (x mob) (x feature) (y mob) (y feature) (z mob) (z feature))
              (add-mob-to-level-list (level world) mob)
              (loop-finish)))
+
+(defun find-unoccupied-place-water (world mob)
+  (let ((water-cells nil)
+        (r-cell))
+    (loop for x from 0 below (array-dimension (terrain (level *world*)) 0) do
+      (loop for y from 0 below (array-dimension (terrain (level *world*)) 1) do
+        (loop for z from 0 below (array-dimension (terrain (level *world*)) 2)
+              when (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-water+)
+                do
+                   (push (list x y z) water-cells))))
+    (if water-cells
+      (progn
+        (setf r-cell (nth (random (length water-cells)) water-cells))
+        (setf (x mob) (first r-cell) (y mob) (second r-cell) (z mob) (third r-cell))
+        (add-mob-to-level-list (level world) mob))
+      (progn
+        (find-unoccupied-place-outside world mob)))
+    )
+  )
 
 (defun place-reserved-buildings-forest (reserved-level)
   (let ((result))

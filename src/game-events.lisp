@@ -17,6 +17,7 @@
 (defconstant +game-event-adjust-outdoor-light+ 12)
 (defconstant +game-event-win-for-thief+ 13)
 (defconstant +game-event-rain-falls+ 14)
+(defconstant +game-event-win-for-eater+ 15)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

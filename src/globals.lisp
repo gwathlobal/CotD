@@ -96,7 +96,7 @@
 (defconstant +mob-type-star-singer-gazer-mender+ 39)
 (defconstant +mob-type-angel-image+ 40)
 (defconstant +mob-type-eater-of-the-dead+ 41)
-
+(defconstant +mob-type-eater-of-the-dead-rage+ 42)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -205,6 +205,7 @@
 (defconstant +mob-abil-bend-space+ 82)
 (defconstant +mob-abil-cast-shadow+ 83)
 (defconstant +mob-abil-cannibalize+ 84)
+(defconstant +mob-abil-primordial-rage+ 85)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -240,6 +241,7 @@
 (defconstant +mob-effect-sprint+ 31)
 (defconstant +mob-effect-exerted+ 32)
 (defconstant +mob-effect-casting-shadow+ 33)
+(defconstant +mob-effect-primordial-rage+ 34)
 
 (defconstant +mob-order-follow+ 0)
 

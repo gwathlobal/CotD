@@ -4060,3 +4060,34 @@
                                                           (t
                                                            (progn
                                                              nil)))))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-primordial-rage+ :name "Primordial rage" :descr "Greatly increase your dodging, armor and damage for 4 turns." 
+                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-primordial-rage+ :actor-id (id actor) :cd 4)
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-primordial-rage+)
+                                                               (not (mob-effect-p actor +mob-effect-primordial-rage+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; if able to heal and less than 50% hp - heal
+                                                  (if (and nearest-enemy
+                                                           (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 2)
+                                                           (null (riding-mob-id actor))
+                                                           (mob-ability-p actor +mob-abil-primordial-rage+)
+                                                           (can-invoke-ability actor actor +mob-abil-primordial-rage+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
