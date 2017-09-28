@@ -79,6 +79,7 @@
                                                          (declare (ignore effect))
                                                          (let ((old-max-hp (max-hp actor)))
                                                            (setf (mob-type actor) +mob-type-archangel+)
+                                                           (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                            (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                          (setf (face-mob-type-id actor) (mob-type actor))
                                                          (set-cur-weapons actor)
@@ -91,8 +92,10 @@
                                                          (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor))
 
                                                           ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor) do
-                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
                                                          
                                                          (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
@@ -103,6 +106,7 @@
                                                             (declare (ignore effect))
                                                             (let ((old-max-hp (max-hp actor)))
                                                               (setf (mob-type actor) +mob-type-angel+)
+                                                              (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
@@ -113,8 +117,10 @@
                                                             (adjust-sight actor)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor) do
-                                                              (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
                                                             
                                                             (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
@@ -134,6 +140,7 @@
                                                          (set-mob-effect (get-mob-by-id (actor-id effect)) :effect-type-id +mob-effect-necrolink+ :actor-id (actor-id effect) :cd t :param1 (target-id effect))
                                                          (let ((old-max-hp (max-hp actor)))
                                                            (setf (mob-type actor) +mob-type-reanimated-empowered+)
+                                                           (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                            (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                          (setf (face-mob-type-id actor) (mob-type actor))
                                                          (set-cur-weapons actor)
@@ -146,8 +153,10 @@
                                                          ;(set-name actor)
 
                                                           ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor) do
-                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
                                                          
                                                          (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
@@ -157,6 +166,7 @@
                                              :on-remove #'(lambda (effect actor)
                                                             (let ((old-max-hp (max-hp actor)))
                                                               (setf (mob-type actor) (param1 effect))
+                                                              (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
@@ -172,8 +182,10 @@
                                                             (rem-mob-effect (get-mob-by-id (actor-id effect)) +mob-effect-necrolink+)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor) do
-                                                              (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
                                                             
                                                             (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
@@ -262,8 +274,10 @@
                                                            (adjust-sight actor)
                                                            
                                                            ;; set up current abilities cooldowns
-                                                           (loop for ability-id being the hash-key in (abilities actor) do
-                                                             (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                           (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
                                                            )
                                                          )
                                              :on-remove #'(lambda (effect actor)
@@ -277,8 +291,10 @@
                                                             (adjust-sight actor)
 
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor) do
-                                                              (setf (gethash ability-id (abilities-cd actor)) 0)))
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0)))
                                              :on-tick #'(lambda (effect actor)
                                                           (declare (ignore effect))
                                                           (let ((cur-hp 0))
@@ -375,12 +391,10 @@
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-casting-shadow+ :name "Casting shadows" :color (sdl:color :r 100 :g 100 :b 100)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-primordial-rage+ :name "Primordial rage" :color sdl:*yellow*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-primordial-power+ :name "Primordial power" :color sdl:*yellow*
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
-                                                         (let ((old-max-hp (max-hp actor)))
-                                                           (setf (mob-type actor) +mob-type-eater-of-the-dead-rage+)
-                                                           (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                         (setf (mob-type actor) +mob-type-eater-of-the-dead-rage+)
                                                          (setf (face-mob-type-id actor) (mob-type actor))
                                                          (set-cur-weapons actor)
                                                          (adjust-dodge actor)
@@ -390,19 +404,19 @@
                                                          (adjust-sight actor)
                                                          
                                                           ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor) do
-                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
                                                          
                                                          (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A shakes with primordial rage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                                                                (format nil "~A shakes with primordial power. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
-                                                            (let ((old-max-hp (max-hp actor)))
-                                                              (setf (mob-type actor) +mob-type-eater-of-the-dead+)
-                                                              (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                            (setf (mob-type actor) +mob-type-eater-of-the-dead+)
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
                                                             (adjust-dodge actor)
@@ -412,12 +426,14 @@
                                                             (adjust-sight actor)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor) do
-                                                              (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
                                                             
                                                             (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A has its primordial rage subsided.~%" (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                                                                   (format nil "The primordial power of ~A wanes.~%" (prepend-article +article-the+ (visible-name actor)))))
                                              ))

@@ -1472,10 +1472,7 @@
   (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%")))
 
 (defmethod on-tick ((mob mob))
-
-  ;; increase cur-ap by max-ap
-  ;(incf (cur-ap mob) (max-ap mob))
-      
+     
   (when (< (cur-fp mob) 0)
     (setf (cur-fp mob) 0))
 

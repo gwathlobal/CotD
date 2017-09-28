@@ -43,6 +43,7 @@ FEATURES
  - Multi-tile monsters
  - 3D map
  - Stealth gameplay
+ - Control several characters at once
 
 --------------------
 GENERAL TIPS
@@ -68,6 +69,13 @@ THE PANDEMONIUM HIERARCHY
  - You start as a puny Crimson or Shadow imp who is no match for a Chrome Angel.
  - Kill humans to gain power. Beware of blessed ones. 
  - To win, kill all angels or ascend beyond Archdemon or Shadow devil. Destruction of mankind is not enough.
+
+-------------------- 
+THE PRIMORDIAL
+
+ - You start as a monstrous Eater of the dead who rose from thousands years of slumber to drive Angels and Demons away from the City.
+ - Eat corpses to gain health and power. Spend power to temporarily increase your combat prowess. 
+ - To win, kill all angels and demons.
 
 --------------------
 CITIZENS OF THE CITY

@@ -34,6 +34,13 @@ OUTSIDER BEASTS
  - The demonic invasion has attracted Fiends. If a demon gets near one, it will be able to dominate and ride it as a mount.
  - The Gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win. Angels may dominate these at the cost of their own health, but in return, they will be able to invoke Gargantaur's mind burn.
  - The wisps have been exposed to the celestial light for so long that they are completely blind. Yet they navigate using their hearing and are able to fly. Wisps will not attack each other and the Angels.
+
+PRIMORDIALS
+ - In the taiga bogs and forests of the East live strange creatures that walked the Earth before any ape could be called sapient. Now they slumber, waiting for the time when the cycle of humankind is complete and they are able to reign the land once more. The natives fear, worship and offer sacrifices to them. But when the outsiders from beyond Earth arrived in the City, they rose once more to drive the invaders out of what they consider their own domain.
+ - You start as an Eater of the dead, a tentacled monster, weakened by the millennia of inactivity.
+ - You are able to feast on the corpses of the fallen to gain HP and power, and temporarily invoke your primordial power to gain increased damage, armor and dodging chance.
+ - You equally hate everybody in the City and are hated by everyone. 
+ - Your goal is to destroy all angels and demons.
  
 CITIZENS OF THE CITY
  - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.

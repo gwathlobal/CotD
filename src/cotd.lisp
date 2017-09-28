@@ -220,7 +220,7 @@
         (join-eater-item (cons "Join as the Eater of the dead"
                                   #'(lambda (n) 
                                       (declare (ignore n))
-                                      (let ((weather-types (remove (get-scenario-feature-by-id +weather-type-snow+) (get-all-scenario-features-by-type +scenario-feature-weather+ nil)))
+                                      (let ((weather-types (remove +weather-type-snow+ (get-all-scenario-features-by-type +scenario-feature-weather+ nil)))
                                             (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
                                             (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
                                         

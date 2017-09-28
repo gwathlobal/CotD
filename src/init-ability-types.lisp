@@ -1846,7 +1846,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-climbing+ :name "Climbing" :descr "Toggle the climbing mode. While in the climbing mode you are able to scale walls up and down and will not fall as long as you remain next to a solid wall or a floor. You can toggle the climbing mode at any time." 
+                                 :id +mob-abil-climbing+ :name "Climbing" :descr "Toggle the climbing mode. While in the climbing mode you are able to scale walls up and down and will not fall as long as you remain next to a solid wall or a floor. You can toggle the climbing mode at any time. However, you are unable to climb while sprinting." 
                                  :cost 0 :spd 0 :passive nil
                                  :final t :on-touch nil
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -3736,7 +3736,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-sprint+ :name "Sprint" :descr "Concenrate all your physical efforts, making yourself move 25% faster for 4 turns. However, spriniting denies you your ability to climb. You are unable to sprint while riding another creature." 
+                                 :id +mob-abil-sprint+ :name "Sprint" :descr "Concenrate all your physical efforts, making yourself move 25% faster for 4 turns. You are unable to sprint while riding another creature." 
                                  :cd 10 :spd 0 :passive nil
                                  :final t :on-touch nil
                                  :motion 0
@@ -3953,7 +3953,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-cannibalize+ :name "Cannibalize" :descr "Eat the corpse you are standing on to gain 2 HP and 1 power." 
+                                 :id +mob-abil-cannibalize+ :name "Cannibalize" :descr "Eat the corpse you are standing on to gain 3 HP, 1 maximum HP and 1 power." 
                                  :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 100
@@ -3967,7 +3967,8 @@
                                                 (remove-item-from-level-list (level *world*) target)
                                                 (remove-item-from-world target)
 
-                                                (incf (cur-hp actor) 2)
+                                                (incf (cur-hp actor) 3)
+                                                (incf (max-hp actor))
                                                 (when (> (cur-hp actor) (max-hp actor))
                                                   (setf (cur-hp actor) (max-hp actor)))
 
@@ -3988,9 +3989,7 @@
                                                                           nil))))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
-                                                  (if (and (and (not nearest-enemy)
-                                                                (or (< (cur-hp actor) (max-hp actor))
-                                                                    (< (cur-fp actor) (max-fp actor))))
+                                                  (if (and (not nearest-enemy)
                                                            (mob-ability-p actor +mob-abil-cannibalize+)
                                                            (can-invoke-ability actor actor +mob-abil-cannibalize+))
                                                     t
@@ -4062,20 +4061,20 @@
                                                              nil)))))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-primordial-rage+ :name "Primordial rage" :descr "Greatly increase your dodging, armor and damage for 4 turns." 
+                                 :id +mob-abil-primordial-power+ :name "Primordial power" :descr "Greatly increase your dodging chance, armor and damage for 4 turns." 
                                  :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (set-mob-effect actor :effect-type-id +mob-effect-primordial-rage+ :actor-id (id actor) :cd 4)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-primordial-power+ :actor-id (id actor) :cd 4)
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-primordial-rage+)
-                                                               (not (mob-effect-p actor +mob-effect-primordial-rage+)))
+                                                      (if (and (mob-ability-p actor +mob-abil-primordial-power+)
+                                                               (not (mob-effect-p actor +mob-effect-primordial-power+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -4084,10 +4083,17 @@
                                                   (if (and nearest-enemy
                                                            (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 2)
                                                            (null (riding-mob-id actor))
-                                                           (mob-ability-p actor +mob-abil-primordial-rage+)
-                                                           (can-invoke-ability actor actor +mob-abil-primordial-rage+))
+                                                           (mob-ability-p actor +mob-abil-primordial-power+)
+                                                           (can-invoke-ability actor actor +mob-abil-primordial-power+))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-primordial+ :name "Primordial" :descr "You dwelt on Earth before the advent of humankind. You will dwell on Earth after its inevitable demise." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

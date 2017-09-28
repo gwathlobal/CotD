@@ -73,7 +73,7 @@
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
-                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-rage)
+                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 5) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -272,8 +272,10 @@
     (setf (gethash +mob-abil-cast-shadow+ (abilities mob-type)) t))
   (when abil-cannibalize
     (setf (gethash +mob-abil-cannibalize+ (abilities mob-type)) t))
-  (when abil-primordial-rage
-    (setf (gethash +mob-abil-primordial-rage+ (abilities mob-type)) t))
+  (when abil-primordial-power
+    (setf (gethash +mob-abil-primordial-power+ (abilities mob-type)) t))
+  (when abil-primordial
+    (setf (gethash +mob-abil-primordial+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -482,6 +484,7 @@
    (made-turn :initform nil :accessor made-turn)
    
    (cur-hp :initform 0 :initarg :cur-hp :accessor cur-hp)
+   (max-hp :initform 0 :accessor max-hp)
    (cur-fp :initform 0 :initarg :cur-fp :accessor cur-fp)
 
    ;(fov-map :initform (make-array (list (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)))) :accessor fov-map)
@@ -555,7 +558,8 @@
 (defmethod initialize-instance :after ((mob mob) &key)
   (setf (id mob) (find-free-id *mobs*))
   (setf (aref *mobs* (id mob)) mob)
-  
+
+  (setf (max-hp mob) (max-hp (get-mob-type-by-id (mob-type mob))))
   (setf (cur-hp mob) (max-hp mob))
   (setf (cur-fp mob) 0)
   (setf (cur-ap mob) (max-ap mob))
@@ -616,9 +620,6 @@
 
 (defmethod faction ((mob mob))
   (faction (get-mob-type-by-id (mob-type mob))))
-
-(defmethod max-hp ((mob mob))
-  (max-hp (get-mob-type-by-id (mob-type mob))))
 
 (defmethod max-fp ((mob mob))
   (max-fp (get-mob-type-by-id (mob-type mob))))

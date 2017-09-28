@@ -205,7 +205,8 @@
 (defconstant +mob-abil-bend-space+ 82)
 (defconstant +mob-abil-cast-shadow+ 83)
 (defconstant +mob-abil-cannibalize+ 84)
-(defconstant +mob-abil-primordial-rage+ 85)
+(defconstant +mob-abil-primordial-power+ 85)
+(defconstant +mob-abil-primordial+ 86)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -241,7 +242,7 @@
 (defconstant +mob-effect-sprint+ 31)
 (defconstant +mob-effect-exerted+ 32)
 (defconstant +mob-effect-casting-shadow+ 33)
-(defconstant +mob-effect-primordial-rage+ 34)
+(defconstant +mob-effect-primordial-power+ 34)
 
 (defconstant +mob-order-follow+ 0)
 

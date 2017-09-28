@@ -483,23 +483,23 @@
                                        :glyph-idx 69 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Tentacles" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 25
-                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0))
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 2
-                                       :base-light-radius 0
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t 
-                                       :abil-open-close-door t :abil-cannibalize t :abil-primordial-rage t
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t  :abil-primordial t
+                                       :abil-open-close-door t :abil-cannibalize t :abil-primordial-power t :abil-sprint t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-eater-of-the-dead-rage+
                                        :name "eater of the dead"
                                        :glyph-idx 37 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
-                                       :weapon (list "Clawed tentacles" (list +weapon-dmg-flesh+ 6 10 (truncate (* +normal-ap+ 0.75)) 100 ()) nil) :base-dodge 65
-                                       :armor (list (list +weapon-dmg-flesh+ 2 0) (list +weapon-dmg-iron+ 2 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 2 0))
+                                       :weapon (list "Clawed tentacles" (list +weapon-dmg-flesh+ 6 10 (truncate (* +normal-ap+ 0.75)) 100 ()) nil) :base-dodge 75
+                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 3 0) (list +weapon-dmg-vorpal+ 3 0) (list +weapon-dmg-fire+ 3 0))
                                        :strength 3
-                                       :base-light-radius 0
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t 
-                                       :abil-open-close-door t :abil-cannibalize t
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :abil-open-close-door t :abil-cannibalize t :abil-sprint t
                                        :ai-curious t))
 
 ;;--------------------
