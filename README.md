@@ -5,28 +5,19 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-September 15, 2017 v1.2.1
+September 30, 2017 v1.2.2
 
-- Added Trinity mimics as a playable faction. Trinity mimics are three mind-linked angels - the Star singer, Star gazer, and Star mender. Each has a separate set of abilities and all of them can merge with each other. The player controls each mimic individually.
-- Added Righteous fury ability to the Star singer. Righteous fury is a berserk-like ability that lets you attack harder and faster but at a cost of slowing you afterwards.
-- Added Pain link ability to the Star signer. Pain link makes the target deal increased damage to the caster but decreased damage to everyone else.
-- Added Heal other ability to the Star mender. This ability allows healing not only yourself but your allies as well.
-- Added Soul reinforcement ability to the Star mender. Soul reinforcement prevents a fatal blow that would otherwise kill the target.
-- Added Silence ability to the Star gazer. Silence prevents the target from casting.
-- Added Confuse ability to the Star gazer. Confused targets sometimes move in a random direction instead of an intended action.
-- Added Pandemonium Shades as a playable faction. Shadow creatures are unable to possess humans but get a number of shadow-related abilities. You start as a shadow imp.
-- Added Umbral aura to shadow devils. This makes shadow devils be not light, but darkness sources.
-- Added Extinguish light to shadow demons and shadow devils. This ranged ability will switch off a stationary light or cause an enemy to stop emitting light for short period.
-- Added Shadow step to all shadow creatures. Shadow step is a short-range teleport that works only if the source and destination tiles are not lit.
-- Added the Church as a playable faction. You start as a priest in a church and your aim is to destroy all demons.
-- Added Smite to priests. Smite is a single target damage ability that gets better the more humans are around the caster.
-- Added Slow to priests. Slow is a single target ability that causes the enemy to take more time when attempting any action.
-- Added Prayer of wrath to the priests. This ability grants a fire-based melee attack to those who follow you.
-- You can now wait a turn using [.], and pick items using [g] and [,].
-- The game now logs your current title instead of your initial title into a high score entry.
-- The player is now highlighted on the map.
-- Dropping in water gives you a 'wet' effect, which means 25% of increased fire resistance.
-- Added rainy weather. Being caught in the rain will make characters wet, extinguish fires and clear blood.
+- Added a new playable creature - the Eater of the dead. It has two unique abilities - Cannibalize, that lets you devour a corpse to gain HP and power and increase your maximum HP, and Primordial power, that increases your damage, armor, and evasion.
+- Added the Cast shadows ability to all shadow demons. This ability causes a character to cast unnatural shadows that you can use to shadow step to and from.
+- Added the Bend space ability to all crimson demons. This ability lets you teleport to a random location a short distance away.
+- Added the Jump ability to the thief. This ability allows you to move 2 tiles away from you and cling to a wall next to the destination tile.
+- Added the Sprint ability to the thief. This ability allows you to temporarily increase your movement speed.
+- Added the Ressurection ability to all angels. This ability allows you to resurrect other fallen angels and humans.
+- Added morgue files to characters.
+- Added the Split soul ability to the chrome angels. This ability lets the user create an image of themselves that the user can later teleport to.
+- Added graveyards to the building list.
+- Added a new church layout.
+- Added flavor signs to some buildings.
 
 CURRENT CHANGELOG
 

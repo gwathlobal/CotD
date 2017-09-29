@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+September 30, 2017 v1.2.2
+
 - Added a new playable creature - the Eater of the dead. It has two unique abilities - Cannibalize, that lets you devour a corpse to gain HP and power and increase your maximum HP, and Primordial power, that increases your damage, armor, and evasion.
 - Added the Cast shadows ability to all shadow demons. This ability causes a character to cast unnatural shadows that you can use to shadow step to and from.
 - Added the Bend space ability to all crimson demons. This ability lets you teleport to a random location a short distance away.
