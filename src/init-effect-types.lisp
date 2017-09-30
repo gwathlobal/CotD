@@ -18,21 +18,22 @@
 (set-effect-type (make-instance 'effect-type :id +mob-effect-reveal-true-form+ :name "Revealed" :color sdl:*red*
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
-                                                         (setf (face-mob-type-id actor) (mob-type actor))
+                                                         (adjust-disguise-for-mob actor)
                                                          )
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
-                                                            (when (slave-mob-id actor)
-                                                              (setf (face-mob-type-id actor) (mob-type (get-mob-by-id (slave-mob-id actor))))))))
+                                                            (rem-mob-effect-simple actor +mob-effect-reveal-true-form+)
+                                                            (adjust-disguise-for-mob actor))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-divine-concealed+ :name "Concealed" :color sdl:*cyan*
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
-                                                         (setf (face-mob-type-id actor) +mob-type-man+)
+                                                         (adjust-disguise-for-mob actor)
                                                          )
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
-                                                            (setf (face-mob-type-id actor) (mob-type actor)))))
+                                                            (rem-mob-effect-simple actor +mob-effect-divine-concealed+)
+                                                            (adjust-disguise-for-mob actor))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-calling-for-help+ :name "Summoning" :color sdl:*green*))
 
@@ -435,5 +436,16 @@
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "The primordial power of ~A wanes.~%" (prepend-article +article-the+ (visible-name actor)))))
+                                                                                   (format nil "The primordial power of ~A wanes. " (prepend-article +article-the+ (visible-name actor)))))
                                              ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-disguised+ :name "Disguised" :color sdl:*white*
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+
+                                                            (rem-mob-effect-simple actor +mob-effect-disguised+)
+                                                            (adjust-disguise-for-mob actor)
+                                                            
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "~A reveals itself as ~A. " (prepend-article +article-the+ (visible-name actor))
+                                                                                           (get-qualified-name actor))))))

@@ -8,6 +8,7 @@
    (name :initform "No name item" :initarg :name :accessor name)
    (plural-name :initform nil :initarg :plural-name :accessor plural-name)
    (descr :initform nil :initarg :descr :accessor descr)
+   (flavor-quote :initform nil :initarg :flavor-quote :accessor flavor-quote)
    (max-stack-num :initform 1 :initarg :max-stack-num :accessor max-stack-num)
    (value :initform 0 :initarg :value :accessor value)
    (abilities :initform (make-hash-table) :accessor abilities)
@@ -94,6 +95,9 @@
 (defmethod descr ((item item))
   (descr (get-item-type-by-id (item-type item))))
 
+(defmethod flavor-quote ((item item))
+  (flavor-quote (get-item-type-by-id (item-type item))))
+
 (defmethod name ((item item))
   (if (slot-value item 'name)
     (values (slot-value item 'name) +noun-proper+ +noun-singular+)
@@ -106,13 +110,16 @@
 
 (defun get-item-descr (item)
   (let ((str (create-string)))
-    (format str "~A~%~%~AQty: ~A~A" (capitalize-name (prepend-article +article-a+ (name item)))
+    (format str "~A~%~%~AQty: ~A~A~%~%~A" (capitalize-name (prepend-article +article-a+ (name item)))
             (if (descr item)
               (format nil "~A~%~%" (descr item))
               "")
             (qty item)
             (if (not (zerop (value item)))
               (format nil " Value: ~A" (value item))
+              "")
+            (if (flavor-quote item)
+              (format nil "~A~%~%" (flavor-quote item))
               ""))
     str))
 
@@ -134,33 +141,29 @@
           collect item))
 
 (defun add-to-inv (item inv inv-id)
-  ;(unless (inv-id item)
-  ;  (remove-item-from-level-list (level *world*) item))
-  ;(unless (eq inv-id (inv-id item))
-    ;; find the same item type
-    (let ((incomplete-stacks (remove-if #'(lambda (a)
-                                            (if (= (max-stack-num a) (qty a))
-                                              t
-                                              nil))
-                                        (get-inv-items-by-type inv (item-type item)))))
-      (if (null incomplete-stacks)
-        (progn
-          (push (id item) inv)
-          (setf (inv-id item) inv-id))
-        (progn
-          (incf (qty (first incomplete-stacks)) (qty item))
-          (setf (qty item) 0)
-          (when (> (qty (first incomplete-stacks)) (max-stack-num (first incomplete-stacks)))
-            (setf (qty item) (- (qty (first incomplete-stacks)) (max-stack-num (first incomplete-stacks))))
-            (setf (qty (first incomplete-stacks)) (max-stack-num (first incomplete-stacks))))
-          (if (zerop (qty item))
-            (progn
-              (remove-item-from-world item))
-            (progn
-              (push (id item) inv)
-              (setf (inv-id item) inv-id)))))
-      )
-  ;)
+  ;; find the same item type
+  (let ((incomplete-stacks (remove-if #'(lambda (a)
+                                          (if (= (max-stack-num a) (qty a))
+                                            t
+                                            nil))
+                                      (get-inv-items-by-type inv (item-type item)))))
+    (if (null incomplete-stacks)
+      (progn
+        (push (id item) inv)
+        (setf (inv-id item) inv-id))
+      (progn
+        (incf (qty (first incomplete-stacks)) (qty item))
+        (setf (qty item) 0)
+        (when (> (qty (first incomplete-stacks)) (max-stack-num (first incomplete-stacks)))
+          (setf (qty item) (- (qty (first incomplete-stacks)) (max-stack-num (first incomplete-stacks))))
+          (setf (qty (first incomplete-stacks)) (max-stack-num (first incomplete-stacks))))
+        (if (zerop (qty item))
+          (progn
+            (remove-item-from-world item))
+          (progn
+            (push (id item) inv)
+            (setf (inv-id item) inv-id)))))
+    )
   inv)
 
 (defun remove-from-inv (item inv &key (qty (qty item)))
@@ -178,6 +181,26 @@
       (setf (inv-id item) nil)
       (remove (id item) inv)))
   )
+
+(defun remove-from-inv-by-type (item-type inv qty)
+  (when (zerop qty)
+    (return-from remove-from-inv-by-type nil))
+  (loop for item-id in inv
+        for item = (get-item-by-id item-id)
+        with qty-left = qty
+        when (= (item-type item) item-type)
+          do
+             (if (> qty-left (qty item))
+               (progn
+                 (decf qty-left (qty item))
+                 (setf inv (remove-from-inv item inv)))
+               (progn
+                 (setf inv (remove-from-inv item inv :qty qty-left))
+                 (setf qty-left 0)))
+        when (zerop qty-left)
+          do
+             (loop-finish))
+  inv)
 
 (defmethod visible-name ((item item))
   (multiple-value-bind (item-name noun-proper noun-singular) (name item)

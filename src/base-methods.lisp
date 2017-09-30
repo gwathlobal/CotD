@@ -1012,7 +1012,6 @@
     (when (and actor
                (mob-effect-p actor +mob-effect-divine-concealed+))
       (rem-mob-effect actor +mob-effect-divine-concealed+)
-      (setf (face-mob-type-id actor) (mob-type actor))
       (when (or (check-mob-visible actor :observer *player*)
                 (check-mob-visible target :observer *player*))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -1022,8 +1021,12 @@
       (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor)))))
-      (setf (face-mob-type-id actor) (mob-type actor))
       (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)))
+
+  ;; if the attacker is disguised - remove the disguise
+  (when (and actor
+             (mob-effect-p actor +mob-effect-disguised+))
+    (rem-mob-effect actor +mob-effect-disguised+))
 
   (multiple-value-bind (dx dy) (x-y-dir (1+ (random 9)))
     (let* ((cur-dmg) (dodge-chance) 
@@ -1797,4 +1800,13 @@
       (setf score 0))
     score))
 
-
+(defun adjust-disguise-for-mob (mob)
+  (setf (face-mob-type-id mob) (mob-type mob))
+  (when (mob-effect-p mob +mob-effect-divine-concealed+)
+    (setf (face-mob-type-id mob) +mob-type-man+))
+  (when (and (mob-ability-p mob +mob-abil-demon+)
+             (slave-mob-id mob)
+             (not (mob-effect-p mob +mob-effect-reveal-true-form+)))
+    (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))
+  (when (mob-effect-p mob +mob-effect-disguised+)
+    (setf (face-mob-type-id mob) (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-disguised+))))))

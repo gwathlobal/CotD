@@ -207,6 +207,8 @@
 (defconstant +mob-abil-cannibalize+ 84)
 (defconstant +mob-abil-primordial-power+ 85)
 (defconstant +mob-abil-primordial+ 86)
+(defconstant +mob-abil-make-disguise+ 87)
+(defconstant +mob-abil-remove-disguise+ 88)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -243,6 +245,7 @@
 (defconstant +mob-effect-exerted+ 32)
 (defconstant +mob-effect-casting-shadow+ 33)
 (defconstant +mob-effect-primordial-power+ 34)
+(defconstant +mob-effect-disguised+ 35)
 
 (defconstant +mob-order-follow+ 0)
 
@@ -265,7 +268,9 @@
 (defconstant +item-type-coin+ 4)
 (defconstant +item-type-medkit+ 5)
 (defconstant +item-type-smoke-bomb+ 6)
-
+(defconstant +item-type-clothing+ 7)
+(defconstant +item-type-disguise+ 8)
+ 
 ;;--------------------
 ;; FEATURE-TYPE Constants
 ;;-------------------- 

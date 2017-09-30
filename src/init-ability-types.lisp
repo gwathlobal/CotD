@@ -4107,3 +4107,69 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-make-disguise+ :name "Make a disguise" :descr "Create a disguise out of two costumes. The disguise lets you conceal your true nature and present yourself as an ordinary man or a woman." 
+                                 :spd (* +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone working~A. " str)))
+                                                
+                                                (setf (inv actor) (remove-from-inv-by-type +item-type-clothing+ (inv actor) 2))
+                                                (mob-pick-item actor (make-instance 'item :item-type +item-type-disguise+ :x (x actor) :y (y actor) :z (z actor) :qty 1)
+                                                               :spd nil :silent t)
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A creates a disguise. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-make-disguise+)
+                                                               (>= (loop for item in (get-inv-items-by-type (inv actor) +item-type-clothing+)
+                                                                         sum (qty item))
+                                                                   2))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-make-disguise+)
+                                                           (can-invoke-ability actor actor +mob-abil-make-disguise+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-remove-disguise+ :name "Remove a disguise" :descr "Remove a man-made disguise from yourself." 
+                                 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear clothes rustling~A. " str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A removes its disguise. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                (rem-mob-effect actor +mob-effect-disguised+)
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-remove-disguise+)
+                                                               (mob-effect-p actor +mob-effect-disguised+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-remove-disguise+)
+                                                           (can-invoke-ability actor actor +mob-abil-remove-disguise+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

@@ -33,7 +33,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
+                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))) (list +item-type-clothing+ (random 2)))
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-woman+ 
@@ -45,7 +45,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
+                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))) (list +item-type-clothing+ (random 2)))
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-child+ 
@@ -68,7 +68,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :init-items (list (list +item-type-coin+ (+ 10 (random 10))))
+                                       :init-items (list (list +item-type-coin+ (+ 10 (random 10))) (list +item-type-clothing+ (random 2)))
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-criminal+ 
@@ -80,6 +80,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
+                                       :init-items (list (list +item-type-clothing+ (random 2)))
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-policeman+ 
@@ -91,7 +92,7 @@
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))))
+                                       :init-items (list (list +item-type-coin+ (+ 5 (random 10))) (list +item-type-clothing+ (random 2)))
                              ))
 
 ;;--------------------
@@ -138,7 +139,7 @@
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t
-                                       :abil-sprint t :abil-jump t
+                                       :abil-sprint t :abil-jump t :abil-make-disguise t :abil-remove-disguise t
                                        :ai-kleptomaniac t :ai-cautious t
                                        :init-items (list (list +item-type-smoke-bomb+ 3))
                              ))
@@ -232,7 +233,7 @@
                                        :strength 4
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
                                        :abil-heal-self 2 :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
-                                       :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t :abil-split-soul t :abil-resurrection t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t :abil-split-soul t :abil-resurrection t :abil-remove-disguise t
                                        :ai-wants-bless t :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer+

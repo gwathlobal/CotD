@@ -73,7 +73,8 @@
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
-                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial)
+                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial
+                                                                abil-make-disguise abil-remove-disguise)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 5) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -276,6 +277,10 @@
     (setf (gethash +mob-abil-primordial-power+ (abilities mob-type)) t))
   (when abil-primordial
     (setf (gethash +mob-abil-primordial+ (abilities mob-type)) t))
+  (when abil-make-disguise
+    (setf (gethash +mob-abil-make-disguise+ (abilities mob-type)) t))
+  (when abil-remove-disguise
+    (setf (gethash +mob-abil-remove-disguise+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -573,9 +578,11 @@
       (setf (mounted-by-mob-id horse) (id mob))
       (setf (riding-mob-id mob) (id horse))))
 
-  (loop for (item-type-id qty) in (init-items (get-mob-type-by-id (mob-type mob))) do
-    (mob-pick-item mob (make-instance 'item :item-type item-type-id :x (x mob) :y (y mob) :z (z mob) :qty qty)
-                   :spd nil :silent t))
+  (loop for (item-type-id qty) in (init-items (get-mob-type-by-id (mob-type mob)))
+        when (not (zerop qty))
+          do
+             (mob-pick-item mob (make-instance 'item :item-type item-type-id :x (x mob) :y (y mob) :z (z mob) :qty qty)
+                            :spd nil :silent t))
   
   ;; add permanent flying effect, if the mob can fly
   (when (mob-ability-p mob +mob-abil-flying+)
