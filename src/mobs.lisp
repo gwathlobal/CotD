@@ -48,6 +48,7 @@
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
    ;;   :is-fire
+   ;;   :constricts
    
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
    (base-sight :initform *base-mob-sight* :initarg :base-sight :accessor base-sight)
@@ -74,7 +75,7 @@
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
                                                                 abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial
-                                                                abil-make-disguise abil-remove-disguise)
+                                                                abil-make-disguise abil-remove-disguise abil-constriction)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 5) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -281,6 +282,8 @@
     (setf (gethash +mob-abil-make-disguise+ (abilities mob-type)) t))
   (when abil-remove-disguise
     (setf (gethash +mob-abil-remove-disguise+ (abilities mob-type)) t))
+  (when abil-constriction
+    (setf (gethash +mob-abil-constriction+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

@@ -449,3 +449,35 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A reveals itself as ~A. " (prepend-article +article-the+ (visible-name actor))
                                                                                            (get-qualified-name actor))))))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-constriction-source+ :name "Constricting" :color sdl:*yellow*
+                                             :on-remove #'(lambda (effect actor)
+                                                            ;; the param1 here is (list (list x y z)            - xyz coordinates of the constrictor
+                                                            ;;                          (list id1 id2 id3 ...)) - collection of mob IDs that are being constricted by this constrictor 
+                                                            (rem-mob-effect-simple actor +mob-effect-constriction-source+)
+                                                            
+                                                            (loop for target-id in (second (param1 effect))
+                                                                  for target = (get-mob-by-id target-id)
+                                                                  do
+                                                                     (rem-mob-effect target +mob-effect-constriction-target+))
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-constriction-target+ :name "Constricted" :color sdl:*yellow*
+                                             :on-remove #'(lambda (effect actor)
+                                                            ;; the param1 here is (list x y z) - xyz coordinates of the mob being constricted
+                                                            (when (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-constriction-source+)
+                                                              (let ((source-effect (get-effect-by-id (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-constriction-source+))))
+                                                                (setf (second (param1 source-effect)) (remove (id actor) (second (param1 source-effect))))
+                                                                (unless (second (param1 source-effect))
+                                                                  (rem-mob-effect (get-mob-by-id (actor-id effect)) +mob-effect-constriction-source+))))
+                                                            )
+                                             :on-tick #'(lambda (effect actor)
+                                                          (inflict-damage actor :min-dmg (get-melee-weapon-dmg-min (get-mob-by-id (actor-id effect))) :max-dmg (get-melee-weapon-dmg-min (get-mob-by-id (actor-id effect)))
+                                                                                :dmg-type (get-melee-weapon-dmg-type (get-mob-by-id (actor-id effect)))
+                                                                                :att-spd nil :weapon-aux () :acc 100 
+                                                                                :actor (get-mob-by-id (actor-id effect))
+                                                                                :no-hit-message t
+                                                                                :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                              (format nil "~A constricts around ~A for ~A damage. "
+                                                                                                                      (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id (actor-id effect)))))
+                                                                                                                      (prepend-article +article-the+ (visible-name actor)) cur-dmg))))))

@@ -200,8 +200,11 @@
   (logger (format nil "CALC-LIT-TILES: ~A [~A]~%" (name mob) (id mob)))
 
   (dotimes (x1 (array-dimension (memo (level *world*)) 0))
+    (declare (type fixnum x1))
     (dotimes (y1 (array-dimension (memo (level *world*)) 1))
+      (declare (type fixnum y1))
       (dotimes (z1 (array-dimension (memo (level *world*)) 2))
+        (declare (type fixnum z1))
         (set-single-memo-* (level *world*) x1 y1 z1 :light 0)
         )))
 

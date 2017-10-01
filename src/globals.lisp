@@ -22,7 +22,7 @@
                                        "Uriel" "Uzziel" "Vehuel" "Zophiel" "Azazel" "Azrael" "Sariel" "Gabriel" "Raphael" "Michael"))
 
 (defparameter *init-demon-names* (list "Amon" "Abaddon" "Agares" "Haborym" "Alastor" "Allocer" "Amaymon" "Amdusias" "Andras" "Amdusias" "Andromalius" "Anzu" "Asmodeus" "Astaroth" "Bael" "Balam" "Barbatos" "Bathin" "Beelzebub"
-                                       "Behemoth" "Beleth" "Belial" "Belthgor" "Berith" "Bifrons" "Botis" "Buer" "Cacus" "Cerberus" "Mastema" "Melchiresus" "Moloch" "Onoskelis" "Shedim" "Xaphan" "Ornias" "Mammon" "Lix Tetrax"
+                                       "Behemoth" "Beleth" "Belial" "Belthegor" "Berith" "Bifrons" "Botis" "Buer" "Cacus" "Cerberus" "Mastema" "Melchiresus" "Moloch" "Onoskelis" "Shedim" "Xaphan" "Ornias" "Mammon" "Lix Tetrax"
                                        "Nybbas" "Focalor" "Furfur" "Gaap" "Geryon" "Haures" "Ipos" "Jezebeth" "Kasdeya" "Kobal" "Malphas" "Melchom" "Mullin" "Naberius" "Nergal" "Nicor" "Nysrogh" "Oriax" "Paymon" "Philatnus"
                                        "Pruflas" "Raum" "Rimmon" "Ronove" "Ronwe" "Shax" "Shalbriri" "Sonellion" "Stolas" "Succorbenoth" "Thamuz" "Ukobach" "Uphir" "Uvall" "Valafar" "Vepar" "Verdelet" "Verin" "Xaphan" "Zagan"
                                        "Zepar"))
@@ -209,6 +209,7 @@
 (defconstant +mob-abil-primordial+ 86)
 (defconstant +mob-abil-make-disguise+ 87)
 (defconstant +mob-abil-remove-disguise+ 88)
+(defconstant +mob-abil-constriction+ 89)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -246,6 +247,8 @@
 (defconstant +mob-effect-casting-shadow+ 33)
 (defconstant +mob-effect-primordial-power+ 34)
 (defconstant +mob-effect-disguised+ 35)
+(defconstant +mob-effect-constriction-source+ 36)
+(defconstant +mob-effect-constriction-target+ 37)
 
 (defconstant +mob-order-follow+ 0)
 

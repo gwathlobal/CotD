@@ -385,6 +385,21 @@
                (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))
                (not (eq mob (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)))))
       (set-mob-location (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)) orig-x orig-y (1+ orig-z)))
+
+    ;; check if the mob is constricting somebody or being constricted and if the effect should be broken
+    (when (mob-effect-p mob +mob-effect-constriction-source+)
+      (let ((effect (get-effect-by-id (mob-effect-p mob +mob-effect-constriction-source+))))
+        (when (or (/= (first (first (param1 effect))) (x mob))
+                  (/= (second (first (param1 effect))) (y mob))
+                  (/= (third (first (param1 effect))) (z mob)))
+          (rem-mob-effect mob +mob-effect-constriction-source+))))
+    
+    (when (mob-effect-p mob +mob-effect-constriction-target+)
+      (let ((effect (get-effect-by-id (mob-effect-p mob +mob-effect-constriction-target+))))
+        (when (or (/= (first (param1 effect)) (x mob))
+                  (/= (second (param1 effect)) (y mob))
+                  (/= (third (param1 effect)) (z mob)))
+          (rem-mob-effect mob +mob-effect-constriction-target+))))
     ))
 
 (defun move-mob (mob dir &key (push nil) (dir-z 0))
@@ -1202,6 +1217,20 @@
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
                                               (funcall specific-hit-string-func cur-dmg))))))
                 )
+              ;; if the attacker can constrict - constrict around the target
+              (when (and actor
+                         weapon-aux
+                         (find :constricts weapon-aux))
+                (set-mob-effect target :effect-type-id +mob-effect-constriction-target+ :actor-id (id actor) :param1 (list (x target) (y target) (z target)))
+                (if (mob-effect-p actor +mob-effect-constriction-source+)
+                  (progn
+                    (let ((effect (get-effect-by-id (mob-effect-p actor +mob-effect-constriction-source+))))
+                      (setf (second (param1 effect)) (append (second (param1 effect)) (list (id target))))))
+                  (progn
+                    (set-mob-effect actor :effect-type-id +mob-effect-constriction-source+ :actor-id (id actor) :param1 (list (list (x actor) (y actor) (z actor))
+                                                                                                                              (list (id target))))))
+                (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                       (format nil "~A grabs ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))))
               )))
         (progn
           ;; attacker missed

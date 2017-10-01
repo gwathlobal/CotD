@@ -2421,7 +2421,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into Avatar of Brilliance for 6 turns, significantly boosting your combat prowess." 
+                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into an Avatar of Brilliance for 6 turns, significantly boosting your combat prowess." 
                                  :cost 4 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4173,3 +4173,10 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-constriction+ :name "Constriction" :descr "When you attack a character in melee, you are able to grab and constrict around them. When constricting, you continue to deal damage to the constricted character even if you are already attacking another character. Constriction is broken when you or the constricted character move to another tile." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

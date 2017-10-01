@@ -59,10 +59,16 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect))
     
-    (let ((cur-str) (color-list nil) (str-list))
+    (let ((cur-str) (color-list nil) (str-list) (abilities-list (get-mob-all-abilities *player*)))
       (setf cur-str (cur-sel win))
-      (setf str-list (loop for ability-type-id in (get-mob-all-abilities *player*)
+      (setf abilities-list (stable-sort abilities-list #'(lambda (a b)
+                                                           (if (and (abil-passive-p a)
+                                                                    (not (abil-passive-p b)))
+                                                             t
+                                                             nil))))
+      (setf str-list (loop for ability-type-id in abilities-list
                            collect (name (get-ability-type-by-id ability-type-id))))
+      
 
       (setf color-list (loop for i from 0 below (length (get-mob-all-abilities *player*))
                              collect (if (= i cur-str) 
@@ -76,7 +82,12 @@
          (y (+ 30 (* (sdl:char-height sdl:*default-font*) 1)))
          (w (- (truncate *window-width* 2) 20))
          (h (- *window-height* 20 (sdl:char-height sdl:*default-font*) y))
-         (ability (get-ability-type-by-id (nth (cur-sel win) (get-mob-all-abilities *player*)))))
+         (abilities-list (stable-sort (get-mob-all-abilities *player*) #'(lambda (a b)
+                                                                           (if (and (abil-passive-p a)
+                                                                                    (not (abil-passive-p b)))
+                                                                             t
+                                                                             nil))))
+         (ability (get-ability-type-by-id (nth (cur-sel win) abilities-list))))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       
       

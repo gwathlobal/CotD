@@ -10,33 +10,33 @@ GENERAL TIPS
  - Stockpile power to get promoted or spend it on available abilities.
  
 THE CELESTIAL COMMUNION
- - The ranks of the Celestial Communion are filled with Chrome Angels who can temporarily transform themselves into Avatars of Brilliance.
- - A Chrome Angel can easily dispatch lowly Imps. To deal with more powerful targets, invoke the Avatar of Brilliance powers. 
+ - The ranks of the Celestial Communion are filled with Chrome angels who can temporarily transform themselves into Avatars of Brilliance.
+ - A Chrome angel can easily dispatch lowly Imps. To deal with more powerful targets, invoke the Avatar of Brilliance powers. 
  - Some of the angels grow tired of the ever-humming singlemind and prefer more limited but deeper bonds. These are Trinity mimics, a group of three angels who act as one.
  - You can bless humans to gain power.
  - You are able to hide your divinity and disguise yourself as a human to lure enemies to you.
  - Your strength is the ability to heal yourself when needed. You are also able to see what all other Angels see.
- - To win, kill all demons or ascend beyond Chrome Angel (Trinity mimics need to fill the power meter on all of their alive characters). Survival of mankind is not required.
+ - To win, kill all demons or ascend beyond Chrome angel (Trinity mimics need to fill the power meter on all of their alive characters). Survival of mankind is not required.
  
 THE PANDEMONIUM HIERARCHY
- - The Pandemonium Hierarchy is represented with two rows of units: a Crimson Imp, Crimson Demon, and Archdemon, on the one hand, and a Shadow Imp, Shadow Demon, and Shadow Devil, on the other.
- - You start as a puny Crimson or Shadow Imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
- - Imps and Demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
- - Shadow creatures are unable to possess anybody but can teleport around unlit areas.
+ - The Pandemonium Hierarchy is represented with two rows of units: a Crimson imp, Crimson demon, and Archdemon, on the one hand, and a Shadow imp, Shadow demon, and Shadow devil, on the other.
+ - You start as a puny Crimson or Shadow imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
+ - Crimson imps and demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
+ - Shadow creatures are unable to possess mortals but can teleport around unlit areas.
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
  - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
  - Remember, "friendly fire" is allowed for your faction. Be cautious when walking side-by-side with your "friends".
- - To win, kill all angels or ascend beyond Archdemon or Shadow Devil. Destruction of mankind is not enough.
+ - To win, kill all angels or ascend beyond Archdemon or Shadow devil. Destruction of mankind is not enough.
  
 OUTSIDER BEASTS
  - Outsider beasts are half-sentient creatures of various origin that will actively attack everything in sight, including their own kin.
  - The demonic invasion has attracted Fiends. If a demon gets near one, it will be able to dominate and ride it as a mount.
- - The Gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win. Angels may dominate these at the cost of their own health, but in return, they will be able to invoke Gargantaur's mind burn.
+ - The gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win. Angels may dominate these at the cost of their own health, but in return, they will be able to invoke the gargantaur's mind burn.
  - The wisps have been exposed to the celestial light for so long that they are completely blind. Yet they navigate using their hearing and are able to fly. Wisps will not attack each other and the Angels.
 
 PRIMORDIALS
- - In the taiga bogs and forests of the East live strange creatures that walked the Earth before any ape could be called sapient. Now they slumber, waiting for the time when the cycle of humankind is complete and they are able to reign the land once more. The natives fear, worship and offer sacrifices to them. But when the outsiders from beyond Earth arrived in the City, they rose once more to drive the invaders out of what they consider their own domain.
+ - In the taiga bogs and forests of the East live strange creatures that walked the Earth before any ape could be called sapient. Now they slumber, waiting for the time when the cycle of humankind is complete and they are able to reign the land once more. The natives fear, worship and offer sacrifices to them. But when the outsiders from beyond Earth arrived in the City, the primordials rose once more to drive the invaders out of what they consider their own domain.
  - You start as an Eater of the dead, a tentacled monster, weakened by the millennia of inactivity.
  - You are able to feast on the corpses of the fallen to gain HP and power, and temporarily invoke your primordial power to gain increased damage, armor and dodging chance.
  - You equally hate everybody in the City and are hated by everyone. 
@@ -60,7 +60,7 @@ THE MILITARY
  - Scouts have a more powerful rifle than soldiers, are able to reveal the true form of a single enemy and enter the battle riding a horse.
  - Sergeants wield six-round revolvers that deal less damage than a rifle but do not need to be reloaded so often.
  - Machine-gunners carry a light machine gun capable of firing the whole magazine in one turn. Alas, its accuracy leaves to be desired. 
- - Chaplains are also armed with six-round revolvers but, more importantly, are able to pray to reveal disguised enemies or to grant divine protection to allies (similar to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.
+ - Chaplains are also armed with six-round revolvers but, more importantly, are able to pray to reveal disguised supernatural enemies or to grant divine protection to allies (similar to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.
  - If you side with the military, you may start as a Chaplain or as a Scout. 
  - Chaplains are accompanied by a host of loyal troops. 
  - Scouts start alone but compensate that with unsurpassed speed. Be careful, though - unlike a Chaplain, you do not have protection from possession. So if a demon traps you in your own body, the game is over for you.
