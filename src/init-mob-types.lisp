@@ -416,6 +416,20 @@
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-umbral-aura t :abil-cast-shadow t
                                        :ai-curious t))
 
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-malseraph-puppet+
+                                       :name "Malseraph's puppet"
+                                       :glyph-idx 68 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 22 :max-fp 12
+                                       :faction +faction-type-demons+
+                                       :weapon (list "Falchion" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
+                                       :strength 3
+                                       :base-light-radius 0
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t
+                                       :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-toggle-light t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t
+                                       :ai-curious t))
+
 ;;--------------------
 ;; UNDEAD
 ;;--------------------

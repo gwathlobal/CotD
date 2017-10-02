@@ -41,6 +41,7 @@
 (defconstant +player-faction-trinity-mimics+ 23)
 (defconstant +weather-type-rain+ 24)
 (defconstant +player-faction-eater+ 25)
+(defconstant +player-faction-puppet+ 26)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

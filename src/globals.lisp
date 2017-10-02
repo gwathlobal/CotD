@@ -97,6 +97,7 @@
 (defconstant +mob-type-angel-image+ 40)
 (defconstant +mob-type-eater-of-the-dead+ 41)
 (defconstant +mob-type-eater-of-the-dead-rage+ 42)
+(defconstant +mob-type-malseraph-puppet+ 43)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
