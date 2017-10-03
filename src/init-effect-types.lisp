@@ -1,8 +1,14 @@
 (in-package :cotd)
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-possessed+ :name "Possessed" :color sdl:*red*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-possessed+ :name "Possessed"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*red*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-blessed+ :name "Blessed" :color sdl:*blue*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-blessed+ :name "Blessed"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*blue*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore actor))
                                                          (incf (total-blessed *world*))
@@ -15,7 +21,10 @@
                                                             (decf (total-blessed *world*))
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-reveal-true-form+ :name "Revealed" :color sdl:*red*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-reveal-true-form+ :name "Revealed"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*red*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-disguise-for-mob actor)
@@ -25,7 +34,10 @@
                                                             (rem-mob-effect-simple actor +mob-effect-reveal-true-form+)
                                                             (adjust-disguise-for-mob actor))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-concealed+ :name "Concealed" :color sdl:*cyan*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-concealed+ :name "Concealed" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*cyan*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-disguise-for-mob actor)
@@ -35,13 +47,25 @@
                                                             (rem-mob-effect-simple actor +mob-effect-divine-concealed+)
                                                             (adjust-disguise-for-mob actor))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-calling-for-help+ :name "Summoning" :color sdl:*green*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-calling-for-help+ :name "Summoning" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-called-for-help+ :name "Called" :color sdl:*green*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-called-for-help+ :name "Called" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-shield+ :name "Divine shield" :color sdl:*yellow*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-divine-shield+ :name "Divine shield"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*yellow*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-cursed+ :name "Cursed" :color (sdl:color :r 139 :g 69 :b 19)
+(set-effect-type (make-instance 'effect-type :id +mob-effect-cursed+ :name "Cursed" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 139 :g 69 :b 19))
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-m-acc actor)
@@ -52,7 +76,10 @@
                                                             (adjust-m-acc actor)
                                                             (adjust-r-acc actor))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-blind+ :name "Blind" :color (sdl:color :r 100 :g 100 :b 100)
+(set-effect-type (make-instance 'effect-type :id +mob-effect-blind+ :name "Blind"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 100 :g 100 :b 100))
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-sight actor)
@@ -61,9 +88,15 @@
                                                             (declare (ignore effect))
                                                             (adjust-sight actor))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-fear+ :name "Fear" :color sdl:*magenta*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-fear+ :name "Fear"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*magenta*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-climbing-mode+ :name "Climbing" :color (sdl:color :r 100 :g 100 :b 100)
+(set-effect-type (make-instance 'effect-type :id +mob-effect-climbing-mode+ :name "Climbing"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 100 :g 100 :b 100))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (rem-mob-effect-simple actor +mob-effect-climbing-mode+)
@@ -71,11 +104,20 @@
                                                               (set-mob-location actor (x actor) (y actor) (z actor))
                                                               (make-act actor +normal-ap+)))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-alertness+ :name "On alert" :color sdl:*red*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-alertness+ :name "On alert"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*red*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-ready-to-possess+ :name "Ready to possess" :color (sdl:color :r 100 :g 100 :b 100)))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-ready-to-possess+ :name "Ready to possess"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 100 :g 100 :b 100))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-avatar-of-brilliance+ :name "Avatar of Brilliance" :color sdl:*white*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-avatar-of-brilliance+ :name "Avatar of Brilliance"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (let ((old-max-hp (max-hp actor)))
@@ -135,7 +177,10 @@
                                                           (when (not (mob-effect-p actor +mob-effect-gravity-pull+))
                                                             (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor))))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-empowered-undead+ :name "Empowered" :color sdl:*green*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-empowered-undead+ :name "Empowered" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (setf (param1 effect) (mob-type actor)) ;; store mob-type-id in param1 of the effect
                                                          (set-mob-effect (get-mob-by-id (actor-id effect)) :effect-type-id +mob-effect-necrolink+ :actor-id (actor-id effect) :cd t :param1 (target-id effect))
@@ -194,19 +239,31 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A loses its power. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-necrolink+ :name "Necrolink" :color (sdl:color :r 100 :g 100 :b 100)
+(set-effect-type (make-instance 'effect-type :id +mob-effect-necrolink+ :name "Necrolink" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 100 :g 100 :b 100))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (setf (order actor) nil))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-gravity-pull+ :name "Gravity pull" :color sdl:*red*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-gravity-pull+ :name "Gravity pull"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*red*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-flying+ :name "Flying" :color sdl:*cyan*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-flying+ :name "Flying"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*cyan*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (apply-gravity actor))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-slow+ :name "Slowed" :color sdl:*red*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-slow+ :name "Slowed"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*red*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (incf (cur-speed actor) 50)
@@ -216,7 +273,10 @@
                                                             (decf (cur-speed actor) 50)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-holy-touch+ :name "Holy touch" :color sdl:*white*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-holy-touch+ :name "Holy touch"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)
                                              :on-add #'(lambda (effect actor)
                                                          (setf (param1 effect) (weapon actor))
                                                          (setf (weapon actor) (list "Holy touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 (list :is-fire)) nil))
@@ -225,17 +285,22 @@
                                                             (setf (weapon actor) (param1 effect))
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-extinguished-light+ :name "Extinguished light" :color (sdl:color :r 100 :g 100 :b 100)
+(set-effect-type (make-instance 'effect-type :id +mob-effect-extinguished-light+ :name "Extinguished light"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 100 :g 100 :b 100))
                                              :on-add #'(lambda (effect actor)
                                                          (setf (param1 effect) (cur-light actor))
                                                          (setf (cur-light actor) 0)
                                                          )
                                              :on-remove #'(lambda (effect actor)
                                                             (setf (cur-light actor) (param1 effect))
-                                                            ;(update-visible-mobs actor)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-merged+ :name "Merged" :color sdl:*cyan*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-merged+ :name "Merged"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*cyan*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (let ((singer nil)
@@ -309,7 +374,10 @@
                                                                  do
                                                                     (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (merged-id-list actor))))))))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-righteous-fury+ :name "Righteous fury" :color (sdl:color :r 255 :g 140 :b 0)
+(set-effect-type (make-instance 'effect-type :id +mob-effect-righteous-fury+ :name "Righteous fury"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 255 :g 140 :b 0))
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (setf (weapon actor) (list "Flaming sword" (list +weapon-dmg-fire+ 4 7 (truncate +normal-ap+ 1.3) 100 (list :chops-body-parts :is-fire)) nil))
@@ -324,7 +392,10 @@
                                                                                    (format nil "~A is no longer filled with righteous fury. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
                                              ))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-wet+ :name "Wet" :color sdl:*blue*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-wet+ :name "Wet" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*blue*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-armor actor)
@@ -334,7 +405,10 @@
                                                             (adjust-armor actor)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-source+ :name "Pain link" :color sdl:*white*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-source+ :name "Pain link"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             ;; param1 - id of the mob, affected by the +mob-effect-pain-link-source+
@@ -342,7 +416,10 @@
                                                               (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-pain-link-target+))
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-target+ :name "Pain link" :color sdl:*magenta*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-pain-link-target+ :name "Pain link"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*magenta*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             ;; I need this otherwise there will be an infinite recursion 
@@ -351,13 +428,25 @@
                                                             (rem-mob-effect (get-mob-by-id (actor-id effect)) +mob-effect-pain-link-source+)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-soul-reinforcement+ :name "Reinforced soul" :color sdl:*cyan*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-soul-reinforcement+ :name "Reinforced soul"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*cyan*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-silence+ :name "Silenced" :color sdl:*cyan*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-silence+ :name "Silenced"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*cyan*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-confuse+ :name "Confused" :color sdl:*magenta*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-confuse+ :name "Confused"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*magenta*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-split-soul-source+ :name "Split soul" :color sdl:*white*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-split-soul-source+ :name "Split soul"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             ;; param1 - id of the mob, affected by the +mob-effect-pain-link-source+
@@ -365,7 +454,10 @@
                                                               (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-split-soul-target+))
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-split-soul-target+ :name "Split soul" :color sdl:*white*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-split-soul-target+ :name "Split soul"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             ;; I need this otherwise there will be an infinite recursion 
                                                             (when (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-split-soul-source+)
@@ -377,7 +469,10 @@
                                                             (make-dead actor :splatter nil :msg nil :msg-newline nil :killer nil :corpse nil :aux-params nil)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-sprint+ :name "Sprint" :color sdl:*green*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-sprint+ :name "Sprint" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (rem-mob-effect actor +mob-effect-climbing-mode+)
@@ -388,11 +483,20 @@
                                                             (incf (cur-move-speed actor) 25)
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-exerted+ :name "Exerted" :color sdl:*yellow*))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-exerted+ :name "Exerted"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*yellow*)))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-casting-shadow+ :name "Casting shadows" :color (sdl:color :r 100 :g 100 :b 100)))
+(set-effect-type (make-instance 'effect-type :id +mob-effect-casting-shadow+ :name "Casting shadows" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 100 :g 100 :b 100))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-primordial-power+ :name "Primordial power" :color sdl:*yellow*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-primordial-power+ :name "Primordial power"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*yellow*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (setf (mob-type actor) +mob-type-eater-of-the-dead-rage+)
@@ -439,7 +543,10 @@
                                                                                    (format nil "The primordial power of ~A wanes. " (prepend-article +article-the+ (visible-name actor)))))
                                              ))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-disguised+ :name "Disguised" :color sdl:*white*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-disguised+ :name "Disguised"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
 
@@ -450,7 +557,10 @@
                                                                                    (format nil "~A reveals itself as ~A. " (prepend-article +article-the+ (visible-name actor))
                                                                                            (get-qualified-name actor))))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-constriction-source+ :name "Constricting" :color sdl:*yellow*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-constriction-source+ :name "Constricting" 
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*yellow*)
                                              :on-remove #'(lambda (effect actor)
                                                             ;; the param1 here is (list (list x y z)            - xyz coordinates of the constrictor
                                                             ;;                          (list id1 id2 id3 ...)) - collection of mob IDs that are being constricted by this constrictor 
@@ -462,7 +572,10 @@
                                                                      (rem-mob-effect target +mob-effect-constriction-target+))
                                                             )))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-constriction-target+ :name "Constricted" :color sdl:*yellow*
+(set-effect-type (make-instance 'effect-type :id +mob-effect-constriction-target+ :name "Constricted"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*yellow*)
                                              :on-remove #'(lambda (effect actor)
                                                             ;; the param1 here is (list x y z) - xyz coordinates of the mob being constricted
                                                             (when (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-constriction-source+)
@@ -481,3 +594,16 @@
                                                                                                               (format nil "~A constricts around ~A for ~A damage. "
                                                                                                                       (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id (actor-id effect)))))
                                                                                                                       (prepend-article +article-the+ (visible-name actor)) cur-dmg))))))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-irradiated+ :name "Irradiated"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore actor))
+                                                             (cond
+                                                               ((> (param1 effect) 10) sdl:*red*)
+                                                               ((> (param1 effect) 5) sdl:*yellow*)
+                                                               (t sdl:*green*)))
+                                             :on-tick #'(lambda (effect actor)
+                                                          (when (zerop (random 3))
+                                                            (decf (param1 effect)))
+                                                          (when (<= (param1 effect) 0)
+                                                            (rem-mob-effect actor (effect-type effect))))))

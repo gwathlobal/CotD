@@ -139,6 +139,7 @@
                                          :on-check-applic (lambda (actor item)
                                                             (declare (ignore item))
                                                             (if (and (not (mob-effect-p actor +mob-effect-disguised+))
-                                                                     (mob-ability-p actor +mob-abil-human+))
+                                                                     (or (mob-ability-p actor +mob-abil-human+)
+                                                                         (= (mob-type actor) +mob-type-malseraph-puppet+)))
                                                                 t
                                                                 nil))))

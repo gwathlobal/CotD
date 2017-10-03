@@ -4180,3 +4180,121 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-irradiate+ :name "Irradiate" :descr "Channel hellish powers to affect a target character with sickly invisible rays. Exposure to them causes irradiation of the target. The power of the irradiation increases with the number of times the target is affected by the rays. Heavy irradiation may sometimes make the target unable to act." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 40
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (logger (format nil "MOB-IRRADIATE: ~A [~A] uses irradiate on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A. " str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A irradiates ~A. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                   (prepend-article +article-the+ (visible-name target))))
+                                                (if (mob-effect-p target +mob-effect-irradiated+)
+                                                  (progn
+                                                    (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
+                                                      (incf (param1 effect) (+ 2 (random 3)))))
+                                                  (progn
+                                                    (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-irradiate+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor)))
+                                                           (or (not (mob-effect-p nearest-enemy +mob-effect-irradiated+))
+                                                               (and (mob-effect-p nearest-enemy +mob-effect-irradiated+)
+                                                                    (< (param1 (get-effect-by-id (mob-effect-p nearest-enemy +mob-effect-irradiated+))) 5)
+                                                                    (zerop (random 2)))
+                                                               (and (mob-effect-p nearest-enemy +mob-effect-irradiated+)
+                                                                    (< (param1 (get-effect-by-id (mob-effect-p nearest-enemy +mob-effect-irradiated+))) 10)
+                                                                    (zerop (random 3)))))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-fission+ :name "Fission" :descr "Cause a violent outburst of energy from all irradiated targets in sight. The damage to the target scales with the degree of irradiation. Characters that are not irradiated are not affected." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 40
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (let ((targets))
+                                                  (setf targets (loop for mob-id in (visible-mobs actor)
+                                                                      for mob = (get-mob-by-id mob-id)
+                                                                      when (mob-effect-p mob +mob-effect-irradiated+)
+                                                                        collect mob))
+                                                
+                                                  (logger (format nil "MOB-FISSION: ~A [~A] uses fission on ~A.~%" (name actor) (id actor) (loop with str = (create-string)
+                                                                                                                                                 for mob in targets do
+                                                                                                                                                   (format str "~A [~A], " (name mob) (id mob))
+                                                                                                                                                 finally
+                                                                                                                                                    (return str))))
+                                                  
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone chanting~A. " str)))
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A causes fission. "
+                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                  (loop for mob in targets
+                                                        when (> (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))) 0)
+                                                          do
+                                                             (inflict-damage mob :min-dmg (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+)))
+                                                                                 :max-dmg (* 2 (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))))
+                                                                                 :dmg-type +weapon-dmg-radiation+ :no-dodge t
+                                                                                 :att-spd nil :weapon-aux () :acc 100)
+                                                             (rem-mob-effect mob +mob-effect-irradiated+))
+                                                  
+                                                  (decf (cur-fp actor) (cost ability-type)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-fission+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor)))
+                                                           (or (and (mob-effect-p nearest-enemy +mob-effect-irradiated+)
+                                                                    (< (param1 (get-effect-by-id (mob-effect-p nearest-enemy +mob-effect-irradiated+))) 5)
+                                                                    (zerop (random 3)))
+                                                               (and (mob-effect-p nearest-enemy +mob-effect-irradiated+)
+                                                                    (< (param1 (get-effect-by-id (mob-effect-p nearest-enemy +mob-effect-irradiated+))) 10)
+                                                                    (zerop (random 2)))
+                                                               (and (mob-effect-p nearest-enemy +mob-effect-irradiated+)
+                                                                    (>= (param1 (get-effect-by-id (mob-effect-p nearest-enemy +mob-effect-irradiated+))) 10))))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                   (declare (ignore nearest-ally))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))))

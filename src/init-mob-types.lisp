@@ -427,7 +427,7 @@
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-toggle-light t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-remove-disguise t :abil-irradiate t :abil-fission t
                                        :ai-curious t))
 
 ;;--------------------

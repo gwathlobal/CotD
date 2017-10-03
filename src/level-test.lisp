@@ -133,11 +133,11 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+ :x 40 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 40 :y 15 :z 0))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-imp+ :x 41 :y 15 :z 0))
-        (demon (make-instance 'mob :mob-type +mob-type-imp+ :x 41 :y 16 :z 0))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-malseraph-puppet+ :x 41 :y 15 :z 0))
+        ;(demon (make-instance 'mob :mob-type +mob-type-imp+ :x 41 :y 16 :z 0))
         ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 30 :y 12 :z 0))
         )
     (setf (cur-fp *player*) 10)
@@ -145,7 +145,7 @@
     (setf (cur-hp *player*) 50)
     ;(setf (cur-fp angel) 5)
    ; (setf (cur-fp demon) 2)
-   ; (setf (cur-fp soldier) 2)
+    (setf (cur-fp soldier) 12)
 
     ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
@@ -154,7 +154,7 @@
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-flying+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
-    (add-mob-to-level-list (level world) demon)
+    ;(add-mob-to-level-list (level world) demon)
     ;(add-mob-to-level-list (level world) angel)
     
     ;(setf (mimic-id-list *player*) (list (id *player*) (id soldier) (id demon)))

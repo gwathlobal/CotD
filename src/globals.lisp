@@ -211,6 +211,8 @@
 (defconstant +mob-abil-make-disguise+ 87)
 (defconstant +mob-abil-remove-disguise+ 88)
 (defconstant +mob-abil-constriction+ 89)
+(defconstant +mob-abil-irradiate+ 90)
+(defconstant +mob-abil-fission+ 91)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -250,6 +252,7 @@
 (defconstant +mob-effect-disguised+ 35)
 (defconstant +mob-effect-constriction-source+ 36)
 (defconstant +mob-effect-constriction-target+ 37)
+(defconstant +mob-effect-irradiated+ 38)
 
 (defconstant +mob-order-follow+ 0)
 
@@ -258,6 +261,7 @@
 (defconstant +weapon-dmg-fire+ 2)
 (defconstant +weapon-dmg-vorpal+ 3)
 (defconstant +weapon-dmg-mind+ 4)
+(defconstant +weapon-dmg-radiation+ 5)
 
 ;;--------------------
 ;; ITEM-TYPE Constants

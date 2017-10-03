@@ -296,6 +296,16 @@
     (setf (path mob) nil)
     (return-from ai-function nil))
 
+  ;; if the mob is heavily irradiated - (2% * irradiation power) chance to take no action
+  (when (and (mob-effect-p mob +mob-effect-irradiated+)
+             (< (random 100) (* 2 (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))))))
+    (logger (format nil "AI-FUNCTION: ~A [~A] is irradiated, loses turn.~%" (name mob) (id mob)))
+    (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                           (format nil "~A is sick. " (capitalize-name (prepend-article +article-the+ (name mob)))))
+    (move-mob mob 5)
+    (setf (path mob) nil)
+    (return-from ai-function nil))
+
   ;; if the mob possesses smb, there is a chance that the slave will revolt and move randomly
   (when (and (slave-mob-id mob)
              (zerop (random (* *possessed-revolt-chance* (mob-ability-p mob +mob-abil-can-possess+)))))
@@ -862,13 +872,28 @@
 
   ;; if the player is confused and the RNG is right
   ;; wait for a meaningful action and move randomly instead
-  (when (and (mob-effect-p *player* +mob-effect-confuse+)
+  (when (and (mob-effect-p player +mob-effect-confuse+)
              (zerop (random 2)))
     (logger (format nil "AI-FUNCTION: ~A [~A] is under effects of confusion.~%" (name player) (id player)))
     (setf (can-move-if-possessed player) t)
     (loop while (can-move-if-possessed player) do
       (get-input-player))
+    (print-visible-message (x player) (y player) (z player) (level *world*) 
+                           (format nil "~A is confused. " (capitalize-name (name player))))
     (ai-mob-random-dir *player*)
+    (return-from ai-function nil))
+
+  ;; if the player is irradiated and the RNG is right
+  ;; wait for a meaningful action and wait a turn instead
+  (when (and (mob-effect-p player +mob-effect-irradiated+)
+             (< (random 100) (* 2 (param1 (get-effect-by-id (mob-effect-p player +mob-effect-irradiated+))))))
+    (logger (format nil "AI-FUNCTION: ~A [~A] is under effects of irradiation.~%" (name player) (id player)))
+    (setf (can-move-if-possessed player) t)
+    (loop while (can-move-if-possessed player) do
+      (get-input-player))
+    (print-visible-message (x player) (y player) (z player) (level *world*) 
+                           (format nil "~A feels sick. " (capitalize-name (name player))))
+    (move-mob player 5)
     (return-from ai-function nil))
   
   ;; if possessed & unable to revolt - wait till the player makes a meaningful action
