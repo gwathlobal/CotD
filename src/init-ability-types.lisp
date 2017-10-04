@@ -337,7 +337,7 @@
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-call-for-help+ :name "Summon ally" :descr "Invoke hellish powers to summon one ally to your place. Remember that you may call but nobody is obliged to answer." 
                                  :cost 1 :spd (truncate +normal-ap+ 3) :passive nil
-                                 :final t :on-touch nil
+                                 :final t :on-touch nil :removes-disguise t
                                  :motion 30
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
@@ -396,7 +396,7 @@
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-answer-the-call+ :name "Answer the call" :descr "Invoke hellish powers to answer the summoning of your allies. If somebody has already answered the call, nothing will happen. If the teleport is successful, the ability will cost 5 time units." 
                                  :cost 0 :spd 0 :passive nil
-                                 :final t :on-touch nil
+                                 :final t :on-touch nil :removes-disguise t
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
@@ -1294,7 +1294,7 @@
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-dominate-fiend+ :name "Dominate fiend" :descr "You can mount a fiend, if you stand next to it. Riding a fiend will reveal your true form." 
                                  :cost 0 :spd +normal-ap+ :passive nil
-                                 :final t :on-touch nil
+                                 :final t :on-touch nil :removes-disguise t
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
@@ -4184,7 +4184,7 @@
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-irradiate+ :name "Irradiate" :descr "Channel hellish powers to affect a target character with sickly invisible rays. Exposure to them causes irradiation of the target. The power of the irradiation increases with the number of times the target is affected by the rays. Heavy irradiation may sometimes make the target unable to act." 
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
-                                 :final t :on-touch nil
+                                 :final t :on-touch nil :removes-disguise t
                                  :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-IRRADIATE: ~A [~A] uses irradiate on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -4242,7 +4242,7 @@
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-fission+ :name "Fission" :descr "Cause a violent outburst of energy from all irradiated targets in sight. The damage to the target scales with the degree of irradiation. Characters that are not irradiated are not affected." 
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
-                                 :final t :on-touch nil
+                                 :final t :on-touch nil :removes-disguise t
                                  :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))

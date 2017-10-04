@@ -15,6 +15,7 @@
    (passive :initform t :initarg :passive :accessor passive) ;; passive abilities should have their cost set to 0
    (on-touch :initform nil :initarg :on-touch :accessor on-touch :type boolean) ;; if the abilities should be invoked, when actor bumps into target
    (final :initform t :initarg :final :accessor final :type boolean) ;; if the ability is invoked, no further abilities can be invoked
+   (removes-disguise :initform nil :initarg :removes-disguise :accessor removes-disguise :type boolean) ;; if this ability is invoked, the disguise effect is removed
    (on-invoke :initform nil :initarg :on-invoke :accessor on-invoke) ;; a function that takes three parameters - ability-type, actor and target
    (on-check-applic :initform nil :initarg :on-check-applic :accessor on-check-applic) ;; a function that takes three parameters - ability type, actor and target
    (on-kill :initform nil :initarg :on-kill :accessor on-kill :type boolean) ;; if the ability should be invoked when actor kills target

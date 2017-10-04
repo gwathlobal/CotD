@@ -2,7 +2,7 @@ CHANGELOG
 
 - Added Irradiate and Fission abilities to Malseraph's puppet. Irradiate applies an special status to the target, while Fission is used to cause damage to those with this status and clear it from them. 
 - Added Constriction ability to the Eater of the dead. This ability lets you garb targets and continue to deal damage to them automatically while all participants remain in place.
-- Citizens of the City can now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans only) makes you look as an ordinary man or woman to everybody else. 
+- Citizens of the City can now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look as an ordinary man or woman to everybody else. 
 
 --------------------
 September 30, 2017 v1.2.2

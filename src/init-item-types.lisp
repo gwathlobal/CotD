@@ -118,7 +118,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-disguise+
                                          :name "disguise" :plural-name "disguises"
-                                         :descr "A special kit that lets you disguise yourself as an ordinary man or woman. Usable by humans only."
+                                         :descr "A special kit that lets you disguise yourself as an ordinary man or woman. Usable by humans and Malseraph's puppets only."
                                          :flavor-quote (format nil "\"The door opened and a masked corpulent stocky man, wearing a coachman's suit and a hat with peackock's feathers, entered the reading room. He was followed by two masked ladies and a servant holding a tray. On the tray, there stood a bellied bottle of liqueur, three bottles of red wine and several glasses.\"~%Anton Checkov. The Mask.")
                                          :glyph-idx 59 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor item)
