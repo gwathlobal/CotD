@@ -155,6 +155,7 @@
                         (when (and (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                    (on-use (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                    (funcall (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win))) *player* (get-inv-item-by-pos (inv *player*) (cur-inv win))))
+                          (clear-message-list *small-message-box*)
                           (mob-use-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                           (setf *current-window* (return-to win))
                           (make-output *current-window*)

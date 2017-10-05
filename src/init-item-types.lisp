@@ -42,7 +42,9 @@
                                                                                                                   (format nil "You hear some rustling sounds~A. " str)))
                                                        
                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                              (format nil "~A uses a medkit to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr))))
+                                                                              (format nil "~A uses a medkit to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr)))
+                                                     ;; remove after use
+                                                     t)
                                          :on-check-applic #'(lambda (actor item)
                                                               (declare (ignore item))
                                                               (if (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
@@ -94,7 +96,9 @@
                                                                                                                     (format nil "You hear some hiss~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A uses a smoke bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))))
+                                                                                (format nil "~A uses a smoke bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                     ;; remove after use
+                                                     t)
                                          :on-check-applic (lambda (actor item)
                                                               (declare (ignore item))
                                                               (if (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
@@ -120,26 +124,93 @@
                                          :name "disguise" :plural-name "disguises"
                                          :descr "A special kit that lets you disguise yourself as an ordinary man or woman. Usable by humans and Malseraph's puppets only."
                                          :flavor-quote (format nil "\"The door opened and a masked corpulent stocky man, wearing a coachman's suit and a hat with peackock's feathers, entered the reading room. He was followed by two masked ladies and a servant holding a tray. On the tray, there stood a bellied bottle of liqueur, three bottles of red wine and several glasses.\"~%Anton Checkov. The Mask.")
-                                         :glyph-idx 59 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 10 :value 10
+                                         :glyph-idx 59 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor item)
                                                      (declare (ignore item))
                                                      
-                                                     (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
-                                                                                                                    (format nil "You hear some hiss~A. " str)))
-                                                         
-                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                            (format nil "~A disguises itself as " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                     (set-mob-effect actor :effect-type-id +mob-effect-disguised+ :actor-id (id actor) :param1 (if (zerop (random 2))
-                                                                                                                                                 +mob-type-man+
-                                                                                                                                                 +mob-type-woman+))
-                                                     (adjust-disguise-for-mob actor)
-                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                            (format nil "~A. " (prepend-article +article-a+ (name (get-mob-type-by-id (face-mob-type-id actor))))))
-                                                     )
-                                         :on-check-applic (lambda (actor item)
+                                                     (invoke-disguise actor)
+                                                     ;; remove after use
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
                                                             (declare (ignore item))
                                                             (if (and (not (mob-effect-p actor +mob-effect-disguised+))
                                                                      (or (mob-ability-p actor +mob-abil-human+)
                                                                          (= (mob-type actor) +mob-type-malseraph-puppet+)))
                                                                 t
-                                                                nil))))
+                                                              nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally))
+                                                          (if (and (funcall (on-check-applic item) actor item)
+                                                                   (not nearest-enemy))
+                                                            t
+                                                            nil))))
+
+(set-item-type (make-instance 'item-type :id +item-type-deck-of-war+
+                                         :name "deck of war" :plural-name "decks of war"
+                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
+                                         :abil-card (list +item-card-curse+ +item-card-blindness+ +item-card-fear+ +item-card-slow+ +item-card-silence+ +item-card-confuse+ +item-card-polymorph+)
+                                         :on-use #'(lambda (actor item)
+
+                                                     (when (cards item)
+                                                       (let ((card-type-id))
+                                                         (setf card-type-id (pop (cards item)))
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A draws the ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                        (name (get-card-type-by-id card-type-id))))
+                                                         (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor))
+                                                       )
+
+                                                     ;; remove if there are no cards in the deck
+                                                     (if (cards item)
+                                                       nil
+                                                       t)
+                                                     )
+                                         :on-check-applic #'(lambda (actor item)
+                                                            (declare (ignore actor))
+                                                              (if (cards item)
+                                                       t
+                                                       nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally))
+                                                          (if (and (funcall (on-check-applic item) actor item)
+                                                                   nearest-enemy
+                                                                  (or (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                         0.5)
+                                                                      (> (strength nearest-enemy) (strength actor))))
+                                                            t
+                                                            nil))))
+
+(set-item-type (make-instance 'item-type :id +item-type-deck-of-escape+
+                                         :name "deck of escape" :plural-name "decks of escape"
+                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
+                                         :abil-card (list +item-card-blink+ +item-card-teleport+ +item-card-shadow-step+ +item-card-sprint+ +item-card-flying+ +item-card-disguise+)
+                                         :on-use #'(lambda (actor item)
+
+                                                     (when (cards item)
+                                                       (let ((card-type-id))
+                                                         (setf card-type-id (pop (cards item)))
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A draws the ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                        (name (get-card-type-by-id card-type-id))))
+                                                         (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor))
+                                                       )
+
+                                                     ;; remove if there are no cards in the deck
+                                                     (if (cards item)
+                                                       nil
+                                                       t)
+                                                     )
+                                         :on-check-applic #'(lambda (actor item)
+                                                            (declare (ignore actor))
+                                                              (if (cards item)
+                                                                t
+                                                              nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally))
+                                                          (if (and (funcall (on-check-applic item) actor item)
+                                                                   nearest-enemy
+                                                                  (or (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                         0.5)
+                                                                      (> (strength nearest-enemy) (strength actor))))
+                                                            t
+                                                            nil))))

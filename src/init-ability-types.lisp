@@ -717,55 +717,13 @@
                                  :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
-                                                
                                                 (logger (format nil "MOB-CURSE: ~A [~A] incants the curses~%" (name actor) (id actor)))
-
+                                                
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear someone laughing and cursing~A." str)))
+                                                                                                           (format nil "You hear someone laughing and cursing~A." str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A laughs and curses maniacally. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-
-                                                (let ((enemy-list nil))
-                                                  (when (zerop (random 2))
-                                                    ;; 1/2th chance to do anything
-                                                    
-                                                    ;; collect all unholy enemies in sight
-                                                    (setf enemy-list (loop for enemy-mob-id in (visible-mobs actor)
-                                                                           when (not (get-faction-relation (faction actor) (faction (get-mob-by-id enemy-mob-id))))
-                                                                             collect enemy-mob-id))
-                                                    
-                                                    (logger (format nil "MOB-CURSE: ~A [~A] affects the following enemies ~A with the curse~%" (name actor) (id actor) enemy-list))
-                                                    
-                                                    ;; place a curse on them for 5 turns
-                                                    (loop for enemy-mob-id in enemy-list
-                                                          with protected = nil
-                                                          do
-                                                             (setf protected nil)
-                                                             ;; divine shield and blessings also grant one-time protection from curses
-                                                             (when (and (not protected) (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-blessed+))
-                                                               (rem-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-blessed+)
-                                                               (setf protected t))
-                                                             
-                                                             (when (and (not protected) (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-divine-shield+))
-                                                               (rem-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-divine-shield+)
-                                                               (setf protected t))
-                                                             
-                                                             (if protected
-                                                               (progn
-                                                                 (logger (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name (get-mob-by-id enemy-mob-id)) (id (get-mob-by-id enemy-mob-id))))
-                                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                        (format nil "~A's curse removed divine protection from ~A. "
-                                                                                                (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                                (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id)))))
-                                                                 )
-                                                               (progn
-                                                                 (logger (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
-                                                                 (set-mob-effect (get-mob-by-id enemy-mob-id) :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
-                                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                        (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id))))))))
-                                                          )
-
-                                                    ))
+                                                (invoke-curse actor)
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -977,23 +935,7 @@
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A roars to fear its enemies. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                        :observed-mob actor)
-                                                (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
-                                                ;; fear nearby visible enemy mobs
-                                                ;; fear can be resisted depending on the strength of the mob
-                                                (loop for i from 0 below (length (visible-mobs actor))
-                                                      for mob = (get-mob-by-id (nth i (visible-mobs actor)))
-                                                      when (not (get-faction-relation (faction actor) (faction mob)))
-                                                        do
-                                                           (if (> (random (+ (strength mob) (mob-ability-p actor +mob-abil-instill-fear+))) (strength mob))
-                                                             (progn
-                                                               (set-mob-effect mob :effect-type-id +mob-effect-fear+ :actor-id (id actor) :cd 3)
-                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                      (format nil "~A is feared. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
-                                                                                      :observed-mob mob))
-                                                             (progn
-                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                      (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
-                                                                                      :observed-mob mob))))
+                                                (invoke-fear actor (mob-ability-p actor +mob-abil-instill-fear+))
                                                           
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
@@ -1523,52 +1465,8 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (logger (format nil "MOB-GARGANTAUR-TELEPORT: ~A [~A] teleports self~%" (name actor) (id actor)))
-
-                                                (let ((max-x (array-dimension (terrain (level *world*)) 0))
-                                                      (max-y (array-dimension (terrain (level *world*)) 1))
-                                                      (rx (- (+ 80 (x actor))
-                                                             (1+ (random 160)))) 
-                                                      (ry (- (+ 80 (y actor))
-                                                             (1+ (random 160))))
-                                                      (n 2000))
-                                                  ;; 2000 hundred tries to find a suitable place for teleport
-                                                  (loop while (or (< rx 0) (< ry 0) (>= rx max-x) (>= ry max-y)
-                                                                  (< (get-distance (x actor) (y actor) rx ry) 80)
-                                                                  (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry (z actor)) +terrain-trait-opaque-floor+))
-                                                                  (not (eq (check-move-on-level actor rx ry (z actor)) t))
-                                                                  (= (get-level-connect-map-value (level *world*) rx ry (z actor) (if (riding-mob-id actor)
-                                                                                                                                  (map-size (get-mob-by-id (riding-mob-id actor)))
-                                                                                                                                  (map-size actor))
-                                                                                                  (get-mob-move-mode actor))
-                                                                      +connect-room-none+))
-                                                        do
-                                                           
-                                                           (decf n)
-                                                           (when (zerop n)
-                                                             (loop-finish))
-                                                           (setf rx (- (+ 80 (x actor))
-                                                                       (1+ (random 160))))
-                                                           (setf ry (- (+ 80 (y actor))
-                                                                       (1+ (random 160)))))
-                                                  ;;(format t "MOB-GARGANTAUR-TELEPORT: (RX RY) = (~A ~A), N = ~A, CHECK-MOVE ~A, DIST = ~A~%" rx ry n (check-move-on-level actor rx ry (z actor)) (get-distance (x actor) (y actor) rx ry))
-                                                  (if (not (zerop n))
-                                                    (progn
-                                                      (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A." str)))
-                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                             (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                      (set-mob-location actor rx ry (z actor))
-                                                      (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A." str)))
-                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                             (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
-                                                    (progn
-                                                      (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A." str)))
-                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                             (format nil "~A blinks for a second, but remains in place. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
-                                                  ))
+                                                (invoke-teleport-self actor 80 (z actor))
+                                                )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (mob-ability-p actor +mob-abil-gargantaur-teleport+)
@@ -3854,41 +3752,9 @@
                                  :motion 100
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (logger (format nil "MOB-BEND-SPACE: ~A [~A] invokes bend space.~%" (name actor) (id actor)))
-                                                (let ((applicable-tiles ())
-                                                      (dx) (dy) (dz) (r))
-                                                  (loop for dx of-type fixnum from (- (x actor) 6) to (+ (x actor) 6) do
-                                                    (loop for dy of-type fixnum from (- (y actor) 6) to (+ (y actor) 6) do
-                                                      (loop for dz of-type fixnum from (- (z actor) 6) to (+ (z actor) 6)
-                                                            when (and (>= dx 0) (< dx (array-dimension (terrain (level *world*)) 0))
-                                                                      (>= dy 0) (< dy (array-dimension (terrain (level *world*)) 1))
-                                                                      (>= dz 0) (< dz (array-dimension (terrain (level *world*)) 2))
-                                                                      (eq (check-move-on-level actor dx dy dz) t)
-                                                                      (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+)
-                                                                          (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-water+)))
-                                                              do
-                                                                 (push (list dx dy dz) applicable-tiles))))
-                                                  (when applicable-tiles
-                                                    (setf r (random (length applicable-tiles)))
-                                                    (setf dx (first (nth r applicable-tiles))
-                                                          dy (second (nth r applicable-tiles))
-                                                          dz (third (nth r applicable-tiles))))
-                                                  (logger (format nil "MOB-BEND-SPACE: ~A [~A] teleports to (~A ~A ~A).~%" (name actor) (id actor) dx dy dz))
-                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A. " str)))
-                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                  
-                                                  (set-mob-location actor dx dy dz)
-                                                  
-                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A. " str)))
-                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                  )
-
-                                                (decf (cur-fp actor) (cost ability-type))
+                                                (invoke-bend-space actor)
                                                 
+                                                (decf (cur-fp actor) (cost ability-type))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))

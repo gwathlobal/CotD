@@ -999,9 +999,9 @@
 
 (defun mob-use-item (actor item)
   (when (on-use item)
-    (funcall (on-use item) actor item)
-    (setf (inv actor) (remove-from-inv item (inv actor) :qty 1))
-    (remove-item-from-world item)
+    (when (funcall (on-use item) actor item)
+      (setf (inv actor) (remove-from-inv item (inv actor) :qty 1))
+      (remove-item-from-world item))
     (incf-mob-motion actor *mob-motion-use-item*)
     (make-act actor (truncate +normal-ap+ 2))))
 
@@ -1842,3 +1842,178 @@
     (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))
   (when (mob-effect-p mob +mob-effect-disguised+)
     (setf (face-mob-type-id mob) (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-disguised+))))))
+
+;;-------------------------------
+;; Common cards & abilities funcs
+;;-------------------------------
+
+(defun invoke-bend-space (actor)
+  (logger (format nil "MOB-BEND-SPACE: ~A [~A] invokes bend space.~%" (name actor) (id actor)))
+  (let ((applicable-tiles ())
+        (dx) (dy) (dz) (r))
+    (loop for dx of-type fixnum from (- (x actor) 6) to (+ (x actor) 6) do
+      (loop for dy of-type fixnum from (- (y actor) 6) to (+ (y actor) 6) do
+        (loop for dz of-type fixnum from (- (z actor) 6) to (+ (z actor) 6)
+              when (and (>= dx 0) (< dx (array-dimension (terrain (level *world*)) 0))
+                        (>= dy 0) (< dy (array-dimension (terrain (level *world*)) 1))
+                        (>= dz 0) (< dz (array-dimension (terrain (level *world*)) 2))
+                        (eq (check-move-on-level actor dx dy dz) t)
+                        (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+)
+                            (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-water+)))
+                do
+                   (push (list dx dy dz) applicable-tiles))))
+    (when applicable-tiles
+      (setf r (random (length applicable-tiles)))
+      (setf dx (first (nth r applicable-tiles))
+            dy (second (nth r applicable-tiles))
+            dz (third (nth r applicable-tiles))))
+    (logger (format nil "MOB-BEND-SPACE: ~A [~A] teleports to (~A ~A ~A).~%" (name actor) (id actor) dx dy dz))
+    (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                               (format nil "You hear crackling~A. " str)))
+    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                           (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+    
+    (set-mob-location actor dx dy dz)
+    
+    (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                               (format nil "You hear crackling~A. " str)))
+    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                           (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+    ))
+
+(defun invoke-teleport-self (actor min-distance z)
+  (logger (format nil "MOB-TELEPORT-SELF: ~A [~A] teleports self~%" (name actor) (id actor)))
+
+  (let ((max-x (array-dimension (terrain (level *world*)) 0))
+        (max-y (array-dimension (terrain (level *world*)) 1))
+        (rx (- (+ 80 (x actor))
+               (1+ (random 160)))) 
+        (ry (- (+ 80 (y actor))
+               (1+ (random 160))))
+        (n 2000))
+    ;; 2000 hundred tries to find a suitable place for teleport
+    (loop while (or (< rx 0) (< ry 0) (>= rx max-x) (>= ry max-y)
+                    (< (get-distance (x actor) (y actor) rx ry) min-distance)
+                    (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry z) +terrain-trait-opaque-floor+))
+                    (not (eq (check-move-on-level actor rx ry z) t))
+                    (= (get-level-connect-map-value (level *world*) rx ry z (if (riding-mob-id actor)
+                                                                              (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                              (map-size actor))
+                                                    (get-mob-move-mode actor))
+                       +connect-room-none+))
+          do
+             ;(format t "RX = ~A, RX = ~A, DIST = ~A, TERRAIN-FLOOR = ~A, CHECK-MOVE = ~A, CONNECT = ~A~%"
+             ;        rx ry (get-distance (x actor) (y actor) rx ry)
+             ;        (if (and (>= rx 0) (>= ry 0) (< rx max-x) (< ry max-y))
+             ;          (get-terrain-type-trait (get-terrain-* (level *world*) rx ry (z actor)) +terrain-trait-opaque-floor+)
+             ;          nil)
+             ;        (if (and (>= rx 0) (>= ry 0) (< rx max-x) (< ry max-y))
+             ;          (check-move-on-level actor rx ry (z actor))
+             ;          nil)
+             ;        (if (and (>= rx 0) (>= ry 0) (< rx max-x) (< ry max-y))
+             ;          (get-level-connect-map-value (level *world*) rx ry (z actor) (if (riding-mob-id actor)
+             ;                                                                         (map-size (get-mob-by-id (riding-mob-id actor)))
+             ;                                                                         (map-size actor))
+             ;                                       (get-mob-move-mode actor))
+             ;          nil))
+             (decf n)
+             (when (zerop n)
+               (loop-finish))
+             (setf rx (- (+ 80 (x actor))
+                         (1+ (random 160))))
+             (setf ry (- (+ 80 (y actor))
+                         (1+ (random 160)))))
+    
+    (if (not (zerop n))
+      (progn
+        (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
+                                                                    (format nil "You hear crackling~A." str)))
+        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                               (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+        (set-mob-location actor rx ry z)
+        (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
+                                                                    (format nil "You hear crackling~A." str)))
+        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                               (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+      (progn
+        (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
+                                                                    (format nil "You hear crackling~A." str)))
+        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                               (format nil "~A blinks for a second, but remains in place. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+    ))
+
+(defun invoke-disguise (actor)
+  (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
+                                                             (format nil "You hear some hiss~A. " str)))
+  
+  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                         (format nil "~A disguises itself as " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+  (set-mob-effect actor :effect-type-id +mob-effect-disguised+ :actor-id (id actor) :param1 (if (zerop (random 2))
+                                                                                              +mob-type-man+
+                                                                                              +mob-type-woman+))
+  (adjust-disguise-for-mob actor)
+  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                         (format nil "~A. " (prepend-article +article-a+ (name (get-mob-type-by-id (face-mob-type-id actor)))))))
+
+(defun invoke-curse (actor)
+    
+  (let ((enemy-list nil))
+    (when (zerop (random 2))
+      ;; 1/2th chance to do anything
+      
+      ;; collect all unholy enemies in sight
+      (setf enemy-list (loop for enemy-mob-id in (visible-mobs actor)
+                             when (not (get-faction-relation (faction actor) (faction (get-mob-by-id enemy-mob-id))))
+                               collect enemy-mob-id))
+      
+      (logger (format nil "MOB-CURSE: ~A [~A] affects the following enemies ~A with the curse~%" (name actor) (id actor) enemy-list))
+      
+      ;; place a curse on them for 5 turns
+      (loop for enemy-mob-id in enemy-list
+            with protected = nil
+            do
+               (setf protected nil)
+               ;; divine shield and blessings also grant one-time protection from curses
+               (when (and (not protected) (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-blessed+))
+                 (rem-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-blessed+)
+                 (setf protected t))
+               
+               (when (and (not protected) (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-divine-shield+))
+                 (rem-mob-effect (get-mob-by-id enemy-mob-id) +mob-effect-divine-shield+)
+                 (setf protected t))
+               
+               (if protected
+                 (progn
+                   (logger (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name (get-mob-by-id enemy-mob-id)) (id (get-mob-by-id enemy-mob-id))))
+                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                          (format nil "~A's curse removed divine protection from ~A. "
+                                                  (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                  (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id)))))
+                   )
+                 (progn
+                   (logger (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
+                   (set-mob-effect (get-mob-by-id enemy-mob-id) :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
+                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                          (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id))))))))
+            )
+      
+      )))
+
+(defun invoke-fear (actor fear-strength)
+  (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
+  ;; fear nearby visible enemy mobs
+  ;; fear can be resisted depending on the strength of the mob
+  (loop for i from 0 below (length (visible-mobs actor))
+        for mob = (get-mob-by-id (nth i (visible-mobs actor)))
+        when (not (get-faction-relation (faction actor) (faction mob)))
+          do
+             (if (> (random (+ (strength mob) fear-strength)) (strength mob))
+               (progn
+                 (set-mob-effect mob :effect-type-id +mob-effect-fear+ :actor-id (id actor) :cd 3)
+                 (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                        (format nil "~A is feared. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
+                                        :observed-mob mob))
+               (progn
+                 (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                        (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
+                                        :observed-mob mob)))))

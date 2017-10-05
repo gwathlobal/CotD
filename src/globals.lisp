@@ -98,6 +98,7 @@
 (defconstant +mob-type-eater-of-the-dead+ 41)
 (defconstant +mob-type-eater-of-the-dead-rage+ 42)
 (defconstant +mob-type-malseraph-puppet+ 43)
+(defconstant +mob-type-sheep+ 44)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -253,6 +254,7 @@
 (defconstant +mob-effect-constriction-source+ 36)
 (defconstant +mob-effect-constriction-target+ 37)
 (defconstant +mob-effect-irradiated+ 38)
+(defconstant +mob-effect-polymorph-sheep+ 39)
 
 (defconstant +mob-order-follow+ 0)
 
@@ -268,6 +270,7 @@
 ;;-------------------- 
 
 (defconstant +item-abil-corpse+ 0)
+(defconstant +item-abil-card+ 1)
 
 (defconstant +item-type-body-part-limb+ 0)
 (defconstant +item-type-body-part-half+ 1)
@@ -278,6 +281,8 @@
 (defconstant +item-type-smoke-bomb+ 6)
 (defconstant +item-type-clothing+ 7)
 (defconstant +item-type-disguise+ 8)
+(defconstant +item-type-deck-of-war+ 9)
+(defconstant +item-type-deck-of-escape+ 10)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants
@@ -382,6 +387,7 @@
 (defparameter *mob-types* (make-array (list 0) :adjustable t))
 (defparameter *item-types* (make-array (list 0) :adjustable t))
 (defparameter *effect-types* (make-array (list 0) :adjustable t))
+(defparameter *card-types* (make-array (list 0) :adjustable t))
 
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))

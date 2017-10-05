@@ -169,7 +169,7 @@
                                                                                                                (format nil "You hear some strange noise~A.~%" str)))
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A transforms itself back into a chrome angel.~%" (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                                   (format nil "~A transforms itself back into a chrome angel. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                             
                                                             (rem-mob-effect actor +mob-effect-flying+))
                                              :on-tick #'(lambda (effect actor)
@@ -607,3 +607,60 @@
                                                             (decf (param1 effect)))
                                                           (when (<= (param1 effect) 0)
                                                             (rem-mob-effect actor (effect-type effect))))))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-polymorph-sheep+ :name "Polymorhped"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*magenta*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (let ((old-max-hp (max-hp actor)))
+                                                           (setf (mob-type actor) +mob-type-sheep+)
+                                                           (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                           (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                         (setf (face-mob-type-id actor) (mob-type actor))
+                                                         (set-cur-weapons actor)
+                                                         (adjust-dodge actor)
+                                                         (adjust-armor actor)
+                                                         (adjust-m-acc actor)
+                                                         (adjust-r-acc actor)
+                                                         (adjust-sight actor)
+                                                         
+                                                         ;; set up current abilities cooldowns
+                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                         
+                                                         (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                    (format nil "You hear some strange noise~A. " str)))
+                                                         
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A transforms into a sheep. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                             :on-remove #'(lambda (effect actor)
+                                                            
+                                                            (let ((old-max-hp (max-hp actor)))
+                                                              (setf (mob-type actor) (first (param1 effect)))
+                                                              (setf (max-hp actor) (second (param1 effect)))
+                                                              (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                            (setf (face-mob-type-id actor) (mob-type actor))
+                                                            (set-cur-weapons actor)
+                                                            (adjust-dodge actor)
+                                                            (adjust-armor actor)
+                                                            (adjust-m-acc actor)
+                                                            (adjust-r-acc actor)
+                                                            (adjust-sight actor)
+                                                            
+                                                            ;; set up current abilities cooldowns
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                               (format nil "You hear some strange noise~A.~%" str)))
+                                                            
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                           (name (get-mob-type-by-id (mob-type actor))))))
+                                             ))

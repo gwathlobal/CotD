@@ -13,18 +13,21 @@
    (value :initform 0 :initarg :value :accessor value)
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; abil-corpse - +item-abil-corpse+
+   ;; abil-card - +item-abil-card+ - a list of cards that might appear in this deck
    (on-use :initform nil :initarg :on-use :accessor on-use)
    (on-check-applic :initform nil :initarg :on-check-applic :accessor on-check-applic)
    (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)
    ))
 
-(defmethod initialize-instance :after ((item-type item-type) &key abil-corpse)
+(defmethod initialize-instance :after ((item-type item-type) &key abil-corpse abil-card)
   (when abil-corpse
     (setf (gethash +item-abil-corpse+ (abilities item-type)) abil-corpse))
+  (when abil-card
+    (setf (gethash +item-abil-card+ (abilities item-type)) abil-card))
   )
 
-(defun get-item-type-by-id (mob-type-id)
-  (aref *item-types* mob-type-id))
+(defun get-item-type-by-id (item-type-id)
+  (aref *item-types* item-type-id))
 
 (defun set-item-type (item-type)
   (when (>= (id item-type) (length *item-types*))
@@ -41,6 +44,7 @@
    (alive-name :initform "" :accessor alive-name)
    (item-type :initform 0 :initarg :item-type :accessor item-type :type fixnum)
    (dead-mob :initform nil :initarg :dead-mob :accessor dead-mob)
+   (cards :initform () :initarg :cards :accessor cards)
    (x :initarg :x :initform 0 :accessor x :type fixnum)
    (y :initarg :y :initform 0 :accessor y :type fixnum)
    (z :initarg :z :initform 0 :accessor z :type fixnum)
@@ -48,13 +52,19 @@
    (qty :initform 1 :initarg :qty :accessor qty)
    ))
 
-(defmethod initialize-instance :after ((item item) &key)
+(defmethod initialize-instance :after ((item item) &key (card-num (+ 3 (random 6))))
   (setf (id item) (find-free-id *items*))
   (setf (aref *items* (id item)) item)
 
   ;(setf (name item) (format nil "~A" (name (get-item-type-by-id (item-type item)))))
   (when (> (qty item) (max-stack-num item))
     (setf (qty item) (max-stack-num item)))
+
+  (when (and (item-ability-p item +item-abil-card+)
+             (null (cards item)))
+    (loop repeat card-num
+          do
+             (push (nth (random (length (item-ability-p item +item-abil-card+))) (item-ability-p item +item-abil-card+)) (cards item))))
   )
 
 (defun copy-item (item)
@@ -110,13 +120,22 @@
 
 (defun get-item-descr (item)
   (let ((str (create-string)))
-    (format str "~A~%~%~AQty: ~A~A~%~%~A" (capitalize-name (prepend-article +article-a+ (name item)))
+    (format str "~A~%~%~AQty: ~A~A~A~%~%~A" (capitalize-name (prepend-article +article-a+ (name item)))
             (if (descr item)
               (format nil "~A~%~%" (descr item))
               "")
             (qty item)
             (if (not (zerop (value item)))
               (format nil " Value: ~A" (value item))
+              "")
+            (if (and (not *cotd-release*)
+                     (cards item))
+              (format nil "~%Cards: (~A)" (loop with str = (create-string)
+                                                for card-type-id in (cards item)
+                                                for card-type = (get-card-type-by-id card-type-id)
+                                                do
+                                                   (format str "~A, " (name card-type))
+                                                finally (return str)))
               "")
             (if (flavor-quote item)
               (format nil "~A~%~%" (flavor-quote item))

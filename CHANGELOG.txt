@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added card decks to the game. There are two types of decks - decks of war and decks of escape. Each deck consists of a number cards that a character can draw. You can not see what card you draw and waht cards remain in the deck. Drawing a card immediately invokes its effect.
 - Added Irradiate and Fission abilities to Malseraph's puppet. Irradiate applies an special status to the target, while Fission is used to cause damage to those with this status and clear it from them. 
 - Added Constriction ability to the Eater of the dead. This ability lets you garb targets and continue to deal damage to them automatically while all participants remain in place.
 - Citizens of the City can now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look as an ordinary man or woman to everybody else. 

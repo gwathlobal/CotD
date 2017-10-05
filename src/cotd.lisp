@@ -73,6 +73,7 @@
            (when turn-finished
              (incf (real-game-time *world*))
              (setf (turn-finished *world*) t)
+             (set-message-this-turn nil)
              (loop for mob of-type mob across *mobs* do
                (when (and (not (check-dead mob))
                           (not (is-merged mob)))
@@ -85,6 +86,7 @@
                       (funcall (on-tick-func feature) (level *world*) feature))
              (when (zerop (random 3))
                (setf (wind-dir (level *world*)) (1+ (random 9))))
+             (when (get-message-this-turn) (add-message (format nil "~%")))
              ))
   )
   

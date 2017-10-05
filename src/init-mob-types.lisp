@@ -424,7 +424,7 @@
                                        :weapon (list "Falchion" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
-                                       :base-light-radius 0
+                                       :base-light-radius 6
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-remove-disguise t :abil-irradiate t :abil-fission t
@@ -529,6 +529,16 @@
                                        :strength 0
                                        :base-light-radius 0
                                        :abil-animal t :abil-momentum 2 :abil-horse-can-be-ridden t
+                                       :ai-coward t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-sheep+ 
+                                       :name "sheep"
+                                       :glyph-idx 72 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 12 :max-fp 0
+                                       :faction +faction-type-animals+
+                                       :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
+                                       :strength 0
+                                       :base-light-radius 0
+                                       :abil-animal t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fiend+ 
