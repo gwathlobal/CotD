@@ -379,6 +379,12 @@
 (defconstant +terrain-floor-sign-bank+ 50)
 (defconstant +terrain-floor-sign-church-orthodox+ 51)
 
+;;--------------------
+;; GOD Constants
+;;--------------------
+
+(defconstant +god-entity-malseraph+ 0)
+
 (defparameter *faction-table* (make-hash-table))
 
 (defparameter *ability-types* (make-array (list 0) :adjustable t))
@@ -388,6 +394,7 @@
 (defparameter *item-types* (make-array (list 0) :adjustable t))
 (defparameter *effect-types* (make-array (list 0) :adjustable t))
 (defparameter *card-types* (make-array (list 0) :adjustable t))
+(defparameter *gods* (make-array (list 0) :adjustable t))
 
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))

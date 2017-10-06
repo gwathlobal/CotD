@@ -499,7 +499,8 @@
    (max-hp :initform 0 :accessor max-hp)
    (cur-fp :initform 0 :initarg :cur-fp :accessor cur-fp)
 
-   ;(fov-map :initform (make-array (list (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)) (1+ (* *max-mob-sight* 2)))) :accessor fov-map)
+   (worshiped-god :initform nil :initarg :worshiped-god :accessor worshiped-god) ;; when the mob worships a god, this param is (<god id> <piety>)
+
    (visible-mobs :initform nil :accessor visible-mobs)
    (shared-visible-mobs :initform nil :accessor shared-visible-mobs)
    (proper-visible-mobs :initform nil :accessor proper-visible-mobs)
@@ -612,6 +613,10 @@
   ;; if the mob has climbing ability - start with it turned on
   (when (mob-ability-p mob +mob-abil-climbing+)
     (set-mob-effect mob :effect-type-id +mob-effect-climbing-mode+ :actor-id (id mob) :cd t))
+
+  ;; if the mob is Malseraph's puppet - automatically worship Malseraph
+  (when (= (mob-type mob) +mob-type-malseraph-puppet+)
+    (setf (worshiped-god mob) (list +god-entity-malseraph+ 150)))
   
   (when (mob-ability-p mob +mob-abil-human+)
     (incf (total-humans *world*))

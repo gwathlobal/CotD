@@ -183,7 +183,7 @@
 (set-item-type (make-instance 'item-type :id +item-type-deck-of-escape+
                                          :name "deck of escape" :plural-name "decks of escape"
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
-                                         :abil-card (list +item-card-blink+ +item-card-teleport+ +item-card-shadow-step+ +item-card-sprint+ +item-card-flying+ +item-card-disguise+)
+                                         :abil-card (list +item-card-blink+ +item-card-teleport+ +item-card-sprint+ +item-card-flying+ +item-card-disguise+)
                                          :on-use #'(lambda (actor item)
 
                                                      (when (cards item)

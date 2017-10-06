@@ -2017,3 +2017,15 @@
                  (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                         (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
                                         :observed-mob mob)))))
+
+(defun set-mob-piety (mob piety-num)
+  (when (worshiped-god mob)
+    (let ((old-piety (get-worshiped-god-piety (worshiped-god mob))))
+      (cond
+        ((< piety-num 0) (setf piety-num 0))
+        ((> piety-num 200) (setf piety-num 200)))
+      (setf (second (worshiped-god mob)) piety-num)
+      (when (and (eq mob *player*)
+                 (check-piety-level-changed (get-worshiped-god-type (worshiped-god mob))
+                                            old-piety (get-worshiped-god-piety (worshiped-god mob))))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (return-piety-change-str (get-worshiped-god-type (worshiped-god mob)) (get-worshiped-god-piety (worshiped-god mob)) old-piety))))))

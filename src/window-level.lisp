@@ -30,7 +30,7 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
@@ -45,6 +45,10 @@
                           "")
                         (if (/= (cur-oxygen *player*) *max-oxygen-level*)
                           (format nil "Oxygen: ~A/~A~%" (cur-oxygen *player*) *max-oxygen-level*)
+                          "")
+                        (if (worshiped-god *player*)
+                          (format nil "~A: ~A~%" (name (get-god-by-id (get-worshiped-god-type (worshiped-god *player*)))) (return-piety-str (get-worshiped-god-type (worshiped-god *player*))
+                                                                                                                                            (get-worshiped-god-piety (worshiped-god *player*))))
                           "")
                         (get-weapon-descr-line *player*)
                         (total-humans *world*)

@@ -30,11 +30,17 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
     
-    (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~%~A~%~%~A~%Dodge chance: ~A~%~A~A"
+    (write-text (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~%~A~%~%~A~%Dodge chance: ~A~%~A~A"
                         (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
-                        (if (mob-ability-p *player* +mob-abil-military-follow-me+) (format nil "Followers: ~A~%" (count-follower-list *player*)) "")
+                        (if (or (mob-ability-p *player* +mob-abil-military-follow-me+)
+                                (mob-ability-p *player* +mob-abil-prayer-bless+))
+                          (format nil "Followers: ~A~%" (count-follower-list *player*)) "")
+                        (if (worshiped-god *player*)
+                          (format nil "~A: ~A~%" (name (get-god-by-id (get-worshiped-god-type (worshiped-god *player*)))) (return-piety-str (get-worshiped-god-type (worshiped-god *player*))
+                                                                                                                                            (get-worshiped-god-piety (worshiped-god *player*))))
+                          "")
                         (get-weapon-descr-long *player*)
                         (get-armor-descr *player*)
                         (cur-dodge *player*)

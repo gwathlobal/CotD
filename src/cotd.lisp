@@ -78,7 +78,10 @@
                (when (and (not (check-dead mob))
                           (not (is-merged mob)))
                  ;; increase cur-ap by max-ap
-                 (incf (cur-ap mob) (max-ap mob))))
+                 (incf (cur-ap mob) (max-ap mob))
+                 ;; tick piety if the mob worships a god
+                 (when (worshiped-god mob)
+                   (funcall (piety-tick-func (get-god-by-id (get-worshiped-god-type (worshiped-god mob)))) (get-god-by-id (get-worshiped-god-type (worshiped-god mob))) mob))))
              (loop for feature-id of-type fixnum in (feature-id-list (level *world*))
                    for feature of-type feature = (get-feature-by-id feature-id)
                    when (on-tick-func feature)
