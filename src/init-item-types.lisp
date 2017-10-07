@@ -148,7 +148,8 @@
 (set-item-type (make-instance 'item-type :id +item-type-deck-of-war+
                                          :name "deck of war" :plural-name "decks of war"
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
-                                         :abil-card (list +item-card-curse+ +item-card-blindness+ +item-card-fear+ +item-card-slow+ +item-card-silence+ +item-card-confuse+ +item-card-polymorph+)
+                                         :abil-card (list +item-card-curse-other+ +item-card-blindness-other+ +item-card-fear-other+ +item-card-slow-other+ +item-card-silence-other+ +item-card-confuse-other+
+                                                          +item-card-polymorph-other+ +item-card-irradiate-other+)
                                          :on-use #'(lambda (actor item)
 
                                                      (when (cards item)
@@ -192,8 +193,7 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A draws the ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                         (name (get-card-type-by-id card-type-id))))
-                                                         (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor))
-                                                       )
+                                                         (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor)))
 
                                                      ;; remove if there are no cards in the deck
                                                      (if (cards item)

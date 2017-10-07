@@ -1841,7 +1841,8 @@
              (not (mob-effect-p mob +mob-effect-reveal-true-form+)))
     (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))
   (when (mob-effect-p mob +mob-effect-disguised+)
-    (setf (face-mob-type-id mob) (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-disguised+))))))
+    (setf (face-mob-type-id mob) (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-disguised+)))))
+  (format t "ADJUST-DISGUISE: ~A [~A] = ~A~%" (name mob) (id mob) (face-mob-type-id mob)))
 
 ;;-------------------------------
 ;; Common cards & abilities funcs

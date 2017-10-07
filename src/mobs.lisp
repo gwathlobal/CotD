@@ -704,8 +704,8 @@
       (setf (actor-id (get-effect-by-id (mob-effect-p mob effect-type-id))) actor-id))
     (progn
       (let ((effect (make-instance 'effect :effect-type effect-type-id :actor-id actor-id :target-id (id mob) :cd cd :param1 param1)))
-        (funcall (on-add (get-effect-type-by-id (effect-type effect))) effect mob)
-        (setf (gethash (effect-type effect) (effects mob)) (id effect)))))
+        (setf (gethash (effect-type effect) (effects mob)) (id effect))
+        (funcall (on-add (get-effect-type-by-id (effect-type effect))) effect mob))))
   )
 
 (defun rem-mob-effect (mob effect-type-id)
