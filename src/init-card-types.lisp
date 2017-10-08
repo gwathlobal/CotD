@@ -142,7 +142,6 @@
                                          :name "Card of Radiation"
                                          :on-use #'(lambda (card-type actor)
                                                      (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
-                                                     ;; silence nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
                                                            do
@@ -270,4 +269,20 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "Malseraph grants ~A ~A. " (prepend-article +article-the+ (visible-name actor)) (prepend-article +article-a+ (visible-name deck-item)))))
                                                        (mob-pick-item actor deck-item :spd nil :silent t))
+                                                     )))
+
+(set-card-type (make-instance 'card-type :id +item-card-glowing-all+
+                                         :name "Card of Glowing"
+                                         :on-use #'(lambda (card-type actor)
+                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (loop for i from 0 below (length (visible-mobs actor))
+                                                           for target = (get-mob-by-id (nth i (visible-mobs actor)))
+                                                           do
+                                                              (set-mob-effect target :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                     (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                           )
+                                                     (set-mob-effect actor :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
+                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                            (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                      )))

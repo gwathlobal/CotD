@@ -547,6 +547,10 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
                                                              sdl:*white*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         ;; Malseraph likes when you lose disguises
+                                                         (increase-piety-for-god +god-entity-malseraph+ actor 30))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
 
@@ -555,7 +559,9 @@
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A reveals itself as ~A. " (prepend-article +article-the+ (visible-name actor))
-                                                                                           (get-qualified-name actor))))))
+                                                                                           (get-qualified-name actor)))
+                                                            ;; Malseraph likes when you lose disguises
+                                                            (increase-piety-for-god +god-entity-malseraph+ actor 30))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-constriction-source+ :name "Constricting" 
                                              :color-func #'(lambda (effect actor)
@@ -664,3 +670,8 @@
                                                                                    (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                            (name (get-mob-type-by-id (mob-type actor))))))
                                              ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-glowing+ :name "Glowing"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore actor effect))
+                                                             sdl:*yellow*)))

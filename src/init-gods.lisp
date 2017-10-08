@@ -49,7 +49,13 @@
                                                                             (t 0)))
                                                               (deck-of-boons (list (list +item-card-polymorph-other+ t t) (list +item-card-irradiate-other+ t t) (list +item-card-confuse-other+ t t) (list +item-card-silence-other+ t t)
                                                                                    (list +item-card-slow-other+ t t) (list +item-card-fear-other+ t t) (list +item-card-blindness-other+ t t) (list +item-card-curse-other+ t t)
-                                                                                   (list +item-card-give-deck+ t nil))))
+                                                                                   (list +item-card-give-deck+ t nil)))
+                                                              (neutral-chance (cond
+                                                                                ((= piety-level 1) 3)
+                                                                                ((= piety-level 2) 5)
+                                                                                ((= piety-level 3) 3)
+                                                                                (t 1)))
+                                                              (deck-of-neutrality (list (list +item-card-glowing+))))
 
                                                          ;; Malseraph is not interested and something bad is about to happen 
                                                          (when (and (not card-played)
@@ -110,6 +116,18 @@
                                                                                         (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))))
                                                                (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) mob))
 
+                                                             ))
+
+                                                         ;; Malseraph is mildly interested and something neutral is about to happen
+                                                         (when (and (not card-played)
+                                                                    (not (zerop neutral-chance))
+                                                                    (< (random 100) neutral-chance))
+                                                           (setf card-played t)
+                                                           (let* ((r (random (length deck-of-neutrality)))
+                                                                  (card-type-id (first (nth r deck-of-neutrality))))
+                                                             (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                    (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id))))
+                                                             (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) mob)
                                                              ))
                                                          
                                                          (set-mob-piety mob new-piety)))))

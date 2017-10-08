@@ -1946,15 +1946,14 @@
 (defun invoke-disguise (actor)
   (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
                                                              (format nil "You hear some hiss~A. " str)))
+  (let ((face-mob-type-id (if (zerop (random 2))
+                            +mob-type-man+
+                            +mob-type-woman+)))
   
-  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                         (format nil "~A disguises itself as " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-  (set-mob-effect actor :effect-type-id +mob-effect-disguised+ :actor-id (id actor) :param1 (if (zerop (random 2))
-                                                                                              +mob-type-man+
-                                                                                              +mob-type-woman+))
-  (adjust-disguise-for-mob actor)
-  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                         (format nil "~A. " (prepend-article +article-a+ (name (get-mob-type-by-id (face-mob-type-id actor)))))))
+    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                           (format nil "~A disguises itself as ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-a+ (name (get-mob-type-by-id face-mob-type-id)))))
+    (set-mob-effect actor :effect-type-id +mob-effect-disguised+ :actor-id (id actor) :param1 face-mob-type-id)
+    (adjust-disguise-for-mob actor)))
 
 (defun invoke-curse (actor)
     

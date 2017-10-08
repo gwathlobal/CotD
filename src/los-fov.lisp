@@ -397,6 +397,10 @@
                                                     (when (and (= (+ dx (first (param1 effect))) (x mob))
                                                                (= (+ dy (second (param1 effect))) (y mob)))
                                                       (setf (brightness mob) (- *mob-visibility-threshold* 10))))))))
+
+  ;; if the mob is glowing - increase its brightness by 100
+  (when (mob-effect-p mob +mob-effect-glowing+)
+    (incf (brightness mob) 100))
   
   (when (< (brightness mob) 0)
     (setf (brightness mob) 0))

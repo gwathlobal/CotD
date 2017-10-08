@@ -53,3 +53,8 @@
 
 (defun return-piety-change-str (god-id piety-num-new piety-num-old)
   (funcall (piety-change-str-func (get-god-by-id god-id)) (get-god-by-id god-id) piety-num-new piety-num-old))
+
+(defun increase-piety-for-god (god-id mob piety-inc)
+  (when (and (worshiped-god mob)
+             (= (get-worshiped-god-type (worshiped-god mob)) god-id))
+    (set-mob-piety mob (+ (get-worshiped-god-piety (worshiped-god mob)) piety-inc))))

@@ -255,6 +255,7 @@
 (defconstant +mob-effect-constriction-target+ 37)
 (defconstant +mob-effect-irradiated+ 38)
 (defconstant +mob-effect-polymorph-sheep+ 39)
+(defconstant +mob-effect-glowing+ 40)
 
 (defconstant +mob-order-follow+ 0)
 

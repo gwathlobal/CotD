@@ -22,6 +22,7 @@
 (defconstant +item-card-blindness-self+ 19)
 (defconstant +item-card-curse-self+ 20)
 (defconstant +item-card-give-deck+ 21)
+(defconstant +item-card-glowing-all+ 22)
 
 (defclass card-type ()
   ((id :initarg :id :accessor id)
