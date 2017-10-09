@@ -44,6 +44,9 @@
 (defun get-worshiped-god-piety (worshiped-god)
   (second worshiped-god))
 
+(defun get-worshiped-god-param1 (worshiped-god)
+  (third worshiped-god))
+
 (defun check-piety-level-changed (god-id piety-num-old piety-num-new)
   (let ((god (get-god-by-id god-id)))
     (if (/= (funcall (piety-level-func god) god piety-num-old)

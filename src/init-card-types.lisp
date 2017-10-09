@@ -67,7 +67,7 @@
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
                                                            do
                                                               (set-mob-effect target :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 5)
-                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                              (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                      (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
                                                            )
                                                      )))
@@ -81,7 +81,7 @@
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
                                                            do
                                                               (set-mob-effect target :effect-type-id +mob-effect-silence+ :actor-id (id actor) :cd 5)
-                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                              (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                      (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
                                                            ))))
 
@@ -114,15 +114,19 @@
                                                      ;; polymorph nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
+                                                           with polymorphed-once = nil
                                                            when (not (get-faction-relation (faction actor) (faction target)))
                                                              do
                                                                 (if (> (1+ (random 6)) (strength target))
                                                                   (progn
-                                                                    (set-mob-effect target :effect-type-id +mob-effect-polymorph-sheep+ :actor-id (id actor) :cd 5 :param1 (list (mob-type target) (max-hp target))))
+                                                                    (set-mob-effect target :effect-type-id +mob-effect-polymorph-sheep+ :actor-id (id actor) :cd 5 :param1 (list (mob-type target) (max-hp target)))
+                                                                    (setf polymorphed-once t))
                                                                   (progn
                                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                            (format nil "~A resists polymorph. "
                                                                                                    (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
+                                                           finally (when polymorphed-once
+                                                                     (increase-piety-for-god +god-entity-malseraph+ actor 50))    
                                                            ))))
 
 (set-card-type (make-instance 'card-type :id +item-card-polymorph-self+
@@ -275,14 +279,18 @@
                                          :name "Card of Glowing"
                                          :on-use #'(lambda (card-type actor)
                                                      (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
-                                                     (loop for i from 0 below (length (visible-mobs actor))
-                                                           for target = (get-mob-by-id (nth i (visible-mobs actor)))
-                                                           do
-                                                              (set-mob-effect target :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
-                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                     (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
-                                                           )
-                                                     (set-mob-effect actor :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
-                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                            (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                     (loop for x from (- (x actor) 6) to (+ (x actor) 6) do
+                                                       (loop for y from (- (y actor) 6) to (+ (y actor) 6) do
+                                                         (loop for z from (- (z actor) 6) to (+ (z actor) 6)
+                                                               with target = nil
+                                                               when (and (>= x 0) (< x (array-dimension (terrain (level *world*)) 0))
+                                                                         (>= y 0) (< y (array-dimension (terrain (level *world*)) 1))
+                                                                         (>= z 0) (< z (array-dimension (terrain (level *world*)) 2))
+                                                                         (get-mob-* (level *world*) x y z))
+                                                                 do
+                                                                    (setf target (get-mob-* (level *world*) x y z))
+                                                                    (set-mob-effect target :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
+                                                                    (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                                           (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                               )))
                                                      )))

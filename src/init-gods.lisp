@@ -55,7 +55,7 @@
                                                                                 ((= piety-level 2) 5)
                                                                                 ((= piety-level 3) 3)
                                                                                 (t 1)))
-                                                              (deck-of-neutrality (list (list +item-card-glowing+))))
+                                                              (deck-of-neutrality (list (list +item-card-glowing-all+))))
 
                                                          ;; Malseraph is not interested and something bad is about to happen 
                                                          (when (and (not card-played)
@@ -129,5 +129,21 @@
                                                                                     (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id))))
                                                              (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) mob)
                                                              ))
+
+                                                         ;; check if strength of enemies around of you is more than the previous turn
+                                                         (loop for mob-id in (visible-mobs mob)
+                                                                   for vmob = (get-mob-by-id mob-id)
+                                                                   with enemy-strength = 0
+                                                                   when (and (not (check-dead vmob))
+                                                                             (not (is-merged vmob))
+                                                                             (null (get-faction-relation (faction mob) (get-visible-faction vmob :viewer mob))))
+                                                                     do
+                                                                        (incf enemy-strength (strength vmob))
+                                                                   finally
+                                                                      (when (> enemy-strength (+ (get-worshiped-god-param1 (worshiped-god mob)) (strength mob)))
+                                                                        (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                               (format nil "Malseraph giggles. "))
+                                                                        (incf new-piety 40))
+                                                                      (set-mob-worshiped-god-param1 mob enemy-strength))
                                                          
                                                          (set-mob-piety mob new-piety)))))

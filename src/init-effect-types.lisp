@@ -642,7 +642,8 @@
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A transforms into a sheep. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                                                                (format nil "~A transforms into a sheep. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         (increase-piety-for-god +god-entity-malseraph+ actor 50))
                                              :on-remove #'(lambda (effect actor)
                                                             
                                                             (let ((old-max-hp (max-hp actor)))
@@ -668,7 +669,8 @@
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                           (name (get-mob-type-by-id (mob-type actor))))))
+                                                                                           (name (get-mob-type-by-id (mob-type actor)))))
+                                                            (increase-piety-for-god +god-entity-malseraph+ actor 50))
                                              ))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-glowing+ :name "Glowing"
