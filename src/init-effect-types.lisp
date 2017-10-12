@@ -620,6 +620,12 @@
                                                              sdl:*magenta*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
+                                                         (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                    (format nil "You hear some strange noise~A. " str)))
+                                                         
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A transforms into a sheep. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         
                                                          (let ((old-max-hp (max-hp actor)))
                                                            (setf (mob-type actor) +mob-type-sheep+)
                                                            (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
@@ -638,13 +644,15 @@
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
                                                          
-                                                         (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                                    (format nil "You hear some strange noise~A. " str)))
                                                          
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A transforms into a sheep. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                          (increase-piety-for-god +god-entity-malseraph+ actor 50))
                                              :on-remove #'(lambda (effect actor)
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                               (format nil "You hear some strange noise~A.~%" str)))
+                                                            
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                           (name (get-mob-type-by-id (first (param1 effect))))))
                                                             
                                                             (let ((old-max-hp (max-hp actor)))
                                                               (setf (mob-type actor) (first (param1 effect)))
@@ -664,12 +672,7 @@
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
                                                             
-                                                            (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                               (format nil "You hear some strange noise~A.~%" str)))
                                                             
-                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                           (name (get-mob-type-by-id (mob-type actor)))))
                                                             (increase-piety-for-god +god-entity-malseraph+ actor 50))
                                              ))
 

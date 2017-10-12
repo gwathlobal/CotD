@@ -1445,13 +1445,15 @@
     (when (mounted-by-mob-id mob)
       (setf (riding-mob-id (get-mob-by-id (mounted-by-mob-id mob))) nil)
       (adjust-dodge (get-mob-by-id (mounted-by-mob-id mob)))
-      (add-mob-to-level-list (level *world*) (get-mob-by-id (mounted-by-mob-id mob))))
+      (add-mob-to-level-list (level *world*) (get-mob-by-id (mounted-by-mob-id mob)))
+      (setf (mounted-by-mob-id mob) nil))
     ;; if the target is riding something, place back the mount on map
     (when (riding-mob-id mob)
       (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id mob))) nil)
       (setf (x (get-mob-by-id (riding-mob-id mob))) (x mob)
             (y (get-mob-by-id (riding-mob-id mob))) (y mob))
-      (add-mob-to-level-list (level *world*) (get-mob-by-id (riding-mob-id mob))))
+      (add-mob-to-level-list (level *world*) (get-mob-by-id (riding-mob-id mob)))
+      (setf (riding-mob-id mob) nil))
 
     
     
@@ -1662,9 +1664,9 @@
           (or (/= (- (x mob) x) 0)
               (/= (- (y mob) y) 0)))
      0)
-    ((and (mob-effect-p mob +mob-effect-possessed+)
-          (mob-effect-p mob +mob-effect-reveal-true-form+))
-     (glyph-idx (get-mob-type-by-id (mob-type (get-mob-by-id (slave-mob-id mob))))))
+    ;((and (mob-effect-p mob +mob-effect-possessed+)
+    ;      (mob-effect-p mob +mob-effect-reveal-true-form+))
+    ; (glyph-idx (get-mob-type-by-id (mob-type (get-mob-by-id (slave-mob-id mob))))))
     (t (glyph-idx (get-mob-type-by-id (face-mob-type-id mob))))))
 
 (defun get-current-mob-glyph-color (mob)
@@ -1673,7 +1675,8 @@
           (mob-effect-p mob +mob-effect-reveal-true-form+))
      (glyph-color (get-mob-type-by-id (mob-type mob)))
      )
-    ((and (mob-effect-p mob +mob-effect-possessed+)
+    ((and (or (mob-effect-p mob +mob-effect-possessed+)
+              (mob-effect-p mob +mob-effect-disguised+))
           (= (faction *player*) (faction mob)))
      (glyph-color (get-mob-type-by-id (mob-type mob))))
     ((and (mob-ability-p *player* +mob-abil-angel+)

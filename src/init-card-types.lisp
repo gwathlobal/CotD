@@ -154,7 +154,7 @@
                                                                   (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
                                                                     (incf (param1 effect) (+ 2 (random 3)))))
                                                                 (progn
-                                                                  (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
+                                                                  (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd 5 :param1 (+ 2 (random 3)))))
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                      (format nil "~A is irradiated. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
                                                            ))))
@@ -168,7 +168,7 @@
                                                          (let ((effect (get-effect-by-id (mob-effect-p actor +mob-effect-irradiated+))))
                                                            (incf (param1 effect) (+ 2 (random 3)))))
                                                        (progn
-                                                         (set-mob-effect actor :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
+                                                         (set-mob-effect actor :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd 5 :param1 (+ 2 (random 3)))))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-confuse-self+
@@ -279,18 +279,21 @@
                                          :name "Card of Glowing"
                                          :on-use #'(lambda (card-type actor)
                                                      (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
-                                                     (loop for x from (- (x actor) 6) to (+ (x actor) 6) do
-                                                       (loop for y from (- (y actor) 6) to (+ (y actor) 6) do
-                                                         (loop for z from (- (z actor) 6) to (+ (z actor) 6)
-                                                               with target = nil
-                                                               when (and (>= x 0) (< x (array-dimension (terrain (level *world*)) 0))
-                                                                         (>= y 0) (< y (array-dimension (terrain (level *world*)) 1))
-                                                                         (>= z 0) (< z (array-dimension (terrain (level *world*)) 2))
-                                                                         (get-mob-* (level *world*) x y z))
-                                                                 do
-                                                                    (setf target (get-mob-* (level *world*) x y z))
-                                                                    (set-mob-effect target :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
-                                                                    (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                           (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
-                                                               )))
+                                                     (let ((targets nil))
+                                                       (loop for x from (- (x actor) 6) to (+ (x actor) 6) do
+                                                         (loop for y from (- (y actor) 6) to (+ (y actor) 6) do
+                                                           (loop for z from (- (z actor) 6) to (+ (z actor) 6)
+                                                                 
+                                                                 when (and (>= x 0) (< x (array-dimension (terrain (level *world*)) 0))
+                                                                           (>= y 0) (< y (array-dimension (terrain (level *world*)) 1))
+                                                                           (>= z 0) (< z (array-dimension (terrain (level *world*)) 2))
+                                                                           (get-mob-* (level *world*) x y z))
+                                                                   do
+                                                                      (pushnew (get-mob-* (level *world*) x y z) targets)
+                                                                      
+                                                                 )))
+                                                       (loop for target in targets do
+                                                         (set-mob-effect target :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
+                                                         (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                                (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
                                                      )))

@@ -55,7 +55,7 @@
                                                                                 ((= piety-level 2) 5)
                                                                                 ((= piety-level 3) 3)
                                                                                 (t 1)))
-                                                              (deck-of-neutrality (list (list +item-card-glowing-all+))))
+                                                              (deck-of-neutrality (list (list +item-card-glowing-all+) (list +item-card-disguise+))))
 
                                                          ;; Malseraph is not interested and something bad is about to happen 
                                                          (when (and (not card-played)
