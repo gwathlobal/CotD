@@ -424,7 +424,7 @@
                                        :weapon (list "Falchion" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
-                                       :base-light-radius 6
+                                       :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-remove-disguise t :abil-irradiate t :abil-fission t

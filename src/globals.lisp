@@ -326,6 +326,7 @@
 (defconstant +terrain-trait-openable-door+ 12)
 (defconstant +terrain-trait-openable-window+ 13)
 (defconstant +terrain-trait-flammable+ 14)
+(defconstant +terrain-trait-can-jump-over+ 15)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)

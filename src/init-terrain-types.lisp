@@ -102,7 +102,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-barricade+ :name "barricade"
                                                :glyph-idx 3 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 10))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 10  :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-earth+ :name "earth"
                                                :glyph-idx 96 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color (sdl:color :r 185 :g 83 :b 43)
@@ -110,11 +110,11 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-bush+ :name "bush"
                                                :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-grave+ :name "grave"
                                                :glyph-idx 121 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20  :trait-can-jump-over t))
 
 ;;--------------------
 ;; Trees
@@ -170,11 +170,11 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-table+ :name "table"
                                                :glyph-idx 101 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 10))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 10  :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bed+ :name "bed"
                                                :glyph-idx 102 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 12))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 12 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-cabinet+ :name "cabinet"
                                                :glyph-idx 103 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 

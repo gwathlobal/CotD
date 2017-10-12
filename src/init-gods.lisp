@@ -139,11 +139,17 @@
                                                                              (null (get-faction-relation (faction mob) (get-visible-faction vmob :viewer mob))))
                                                                      do
                                                                         (incf enemy-strength (strength vmob))
-                                                                   finally
-                                                                      (when (> enemy-strength (+ (get-worshiped-god-param1 (worshiped-god mob)) (strength mob)))
+                                                               finally
+                                                                  (when (> enemy-strength (+ (get-worshiped-god-param1 (worshiped-god mob)) (strength mob)))
                                                                         (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                                (format nil "Malseraph giggles. "))
-                                                                        (incf new-piety 40))
-                                                                      (set-mob-worshiped-god-param1 mob enemy-strength))
+                                                                        (incf new-piety 40)
+                                                                        (set-mob-worshiped-god-param1 mob enemy-strength))
+                                                                  
+                                                                  (when (<= enemy-strength (+ (get-worshiped-god-param1 (worshiped-god mob)) (strength mob)))
+                                                                    (set-mob-worshiped-god-param2 mob (1+ (get-worshiped-god-param2 (worshiped-god mob)))))
+                                                                  (when (> (get-worshiped-god-param2 (worshiped-god mob)) 5)
+                                                                    (set-mob-worshiped-god-param1 mob enemy-strength)
+                                                                    (set-mob-worshiped-god-param2 mob 0)))
                                                          
                                                          (set-mob-piety mob new-piety)))))

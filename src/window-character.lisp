@@ -101,10 +101,10 @@
                           (descr ability)
                           (if (passive ability)
                             "Passive."
-                            (format nil "~A~ATime units: ~A"
+                            (format nil "~A~ATime cost: ~A turn~:P"
                                     (if (zerop (cost ability)) "" (format nil "Cost: ~A pwr  " (cost ability)))
-                                    (if (zerop (cd ability)) "" (format nil "Cooldown: ~A TU  " (* +normal-ap+ (cd ability))))
-                                    (spd ability))))
+                                    (if (zerop (cd ability)) "" (format nil "Cooldown: ~A turn~:P  " (cd ability)))
+                                    (/ (spd ability) +normal-ap+))))
                   a-rect :color sdl:*white*)
       )
     )

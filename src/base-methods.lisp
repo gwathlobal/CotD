@@ -358,7 +358,6 @@
                (apply-gravity mob))
       (let ((init-z (z mob)) (cur-dmg 0))
         (set-mob-location mob (x mob) (y mob) (apply-gravity mob) :apply-gravity nil)
-        ()
         (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
         (decf (cur-hp mob) cur-dmg)
         (when (> cur-dmg 0)
@@ -1841,8 +1840,7 @@
              (not (mob-effect-p mob +mob-effect-reveal-true-form+)))
     (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))
   (when (mob-effect-p mob +mob-effect-disguised+)
-    (setf (face-mob-type-id mob) (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-disguised+)))))
-  (format t "ADJUST-DISGUISE: ~A [~A] = ~A~%" (name mob) (id mob) (face-mob-type-id mob)))
+    (setf (face-mob-type-id mob) (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-disguised+))))))
 
 ;;-------------------------------
 ;; Common cards & abilities funcs

@@ -6,6 +6,8 @@ CHANGELOG
 - There are two types of decks that Malseraph can give - decks of war and decks of escape. Each deck consists of a number cards that a character can draw. You can not see what card you draw and waht cards remain in the deck. Drawing a card immediately invokes its effect.
 - Added Constriction ability to the Eater of the dead. This ability lets you grab targets and continue to deal damage to them automatically while all participants remain in place.
 - Citizens of the City can now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look as an ordinary man or woman to everybody else. 
+- Fixed the bug with jumping when you would fall through the ground if you hit an obstacle during the jump.
+- You can now jump over small obstacles like beds, tables, barricades, bushes.
 
 --------------------
 September 30, 2017 v1.2.2

@@ -52,7 +52,7 @@
                                   "   .......                                                ......     ......   "
                                   "   .......                                                ......     ......   "
                                   "   .......            .....       .....                                       "
-                                  "   .......            .....       .....                                       "
+                                  "   .......            .....       .bb..                                       "
                                   "                      .....      ......d                                      "
                                   "   .......           d............######|                  .................   "
                                   "   .......            ....u......u#____#                  .................   "
@@ -112,6 +112,7 @@
                                (#\# +terrain-wall-stone+)
                                (#\- +terrain-wall-window+)
                                (#\+ +terrain-door-closed+)
+                               (#\b +terrain-floor-bed+)
                                (#\' +terrain-door-open+)
                                (#\Space +terrain-floor-air+)
                                (#\u +terrain-slope-stone-up+)
@@ -133,10 +134,10 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-malseraph-puppet+ :x 40 :y 15 :z 0))
+  (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :x 40 :y 15 :z 0))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 41 :y 15 :z 0))
+  (let (;(soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 41 :y 15 :z 0))
         ;(demon (make-instance 'mob :mob-type +mob-type-angel+ :x 41 :y 16 :z 0))
         ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 30 :y 12 :z 0))
         )
@@ -153,7 +154,7 @@
     ;(set-mob-effect demon +mob-effect-calling-for-help+ 100)
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-flying+ :actor-id (id soldier))
-    (add-mob-to-level-list (level world) soldier)
+    ;(add-mob-to-level-list (level world) soldier)
     ;(add-mob-to-level-list (level world) demon)
     ;(add-mob-to-level-list (level world) angel)
     

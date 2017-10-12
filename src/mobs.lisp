@@ -500,7 +500,7 @@
    (cur-fp :initform 0 :initarg :cur-fp :accessor cur-fp)
 
    (worshiped-god :initform nil :initarg :worshiped-god :accessor worshiped-god) ;; when the mob worships a god, this param is (<god id> <piety> <param1>)
-                                                                                 ;; for Malseraph, param1 - danger level at the end of the previous turn
+                                                                                 ;; for Malseraph, param1 - danger level at the end of the previous turn, param2 - cooldown for decreaseing danger level
    
    (visible-mobs :initform nil :accessor visible-mobs)
    (shared-visible-mobs :initform nil :accessor shared-visible-mobs)
@@ -617,7 +617,7 @@
 
   ;; if the mob is Malseraph's puppet - automatically worship Malseraph
   (when (= (mob-type mob) +mob-type-malseraph-puppet+)
-    (set-mob-worshiped-god mob :god-id +god-entity-malseraph+ :init-piety 150 :param1 0))
+    (set-mob-worshiped-god mob :god-id +god-entity-malseraph+ :init-piety 150 :param1 0 :param2 0))
   
   (when (mob-ability-p mob +mob-abil-human+)
     (incf (total-humans *world*))
@@ -1069,11 +1069,14 @@
     
     result))
 
-(defun set-mob-worshiped-god (mob &key (god-id +god-entity-malseraph+) (init-piety 0) param1)
-  (setf (worshiped-god mob) (list god-id init-piety param1)))
+(defun set-mob-worshiped-god (mob &key (god-id +god-entity-malseraph+) (init-piety 0) param1 param2)
+  (setf (worshiped-god mob) (list god-id init-piety param1 param2)))
 
 (defun set-mob-worshiped-god-param1 (mob new-value)
   (setf (third (worshiped-god mob)) new-value))
+
+(defun set-mob-worshiped-god-param2 (mob new-value)
+  (setf (fourth (worshiped-god mob)) new-value))
 
 ;;----------------------
 ;; PLAYER

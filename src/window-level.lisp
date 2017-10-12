@@ -393,16 +393,16 @@
                                       (loop
                                         for ability-type-id in mob-abilities
                                         collect (cond
-                                                  ((not (abil-applic-cost-p ability-type-id *player*)) (format nil "Cost: ~A. Insufficient power!" (cost (get-ability-type-by-id ability-type-id))))
-                                                  ((not (abil-applic-cd-p ability-type-id *player*)) (format nil "CD: ~A. On cooldown!" (abil-cur-cd-p *player* ability-type-id)))
-                                                  (t (format nil "~A~ATU: ~A."
+                                                  ((not (abil-applic-cost-p ability-type-id *player*)) (format nil "Cost: ~A pwr. Insufficient power!" (cost (get-ability-type-by-id ability-type-id))))
+                                                  ((not (abil-applic-cd-p ability-type-id *player*)) (format nil "CD: ~A turn~:P. On cooldown!" (abil-cur-cd-p *player* ability-type-id)))
+                                                  (t (format nil "~A~ATime: ~A turn~:P."
                                                           (if (zerop (cost (get-ability-type-by-id ability-type-id)))
                                                             ""
-                                                            (format nil "Cost: ~A. " (cost (get-ability-type-by-id ability-type-id))))
+                                                            (format nil "Cost: ~A pwr. " (cost (get-ability-type-by-id ability-type-id))))
                                                           (if (abil-applic-cd-p ability-type-id *player*)
                                                             ""
-                                                            (format nil "CD: ~A. " (abil-cur-cd-p *player* ability-type-id)))
-                                                          (spd (get-ability-type-by-id ability-type-id)))))))
+                                                            (format nil "CD: ~A turn~:P. " (abil-cur-cd-p *player* ability-type-id)))
+                                                          (/ (spd (get-ability-type-by-id ability-type-id)) +normal-ap+))))))
 
                                 ;; populate the ability prompt list
                                 (setf abil-prompt-list

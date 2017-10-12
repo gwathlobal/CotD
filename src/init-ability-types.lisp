@@ -3676,7 +3676,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-jump+ :name "Jump" :descr "Jump to a specified location up to 3 tiles away. Jumping lets you cling to walls if the destination allows it. Sprinting lets you jump 1 tile farther and you will still be able to cling to a wall after the jump." 
+                                 :id +mob-abil-jump+ :name "Jump" :descr "Jump to a specified location up to 3 tiles away. Jumping lets you cling to walls if the destination allows it. Sprinting lets you jump 1 tile farther and you will still be able to cling to a wall after the jump. You are able to jump over small obstacles like tables and fences." 
                                  :cd 0 :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 10
@@ -3701,22 +3701,52 @@
                                                   
                                                   (loop for (dx . dy) in path-line
                                                         with charge-distance = (if (mob-effect-p actor +mob-effect-sprint+)
-                                                                                 2
-                                                                                 1)
+                                                                                 3
+                                                                                 2)
                                                         with charge-result = nil
+                                                        with sdx = (x actor)
+                                                        with sdy = (y actor)
+                                                        with prev-dx = (x actor)
+                                                        with prev-dy = (y actor)
+                                                        with hit-obstacle = nil
+                                                        with can-jump-over = nil
                                                         while (not (zerop charge-distance))
                                                         do
                                                            (decf charge-distance)
                                                            (setf charge-result (check-move-on-level actor dx dy (z actor)))
-                                                           (when (not (eq charge-result t))
+                                                           (if (not (eq charge-result t))
+                                                             (setf hit-obstacle t)
+                                                             (setf hit-obstacle nil))
+                                                           (if (and charge-result
+                                                                    (typep charge-result 'list)
+                                                                    (eq (first charge-result) :obstacles)
+                                                                    (get-terrain-type-trait (get-terrain-* (level *world*)
+                                                                                                           (first (first (second charge-result)))
+                                                                                                           (second (first (second charge-result)))
+                                                                                                           (third (first (second charge-result))))
+                                                                                            +terrain-trait-can-jump-over+))
+                                                             (setf can-jump-over t)
+                                                             (setf can-jump-over nil))
+                                                           (setf sdx dx sdy dy)
+                                                           (when (and hit-obstacle
+                                                                      (null can-jump-over))
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A hits an obstacle. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                             (setf sdx prev-dx sdy prev-dy)
                                                              (loop-finish))
+                                                           (when (null hit-obstacle)
+                                                             (setf prev-dx sdx prev-dy sdy))
+                                                           (when (and (zerop charge-distance)
+                                                                      hit-obstacle
+                                                                      can-jump-over)
+                                                             (setf sdx prev-dx sdy prev-dy))
                                                         finally
                                                            (rem-mob-effect actor +mob-effect-sprint+)
                                                            (when (mob-ability-p actor +mob-abil-climbing+)
                                                              (set-mob-effect actor :effect-type-id +mob-effect-climbing-mode+ :actor-id (id actor) :cd t))
-                                                           (set-mob-location actor dx dy (z actor) :apply-gravity t))
+                                                           (when (or (/= (x actor) sdx)
+                                                                     (/= (y actor) sdy))
+                                                             (set-mob-location actor sdx sdy (z actor) :apply-gravity t)))
                                                   (set-mob-effect actor :effect-type-id +mob-effect-exerted+ :actor-id (id actor) :cd 6)
                                                   ))
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -3872,14 +3902,14 @@
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                    (declare (ignore nearest-enemy nearest-ally))
-                                                   (let ((target nil))
-                                                     (loop for item-id in (get-items-* (level *world*) (x actor) (y actor) (z actor))
-                                                           for item = (get-item-by-id item-id)
-                                                           with corpses = nil
-                                                           when (item-ability-p item +item-abil-corpse+)
-                                                             do
-                                                                (push item corpses)
-                                                           finally (return (first corpses)))
+                                                   (let ((target (loop for item-id in (get-items-* (level *world*) (x actor) (y actor) (z actor))
+                                                                       for item = (get-item-by-id item-id)
+                                                                       with corpses = nil
+                                                                       when (item-ability-p item +item-abil-corpse+)
+                                                                         do
+                                                                            (push item corpses)
+                                                                       finally (return (first corpses)))))
+                                                     
                                                      (mob-invoke-ability actor target (id ability-type))))
                                  :obj-select-func #'(lambda (ability-type-id)
                                                       (let ((items (get-items-* (level *world*) (x *player*) (y *player*) (z *player*)))
