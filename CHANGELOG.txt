@@ -2,7 +2,8 @@ CHANGELOG
 
 - Added Malseraph's puppets as a playable faction. Malseraph's puppets are demons who worship Malseraph, the Demon God of Acting, Gambling and Violent Changes. They lack the possession ability but make up for it with the powers of their god.
 - By themselves Malseraph's puppets have the Irradiate and Fission abilities. Irradiate applies a special status to the target, while Fission is used to cause damage to those with this status and clear it from them. 
-- Malseraph is the master of cards and likes to be entertained. When he is in the good mood, he will draw cards with beneficial effects from his decks and can even grant some of the decks to you. When he is in the bad mood, he will use his more malicious cards against you to spice things up.
+- Malseraph is the master of cards and likes to be entertained. Malseraph likes disguises, polymorphs and getting in dsngerous situations.
+- When Malseraph is in the good mood, he will draw cards with beneficial effects from his decks and can even grant some of the decks to you. When he is in the bad mood, he will use his more malicious cards against you to spice things up.
 - There are two types of decks that Malseraph can give - decks of war and decks of escape. Each deck consists of a number cards that a character can draw. You can not see what card you draw and waht cards remain in the deck. Drawing a card immediately invokes its effect.
 - Added Constriction ability to the Eater of the dead. This ability lets you grab targets and continue to deal damage to them automatically while all participants remain in place.
 - Citizens of the City can now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look as an ordinary man or woman to everybody else. 
