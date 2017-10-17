@@ -1426,9 +1426,9 @@
                                                   
                                                 (inflict-damage target :min-dmg 2 :max-dmg 4 :dmg-type +weapon-dmg-mind+
                                                                        :att-spd nil :weapon-aux () :acc 100 :add-blood nil :no-dodge t
-                                                                       :actor actor
+                                                                       :actor actor :no-hit-message t
                                                                        :specific-hit-string-func #'(lambda (cur-dmg)
-                                                                                                     (format nil "~A takes ~A dmg. " (capitalize-name (prepend-article +article-the+ (name target))) cur-dmg)))
+                                                                                                     (format nil "~A has its mind burned for ~A dmg. " (capitalize-name (prepend-article +article-the+ (name target))) cur-dmg)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -1596,9 +1596,9 @@
                                                   
                                                 (inflict-damage target :min-dmg 2 :max-dmg 4 :dmg-type +weapon-dmg-mind+
                                                                        :att-spd nil :weapon-aux () :acc 100 :add-blood nil :no-dodge t
-                                                                       :actor actor
+                                                                       :actor actor :no-hit-message t
                                                                        :specific-hit-string-func #'(lambda (cur-dmg)
-                                                                                                     (format nil "~A takes ~A dmg. " (capitalize-name (prepend-article +article-the+ (name target))) cur-dmg)))
+                                                                                                     (format nil "~A has its mind burned for ~A dmg. " (capitalize-name (prepend-article +article-the+ (name target))) cur-dmg)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -4078,7 +4078,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-irradiate+ :name "Irradiate" :descr "Channel hellish powers to affect a target character with sickly invisible rays. Exposure to them causes irradiation of the target. The power of the irradiation increases with the number of times the target is affected by the rays. Heavy irradiation may sometimes make the target unable to act." 
+                                 :id +mob-abil-irradiate+ :name "Irradiate" :descr "Channel hellish powers to affect the target character with sickly invisible rays. Exposure to them causes irradiation of the target. The power of the irradiation increases with the number of times the target is affected by the rays. Heavy irradiation may sometimes make the target unable to act." 
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil :removes-disguise t
                                  :motion 40

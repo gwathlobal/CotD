@@ -147,6 +147,8 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-deck-of-war+
                                          :name "deck of war" :plural-name "decks of war"
+                                         :descr "A special deck of cards granted by Malseraph, the Demon God of Acting, Gambling and Violent Changes. The deck contains a random number of different cards, all devouted to combat and fighting. Each card has a special effect that will benefit those who use it."
+                                         :flavor-quote (format nil "\"As for cards, there was no habit to play cards in those circles (mainly literary ones) where Fyodor Mikhailovich used to move. During our 14 years of marriage, my husband played preferans only once, at my relatives' place; and though he had not touched a card for more than 10 years, he played perfectly and even managed to win several roubles from his partners which embarrassed him greatly.\"~%Anna Dostoevskaya. Dostoevsky: Reminiscences.")
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
                                          :abil-card (list +item-card-curse-other+ +item-card-blindness-other+ +item-card-fear-other+ +item-card-slow-other+ +item-card-silence-other+ +item-card-confuse-other+
                                                           +item-card-polymorph-other+ +item-card-irradiate-other+)
@@ -183,6 +185,8 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-deck-of-escape+
                                          :name "deck of escape" :plural-name "decks of escape"
+                                         :descr "A special deck of cards granted by Malseraph, the Demon God of Acting, Gambling and Violent Changes. The deck contains a random number of different cards, all devouted to escapes and trickery. Each card has a special effect that will benefit those who use it."
+                                         :flavor-quote (format nil "\"As for cards, there was no habit to play cards in those circles (mainly literary ones) where Fyodor Mikhailovich used to move. During our 14 years of marriage, my husband played preferans only once, at my relatives' place; and though he had not touched a card for more than 10 years, he played perfectly and even managed to win several roubles from his partners which embarrassed him greatly.\"~%Anna Dostoevskaya. Dostoevsky: Reminiscences.")
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
                                          :abil-card (list +item-card-blink+ +item-card-teleport+ +item-card-sprint+ +item-card-flying+ +item-card-disguise+)
                                          :on-use #'(lambda (actor item)

@@ -23,6 +23,7 @@ THE PANDEMONIUM HIERARCHY
  - You start as a puny Crimson or Shadow imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
  - Crimson imps and demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
  - Shadow creatures are unable to possess mortals but can teleport around unlit areas.
+ - Apart from the usual demons stand the servants of the whimsical Demon God Malseraph - those who are called Malseraph's puppets. They lack some powers of other demons but try to please their God to receive its aid. 
  - You kill humans (or fellow demons, by the way) to gain power and heal.
  - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
  - Your strength is the ability to summon allies to yourself to gang up on your enemy. 

@@ -15,7 +15,7 @@
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 10 :y 10 :w 305 :h 435))
     (sdl:fill-surface sdl:*black* :template a-rect))
   ;; a pane for item description
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 325 :y 10 :w 305 :h 225))
+  (sdl:with-rectangle (a-rect (sdl:rectangle :x 325 :y 10 :w 305 :h (- *window-height* 20)))
     (sdl:fill-surface sdl:*black* :template a-rect))
   ;; a pane for player chars
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 325 :y 245 :w 305 :h 200))
@@ -58,7 +58,7 @@
   ;; drawing selected item description
   (when (> (length (inv *player*)) 0)
     (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win))))
-      (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w (- *window-width* 330 20) :h 215))
+      (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w (- *window-width* 330 20) :h (- *window-height* 50)))
       ))
 
   ;; drawing some player chars
