@@ -57,8 +57,17 @@
 
   ;; drawing selected item description
   (when (> (length (inv *player*)) 0)
-    (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win))))
-      (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w (- *window-width* 330 20) :h (- *window-height* 50)))
+    (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+          (lines-count 0))
+      (setf lines-count (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w (- *window-width* 330 20) :h (- *window-height* 50))))
+      (when (flavor-quote item)
+        (cond
+          ((equal (options-font *options*) 'font-8x13) (sdl:initialise-default-font sdl:*font-8x13o*))
+          (t (sdl:initialise-default-font sdl:*font-6x13o*)))
+        (write-text (flavor-quote item) (sdl:rectangle :x 330 :y (+ 15 (* lines-count (sdl:char-height sdl:*default-font*))) :w (- *window-width* 330 20) :h (- *window-height* 50)))
+        (cond
+          ((equal (options-font *options*) 'font-8x13) (sdl:initialise-default-font sdl:*font-8x13*))
+          (t (sdl:initialise-default-font sdl:*font-6x13*))))
       ))
 
   ;; drawing some player chars

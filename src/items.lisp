@@ -120,7 +120,7 @@
 
 (defun get-item-descr (item)
   (let ((str (create-string)))
-    (format str "~A~%~%~AQty: ~A~A~A~%~%~A" (capitalize-name (prepend-article +article-a+ (name item)))
+    (format str "~A~%~%~AQty: ~A~A~A~%~%" (capitalize-name (prepend-article +article-a+ (name item)))
             (if (descr item)
               (format nil "~A~%~%" (descr item))
               "")
@@ -137,9 +137,7 @@
                                                    (format str "~A, " (name card-type))
                                                 finally (return str)))
               "")
-            (if (flavor-quote item)
-              (format nil "~A~%~%" (flavor-quote item))
-              ""))
+            )
     str))
 
 (defun get-inv-item-by-id (inv item-id)
