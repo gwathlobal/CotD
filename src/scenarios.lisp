@@ -619,7 +619,8 @@
     (loop for x from 0 below (array-dimension (terrain (level *world*)) 0) do
       (loop for y from 0 below (array-dimension (terrain (level *world*)) 1) do
         (loop for z from 0 below (array-dimension (terrain (level *world*)) 2)
-              when (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-water+)
+              when (and (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-water+)
+                        (eq (check-move-on-level mob x y z) t))
                 do
                    (push (list x y z) water-cells))))
     (if water-cells

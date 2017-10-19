@@ -273,7 +273,9 @@
 			    )
                         
 			(cond
-			  ((sdl:key= key :sdl-key-escape) (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*)) (setf *current-window* (return-to win)) (go exit-func))
+			  ((sdl:key= key :sdl-key-escape) (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+                           (setf *current-window* (return-to win))
+                           (go exit-func))
 			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter)) (when (funcall (exec-func win))
                                                                                                  (go exit-func)))
 			  ;((sdl:key= key :sdl-key-tab) (setf (cur-tab win) (not (cur-tab win))) (setf (cur-inv win) 0))

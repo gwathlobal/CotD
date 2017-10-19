@@ -587,7 +587,8 @@
       (setf (mounted-by-mob-id horse) (id mob))
       (setf (riding-mob-id mob) (id horse))))
 
-  (loop for (item-type-id qty) in (init-items (get-mob-type-by-id (mob-type mob)))
+  (loop for (item-type-id qty-func) in (init-items (get-mob-type-by-id (mob-type mob)))
+        for qty = (funcall qty-func)
         when (not (zerop qty))
           do
              (mob-pick-item mob (make-instance 'item :item-type item-type-id :x (x mob) :y (y mob) :z (z mob) :qty qty)

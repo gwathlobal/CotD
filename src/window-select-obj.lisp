@@ -83,7 +83,7 @@
                         (cond
 			  ;; escape - quit
 			  ((sdl:key= key :sdl-key-escape) 
-			   (setf *current-window* (return-to win)) (go exit-func))
+			   (setf *current-window* (return-to win)) (format t "AFTER ESCAPE FROM SELECT-OBJ~%") (go exit-func))
 			  ;; enter - select
 			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
 			   (funcall (enter-func win) (cur-sel win))

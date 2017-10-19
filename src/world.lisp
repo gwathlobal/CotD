@@ -57,7 +57,7 @@
     (loop for nx from sx below (+ sx (map-size mob)) do
       (loop for ny from sy below (+ sy (map-size mob)) do
         (setf (aref (mobs level) nx ny (z mob)) nil))))
-  (logger (format nil "REMOVE-MOB-FROM-LEVEL-LIST: ~A [~A] (~A ~A ~A) = ~A" (name mob) (id mob) (x mob) (y mob) (z mob) (get-mob-* level (x mob) (y mob) (z mob)))))
+  (logger (format nil "REMOVE-MOB-FROM-LEVEL-LIST: ~A [~A] (~A ~A ~A) = ~A~%" (name mob) (id mob) (x mob) (y mob) (z mob) (get-mob-* level (x mob) (y mob) (z mob)))))
 
 (defun add-feature-to-level-list (level feature)
   (if (and (can-merge-func feature)

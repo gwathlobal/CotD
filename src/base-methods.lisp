@@ -234,7 +234,7 @@
                                           :source source-mob :force-sound force-sound)))
 
 (defun set-mob-location (mob x y z &key (apply-gravity t))
-  
+  (logger (format nil "SET-MOB-LOCATION BEFORE: ~A [~A] (~A ~A ~A) to (~A ~A ~A) gravity = ~A~%" (name mob) (id mob) (x mob) (y mob) (z mob) x y z apply-gravity))
   (let ((place-func #'(lambda (nmob)
                         (let ((sx) (sy))
                           ;; calculate the coords of the mob's NE corner
@@ -280,6 +280,9 @@
          (if (and (= (x (get-mob-by-id (riding-mob-id mob))) x) (= (y (get-mob-by-id (riding-mob-id mob))) y) (= (z (get-mob-by-id (riding-mob-id mob))) z))
            (incf-mob-motion (get-mob-by-id (riding-mob-id mob)) *mob-motion-stand*)
            (incf-mob-motion (get-mob-by-id (riding-mob-id mob)) *mob-motion-move*))
+
+         ;; remove the rider from the prev location 
+         (setf (aref (mobs (level *world*)) (x mob) (y mob) (z mob)) nil)
          
          (funcall place-func (get-mob-by-id (riding-mob-id mob)))
 
@@ -301,6 +304,9 @@
                (rider-orig-y (y (get-mob-by-id (mounted-by-mob-id mob))))
                (rider-orig-z (z (get-mob-by-id (mounted-by-mob-id mob)))))
 
+           ;; remove the rider from the prev location 
+           (setf (aref (mobs (level *world*)) rider-orig-x rider-orig-y rider-orig-z) nil)
+           
            (funcall place-func mob)
            
            ;; place the rider
@@ -382,7 +388,10 @@
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
                (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+))
                (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))
-               (not (eq mob (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)))))
+               (not (eq mob (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))))
+               (and (mounted-by-mob-id mob)
+                    (not (eq (get-mob-by-id (mounted-by-mob-id mob)) (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))))))
+      (format t "HERE~%")
       (set-mob-location (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)) orig-x orig-y (1+ orig-z)))
 
     ;; check if the mob is constricting somebody or being constricted and if the effect should be broken
@@ -399,7 +408,8 @@
                   (/= (second (param1 effect)) (y mob))
                   (/= (third (param1 effect)) (z mob)))
           (rem-mob-effect mob +mob-effect-constriction-target+))))
-    ))
+    )
+  (logger (format nil "SET-MOB-LOCATION AFTER: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob))))
 
 (defun move-mob (mob dir &key (push nil) (dir-z 0))
   (let ((dx 0)
@@ -419,7 +429,8 @@
     ;; if being ridden - restore the direction from the order being given by the rider
     (when (and (mounted-by-mob-id mob)
                (order-for-next-turn mob))
-      (setf dir (order-for-next-turn mob)))
+      (setf dir (first (order-for-next-turn mob)))
+      (setf dir-z (second (order-for-next-turn mob))))
     
     (multiple-value-setq (dx dy) (x-y-dir dir))
 
@@ -428,7 +439,7 @@
       (logger (format nil "MOVE-MOB: ~A [~A] gives orders to mount ~A [~A] to move in the dir ~A~%" (name mob) (id mob) (name (get-mob-by-id (riding-mob-id mob))) (id (get-mob-by-id (riding-mob-id mob))) dir))
 
       ;; assign the order for the mount for its next turn
-      (setf (order-for-next-turn (get-mob-by-id (riding-mob-id mob))) dir)
+      (setf (order-for-next-turn (get-mob-by-id (riding-mob-id mob))) (list dir dir-z))
       
       ;; perform the attack in the chosen direction (otherwise it will be only the mount that attacks)
       (let ((check-result (check-move-on-level mob (+ (x mob) dx) (+ (y mob) dy) (+ (z mob) dir-z))))
@@ -598,7 +609,7 @@
                            (= x (x mob))
                            (= y (y mob)))
                   (setf move-spd (truncate (* (cur-move-speed mob) (move-spd (get-mob-type-by-id (mob-type mob)))) 100)))
-                ;;(format t "APPLY-GRAVITY ~A~%" apply-gravity)
+                ;(format t "APPLY-GRAVITY ~A~%" apply-gravity)
                 (set-mob-location mob x y z :apply-gravity apply-gravity)
 
                 (when (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
@@ -613,7 +624,7 @@
                  (when (mob-ability-p mob +mob-abil-momentum+)
                   (setf (momentum-spd mob) 0)
                   (setf (momentum-dir mob) (cons 0 0)))
-                (setf (order-for-next-turn mob) 5)
+                (setf (order-for-next-turn mob) (list 5 0))
 
                 ;; if the obstacle is bumpable - bump & exit
                 (when (and (eq (first check-result) :obstacles)
@@ -1300,7 +1311,7 @@
   nil)
 
 (defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()))
-  (logger (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)" (name mob) (id mob) (x mob) (y mob) (z mob)))
+  (logger (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
   (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))))
     
     (when (dead= mob)
@@ -1339,7 +1350,8 @@
     (loop for effect-id being the hash-value in (effects mob)
           for effect = (get-effect-by-id effect-id)
           do
-             (rem-mob-effect mob (effect-type effect)))
+             (when (not (= (effect-type effect) +mob-effect-climbing-mode+))
+               (rem-mob-effect mob (effect-type effect))))
     
     ;; place the inventory on the ground
     (loop for item-id in (inv mob)

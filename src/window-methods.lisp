@@ -175,7 +175,8 @@
     new-str))
 
 (defun get-input-player ()
-  (run-window *current-window*))
+  (run-window *current-window*)
+  )
 
 (defun get-text-input (str key mod unicode)
   (declare (ignore key mod))

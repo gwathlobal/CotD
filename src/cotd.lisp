@@ -84,7 +84,8 @@
                    (funcall (piety-tick-func (get-god-by-id (get-worshiped-god-type (worshiped-god mob)))) (get-god-by-id (get-worshiped-god-type (worshiped-god mob))) mob))))
              (loop for feature-id of-type fixnum in (feature-id-list (level *world*))
                    for feature of-type feature = (get-feature-by-id feature-id)
-                   when (on-tick-func feature)
+                   when (and feature
+                             (on-tick-func feature))
                    do
                       (funcall (on-tick-func feature) (level *world*) feature))
              (when (zerop (random 3))

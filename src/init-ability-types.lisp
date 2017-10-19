@@ -1087,11 +1087,9 @@
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
-                                                
-
-                                                (set-mob-location actor (x target) (y target) (z target))
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
+                                                (set-mob-location actor (x target) (y target) (z target))
 
                                                 (when (or (check-mob-visible actor :observer *player*)
                                                           (check-mob-visible target :observer *player*))
@@ -1240,7 +1238,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
 
                                                 (when (or (check-mob-visible actor :observer *player*)
                                                           (check-mob-visible target :observer *player*))
@@ -1255,10 +1253,12 @@
                                                                          (format nil ". ")))
                                                 
                                                 
-                                                (set-mob-location actor (x target) (y target) (z target))
+                                                
                                                 
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
+
+                                                (set-mob-location actor (x target) (y target) (z target))
 
                                                 (adjust-dodge actor)
                                                 
@@ -1520,10 +1520,9 @@
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil ". "))
                                                       
-                                                      (set-mob-location actor (x target) (y target) (z target))
-                                                      
                                                       (setf (mounted-by-mob-id target) (id actor))
                                                       (setf (riding-mob-id actor) (id target))
+                                                      (set-mob-location actor (x target) (y target) (z target))
                                                                                                             
                                                       (adjust-dodge actor)
                                                       
@@ -3422,15 +3421,14 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
-                                                        (if (and (mob-ability-p actor +mob-abil-restore-soul+)
-                                                                 (mob-effect-p actor +mob-effect-split-soul-target+)
-                                                                 (mob-effect-p source +mob-effect-split-soul-source+)
-                                                                 (not (mob-effect-p actor +mob-effect-divine-concealed+))
-                                                                 (not (mob-effect-p actor +mob-effect-silence+))
-                                                                 (null (riding-mob-id source)))
-                                                          t
-                                                          nil)))
+                                                      (if (and (mob-ability-p actor +mob-abil-restore-soul+)
+                                                               (mob-effect-p actor +mob-effect-split-soul-target+)
+                                                               (mob-effect-p (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+)))) +mob-effect-split-soul-source+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+))
+                                                               (null (riding-mob-id (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+)))))))
+                                                        t
+                                                        nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
                                                   (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
