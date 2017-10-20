@@ -471,6 +471,7 @@
 
     ;; if the mob is a trinity mimic, assign the first one as a leader and make all others in the group follow it
     (when (mob-ai-trinity-mimic-p mob)
+      (setf (order mob) nil)
       (loop for mimic-id in (mimic-id-list mob)
             for mimic = (get-mob-by-id mimic-id)
             when (and (not (eq mimic mob))

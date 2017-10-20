@@ -160,9 +160,9 @@
   (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 45 :y 19 :z 3))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-shadow-demon+ :x 47 :y 18 :z 1))
-        (demon (make-instance 'mob :mob-type +mob-type-fiend+ :x 47 :y 19 :z 3))
-        ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 30 :y 12 :z 1))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-star-gazer+ :x 47 :y 18 :z 3))
+        (demon (make-instance 'mob :mob-type +mob-type-star-singer+ :x 47 :y 19 :z 3))
+        (angel (make-instance 'mob :mob-type +mob-type-star-mender+ :x 47 :y 17 :z 3))
         )
     (setf (cur-fp *player*) 10)
     (setf (max-hp *player*) 50)
@@ -179,11 +179,11 @@
     ;(set-mob-effect soldier :effect-type-id +mob-effect-flying+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
     (add-mob-to-level-list (level world) demon)
-    ;(add-mob-to-level-list (level world) angel)
+    (add-mob-to-level-list (level world) angel)
     
-    ;(setf (mimic-id-list *player*) (list (id *player*) (id soldier) (id demon)))
-    ;(setf (mimic-id-list soldier) (list (id *player*) (id soldier) (id demon)))
-    ;(setf (mimic-id-list demon) (list (id *player*) (id soldier) (id demon)))
+    (setf (mimic-id-list *player*) (list (id angel) (id soldier) (id demon)))
+    (setf (mimic-id-list soldier) (list (id angel) (id soldier) (id demon)))
+    (setf (mimic-id-list demon) (list (id angel) (id soldier) (id demon)))
 
     ;(add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-demon+ :x 35 :y 13 :z 1))
 

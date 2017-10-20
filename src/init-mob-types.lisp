@@ -321,7 +321,7 @@
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-righteous-fury t :abil-pain-link t
                                        :abil-soul-reinforcement t :abil-silence t :abil-confuse t :abil-resurrection t
-                                       :ai-wants-bless t :ai-curious t))
+                                       :ai-wants-bless t :ai-curious t :ai-trinity-mimic t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel-image+
                                        :name "stellar image"

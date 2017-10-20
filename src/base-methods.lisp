@@ -1320,7 +1320,8 @@
     (loop for merged-id in (merged-id-list mob)
           for merged-mob = (get-mob-by-id merged-id)
           do
-             (setf (cur-hp merged-mob) 0))
+             (setf (cur-hp merged-mob) 0)
+             (make-dead merged-mob :splatter nil :msg nil :corpse nil))
     
     (when (and (eq mob *player*)
                killer)
@@ -1738,8 +1739,9 @@
                                             (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
                                      (setf nearest-mob mob))
                               finally (return nearest-mob)))
-    (when nearest-enemy
-      (setf (sense-evil-id *player*) (id nearest-enemy)))))
+    (if nearest-enemy
+      (setf (sense-evil-id *player*) (id nearest-enemy))
+      (setf (sense-evil-id *player*) nil))))
 
 (defun sense-good ()
   (let ((nearest-enemy))
@@ -1754,8 +1756,9 @@
                                             (get-distance (x *player*) (y *player*) (x nearest-mob) (y nearest-mob)))
                                      (setf nearest-mob mob))
                               finally (return nearest-mob)))
-    (when nearest-enemy
-      (setf (sense-good-id *player*) (id nearest-enemy)))))
+    (if nearest-enemy
+      (setf (sense-good-id *player*) (id nearest-enemy))
+      (setf (sense-good-id *player*) nil))))
 
 (defun mob-pick-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))) (silent nil))
   (logger (format nil "MOB-PICK-ITEM: ~A [~A] picks up ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
