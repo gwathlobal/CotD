@@ -9,19 +9,17 @@ The year is 1915. The Great War thunders in the west, but the Hinterland is not 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.2.2
+LATEST CHANGES v1.2.3
 
-- Added a new playable creature - the Eater of the dead. It has two unique abilities - Cannibalize, that lets you devour a corpse to gain HP and power and increase your maximum HP, and Primordial power, that increases your damage, armor, and evasion.
-- Added the Cast shadows ability to all shadow demons. This ability causes a character to cast unnatural shadows that you can use to shadow step to and from.
-- Added the Bend space ability to all crimson demons. This ability lets you teleport to a random location a short distance away.
-- Added the Jump ability to the thief. This ability allows you to move 2 tiles away from you and cling to a wall next to the destination tile.
-- Added the Sprint ability to the thief. This ability allows you to temporarily increase your movement speed.
-- Added the Ressurection ability to all angels. This ability allows you to resurrect other fallen angels and humans.
-- Added morgue files to characters.
-- Added the Split soul ability to the chrome angels. This ability lets the user create an image of themselves that the user can later teleport to.
-- Added graveyards to the building list.
-- Added a new church layout.
-- Added flavor signs to some buildings.
+- Added Malseraph's puppets as a playable faction. Malseraph's puppets are demons who worship Malseraph, the Demon God of Acting, Gambling and Violent Changes. They lack the possession ability but make up for it with the powers of their god.
+- By themselves, Malseraph's puppets have the Irradiate and Fission abilities. Irradiate applies a special status to the target, while Fission is used to cause damage to those with this status and clear it from them. 
+- Malseraph is the master of cards and likes to be entertained. Malseraph likes disguises, polymorphs, and dangerous situations.
+- When Malseraph is in the good mood, it will draw cards with beneficial effects from its decks and can even grant some of the decks to you. When it is in the bad mood, it will use its more malicious cards against you to spice things up.
+- There are two types of decks that Malseraph can give - decks of war and decks of escape. Each deck consists of a number cards that a character can draw. You can not see what card you draw and what cards remain in the deck. Drawing a card immediately invokes its effect.
+- Added Constriction ability to the Eater of the dead. This ability lets you grab targets and continue to deal damage to them automatically while all participants remain in place.
+- Citizens of the City may now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look as an ordinary man or woman to everybody else. 
+- Fixed the bug with jumping when you would fall through the ground if you hit an obstacle during the jump.
+- You can now jump over small obstacles like beds, tables, barricades, and bushes.
 
 --------------------
 FEATURES
@@ -58,6 +56,7 @@ THE CELESTIAL COMMUNION
 THE PANDEMONIUM HIERARCHY
 
  - You start as a puny Crimson or Shadow imp who is no match for a Chrome Angel.
+ - You can also start as a worshipper of a Demon God Malseraph.
  - Kill humans to gain power. Beware of blessed ones. 
  - To win, kill all angels or ascend beyond Archdemon or Shadow devil. Destruction of mankind is not enough.
 
