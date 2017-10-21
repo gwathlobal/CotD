@@ -350,8 +350,8 @@
         (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
       ;; font
       (cond
-        ((equal (options-font *options*) 'font-8x13) (sdl:initialise-default-font sdl:*font-8x13*))
-        (t (sdl:initialise-default-font sdl:*font-6x13*)))
+        ((equal (options-font *options*) 'font-6x13) (sdl:initialise-default-font sdl:*font-6x13*))
+        (t (sdl:initialise-default-font sdl:*font-8x13*)))
       ;; name
       (cond
         ((options-player-name *options*) nil)

@@ -1086,7 +1086,7 @@
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-trinity-mimics+
                                              :type +scenario-feature-player-faction+
-                                             :name "Celestial Communion (as Trinity Mimics)"
+                                             :name "Celestial Communion (as Trinity mimics)"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
@@ -1266,7 +1266,7 @@
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-puppet+
                                              :type +scenario-feature-player-faction+
-                                             :name "Malseraph's puppet"
+                                             :name "Pandemonium Hierarchy (as Malseraph's puppet)"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)

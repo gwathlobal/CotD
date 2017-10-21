@@ -1,8 +1,9 @@
 - Add the possessor faction
-- Add Malseraph's faction
 - Eater should get abilities from corpses
 - Eater should trade power for upgrades
 - Eater should create ammunition and spend it for abilities
+- Scout should call artillery strike
+- Satanists should decipher demonic runes from walls to gain power
 - Movement on tiles with mobs should cost more so that they do not bump into each other that often
 - Add courtyard houses like Thief2RL
 - Add the Revolutionaries faction

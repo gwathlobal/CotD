@@ -3,7 +3,7 @@
 (defstruct options
   (tiles 'large) ;;; 'large - use small tiles 
                  ;;; 'small - use large tiles
-  (font 'font-6x13) ;;; 'font-6x13 - use small font
+  (font 'font-8x13) ;;; 'font-6x13 - use small font
                     ;;; 'font-8x13 - use large font
   (player-name "Player") ;;; default name of the player
   )

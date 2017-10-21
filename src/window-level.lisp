@@ -243,13 +243,16 @@
        (:key-down-event (:key key :mod mod :unicode unicode)
                         (declare (ignore unicode))
 
+                        (format t "~%")
+                        (format t "KEY = ~A~%" key)
+                        (format t "MOD BEFORE NORMALIZE = ~A~%" key)
+                        
                          ;; normalize mod
                         (loop while (>= mod sdl-key-mod-num) do
                           (decf mod sdl-key-mod-num))
-  
-                        ;; remove the messages from the small message box
-                        ;(clear-message-list *small-message-box*)
-                        
+
+                        (format t "MOD AFTER NORMALIZE = ~A~%" key)
+                                                
                         ;;------------------
 			;; moving - arrows
 			(when (or (sdl:key= key :sdl-key-pageup) (sdl:key= key :sdl-key-kp9))
