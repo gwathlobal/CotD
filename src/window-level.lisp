@@ -245,13 +245,13 @@
 
                         (format t "~%")
                         (format t "KEY = ~A~%" key)
-                        (format t "MOD BEFORE NORMALIZE = ~A~%" key)
+                        (format t "MOD BEFORE NORMALIZE = ~A~%" mod)
                         
                          ;; normalize mod
                         (loop while (>= mod sdl-key-mod-num) do
                           (decf mod sdl-key-mod-num))
 
-                        (format t "MOD AFTER NORMALIZE = ~A~%" key)
+                        (format t "MOD AFTER NORMALIZE = ~A~%" mod)
                                                 
                         ;;------------------
 			;; moving - arrows
