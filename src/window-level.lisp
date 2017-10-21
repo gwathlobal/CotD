@@ -241,17 +241,17 @@
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func *current-window*)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
-                        (declare (ignore unicode))
 
-                        (format t "~%")
-                        (format t "KEY = ~A~%" key)
-                        (format t "MOD BEFORE NORMALIZE = ~A~%" mod)
+                        ;(format t "~%")
+                        ;(format t "KEY = ~A~%" key)
+                        ;(format t "MOD BEFORE NORMALIZE = ~A~%" mod)
                         
                          ;; normalize mod
                         (loop while (>= mod sdl-key-mod-num) do
                           (decf mod sdl-key-mod-num))
 
-                        (format t "MOD AFTER NORMALIZE = ~A~%" mod)
+                        ;(format t "MOD AFTER NORMALIZE = ~A~%" mod)
+                        ;(format t "UNICODE = ~A~%" unicode)
                                                 
                         ;;------------------
 			;; moving - arrows
@@ -284,7 +284,8 @@
                             )
                           )
                         (when (or (sdl:key= key :sdl-key-kp5)
-                                  (sdl:key= key :sdl-key-period))
+                                  (and (sdl:key= key :sdl-key-period)
+                                       (= mod 0)))
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -321,11 +322,16 @@
                           )
                         ;;------------------
 			;; move down - Shift + . (i.e., >)
-                        (when (and (sdl:key= key :sdl-key-period) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)
+                        (when (and (or (and (sdl:key= key :sdl-key-period) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                       (eq unicode +cotd-unicode-greater-than-sign+))
+                                   (> (z *player*) 0)
+                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-opaque-floor+))
+                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (1- (z *player*))) +terrain-trait-blocks-move+))
                                    (or (mob-effect-p *player* +mob-effect-climbing-mode+)
                                        (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-water+)
                                        (mob-effect-p *player* +mob-effect-flying+))
-                                   (> (z *player*) 0))
+                                   )
+                          (format t "HERE~%")
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -334,7 +340,8 @@
                           )
                         ;;------------------
 			;; move up - Shift + , (i.e., <)
-                        (when (and (sdl:key= key :sdl-key-comma) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)
+                        (when (and (or (and (sdl:key= key :sdl-key-comma) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                       (eq unicode +cotd-unicode-less-than-sign+))
                                    (or (and (mob-effect-p *player* +mob-effect-climbing-mode+)
                                             (funcall #'(lambda ()
                                                          (let ((result nil))
@@ -349,6 +356,7 @@
                                        (mob-effect-p *player* +mob-effect-flying+))
                                    (not (mob-effect-p *player* +mob-effect-gravity-pull+))
                                    (< (z *player*) (1- (array-dimension (terrain (level *world*)) 2))))
+                          (format t "HERE 2~%")
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -357,18 +365,20 @@
                           )
 			;;------------------
 			;; character mode - Shift + 2
-			(when (and (sdl:key= key :sdl-key-2) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+			(when (or (and (sdl:key= key :sdl-key-2) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                  (eq unicode +cotd-unicode-at-sign+))
 			  (setf *current-window* (make-instance 'character-window :return-to *current-window*)))
                         ;;------------------
 			;; help screen - ?
 			(when (or (sdl:key= key :sdl-key-question)
+                                  (eq unicode +cotd-unicode-question-mark+)
                                   (and (sdl:key= key :sdl-key-slash) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
                                   (and (sdl:key= key :sdl-key-7) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)))
 			  (setf *current-window* (make-instance 'help-window :return-to *current-window*)))		
                         ;;------------------
 			;; select abilities - a
-                        (when (and (sdl:key= key :sdl-key-a))
-
+                        (when (or (and (sdl:key= key :sdl-key-a))
+                                  (eq unicode +cotd-unicode-latin-a-small+))
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (go exit-loop))
@@ -465,7 +475,8 @@
 			    ))
 			;;------------------
 			;; look mode - l
-			(when (and (sdl:key= key :sdl-key-l) (= mod 0))
+			(when (or (and (sdl:key= key :sdl-key-l) (= mod 0))
+                                  (eq unicode +cotd-unicode-latin-l-small+))
 			  (setf *current-window* (make-instance 'map-select-window 
 								:return-to *current-window*
 								:cmd-str (list "[<] Look up  [>] Look down  "
@@ -475,7 +486,8 @@
 			  (make-output *current-window*))
                         ;;------------------
 			;; shoot mode - f
-			(when (and (sdl:key= key :sdl-key-f) (= mod 0))
+			(when (or (and (sdl:key= key :sdl-key-f) (= mod 0))
+                                  (eq unicode +cotd-unicode-latin-f-small+))
 
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -508,7 +520,8 @@
                               (add-message (format nil "Can't switch into firing mode: no ranged weapons.~%")))))
                         ;;------------------
 			;; reload - r
-			(when (and (sdl:key= key :sdl-key-r) (= mod 0))
+			(when (or (and (sdl:key= key :sdl-key-r) (= mod 0))
+                                  (eq unicode +cotd-unicode-latin-r-small+))
                           (clear-message-list *small-message-box*)
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -525,7 +538,8 @@
                               (add-message (format nil "Can't reload: this is not a ranged weapon.~%")))))
                         ;;------------------
 			;; view inventory - i
-                        (when (and (sdl:key= key :sdl-key-i) (= mod 0))
+                        (when (or (and (sdl:key= key :sdl-key-i) (= mod 0))
+                                  (eq unicode +cotd-unicode-latin-i-small+))
                           (setf *current-window* (make-instance 'inventory-window :return-to *current-window*)))
                         ;;------------------
 			;; pick item - p, g or ,
@@ -575,13 +589,15 @@
 			    ))
                         ;;------------------
 			;; view messages - m
-                        (when (and (sdl:key= key :sdl-key-m) (= mod 0))
+                        (when (or (and (sdl:key= key :sdl-key-m) (= mod 0))
+                                  (eq unicode +cotd-unicode-latin-m-small+))
 			  (setf *current-window* (make-instance 'message-window 
 								:return-to *current-window*))
                           (make-output *current-window*))
                         ;;------------------
 			;; quit to menu - Shift + q
-                        (when (and (sdl:key= key :sdl-key-q) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                        (when (or (and (sdl:key= key :sdl-key-q) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                  (eq unicode +cotd-unicode-latin-q-captial+))
                           (setf *current-window* (make-instance 'select-obj-window 
                                                                 :return-to *current-window*
                                                                 :header-line "Are you sure you want to quit?"
