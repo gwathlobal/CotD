@@ -4,6 +4,10 @@
 ;; ABILITY-TYPE
 ;;--------------------
 
+(defconstant +abil-select-start-with-hostile+ 0)
+(defconstant +abil-select-start-with-self+ 1)
+(defconstant +abil-select-start-with-ally+ 2)
+
 (defclass ability-type ()
   ((id :initarg :id :accessor id)
    (name :initarg :name :accessor name)
@@ -12,6 +16,7 @@
    (spd :initform +normal-ap+ :initarg :spd :accessor spd)
    (cd :initform 0 :initarg :cd :accessor cd)
    (motion :initform 0 :initarg :motion :accessor motion)
+   (start-map-select-func :initform nil :initarg :start-map-select-func :accessor start-map-select-func)
    (passive :initform t :initarg :passive :accessor passive) ;; passive abilities should have their cost set to 0
    (on-touch :initform nil :initarg :on-touch :accessor on-touch :type boolean) ;; if the abilities should be invoked, when actor bumps into target
    (final :initform t :initarg :final :accessor final :type boolean) ;; if the ability is invoked, no further abilities can be invoked
@@ -70,6 +75,9 @@
 
 (defun abil-max-cd-p (ability-type-id)
   (cd (get-ability-type-by-id ability-type-id)))
+
+(defun abil-start-map-select-func-p (ability-type-id)
+  (start-map-select-func (get-ability-type-by-id ability-type-id)))
 
 (defun abil-cur-cd-p (mob ability-type-id)
   (if (gethash ability-type-id (abilities-cd mob))

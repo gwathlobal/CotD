@@ -228,8 +228,6 @@
   
   )
 
-
-
 (defmethod make-output ((win cell-window))
   
   (update-screen win)
@@ -438,6 +436,7 @@
                                                                                            (progn
                                                                                              (setf *current-window* (make-instance 'map-select-window 
                                                                                                                                    :return-to *current-window*
+                                                                                                                                   :start-map-select (abil-start-map-select-func-p (nth cur-sel mob-abilities))
                                                                                                                                    :cmd-str (list "[Enter] Invoke  "
                                                                                                                                                   "")
                                                                                                                                    :exec-func #'(lambda ()

@@ -1,5 +1,7 @@
 CHANGELOG
 
+- If an ability requires the player to select the target, the the game will initially focus applicable target (instead of always focusing hostile characters).
+
 --------------------
 October 21, 2017 v1.2.3
 

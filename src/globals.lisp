@@ -284,6 +284,7 @@
 (defconstant +item-type-disguise+ 8)
 (defconstant +item-type-deck-of-war+ 9)
 (defconstant +item-type-deck-of-escape+ 10)
+(defconstant +item-type-eater-parasite+ 11)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants

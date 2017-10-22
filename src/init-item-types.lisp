@@ -30,8 +30,8 @@
                                          :descr "A medkit that can heal 3-5 HP. Usable by humans only. Unusable underwater."
                                          :flavor-quote (format nil "\"There was a large wound in his stomach. The King washed it as best he could, and bandaged it with his handkerchief and with a towel the hermit had. But the blood would not stop flowing, and the King again and again removed the bandage soaked with warm blood, and washed and rebandaged the wound. When at last the blood ceased flowing, the man revived and asked for something to drink.\"~%Leo Tolstoy. Three Questions.")
                                          :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 10 :value 10
-                                         :on-use #'(lambda (actor item)
-                                                     (declare (ignore item))
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore item target))
                                                      (let ((heal-pwr (+ 3 (random 3))))
                                                        (when (> (+ (cur-hp actor) heal-pwr)
                                                                 (max-hp actor))
@@ -61,15 +61,18 @@
                                                                             (< (/ (cur-hp actor) (max-hp actor)) 
                                                                                0.5))))
                                                             t
-                                                            nil))))
+                                                            nil))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-enemy nearest-ally check-result))
+                                                             (mob-use-item actor nil item))))
 
 (set-item-type (make-instance 'item-type :id +item-type-smoke-bomb+
                                          :name "smoke bomb" :plural-name "smoke bombs"
                                          :descr "A bomb that emits clouds of smoke to conceal you. Usable only by humans. Can not be used in water."
                                          :flavor-quote (format nil "\"All smoke and steam, he thought; all seems for ever changing, on all sides new forms, phantoms flying after phantoms, while in reality it is all the same and the same again; everything hurrying, flying towards something, and everything vanishing without a trace, attaining to nothing; another wind blows, and all is dashing in the opposite direction, and there again the same untiring, restless - and useless gambols!\"~%Ivan Turgenev. Smoke.")
                                          :glyph-idx 1 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :max-stack-num 10 :value 10
-                                         :on-use #'(lambda (actor item)
-                                                     (declare (ignore item))
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore target item))
                                                      (when (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
                                                        (let ((cell-list (list '(-1 -1 1) '(-1 0 1) '(-1 1 1) '(0 -1 1) '(0 0 1) '(0 1 1) '(1 -1 1) '(1 0 1) '(1 1 1)
                                                                               '(-1 -1 0) '(-1 0 0) '(-1 1 0) '(0 -1 0) '(0 0 0) '(0 1 0) '(1 -1 0) '(1 0 0) '(1 1 0)
@@ -113,7 +116,10 @@
                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
                                                                       0.4))
                                                             t
-                                                            nil))))
+                                                            nil))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-enemy nearest-ally check-result))
+                                                             (mob-use-item actor nil item))))
 
 (set-item-type (make-instance 'item-type :id +item-type-clothing+
                                          :name "civilian costume" :plural-name "civilian costumes"
@@ -125,8 +131,8 @@
                                          :descr "A special kit that lets you disguise yourself as an ordinary man or woman. Usable by humans and Malseraph's puppets only."
                                          :flavor-quote (format nil "\"The door opened and a masked corpulent stocky man, wearing a coachman's suit and a hat with peackock's feathers, entered the reading room. He was followed by two masked ladies and a servant holding a tray. On the tray, there stood a bellied bottle of liqueur, three bottles of red wine and several glasses.\"~%Anton Checkov. The Mask.")
                                          :glyph-idx 59 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-stack-num 10 :value 10
-                                         :on-use #'(lambda (actor item)
-                                                     (declare (ignore item))
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore target item))
                                                      
                                                      (invoke-disguise actor)
                                                      ;; remove after use
@@ -143,7 +149,10 @@
                                                           (if (and (funcall (on-check-applic item) actor item)
                                                                    (not nearest-enemy))
                                                             t
-                                                            nil))))
+                                                            nil))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-enemy nearest-ally check-result))
+                                                             (mob-use-item actor nil item))))
 
 (set-item-type (make-instance 'item-type :id +item-type-deck-of-war+
                                          :name "deck of war" :plural-name "decks of war"
@@ -152,8 +161,8 @@
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
                                          :abil-card (list +item-card-curse-other+ +item-card-blindness-other+ +item-card-fear-other+ +item-card-slow-other+ +item-card-silence-other+ +item-card-confuse-other+
                                                           +item-card-polymorph-other+ +item-card-irradiate-other+)
-                                         :on-use #'(lambda (actor item)
-
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore target))
                                                      (when (cards item)
                                                        (let ((card-type-id))
                                                          (setf card-type-id (pop (cards item)))
@@ -181,7 +190,10 @@
                                                                          0.5)
                                                                       (> (strength nearest-enemy) (strength actor))))
                                                             t
-                                                            nil))))
+                                                            nil))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-enemy nearest-ally check-result))
+                                                             (mob-use-item actor nil item))))
 
 (set-item-type (make-instance 'item-type :id +item-type-deck-of-escape+
                                          :name "deck of escape" :plural-name "decks of escape"
@@ -189,8 +201,8 @@
                                          :flavor-quote (format nil "\"As for cards, there was no habit to play cards in those circles (mainly literary ones) where Fyodor Mikhailovich used to move. During our 14 years of marriage, my husband played preferans only once, at my relatives' place; and though he had not touched a card for more than 10 years, he played perfectly and even managed to win several roubles from his partners which embarrassed him greatly.\"~%Anna Dostoevskaya. Dostoevsky: Reminiscences.")
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
                                          :abil-card (list +item-card-blink+ +item-card-teleport+ +item-card-sprint+ +item-card-flying+ +item-card-disguise+)
-                                         :on-use #'(lambda (actor item)
-
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore target))
                                                      (when (cards item)
                                                        (let ((card-type-id))
                                                          (setf card-type-id (pop (cards item)))
@@ -217,4 +229,44 @@
                                                                          0.5)
                                                                       (> (strength nearest-enemy) (strength actor))))
                                                             t
-                                                            nil))))
+                                                            nil))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-enemy nearest-ally check-result))
+                                                             (mob-use-item actor nil item))))
+
+(set-item-type (make-instance 'item-type :id +item-type-eater-parasite+
+                                         :name "parasite" :plural-name "parasites"
+                                         :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 1000
+                                         :on-use #'(lambda (actor target item)
+                                                     ;; always remove 1 item
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
+                                                            (declare (ignore actor))
+                                                              t)
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally))
+                                                          (if (and (funcall (on-check-applic item) actor item)
+                                                                   nearest-enemy
+                                                                   (or (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                          0.5)
+                                                                       (> (strength nearest-enemy) (strength actor))))
+                                                            t
+                                                            nil))
+                                         :map-select-func #'(lambda (item)
+                                                              (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                                (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                         (= (view-z *player*) (z *player*))
+                                                                         (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
+                                                                         (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                         (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                             (get-terrain-type-trait terrain +terrain-trait-water+))
+                                                                         (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+)))
+                                                                  (progn
+                                                                    (clear-message-list *small-message-box*)
+                                                                    (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
+                                                                    t)
+                                                                  (progn
+                                                                    nil))))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-ally check-result))
+                                                             (mob-use-item actor nearest-enemy item))))

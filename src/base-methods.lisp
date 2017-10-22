@@ -1007,9 +1007,9 @@
       (incf-mob-motion actor (motion ability-type))
       (make-act actor (spd ability-type)))))
 
-(defun mob-use-item (actor item)
+(defun mob-use-item (actor target item)
   (when (on-use item)
-    (when (funcall (on-use item) actor item)
+    (when (funcall (on-use item) actor target item)
       (setf (inv actor) (remove-from-inv item (inv actor) :qty 1))
       (remove-item-from-world item))
     (incf-mob-motion actor *mob-motion-use-item*)
@@ -2045,3 +2045,329 @@
                  (check-piety-level-changed (get-worshiped-god-type (worshiped-god mob))
                                             old-piety (get-worshiped-god-piety (worshiped-god mob))))
         (print-visible-message (x mob) (y mob) (z mob) (level *world*) (return-piety-change-str (get-worshiped-god-type (worshiped-god mob)) (get-worshiped-god-piety (worshiped-god mob)) old-piety))))))
+
+(defun player-start-map-select-nearest-hostile ()
+  (let ((hostile-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob)))))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id))))
+            do
+               (push mob-id hostile-mobs))
+    
+    (setf hostile-mobs (sort hostile-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
+                                   t
+                                   nil))
+                             :key #'(lambda (mob-id)
+                                      (get-mob-by-id mob-id))))
+    (if hostile-mobs
+      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))) (view-z *player*) (z (get-mob-by-id (first hostile-mobs))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-nearest-hostile-next ()
+  (let ((hostile-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob)))))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id)))
+                    (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 2))
+            do
+               (push mob-id hostile-mobs))
+    
+    (setf hostile-mobs (sort hostile-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
+                                   t
+                                   nil))
+                             :key #'(lambda (mob-id)
+                                      (get-mob-by-id mob-id))))
+    (if hostile-mobs
+      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))) (view-z *player*) (z (get-mob-by-id (first hostile-mobs))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-nearest-ally ()
+  (let ((allied-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (get-faction-relation (faction *player*) (faction mob))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id))))
+            do
+               (push mob allied-mobs))
+    
+    (setf allied-mobs (sort allied-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (get-faction-relation (faction *player*) (faction mob-1))
+                                          (get-faction-relation (faction *player*) (faction mob-2)))
+                                   t
+                                   nil))
+                             ))
+    (if allied-mobs
+      (setf (view-x *player*) (x (first allied-mobs)) (view-y *player*) (y (first allied-mobs)) (view-z *player*) (z (first allied-mobs)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-nearest-ally-next ()
+  (let ((allied-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (get-faction-relation (faction *player*) (faction mob))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id)))
+                    (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 2))
+            do
+               (push mob allied-mobs))
+    
+    (setf allied-mobs (sort allied-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (get-faction-relation (faction *player*) (faction mob-1))
+                                          (get-faction-relation (faction *player*) (faction mob-2)))
+                                   t
+                                   nil))
+                             ))
+    (if allied-mobs
+      (setf (view-x *player*) (x (first allied-mobs)) (view-y *player*) (y (first allied-mobs)) (view-z *player*) (z (first allied-mobs)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-self ()
+  (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*)))
+
+(defun player-start-map-select-death-from-above ()
+  (let ((hostile-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob)))))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id)))
+                    (< (z mob) (z *player*)))
+            do
+               (push mob-id hostile-mobs))
+    
+    (setf hostile-mobs (sort hostile-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
+                                   t
+                                   nil))
+                             :key #'(lambda (mob-id)
+                                      (get-mob-by-id mob-id))))
+    (if hostile-mobs
+      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))) (view-z *player*) (z (get-mob-by-id (first hostile-mobs))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-door ()
+  (let ((doors nil))
+    (check-surroundings (x *player*) (y *player*) nil #'(lambda (dx dy)
+                                                        (let ((terrain (get-terrain-* (level *world*) dx dy (z *player*))))
+                                                          (when (and terrain
+                                                                     (not (get-mob-* (level *world*) dx dy (z *player*)))
+                                                                     (get-terrain-type-trait terrain +terrain-trait-openable-door+))
+                                                            (push (list dx dy (z *player*)) doors)))))
+    
+    (if doors
+      (setf (view-x *player*) (first (first doors)) (view-y *player*) (second (first doors)) (view-z *player*) (third (first doors)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-light ()
+  (let ((lights nil))
+    (check-surroundings (x *player*) (y *player*) nil #'(lambda (dx dy)
+                                                        (let ((terrain (get-terrain-* (level *world*) dx dy (z *player*))))
+                                                          (when (and terrain
+                                                                     (get-terrain-type-trait terrain +terrain-trait-light-source+))
+                                                            (push (list dx dy (z *player*)) lights)))))
+    
+    (if lights
+      (setf (view-x *player*) (first (first lights)) (view-y *player*) (second (first lights)) (view-z *player*) (third (first lights)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-window ()
+  (let ((windows nil))
+    (check-surroundings (x *player*) (y *player*) nil #'(lambda (dx dy)
+                                                          (let ((terrain (get-terrain-* (level *world*) dx dy (z *player*))))
+                                                            (when (and terrain
+                                                                       (not (get-mob-* (level *world*) dx dy (z *player*)))
+                                                                       (get-terrain-type-trait terrain +terrain-trait-openable-window+))
+                                                              (push (list dx dy (z *player*)) windows)))))
+    
+    (if windows
+      (setf (view-x *player*) (first (first windows)) (view-y *player*) (second (first windows)) (view-z *player*) (third (first windows)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-corpse ()
+  (let ((corpses nil))
+    (update-visible-items *player*)
+    (loop for item-id in (visible-items *player*)
+          for item = (get-item-by-id item-id)
+          when (and (item-ability-p item +item-abil-corpse+))
+            do
+               (push item corpses))
+
+    (setf corpses (sort corpses
+                        #'(lambda (item-1 item-2)
+                            (if (and (< (get-distance (x *player*) (y *player*) (x item-1) (y item-1))
+                                        (get-distance (x *player*) (y *player*) (x item-2) (y item-2))))
+                                   t
+                                   nil))
+                        ))
+
+    (if corpses
+      (setf (view-x *player*) (x (first corpses)) (view-y *player*) (y (first corpses)) (view-z *player*) (z (first corpses)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-empower-undead ()
+  (let ((allied-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (get-faction-relation (faction *player*) (faction mob))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id)))
+                    (mob-ability-p mob +mob-abil-undead+))
+            do
+               (push mob allied-mobs))
+    
+    (setf allied-mobs (sort allied-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (get-faction-relation (faction *player*) (faction mob-1))
+                                          (get-faction-relation (faction *player*) (faction mob-2)))
+                                   t
+                                   nil))
+                             ))
+    (if allied-mobs
+      (setf (view-x *player*) (x (first allied-mobs)) (view-y *player*) (y (first allied-mobs)) (view-z *player*) (z (first allied-mobs)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-hostile-unholy ()
+  (let ((hostile-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob)))))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id)))
+                    (mob-ability-p mob +mob-abil-unholy+))
+            do
+               (push mob-id hostile-mobs))
+    
+    (setf hostile-mobs (sort hostile-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
+                                   t
+                                   nil))
+                             :key #'(lambda (mob-id)
+                                      (get-mob-by-id mob-id))))
+    (if hostile-mobs
+      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))) (view-z *player*) (z (get-mob-by-id (first hostile-mobs))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-extinguish-light ()
+  (let ((hostile-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob)))))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id)))
+                    (> (cur-light mob) 0))
+            do
+               (push mob-id hostile-mobs))
+    
+    (setf hostile-mobs (sort hostile-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1)))))
+                                          (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2))))))
+                                   t
+                                   nil))
+                             :key #'(lambda (mob-id)
+                                      (get-mob-by-id mob-id))))
+    (if hostile-mobs
+      (setf (view-x *player*) (x (get-mob-by-id (first hostile-mobs))) (view-y *player*) (y (get-mob-by-id (first hostile-mobs))) (view-z *player*) (z (get-mob-by-id (first hostile-mobs))))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-select-merge ()
+  (let ((allied-mobs))
+     ;; find the nearest hostile mob & set it as target
+    (loop for mob-id in (visible-mobs *player*)
+          for mob = (get-mob-by-id mob-id)
+          when (and (get-faction-relation (faction *player*) (faction mob))
+                    (not (and (riding-mob-id *player*)
+                              (= (riding-mob-id *player*) mob-id)))
+                    (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 2)
+                    (find (id mob) (mimic-id-list *player*)))
+            do
+               (push mob allied-mobs))
+    
+    (setf allied-mobs (sort allied-mobs
+                             #'(lambda (mob-1 mob-2)
+                                 (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
+                                             (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2))))
+                                   t
+                                   nil))
+                             ))
+    (if allied-mobs
+      (setf (view-x *player*) (x (first allied-mobs)) (view-y *player*) (y (first allied-mobs)) (view-z *player*) (z (first allied-mobs)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))
+
+(defun player-start-map-resurrect ()
+  (let ((corpses nil))
+    (update-visible-items *player*)
+    (loop for item-id in (visible-items *player*)
+          for item = (get-item-by-id item-id)
+          when (and (item-ability-p item +item-abil-corpse+)
+                    (not (mob-ability-p (get-mob-by-id (dead-mob item)) +mob-abil-demon+))
+                    (= (item-type item) +item-type-body-part-full+))
+            do
+               (push item corpses))
+
+    (setf corpses (sort corpses
+                        #'(lambda (item-1 item-2)
+                            (if (and (< (get-distance (x *player*) (y *player*) (x item-1) (y item-1))
+                                        (get-distance (x *player*) (y *player*) (x item-2) (y item-2))))
+                                   t
+                                   nil))
+                        ))
+
+    (if corpses
+      (setf (view-x *player*) (x (first corpses)) (view-y *player*) (y (first corpses)) (view-z *player*) (z (first corpses)))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      )))

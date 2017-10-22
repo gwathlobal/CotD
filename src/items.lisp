@@ -17,6 +17,8 @@
    (on-use :initform nil :initarg :on-use :accessor on-use)
    (on-check-applic :initform nil :initarg :on-check-applic :accessor on-check-applic)
    (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)
+   (ai-invoke-func :initform nil :initarg :ai-invoke-func :accessor ai-invoke-func)
+   (map-select-func :initform nil :initarg :map-select-func :accessor map-select-func)
    ))
 
 (defmethod initialize-instance :after ((item-type item-type) &key abil-corpse abil-card)
@@ -101,6 +103,12 @@
 
 (defmethod on-check-applic ((item item))
   (on-check-applic (get-item-type-by-id (item-type item))))
+
+(defmethod ai-invoke-func ((item item))
+  (ai-invoke-func (get-item-type-by-id (item-type item))))
+
+(defmethod map-select-func ((item item))
+  (map-select-func (get-item-type-by-id (item-type item))))
 
 (defmethod descr ((item item))
   (descr (get-item-type-by-id (item-type item))))

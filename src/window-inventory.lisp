@@ -164,13 +164,34 @@
                         (when (and (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                    (on-use (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                    (funcall (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win))) *player* (get-inv-item-by-pos (inv *player*) (cur-inv win))))
-                          (clear-message-list *small-message-box*)
-                          (mob-use-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                          (setf *current-window* (return-to win))
-                          (make-output *current-window*)
-                          (return-from run-window nil)))
-                       ;((sdl:key= key :sdl-key-return) (on-use (get-item-inv (cur-inv win) *player*) *player*))
-		       ;  ((and (sdl:key= key :sdl-key-e) (= mod 0)) (eject-ammo *player* (get-item-inv (cur-inv win) *player*)))
+                          (cond
+                            ((map-select-func (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                             (progn
+                               (setf *current-window* (make-instance 'map-select-window 
+                                                                     :return-to *current-window*
+                                                                     :cmd-str (list "[Enter] Use  "
+                                                                                    "")
+                                                                     :exec-func #'(lambda ()
+                                                                                    (if (funcall (map-select-func (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                                                                                                 (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                                                                                      (progn
+                                                                                        (setf *current-window* win)
+                                                                                        (make-output *current-window*)
+                                                                                        t)
+                                                                                      (progn
+                                                                                        nil)))
+                                                                     ))
+                               (make-output *current-window*)
+                               (when (run-window *current-window*)
+                                 (return-from run-window nil))))
+                            (t
+                             (progn
+                               (clear-message-list *small-message-box*)
+                               (mob-use-item *player* nil (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                               (setf *current-window* (return-to win))
+                               (make-output *current-window*)
+                               (return-from run-window nil))))
+                          ))
                        )
                      (make-output *current-window*)
                      

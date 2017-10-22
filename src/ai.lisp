@@ -490,18 +490,19 @@
       (setf ability-list (loop for ability-id being the hash-key in (abilities mob)
                                for ability = (get-ability-type-by-id ability-id)
                                for func of-type function = (on-check-ai ability)
+                               with check-result = nil 
                                when (and func
-                                         (funcall func ability mob nearest-enemy nearest-ally))
-                                 collect ability))
+                                         (setf check-result (funcall func ability mob nearest-enemy nearest-ally)))
+                                 collect (list ability check-result)))
 
       
       ;; randomly choose one of them and invoke it
       (when ability-list
         (setf r (random (length ability-list)))
-        (let ((ai-invoke-func (on-invoke-ai (nth r ability-list))))
+        (let ((ai-invoke-func (on-invoke-ai (first (nth r ability-list)))))
           (declare (type function ai-invoke-func))
-          (logger (format nil "AI-FUNCTION: ~A [~A] decides to invoke ability ~A~%" (name mob) (id mob) (name (nth r ability-list))))
-          (funcall ai-invoke-func (nth r ability-list) mob nearest-enemy nearest-ally))
+          (logger (format nil "AI-FUNCTION: ~A [~A] decides to invoke ability ~A~%" (name mob) (id mob) (name (first (nth r ability-list)))))
+          (funcall ai-invoke-func (first (nth r ability-list)) mob nearest-enemy nearest-ally (second (nth r ability-list))))
         (return-from ai-function)
         )
       )
@@ -514,19 +515,21 @@
       ;; find all applicable items
       (setf item-list (loop for item-id in (inv mob)
                             for item = (get-item-by-id item-id)
-                            for ai-func of-type function = (on-check-ai item)
-                            for use-func of-type function = (on-use item) 
+                            for ai-check-func of-type function = (on-check-ai item)
+                            for use-func of-type function = (on-use item)
+                            with check-result = nil 
                             when (and use-func
-                                      ai-func
-                                      (funcall ai-func mob item nearest-enemy nearest-ally))
-                              collect item))
+                                      ai-check-func
+                                      (setf check-result (funcall ai-check-func mob item nearest-enemy nearest-ally)))
+                              collect (list item check-result)))
 
       
       ;; randomly choose one of them and invoke it
       (when item-list
         (setf r (random (length item-list)))
-        (logger (format nil "AI-FUNCTION: ~A [~A] decides to use item ~A [~A]~%" (name mob) (id mob) (name (nth r item-list)) (id (nth r item-list))))
-        (mob-use-item mob (nth r item-list))
+        (let ((ai-invoke-func (ai-invoke-func (first (nth r item-list)))))
+          (logger (format nil "AI-FUNCTION: ~A [~A] decides to use item ~A [~A]~%" (name mob) (id mob) (name (nth r item-list)) (id (first (nth r item-list)))))
+          (funcall ai-invoke-func (first (nth r item-list)) mob nearest-enemy nearest-ally (second (nth r item-list))))
         (return-from ai-function)
         )
       )

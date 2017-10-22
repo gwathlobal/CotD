@@ -39,8 +39,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-heal-self+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -72,8 +72,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-conceal-divine+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -111,8 +111,8 @@
                                                                (abil-applic-cost-p +mob-abil-heal-self+ actor)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -389,8 +389,8 @@
                                                            (> (total-demons *world*) 1))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -484,8 +484,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-answer-the-call+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -593,8 +593,8 @@
                                                                     (zerop (random 4)))))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -650,8 +650,8 @@
                                                            (> (total-demons *world*) 0))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-prayer-shield+ :name "Pray for protection" :descr "Pray to grant divine protection (1/3rd chance only) to all allies in the area. Divine protection prevents one harmful action from affecting the shielded target." 
@@ -706,8 +706,8 @@
                                                            (zerop (random 3)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -740,8 +740,8 @@
                                                            (zerop (random 3)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -802,8 +802,8 @@
                                                            (zerop (random 3)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -861,8 +861,8 @@
                                                            (zerop (random 3)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -917,8 +917,8 @@
                                                                                            sum (strength mob)))))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -965,8 +965,8 @@
                                                                                            sum (strength mob)))))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -974,6 +974,7 @@
                                  :cd 4 :cost 0 :spd (truncate (* +normal-ap+ 1.5)) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; here the target is not a mob, but a (cons x y)
@@ -1051,8 +1052,8 @@
                                                                (not blocked))
                                                         t
                                                         nil))))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor (cons (x nearest-enemy) (y nearest-enemy)) (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (if (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
@@ -1083,6 +1084,7 @@
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
+                                 :start-map-select-func #'player-start-map-select-nearest-ally-next
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1115,20 +1117,12 @@
                                                                                                         (setf mount mob)))))
                                                     (if (and mount
                                                              (can-invoke-ability actor actor (id ability-type)))
-                                                      t
+                                                      mount
                                                       nil))
                                                   )
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally))
-                                                   (let ((mount nil))
-                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and mob
-                                                                                                                 (get-faction-relation (faction actor) (faction mob))
-                                                                                                                 (mob-ability-p mob +mob-abil-horse-can-be-ridden+)
-                                                                                                                 (null (mounted-by-mob-id mob)))
-                                                                                                        (setf mount mob)))))
-                                                     (mob-invoke-ability actor mount (id ability-type))))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
@@ -1156,6 +1150,7 @@
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
+                                 :start-map-select-func #'player-start-map-select-self
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; here the target is not a mob, but a (cons x y)
@@ -1186,8 +1181,8 @@
                                                   (declare (ignore actor nearest-enemy ability-type nearest-ally))
                                                   nil
                                                   )
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy check-result))
                                                    (mob-invoke-ability actor nearest-ally (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((cell-list nil)
@@ -1236,6 +1231,7 @@
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil :removes-disguise t
                                  :motion 50
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile-next
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
@@ -1282,19 +1278,12 @@
                                                                                                         (setf mount mob)))))
                                                     (if (and mount
                                                              (can-invoke-ability actor mount (id ability-type)))
-                                                      t
+                                                      mount
                                                       nil))
                                                   )
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally))
-                                                   (let ((mount nil))
-                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and mob
-                                                                                                                 (mob-ability-p mob +mob-abil-fiend-can-be-ridden+)
-                                                                                                                 (null (mounted-by-mob-id mob)))
-                                                                                                        (setf mount mob)))))
-                                                     (mob-invoke-ability actor mount (id ability-type))))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (if (and (not (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
@@ -1335,6 +1324,7 @@
                                  :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-nearest-ally
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-EAGLE-EYE: ~A [~A] uses eagle eye to reveal ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1375,8 +1365,8 @@
                                                            (zerop (random 4)))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy check-result))
                                                    (mob-invoke-ability actor nearest-ally (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -1415,6 +1405,7 @@
                                  :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1441,8 +1432,8 @@
                                                            nearest-enemy)
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -1483,8 +1474,8 @@
                                                                        0.5))))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -1492,6 +1483,7 @@
                                  :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile-next
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DOMINATE-GARGANTAUR: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1549,19 +1541,12 @@
                                                              (> (/ (cur-hp actor) (max-hp actor)) 
                                                                 0.5)
                                                              (can-invoke-ability actor mount (id ability-type)))
-                                                      t
+                                                      mount
                                                       nil))
                                                   )
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally))
-                                                   (let ((mount nil))
-                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and mob
-                                                                                                                 (= (mob-type mob) +mob-type-gargantaur+)
-                                                                                                                 (null (mounted-by-mob-id mob)))
-                                                                                                        (setf mount mob)))))
-                                                     (mob-invoke-ability actor mount (id ability-type))))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mount-list nil))
                                                         (check-surroundings (x *player*) (y *player*) nil #'(lambda (dx dy)
@@ -1585,6 +1570,7 @@
                                  :cd 4 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-GARGANTAURS-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1612,8 +1598,8 @@
                                                            nearest-enemy)
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -1634,6 +1620,7 @@
                                  :cd 1 :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
+                                 :start-map-select-func #'player-start-map-select-death-from-above
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-DEATH-FROM-ABOVE: ~A [~A] uses death from above on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -1706,8 +1693,8 @@
                                                            )
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -1770,8 +1757,8 @@
                                                            (not (mob-effect-p actor +mob-effect-climbing-mode+)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -1785,6 +1772,7 @@
                                  :id +mob-abil-open-close-door+ :name "Open/close door" :descr "Open or close door (depending on the current status of the door in question). You can also open a closed door by walking into it." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :start-map-select-func #'player-start-map-select-door
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the tile to be toggled
@@ -1809,8 +1797,8 @@
                                                            (null (get-mob-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor))))))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor (first (path actor)) (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -1833,6 +1821,7 @@
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-light
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the tile to be toggled
@@ -1868,23 +1857,11 @@
                                                     (if (and (mob-ability-p actor +mob-abil-toggle-light+)
                                                              (can-invoke-ability actor actor +mob-abil-toggle-light+)
                                                              light-source)
-                                                      t
+                                                      light-source
                                                       nil)))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally))
-                                                   (let ((light-source nil))
-                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and terrain
-                                                                                                                 (or (and (<= (cur-light actor) 0)
-                                                                                                                          (get-terrain-type-trait terrain +terrain-trait-light-source+)
-                                                                                                                          (not (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+))))
-                                                                                                                     (and (> (cur-light actor) 0)
-                                                                                                                          (get-terrain-type-trait terrain +terrain-trait-light-source+)
-                                                                                                                          (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+)))))
-                                                                                                        (setf light-source (list dx dy (z actor)))))))
-                                                     (when light-source
-                                                       (mob-invoke-ability actor light-source (id ability-type))))
+                                                   (mob-invoke-ability actor check-result (id ability-type))
                                                    )
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -1904,6 +1881,7 @@
                                  :id +mob-abil-open-close-window+ :name "Open/close window" :descr "Open or close window (depending on the current status of the door in question). You can also open a closed window by walking into it." 
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
+                                 :start-map-select-func #'player-start-map-select-window
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the tile to be toggled
@@ -1928,8 +1906,8 @@
                                                            (null (get-mob-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor))))))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor (first (path actor)) (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -1976,8 +1954,8 @@
                                                            (not (mob-effect-p actor +mob-effect-ready-to-possess+)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -2021,8 +1999,8 @@
                                                               0.25))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor (get-mob-by-id (slave-mob-id actor)) (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -2030,6 +2008,7 @@
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :cd 4 :motion 60
+                                 :start-map-select-func #'player-start-map-select-corpse
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-REANIMATE-BODY: ~A [~A] reanimates ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
@@ -2065,58 +2044,36 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally nearest-enemy))
-                                                  (if (and (mob-ability-p actor +mob-abil-reanimate-corpse+)
-                                                           (can-invoke-ability actor actor +mob-abil-reanimate-corpse+)
-                                                           (funcall #'(lambda ()
-                                                                        (let ((visible-items (copy-list (visible-items actor))))
-                                                                          (setf visible-items (remove-if #'(lambda (a)
-                                                                                                             (if (item-ability-p (get-item-by-id a) +item-abil-corpse+)
-                                                                                                               nil
-                                                                                                               t))
-                                                                                                         visible-items))
-                                                                          (setf visible-items (remove-if #'(lambda (a)
-                                                                                                             (if (get-mob-* (level *world*) (x a) (y a) (z a))
-                                                                                                               t
-                                                                                                               nil))
-                                                                                                         visible-items
-                                                                                                         :key #'get-item-by-id))
-                                                                          (setf visible-items (stable-sort visible-items #'(lambda (a b)
-                                                                                                                             (if (> (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
-                                                                                                                                    (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
-                                                                                                                               t
-                                                                                                                               nil))
-                                                                                                           :key #'get-item-by-id))
-                                                                          (if visible-items
-                                                                            (first visible-items)
-                                                                            nil))))
-                                                           )
-                                                    t
-                                                    nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (let ((item-id (funcall #'(lambda ()
+                                                                              (let ((visible-items (copy-list (visible-items actor))))
+                                                                                (setf visible-items (remove-if #'(lambda (a)
+                                                                                                                   (if (item-ability-p (get-item-by-id a) +item-abil-corpse+)
+                                                                                                                     nil
+                                                                                                                     t))
+                                                                                                               visible-items))
+                                                                                (setf visible-items (remove-if #'(lambda (a)
+                                                                                                                   (if (get-mob-* (level *world*) (x a) (y a) (z a))
+                                                                                                                     t
+                                                                                                                     nil))
+                                                                                                               visible-items
+                                                                                                               :key #'get-item-by-id))
+                                                                                (setf visible-items (stable-sort visible-items #'(lambda (a b)
+                                                                                                                                   (if (> (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
+                                                                                                                                          (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
+                                                                                                                                     t
+                                                                                                                                     nil))
+                                                                                                                 :key #'get-item-by-id))
+                                                                                (if visible-items
+                                                                                  (first visible-items)
+                                                                                  nil))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-reanimate-corpse+)
+                                                             (can-invoke-ability actor actor +mob-abil-reanimate-corpse+)
+                                                             item-id)
+                                                      item-id
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally))
-                                                   (let ((item-id (funcall #'(lambda ()
-                                                                               (let ((visible-items (copy-list (visible-items actor))))
-                                                                                 (setf visible-items (remove-if #'(lambda (a)
-                                                                                                                    (if (item-ability-p (get-item-by-id a) +item-abil-corpse+)
-                                                                                                                      nil
-                                                                                                                      t))
-                                                                                                                visible-items))
-                                                                                 (setf visible-items (remove-if #'(lambda (a)
-                                                                                                                    (if (get-mob-* (level *world*) (x a) (y a) (z a))
-                                                                                                                      t
-                                                                                                                      nil))
-                                                                                                                visible-items
-                                                                                                                :key #'get-item-by-id))
-                                                                                 (setf visible-items (stable-sort visible-items #'(lambda (a b)
-                                                                                                                                    (if (> (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
-                                                                                                                                           (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
-                                                                                                                                      t
-                                                                                                                                      nil))
-                                                                                                                  :key #'get-item-by-id))
-                                                                                 (if visible-items
-                                                                                   (first visible-items)
-                                                                                   nil))))))
-                                                     (mob-invoke-ability actor (get-item-by-id item-id) (id ability-type))))
+                                                   (mob-invoke-ability actor (get-item-by-id check-result) (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((items (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                             (exit-result nil))
@@ -2197,6 +2154,7 @@
                                  :cd 5 :cost 0 :spd 5 :passive nil
                                  :final t :on-touch nil
                                  :motion 60
+                                 :start-map-select-func #'player-start-map-select-empower-undead
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
@@ -2228,8 +2186,8 @@
                                                            (not (mob-effect-p nearest-ally +mob-effect-empowered-undead+)))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy check-result))
                                                    (mob-invoke-ability actor nearest-ally (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -2251,6 +2209,7 @@
                                  :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 60
+                                 :start-map-select-func #'player-start-map-select-self
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the tile to be ignited
@@ -2286,23 +2245,11 @@
                                                              flammable-tile
                                                              (< (/ (cur-hp actor) (max-hp actor)) 
                                                               0.6))
-                                                      
-                                                      t
+                                                      flammable-tile
                                                       nil)))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
-                                                   (let ((flammable-tile nil))
-                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and terrain
-                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-flammable+)
-                                                                                                                 nearest-enemy
-                                                                                                                 (= dx (x nearest-enemy))
-                                                                                                                 (= dy (y nearest-enemy))
-                                                                                                                 (= (z actor) (z nearest-enemy))
-                                                                                                                 )
-                                                                                                        (setf flammable-tile (list dx dy (z actor)))))))
-                                                    (mob-invoke-ability actor flammable-tile (id ability-type))))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally nearest-enemy))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
@@ -2350,8 +2297,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-avatar-of-brilliance+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -2359,6 +2306,7 @@
                                  :cd 4 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 60
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-GRAVITY-CHAINS: ~A [~A] uses gravity chains on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
@@ -2404,8 +2352,8 @@
                                                     
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -2440,6 +2388,7 @@
                                  :cd 5 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-hostile-unholy 
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-SMITE: ~A [~A] uses smite on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -2508,8 +2457,8 @@
                                                                     (mob-ability-p nearest-enemy +mob-abil-unholy+))))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -2529,6 +2478,7 @@
                                  :cd 5 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-SLOW: ~A [~A] uses slow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -2557,8 +2507,8 @@
                                                            (not (mob-effect-p nearest-enemy +mob-effect-slow+)))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -2617,8 +2567,8 @@
                                                            nearest-enemy)
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -2626,6 +2576,7 @@
                                  :cd 10 :cost 0 :spd (truncate (* +normal-ap+ 0.8)) :passive nil
                                  :final t :on-touch nil
                                  :motion 30
+                                 :start-map-select-func #'player-start-map-select-self
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the destination tile
@@ -2649,7 +2600,18 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
-                                                  (if (and (mob-ability-p actor +mob-abil-shadow-step+)
+                                                  (let ((free-tile-around nil))
+                                                    (when nearest-enemy
+                                                      (check-surroundings (x nearest-enemy) (y nearest-enemy) nil
+                                                                          #'(lambda (dx dy)
+                                                                              (let ((terrain (get-terrain-* (level *world*) dx dy (z nearest-enemy))))
+                                                                                (when (and terrain
+                                                                                           (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                           (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                           (not (get-mob-* (level *world*) dx dy (z nearest-enemy)))
+                                                                                           (< (calculate-single-tile-brightness (level *world*) dx dy (z nearest-enemy)) *mob-visibility-threshold*))
+                                                                                  (setf free-tile-around (list dx dy (z nearest-enemy))))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-shadow-step+)
                                                              (can-invoke-ability actor actor +mob-abil-shadow-step+)
                                                              nearest-enemy
                                                              (or
@@ -2657,34 +2619,14 @@
                                                               (and (> (/ (cur-hp actor) (max-hp actor)) 
                                                                       0.7)
                                                                    (> (strength actor) (strength nearest-enemy))
-                                                                   (progn (let ((free-tile-around nil))
-                                                                            (check-surroundings (x nearest-enemy) (y nearest-enemy) nil
-                                                                                                #'(lambda (dx dy)
-                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z nearest-enemy))))
-                                                                                                      (when (and terrain
-                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
-                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
-                                                                                                                 (not (get-mob-* (level *world*) dx dy (z nearest-enemy)))
-                                                                                                                 (< (calculate-single-tile-brightness (level *world*) dx dy (z nearest-enemy)) *mob-visibility-threshold*))
-                                                                                                        (setf free-tile-around (list dx dy (z nearest-enemy)))))))
-                                                                            free-tile-around)))
+                                                                   free-tile-around)
                                                               )
                                                              )
-                                                      t
-                                                      nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
-                                                   (let ((free-tile-around nil))
-                                                    (check-surroundings (x nearest-enemy) (y nearest-enemy) nil
-                                                                        #'(lambda (dx dy)
-                                                                            (let ((terrain (get-terrain-* (level *world*) dx dy (z nearest-enemy))))
-                                                                              (when (and terrain
-                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
-                                                                                         (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
-                                                                                         (not (get-mob-* (level *world*) dx dy (z nearest-enemy)))
-                                                                                         (< (calculate-single-tile-brightness (level *world*) dx dy (z nearest-enemy)) *mob-visibility-threshold*))
-                                                                                (setf free-tile-around (list dx dy (z nearest-enemy)))))))
-                                                    (mob-invoke-ability actor free-tile-around (id ability-type))))
+                                                      free-tile-around
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally nearest-enemy))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
@@ -2705,6 +2647,7 @@
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 30
+                                 :start-map-select-func #'player-start-map-select-extinguish-light
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 ;; target here is list of (x y z) coordinates for the tile to be toggled
 
@@ -2752,8 +2695,8 @@
                                                              (< (get-outdoor-light-* (level *world*) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) *mob-visibility-threshold*))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor (list (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) (id ability-type))
                                                    )
                                  :map-select-func #'(lambda (ability-type-id)
@@ -2790,6 +2733,7 @@
                                  :cost 0 :spd (truncate +normal-ap+ 1.2) :passive nil
                                  :final t :on-touch nil
                                  :motion 100
+                                 :start-map-select-func #'player-start-map-select-merge
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
@@ -2855,8 +2799,8 @@
                                                                 2))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy check-result))
                                                    (mob-invoke-ability actor nearest-ally (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -2950,8 +2894,8 @@
                                                            nearest-enemy)
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -2959,6 +2903,7 @@
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
+                                 :start-map-select-func #'player-start-map-select-nearest-ally
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-HEAL-OTHER: ~A [~A] heals ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
                                                 (let ((heal-pwr (+ (* 4 (mob-ability-p actor +mob-abil-heal-other+))
@@ -2985,25 +2930,29 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-enemy))
+                                                  (let ((heal-self (if (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                          0.6)
+                                                                     actor
+                                                                     nil))
+                                                        (heal-ally (if (and nearest-ally
+                                                                            (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
+                                                                               (cur-sight actor))
+                                                                            (< (/ (cur-hp nearest-ally) (max-hp nearest-ally)) 
+                                                                               0.6))
+                                                                     nearest-ally
+                                                                     nil)))
                                                   (if (and (mob-ability-p actor +mob-abil-heal-other+)
                                                            (can-invoke-ability actor actor +mob-abil-heal-other+)
-                                                           (or (< (/ (cur-hp actor) (max-hp actor)) 
-                                                                  0.6)
-                                                               (and nearest-ally
-                                                                    (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
-                                                                       (cur-sight actor))
-                                                                    (< (/ (cur-hp nearest-ally) (max-hp nearest-ally)) 
-                                                                       0.6)))
+                                                           (or heal-self
+                                                               heal-ally)
                                                            )
-                                                    t
-                                                    nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy))
-                                                   (let ((target))
-                                                     (cond
-                                                       (nearest-ally (setf target nearest-ally))
-                                                       (t (setf target actor)))
-                                                     (mob-invoke-ability actor target (id ability-type))))
+                                                    (if heal-ally
+                                                      heal-ally
+                                                      heal-self)
+                                                    nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and target
@@ -3051,8 +3000,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-righteous-fury+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -3060,6 +3009,7 @@
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 20
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-PAIN-LINK: ~A [~A] uses pain link on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
@@ -3094,8 +3044,8 @@
                                                            (not (mob-effect-p actor +mob-effect-pain-link-source+)))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -3115,6 +3065,7 @@
                                  :cost 3 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 30
+                                 :start-map-select-func #'player-start-map-select-nearest-ally
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-SOUL-REINFORCEMENT: ~A [~A] reinforces sould of ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
@@ -3138,25 +3089,28 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-enemy))
-                                                  (if (and (mob-ability-p actor +mob-abil-soul-reinforcement+)
-                                                           (can-invoke-ability actor actor +mob-abil-soul-reinforcement+)
-                                                           (or (< (/ (cur-hp actor) (max-hp actor)) 
-                                                                  0.2)
-                                                               (and nearest-ally
-                                                                    (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
-                                                                       (cur-sight actor))
-                                                                    (< (/ (cur-hp nearest-ally) (max-hp nearest-ally)) 
-                                                                       0.2)))
-                                                           )
-                                                    t
-                                                    nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy))
-                                                   (let ((target))
-                                                     (cond
-                                                       (nearest-ally (setf target nearest-ally))
-                                                       (t (setf target actor)))
-                                                     (mob-invoke-ability actor target (id ability-type))))
+                                                  (let ((reinforce-self (if (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                               0.2)
+                                                                          actor
+                                                                          nil))
+                                                        (reinforce-ally (if (and nearest-ally
+                                                                                 (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
+                                                                                    (cur-sight actor))
+                                                                                 (< (/ (cur-hp nearest-ally) (max-hp nearest-ally)) 
+                                                                                    0.2))
+                                                                          nearest-ally
+                                                                          nil)))
+                                                    (if (and (mob-ability-p actor +mob-abil-soul-reinforcement+)
+                                                             (can-invoke-ability actor actor +mob-abil-soul-reinforcement+)
+                                                             (or reinforce-self
+                                                                 reinforce-ally))
+                                                      (if reinforce-ally
+                                                        reinforce-ally
+                                                        reinforce-self)
+                                                    nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and target
@@ -3175,6 +3129,7 @@
                                  :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 30
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-SILENCE: ~A [~A] uses silence on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
@@ -3206,8 +3161,8 @@
                                                            (not (mob-effect-p nearest-enemy +mob-effect-silence+)))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -3227,6 +3182,7 @@
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 40
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-CONFUSE: ~A [~A] uses confuse on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
@@ -3265,8 +3221,8 @@
                                                            (not (mob-effect-p nearest-enemy +mob-effect-confuse+)))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -3286,6 +3242,7 @@
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 60
+                                 :start-map-select-func #'player-start-map-select-self
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 ;; target here is list of (x y z) coordinates for the tile to be placed an image
                                                 (multiple-value-bind (x y z) (values-list target)
@@ -3335,25 +3292,11 @@
                                                              nearest-enemy
                                                              (<= (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)
                                                              (> (strength nearest-enemy) (strength actor)))
-                                                      t
+                                                      farthest-tile
                                                       nil)))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
-                                                   (let ((farthest-tile nil))
-                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and terrain
-                                                                                                                 (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
-                                                                                                                     (get-terrain-type-trait terrain +terrain-trait-water+))
-                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
-                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor)))
-                                                                                                                 nearest-enemy)
-                                                                                                        (unless farthest-tile
-                                                                                                          (setf farthest-tile (list dx dy (z actor))))
-                                                                                                        (when (> (get-distance dx dy (x nearest-enemy) (y nearest-enemy))
-                                                                                                                 (get-distance (first farthest-tile) (second farthest-tile) (x nearest-enemy) (y nearest-enemy)))
-                                                                                                          (setf farthest-tile (list dx dy (z actor))))))))
-                                                    (mob-invoke-ability actor farthest-tile (id ability-type))))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally nearest-enemy))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
@@ -3446,8 +3389,8 @@
                                                              (can-invoke-ability actor actor +mob-abil-restore-soul+))
                                                       t
                                                       nil)))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -3455,6 +3398,7 @@
                                  :cost 6 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 60
+                                 :start-map-select-func #'player-start-map-resurrect
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-RESURRECTION: ~A [~A] resurrects ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
@@ -3506,9 +3450,7 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally nearest-enemy))
-                                                  (if (and (mob-ability-p actor +mob-abil-resurrection+)
-                                                           (can-invoke-ability actor actor +mob-abil-resurrection+)
-                                                           (funcall #'(lambda ()
+                                                  (let ((item-id (funcall #'(lambda ()
                                                                         (let ((visible-items (copy-list (visible-items actor))))
                                                                           (setf visible-items (remove-if #'(lambda (a)
                                                                                                              (if (= (item-type a) +item-type-body-part-full+)
@@ -3537,43 +3479,15 @@
                                                                                                            :key #'get-item-by-id))
                                                                           (if visible-items
                                                                             (first visible-items)
-                                                                            nil))))
-                                                           )
-                                                    t
-                                                    nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                                            nil))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-resurrection+)
+                                                             (can-invoke-ability actor actor +mob-abil-resurrection+)
+                                                             item-id)
+                                                      item-id
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally))
-                                                   (let ((item-id (funcall #'(lambda ()
-                                                                               (let ((visible-items (copy-list (visible-items actor))))
-                                                                                 (setf visible-items (remove-if #'(lambda (a)
-                                                                                                                    (if (= (item-type a) +item-type-body-part-full+)
-                                                                                                                      nil
-                                                                                                                      t))
-                                                                                                                visible-items
-                                                                                                                :key #'get-item-by-id))
-                                                                                 (setf visible-items (remove-if #'(lambda (a)
-                                                                                                                    (if (get-mob-* (level *world*) (x a) (y a) (z a))
-                                                                                                                      t
-                                                                                                                      nil))
-                                                                                                                visible-items
-                                                                                                                :key #'get-item-by-id))
-                                                                                 (setf visible-items (remove-if #'(lambda (a)
-                                                                                                                    (if (and (dead-mob a)
-                                                                                                                             (mob-ability-p (get-mob-by-id (dead-mob a)) +mob-abil-angel+))
-                                                                                                                      nil
-                                                                                                                      t))
-                                                                                                                visible-items
-                                                                                                                :key #'get-item-by-id))
-                                                                                 (setf visible-items (stable-sort visible-items #'(lambda (a b)
-                                                                                                                                    (if (> (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
-                                                                                                                                           (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
-                                                                                                                                      t
-                                                                                                                                      nil))
-                                                                                                                  :key #'get-item-by-id))
-                                                                                 (if visible-items
-                                                                                   (first visible-items)
-                                                                                   nil))))))
-                                                     (mob-invoke-ability actor (get-item-by-id item-id) (id ability-type))))
+                                                   (mob-invoke-ability actor (get-item-by-id check-result) (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((items (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                             (exit-result nil))
@@ -3669,8 +3583,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-sprint+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -3678,6 +3592,7 @@
                                  :cd 0 :cost 0 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 10
+                                 :start-map-select-func #'player-start-map-select-self
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; here the target is not a mob, but a (cons x y)
@@ -3760,8 +3675,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-jump+))
                                                     nil
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor (cons (x nearest-enemy) (y nearest-enemy)) (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (if (eq *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
@@ -3798,8 +3713,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-bend-space+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -3807,6 +3722,7 @@
                                  :cd 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 40
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-CAST-SHADOW: ~A [~A] uses cast shadow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -3840,8 +3756,8 @@
                                                            (not (mob-effect-p nearest-enemy +mob-effect-casting-shadow+)))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -3898,8 +3814,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-cannibalize+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (let ((target (loop for item-id in (get-items-* (level *world*) (x actor) (y actor) (z actor))
                                                                        for item = (get-item-by-id item-id)
                                                                        with corpses = nil
@@ -3991,8 +3907,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-primordial-power+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -4033,8 +3949,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-make-disguise+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -4064,8 +3980,8 @@
                                                            (can-invoke-ability actor actor +mob-abil-remove-disguise+))
                                                     t
                                                     nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-enemy nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
@@ -4080,6 +3996,7 @@
                                  :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil :removes-disguise t
                                  :motion 40
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-IRRADIATE: ~A [~A] uses irradiate on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
@@ -4094,7 +4011,7 @@
                                                     (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
                                                       (incf (param1 effect) (+ 2 (random 3)))))
                                                   (progn
-                                                    (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
+                                                    (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd 16 :param1 (+ 2 (random 3)))))
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -4117,8 +4034,8 @@
                                                                     (zerop (random 3)))))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -4189,6 +4106,6 @@
                                                                     (>= (param1 (get-effect-by-id (mob-effect-p nearest-enemy +mob-effect-irradiated+))) 10))))
                                                       t
                                                       nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                   (declare (ignore nearest-ally))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))))
