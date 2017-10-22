@@ -19,6 +19,7 @@
    (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)
    (ai-invoke-func :initform nil :initarg :ai-invoke-func :accessor ai-invoke-func)
    (map-select-func :initform nil :initarg :map-select-func :accessor map-select-func)
+   (start-map-select-func :initform nil :initarg :start-map-select-func :accessor start-map-select-func)
    ))
 
 (defmethod initialize-instance :after ((item-type item-type) &key abil-corpse abil-card)
@@ -109,6 +110,9 @@
 
 (defmethod map-select-func ((item item))
   (map-select-func (get-item-type-by-id (item-type item))))
+
+(defmethod start-map-select-func ((item item))
+  (start-map-select-func (get-item-type-by-id (item-type item))))
 
 (defmethod descr ((item item))
   (descr (get-item-type-by-id (item-type item))))

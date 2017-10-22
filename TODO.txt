@@ -4,7 +4,6 @@
 - Eater should get light radius from angels
 - Eater should trade power for upgrades
 - Eater should create ammunition and spend it for abilities
-- Eater should get parasite ability that reveals location of the affected unit
 - Eater should get acid spit that removes resistances
 - Eater should get spawn broodlings which are temporary units allied with the player
 - Eater should get morph upgrades to armor or weapons

@@ -122,12 +122,14 @@
                      (cond
                        ((sdl:key= key :sdl-key-escape) 
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
+                       ;; d - drop all items
                        ((and (sdl:key= key :sdl-key-d) (= mod 0))
                         (clear-message-list *small-message-box*)
                         (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                         (setf *current-window* (return-to win))
                         (make-output *current-window*)
                         (return-from run-window nil))
+                       ;; Ctrl + d - drop a number of items
                        ((and (sdl:key= key :sdl-key-d) (/= (logand mod sdl-cffi::sdl-key-mod-ctrl) 0)) 
                         (progn
                           
@@ -160,6 +162,7 @@
                               (make-output *current-window*)
                               (return-from run-window nil)))
                           ))
+                       ;; u - use an item
                        ((sdl:key= key :sdl-key-u)
                         (when (and (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                    (on-use (get-inv-item-by-pos (inv *player*) (cur-inv win)))
@@ -169,13 +172,14 @@
                              (progn
                                (setf *current-window* (make-instance 'map-select-window 
                                                                      :return-to *current-window*
+                                                                     :start-map-select (start-map-select-func (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                                                      :cmd-str (list "[Enter] Use  "
                                                                                     "")
                                                                      :exec-func #'(lambda ()
                                                                                     (if (funcall (map-select-func (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                                                                                  (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                                                                       (progn
-                                                                                        (setf *current-window* win)
+                                                                                        (setf *current-window* (return-to win))
                                                                                         (make-output *current-window*)
                                                                                         t)
                                                                                       (progn

@@ -1,6 +1,7 @@
 CHANGELOG
 
-- If an ability requires the player to select the target, the the game will initially focus applicable target (instead of always focusing hostile characters).
+- Added the Create parasites ability to the Eater of the dead. This lets you create a number of parasites that can be thrown onto enemies. A parasited character will always reveal its location to the Eater.
+- If an ability requires the player to select a target, the game will initially focus the applicable target (instead of always focusing hostile characters).
 
 --------------------
 October 21, 2017 v1.2.3

@@ -289,7 +289,7 @@
                           (and (mob-ability-p mob +mob-abil-trinity-mimic+)
                                (mob-ability-p tmob +mob-abil-trinity-mimic+)
                                (find (id mob) (mimic-id-list tmob)))))
-             (pushnew (id tmob) (shared-visible-mobs mob))
+             (pushnew mob-id (shared-visible-mobs mob))
                ;(format t "~A [~A] sees ~A~%" (name tmob) (id tmob) (visible-mobs tmob))
              (loop for vmob-id in (proper-visible-mobs tmob)
                    when (and (not (check-dead (get-mob-by-id vmob-id)))
@@ -297,7 +297,15 @@
                      do
                         (pushnew vmob-id (shared-visible-mobs mob)))
              (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
-    
+
+           ;; you see all mobs that you have parasites on
+           (when (and (not (eq mob tmob))
+                      (mob-ability-p mob +mob-abil-primordial+)
+                      (mob-effect-p tmob +mob-effect-parasite+))
+             (pushnew mob-id (shared-visible-mobs mob))
+             
+             (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
+           
            ;; set up visible mobs
            (when (and (not (eq mob tmob))
                       (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob)))

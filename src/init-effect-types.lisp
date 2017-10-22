@@ -680,3 +680,8 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore actor effect))
                                                              sdl:*yellow*)))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-parasite+ :name "Parasite"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 0 :g 100 :b 0))))

@@ -142,7 +142,7 @@
                                                             (if (and (not (mob-effect-p actor +mob-effect-disguised+))
                                                                      (or (mob-ability-p actor +mob-abil-human+)
                                                                          (= (mob-type actor) +mob-type-malseraph-puppet+)))
-                                                                t
+                                                              t
                                                               nil))
                                          :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
                                                           (declare (ignore nearest-ally))
@@ -237,33 +237,37 @@
 (set-item-type (make-instance 'item-type :id +item-type-eater-parasite+
                                          :name "parasite" :plural-name "parasites"
                                          :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 1000
+                                         :descr "A living itching creature that can be thrown by the Eater of the dead onto an enemy. A parasited character will always reveal its location to the primordial."
+                                         :start-map-select-func #'player-start-map-select-nearest-hostile
                                          :on-use #'(lambda (actor target item)
+                                                     (declare (ignore item))
+                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                            (format nil "~A throws a parasite onto ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                    (prepend-article +article-the+ (visible-name target))))
+                                                     (set-mob-effect target :effect-type-id +mob-effect-parasite+ :actor-id (id actor) :cd 99)
                                                      ;; always remove 1 item
                                                      t)
                                          :on-check-applic #'(lambda (actor item)
-                                                            (declare (ignore actor))
-                                                              t)
+                                                            (declare (ignore item))
+                                                              (if (and (mob-ability-p actor +mob-abil-primordial+))
+                                                                t
+                                                                nil))
                                          :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
                                                           (declare (ignore nearest-ally))
                                                           (if (and (funcall (on-check-applic item) actor item)
                                                                    nearest-enemy
-                                                                   (or (< (/ (cur-hp actor) (max-hp actor)) 
-                                                                          0.5)
-                                                                       (> (strength nearest-enemy) (strength actor))))
+                                                                   (not (mob-effect-p nearest-enemy +mob-effect-parasite+))
+                                                                   (> (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 4))
                                                             t
                                                             nil))
                                          :map-select-func #'(lambda (item)
-                                                              (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                              (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                 (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                         (= (view-z *player*) (z *player*))
-                                                                         (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
-                                                                         (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                         (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
-                                                                             (get-terrain-type-trait terrain +terrain-trait-water+))
-                                                                         (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+)))
+                                                                         mob
+                                                                         (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 7))
                                                                   (progn
                                                                     (clear-message-list *small-message-box*)
-                                                                    (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
+                                                                    (mob-use-item *player* mob item)
                                                                     t)
                                                                   (progn
                                                                     nil))))

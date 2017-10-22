@@ -4109,3 +4109,38 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-ally check-result))
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-create-parasites+ :name "Create parasites" :descr "Create 6 parasites that can infest an enemy character for a very long period of time. You can always see the location of parasited characters." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+                                                
+                                                (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-parasite+ :x (x actor) :y (y actor) :z (z actor) :qty 6)
+                                                               :spd nil :silent t)
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A creates 6 parasites. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-create-parasites+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-create-parasites+)
+                                                           (can-invoke-ability actor actor +mob-abil-create-parasites+)
+                                                           (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-clothing+)
+                                                                    sum (qty item))
+                                                                   3))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

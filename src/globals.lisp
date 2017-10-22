@@ -214,6 +214,7 @@
 (defconstant +mob-abil-constriction+ 89)
 (defconstant +mob-abil-irradiate+ 90)
 (defconstant +mob-abil-fission+ 91)
+(defconstant +mob-abil-create-parasites+ 92)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -256,6 +257,7 @@
 (defconstant +mob-effect-irradiated+ 38)
 (defconstant +mob-effect-polymorph-sheep+ 39)
 (defconstant +mob-effect-glowing+ 40)
+(defconstant +mob-effect-parasite+ 41)
 
 (defconstant +mob-order-follow+ 0)
 
