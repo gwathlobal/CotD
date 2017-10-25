@@ -4011,7 +4011,7 @@
                                                     (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
                                                       (incf (param1 effect) (+ 2 (random 3)))))
                                                   (progn
-                                                    (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd 16 :param1 (+ 2 (random 3)))))
+                                                    (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)

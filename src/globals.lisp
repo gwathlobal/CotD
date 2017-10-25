@@ -287,6 +287,7 @@
 (defconstant +item-type-deck-of-war+ 9)
 (defconstant +item-type-deck-of-escape+ 10)
 (defconstant +item-type-eater-parasite+ 11)
+(defconstant +item-type-signal-flare+ 12)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants
@@ -309,6 +310,8 @@
 (defconstant +feature-start-gold-big+ 8)
 (defconstant +feature-start-church-player+ 9)
 (defconstant +feature-start-repel-demons+ 10)
+(defconstant +feature-smoke-flare+ 11)
+(defconstant +feature-smoke-flare-final+ 12)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

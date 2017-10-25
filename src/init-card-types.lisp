@@ -154,7 +154,7 @@
                                                                   (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
                                                                     (incf (param1 effect) (+ 2 (random 3)))))
                                                                 (progn
-                                                                  (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd 5 :param1 (+ 2 (random 3)))))
+                                                                  (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                      (format nil "~A is irradiated. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
                                                            ))))
@@ -168,7 +168,7 @@
                                                          (let ((effect (get-effect-by-id (mob-effect-p actor +mob-effect-irradiated+))))
                                                            (incf (param1 effect) (+ 2 (random 3)))))
                                                        (progn
-                                                         (set-mob-effect actor :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd 5 :param1 (+ 2 (random 3)))))
+                                                         (set-mob-effect actor :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-confuse-self+

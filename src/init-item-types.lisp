@@ -274,3 +274,104 @@
                                          :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
                                                              (declare (ignore nearest-ally check-result))
                                                              (mob-use-item actor nearest-enemy item))))
+
+(set-item-type (make-instance 'item-type :id +item-type-signal-flare+
+                                         :name "signal flare" :plural-name "signal flares"
+                                         :descr "A flare that gives a signal for the artillery to strike at the selected location. The flare may be used only by humans and only if there are no obstacles above you up to the highest Z level."
+                                         :glyph-idx 1 :glyph-color sdl:*red* :back-color sdl:*black* :max-stack-num 10 :value 10
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore item))
+                                                     (let ((x (+ (first target) (- (random 3) 1)))
+                                                           (y (+ (second target) (- (random 3) 1))))
+
+                                                       (loop with final-z = (third target)
+                                                             for z from (1- (array-dimension (terrain (level *world*)) 2)) downto final-z
+                                                             when (and (get-terrain-* (level *world*) x y z)
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+))
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+))
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-projectiles+))
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)))
+                                                               do
+                                                                  (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-flare+ :x x :y y :z z :counter 2))
+                                                             when (and (get-terrain-* (level *world*) x y z)
+                                                                       (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+)))
+                                                               do
+                                                                  (loop-finish)
+                                                             when (and (get-terrain-* (level *world*) x y z)
+                                                                       (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+)
+                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-projectiles+)
+                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)))
+                                                               do
+                                                                  (incf z)
+                                                                  (loop-finish)
+                                                             
+                                                             finally
+                                                                (when (< z (array-dimension (terrain (level *world*)) 2))
+                                                                  (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-flare-final+ :x x :y y :z z :counter 2 :param1 (id actor)))))
+                                                       
+                                                       (generate-sound actor (x actor) (y actor) (z actor) 40 #'(lambda (str)
+                                                                                                                  (format nil "You hear someone shooting~A. " str)))
+                                                       
+                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                              (format nil "~A uses a flare. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                                     
+                                                     ;; remove after use
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
+                                                              (declare (ignore item))
+                                                              (if (and (mob-ability-p actor +mob-abil-human+)
+                                                                       (loop for z from (1+ (z actor)) below (array-dimension (terrain (level *world*)) 2)
+                                                                             with clear-path = t
+                                                                             when (and (get-terrain-* (level *world*) (x actor) (y actor) z)
+                                                                                       (or (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-projectiles+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-water+)))
+                                                                               do
+                                                                                  (setf clear-path nil)
+                                                                                  (loop-finish)
+                                                                             finally (return clear-path)))
+                                                                t
+                                                                nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally))
+                                                          (if (and (funcall (on-check-applic item) actor item)
+                                                                   nearest-enemy
+                                                                   (> (strength nearest-enemy) (* 2 (strength actor)))
+                                                                   (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 9)
+                                                                   (loop for z from (1- (array-dimension (terrain (level *world*)) 2)) downto (1+ (z nearest-enemy))
+                                                                             with clear-path = t
+                                                                             when (and (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z)
+                                                                                       (or (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-move+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-projectiles+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-water+)))
+                                                                               do
+                                                                                  (setf clear-path nil)
+                                                                                  (loop-finish)
+                                                                             finally (return clear-path)))
+                                                            t
+                                                            nil))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-ally check-result))
+                                                             (mob-use-item actor (list (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) item))
+                                         :map-select-func #'(lambda (item)
+                                                              (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                       (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 9)
+                                                                       (loop for z from (1- (array-dimension (terrain (level *world*)) 2)) downto (1+ (view-z *player*))
+                                                                             with clear-path = t
+                                                                             when (and (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
+                                                                                       (or (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-move+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-projectiles+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-water+)))
+                                                                               do
+                                                                                  (setf clear-path nil)
+                                                                                  (loop-finish)
+                                                                             finally (return clear-path)))
+                                                                (progn
+                                                                  (clear-message-list *small-message-box*)
+                                                                  (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
+                                                                  t)
+                                                                (progn
+                                                                  nil)))))

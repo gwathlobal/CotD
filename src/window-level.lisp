@@ -155,7 +155,7 @@
                                        "(M) ")
                                      (capitalize-name (visible-name vmob))
                                      (if (riding-mob-id vmob)
-                                       (format nil ", riding ~A" (visible-name (get-mob-by-id (riding-mob-id vmob))))
+                                       (format nil ", riding ~A" (prepend-article +article-a+ (visible-name (get-mob-by-id (riding-mob-id vmob)))))
                                        "")
                                      (if (/= (- (z vmob) (z mob)) 0)
                                        (format nil " (~@d)" (- (z vmob) (z mob)))
@@ -329,7 +329,6 @@
                                        (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-water+)
                                        (mob-effect-p *player* +mob-effect-flying+))
                                    )
-                          (format t "HERE~%")
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -354,7 +353,6 @@
                                        (mob-effect-p *player* +mob-effect-flying+))
                                    (not (mob-effect-p *player* +mob-effect-gravity-pull+))
                                    (< (z *player*) (1- (array-dimension (terrain (level *world*)) 2))))
-                          (format t "HERE 2~%")
                           (clear-message-list *small-message-box*)
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -500,6 +498,7 @@
                                                                         :return-to *current-window*
                                                                         :cmd-str (list "[Enter] Fire  [<] Look up  [>] Look down  "
                                                                                        "")
+                                                                        :start-map-select #'player-start-map-select-nearest-hostile
                                                                         :check-lof t
                                                                         :exec-func #'(lambda ()
                                                                                        (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))

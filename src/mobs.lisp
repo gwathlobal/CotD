@@ -585,9 +585,9 @@
   ;; when starting with a horse - create a horse on the spot and mount it
   (when (mob-ability-p mob +mob-abil-starts-with-horse+)
     (let ((horse (make-instance 'mob :mob-type +mob-type-horse+ :x (x mob) :y (y mob) :z (z mob))))
-      (add-mob-to-level-list (level *world*) horse)
       (setf (mounted-by-mob-id horse) (id mob))
-      (setf (riding-mob-id mob) (id horse))))
+      (setf (riding-mob-id mob) (id horse))
+      (add-mob-to-level-list (level *world*) horse)))
 
   (loop for (item-type-id qty-func) in (init-items (get-mob-type-by-id (mob-type mob)))
         for qty = (funcall qty-func)

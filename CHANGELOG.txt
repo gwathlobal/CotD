@@ -1,6 +1,7 @@
 CHANGELOG
 
 - Added the Create parasites ability to the Eater of the dead. This lets you create a number of parasites that can be thrown onto enemies. A parasited character will always reveal its location to the Eater.
+- Added signal flares to Scouts. Signal flares prompt the artillary that the military have deployed outside the City to strike at the location of the flare. This strike deals significant iron and fire damage around the location where the strike lands.
 - If an ability requires the player to select a target, the game will initially focus the applicable target (instead of always focusing hostile characters).
 
 --------------------
