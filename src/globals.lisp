@@ -215,6 +215,8 @@
 (defconstant +mob-abil-irradiate+ 90)
 (defconstant +mob-abil-fission+ 91)
 (defconstant +mob-abil-create-parasites+ 92)
+(defconstant +mob-abil-mutate-acid-spit+ 93)
+(defconstant +mob-abil-acid-spit+ 94)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

@@ -67,9 +67,22 @@
     
     (let ((cur-str) (color-list nil) (str-list) (abilities-list (get-mob-all-abilities *player*)))
       (setf cur-str (cur-sel win))
+      ;(setf abilities-list (stable-sort abilities-list #'(lambda (a b)
+      ;                                                     (if (and (not (mob-is-ability-mutation *player* b))
+      ;                                                              (mob-is-ability-mutation *player* a))
+      ;                                                       t
+      ;                                                       nil))))
       (setf abilities-list (stable-sort abilities-list #'(lambda (a b)
-                                                           (if (and (abil-passive-p a)
-                                                                    (not (abil-passive-p b)))
+                                                           (if (or (and (not (mob-is-ability-mutation *player* a))
+                                                                        (not (mob-is-ability-mutation *player* b))
+                                                                        (abil-passive-p a)
+                                                                        (not (abil-passive-p b)))
+                                                                   (and (mob-is-ability-mutation *player* a)
+                                                                        (mob-is-ability-mutation *player* b)
+                                                                        (abil-passive-p a)
+                                                                        (not (abil-passive-p b)))
+                                                                   (and (not (mob-is-ability-mutation *player* a))
+                                                                        (mob-is-ability-mutation *player* b)))
                                                              t
                                                              nil))))
       (setf str-list (loop for ability-type-id in abilities-list
@@ -79,7 +92,9 @@
       (setf color-list (loop for i from 0 below (length (get-mob-all-abilities *player*))
                              collect (if (= i cur-str) 
                                        sdl:*yellow*
-                                       sdl:*white*)))
+                                       (if (mob-is-ability-mutation *player* (nth i abilities-list))
+                                         sdl:*magenta*
+                                         sdl:*white*))))
      
       (draw-selection-list str-list cur-str (truncate h (sdl:get-font-height)) x y :color-list color-list))
     )
@@ -89,8 +104,16 @@
          (w (- (truncate *window-width* 2) 20))
          (h (- *window-height* 20 (sdl:char-height sdl:*default-font*) y))
          (abilities-list (stable-sort (get-mob-all-abilities *player*) #'(lambda (a b)
-                                                                           (if (and (abil-passive-p a)
-                                                                                    (not (abil-passive-p b)))
+                                                                           (if (or (and (not (mob-is-ability-mutation *player* a))
+                                                                                        (not (mob-is-ability-mutation *player* b))
+                                                                                        (abil-passive-p a)
+                                                                                        (not (abil-passive-p b)))
+                                                                                   (and (mob-is-ability-mutation *player* a)
+                                                                                        (mob-is-ability-mutation *player* b)
+                                                                                        (abil-passive-p a)
+                                                                                        (not (abil-passive-p b)))
+                                                                                   (and (not (mob-is-ability-mutation *player* a))
+                                                                                        (mob-is-ability-mutation *player* b)))
                                                                              t
                                                                              nil))))
          (ability (get-ability-type-by-id (nth (cur-sel win) abilities-list))))

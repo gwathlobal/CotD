@@ -95,9 +95,6 @@
 (defun abil-motion-p (ability-type-id)
   (motion (get-ability-type-by-id ability-type-id)))
 
-(defmethod abilities ((mob mob))
-  (abilities (get-mob-type-by-id (mob-type mob))))
-
 (defun get-mob-all-abilities (mob)
   (loop
     for ability-type-id being the hash-key in (abilities mob)

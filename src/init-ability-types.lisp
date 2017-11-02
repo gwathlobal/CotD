@@ -7,8 +7,8 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (let ((heal-pwr (+ (* 4 (mob-ability-p actor +mob-abil-heal-self+))
-                                                                   (random (* 3 (mob-ability-p actor +mob-abil-heal-self+))))))
+                                                (let ((heal-pwr (+ (* 4 (mob-ability-value actor +mob-abil-heal-self+))
+                                                                   (random (* 3 (mob-ability-value actor +mob-abil-heal-self+))))))
                                                   (when (> (+ (cur-hp actor) heal-pwr)
                                                            (max-hp actor))
                                                     (setf heal-pwr (- (max-hp actor) (cur-hp actor))))
@@ -935,7 +935,7 @@
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A roars to fear its enemies. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                        :observed-mob actor)
-                                                (invoke-fear actor (mob-ability-p actor +mob-abil-instill-fear+))
+                                                (invoke-fear actor (mob-ability-value actor +mob-abil-instill-fear+))
                                                           
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
@@ -2906,8 +2906,8 @@
                                  :start-map-select-func #'player-start-map-select-nearest-ally
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-HEAL-OTHER: ~A [~A] heals ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
-                                                (let ((heal-pwr (+ (* 4 (mob-ability-p actor +mob-abil-heal-other+))
-                                                                   (random (* 3 (mob-ability-p actor +mob-abil-heal-other+))))))
+                                                (let ((heal-pwr (+ (* 4 (mob-ability-value actor +mob-abil-heal-other+))
+                                                                   (random (* 3 (mob-ability-value actor +mob-abil-heal-other+))))))
                                                   (when (> (+ (cur-hp target) heal-pwr)
                                                            (max-hp target))
                                                     (setf heal-pwr (- (max-hp target) (cur-hp target))))
@@ -4144,3 +4144,44 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-acid-spit+ :name "Evolve acid spit" :descr "Give yourself an ability to spit acid at your enemies." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+                                                
+                                                (mob-set-mutation actor +mob-abil-acid-spit+)
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A evolves and gets an acid spit. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-acid-spit+)
+                                                               (not (mob-ability-p actor +mob-abil-acid-spit+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-acid-spit+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-acid-spit+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-acid-spit+ :name "Acid spit" :descr "You are able to spit acid at your enemies." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

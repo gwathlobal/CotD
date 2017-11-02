@@ -254,6 +254,7 @@
                                                                                          )
                                                                                        )
                                                                                      exit-result)))
+
                                                                      (loop for target in targets
                                                                            for cur-dmg = 0
                                                                            do

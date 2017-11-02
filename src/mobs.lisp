@@ -75,7 +75,7 @@
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
                                                                 abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial
-                                                                abil-make-disguise abil-remove-disguise abil-constriction abil-irradiate abil-fission abil-create-parasites)
+                                                                abil-make-disguise abil-remove-disguise abil-constriction abil-irradiate abil-fission abil-create-parasites abil-mutate-acid-spit abil-acid-spit)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 6) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -290,6 +290,10 @@
     (setf (gethash +mob-abil-fission+ (abilities mob-type)) t))
   (when abil-create-parasites
     (setf (gethash +mob-abil-create-parasites+ (abilities mob-type)) t))
+  (when abil-mutate-acid-spit
+    (setf (gethash +mob-abil-mutate-acid-spit+ (abilities mob-type)) t))
+  (when abil-acid-spit
+    (setf (gethash +mob-abil-acid-spit+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -534,6 +538,7 @@
 
    (effects :initform (make-hash-table) :accessor effects)
    (abilities-cd :initform (make-hash-table) :accessor abilities-cd)
+   (abilities :initform (make-hash-table) :accessor abilities)  ;; each value is (<is mutation t/nil> <power level>)
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
@@ -601,6 +606,7 @@
     (set-mob-effect mob :effect-type-id +mob-effect-flying+ :actor-id (id mob)))
   
   (set-cur-weapons mob)
+  (adjust-abilities mob)
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-m-acc mob)
@@ -701,6 +707,28 @@
 (defun mob-ability-p (mob ability-type-id)
   (gethash ability-type-id (abilities mob)))
 
+(defun mob-is-ability-mutation (mob ability-type-id)
+  (if (and (gethash ability-type-id (abilities mob))
+           (first (gethash ability-type-id (abilities mob))))
+    t
+    nil))
+
+(defun mob-ability-value (mob ability-type-id)
+  (if (gethash ability-type-id (abilities mob))
+    (second (gethash ability-type-id (abilities mob)))
+    nil))
+
+(defun mob-set-mutation (mob ability-type-id &optional (ability-value t))
+  (setf (gethash ability-type-id (abilities mob)) (list t
+                                                        ability-value)))
+
+(defun mob-remove-mutation (mob ability-type-id)
+  (setf (gethash ability-type-id (abilities mob)) nil)
+  ;; place a non-mutation ability if there is one 
+  (when (gethash ability-type-id (abilities (get-mob-type-by-id (mob-type mob))))
+    (setf (gethash ability-type-id (abilities mob)) (list nil
+                                                          (gethash ability-type-id (abilities (get-mob-type-by-id (mob-type mob))))))))
+
 (defun set-mob-effect (mob &key effect-type-id actor-id (cd t) (param1 nil))
   (if (mob-effect-p mob effect-type-id)
     (progn
@@ -744,6 +772,19 @@
   (setf (weapon mob) (copy-list (weapon (get-mob-type-by-id (mob-type mob)))))
   (setf (second (weapon mob)) (copy-list (second (weapon (get-mob-type-by-id (mob-type mob))))))
   (setf (third (weapon mob)) (copy-list (third (weapon (get-mob-type-by-id (mob-type mob)))))))
+
+(defun adjust-abilities (mob)
+  ;; clear all previous non-mutation abilities
+  (loop for ability-type-id being the hash-key in (abilities mob)
+        when (not (mob-is-ability-mutation mob ability-type-id))
+          do
+             (setf (gethash ability-type-id (abilities mob)) nil))
+  ;; set new abilities from mob-type if no corresponding mutation is there
+  (loop for ability-type-id being the hash-key in (abilities (get-mob-type-by-id (mob-type mob))) using (hash-value ability-value)
+        when (not (mob-is-ability-mutation mob ability-type-id))
+          do
+             (setf (gethash ability-type-id (abilities mob)) (list nil
+                                                                   ability-value))))
 
 (defun adjust-sight (mob)
   (let ((light (base-light-radius mob)))

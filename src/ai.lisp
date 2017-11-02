@@ -308,7 +308,7 @@
 
   ;; if the mob possesses smb, there is a chance that the slave will revolt and move randomly
   (when (and (slave-mob-id mob)
-             (zerop (random (* *possessed-revolt-chance* (mob-ability-p mob +mob-abil-can-possess+)))))
+             (zerop (random (* *possessed-revolt-chance* (mob-ability-value mob +mob-abil-can-possess+)))))
     (logger (format nil "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)))
     (when (and (check-mob-visible mob :observer *player*)
                (or (mob-effect-p mob +mob-effect-reveal-true-form+)
@@ -912,7 +912,7 @@
     (loop while (can-move-if-possessed player) do
       (get-input-player))
         
-    (if (zerop (random (* *possessed-revolt-chance* (mob-ability-p (get-mob-by-id (master-mob-id player)) +mob-abil-can-possess+))))
+    (if (zerop (random (* *possessed-revolt-chance* (mob-ability-value (get-mob-by-id (master-mob-id player)) +mob-abil-can-possess+))))
       (progn
         (logger (format nil "AI-FUNCTION: ~A [~A] revolts against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
         
@@ -938,7 +938,7 @@
   ;; if player possesses somebody & the slave revolts
   ;; wait for a meaningful action and move randomly instead 
   (when (slave-mob-id player)
-    (when (zerop (random (* *possessed-revolt-chance* (mob-ability-p player +mob-abil-can-possess+))))
+    (when (zerop (random (* *possessed-revolt-chance* (mob-ability-value player +mob-abil-can-possess+))))
       (logger (format nil "AI-FUNCTION: ~A [~A] possesses ~A [~A], but the slave revolts.~%" (name player) (id player) (name (get-mob-by-id (slave-mob-id player))) (slave-mob-id player)))
       (setf (can-move-if-possessed player) t)
       (loop while (can-move-if-possessed player) do

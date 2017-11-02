@@ -502,7 +502,7 @@
                                        :strength 2
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t  :abil-primordial t :abil-constriction t
-                                       :abil-open-close-door t :abil-cannibalize t :abil-primordial-power t :abil-sprint t :abil-create-parasites t
+                                       :abil-open-close-door t :abil-cannibalize t :abil-primordial-power t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-eater-of-the-dead-rage+

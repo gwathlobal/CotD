@@ -539,8 +539,8 @@
 
     ;; limit max speed
     (when (and (mob-ability-p mob +mob-abil-momentum+)
-               (> (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
-      (setf (momentum-spd mob) (mob-ability-p mob +mob-abil-momentum+)))
+               (> (momentum-spd mob) (mob-ability-value mob +mob-abil-momentum+)))
+      (setf (momentum-spd mob) (mob-ability-value mob +mob-abil-momentum+)))
     (when (not (mob-ability-p mob +mob-abil-momentum+))
       (setf (momentum-spd mob) 0))
     (when (< (momentum-spd mob) 0)
