@@ -695,3 +695,36 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
                                                              (sdl:color :r 0 :g 100 :b 0))))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-evolving+ :name "Evolving"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
+                                             :on-remove #'(lambda (effect actor)
+                                                            ;; evolution finished, give the ability
+                                                            (when (eq (cd effect) 0)
+                                                              (let ((ability-type-id (first (param1 effect)))
+                                                                    (str (second (param1 effect))))
+                                                                (mob-set-mutation actor ability-type-id)
+                                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                       (format nil "~A finishes evolving and ~A. "
+                                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                               str))))
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-adrenaline+ :name "Adrenaline"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore actor))
+                                                             (cond
+                                                               ((> (param1 effect) 10) sdl:*red*)
+                                                               ((> (param1 effect) 5) sdl:*yellow*)
+                                                               (t sdl:*green*)))
+                                             :on-tick #'(lambda (effect actor)
+                                                          (when (>= (param1 effect) 15)
+                                                            (setf (param1 effect) 15))
+
+                                                          (decf (param1 effect))
+                                                          (when (zerop (random 2))
+                                                            (decf (param1 effect)))
+                                                          (when (<= (param1 effect) 0)
+                                                            (rem-mob-effect actor (effect-type effect))))))

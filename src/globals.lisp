@@ -217,6 +217,8 @@
 (defconstant +mob-abil-create-parasites+ 92)
 (defconstant +mob-abil-mutate-acid-spit+ 93)
 (defconstant +mob-abil-acid-spit+ 94)
+(defconstant +mob-abil-mutate-adrenal-gland+ 95)
+(defconstant +mob-abil-adrenal-gland+ 96)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -260,6 +262,8 @@
 (defconstant +mob-effect-polymorph-sheep+ 39)
 (defconstant +mob-effect-glowing+ 40)
 (defconstant +mob-effect-parasite+ 41)
+(defconstant +mob-effect-evolving+ 42)
+(defconstant +mob-effect-adrenaline+ 43)
 
 (defconstant +mob-order-follow+ 0)
 

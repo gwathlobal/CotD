@@ -4146,7 +4146,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-acid-spit+ :name "Evolve acid spit" :descr "Give yourself an ability to spit acid at your enemies." 
+                                 :id +mob-abil-mutate-acid-spit+ :name "Grow acid spit" :descr "Give yourself an ability to spit acid at your enemies." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4181,6 +4181,48 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-acid-spit+ :name "Acid spit" :descr "You are able to spit acid at your enemies." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-adrenal-gland+ :name "Grow an adrenal gland" :descr "Evolve to give yourself an ability to increase adrenaline level when fighting. The evolution process takes 10 turns. Increased adrenaline makes all your attacks faster." 
+                                 :cost 2 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 20
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 40 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-adrenal-gland+ "grows an adrenal gland"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-adrenal-gland+)
+                                                               (not (mob-ability-p actor +mob-abil-adrenal-gland+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-adrenal-gland+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-adrenal-gland+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-adrenal-gland+ :name "Adrenal gland" :descr "When you attack somebody, your adrenaline level will start to increase. Increased adrenaline will make your attacks faster." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil

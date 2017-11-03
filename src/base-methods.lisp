@@ -993,7 +993,12 @@
       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                              (format nil "~A misses. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
       )
-    (make-act actor (get-ranged-weapon-speed actor))
+    (let ((ranged-spd (get-ranged-weapon-speed actor)))
+      (when (mob-effect-p actor +mob-effect-adrenaline+)
+        (let ((adrenaline-value (param1 (get-effect-by-id (mob-effect-p actor +mob-effect-adrenaline+)))))
+          (setf ranged-spd (truncate (* ranged-spd (- 100 (* adrenaline-value 5))) 100))))
+      
+      (make-act actor ranged-spd))
     ))
 
 (defun mob-invoke-ability (actor target ability-type-id)
@@ -1270,6 +1275,15 @@
           
           ))
 
+      (when (and actor
+                 (mob-ability-p actor +mob-abil-adrenal-gland+))
+        (if (mob-effect-p actor +mob-effect-adrenaline+)
+          (progn
+            (let ((effect (get-effect-by-id (mob-effect-p actor +mob-effect-adrenaline+))))
+              (incf (param1 effect) 1)))
+          (progn
+            (set-mob-effect actor :effect-type-id +mob-effect-adrenaline+ :actor-id (id actor) :param1 2))))
+      
       (when (and (not no-check-dead)
                  (check-dead target))
         (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params weapon-aux)
@@ -1300,9 +1314,15 @@
   (generate-sound attacker (x attacker) (y attacker) (z attacker) *mob-sound-melee* #'(lambda (str)
                                                                                         (format nil "You hear sounds of fighting~A. " str)))
 
-  (inflict-damage target :min-dmg (get-melee-weapon-dmg-min attacker) :max-dmg (get-melee-weapon-dmg-max attacker) :dmg-type (get-melee-weapon-dmg-type attacker)
-                         :att-spd (get-melee-weapon-speed attacker) :weapon-aux (get-melee-weapon-aux-simple (weapon attacker)) :acc (m-acc attacker) :add-blood t 
-                         :actor attacker)
+  (let ((melee-spd (get-melee-weapon-speed attacker)))
+
+    (when (mob-effect-p attacker +mob-effect-adrenaline+)
+      (let ((adrenaline-value (param1 (get-effect-by-id (mob-effect-p attacker +mob-effect-adrenaline+)))))
+        (setf melee-spd (truncate (* melee-spd (- 100 (* adrenaline-value 5))) 100))))
+    
+    (inflict-damage target :min-dmg (get-melee-weapon-dmg-min attacker) :max-dmg (get-melee-weapon-dmg-max attacker) :dmg-type (get-melee-weapon-dmg-type attacker)
+                           :att-spd melee-spd :weapon-aux (get-melee-weapon-aux-simple (weapon attacker)) :acc (m-acc attacker) :add-blood t 
+                           :actor attacker))
   )
 
 (defun check-dead (mob)

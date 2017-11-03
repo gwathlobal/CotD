@@ -75,7 +75,8 @@
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
                                                                 abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial
-                                                                abil-make-disguise abil-remove-disguise abil-constriction abil-irradiate abil-fission abil-create-parasites abil-mutate-acid-spit abil-acid-spit)
+                                                                abil-make-disguise abil-remove-disguise abil-constriction abil-irradiate abil-fission abil-create-parasites abil-mutate-acid-spit abil-acid-spit
+                                                                abil-mutate-adrenal-gland abil-adrenal-gland)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 6) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -294,6 +295,10 @@
     (setf (gethash +mob-abil-mutate-acid-spit+ (abilities mob-type)) t))
   (when abil-acid-spit
     (setf (gethash +mob-abil-acid-spit+ (abilities mob-type)) t))
+  (when abil-mutate-adrenal-gland
+    (setf (gethash +mob-abil-mutate-adrenal-gland+ (abilities mob-type)) t))
+  (when abil-adrenal-gland
+    (setf (gethash +mob-abil-adrenal-gland+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

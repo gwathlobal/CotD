@@ -1,7 +1,12 @@
 - Add the possessor faction
 - Eater should get abilities from corpses
-- Eater should get disguise from angels
+- Eater should get regenerate from angels
 - Eater should get light radius from angels
+- Eater should get disguise from humans
+- Eater should get vulnerability to vorpal from humans
+- Eater should get vulnerability to fire from demons
+- Eater should get blink from crimson demons
+- Eater should get stealth from shadow demons
 - Eater should trade power for upgrades
 - Eater should create ammunition and spend it for abilities
 - Eater should get acid spit that removes resistances
