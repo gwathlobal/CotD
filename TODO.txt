@@ -2,7 +2,7 @@
 - Eater should get abilities from corpses
 - Eater should get regenerate from angels
 - Eater should get light radius from angels
-- Eater should get disguise from humans
+- Eater should get ability to switch light on/off from humans
 - Eater should get vulnerability to vorpal from humans
 - Eater should get vulnerability to fire from demons
 - Eater should get blink from crimson demons

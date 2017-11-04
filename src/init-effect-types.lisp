@@ -627,7 +627,7 @@
                                                              (declare (ignore effect actor))
                                                              sdl:*magenta*)
                                              :on-add #'(lambda (effect actor)
-                                                         (declare (ignore effect))
+                                                         
                                                          (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
@@ -639,6 +639,18 @@
                                                            (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                            (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                          (setf (face-mob-type-id actor) (mob-type actor))
+
+                                                         ;; polymorph block mutations
+                                                         (loop for ability-type-id being the hash-key in (abilities actor)
+                                                               with mutation-list = ()
+                                                               when (and (mob-is-ability-mutation actor ability-type-id)
+                                                                         (on-remove-mutation (get-ability-type-by-id ability-type-id)))
+                                                                 do
+                                                                    (mob-remove-mutation actor ability-type-id)
+                                                                    (pushnew mutation-list ability-type-id)
+                                                               finally
+                                                                  (setf (param1 effect) (append (param1 effect) (list mutation-list))))
+                                                         
                                                          (set-cur-weapons actor)
                                                          (adjust-abilities actor)
                                                          (adjust-dodge actor)
@@ -669,6 +681,13 @@
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
+
+                                                            ;; polymorph returns mutations
+                                                            (loop for ability-type-id in (third (param1 effect))
+                                                                  when (on-add-mutation (get-ability-type-by-id ability-type-id))
+                                                                 do
+                                                                    (mob-set-mutation actor ability-type-id))
+                                                            
                                                             (adjust-abilities actor)
                                                             (adjust-dodge actor)
                                                             (adjust-armor actor)

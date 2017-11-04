@@ -44,11 +44,12 @@
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
-   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <list of aux params>))
+   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <shoot str> <list of aux params>))
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
    ;;   :is-fire
    ;;   :constricts
+   ;;   :no-charges
    
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
    (base-sight :initform *base-mob-sight* :initarg :base-sight :accessor base-sight)
@@ -76,9 +77,9 @@
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
                                                                 abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial
                                                                 abil-make-disguise abil-remove-disguise abil-constriction abil-irradiate abil-fission abil-create-parasites abil-mutate-acid-spit abil-acid-spit
-                                                                abil-mutate-adrenal-gland abil-adrenal-gland)
+                                                                abil-adrenal-gland abil-mutate-corrosive-bile abil-corrosive-bile abil-mutate-clawed-tentacle abil-clawed-tentacle)
   ;; set up armor
-  (setf (armor mob-type) (make-array (list 6) :initial-element nil))
+  (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
     (setf (aref (armor mob-type) dmg-type) (list dir-resist %-resist)))
   
@@ -295,10 +296,16 @@
     (setf (gethash +mob-abil-mutate-acid-spit+ (abilities mob-type)) t))
   (when abil-acid-spit
     (setf (gethash +mob-abil-acid-spit+ (abilities mob-type)) t))
-  (when abil-mutate-adrenal-gland
-    (setf (gethash +mob-abil-mutate-adrenal-gland+ (abilities mob-type)) t))
   (when abil-adrenal-gland
     (setf (gethash +mob-abil-adrenal-gland+ (abilities mob-type)) t))
+  (when abil-mutate-corrosive-bile
+    (setf (gethash +mob-abil-mutate-corrosive-bile+ (abilities mob-type)) t))
+  (when abil-corrosive-bile
+    (setf (gethash +mob-abil-corrosive-bile+ (abilities mob-type)) t))
+  (when abil-mutate-clawed-tentacle
+    (setf (gethash +mob-abil-mutate-clawed-tentacle+ (abilities mob-type)) t))
+  (when abil-clawed-tentacle
+    (setf (gethash +mob-abil-clawed-tentacle+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -431,19 +438,26 @@
   (when (third weapon)
     (nth 6 (third weapon))))
 
+(defmethod get-ranged-weapon-shoot-str ((mob-type mob-type))
+  (get-ranged-weapon-shoot-str-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-shoot-str-simple (weapon)
+  (when (third weapon)
+    (nth 7 (third weapon))))
+
 (defmethod get-ranged-weapon-aux ((mob-type mob-type))
   (get-ranged-weapon-aux-simple (weapon mob-type)))
 
 (defun get-ranged-weapon-aux-simple (weapon)
   (when (third weapon)
-    (nth 7 (third weapon))))
+    (nth 8 (third weapon))))
 
 (defmethod get-ranged-weapon-aux-param ((mob-type mob-type) aux-feature)
   (get-ranged-weapon-aux-param-simple (weapon mob-type) aux-feature))
 
 (defun get-ranged-weapon-aux-param-simple (weapon aux-feature)
   (when (third weapon)
-    (find aux-feature (nth 7 (third weapon)))))
+    (find aux-feature (nth 8 (third weapon)))))
 
 (defmethod get-weapon-descr-line ((mob-type mob-type))
   (let ((str (create-string)))
@@ -451,12 +465,14 @@
     (when (is-weapon-melee mob-type)
       (format str "~% M: (dmg: ~A-~A) (spd: ~A) (acc: ~A%)" (get-melee-weapon-dmg-min mob-type) (get-melee-weapon-dmg-max mob-type) (get-melee-weapon-speed mob-type) (get-melee-weapon-acc mob-type)))
     (when (is-weapon-ranged mob-type)
-      (format str "~% R: (dmg: ~A-~A~A) (spd: ~A) (acc: ~A%) ~A/~A"
+      (format str "~% R: (dmg: ~A-~A~A) (spd: ~A) (acc: ~A%)~A"
               (get-ranged-weapon-dmg-min mob-type) (get-ranged-weapon-dmg-max mob-type)
               (if (= (get-ranged-weapon-rof mob-type) 1) "" (format nil " x~A" (get-ranged-weapon-rof mob-type)))
               (get-ranged-weapon-speed mob-type)
               (get-ranged-weapon-acc mob-type)
-              (get-ranged-weapon-charges mob-type) (get-ranged-weapon-charges mob-type)))
+              (if (not (find :no-charges (get-ranged-weapon-aux mob-type)))
+                (format nil " ~A/~A" (get-ranged-weapon-charges mob-type) (get-ranged-weapon-charges mob-type))
+                "")))
     str))
 
 (defmethod get-armor-resist ((mob-type mob-type) dmg-type)
@@ -487,6 +503,15 @@
     (if (get-armor-resist mob-type +weapon-dmg-vorpal+)
       (format str " Vorpal: ~A, ~A%~%" (get-armor-d-resist mob-type +weapon-dmg-vorpal+) (get-armor-%-resist mob-type +weapon-dmg-vorpal+))
       (format str " Vorpal: 0, 0%~%"))
+    (if (get-armor-resist mob-type +weapon-dmg-mind+)
+      (format str " Mind: ~A, ~A%~%" (get-armor-d-resist mob-type +weapon-dmg-mind+) (get-armor-%-resist mob-type +weapon-dmg-mind+))
+      (format str " Mind: 0, 0%~%"))
+    (if (get-armor-resist mob-type +weapon-dmg-radiation+)
+      (format str " Radiation: ~A, ~A%~%" (get-armor-d-resist mob-type +weapon-dmg-radiation+) (get-armor-%-resist mob-type +weapon-dmg-radiation+))
+      (format str " Radiation: 0, 0%~%"))
+    (if (get-armor-resist mob-type +weapon-dmg-acid+)
+      (format str " Acid: ~A, ~A%~%" (get-armor-d-resist mob-type +weapon-dmg-acid+) (get-armor-%-resist mob-type +weapon-dmg-acid+))
+      (format str " Acid: 0, 0%~%"))
     str))
 
 ;;----------------------
@@ -547,10 +572,12 @@
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
-   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <list of aux params>))
+   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <cur charges> <rate of fire> <accuracy> <shoot str> <list of aux params>))
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
    ;;   :is-fire
+   ;;   :constricts
+   ;;   :no-charges
    
    (cur-sight :initform 6 :initarg :cur-sight :accessor cur-sight)
    (m-acc :initform +base-accuracy+ :initarg :m-acc :accessor m-acc)
@@ -724,10 +751,15 @@
     nil))
 
 (defun mob-set-mutation (mob ability-type-id &optional (ability-value t))
+  (when (and (null (gethash ability-type-id (abilities mob)))
+             (on-add-mutation (get-ability-type-by-id ability-type-id)))
+    (funcall (on-add-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))
   (setf (gethash ability-type-id (abilities mob)) (list t
                                                         ability-value)))
 
 (defun mob-remove-mutation (mob ability-type-id)
+  (when (and (on-remove-mutation (get-ability-type-by-id ability-type-id)))
+    (funcall (on-remove-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))
   (setf (gethash ability-type-id (abilities mob)) nil)
   ;; place a non-mutation ability if there is one 
   (when (gethash ability-type-id (abilities (get-mob-type-by-id (mob-type mob))))
@@ -905,6 +937,9 @@
 (defmethod get-ranged-weapon-acc ((mob mob))
   (get-ranged-weapon-acc-simple (weapon mob)))
 
+(defmethod get-ranged-weapon-shoot-str ((mob mob))
+  (get-ranged-weapon-shoot-str-simple (weapon mob)))
+
 (defmethod get-ranged-weapon-aux ((mob mob))
   (get-ranged-weapon-aux-simple (weapon mob)))
 
@@ -917,12 +952,14 @@
     (when (is-weapon-melee mob)
       (format str "~% M: (d: ~A-~A) (s: ~A) (a: ~A%)" (get-melee-weapon-dmg-min mob) (get-melee-weapon-dmg-max mob) (get-melee-weapon-speed mob) (get-melee-weapon-acc mob)))
     (when (is-weapon-ranged mob)
-      (format str "~% R: (d: ~A-~A~A) (s: ~A) (a: ~A%) ~A/~A"
+      (format str "~% R: (d: ~A-~A~A) (s: ~A) (a: ~A%)~A"
               (get-ranged-weapon-dmg-min mob) (get-ranged-weapon-dmg-max mob)
               (if (= (get-ranged-weapon-rof mob) 1) "" (format nil " x~A" (get-ranged-weapon-rof mob)))
               (get-ranged-weapon-speed mob)
               (get-ranged-weapon-acc mob)
-              (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob)))
+              (if (not (find :no-charges (get-ranged-weapon-aux mob)))
+                (format nil " ~A/~A" (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob))
+                "")))
     str))
 
 (defun get-dmg-type-name (dmg-type)
@@ -930,7 +967,10 @@
     ((= dmg-type +weapon-dmg-flesh+) (format nil "Flesh"))
     ((= dmg-type +weapon-dmg-fire+) (format nil "Fire"))
     ((= dmg-type +weapon-dmg-iron+) (format nil "Iron"))
-    ((= dmg-type +weapon-dmg-vorpal+) (format nil "Vorpal"))))
+    ((= dmg-type +weapon-dmg-vorpal+) (format nil "Vorpal"))
+    ((= dmg-type +weapon-dmg-mind+) (format nil "Mind"))
+    ((= dmg-type +weapon-dmg-radiation+) (format nil "Radiation"))
+    ((= dmg-type +weapon-dmg-acid+) (format nil "Acid"))))
 
 (defmethod get-weapon-descr-long ((mob mob))
   (let ((str (create-string)))
@@ -941,12 +981,14 @@
               (get-melee-weapon-speed mob)
               (get-melee-weapon-acc mob)))
     (when (is-weapon-ranged mob)
-      (format str "~% R: (dmg: ~A, ~A-~A~A) (spd: ~A) (acc: ~A%) ~A/~A"
+      (format str "~% R: (dmg: ~A, ~A-~A~A) (spd: ~A) (acc: ~A%)~A"
               (get-dmg-type-name (get-ranged-weapon-dmg-type mob)) (get-ranged-weapon-dmg-min mob) (get-ranged-weapon-dmg-max mob)
               (if (= (get-ranged-weapon-rof mob) 1) "" (format nil " x~A" (get-ranged-weapon-rof mob)))
               (get-ranged-weapon-speed mob)
               (get-ranged-weapon-acc mob)
-              (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob)))
+              (if (not (find :no-charges (get-ranged-weapon-aux mob)))
+                (format nil " ~A/~A" (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob))
+                "")))
     str))
 
 (defmethod get-armor-resist ((mob mob) dmg-type)

@@ -215,10 +215,13 @@
 (defconstant +mob-abil-irradiate+ 90)
 (defconstant +mob-abil-fission+ 91)
 (defconstant +mob-abil-create-parasites+ 92)
-(defconstant +mob-abil-mutate-acid-spit+ 93)
-(defconstant +mob-abil-acid-spit+ 94)
-(defconstant +mob-abil-mutate-adrenal-gland+ 95)
-(defconstant +mob-abil-adrenal-gland+ 96)
+(defconstant +mob-abil-adrenal-gland+ 93)
+(defconstant +mob-abil-mutate-acid-spit+ 94)
+(defconstant +mob-abil-acid-spit+ 95)
+(defconstant +mob-abil-mutate-corrosive-bile+ 96)
+(defconstant +mob-abil-corrosive-bile+ 97)
+(defconstant +mob-abil-mutate-clawed-tentacle+ 98)
+(defconstant +mob-abil-clawed-tentacle+ 99)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -273,6 +276,7 @@
 (defconstant +weapon-dmg-vorpal+ 3)
 (defconstant +weapon-dmg-mind+ 4)
 (defconstant +weapon-dmg-radiation+ 5)
+(defconstant +weapon-dmg-acid+ 6)
 
 ;;--------------------
 ;; ITEM-TYPE Constants
@@ -318,6 +322,7 @@
 (defconstant +feature-start-repel-demons+ 10)
 (defconstant +feature-smoke-flare+ 11)
 (defconstant +feature-smoke-flare-final+ 12)
+(defconstant +feature-corrosive-bile-target+ 13)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

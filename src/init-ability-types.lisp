@@ -4146,7 +4146,14 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-acid-spit+ :name "Grow acid spit" :descr "Give yourself an ability to spit acid at your enemies." 
+                                 :id +mob-abil-adrenal-gland+ :name "Adrenal gland" :descr "When you attack somebody, your adrenaline level will start to increase. Increased adrenaline will make your attacks faster." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spite is mutually exclusive with clawed tentacles and corrosive sacs." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4154,17 +4161,21 @@
                                                 (declare (ignore target))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear some burping~A. " str)))
-                                                
-                                                (mob-set-mutation actor +mob-abil-acid-spit+)
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-acid-spit+ "grows an acid gland"))
                                                 
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A evolves and gets an acid spit. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-acid-spit+)
-                                                               (not (mob-ability-p actor +mob-abil-acid-spit+)))
+                                                               (not (mob-ability-p actor +mob-abil-acid-spit+))
+                                                               (not (mob-ability-p actor +mob-abil-corrosive-bile+))
+                                                               (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -4184,36 +4195,49 @@
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil
-                                 :on-check-applic nil))
+                                 :on-check-applic nil
+                                 :on-add-mutation #'(lambda (ability-type actor)
+                                                      (declare (ignore ability-type))
+                                                      (setf (weapon actor) (list "Tentacles & Acid spit"
+                                                                                 (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
+                                                                                 (list +weapon-dmg-acid+ 2 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges))))
+                                                      )
+                                 :on-remove-mutation #'(lambda (ability-type actor)
+                                                         (declare (ignore ability-type))
+                                                         (setf (weapon actor) (list "Tentacles" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) nil))
+                                                      )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-adrenal-gland+ :name "Grow an adrenal gland" :descr "Evolve to give yourself an ability to increase adrenaline level when fighting. The evolution process takes 10 turns. Increased adrenaline makes all your attacks faster." 
-                                 :cost 2 :spd +normal-ap+ :passive nil
+                                 :id +mob-abil-mutate-corrosive-bile+ :name "Grow corrosive sacs" :descr "Evolve to give yourself an ability to spit corrosive bile at your enemies. The evolution process takes 10 turns. Corrosive bile is shot upwards and lands to the destination tile on the next turn, dealing damage to charaters in and around it. The corrosive sacs are mutually exclusive with clawed tentacles and acid spite." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
-                                 :motion 20
+                                 :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (generate-sound actor (x actor) (y actor) (z actor) 40 #'(lambda (str)
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear some burping~A. " str)))
 
-                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-adrenal-gland+ "grows an adrenal gland"))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-corrosive-bile+ "grows corrosive sacs"))
                                                 
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-mutate-adrenal-gland+)
-                                                               (not (mob-ability-p actor +mob-abil-adrenal-gland+))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-corrosive-bile+)
+                                                               (not (mob-ability-p actor +mob-abil-acid-spit+))
+                                                               (not (mob-ability-p actor +mob-abil-corrosive-bile+))
+                                                               (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
                                                   (if (and (not nearest-enemy)
-                                                           (mob-ability-p actor +mob-abil-mutate-adrenal-gland+)
-                                                           (can-invoke-ability actor actor +mob-abil-mutate-adrenal-gland+)
+                                                           (mob-ability-p actor +mob-abil-mutate-corrosive-bile+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-corrosive-bile+)
                                                            )
                                                     t
                                                     nil))
@@ -4222,8 +4246,152 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-adrenal-gland+ :name "Adrenal gland" :descr "When you attack somebody, your adrenaline level will start to increase. Increased adrenaline will make your attacks faster." 
+                                 :id +mob-abil-corrosive-bile+ :name "Corrosive bile" :descr "Spit corrosive bile at a tile. It is shot upwards and lands to the destination tile on the next turn, dealing 1-3 acid damage to charaters in and around it. Available if there are no obstacles above you up to the highest Z level." 
+                                 :cost 0 :cd 4 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil :removes-disguise t
+                                 :motion 40
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target is (x y z)
+                                                (logger (format nil "MOB-CORROSIVE-BILE: ~A [~A] uses corrosive bile on ~A.~%" (name actor) (id actor) target))
+
+                                                (let ((x (+ (first target) (- (random 3) 1)))
+                                                      (y (+ (second target) (- (random 3) 1))))
+                                                  
+                                                  (loop with final-z = (third target)
+                                                        for z from (1- (array-dimension (terrain (level *world*)) 2)) downto final-z
+                                                        when (and (get-terrain-* (level *world*) x y z)
+                                                                  (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+)))
+                                                          do
+                                                             (loop-finish)
+                                                        when (and (get-terrain-* (level *world*) x y z)
+                                                                  (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+)
+                                                                      (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-projectiles+)
+                                                                      (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)))
+                                                          do
+                                                             (incf z)
+                                                             (loop-finish)
+                                                             
+                                                        finally
+                                                           (when (< z (array-dimension (terrain (level *world*)) 2))
+                                                             (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-corrosive-bile-target+ :x x :y y :z z :counter 2 :param1 (id actor)))))
+                                                  
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 40 #'(lambda (str)
+                                                                                                             (format nil "You hear someone bodily sounds~A. " str)))
+                                                  
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A spits corrosive bile. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-corrosive-bile+)
+                                                               (loop for z from (1+ (z actor)) below (array-dimension (terrain (level *world*)) 2)
+                                                                     with clear-path = t
+                                                                     when (and (get-terrain-* (level *world*) (x actor) (y actor) z)
+                                                                               (or (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-projectiles+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-water+)))
+                                                                       do
+                                                                          (setf clear-path nil)
+                                                                          (loop-finish)
+                                                                     finally (return clear-path)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 9)
+                                                           (loop for z from (1- (array-dimension (terrain (level *world*)) 2)) downto (1+ (z nearest-enemy))
+                                                                 with clear-path = t
+                                                                 when (and (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z)
+                                                                           (or (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-move+)
+                                                                               (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-opaque-floor+)
+                                                                               (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-projectiles+)
+                                                                               (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-water+)))
+                                                                   do
+                                                                      (setf clear-path nil)
+                                                                      (loop-finish)
+                                                                 finally (return clear-path)))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
+                                                   (mob-invoke-ability actor (list (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                               (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 9)
+                                                               (loop for z from (1- (array-dimension (terrain (level *world*)) 2)) downto (1+ (view-z *player*))
+                                                                     with clear-path = t
+                                                                     when (and (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
+                                                                               (or (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-move+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-opaque-floor+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-projectiles+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-water+)))
+                                                                       do
+                                                                          (setf clear-path nil)
+                                                                          (loop-finish)
+                                                                     finally (return clear-path)))
+                                                        (progn
+                                                          (clear-message-list *small-message-box*)
+                                                          (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                          t)
+                                                        (progn
+                                                          nil))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-clawed-tentacle+ :name "Grow clawed tentacles" :descr "Evolve to give yourself clawed tentacles which significatly increase melee damage. The clawed tentacles are mutually exclusive with acid spite and corrosive sacs." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-clawed-tentacle+ "grows clawed tentacles"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-clawed-tentacle+)
+                                                               (not (mob-ability-p actor +mob-abil-acid-spit+))
+                                                               (not (mob-ability-p actor +mob-abil-corrosive-bile+))
+                                                               (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-clawed-tentacle+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-clawed-tentacle+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-clawed-tentacle+ :name "Clawed tentacles" :descr "Your tentacles have sharp claws." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil
-                                 :on-check-applic nil))
+                                 :on-check-applic nil
+                                 :on-add-mutation #'(lambda (ability-type actor)
+                                                      (declare (ignore ability-type))
+                                                      (setf (weapon actor) (list "Clawed tentacles" (list +weapon-dmg-flesh+ 3 5 (truncate (* +normal-ap+ 0.75)) 100 (list :constricts)) nil))
+                                                      )
+                                 :on-remove-mutation #'(lambda (ability-type actor)
+                                                         (declare (ignore ability-type))
+                                                         (setf (weapon actor) (list "Tentacles" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) nil))
+                                                      )))

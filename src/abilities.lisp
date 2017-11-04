@@ -28,6 +28,8 @@
    (on-invoke-ai :initform nil :initarg :on-invoke-ai :accessor on-invoke-ai) ;; a function that invokes the ability for the ai
    (map-select-func :initform nil :initarg :map-select-func :accessor map-select-func) ;; a function that is invoked when the player needs to select the target for the ability, also indicates that this is a targeted ability
    (obj-select-func :initform nil :initarg :obj-select-func :accessor obj-select-func) ;; a function that is invoked when the player needs to select some other object after choosing this ability
+   (on-add-mutation :initform nil :initarg :on-add-mutation :accessor on-add-mutation) ;; a function that takes two parameters - ability-type, actor 
+   (on-remove-mutation :initform nil :initarg :on-remove-mutation :accessor on-remove-mutation) ;; a function that takes two parameters - ability-type, actor 
    ))
 
 (defun set-ability-type (ability-type)

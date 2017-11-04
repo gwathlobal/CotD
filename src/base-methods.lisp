@@ -869,7 +869,8 @@
   (unless (is-weapon-ranged actor)
     (return-from mob-can-shoot nil))
 
-  (if (not (zerop (get-ranged-weapon-charges actor)))
+  (if (or (find :no-charges (get-ranged-weapon-aux actor))
+          (not (zerop (get-ranged-weapon-charges actor))))
     t
     nil))
 
@@ -904,17 +905,19 @@
     (generate-sound actor (x actor) (y actor) (z actor) *mob-sound-shoot* #'(lambda (str)
                                                                                (format nil "You hear shooting~A. " str)))
     
-     ;; reduce the number of bullets in the magazine
-    (if (> (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))
-      (progn
-        (setf bullets-left (get-ranged-weapon-rof actor))
-        (set-ranged-weapon-charges actor (- (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))))
-      (progn
-        (setf bullets-left (get-ranged-weapon-charges actor))
-        (set-ranged-weapon-charges actor 0)))
-
+    ;; reduce the number of bullets in the magazine
+    (if (not (find :no-charges (get-ranged-weapon-aux actor)))
+      (if (> (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))
+        (progn
+          (setf bullets-left (get-ranged-weapon-rof actor))
+          (set-ranged-weapon-charges actor (- (get-ranged-weapon-charges actor) (get-ranged-weapon-rof actor))))
+        (progn
+          (setf bullets-left (get-ranged-weapon-charges actor))
+          (set-ranged-weapon-charges actor 0)))
+      (setf bullets-left (get-ranged-weapon-rof actor)))
+    
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A shoots ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target))))
+                           (format nil "~A ~A ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-ranged-weapon-shoot-str actor) (prepend-article +article-the+ (visible-name target))))
     
     (loop repeat bullets-left
           with rx

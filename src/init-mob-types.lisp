@@ -152,7 +152,7 @@
                                        :name "soldier"
                                        :glyph-idx 32 :glyph-color sdl:*green* :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 100 ())) :base-dodge 25
+                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
@@ -164,7 +164,7 @@
                                        :name "sergeant"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
+                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
@@ -176,7 +176,7 @@
                                        :name "chaplain"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 85 :g 107 :b 47) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 ())) :base-dodge 25
+                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
@@ -188,7 +188,7 @@
                                        :name "machine-gunner"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 50 :g 150 :b 50) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 70 ())) :base-dodge 25
+                                       :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 70 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
@@ -200,7 +200,7 @@
                                        :name "scout"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 60 :g 179 :b 113) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 120 ())) :base-dodge 25
+                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 120 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-starts-with-horse t
@@ -502,7 +502,7 @@
                                        :strength 2
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t  :abil-primordial t :abil-constriction t
-                                       :abil-open-close-door t :abil-cannibalize t :abil-primordial-power t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t :abil-mutate-adrenal-gland t
+                                       :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t :abil-adrenal-gland t :abil-mutate-corrosive-bile t :abil-mutate-clawed-tentacle t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-eater-of-the-dead-rage+
