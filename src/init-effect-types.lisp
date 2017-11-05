@@ -270,11 +270,11 @@
                                                              sdl:*red*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
-                                                         (incf (cur-speed actor) 50)
+                                                         (adjust-speed actor)
                                                          )
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
-                                                            (decf (cur-speed actor) 50)
+                                                            (adjust-speed actor)
                                                             )))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-holy-touch+ :name "Holy touch"
@@ -499,58 +499,6 @@
                                                              (declare (ignore effect actor))
                                                              (sdl:color :r 100 :g 100 :b 100))))
 
-(set-effect-type (make-instance 'effect-type :id +mob-effect-primordial-power+ :name "Primordial power"
-                                             :color-func #'(lambda (effect actor)
-                                                             (declare (ignore effect actor))
-                                                             sdl:*yellow*)
-                                             :on-add #'(lambda (effect actor)
-                                                         (declare (ignore effect))
-                                                         (setf (mob-type actor) +mob-type-eater-of-the-dead-rage+)
-                                                         (setf (face-mob-type-id actor) (mob-type actor))
-                                                         (set-cur-weapons actor)
-                                                         (adjust-abilities actor)
-                                                         (adjust-dodge actor)
-                                                         (adjust-armor actor)
-                                                         (adjust-m-acc actor)
-                                                         (adjust-r-acc actor)
-                                                         (adjust-sight actor)
-                                                         
-                                                          ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor)
-                                                               when (null (gethash ability-id (abilities-cd actor)))
-                                                                 do
-                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
-                                                         
-                                                         (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                                    (format nil "You hear some strange noise~A. " str)))
-                                                         
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A shakes with primordial power. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
-                                             :on-remove #'(lambda (effect actor)
-                                                            (declare (ignore effect))
-                                                            (setf (mob-type actor) +mob-type-eater-of-the-dead+)
-                                                            (setf (face-mob-type-id actor) (mob-type actor))
-                                                            (set-cur-weapons actor)
-                                                            (adjust-abilities actor)
-                                                            (adjust-dodge actor)
-                                                            (adjust-armor actor)
-                                                            (adjust-m-acc actor)
-                                                            (adjust-r-acc actor)
-                                                            (adjust-sight actor)
-                                                            
-                                                            ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
-                                                               when (null (gethash ability-id (abilities-cd actor)))
-                                                                 do
-                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
-                                                            
-                                                            (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                               (format nil "You hear some strange noise~A.~%" str)))
-                                                            
-                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "The primordial power of ~A wanes. " (prepend-article +article-the+ (visible-name actor)))))
-                                             ))
-
 (set-effect-type (make-instance 'effect-type :id +mob-effect-disguised+ :name "Disguised"
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
@@ -566,7 +514,7 @@
                                                             (adjust-disguise-for-mob actor)
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                   (format nil "~A reveals itself as ~A. " (prepend-article +article-the+ (visible-name actor))
+                                                                                   (format nil "~A reveals itself as ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                            (get-qualified-name actor)))
                                                             ;; Malseraph likes when you lose disguises
                                                             (increase-piety-for-god +god-entity-malseraph+ actor 30))))
@@ -647,7 +595,7 @@
                                                                          (on-remove-mutation (get-ability-type-by-id ability-type-id)))
                                                                  do
                                                                     (mob-remove-mutation actor ability-type-id)
-                                                                    (pushnew mutation-list ability-type-id)
+                                                                    (pushnew ability-type-id mutation-list)
                                                                finally
                                                                   (setf (param1 effect) (append (param1 effect) (list mutation-list))))
                                                          
@@ -743,7 +691,44 @@
                                                             (setf (param1 effect) 15))
 
                                                           (decf (param1 effect))
-                                                          (when (zerop (random 2))
+                                                          (when (zerop (random 4))
                                                             (decf (param1 effect)))
                                                           (when (<= (param1 effect) 0)
                                                             (rem-mob-effect actor (effect-type effect))))))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-metabolic-boost+ :name "Metabolic boost"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*yellow*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         
+                                                         (adjust-speed actor)
+                                                         (adjust-dodge actor))
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+
+                                                            (rem-mob-effect-simple actor +mob-effect-metabolic-boost+)
+                                                            (adjust-dodge actor)
+                                                            (adjust-speed actor)
+                                                            
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "The metabolism of ~A returns to the norm. " (prepend-article +article-the+ (visible-name actor))))
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-spines+ :name "Spines"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor))
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+
+                                                            (rem-mob-effect-simple actor +mob-effect-spines+)
+                                                            (adjust-armor actor)
+                                                            
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "~A retracts its spines. " (prepend-article +article-the+ (visible-name actor))))
+                                                            )))

@@ -503,6 +503,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t  :abil-primordial t :abil-constriction t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t :abil-adrenal-gland t :abil-mutate-corrosive-bile t :abil-mutate-clawed-tentacle t
+                                       :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-eater-of-the-dead-rage+

@@ -3881,37 +3881,6 @@
                                                              nil)))))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-primordial-power+ :name "Primordial power" :descr "Greatly increase your dodging chance, armor and damage for 4 turns." 
-                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
-                                 :final t :on-touch nil
-                                 :motion 50
-                                 :on-invoke #'(lambda (ability-type actor target)
-                                                (declare (ignore target))
-                                                (set-mob-effect actor :effect-type-id +mob-effect-primordial-power+ :actor-id (id actor) :cd 4)
-                                                (decf (cur-fp actor) (cost ability-type))
-                                                
-                                                )
-                                 :on-check-applic #'(lambda (ability-type actor target)
-                                                      (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-primordial-power+)
-                                                               (not (mob-effect-p actor +mob-effect-primordial-power+)))
-                                                        t
-                                                        nil))
-                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore ability-type nearest-ally))
-                                                  ;; if able to heal and less than 50% hp - heal
-                                                  (if (and nearest-enemy
-                                                           (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 2)
-                                                           (null (riding-mob-id actor))
-                                                           (mob-ability-p actor +mob-abil-primordial-power+)
-                                                           (can-invoke-ability actor actor +mob-abil-primordial-power+))
-                                                    t
-                                                    nil))
-                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
-                                                   (declare (ignore nearest-enemy nearest-ally check-result))
-                                                   (mob-invoke-ability actor actor (id ability-type)))))
-
-(set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-primordial+ :name "Primordial" :descr "You dwelt on Earth before the advent of humankind. You will dwell on Earth after its inevitable demise." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
@@ -4136,7 +4105,7 @@
                                                   (if (and (not nearest-enemy)
                                                            (mob-ability-p actor +mob-abil-create-parasites+)
                                                            (can-invoke-ability actor actor +mob-abil-create-parasites+)
-                                                           (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-clothing+)
+                                                           (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-eater-parasite+)
                                                                     sum (qty item))
                                                                    3))
                                                     t
@@ -4153,7 +4122,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spite is mutually exclusive with clawed tentacles and corrosive sacs." 
+                                 :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spite is mutually exclusive with the clawed tentacles and corrosive sacs." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4191,7 +4160,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-acid-spit+ :name "Acid spit" :descr "You are able to spit acid at your enemies." 
+                                 :id +mob-abil-acid-spit+ :name "Acid spit" :descr "You are able to spit at your enemies dealing 1-3 acid damage." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil
@@ -4200,7 +4169,7 @@
                                                       (declare (ignore ability-type))
                                                       (setf (weapon actor) (list "Tentacles & Acid spit"
                                                                                  (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
-                                                                                 (list +weapon-dmg-acid+ 2 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges))))
+                                                                                 (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges))))
                                                       )
                                  :on-remove-mutation #'(lambda (ability-type actor)
                                                          (declare (ignore ability-type))
@@ -4208,7 +4177,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-corrosive-bile+ :name "Grow corrosive sacs" :descr "Evolve to give yourself an ability to spit corrosive bile at your enemies. The evolution process takes 10 turns. Corrosive bile is shot upwards and lands to the destination tile on the next turn, dealing damage to charaters in and around it. The corrosive sacs are mutually exclusive with clawed tentacles and acid spite." 
+                                 :id +mob-abil-mutate-corrosive-bile+ :name "Grow corrosive sacs" :descr "Evolve to give yourself an ability to spit corrosive bile at your enemies. The evolution process takes 10 turns. Corrosive bile is shot upwards and lands to the destination tile on the next turn, dealing damage to charaters in and around it. The corrosive sacs are mutually exclusive with the clawed tentacles and acid spite." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4246,7 +4215,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-corrosive-bile+ :name "Corrosive bile" :descr "Spit corrosive bile at a tile. It is shot upwards and lands to the destination tile on the next turn, dealing 1-3 acid damage to charaters in and around it. Available if there are no obstacles above you up to the highest Z level." 
+                                 :id +mob-abil-corrosive-bile+ :name "Corrosive bile" :descr "Spit corrosive bile at a tile. It is shot upwards and lands to the destination tile on the next turn, dealing 4-8 acid damage to charaters in and around it. Available if there are no obstacles above you up to the highest Z level. Corrosive bile is not very accurate and will sometimes land next to the targeted location." 
                                  :cost 0 :cd 4 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil :removes-disguise t
                                  :motion 40
@@ -4344,7 +4313,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-clawed-tentacle+ :name "Grow clawed tentacles" :descr "Evolve to give yourself clawed tentacles which significatly increase melee damage. The clawed tentacles are mutually exclusive with acid spite and corrosive sacs." 
+                                 :id +mob-abil-mutate-clawed-tentacle+ :name "Grow clawed tentacles" :descr "Evolve to give yourself clawed tentacles which significatly increase melee damage. The evolution process takes 10 turns. The clawed tentacles are mutually exclusive with the acid spite and corrosive sacs." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4395,3 +4364,190 @@
                                                          (declare (ignore ability-type))
                                                          (setf (weapon actor) (list "Tentacles" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) nil))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-chitinous-plating+ :name "Grow chitinous plating" :descr "Evolve to increase your skin thickness which will turn it into full-scale armor. The evolution process takes 10 turns. Chitinous plating gives 2 poins of direct resistance against flesh, iron, fire, vorpal and acid damage. The chitinous plating is mutually exclusive with the metabolic boost and retracting spines." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-chitinous-plating+ "gets completely covered with chitin"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-chitinous-plating+)
+                                                               (not (mob-ability-p actor +mob-abil-chitinous-plating+))
+                                                               (not (mob-ability-p actor +mob-abil-metabolic-boost+))
+                                                               (not (mob-ability-p actor +mob-abil-retracting-spines+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-chitinous-plating+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-chitinous-plating+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-chitinous-plating+ :name "Chitinous plating" :descr "You are completely covered with chitin which gives you 2 points of direct resistance against flesh, iron, fire, vorpal and acid damage." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil
+                                 :on-add-mutation #'(lambda (ability-type actor)
+                                                      (declare (ignore ability-type))
+                                                      (adjust-armor actor)
+                                                      )
+                                 :on-remove-mutation #'(lambda (ability-type actor)
+                                                         (declare (ignore ability-type))
+                                                         (adjust-armor actor)
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-metabolic-boost+ :name "Increase metabolism" :descr "Evolve to give youself an ability to boost your metabolism at will. The evolution process takes 10 turns. The metabolic boost grants you increased dodging and overall speed for 4 turns. The metabolic boost is mutually exclusive with the chitinous plating and retracting spines." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-metabolic-boost+ "can now boost metabolism at will"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-metabolic-boost+)
+                                                               (not (mob-ability-p actor +mob-abil-chitinous-plating+))
+                                                               (not (mob-ability-p actor +mob-abil-metabolic-boost+))
+                                                               (not (mob-ability-p actor +mob-abil-retracting-spines+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-metabolic-boost+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-metabolic-boost+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-metabolic-boost+ :name "Metabolic boost" :descr "Accelerate your metabolism which increases your dodging by 50% and overall speed by 30% for 4 turns." 
+                                 :cd 8 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 0
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-metabolic-boost+ :actor-id (id actor) :cd 4)
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A accelerates its metabolism. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-metabolic-boost+)
+                                                               (not (mob-effect-p actor +mob-effect-metabolic-boost+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and nearest-enemy
+                                                           (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 3)
+                                                           (mob-ability-p actor +mob-abil-metabolic-boost+)
+                                                           (can-invoke-ability actor actor +mob-abil-metabolic-boost+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-retracting-spines+ :name "Grow retracting spines" :descr "Evolve to give yourself retracting spines. The evolution process takes 10 turns. The spines grant you 40% resistance against flesh, iron, fire, vorpal and acid damage for 4 turns. Additionally, characters attacking you in melee while the spines are active will take 1-3 flesh damage. The retracting spines are mutually exclusive with the metabolic boost and chitinous plating." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-retracting-spines+ "grows retracting spines"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-retracting-spines+)
+                                                               (not (mob-ability-p actor +mob-abil-chitinous-plating+))
+                                                               (not (mob-ability-p actor +mob-abil-metabolic-boost+))
+                                                               (not (mob-ability-p actor +mob-abil-retracting-spines+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-retracting-spines+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-retracting-spines+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-retracting-spines+ :name "Extend spines" :descr "Extend your spines which gives you 40% resistance against flesh, iron, fire, vorpal and acid damage for 4 turns. Additionally, characters attacking you in melee while the spines are active will take 1-3 flesh damage." 
+                                 :cd 8 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 0
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-spines+ :actor-id (id actor) :cd 4)
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A extends its spines. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-retracting-spines+)
+                                                               (not (mob-effect-p actor +mob-effect-spines+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and nearest-enemy
+                                                           (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 3)
+                                                           (mob-ability-p actor +mob-abil-retracting-spines+)
+                                                           (can-invoke-ability actor actor +mob-abil-retracting-spines+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

@@ -75,9 +75,10 @@
                                                                 abil-can-possess-toggle abil-sacrifice-host abil-reanimate-corpse abil-undead abil-shared-minds abil-ignite-the-fire abil-avatar-of-brilliance
                                                                 abil-empower-undead abil-gravity-chains abil-flying abil-no-corpse abil-smite abil-slow abil-prayer-wrath abil-shadow-step abil-extinguish-light abil-umbral-aura
                                                                 abil-trinity-mimic abil-merge abil-unmerge abil-heal-other abil-righteous-fury abil-pain-link abil-soul-reinforcement abil-silence abil-confuse
-                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial-power abil-primordial
+                                                                abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial
                                                                 abil-make-disguise abil-remove-disguise abil-constriction abil-irradiate abil-fission abil-create-parasites abil-mutate-acid-spit abil-acid-spit
-                                                                abil-adrenal-gland abil-mutate-corrosive-bile abil-corrosive-bile abil-mutate-clawed-tentacle abil-clawed-tentacle)
+                                                                abil-adrenal-gland abil-mutate-corrosive-bile abil-corrosive-bile abil-mutate-clawed-tentacle abil-clawed-tentacle abil-mutate-chitinous-plating abil-chitinous-plating
+                                                                abil-mutate-metabolic-boost abil-metabolic-boost abil-mutate-retracting-spines abil-retracting-spines)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -276,8 +277,6 @@
     (setf (gethash +mob-abil-cast-shadow+ (abilities mob-type)) t))
   (when abil-cannibalize
     (setf (gethash +mob-abil-cannibalize+ (abilities mob-type)) t))
-  (when abil-primordial-power
-    (setf (gethash +mob-abil-primordial-power+ (abilities mob-type)) t))
   (when abil-primordial
     (setf (gethash +mob-abil-primordial+ (abilities mob-type)) t))
   (when abil-make-disguise
@@ -292,12 +291,12 @@
     (setf (gethash +mob-abil-fission+ (abilities mob-type)) t))
   (when abil-create-parasites
     (setf (gethash +mob-abil-create-parasites+ (abilities mob-type)) t))
+  (when abil-adrenal-gland
+    (setf (gethash +mob-abil-adrenal-gland+ (abilities mob-type)) t))
   (when abil-mutate-acid-spit
     (setf (gethash +mob-abil-mutate-acid-spit+ (abilities mob-type)) t))
   (when abil-acid-spit
     (setf (gethash +mob-abil-acid-spit+ (abilities mob-type)) t))
-  (when abil-adrenal-gland
-    (setf (gethash +mob-abil-adrenal-gland+ (abilities mob-type)) t))
   (when abil-mutate-corrosive-bile
     (setf (gethash +mob-abil-mutate-corrosive-bile+ (abilities mob-type)) t))
   (when abil-corrosive-bile
@@ -306,6 +305,18 @@
     (setf (gethash +mob-abil-mutate-clawed-tentacle+ (abilities mob-type)) t))
   (when abil-clawed-tentacle
     (setf (gethash +mob-abil-clawed-tentacle+ (abilities mob-type)) t))
+  (when abil-mutate-chitinous-plating
+    (setf (gethash +mob-abil-mutate-chitinous-plating+ (abilities mob-type)) t))
+  (when abil-chitinous-plating
+    (setf (gethash +mob-abil-chitinous-plating+ (abilities mob-type)) t))
+  (when abil-mutate-metabolic-boost
+    (setf (gethash +mob-abil-mutate-metabolic-boost+ (abilities mob-type)) t))
+  (when abil-metabolic-boost
+    (setf (gethash +mob-abil-metabolic-boost+ (abilities mob-type)) t))
+  (when abil-mutate-retracting-spines
+    (setf (gethash +mob-abil-mutate-retracting-spines+ (abilities mob-type)) t))
+  (when abil-retracting-spines
+    (setf (gethash +mob-abil-retracting-spines+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -751,11 +762,14 @@
     nil))
 
 (defun mob-set-mutation (mob ability-type-id &optional (ability-value t))
-  (when (and (null (gethash ability-type-id (abilities mob)))
-             (on-add-mutation (get-ability-type-by-id ability-type-id)))
-    (funcall (on-add-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))
-  (setf (gethash ability-type-id (abilities mob)) (list t
-                                                        ability-value)))
+  (let ((has-function nil))
+    (when (and (null (gethash ability-type-id (abilities mob)))
+               (on-add-mutation (get-ability-type-by-id ability-type-id)))
+      (setf has-function t))
+    (setf (gethash ability-type-id (abilities mob)) (list t
+                                                          ability-value))
+    (when has-function
+      (funcall (on-add-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))))
 
 (defun mob-remove-mutation (mob ability-type-id)
   (when (and (on-remove-mutation (get-ability-type-by-id ability-type-id)))
@@ -838,9 +852,13 @@
   (let ((dodge 0))
     (setf dodge (base-dodge (get-mob-type-by-id (mob-type mob))))
 
+    (when (mob-effect-p mob +mob-effect-metabolic-boost+)
+      (incf dodge 50))
+    
     ;; when riding - your dodge chance is reduced to zero
     (when (riding-mob-id mob)
       (setf dodge 0))
+
     (setf (cur-dodge mob) dodge)))
 
 (defun adjust-armor (mob)
@@ -853,7 +871,20 @@
       (setf (aref armor i) (copy-list armor-type)))
     (setf (armor mob) armor)
     (when (mob-effect-p mob +mob-effect-wet+)
-      (set-armor-%-resist mob +weapon-dmg-fire+ (+ (get-armor-%-resist mob +weapon-dmg-fire+) 25)))))
+      (set-armor-%-resist mob +weapon-dmg-fire+ (+ (get-armor-%-resist mob +weapon-dmg-fire+) 25)))
+    (when (mob-ability-p mob +mob-abil-chitinous-plating+)
+      (set-armor-d-resist mob +weapon-dmg-flesh+ (+ (get-armor-d-resist mob +weapon-dmg-flesh+) 2))
+      (set-armor-d-resist mob +weapon-dmg-fire+ (+ (get-armor-d-resist mob +weapon-dmg-fire+) 2))
+      (set-armor-d-resist mob +weapon-dmg-iron+ (+ (get-armor-d-resist mob +weapon-dmg-iron+) 2))
+      (set-armor-d-resist mob +weapon-dmg-vorpal+ (+ (get-armor-d-resist mob +weapon-dmg-vorpal+) 2))
+      (set-armor-d-resist mob +weapon-dmg-acid+ (+ (get-armor-d-resist mob +weapon-dmg-acid+) 2)))
+    (when (mob-effect-p mob +mob-effect-spines+)
+      (set-armor-%-resist mob +weapon-dmg-flesh+ (+ (get-armor-%-resist mob +weapon-dmg-flesh+) 40))
+      (set-armor-%-resist mob +weapon-dmg-fire+ (+ (get-armor-%-resist mob +weapon-dmg-fire+) 40))
+      (set-armor-%-resist mob +weapon-dmg-iron+ (+ (get-armor-%-resist mob +weapon-dmg-iron+) 40))
+      (set-armor-%-resist mob +weapon-dmg-vorpal+ (+ (get-armor-%-resist mob +weapon-dmg-vorpal+) 40))
+      (set-armor-%-resist mob +weapon-dmg-acid+ (+ (get-armor-%-resist mob +weapon-dmg-acid+) 40)))
+    ))
 
 (defun adjust-m-acc (mob)
   (setf (m-acc mob) 0)
@@ -878,6 +909,20 @@
     (when (< accuracy 0)
       (setf accuracy 0))
     (setf (r-acc mob) accuracy)))
+
+(defun adjust-speed (mob)
+  (let ((speed 100))
+    
+    (when (mob-effect-p mob +mob-effect-metabolic-boost+)
+      (decf speed 30))
+
+    (when (mob-effect-p mob +mob-effect-slow+)
+      (incf speed 50))
+
+    (when (<= speed 10)
+      (setf speed 10))
+    
+    (setf (cur-speed mob) speed)))
 
 (defmethod get-weapon-name ((mob mob))
   (get-weapon-name-simple (weapon mob)))
@@ -1020,17 +1065,26 @@
   (let ((str (create-string)))
     (format str "Armor:~%")
     (if (get-armor-resist mob +weapon-dmg-flesh+)
-      (format str "  Flesh: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-flesh+) (get-armor-%-resist mob +weapon-dmg-flesh+))
-      (format str "  Flesh: 0, 0%~%"))
+      (format str "     Flesh: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-flesh+) (get-armor-%-resist mob +weapon-dmg-flesh+))
+      (format str "     Flesh: 0, 0%~%"))
     (if (get-armor-resist mob +weapon-dmg-iron+)
-      (format str "   Iron: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-iron+) (get-armor-%-resist mob +weapon-dmg-iron+))
-      (format str "   Iron: 0, 0%~%"))
+      (format str "      Iron: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-iron+) (get-armor-%-resist mob +weapon-dmg-iron+))
+      (format str "      Iron: 0, 0%~%"))
     (if (get-armor-resist mob +weapon-dmg-fire+)
-      (format str "   Fire: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-fire+) (get-armor-%-resist mob +weapon-dmg-fire+))
-      (format str "   Fire: 0, 0%~%"))
+      (format str "      Fire: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-fire+) (get-armor-%-resist mob +weapon-dmg-fire+))
+      (format str "      Fire: 0, 0%~%"))
     (if (get-armor-resist mob +weapon-dmg-vorpal+)
-      (format str " Vorpal: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-vorpal+) (get-armor-%-resist mob +weapon-dmg-vorpal+))
-      (format str " Vorpal: 0, 0%~%"))
+      (format str "    Vorpal: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-vorpal+) (get-armor-%-resist mob +weapon-dmg-vorpal+))
+      (format str "    Vorpal: 0, 0%~%"))
+    (if (get-armor-resist mob +weapon-dmg-mind+)
+      (format str "      Mind: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-mind+) (get-armor-%-resist mob +weapon-dmg-mind+))
+      (format str "      Mind: 0, 0%~%"))
+    (if (get-armor-resist mob +weapon-dmg-radiation+)
+      (format str " Radiation: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-radiation+) (get-armor-%-resist mob +weapon-dmg-radiation+))
+      (format str " Radiation: 0, 0%~%"))
+    (if (get-armor-resist mob +weapon-dmg-acid+)
+      (format str "      Acid: ~A, ~A%~%" (get-armor-d-resist mob +weapon-dmg-acid+) (get-armor-%-resist mob +weapon-dmg-acid+))
+      (format str "      Acid: 0, 0%~%"))
     str))
 
 (defmethod calculate-total-kills ((mob mob))

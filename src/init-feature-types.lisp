@@ -333,7 +333,7 @@
                                                                      (loop for target in targets
                                                                            for cur-dmg = 0
                                                                            do
-                                                                              (incf cur-dmg (inflict-damage target :min-dmg 1 :max-dmg 3 :dmg-type +weapon-dmg-acid+
+                                                                              (incf cur-dmg (inflict-damage target :min-dmg 4 :max-dmg 8 :dmg-type +weapon-dmg-acid+
                                                                                                                    :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
                                                                                                                    :actor (get-mob-by-id (param1 feature))))
                                                                               (if (zerop cur-dmg)

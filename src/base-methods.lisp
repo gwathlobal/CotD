@@ -1321,11 +1321,22 @@
 
     (when (mob-effect-p attacker +mob-effect-adrenaline+)
       (let ((adrenaline-value (param1 (get-effect-by-id (mob-effect-p attacker +mob-effect-adrenaline+)))))
-        (setf melee-spd (truncate (* melee-spd (- 100 (* adrenaline-value 5))) 100))))
+        (setf melee-spd (truncate (* melee-spd (- 100 (* adrenaline-value 5))) 100)))
+      (when (<= melee-spd 0)
+        (setf melee-spd 1)))
     
     (inflict-damage target :min-dmg (get-melee-weapon-dmg-min attacker) :max-dmg (get-melee-weapon-dmg-max attacker) :dmg-type (get-melee-weapon-dmg-type attacker)
                            :att-spd melee-spd :weapon-aux (get-melee-weapon-aux-simple (weapon attacker)) :acc (m-acc attacker) :add-blood t 
                            :actor attacker))
+
+  (when (mob-effect-p target +mob-effect-spines+)
+    (inflict-damage attacker :min-dmg 1 :max-dmg 3 :dmg-type +weapon-dmg-flesh+
+                             :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t
+                             :actor target
+                             :specific-hit-string-func #'(lambda (cur-dmg)
+                                                           (format nil "~A takes ~A damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker))) cur-dmg))
+                             :specific-no-dmg-string-func #'(lambda ()
+                                                              (format nil "~A takes no damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker)))))))
   )
 
 (defun check-dead (mob)
