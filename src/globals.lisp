@@ -96,9 +96,9 @@
 (defconstant +mob-type-star-singer-gazer-mender+ 39)
 (defconstant +mob-type-angel-image+ 40)
 (defconstant +mob-type-eater-of-the-dead+ 41)
-(defconstant +mob-type-eater-of-the-dead-rage+ 42)
-(defconstant +mob-type-malseraph-puppet+ 43)
-(defconstant +mob-type-sheep+ 44)
+(defconstant +mob-type-malseraph-puppet+ 42)
+(defconstant +mob-type-sheep+ 43)
+(defconstant +mob-type-locust+ 44)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -227,6 +227,8 @@
 (defconstant +mob-abil-metabolic-boost+ 102)
 (defconstant +mob-abil-mutate-retracting-spines+ 103)
 (defconstant +mob-abil-retracting-spines+ 104)
+(defconstant +mob-abil-spawn-locusts+ 105)
+(defconstant +mob-abil-mutate-spawn-locusts+ 106)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -273,6 +275,7 @@
 (defconstant +mob-effect-adrenaline+ 42)
 (defconstant +mob-effect-metabolic-boost+ 43)
 (defconstant +mob-effect-spines+ 44)
+(defconstant +mob-effect-mortality+ 45)
 
 (defconstant +mob-order-follow+ 0)
 

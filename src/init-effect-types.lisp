@@ -732,3 +732,17 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A retracts its spines. " (prepend-article +article-the+ (visible-name actor))))
                                                             )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-mortality+ :name "Dies in"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*red*)
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+
+                                                            (rem-mob-effect-simple actor +mob-effect-mortality+)
+                                                            (setf (cur-hp actor) 0)
+                                                            (when (check-dead actor)
+                                                              (make-dead actor :splatter nil :msg t :killer nil :corpse t :aux-params ()))
+                                                            
+                                                            )))

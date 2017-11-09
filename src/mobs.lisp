@@ -78,7 +78,7 @@
                                                                 abil-split-soul abil-restore-soul abil-resurrection abil-sprint abil-jump abil-bend-space abil-cast-shadow abil-cannibalize abil-primordial
                                                                 abil-make-disguise abil-remove-disguise abil-constriction abil-irradiate abil-fission abil-create-parasites abil-mutate-acid-spit abil-acid-spit
                                                                 abil-adrenal-gland abil-mutate-corrosive-bile abil-corrosive-bile abil-mutate-clawed-tentacle abil-clawed-tentacle abil-mutate-chitinous-plating abil-chitinous-plating
-                                                                abil-mutate-metabolic-boost abil-metabolic-boost abil-mutate-retracting-spines abil-retracting-spines)
+                                                                abil-mutate-metabolic-boost abil-metabolic-boost abil-mutate-retracting-spines abil-retracting-spines abil-spawn-locusts abil-mutate-spawn-locusts)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -317,6 +317,10 @@
     (setf (gethash +mob-abil-mutate-retracting-spines+ (abilities mob-type)) t))
   (when abil-retracting-spines
     (setf (gethash +mob-abil-retracting-spines+ (abilities mob-type)) t))
+  (when abil-mutate-spawn-locusts
+    (setf (gethash +mob-abil-mutate-spawn-locusts+ (abilities mob-type)) t))
+  (when abil-spawn-locusts
+    (setf (gethash +mob-abil-spawn-locusts+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -1107,6 +1111,7 @@
   (when (and (not (eq mob *player*))
              (not (mob-ability-p mob +mob-abil-human+))
              (not (mob-ability-p mob +mob-abil-animal+))
+             (not (mob-ability-p mob +mob-abil-primordial+))
              (not (= (mob-type mob) +mob-type-imp+))
              (not (= (mob-type mob) +mob-type-shadow-imp+)))
     (let ((name-pick-n))

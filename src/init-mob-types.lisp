@@ -501,21 +501,20 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 2
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t  :abil-primordial t :abil-constriction t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-constriction t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t :abil-adrenal-gland t :abil-mutate-corrosive-bile t :abil-mutate-clawed-tentacle t
-                                       :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t
+                                       :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t :abil-mutate-spawn-locusts t
                                        :ai-curious t))
 
-(set-mob-type (make-instance 'mob-type :mob-type +mob-type-eater-of-the-dead-rage+
-                                       :name "eater of the dead"
-                                       :glyph-idx 37 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-locust+
+                                       :name "locust"
+                                       :glyph-idx 69 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-eater+
-                                       :weapon (list "Clawed tentacles" (list +weapon-dmg-flesh+ 6 10 (truncate (* +normal-ap+ 0.75)) 100 (list :constricts)) nil) :base-dodge 75
-                                       :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 3 0) (list +weapon-dmg-vorpal+ 3 0) (list +weapon-dmg-fire+ 3 0))
-                                       :strength 3
+                                       :weapon (list "Claws" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 15
+                                       :armor ()
+                                       :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-constriction t
-                                       :abil-open-close-door t :abil-cannibalize t :abil-sprint t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
                                        :ai-curious t))
 
 ;;--------------------
@@ -605,6 +604,7 @@
                        (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
                        (cons +faction-type-criminals+ nil) (cons +faction-type-eater+ nil))
 (set-faction-relations +faction-type-eater+
+                       (cons +faction-type-eater+ t)
                        (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil)
                        (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
                        (cons +faction-type-criminals+ nil))

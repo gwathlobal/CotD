@@ -4551,3 +4551,105 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-spawn-locusts+ :name "Grow spawning sacs" :descr "Evolve to get an ability to spawn locust next to you. The evolution process takes 15 turns. Locusts live for 10 turns, have 8 HP and deal 3-4 flesh dmg in melee." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 15 :param1 (list +mob-abil-spawn-locusts+ "grows spawning sacs"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-spawn-locusts+)
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-spawn-locusts+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-spawn-locusts+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-spawn-locusts+ :name "Spawn locust" :descr "Spawn a locust next to you. The locust has 8 HP, deals 3-4 flesh damage in melee and lives for 10 turns." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :start-map-select-func #'player-start-map-select-self
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                ;; target is (x y z)
+                                                (logger (format nil "MOB-SPAWN-LOCUST: ~A [~A] spawns a locust at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                ;; target here is the item to be reanimated
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                       (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :observed-mob actor)
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear some burping~A. " str)))
+                                                (let ((locust-mob))
+                                                  (setf locust-mob (make-instance 'mob :mob-type +mob-type-locust+ :x (first target) :y (second target) :z (third target)))
+                                                  (set-mob-effect locust-mob :effect-type-id +mob-effect-mortality+ :actor-id (id locust-mob) :cd 10)
+                                                  (add-mob-to-level-list (level *world*) locust-mob))
+
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-spawn-locusts+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((final-cell nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                        (when (null final-cell)
+                                                                                                          (setf final-cell (list dx dy (z actor))))
+                                                                                                        (when (and nearest-enemy
+                                                                                                                   (< (get-distance-3d dx dy (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))
+                                                                                                                      (get-distance-3d (first final-cell) (second final-cell) (third final-cell)
+                                                                                                                                       (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))))
+                                                                                                          (setf final-cell (list dx dy (z actor))))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-spawn-locusts+)
+                                                             (can-invoke-ability actor actor +mob-abil-spawn-locusts+)
+                                                             nearest-enemy
+                                                             final-cell)
+                                                      final-cell
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
+                                                                (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
+                                                        (progn
+                                                          (clear-message-list *small-message-box*)
+                                                          (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                          t)
+                                                        (progn
+                                                          nil))
+                                                      )))

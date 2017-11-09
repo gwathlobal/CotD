@@ -770,6 +770,8 @@
                        (= (first (order target)) +mob-order-follow+)
                        (= (second (order actor)) (second (order target)))))
           (logger (format nil "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target)))
+          (when (not (check-mob-visible target :observer actor))
+            (stumble-upon-mob actor target))
           (make-act actor (truncate (* (cur-move-speed actor) (move-spd (get-mob-type-by-id (mob-type actor)))) 100))
           (return-from on-bump t))
 
