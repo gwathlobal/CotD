@@ -4553,7 +4553,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-spawn-locusts+ :name "Grow spawning sacs" :descr "Evolve to get an ability to spawn locust next to you. The evolution process takes 15 turns. Locusts live for 10 turns, have 8 HP and deal 3-4 flesh dmg in melee." 
+                                 :id +mob-abil-mutate-spawn-locusts+ :name "Grow spawning sacs" :descr "Evolve to get an ability to spawn locust next to you. The evolution process takes 15 turns. Locusts live for 10 turns, have 8 HP and deal 3-4 flesh dmg in melee. The spawning sacs are mutually exclusive with the ovipositor." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4572,6 +4572,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-spawn-locusts+)
+                                                               (not (mob-ability-p actor +mob-abil-spawn-locusts+))
+                                                               (not (mob-ability-p actor +mob-abil-oviposit+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
                                                         nil))
@@ -4653,3 +4655,143 @@
                                                         (progn
                                                           nil))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-ovipositor+ :name "Grow ovipositor" :descr "Evolve to get an ability to lay eggs that can later quickly develop into scarabs. The evolution process takes 15 turns. Scarabs are living bombs that explode acid when contacting an enemy. The ovipositor is mutually exclusive with the spawning sacs." 
+                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 15 :param1 (list +mob-abil-oviposit+ "grows ovipositor"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-ovipositor+)
+                                                               (not (mob-ability-p actor +mob-abil-spawn-locusts+))
+                                                               (not (mob-ability-p actor +mob-abil-oviposit+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-ovipositor+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-ovipositor+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-oviposit+ :name "Oviposit" :descr "Start the egg laying process. Eggs become ready to use in 6 turns and can later quickly develop into scarabs. Scarabs are living bombs that try to move to the target and explode to deal 6-10 acid damage when contacting an enemy." 
+                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 0
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-laying-eggs+ :actor-id (id actor) :cd 6)
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "Eggs start to grow inside ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-laying-eggs+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-oviposit+)
+                                                           (can-invoke-ability actor actor +mob-abil-oviposit+)
+                                                           (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-eater-scarab-egg+)
+                                                                    sum (qty item))
+                                                                   2))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-acid-explosion+ :name "Acid explosion" :descr "You explode when contacting allies and enemies." 
+                                 :passive t :cost 0 :spd +normal-ap+
+                                 :final t :on-touch t
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                
+                                                (logger (format nil "MOB-ACID-EXPLOSION: ~A [~A] explodes on ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+  
+                                                (let ((targets nil)
+                                                      (max-range 1))
+                                                  (draw-fov (x actor) (y actor) (z actor) max-range
+                                                            #'(lambda (dx dy dz prev-cell)
+                                                                (let ((exit-result t))
+                                                                  (block nil
+                                                                    (when (> (get-distance-3d (x actor) (y actor) (z actor) dx dy dz) (1+ max-range))
+                                                                      (setf exit-result 'exit)
+                                                                      (return))
+                                                                    
+                                                                    (when (eq (check-LOS-propagate dx dy dz prev-cell :check-move t) nil)
+                                                                      (setf exit-result 'exit)
+                                                                      (return))
+                                                                    
+                                                                    (place-animation dx dy dz +anim-type-fire-dot+ :params ())
+                                                                    
+                                                                    (when (and (get-mob-* (level *world*) dx dy dz)) 
+                                                                      (pushnew (get-mob-* (level *world*) dx dy dz) targets))
+                                                                    )
+                                                                  exit-result)))
+                                                  
+                                                  (loop for target in targets
+                                                        for cur-dmg = 0
+                                                        do
+                                                           (incf cur-dmg (inflict-damage target :min-dmg 6 :max-dmg 10 :dmg-type +weapon-dmg-acid+
+                                                                                                :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
+                                                                                                :actor actor))
+                                                           (if (zerop cur-dmg)
+                                                             (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                                    (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                             (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                                    (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)))
+                                                           (when (check-dead target)
+                                                             (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (list :is-fire))
+                                                             
+                                                             (when (mob-effect-p target +mob-effect-possessed+)
+                                                               (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+                                                               (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
+                                                                     (y (get-mob-by-id (slave-mob-id target))) (y target)
+                                                                     (z (get-mob-by-id (slave-mob-id target))) (z target))
+                                                               (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))
+                                                  
+                                                  (setf (cur-hp actor) 0)
+                                                  (when (check-dead actor)
+                                                    (make-dead actor :splatter nil :msg t :killer nil :corpse nil :aux-params ())
+                                                    (when (mob-effect-p actor +mob-effect-possessed+)
+                                                      (setf (cur-hp (get-mob-by-id (slave-mob-id actor))) 0)
+                                                      (setf (x (get-mob-by-id (slave-mob-id actor))) (x actor)
+                                                            (y (get-mob-by-id (slave-mob-id actor))) (y actor)
+                                                            (z (get-mob-by-id (slave-mob-id actor))) (z actor))
+                                                      (make-dead (get-mob-by-id (slave-mob-id actor)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())))
+                                                  )
+                                                
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type))
+                                                      (if (and (mob-ability-p actor +mob-abil-acid-explosion+)
+                                                               (not (get-faction-relation (faction actor) (faction target))))
+                                                        t
+                                                        nil))))

@@ -266,9 +266,9 @@
                                                                                                                    :actor (get-mob-by-id (param1 feature))))
                                                                               
                                                                               (if (zerop cur-dmg)
-                                                                                (print-visible-message (x feature) (y feature) (z feature) (level *world*) 
+                                                                                (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
-                                                                                (print-visible-message (x feature) (y feature) (z feature) (level *world*) 
+                                                                                (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)))
                                                                               (when (check-dead target)
                                                                                 (make-dead target :splatter t :msg t :msg-newline nil :killer (get-mob-by-id (param1 feature)) :corpse t :aux-params (list :is-fire))
@@ -337,9 +337,9 @@
                                                                                                                    :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
                                                                                                                    :actor (get-mob-by-id (param1 feature))))
                                                                               (if (zerop cur-dmg)
-                                                                                (print-visible-message (x feature) (y feature) (z feature) (level *world*) 
+                                                                                (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
-                                                                                (print-visible-message (x feature) (y feature) (z feature) (level *world*) 
+                                                                                (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)))
                                                                               (when (check-dead target)
                                                                                 (make-dead target :splatter t :msg t :msg-newline nil :killer (get-mob-by-id (param1 feature)) :corpse t :aux-params (list :is-fire))

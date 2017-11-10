@@ -99,6 +99,7 @@
 (defconstant +mob-type-malseraph-puppet+ 42)
 (defconstant +mob-type-sheep+ 43)
 (defconstant +mob-type-locust+ 44)
+(defconstant +mob-type-scarab+ 45)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -229,6 +230,9 @@
 (defconstant +mob-abil-retracting-spines+ 104)
 (defconstant +mob-abil-spawn-locusts+ 105)
 (defconstant +mob-abil-mutate-spawn-locusts+ 106)
+(defconstant +mob-abil-oviposit+ 107)
+(defconstant +mob-abil-mutate-ovipositor+ 108)
+(defconstant +mob-abil-acid-explosion+ 109)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -276,8 +280,10 @@
 (defconstant +mob-effect-metabolic-boost+ 43)
 (defconstant +mob-effect-spines+ 44)
 (defconstant +mob-effect-mortality+ 45)
+(defconstant +mob-effect-laying-eggs+ 46)
 
 (defconstant +mob-order-follow+ 0)
+(defconstant +mob-order-target+ 1)
 
 (defconstant +weapon-dmg-flesh+ 0)
 (defconstant +weapon-dmg-iron+ 1)
@@ -307,6 +313,7 @@
 (defconstant +item-type-deck-of-escape+ 10)
 (defconstant +item-type-eater-parasite+ 11)
 (defconstant +item-type-signal-flare+ 12)
+(defconstant +item-type-eater-scarab-egg+ 13)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants

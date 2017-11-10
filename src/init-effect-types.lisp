@@ -741,8 +741,29 @@
                                                             (declare (ignore effect))
 
                                                             (rem-mob-effect-simple actor +mob-effect-mortality+)
-                                                            (setf (cur-hp actor) 0)
-                                                            (when (check-dead actor)
-                                                              (make-dead actor :splatter nil :msg t :killer nil :corpse t :aux-params ()))
+                                                            (when (> (cur-hp actor) 0)
+                                                              (setf (cur-hp actor) 0)
+                                                              (when (check-dead actor)
+                                                                (make-dead actor :splatter nil :msg t :killer nil :corpse t :aux-params ())
+                                                                (when (mob-effect-p actor +mob-effect-possessed+)
+                                                                  (setf (cur-hp (get-mob-by-id (slave-mob-id actor))) 0)
+                                                                  (setf (x (get-mob-by-id (slave-mob-id actor))) (x actor)
+                                                                        (y (get-mob-by-id (slave-mob-id actor))) (y actor)
+                                                                        (z (get-mob-by-id (slave-mob-id actor))) (z actor))
+                                                                  (make-dead (get-mob-by-id (slave-mob-id actor)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))
+                                                            
+                                                            )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-laying-eggs+ :name "Laying eggs"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 60 :g 179 :b 113))
+                                             :on-remove #'(lambda (effect actor)
+
+                                                            (when (eq (cd effect) 0)
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "Eggs finished growing inside ~A. " (prepend-article +article-the+ (visible-name actor))))
+                                                              (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-scarab-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 1)
+                                                                             :spd nil :silent t))
                                                             
                                                             )))

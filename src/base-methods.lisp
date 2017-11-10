@@ -1308,7 +1308,8 @@
 (defun melee-target (attacker target)
   (logger (format nil "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target)))
   ;; no weapons - no attack
-  (unless (weapon attacker)
+  (when (or (null (weapon attacker))
+            (null (is-weapon-melee attacker)))
     (make-act attacker +normal-ap+)
     (return-from melee-target nil))
 

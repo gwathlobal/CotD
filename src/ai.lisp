@@ -587,6 +587,19 @@
               (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to follow the leader to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x leader) (y leader) (z leader)))
               (setf nearest-target leader))))
         ))
+
+    ;; approach the target
+    (when (and (order mob)
+               (= (first (order mob)) +mob-order-target+))
+      ;; if the leader is nearby, plot the path to it
+      (let ((target (get-mob-by-id (second (order mob)))))
+        (if (check-dead target)
+          (progn
+            (setf (order mob) nil))
+          (progn
+            (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to follow the leader to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x target) (y target) (z target)))
+            (setf nearest-target target)))
+        ))
     
     ;; got to the nearest target
     (when nearest-target
