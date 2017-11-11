@@ -503,7 +503,8 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-constriction t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t :abil-adrenal-gland t :abil-mutate-corrosive-bile t :abil-mutate-clawed-tentacle t
-                                       :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t :abil-mutate-spawn-locusts t :abil-mutate-ovipositor t
+                                       :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t :abil-mutate-spawn-locusts t :abil-mutate-ovipositor t :abil-mutate-acid-locusts t
+                                       :abil-mutate-fast-scarabs t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-locust+
@@ -517,9 +518,31 @@
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
                                        :ai-curious t))
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-acid-locust+
+                                       :name "acid locust"
+                                       :glyph-idx 69 :glyph-color (sdl:color :r 150 :g 165 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :faction +faction-type-eater+
+                                       :weapon (list "Claws" (list +weapon-dmg-acid+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 15
+                                       :armor ()
+                                       :strength 1
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :ai-curious t))
+
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scarab+
                                        :name "scarab"
-                                       :glyph-idx 69 :glyph-color (sdl:color :r 0 :g 255 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 69 :glyph-color (sdl:color :r 0 :g 255 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :faction +faction-type-eater+
+                                       :weapon () :base-dodge 15
+                                       :armor ()
+                                       :strength 1
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-acid-explosion t
+                                       :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-fast-scarab+
+                                       :name "fast scarab"
+                                       :glyph-idx 69 :glyph-color (sdl:color :r 0 :g 255 :b 100) :back-color sdl:*black* :max-hp 8 :max-fp 0 :move-spd (truncate (* +normal-ap+ 0.8))
                                        :faction +faction-type-eater+
                                        :weapon () :base-dodge 15
                                        :armor ()

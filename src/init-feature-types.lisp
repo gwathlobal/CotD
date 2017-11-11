@@ -321,7 +321,7 @@
                                                                                          (setf exit-result 'exit)
                                                                                          (return))
 
-                                                                                       (place-animation dx dy dz +anim-type-fire-dot+ :params ())
+                                                                                       (place-animation dx dy dz +anim-type-acid-dot+ :params ())
                                                                                        
                                                                                        (when (and (get-mob-* level dx dy dz) 
                                                                                                   )

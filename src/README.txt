@@ -64,7 +64,7 @@ THE PANDEMONIUM HIERARCHY
 THE PRIMORDIAL
 
  - You start as a monstrous Eater of the dead who rose from thousands years of slumber to drive Angels and Demons away from the City.
- - Eat corpses to gain health and power. Spend power to temporarily increase your combat prowess. 
+ - Eat corpses to gain health and power. Spend power to gain benefitial mutations. 
  - To win, kill all angels and demons.
 
 --------------------

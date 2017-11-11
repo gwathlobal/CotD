@@ -86,3 +86,21 @@
                                                 ))
                                                   
                                     ))
+
+(set-anim-type (make-animation-type :id +anim-type-acid-dot+
+                                    :func #'(lambda (animation)
+                                              (let ((x (anim-x animation))
+                                                    (y (anim-y animation))
+                                                    (z (anim-z animation))
+                                                    (glyph-idx 10)
+                                                    (glyph-color (if (zerop (random 2))
+                                                                   (sdl:color :r 0 :g 150 :b 0)
+                                                                   (sdl:color :r 0 :g 255 :b 0)))
+                                                    (back-color sdl:*black*))
+                                                (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
+                                                  (when (and (check-tile-on-map x y z sx sy *max-x-view* *max-y-view* (view-z *player*))
+                                                             (get-single-memo-visibility (get-memo-* (level *world*) x y z)))
+                                                    (display-animation-on-map x y z glyph-idx glyph-color back-color)))
+                                                ))
+                                                  
+                                    ))

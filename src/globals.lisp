@@ -100,6 +100,9 @@
 (defconstant +mob-type-sheep+ 43)
 (defconstant +mob-type-locust+ 44)
 (defconstant +mob-type-scarab+ 45)
+(defconstant +mob-type-acid-locust+ 46)
+(defconstant +mob-type-fast-scarab+ 47)
+
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -233,6 +236,10 @@
 (defconstant +mob-abil-oviposit+ 107)
 (defconstant +mob-abil-mutate-ovipositor+ 108)
 (defconstant +mob-abil-acid-explosion+ 109)
+(defconstant +mob-abil-mutate-acid-locusts+ 110)
+(defconstant +mob-abil-mutate-fast-scarabs+ 111)
+(defconstant +mob-abil-acid-locusts+ 112)
+(defconstant +mob-abil-fast-scarabs+ 113)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

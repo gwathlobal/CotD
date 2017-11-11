@@ -403,7 +403,9 @@
                                                                                                                                      (x target) (y target) (z target)))
                                                                                                              (setf final-cell (list dx dy (z actor))))))))
                                                        (when final-cell
-                                                         (setf scarab-mob (make-instance 'mob :mob-type +mob-type-scarab+ :x (first final-cell) :y (second final-cell) :z (third final-cell)))
+                                                         (if (mob-ability-p actor +mob-abil-fast-scarabs+)
+                                                           (setf scarab-mob (make-instance 'mob :mob-type +mob-type-fast-scarab+ :x (first final-cell) :y (second final-cell) :z (third final-cell)))
+                                                           (setf scarab-mob (make-instance 'mob :mob-type +mob-type-scarab+ :x (first final-cell) :y (second final-cell) :z (third final-cell))))
                                                          (setf (order scarab-mob) (list +mob-order-target+ (id target)))
                                                          (add-mob-to-level-list (level *world*) scarab-mob)))
                                                      ;; always remove 1 item
