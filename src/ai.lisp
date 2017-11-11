@@ -529,7 +529,7 @@
         (setf r (random (length item-list)))
         (let ((ai-invoke-func (ai-invoke-func (first (nth r item-list)))))
           (logger (format nil "AI-FUNCTION: ~A [~A] decides to use item ~A [~A]~%" (name mob) (id mob) (name (first (nth r item-list))) (id (first (nth r item-list)))))
-          (funcall ai-invoke-func (first (nth r item-list)) mob nearest-enemy nearest-ally (second (nth r item-list))))
+          (funcall ai-invoke-func mob (first (nth r item-list)) nearest-enemy nearest-ally (second (nth r item-list))))
         (return-from ai-function)
         )
       )

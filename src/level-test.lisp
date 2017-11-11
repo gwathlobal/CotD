@@ -160,7 +160,7 @@
   (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+ :x 45 :y 19 :z 3))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 50 :y 18 :z 3))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-man+ :x 50 :y 18 :z 3))
         ;(demon (make-instance 'mob :mob-type +mob-type-star-singer+ :x 49 :y 19 :z 3))
         ;(angel (make-instance 'mob :mob-type +mob-type-star-mender+ :x 49 :y 17 :z 3))
         )

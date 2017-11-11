@@ -6,6 +6,7 @@ CHANGELOG
 - For spawning mutation, the Eater of the dead has either spawning sacs or an ovipositor. The spawning sacs can spawn locusts which are rather weak creatures that can attack in melee but die off naturally after a number of turns. The ovipositor spawns scarabs which are living bombs that roll to the target and explode dealing acid damage to everybody around. You can further enhance your spawns by giving locusts an acid bite or making scarabs roll faster.
 - From the very start, to boost its combat prowess the Eater of the dead now has an adrenal gland. When the Eater attacks someone, the gland secrets adrenaline which makes all melee and range attacks faster.
 - The Eater of the dead can create parasites that can be thrown onto enemies. A parasited character will always reveal its location to the Eater.
+- When the Eater of the dead devours corpses, it has a chance to get abilities depending on the type of the corpse.
 - The Eater of the dead can no longer use primordial power.
 - Added signal flares to Scouts. Signal flares prompt the artillary that the military have deployed outside the City to strike at the location of the flare. This strike deals significant iron and fire damage around the location where the strike lands.
 - If an ability requires the player to select a target, the game will initially focus the applicable target (instead of always focusing hostile characters).

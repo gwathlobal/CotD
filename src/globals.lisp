@@ -240,6 +240,10 @@
 (defconstant +mob-abil-mutate-fast-scarabs+ 111)
 (defconstant +mob-abil-acid-locusts+ 112)
 (defconstant +mob-abil-fast-scarabs+ 113)
+(defconstant +mob-abil-regenerate+ 114)
+(defconstant +mob-abil-casts-light+ 115)
+(defconstant +mob-abil-vulnerable-to-vorpal+ 116)
+(defconstant +mob-abil-vulnerable-to-fire+ 117)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -288,6 +292,7 @@
 (defconstant +mob-effect-spines+ 44)
 (defconstant +mob-effect-mortality+ 45)
 (defconstant +mob-effect-laying-eggs+ 46)
+(defconstant +mob-effect-regenerate+ 47)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)

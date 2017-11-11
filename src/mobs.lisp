@@ -861,6 +861,8 @@
   (let ((light (base-light-radius mob)))
     (when (mob-effect-p mob +mob-effect-extinguished-light+)
       (setf light 0))
+    (when (mob-ability-p mob +mob-abil-casts-light+)
+      (setf light 6))
     (setf (cur-light mob) light))
   
   (let ((sight (base-sight mob)))
@@ -904,6 +906,10 @@
       (set-armor-%-resist mob +weapon-dmg-iron+ (+ (get-armor-%-resist mob +weapon-dmg-iron+) 40))
       (set-armor-%-resist mob +weapon-dmg-vorpal+ (+ (get-armor-%-resist mob +weapon-dmg-vorpal+) 40))
       (set-armor-%-resist mob +weapon-dmg-acid+ (+ (get-armor-%-resist mob +weapon-dmg-acid+) 40)))
+    (when (mob-ability-p mob +mob-abil-vulnerable-to-vorpal+)
+      (set-armor-d-resist mob +weapon-dmg-vorpal+ (- (get-armor-d-resist mob +weapon-dmg-vorpal+) 2)))
+    (when (mob-ability-p mob +mob-abil-vulnerable-to-fire+)
+      (set-armor-d-resist mob +weapon-dmg-fire+ (- (get-armor-d-resist mob +weapon-dmg-fire+) 2)))
     ))
 
 (defun adjust-m-acc (mob)

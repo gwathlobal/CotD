@@ -1333,7 +1333,7 @@
                            :actor attacker))
 
   (when (mob-effect-p target +mob-effect-spines+)
-    (inflict-damage attacker :min-dmg 1 :max-dmg 3 :dmg-type +weapon-dmg-flesh+
+    (inflict-damage attacker :min-dmg 2 :max-dmg 3 :dmg-type +weapon-dmg-flesh+
                              :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t
                              :actor target
                              :specific-hit-string-func #'(lambda (cur-dmg)

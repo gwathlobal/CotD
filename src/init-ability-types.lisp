@@ -2692,6 +2692,7 @@
                                                              (can-invoke-ability actor actor +mob-abil-extinguish-light+)
                                                              nearest-enemy
                                                              (> (cur-light nearest-enemy) 0)
+                                                             (not (mob-ability-p nearest-enemy +mob-abil-casts-light+))
                                                              (< (get-outdoor-light-* (level *world*) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) *mob-visibility-threshold*))
                                                       t
                                                       nil))
@@ -3784,6 +3785,58 @@
                                                                                                              (format nil "You hear someone munching~A. " str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A devours ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-a+ (visible-name target))))
+
+                                                (let ((already-mutated nil) (mutation-chance 20))
+                                                  (cond
+                                                    ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-human+)
+                                                     (progn
+                                                       (format t "HERE HUMAN")
+                                                       (when (and (null already-mutated)
+                                                                  (zerop (random mutation-chance)))
+                                                         (mob-set-mutation actor +mob-abil-toggle-light+)
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A can now toggle lights. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         (setf already-mutated t))
+
+                                                       (when (and (null already-mutated)
+                                                                  (zerop (random mutation-chance)))
+                                                         (mob-set-mutation actor +mob-abil-vulnerable-to-vorpal+)
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A is now vulnerable to vorpal. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         (setf already-mutated t))))
+
+                                                    ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-demon+)
+                                                     (progn
+                                                       (when (and (null already-mutated)
+                                                                  (zerop (random mutation-chance)))
+                                                         (mob-set-mutation actor +mob-abil-bend-space+)
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A can now bend space. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         (setf already-mutated t))
+
+                                                       (when (and (null already-mutated)
+                                                                  (zerop (random mutation-chance)))
+                                                         (mob-set-mutation actor +mob-abil-vulnerable-to-fire+)
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A is now vulnerable to fire. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         (setf already-mutated t))))
+
+                                                    ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-angel+)
+                                                     (progn
+                                                       (when (and (null already-mutated)
+                                                                  (zerop (random mutation-chance)))
+                                                         (mob-set-mutation actor +mob-abil-regenerate+)
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A can now regenerate. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         (setf already-mutated t))
+
+                                                       (when (and (null already-mutated)
+                                                                  (zerop (random mutation-chance)))
+                                                         (mob-set-mutation actor +mob-abil-casts-light+)
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A is now cast light. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         (setf already-mutated t))))))
+                                                
                                                 (remove-item-from-level-list (level *world*) target)
                                                 (remove-item-from-world target)
 
@@ -4881,6 +4934,57 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-fast-scarabs+ :name "Fast scarabs" :descr "The scarabs you spawn will cover ground to the target quicker." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-regenerate+ :name "Regenerate" :descr "Heal 6 HP within 6 turns." 
+                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 0
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-regenerate+ :actor-id (id actor) :cd 6)
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to regenerate. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-regenerate+)
+                                                               (not (mob-effect-p actor +mob-effect-regenerate+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-regenerate+)
+                                                           (can-invoke-ability actor actor +mob-abil-regenerate+)
+                                                           (>= (- (max-hp actor) (cur-hp actor))
+                                                               6))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-casts-light+ :name "Casts light" :descr "You light radius is always 6. Prevails over the Extinguish light ability." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-vulnerable-to-vorpal+ :name "Vulnerable to vorpal" :descr "Your resistance to vorpal is always 2 points lower than usual." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-vulnerable-to-fire+ :name "Vulnerable to fire" :descr "Your resistance to fire is always 2 points lower than usual." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil

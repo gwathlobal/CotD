@@ -767,3 +767,13 @@
                                                                              :spd nil :silent t))
                                                             
                                                             )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-regenerate+ :name "Regenerate"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
+                                             :on-tick #'(lambda (effect actor)
+                                                          (declare (ignore effect))
+                                                          (incf (cur-hp actor))
+                                                          (when (> (cur-hp actor) (max-hp actor))
+                                                            (setf (cur-hp actor) (max-hp actor))))))
