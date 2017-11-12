@@ -5082,3 +5082,89 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-cure-mutation+ :name "Cure mutation" :descr "Cure one mutation you have gained." 
+                                 :cost 2 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                ;; target is ability-type-id
+                                                (logger (format nil "MOB-CURE-MUTATION: ~A [~A] invokes cure mutatation on ~A [~A].~%" (name actor) (id actor) (name (get-ability-type-by-id target)) (id (get-ability-type-by-id target))))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear someone bodily sounds~A. " str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A gets rid of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                               (name (get-ability-type-by-id target))))
+
+                                                (mob-remove-mutation actor target)
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (loop for ability-type-id being the hash-key in (abilities actor)
+                                                            with has-mutation = nil
+                                                            when (mob-is-ability-mutation actor ability-type-id)
+                                                              do
+                                                                 (setf has-mutation t)
+                                                                 (loop-finish)
+                                                            finally (return (if has-mutation
+                                                                              t
+                                                                              nil)))
+                                                      )
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-cure-mutation+)
+                                                           (can-invoke-ability actor actor +mob-abil-cure-mutation+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (let* ((malmutations (list +mob-abil-vulnerable-to-fire+ +mob-abil-vulnerable-to-vorpal+ +mob-abil-casts-light+))
+                                                          (target-mutation (nth (random (length malmutations)) malmutations)))
+                                                     (mob-invoke-ability actor target-mutation (id ability-type))))
+                                 :obj-select-func #'(lambda (ability-type-id)
+                                                      (let ((mutations (loop for ability-type-id being the hash-key in (abilities *player*)
+                                                                             with mutations = ()
+                                                                             when (mob-is-ability-mutation *player* ability-type-id)
+                                                                               do
+                                                                                  (pushnew ability-type-id mutations)
+                                                                             finally (return mutations)))
+                                                            (exit-result nil))
+                                                        (cond
+                                                          ((>= (length mutations) 1)
+                                                           (progn
+                                                             (let ((mutation-line-list nil)
+                                                                   (mutation-prompt-list)
+                                                                   (mutation-list (copy-list mutations)))
+
+                                                               (setf mutation-line-list (loop for mutation-id in mutation-list
+                                                                                              for mutation = (get-ability-type-by-id mutation-id)
+                                                                                              collect (format nil "~A" (name mutation))))
+                                                               
+                                                               ;; populate the ability prompt list
+                                                               (setf mutation-prompt-list (loop for mutation-id in mutation-list
+                                                                                                collect #'(lambda (cur-sel)
+                                                                                                            (declare (ignore cur-sel))
+                                                                                                            "[Enter] Cure  [Escape] Cancel")))
+                                                               
+                                                               ;; show selection window
+                                                               (setf *current-window* (make-instance 'select-obj-window 
+                                                                                                     :return-to *current-window* 
+                                                                                                     :header-line "Choose a mutation to cure:"
+                                                                                                     :enter-func #'(lambda (cur-sel)
+                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (mob-invoke-ability *player* (nth cur-sel mutation-list) ability-type-id)
+                                                                                                                     (setf *current-window* (return-to (return-to (return-to *current-window*))))
+                                                                                                                     (make-output *current-window*)
+                                                                                                                     (setf exit-result t))
+                                                                                                     :line-list mutation-line-list
+                                                                                                     :prompt-list mutation-prompt-list))
+                                                               (make-output *current-window*)
+                                                               (run-window *current-window*))
+                                                             exit-result)
+                                                           )
+                                                          (t
+                                                           (progn
+                                                             nil)))))))

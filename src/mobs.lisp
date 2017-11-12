@@ -80,7 +80,7 @@
                                                                 abil-adrenal-gland abil-mutate-corrosive-bile abil-corrosive-bile abil-mutate-clawed-tentacle abil-clawed-tentacle abil-mutate-chitinous-plating abil-chitinous-plating
                                                                 abil-mutate-metabolic-boost abil-metabolic-boost abil-mutate-retracting-spines abil-retracting-spines abil-spawn-locusts abil-mutate-spawn-locusts
                                                                 abil-mutate-ovipositor abil-oviposit abil-acid-explosion abil-mutate-acid-locusts abil-acid-locusts abil-mutate-fast-scarabs abil-fast-scarabs
-                                                                abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts)
+                                                                abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -345,6 +345,8 @@
     (setf (gethash +mob-abil-mutate-tougher-locusts+ (abilities mob-type)) t))
   (when abil-tougher-locusts
     (setf (gethash +mob-abil-tougher-locusts+ (abilities mob-type)) t))
+  (when abil-cure-mutation
+    (setf (gethash +mob-abil-cure-mutation+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
