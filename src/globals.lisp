@@ -244,6 +244,10 @@
 (defconstant +mob-abil-casts-light+ 115)
 (defconstant +mob-abil-vulnerable-to-vorpal+ 116)
 (defconstant +mob-abil-vulnerable-to-fire+ 117)
+(defconstant +mob-abil-mutate-oviposit-more-eggs+ 118)
+(defconstant +mob-abil-oviposit-more-eggs+ 119)
+(defconstant +mob-abil-mutate-tougher-locusts+ 120)
+(defconstant +mob-abil-tougher-locusts+ 121)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

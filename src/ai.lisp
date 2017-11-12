@@ -597,8 +597,9 @@
           (progn
             (setf (order mob) nil))
           (progn
-            (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to follow the leader to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x target) (y target) (z target)))
-            (setf nearest-target target)))
+            (when (find (id target) (visible-mobs mob))
+              (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to go to the target to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x target) (y target) (z target)))
+              (setf nearest-target target))))
         ))
     
     ;; got to the nearest target
@@ -641,9 +642,7 @@
                  (setf (path-dst mob) (ai-find-move-around mob (sound-x sound) (sound-y sound)))
                  (setf (path mob) nil)
                  (loop-finish)
-            finally (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to investigate sound at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
-
-    
+            finally (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to investigate sound at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))   
     
     ;; when mob is kleptomaniac and has no target
     (when (and (mob-ai-kleptomaniac-p mob)
@@ -692,8 +691,7 @@
                  (when item
                    (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (name item) (id item) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
         ))
-
-    
+   
     
     ;; move to some random passable terrain
     (unless (path-dst mob)
