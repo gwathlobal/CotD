@@ -41,3 +41,13 @@ Some units (a Gargantaur) are so huge that they occupy several tiles on the leve
  - They can melee attack several enemies at the same time. For example, a Gargantaur of size 3x3 can crush up to 3 units standing next to it.
  
 Multi-tile units may also serve as mounts (for example, Angels can dominate Gargantaurs). Riding one will give excellent protection against melee attacks, but you will still have to cope with the creature's size and the necessity to turn it around to move in the desired direction.
+
+
+IRRADIATION EFFECT
+
+The irradiation effect only seems to be pretty harmless. Apart from Malseraph's puppets who can use their Fission ability to blow up irradiated characters, high levels of irradiation may cause you to skip turns due to being sick.
+There is also a small chance that irradiation will cause a minor malmutation. These malmutations can be:
+ - light emittance makes you always emit light and illuminate everything around you,
+ - vulnerabilty to fire gives you -2 direct fire resistance,
+ - vulnerabilty to vorpal gives you -2 direct vorpal resistance.
+Only the Eater of the dead can voluntarily get rid of these mutations with their Cure mutation ability. Malseraph can sometimes cure all malmutations of its followers. 

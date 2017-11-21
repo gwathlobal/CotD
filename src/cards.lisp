@@ -23,6 +23,7 @@
 (defconstant +item-card-curse-self+ 20)
 (defconstant +item-card-give-deck+ 21)
 (defconstant +item-card-glowing-all+ 22)
+(defconstant +item-card-cure-mutation+ 23)
 
 (defclass card-type ()
   ((id :initarg :id :accessor id)

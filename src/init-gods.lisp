@@ -49,7 +49,7 @@
                                                                             (t 0)))
                                                               (deck-of-boons (list (list +item-card-polymorph-other+ t t) (list +item-card-irradiate-other+ t t) (list +item-card-confuse-other+ t t) (list +item-card-silence-other+ t t)
                                                                                    (list +item-card-slow-other+ t t) (list +item-card-fear-other+ t t) (list +item-card-blindness-other+ t t) (list +item-card-curse-other+ t t)
-                                                                                   (list +item-card-give-deck+ t nil)))
+                                                                                   (list +item-card-give-deck+ nil nil) (list +item-card-cure-mutation+ nil nil)))
                                                               (neutral-chance (cond
                                                                                 ((= piety-level 1) 3)
                                                                                 ((= piety-level 2) 5)

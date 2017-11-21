@@ -297,3 +297,22 @@
                                                          (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                 (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
                                                      )))
+
+(set-card-type (make-instance 'card-type :id +item-card-cure-mutation+
+                                         :name "Card of Cure Mutation"
+                                         :on-use #'(lambda (card-type actor)
+                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (let ((was-cured nil))
+                                                       (when (mob-ability-p actor +mob-abil-casts-light+)
+                                                         (mob-remove-mutation actor +mob-abil-casts-light+)
+                                                         (setf was-cured t))
+                                                       (when (mob-ability-p actor +mob-abil-vulnerable-to-fire+)
+                                                         (mob-remove-mutation actor +mob-abil-vulnerable-to-fire+)
+                                                         (setf was-cured t))
+                                                       (when (mob-ability-p actor +mob-abil-vulnerable-to-vorpal+)
+                                                         (mob-remove-mutation actor +mob-abil-vulnerable-to-vorpal+)
+                                                         (setf was-cured t))
+                                                       (when was-cured
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                    (format nil "~A is cured of all malmutations. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                     )))

@@ -3834,7 +3834,7 @@
                                                                   (zerop (random mutation-chance)))
                                                          (mob-set-mutation actor +mob-abil-casts-light+)
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A is now cast light. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                                (format nil "~A is now casting light. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                          (setf already-mutated t))))))
                                                 
                                                 (remove-item-from-level-list (level *world*) target)
@@ -4982,14 +4982,14 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-vulnerable-to-vorpal+ :name "Vulnerable to vorpal" :descr "Your resistance to vorpal is always 2 points lower than usual." 
+                                 :id +mob-abil-vulnerable-to-vorpal+ :name "Vulnerable to vorpal" :descr "Your direct resistance to vorpal is always 2 points lower than usual." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-vulnerable-to-fire+ :name "Vulnerable to fire" :descr "Your resistance to fire is always 2 points lower than usual." 
+                                 :id +mob-abil-vulnerable-to-fire+ :name "Vulnerable to fire" :descr "Your direct resistance to fire is always 2 points lower than usual." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil
