@@ -464,7 +464,7 @@
                                                       ;; if none found, simply remove the "answer the call" status
                                                       (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] is unable to find the caller ~%" (name actor) (id actor)))
                                                       (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear crackling~A." str)))
+                                                                                                             (format nil "You hear crackling~A. " str)))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil "~A blinks for a second, but remains in place. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                       (rem-mob-effect actor +mob-effect-called-for-help+)
@@ -3790,7 +3790,6 @@
                                                   (cond
                                                     ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-human+)
                                                      (progn
-                                                       (format t "HERE HUMAN")
                                                        (when (and (null already-mutated)
                                                                   (zerop (random mutation-chance)))
                                                          (mob-set-mutation actor +mob-abil-toggle-light+)
@@ -3841,8 +3840,9 @@
                                                 (remove-item-from-world target)
 
                                                 (incf (cur-hp actor) 3)
-                                                (incf (max-hp actor))
+                                                
                                                 (when (> (cur-hp actor) (max-hp actor))
+                                                  (incf (max-hp actor))
                                                   (setf (cur-hp actor) (max-hp actor)))
 
                                                 (incf (cur-fp actor))
@@ -4176,7 +4176,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spite is mutually exclusive with the clawed tentacles and corrosive sacs." 
-                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -4231,7 +4231,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-mutate-corrosive-bile+ :name "Grow corrosive sacs" :descr "Evolve to give yourself an ability to spit corrosive bile at your enemies. The evolution process takes 10 turns. Corrosive bile is shot upwards and lands to the destination tile on the next turn, dealing damage to charaters in and around it. The corrosive sacs are mutually exclusive with the clawed tentacles and acid spite." 
-                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -4367,7 +4367,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-mutate-clawed-tentacle+ :name "Grow clawed tentacles" :descr "Evolve to give yourself clawed tentacles which significatly increase melee damage. The evolution process takes 10 turns. The clawed tentacles are mutually exclusive with the acid spite and corrosive sacs." 
-                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -4420,7 +4420,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-mutate-chitinous-plating+ :name "Grow chitinous plating" :descr "Evolve to increase your skin thickness which will turn it into full-scale armor. The evolution process takes 10 turns. Chitinous plating gives 2 poins of direct resistance against flesh, iron, fire, vorpal and acid damage. The chitinous plating is mutually exclusive with the metabolic boost and retracting spines." 
-                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -4473,7 +4473,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-mutate-metabolic-boost+ :name "Increase metabolism" :descr "Evolve to give youself an ability to boost your metabolism at will. The evolution process takes 10 turns. The metabolic boost grants you increased dodging and overall speed for 4 turns. The metabolic boost is mutually exclusive with the chitinous plating and retracting spines." 
-                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -4540,7 +4540,7 @@
 
 (set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-mutate-retracting-spines+ :name "Grow retracting spines" :descr "Evolve to give yourself retracting spines. The evolution process takes 10 turns. The spines grant you 40% resistance against flesh, iron, fire, vorpal and acid damage for 4 turns. Additionally, characters attacking you in melee while the spines are active will take 1-3 flesh damage. The retracting spines are mutually exclusive with the metabolic boost and chitinous plating." 
-                                 :cost 1 :spd +normal-ap+ :passive nil
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -4793,7 +4793,10 @@
                                                 (declare (ignore ability-type))
                                                 
                                                 (logger (format nil "MOB-ACID-EXPLOSION: ~A [~A] explodes on ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
-  
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A explodes. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                
                                                 (let ((targets nil)
                                                       (max-range 1))
                                                   (draw-fov (x actor) (y actor) (z actor) max-range
@@ -4826,8 +4829,9 @@
                                                                                     (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
                                                              (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                     (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)))
-                                                           (when (check-dead target)
-                                                             (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (list :is-fire))
+                                                           (when (and (not (eq target actor))
+                                                                      (check-dead target))
+                                                             (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
                                                              
                                                              (when (mob-effect-p target +mob-effect-possessed+)
                                                                (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)

@@ -657,6 +657,9 @@
   (setf (cur-hp mob) (max-hp mob))
   (setf (cur-fp mob) 0)
   (setf (cur-ap mob) (max-ap mob))
+
+  (when (= (mob-type mob) +mob-type-eater-of-the-dead+)
+    (setf (cur-fp mob) 2))
   
   (setf (face-mob-type-id mob) (mob-type mob))
 

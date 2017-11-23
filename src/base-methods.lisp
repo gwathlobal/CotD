@@ -1912,6 +1912,10 @@
                         (>= dy 0) (< dy (array-dimension (terrain (level *world*)) 1))
                         (>= dz 0) (< dz (array-dimension (terrain (level *world*)) 2))
                         (eq (check-move-on-level actor dx dy dz) t)
+                        (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) dx dy dz (if (riding-mob-id actor)
+                                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                          (map-size actor))
+                                                 (get-mob-move-mode actor))
                         (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+)
                             (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-water+)))
                 do

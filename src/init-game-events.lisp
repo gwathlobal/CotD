@@ -53,6 +53,7 @@
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (make-output *current-window*)
                                                              (sdl:with-events ()
@@ -92,6 +93,7 @@
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (make-output *current-window*)
                                                              (sdl:with-events ()
@@ -128,6 +130,7 @@
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (make-output *current-window*)
                                                              (sdl:with-events ()
@@ -174,6 +177,7 @@
                                                              
                                                              (add-message (create-string "~%"))
                                                              (add-message (create-string "You are dead.~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                                                              (make-output *current-window*)
@@ -212,6 +216,7 @@
                                                              
                                                              (add-message (create-string "~%"))
                                                              (add-message (create-string "You are possessed.~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                                                              (make-output *current-window*)
@@ -488,6 +493,7 @@
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (make-output *current-window*)
                                                              (sdl:with-events ()
@@ -570,6 +576,7 @@
                                                              
                                                              (add-message (format nil "~%"))
                                                              (add-message (format nil "Congratulations! You have won the game!~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (make-output *current-window*)
                                                              (sdl:with-events ()
