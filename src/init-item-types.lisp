@@ -238,6 +238,7 @@
                                          :name "parasite" :plural-name "parasites"
                                          :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 1000
                                          :descr "A living itching creature that can be thrown by the Eater of the dead onto an enemy. A parasited character will always reveal its location to the primordial. Usable by primordials only."
+                              :flavor-quote (format nil "\"The neckerchief around the baron's neck was no less remarkable. It was a phenomenon, though for hygienic and aesthetic purposes, the neckechief should have been replaced with a more durable and less soiled one. It was made from the remains of the great cape that Ernesto Rossi had donned when conversing with witches in \"Makbeth\". \"My neckerchief smells of King Duncan's blood!\" often said the old baron while looking for parasites in it.\"~%Anton Chekhov. The Baron.")
                                          :start-map-select-func #'player-start-map-select-nearest-hostile
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item))
@@ -278,6 +279,7 @@
 (set-item-type (make-instance 'item-type :id +item-type-signal-flare+
                                          :name "signal flare" :plural-name "signal flares"
                                          :descr "A flare that gives a signal for the artillery to strike at the selected location. The flare may be used only by humans and only if there are no obstacles above you up to the highest Z level."
+                                         :flavor-quote (format nil "\"In one place, a lightning struck a tree and burned it - and thus came fire. In another place, people dropped hay and it burned - and thus came fire. In a third place, trees rubbed its branches against each other - and caught fire. In a fourth place, iron struck against a rock - and sparkled fire.\"~%Leo Tolstoy. Where Did Fire Come From When People Knew No Fire.")
                                          :glyph-idx 1 :glyph-color sdl:*red* :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item))
@@ -380,6 +382,7 @@
                                          :name "scarab egg" :plural-name "scarab eggs"
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
                                          :descr "A egg that can quickly develop ino a full-grown creature that will move to the target and explode splashing acid around. Usable by primordials only."
+                                         :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
                                          :start-map-select-func #'player-start-map-select-nearest-hostile
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item))
