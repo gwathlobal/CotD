@@ -48,6 +48,6 @@ IRRADIATION EFFECT
 The irradiation effect only seems to be pretty harmless. Apart from Malseraph's puppets who can use their Fission ability to blow up irradiated characters, high levels of irradiation may cause you to skip turns due to being sick.
 There is also a small chance that irradiation will cause a minor malmutation. These malmutations can be:
  - light emittance makes you always emit light and illuminate everything around you,
- - vulnerabilty to fire gives you -2 direct fire resistance,
- - vulnerabilty to vorpal gives you -2 direct vorpal resistance.
+ - vulnerability to fire gives you -2 direct fire resistance,
+ - vulnerability to vorpal gives you -2 direct vorpal resistance.
 Only the Eater of the dead can voluntarily get rid of these mutations with their Cure mutation ability. Malseraph can sometimes cure all malmutations of its followers. 

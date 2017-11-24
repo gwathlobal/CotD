@@ -663,7 +663,10 @@
   
   (setf (face-mob-type-id mob) (mob-type mob))
 
+  (adjust-abilities mob)
+
   ;; when starting with a horse - create a horse on the spot and mount it
+    
   (when (mob-ability-p mob +mob-abil-starts-with-horse+)
     (let ((horse (make-instance 'mob :mob-type +mob-type-horse+ :x (x mob) :y (y mob) :z (z mob))))
       (setf (mounted-by-mob-id horse) (id mob))
@@ -682,7 +685,7 @@
     (set-mob-effect mob :effect-type-id +mob-effect-flying+ :actor-id (id mob)))
   
   (set-cur-weapons mob)
-  (adjust-abilities mob)
+  
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-m-acc mob)
@@ -924,6 +927,9 @@
       (set-armor-d-resist mob +weapon-dmg-vorpal+ (- (get-armor-d-resist mob +weapon-dmg-vorpal+) 2)))
     (when (mob-ability-p mob +mob-abil-vulnerable-to-fire+)
       (set-armor-d-resist mob +weapon-dmg-fire+ (- (get-armor-d-resist mob +weapon-dmg-fire+) 2)))
+    (when (mob-effect-p mob +mob-effect-parasite+)
+      (set-armor-d-resist mob +weapon-dmg-flesh+ (- (get-armor-d-resist mob +weapon-dmg-flesh+) 1))
+      (set-armor-d-resist mob +weapon-dmg-acid+ (- (get-armor-d-resist mob +weapon-dmg-acid+) 1)))
     ))
 
 (defun adjust-m-acc (mob)

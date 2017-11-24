@@ -17,7 +17,7 @@ LATEST CHANGES v1.2.3
 - When Malseraph is in the good mood, it will draw cards with beneficial effects from its decks and can even grant some of the decks to you. When it is in the bad mood, it will use its more malicious cards against you to spice things up.
 - There are two types of decks that Malseraph can give - decks of war and decks of escape. Each deck consists of a number cards that a character can draw. You can not see what card you draw and what cards remain in the deck. Drawing a card immediately invokes its effect.
 - Added Constriction ability to the Eater of the dead. This ability lets you grab targets and continue to deal damage to them automatically while all participants remain in place.
-- Citizens of the City may now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look as an ordinary man or woman to everybody else. 
+- Citizens of the City may now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look like an ordinary man or woman to everybody else. 
 - Fixed the bug with jumping when you would fall through the ground if you hit an obstacle during the jump.
 - You can now jump over small obstacles like beds, tables, barricades, and bushes.
 
@@ -64,7 +64,7 @@ THE PANDEMONIUM HIERARCHY
 THE PRIMORDIAL
 
  - You start as a monstrous Eater of the dead who rose from thousands years of slumber to drive Angels and Demons away from the City.
- - Eat corpses to gain health and power. Spend power to gain benefitial mutations. 
+ - Eat corpses to gain health and power. Spend power to gain beneficial mutations. 
  - To win, kill all angels and demons.
 
 --------------------
@@ -87,7 +87,7 @@ THE MILITARY
  - All military units are capable of ranged combat.
  - You may start as a Chaplain or as a Scout.
  - The Chaplain can lead troops, reveal disguised enemies and provide divine protection to allies.
- - The Scout starts with a horse, can also reveal disguised enemies and is armed with a powerful rifle.
+ - The Scout starts with a horse. He is armed with a powerful rifle, can reveal disguised enemies and call for an artillery strike.
  - To win, kill all demons. But do not let angels stand in your way.
 
 --------------------

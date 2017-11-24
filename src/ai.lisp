@@ -601,10 +601,23 @@
               (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to go to the target to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x target) (y target) (z target)))
               (setf nearest-target target))))
         ))
-    
+
+    (logger (format nil "PATH-DST BEFORE ~A~%" (path-dst mob)))
     ;; got to the nearest target
     (when nearest-target
       (logger (format nil "AI-FUNCTION: Target found ~A [~A] (~A ~A ~A)~%" (name nearest-target) (id nearest-target) (x nearest-target) (y nearest-target) (z nearest-target)))
+      (logger (format nil "LEVEL-CONNECTED-P = ~A~%" (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) (x nearest-target) (y nearest-target) (z nearest-target) (if (riding-mob-id mob)
+                                                                                                                                     (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                                     (map-size mob))
+                                                                    (get-mob-move-mode mob))))
+      (logger (format nil "LEVEL-CONNECTED ACTOR = ~A~%" (get-level-connect-map-value (level *world*) (x mob) (y mob) (z mob) (if (riding-mob-id mob)
+                                                                                                                      (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                      (map-size mob))
+                                                                            (get-mob-move-mode mob))))
+      (logger (format nil "LEVEL-CONNECTED TARGET = ~A~%" (get-level-connect-map-value (level *world*) (x nearest-target) (y nearest-target) (z nearest-target) (if (riding-mob-id mob)
+                                                                                                                      (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                      (map-size mob))
+                                                                            (get-mob-move-mode mob))))
       (cond
         ((level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) (x nearest-target) (y nearest-target) (z nearest-target) (if (riding-mob-id mob)
                                                                                                                                      (map-size (get-mob-by-id (riding-mob-id mob)))
@@ -616,6 +629,7 @@
               (ai-find-move-around mob (x nearest-target) (y nearest-target)))
          (setf (path-dst mob) (ai-find-move-around mob (x nearest-target) (y nearest-target)))
          (setf (path mob) nil))))
+    (logger (format nil "PATH-DST AFTER ~A~%" (path-dst mob)))
 
     ;; if the mob is curious and it has nothing to do - move to the nearest sound, if any
     (when (and (mob-ai-curious-p mob)
@@ -738,7 +752,7 @@
               (logger (format nil "AI-FUNCTION: NEW R (~A ~A ~A)~%" rx ry rz)))
         (setf (path-dst mob) (list rx ry rz))
         (logger (format nil "AI-FUNCTION: Mob's destination is randomly set to (~A, ~A, ~A)~%" (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
-    
+
     ;; calculate path to the destination
     (when (and (path-dst mob)
                (not (mob-ai-simple-pathfinding-p mob))

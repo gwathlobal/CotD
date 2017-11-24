@@ -39,7 +39,7 @@ OUTSIDER BEASTS
 PRIMORDIALS
  - In the taiga bogs and forests of the East live strange creatures that had walked the Earth before any ape could be called sapient. Now they slumber, waiting for the time when the cycle of humankind is complete and they are able to reign the land once more. The natives fear, worship and offer sacrifices to them. But when the outsiders from beyond Earth arrived in the City, the primordials rose once more to drive the invaders out of what they consider their own domain.
  - You start as an Eater of the dead, a tentacled monster, weakened by the millennia of inactivity.
- - You are able to feast on the corpses of the fallen to gain HP and power, and mutate yourself gaining various abilities.
+ - You are able to feast on the corpses of the fallen to gain HP and power and mutate yourself gaining various abilities.
  - You equally hate everybody in the City and are hated by everyone. 
  - Your goal is to destroy all angels and demons.
  
@@ -58,7 +58,7 @@ THE MILITARY
  - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
  - The military is comprised of five units: Soldiers, Scouts, Sergeants, Machine-gunners, and Chaplains. All of them are capable of ranged combat but do not gain power whatsoever.
  - Soldiers are armed with single-shot rifles and need to reload every other turn.
- - Scouts have a more powerful rifle than soldiers, are able to reveal the true form of a single enemy and enter the battle riding a horse.
+ - Scouts have a more powerful rifle than soldiers, are able to reveal the true form of a single enemy, call for an artillery strike and enter the battle riding a horse.
  - Sergeants wield six-round revolvers that deal less damage than a rifle but do not need to be reloaded so often.
  - Machine-gunners carry a light machine gun capable of firing the whole magazine in one turn. Alas, its accuracy leaves to be desired. 
  - Chaplains are also armed with six-round revolvers but, more importantly, are able to pray to reveal disguised supernatural enemies or to grant divine protection to allies (similar to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.

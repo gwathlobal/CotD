@@ -1043,7 +1043,7 @@
                              (format nil "~A is not harmed. " (capitalize-name (prepend-article +article-the+ (visible-name target))))))
     (rem-mob-effect target +mob-effect-divine-shield+)
     (when (and actor att-spd) (make-act actor att-spd))
-    (return-from inflict-damage nil))
+    (return-from inflict-damage 0))
   
   ;; if the target has keen senses - destroy the illusions
   (when (mob-ability-p target +mob-abil-keen-senses+)

@@ -4133,7 +4133,7 @@
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-create-parasites+ :name "Create parasites" :descr "Create 6 parasites that can infest an enemy character for a very long period of time. You can always see the location of parasited characters." 
+                                 :id +mob-abil-create-parasites+ :name "Create parasites" :descr "Create 6 parasites that can infest an enemy character for a very long period of time. Parasisted characters will have their direct resistances against flesh anf acid damage reduced by 1. You can always see the location of parasited characters." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
