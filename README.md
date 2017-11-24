@@ -5,17 +5,22 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-October 21, 2017 v1.2.3
+November 25, 2017 v1.2.4
 
-- Added Malseraph's puppets as a playable faction. Malseraph's puppets are demons who worship Malseraph, the Demon God of Acting, Gambling and Violent Changes. They lack the possession ability but make up for it with the powers of their god.
-- By themselves, Malseraph's puppets have the Irradiate and Fission abilities. Irradiate applies a special status to the target, while Fission is used to cause damage to those with this status and clear it from them. 
-- Malseraph is the master of cards and likes to be entertained. Malseraph likes disguises, polymorphs, and dangerous situations.
-- When Malseraph is in the good mood, it will draw cards with beneficial effects from its decks and can even grant some of the decks to you. When it is in the bad mood, it will use its more malicious cards against you to spice things up.
-- There are two types of decks that Malseraph can give - decks of war and decks of escape. Each deck consists of a number cards that a character can draw. You can not see what card you draw and what cards remain in the deck. Drawing a card immediately invokes its effect.
-- Added Constriction ability to the Eater of the dead. This ability lets you grab targets and continue to deal damage to them automatically while all participants remain in place.
-- Citizens of the City may now drop civilian costumes, which can be used to make disguises by the thief. The disguise (usable by humans and Malseraph's puppets only) makes you look as an ordinary man or woman to everybody else. 
-- Fixed the bug with jumping when you would fall through the ground if you hit an obstacle during the jump.
-- You can now jump over small obstacles like beds, tables, barricades, and bushes.
+- Added signal flares to Scouts. Signal flares prompt the artillery that the military has deployed outside the City to strike at the location of the flare. This strike deals significant iron and fire damage around the location where the strike lands.
+- The Eater of the dead can now mutate and grow various organs that can help it in its quest to destroy the outsiders.
+- For offensive mutations, the Eater of the dead can choose from clawed tentacles (an increased melee attack), acid spite (an additional ranged attack) or corrosive bile (a cooldown ability similar to an artillery strike).
+- For defensive mutations, the Eater of the dead can choose from chitinous plating (a passive direct resistance increase), metabolic boost (an active ability that grants increased speed and dodging) or retracting spines (an active ability that gives increased percentage resistances and inflicts damage to melee attackers).
+- For spawning mutation, the Eater of the dead has either spawning sacs or an ovipositor. The spawning sacs can spawn locusts which are rather weak creatures that can attack in melee but die off naturally after a number of turns. The ovipositor spawns scarabs which are living bombs that roll to the target and explode dealing acid damage to everybody around. You can further enhance your spawns by giving locusts an acid bite and making them tougher or making scarabs roll faster and spawning more of them.
+- From the very start, to boost its combat prowess the Eater of the dead now has an adrenal gland. When the Eater attacks someone, the gland secrets adrenaline which makes all melee and range attacks faster.
+- The Eater of the dead can create parasites that can be thrown onto enemies. A parasited character will always reveal its location to the Eater.
+- The Eater of the dead can cure mutations that you do not find helpful.
+- When the Eater of the dead devours corpses, it has a chance to get abilities depending on the type of the corpse.
+- The Eater of the dead can no longer use primordial power.
+- The Eater of the dead starts with 2 power that you can immediately use on mutations. 
+- If an ability requires the player to select a target, the game will initially focus the applicable target (instead of always focusing hostile characters).
+- Irradiation has a small chance to mutate you giving you a minor negative effect.
+- Malseraph can sometimes cure malmutations of its followers.
 
 CURRENT CHANGELOG
 
