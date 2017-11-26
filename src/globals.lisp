@@ -249,6 +249,11 @@
 (defconstant +mob-abil-mutate-tougher-locusts+ 120)
 (defconstant +mob-abil-tougher-locusts+ 121)
 (defconstant +mob-abil-cure-mutation+ 122)
+(defconstant +mob-abil-mutate-thick-carapace+ 123)
+(defconstant +mob-abil-thick-carapace+ 124)
+(defconstant +mob-abil-mutate-acidic-tips+ 125)
+(defconstant +mob-abil-acidic-tips+ 126)
+(defconstant +mob-abil-mutate-jump+ 127)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

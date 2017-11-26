@@ -80,7 +80,8 @@
                                                                 abil-adrenal-gland abil-mutate-corrosive-bile abil-corrosive-bile abil-mutate-clawed-tentacle abil-clawed-tentacle abil-mutate-chitinous-plating abil-chitinous-plating
                                                                 abil-mutate-metabolic-boost abil-metabolic-boost abil-mutate-retracting-spines abil-retracting-spines abil-spawn-locusts abil-mutate-spawn-locusts
                                                                 abil-mutate-ovipositor abil-oviposit abil-acid-explosion abil-mutate-acid-locusts abil-acid-locusts abil-mutate-fast-scarabs abil-fast-scarabs
-                                                                abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation)
+                                                                abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation abil-mutate-thick-carapace abil-thick-carapace
+                                                                abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -347,6 +348,16 @@
     (setf (gethash +mob-abil-tougher-locusts+ (abilities mob-type)) t))
   (when abil-cure-mutation
     (setf (gethash +mob-abil-cure-mutation+ (abilities mob-type)) t))
+  (when abil-mutate-thick-carapace
+    (setf (gethash +mob-abil-mutate-thick-carapace+ (abilities mob-type)) t))
+  (when abil-thick-carapace
+    (setf (gethash +mob-abil-thick-carapace+ (abilities mob-type)) t))
+  (when abil-mutate-acidic-tips
+    (setf (gethash +mob-abil-mutate-acidic-tips+ (abilities mob-type)) t))
+  (when abil-acidic-tips
+    (setf (gethash +mob-abil-acidic-tips+ (abilities mob-type)) t))
+  (when abil-mutate-jump
+    (setf (gethash +mob-abil-mutate-jump+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -917,6 +928,12 @@
       (set-armor-d-resist mob +weapon-dmg-iron+ (+ (get-armor-d-resist mob +weapon-dmg-iron+) 2))
       (set-armor-d-resist mob +weapon-dmg-vorpal+ (+ (get-armor-d-resist mob +weapon-dmg-vorpal+) 2))
       (set-armor-d-resist mob +weapon-dmg-acid+ (+ (get-armor-d-resist mob +weapon-dmg-acid+) 2)))
+    (when (mob-ability-p mob +mob-abil-thick-carapace+)
+      (set-armor-d-resist mob +weapon-dmg-flesh+ (+ (get-armor-d-resist mob +weapon-dmg-flesh+) 1))
+      (set-armor-d-resist mob +weapon-dmg-fire+ (+ (get-armor-d-resist mob +weapon-dmg-fire+) 1))
+      (set-armor-d-resist mob +weapon-dmg-iron+ (+ (get-armor-d-resist mob +weapon-dmg-iron+) 1))
+      (set-armor-d-resist mob +weapon-dmg-vorpal+ (+ (get-armor-d-resist mob +weapon-dmg-vorpal+) 1))
+      (set-armor-d-resist mob +weapon-dmg-acid+ (+ (get-armor-d-resist mob +weapon-dmg-acid+) 1)))
     (when (mob-effect-p mob +mob-effect-spines+)
       (set-armor-%-resist mob +weapon-dmg-flesh+ (+ (get-armor-%-resist mob +weapon-dmg-flesh+) 40))
       (set-armor-%-resist mob +weapon-dmg-fire+ (+ (get-armor-%-resist mob +weapon-dmg-fire+) 40))

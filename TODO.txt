@@ -1,8 +1,9 @@
 - Add the possessor faction
 - Eater should get acid spit that removes resistances
 - New development paths for eater
-- Second tier upgrades for armor for eater
 - Second tier upgrades for weapons for eater
+- Jump and disguise mutations to the eater
+- Add seeker larvae to the eater
 - Satanists should decipher demonic runes from walls to gain power
 - Movement on tiles with mobs should cost more so that they do not bump into each other that often
 - Add courtyard houses like Thief2RL

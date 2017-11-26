@@ -1,11 +1,16 @@
 CHANGELOG
 
+- Added a second tier of armor mutations for the Eater of the dead. These are thick carapace (even more passive damage resistance), acidic tips (extended spines start to deal acid damage) and jump (gain an ability to jump similair to the thief).
+
+--------------------
+November 25, 2017 v1.2.4
+
 - Added signal flares to Scouts. Signal flares prompt the artillery that the military has deployed outside the City to strike at the location of the flare. This strike deals significant iron and fire damage around the location where the strike lands.
 - The Eater of the dead can now mutate and grow various organs that can help it in its quest to destroy the outsiders.
 - For offensive mutations, the Eater of the dead can choose from clawed tentacles (an increased melee attack), acid spite (an additional ranged attack) or corrosive bile (a cooldown ability similar to an artillery strike).
 - For defensive mutations, the Eater of the dead can choose from chitinous plating (a passive direct resistance increase), metabolic boost (an active ability that grants increased speed and dodging) or retracting spines (an active ability that gives increased percentage resistances and inflicts damage to melee attackers).
 - For spawning mutation, the Eater of the dead has either spawning sacs or an ovipositor. The spawning sacs can spawn locusts which are rather weak creatures that can attack in melee but die off naturally after a number of turns. The ovipositor spawns scarabs which are living bombs that roll to the target and explode dealing acid damage to everybody around. You can further enhance your spawns by giving locusts an acid bite and making them tougher or making scarabs roll faster and spawning more of them.
-- From the very start, to boost its combat prowess the Eater of the dead now has an adrenal gland. When the Eater attacks someone, the gland secrets adrenaline which makes all melee and range attacks faster.
+- From the very start, to boost its combat prowess the Eater of the dead now has an adrenal gland. When the Eater attacks someone, the gland secrets adrenaline which makes all melee and ranged attacks faster.
 - The Eater of the dead can create parasites that can be thrown onto enemies. A parasited character will always reveal its location to the Eater.
 - The Eater of the dead can cure mutations that you do not find helpful.
 - When the Eater of the dead devours corpses, it has a chance to get abilities depending on the type of the corpse.

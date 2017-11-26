@@ -1332,14 +1332,19 @@
                            :att-spd melee-spd :weapon-aux (get-melee-weapon-aux-simple (weapon attacker)) :acc (m-acc attacker) :add-blood t 
                            :actor attacker))
 
+  ;; the target has spines active
   (when (mob-effect-p target +mob-effect-spines+)
-    (inflict-damage attacker :min-dmg 2 :max-dmg 3 :dmg-type +weapon-dmg-flesh+
+    (let ((dmg-type (if (mob-ability-p target +mob-abil-acidic-tips+)
+                      +weapon-dmg-acid+
+                      +weapon-dmg-flesh+)))
+    
+      (inflict-damage attacker :min-dmg 2 :max-dmg 3 :dmg-type dmg-type
                              :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t
                              :actor target
                              :specific-hit-string-func #'(lambda (cur-dmg)
                                                            (format nil "~A takes ~A damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker))) cur-dmg))
                              :specific-no-dmg-string-func #'(lambda ()
-                                                              (format nil "~A takes no damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker)))))))
+                                                              (format nil "~A takes no damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker))))))))
   )
 
 (defun check-dead (mob)
