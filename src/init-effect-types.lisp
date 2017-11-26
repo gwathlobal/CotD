@@ -538,6 +538,9 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
                                                              sdl:*yellow*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-dodge actor))
                                              :on-remove #'(lambda (effect actor)
                                                             ;; the param1 here is (list x y z) - xyz coordinates of the mob being constricted
                                                             (when (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-constriction-source+)
@@ -676,7 +679,13 @@
 (set-effect-type (make-instance 'effect-type :id +mob-effect-parasite+ :name "Parasite"
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 0 :g 100 :b 0))))
+                                                             (sdl:color :r 0 :g 100 :b 0))
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor))
+                                             :on-remove #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-evolving+ :name "Evolving"
                                              :color-func #'(lambda (effect actor)
@@ -795,3 +804,14 @@
                                                           (incf (cur-hp actor))
                                                           (when (> (cur-hp actor) (max-hp actor))
                                                             (setf (cur-hp actor) (max-hp actor))))))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-corroded+ :name "Corroded"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*red*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor))
+                                             :on-remove #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor))))

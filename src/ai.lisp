@@ -569,10 +569,11 @@
     ;; if no enemy in sight and the magazine is not full - reload it
     (when (and (is-weapon-ranged mob)
                (not nearest-enemy)
+               (get-ranged-weapon-max-charges mob)
                (< (get-ranged-weapon-charges mob) (get-ranged-weapon-max-charges mob)))
       (mob-reload-ranged-weapon mob)
       (return-from ai-function))
-
+ 
     ;; follow the leader
     (when (and (order mob)
                (= (first (order mob)) +mob-order-follow+))
@@ -675,6 +676,47 @@
       (let ((visible-items (copy-list (visible-items mob))))
         (setf visible-items (remove-if #'(lambda (item)
                                            (zerop (value item)))
+                                       visible-items
+                                       :key #'get-item-by-id))
+        
+        (setf visible-items (stable-sort visible-items #'(lambda (a b)
+                                                         (if (< (get-distance-3d (x mob) (y mob) (z mob) (x a) (y a) (z a))
+                                                                (get-distance-3d (x mob) (y mob) (z mob) (x b) (y b) (z b)))
+                                                           t
+                                                           nil))
+                                         :key #'get-item-by-id))
+
+        (loop for item-id in visible-items
+              for item = (get-item-by-id item-id)
+              when (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) (x item) (y item) (z item) (if (riding-mob-id mob)
+                                                                                                                 (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                                                                 (map-size mob))
+                                            (get-mob-move-mode mob))
+                do
+                   (setf (path-dst mob) (list (x item) (y item) (z item)))
+                   (setf (path mob) nil)
+                   (loop-finish)
+              when (and (> (map-size mob) 1)
+                        (ai-find-move-around mob (x item) (y item)))
+                do
+                   (setf (path-dst mob) (ai-find-move-around mob (x item) (y item)))
+                   (setf (path mob) nil)
+                   (loop-finish)
+              finally
+                 (when item
+                   (logger (format nil "AI-FUNCTION: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (name item) (id item) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))))))
+        ))
+
+    ;; when mob is a cannibal go to the nearest visible item and try to eat it
+    (when (and (mob-ai-cannibal-p mob)
+               (null nearest-target)
+               (visible-items mob))
+
+      ;; find all visible corpses
+      ;; go to the nearest such item
+      (let ((visible-items (copy-list (visible-items mob))))
+        (setf visible-items (remove-if #'(lambda (item)
+                                           (not (item-ability-p item +item-abil-corpse+)))
                                        visible-items
                                        :key #'get-item-by-id))
         

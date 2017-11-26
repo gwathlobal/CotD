@@ -1254,6 +1254,11 @@
                                                                                                                               (list (id target))))))
                 (print-visible-message (x target) (y target) (z target) (level *world*) 
                                        (format nil "~A grabs ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))))
+
+              ;; if the attack corrodes - corrode the target
+              (when (and weapon-aux
+                         (find :corrodes weapon-aux))
+                (set-mob-effect target :effect-type-id +mob-effect-corroded+ :actor-id (if actor (id actor) (id target)) :cd 3))
               )))
         (progn
           ;; attacker missed

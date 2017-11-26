@@ -3787,54 +3787,55 @@
                                                                        (format nil "~A devours ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-a+ (visible-name target))))
 
                                                 (let ((already-mutated nil) (mutation-chance 20))
-                                                  (cond
-                                                    ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-human+)
-                                                     (progn
-                                                       (when (and (null already-mutated)
-                                                                  (zerop (random mutation-chance)))
-                                                         (mob-set-mutation actor +mob-abil-toggle-light+)
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A can now toggle lights. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                         (setf already-mutated t))
-
-                                                       (when (and (null already-mutated)
-                                                                  (zerop (random mutation-chance)))
-                                                         (mob-set-mutation actor +mob-abil-vulnerable-to-vorpal+)
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A is now vulnerable to vorpal. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                         (setf already-mutated t))))
-
-                                                    ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-demon+)
-                                                     (progn
-                                                       (when (and (null already-mutated)
-                                                                  (zerop (random mutation-chance)))
-                                                         (mob-set-mutation actor +mob-abil-bend-space+)
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A can now bend space. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                         (setf already-mutated t))
-
-                                                       (when (and (null already-mutated)
-                                                                  (zerop (random mutation-chance)))
-                                                         (mob-set-mutation actor +mob-abil-vulnerable-to-fire+)
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A is now vulnerable to fire. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                         (setf already-mutated t))))
-
-                                                    ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-angel+)
-                                                     (progn
-                                                       (when (and (null already-mutated)
-                                                                  (zerop (random mutation-chance)))
-                                                         (mob-set-mutation actor +mob-abil-regenerate+)
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A can now regenerate. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                         (setf already-mutated t))
-
-                                                       (when (and (null already-mutated)
-                                                                  (zerop (random mutation-chance)))
-                                                         (mob-set-mutation actor +mob-abil-casts-light+)
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A is now casting light. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
-                                                         (setf already-mutated t))))))
+                                                  (when (dead-mob target)
+                                                    (cond
+                                                      ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-human+)
+                                                       (progn
+                                                         (when (and (null already-mutated)
+                                                                    (zerop (random mutation-chance)))
+                                                           (mob-set-mutation actor +mob-abil-toggle-light+)
+                                                           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                  (format nil "~A can now toggle lights. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                           (setf already-mutated t))
+                                                         
+                                                         (when (and (null already-mutated)
+                                                                    (zerop (random mutation-chance)))
+                                                           (mob-set-mutation actor +mob-abil-vulnerable-to-vorpal+)
+                                                           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                  (format nil "~A is now vulnerable to vorpal. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                           (setf already-mutated t))))
+                                                      
+                                                      ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-demon+)
+                                                       (progn
+                                                         (when (and (null already-mutated)
+                                                                    (zerop (random mutation-chance)))
+                                                           (mob-set-mutation actor +mob-abil-bend-space+)
+                                                           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                  (format nil "~A can now bend space. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                           (setf already-mutated t))
+                                                         
+                                                         (when (and (null already-mutated)
+                                                                    (zerop (random mutation-chance)))
+                                                           (mob-set-mutation actor +mob-abil-vulnerable-to-fire+)
+                                                           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                  (format nil "~A is now vulnerable to fire. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                           (setf already-mutated t))))
+                                                      
+                                                      ((mob-ability-p (get-mob-by-id (dead-mob target)) +mob-abil-angel+)
+                                                       (progn
+                                                         (when (and (null already-mutated)
+                                                                    (zerop (random mutation-chance)))
+                                                           (mob-set-mutation actor +mob-abil-regenerate+)
+                                                           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                  (format nil "~A can now regenerate. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                           (setf already-mutated t))
+                                                         
+                                                         (when (and (null already-mutated)
+                                                                    (zerop (random mutation-chance)))
+                                                           (mob-set-mutation actor +mob-abil-casts-light+)
+                                                           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                  (format nil "~A is now casting light. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                           (setf already-mutated t)))))))
                                                 
                                                 (remove-item-from-level-list (level *world*) target)
                                                 (remove-item-from-world target)
@@ -4133,7 +4134,7 @@
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-create-parasites+ :name "Create parasites" :descr "Create 6 parasites that can infest an enemy character for a very long period of time. Parasisted characters will have their direct resistances against flesh anf acid damage reduced by 1. You can always see the location of parasited characters." 
+                                 :id +mob-abil-create-parasites+ :name "Create parasites" :descr "Create 6 parasites that can infest an enemy character for a very long period of time. Parasited characters will have their direct resistances against flesh anf acid damage reduced by 1. You can always see the location of parasited characters." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4175,7 +4176,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spite is mutually exclusive with the clawed tentacles and corrosive sacs." 
+                                 :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spite is mutually exclusive with the clawed tentacles, corrosive sacs and their upgrades." 
                                  :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4196,7 +4197,9 @@
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-acid-spit+)
                                                                (not (mob-ability-p actor +mob-abil-acid-spit+))
                                                                (not (mob-ability-p actor +mob-abil-corrosive-bile+))
+                                                               (not (mob-ability-p actor +mob-abil-accurate-bile+))
                                                                (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
+                                                               (not (mob-ability-p actor +mob-abil-piercing-needles+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
                                                         nil))
@@ -4220,17 +4223,23 @@
                                  :on-check-applic nil
                                  :on-add-mutation #'(lambda (ability-type actor)
                                                       (declare (ignore ability-type))
-                                                      (setf (weapon actor) (list "Tentacles & Acid spit"
+                                                      (if (mob-ability-p actor +mob-abil-corroding-secretion+)
+                                                        (setf (weapon actor) (list "Tentacles & Acid spit"
                                                                                  (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
-                                                                                 (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges))))
+                                                                                 (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges :corrodes))))
+                                                        (setf (weapon actor) (list "Tentacles & Acid spit"
+                                                                                   (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
+                                                                                   (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges)))))
+                                                      (adjust-r-acc actor)
                                                       )
                                  :on-remove-mutation #'(lambda (ability-type actor)
                                                          (declare (ignore ability-type))
                                                          (setf (weapon actor) (list "Tentacles" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) nil))
+                                                         (adjust-r-acc actor)
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-corrosive-bile+ :name "Grow corrosive sacs" :descr "Evolve to give yourself an ability to spit corrosive bile at your enemies. The evolution process takes 10 turns. Corrosive bile is shot upwards and lands to the destination tile on the next turn, dealing damage to charaters in and around it. The corrosive sacs are mutually exclusive with the clawed tentacles and acid spite." 
+                                 :id +mob-abil-mutate-corrosive-bile+ :name "Grow corrosive sacs" :descr "Evolve to give yourself an ability to spit corrosive bile at your enemies. The evolution process takes 10 turns. Corrosive bile is shot upwards and lands to the destination tile on the next turn, dealing damage to charaters in and around it. The corrosive sacs are mutually exclusive with the clawed tentacles, acid spite and their upgrades." 
                                  :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4250,8 +4259,10 @@
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-corrosive-bile+)
                                                                (not (mob-ability-p actor +mob-abil-acid-spit+))
+                                                               (not (mob-ability-p actor +mob-abil-corroding-secretion+))
                                                                (not (mob-ability-p actor +mob-abil-corrosive-bile+))
                                                                (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
+                                                               (not (mob-ability-p actor +mob-abil-piercing-needles+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
                                                         nil))
@@ -4280,7 +4291,10 @@
 
                                                 (let ((x (+ (first target) (- (random 3) 1)))
                                                       (y (+ (second target) (- (random 3) 1))))
-                                                  
+
+                                                  (when (mob-ability-p actor +mob-abil-accurate-bile+)
+                                                    (setf x (first target) y (second target)))
+                                                                                                    
                                                   (loop with final-z = (third target)
                                                         for z from (1- (array-dimension (terrain (level *world*)) 2)) downto final-z
                                                         when (and (get-terrain-* (level *world*) x y z)
@@ -4366,7 +4380,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-clawed-tentacle+ :name "Grow clawed tentacles" :descr "Evolve to give yourself clawed tentacles which significatly increase melee damage. The evolution process takes 10 turns. The clawed tentacles are mutually exclusive with the acid spite and corrosive sacs." 
+                                 :id +mob-abil-mutate-clawed-tentacle+ :name "Grow clawed tentacles" :descr "Evolve to give yourself clawed tentacles which significatly increase melee damage. The evolution process takes 10 turns. The clawed tentacles are mutually exclusive with the acid spit, corrosive sacs and their upgrades." 
                                  :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4386,7 +4400,9 @@
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-clawed-tentacle+)
                                                                (not (mob-ability-p actor +mob-abil-acid-spit+))
+                                                               (not (mob-ability-p actor +mob-abil-corroding-secretion+))
                                                                (not (mob-ability-p actor +mob-abil-corrosive-bile+))
+                                                               (not (mob-ability-p actor +mob-abil-accurate-bile+))
                                                                (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
@@ -5124,15 +5140,20 @@
                                                       )
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
-                                                  (if (and (not nearest-enemy)
-                                                           (mob-ability-p actor +mob-abil-cure-mutation+)
-                                                           (can-invoke-ability actor actor +mob-abil-cure-mutation+))
-                                                    t
-                                                    nil))
+                                                  (let ((malmutations (loop for malmutation in (list +mob-abil-vulnerable-to-fire+ +mob-abil-vulnerable-to-vorpal+ +mob-abil-casts-light+)
+                                                                           when (and (mob-ability-p actor malmutation)
+                                                                                     (mob-is-ability-mutation actor malmutation))
+                                                                             collect malmutation)))
+                                                    
+                                                    (if (and (not nearest-enemy)
+                                                             (mob-ability-p actor +mob-abil-cure-mutation+)
+                                                             malmutations
+                                                             (can-invoke-ability actor actor +mob-abil-cure-mutation+))
+                                                      malmutations
+                                                      nil)))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
-                                                   (declare (ignore nearest-enemy nearest-ally check-result))
-                                                   (let* ((malmutations (list +mob-abil-vulnerable-to-fire+ +mob-abil-vulnerable-to-vorpal+ +mob-abil-casts-light+))
-                                                          (target-mutation (nth (random (length malmutations)) malmutations)))
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (let* ((target-mutation (nth (random (length check-result)) check-result)))
                                                      (mob-invoke-ability actor target-mutation (id ability-type))))
                                  :obj-select-func #'(lambda (ability-type-id)
                                                       (let ((mutations (loop for ability-type-id being the hash-key in (abilities *player*)
@@ -5320,3 +5341,161 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-piercing-needles+ :name "Grow piercing needles" :descr "Evolve to give your tentacles tiny needles that stick into the constricted target and decrease its dodge chance by 40%. The evolution process takes 10 turns. The piercing needles are mutually exclusive with the acid spit, corrosive sacs and their upgrades." 
+                                 :cost 2 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-piercing-needles+ "grows tiny needles on its tentacles"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-piercing-needles+)
+                                                               (not (mob-ability-p actor +mob-abil-acid-spit+))
+                                                               (not (mob-ability-p actor +mob-abil-corrosive-bile+))
+                                                               (mob-ability-p actor +mob-abil-clawed-tentacle+)
+                                                               (not (mob-ability-p actor +mob-abil-piercing-needles+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-piercing-needles+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-piercing-needles+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-piercing-needles+ :name "Piercing needles" :descr "Your tentacles have tiny needles that stick into the constricted target and decrease its dodge chance by 40%." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-corroding-secretion+ :name "Increase acid strength" :descr "Evolve to make you acid spit corrode its target reducing its direct resistance against acid and flesh damage by 1. The evolution process takes 10 turns. Increased acid strength is mutually exclusive with the clawed tentacles, corrosive sacs and their upgrades." 
+                                 :cost 2 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-corroding-secretion+ "now has increased acid strength"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-corroding-secretion+)
+                                                               (mob-ability-p actor +mob-abil-acid-spit+)
+                                                               (not (mob-ability-p actor +mob-abil-corroding-secretion+))
+                                                               (not (mob-ability-p actor +mob-abil-corrosive-bile+))
+                                                               (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
+                                                               (not (mob-ability-p actor +mob-abil-piercing-needles+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-corroding-secretion+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-corroding-secretion+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-corroding-secretion+ :name "Corroding secretion" :descr "Your acid spit corrodes the target, decreasing its direct resistance against flesh and acid damage by 1." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil
+                                 :on-add-mutation #'(lambda (ability-type actor)
+                                                      (declare (ignore ability-type))
+                                                      (when (and (mob-ability-p actor +mob-abil-corroding-secretion+)
+                                                               (mob-ability-p actor +mob-abil-acid-spit+))
+                                                        (setf (weapon actor) (list "Tentacles & Acid spit"
+                                                                                   (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
+                                                                                   (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges :corrodes))))
+                                                        (adjust-r-acc actor)
+                                                        )
+                                                      )
+                                 :on-remove-mutation #'(lambda (ability-type actor)
+                                                         (declare (ignore ability-type))
+                                                         (setf (weapon actor) (list "Tentacles & Acid spit"
+                                                                                    (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
+                                                                                    (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges))))
+                                                         (adjust-r-acc actor)
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-accurate-bile+ :name "Increase cerebellum" :descr "Evolve to give your corrosive bile increased accuracy so that it always lands to the destination tile. The evolution process takes 10 turns. Increased cerebellum is mutually exclusive with the clawed tentacles, acid spit and their upgrades." 
+                                 :cost 2 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 10 :param1 (list +mob-abil-accurate-bile+ "grows increased cerebellum"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-accurate-bile+)
+                                                               (not (mob-ability-p actor +mob-abil-acid-spit+))
+                                                               (not (mob-ability-p actor +mob-abil-corroding-secretion+))
+                                                               (mob-ability-p actor +mob-abil-corrosive-bile+)
+                                                               (not (mob-ability-p actor +mob-abil-accurate-bile+))
+                                                               (not (mob-ability-p actor +mob-abil-clawed-tentacle+))
+                                                               (not (mob-ability-p actor +mob-abil-piercing-needles+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-accurate-bile+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-accurate-bile+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-accurate-bile+ :name "Increased cerebellum" :descr "Your corrosive bile always lands to the destination tile, without any deviations." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

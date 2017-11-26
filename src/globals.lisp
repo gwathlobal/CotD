@@ -125,6 +125,7 @@
 (defconstant +ai-pref-simple-pathfinding+ 7)
 (defconstant +ai-pref-trinity-mimic+ 8)
 (defconstant +ai-pref-split-soul+ 9)
+(defconstant +ai-pref-cannibal+ 10)
 
 (defconstant +mob-abil-heal-self+ 0)
 (defconstant +mob-abil-conceal-divine+ 1)
@@ -254,6 +255,12 @@
 (defconstant +mob-abil-mutate-acidic-tips+ 125)
 (defconstant +mob-abil-acidic-tips+ 126)
 (defconstant +mob-abil-mutate-jump+ 127)
+(defconstant +mob-abil-mutate-piercing-needles+ 128)
+(defconstant +mob-abil-piercing-needles+ 129)
+(defconstant +mob-abil-mutate-corroding-secretion+ 130)
+(defconstant +mob-abil-corroding-secretion+ 131)
+(defconstant +mob-abil-mutate-accurate-bile+ 132)
+(defconstant +mob-abil-accurate-bile+ 133)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -303,6 +310,7 @@
 (defconstant +mob-effect-mortality+ 45)
 (defconstant +mob-effect-laying-eggs+ 46)
 (defconstant +mob-effect-regenerate+ 47)
+(defconstant +mob-effect-corroded+ 48)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)

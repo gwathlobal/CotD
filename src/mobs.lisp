@@ -30,6 +30,9 @@
    ;;   :ai-kleptomaniac - mob will try to collect as much valuable items as possible
    ;;   :ai-cautious - mob will not attack smb of higher strength
    ;;   :ai-simple-pathfinding - mob will not use Astar pathfinding and will move in the general direction towards the target
+   ;;   :ai-cannibal - mob will try to go to the nearest corpse
+   ;;   :ai-trinity-mimic
+   ;;   :ai-split-soul
       
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The pattern of naming keys that may be used in make-instance is like <name of mob ability constant> minus the 'mob-' part
@@ -50,6 +53,7 @@
    ;;   :is-fire
    ;;   :constricts
    ;;   :no-charges
+   ;;   :corrodes
    
    (armor :initform nil :accessor armor) ;; for initarg - ((<dmg-type> <direct-reduct> <%-reduct>) ...), while inside it is an array of lists
    (base-sight :initform *base-mob-sight* :initarg :base-sight :accessor base-sight)
@@ -63,7 +67,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious ai-simple-pathfinding ai-trinity-mimic ai-split-soul
+                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious ai-simple-pathfinding ai-trinity-mimic ai-split-soul ai-cannibal
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -81,7 +85,8 @@
                                                                 abil-mutate-metabolic-boost abil-metabolic-boost abil-mutate-retracting-spines abil-retracting-spines abil-spawn-locusts abil-mutate-spawn-locusts
                                                                 abil-mutate-ovipositor abil-oviposit abil-acid-explosion abil-mutate-acid-locusts abil-acid-locusts abil-mutate-fast-scarabs abil-fast-scarabs
                                                                 abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation abil-mutate-thick-carapace abil-thick-carapace
-                                                                abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump)
+                                                                abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump abil-mutate-piercing-needles abil-piercing-needles abil-mutate-corroding-secretion abil-corroding-secretion
+                                                                abil-mutate-accurate-bile abil-accurate-bile)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -108,6 +113,8 @@
     (setf (gethash +ai-pref-trinity-mimic+ (ai-prefs mob-type)) t))
   (when ai-split-soul
     (setf (gethash +ai-pref-split-soul+ (ai-prefs mob-type)) t))
+  (when ai-cannibal
+    (setf (gethash +ai-pref-cannibal+ (ai-prefs mob-type)) t))
 
   ;; set up abilities
   (when abil-can-possess
@@ -358,6 +365,18 @@
     (setf (gethash +mob-abil-acidic-tips+ (abilities mob-type)) t))
   (when abil-mutate-jump
     (setf (gethash +mob-abil-mutate-jump+ (abilities mob-type)) t))
+  (when abil-mutate-piercing-needles
+    (setf (gethash +mob-abil-mutate-piercing-needles+ (abilities mob-type)) t))
+  (when abil-piercing-needles
+    (setf (gethash +mob-abil-piercing-needles+ (abilities mob-type)) t))
+  (when abil-mutate-corroding-secretion
+    (setf (gethash +mob-abil-mutate-corroding-secretion+ (abilities mob-type)) t))
+  (when abil-corroding-secretion
+    (setf (gethash +mob-abil-corroding-secretion+ (abilities mob-type)) t))
+  (when abil-mutate-accurate-bile
+    (setf (gethash +mob-abil-mutate-accurate-bile+ (abilities mob-type)) t))
+  (when abil-accurate-bile
+    (setf (gethash +mob-abil-accurate-bile+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -791,6 +810,9 @@
 (defmethod mob-ai-split-soul-p ((mob mob))
   (gethash +ai-pref-split-soul+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
 
+(defmethod mob-ai-cannibal-p ((mob mob))
+  (gethash +ai-pref-cannibal+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+
 (defun mob-effect-p (mob effect-type-id)
   (gethash effect-type-id (effects mob)))
 
@@ -904,9 +926,17 @@
 
     (when (mob-effect-p mob +mob-effect-metabolic-boost+)
       (incf dodge 50))
+
+    (when (and (mob-effect-p mob +mob-effect-constriction-target+)
+               (mob-ability-p (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p mob +mob-effect-constriction-target+))))
+                              +mob-abil-piercing-needles+))
+      (decf dodge 40))
     
     ;; when riding - your dodge chance is reduced to zero
     (when (riding-mob-id mob)
+      (setf dodge 0))
+
+    (when (< dodge 0)
       (setf dodge 0))
 
     (setf (cur-dodge mob) dodge)))
@@ -945,6 +975,9 @@
     (when (mob-ability-p mob +mob-abil-vulnerable-to-fire+)
       (set-armor-d-resist mob +weapon-dmg-fire+ (- (get-armor-d-resist mob +weapon-dmg-fire+) 2)))
     (when (mob-effect-p mob +mob-effect-parasite+)
+      (set-armor-d-resist mob +weapon-dmg-flesh+ (- (get-armor-d-resist mob +weapon-dmg-flesh+) 1))
+      (set-armor-d-resist mob +weapon-dmg-acid+ (- (get-armor-d-resist mob +weapon-dmg-acid+) 1)))
+    (when (mob-effect-p mob +mob-effect-corroded+)
       (set-armor-d-resist mob +weapon-dmg-flesh+ (- (get-armor-d-resist mob +weapon-dmg-flesh+) 1))
       (set-armor-d-resist mob +weapon-dmg-acid+ (- (get-armor-d-resist mob +weapon-dmg-acid+) 1)))
     ))
