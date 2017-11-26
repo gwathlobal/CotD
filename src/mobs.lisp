@@ -86,7 +86,8 @@
                                                                 abil-mutate-ovipositor abil-oviposit abil-acid-explosion abil-mutate-acid-locusts abil-acid-locusts abil-mutate-fast-scarabs abil-fast-scarabs
                                                                 abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation abil-mutate-thick-carapace abil-thick-carapace
                                                                 abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump abil-mutate-piercing-needles abil-piercing-needles abil-mutate-corroding-secretion abil-corroding-secretion
-                                                                abil-mutate-accurate-bile abil-accurate-bile)
+                                                                abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
+                                                                abil-mutate-spawn-scarabs)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -377,6 +378,16 @@
     (setf (gethash +mob-abil-mutate-accurate-bile+ (abilities mob-type)) t))
   (when abil-accurate-bile
     (setf (gethash +mob-abil-accurate-bile+ (abilities mob-type)) t))
+  (when abil-mutate-hooks-and-suckers
+    (setf (gethash +mob-abil-mutate-hooks-and-suckers+ (abilities mob-type)) t))
+  (when abil-mutate-disguise-as-human
+    (setf (gethash +mob-abil-mutate-disguise-as-human+ (abilities mob-type)) t))
+  (when abil-disguise-as-human
+    (setf (gethash +mob-abil-disguise-as-human+ (abilities mob-type)) t))
+  (when abil-spawn-scarabs
+    (setf (gethash +mob-abil-spawn-scarabs+ (abilities mob-type)) t))
+  (when abil-mutate-spawn-scarabs
+    (setf (gethash +mob-abil-mutate-spawn-scarabs+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

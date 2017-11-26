@@ -261,6 +261,11 @@
 (defconstant +mob-abil-corroding-secretion+ 131)
 (defconstant +mob-abil-mutate-accurate-bile+ 132)
 (defconstant +mob-abil-accurate-bile+ 133)
+(defconstant +mob-abil-mutate-hooks-and-suckers+ 134)
+(defconstant +mob-abil-mutate-disguise-as-human+ 135)
+(defconstant +mob-abil-disguise-as-human+ 136)
+(defconstant +mob-abil-spawn-scarabs+ 137)
+(defconstant +mob-abil-mutate-spawn-scarabs+ 138)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -344,6 +349,7 @@
 (defconstant +item-type-eater-parasite+ 11)
 (defconstant +item-type-signal-flare+ 12)
 (defconstant +item-type-eater-scarab-egg+ 13)
+(defconstant +item-type-eater-locust-egg+ 14)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants

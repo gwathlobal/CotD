@@ -505,7 +505,7 @@
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t :abil-adrenal-gland t :abil-mutate-corrosive-bile t :abil-mutate-clawed-tentacle t
                                        :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t :abil-mutate-spawn-locusts t :abil-mutate-ovipositor t :abil-mutate-acid-locusts t
                                        :abil-mutate-fast-scarabs t :abil-mutate-oviposit-more-eggs t :abil-mutate-tougher-locusts t :abil-cure-mutation t :abil-mutate-thick-carapace t :abil-mutate-acidic-tips t :abil-mutate-jump t
-                                       :abil-mutate-piercing-needles t :abil-mutate-accurate-bile t :abil-mutate-corroding-secretion t
+                                       :abil-mutate-piercing-needles t :abil-mutate-accurate-bile t :abil-mutate-corroding-secretion t :abil-mutate-hooks-and-suckers t :abil-mutate-disguise-as-human t :abil-mutate-spawn-scarabs t
                                        :ai-curious t :ai-cannibal t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-locust+

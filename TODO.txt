@@ -1,6 +1,4 @@
 - Add the possessor faction
-- New development paths for eater
-- Jump and disguise mutations to the eater
 - Add seeker larvae to the eater
 - Satanists should decipher demonic runes from walls to gain power
 - Movement on tiles with mobs should cost more so that they do not bump into each other that often

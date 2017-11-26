@@ -3774,7 +3774,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-cannibalize+ :name "Cannibalize" :descr "Eat the corpse you are standing on to gain 3 HP, 1 maximum HP and 1 power." 
+                                 :id +mob-abil-cannibalize+ :name "Cannibalize" :descr "Eat the corpse you are standing on to gain 3 HP and 1 power. If your HP are at the maximum, also gain 1 maximum HP." 
                                  :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 100
@@ -4134,24 +4134,32 @@
                                                    (mob-invoke-ability actor nearest-enemy (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-create-parasites+ :name "Create parasites" :descr "Create 6 parasites that can infest an enemy character for a very long period of time. Parasited characters will have their direct resistances against flesh anf acid damage reduced by 1. You can always see the location of parasited characters." 
+                                 :id +mob-abil-create-parasites+ :name "Spawn parasites" :descr "Start the scarab egg laying process. 6 parasites become ready to use in 3 turns. Parasites can infest an enemy character for a very long period of time. Parasited characters will have their direct resistances against flesh and acid damage reduced by 1. You can always see the location of parasited characters." 
                                  :cost 1 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                             (format nil "You hear some burping~A. " str)))
-                                                
-                                                (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-parasite+ :x (x actor) :y (y actor) :z (z actor) :qty 6)
-                                                               :spd nil :silent t)
+                                                                                                           (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-laying-eggs+ :actor-id (id actor) :cd 3
+                                                                      :param1 #'(lambda ()
+                                                                                  (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-parasite+ :x (x actor) :y (y actor) :z (z actor) :qty 6)
+                                                                                                 :spd nil :silent t)
+                                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                         (format nil "6 parasite eggs have finished growing inside ~A. "
+                                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A creates 6 parasites. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                       (format nil "Parasite eggs start to grow inside ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-create-parasites+))
+                                                      (if (and (mob-ability-p actor +mob-abil-create-parasites+)
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-laying-eggs+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
@@ -4628,7 +4636,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-spawn-locusts+ :name "Grow spawning sacs" :descr "Evolve to get an ability to spawn locust next to you. The evolution process takes 15 turns. Locusts live for 10 turns, have 8 HP and deal 3-4 flesh dmg in melee. The spawning sacs are mutually exclusive with the ovipositor." 
+                                 :id +mob-abil-mutate-spawn-locusts+ :name "Grow locust spawning sacs" :descr "Evolve to let your ovipositor spawn locusts. The evolution process takes 15 turns. Locusts live for 10 turns, have 8 HP and deal 3-4 flesh dmg in melee. The locust spawning sacs are mutually exclusive with the scarab spawning sacs." 
                                  :cost 3 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4637,7 +4645,7 @@
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear some burping~A. " str)))
 
-                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 15 :param1 (list +mob-abil-spawn-locusts+ "grows spawning sacs"))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 15 :param1 (list +mob-abil-spawn-locusts+ "grows locust spawning sacs"))
                                                 
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -4648,7 +4656,8 @@
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-spawn-locusts+)
                                                                (not (mob-ability-p actor +mob-abil-spawn-locusts+))
-                                                               (not (mob-ability-p actor +mob-abil-oviposit+))
+                                                               (not (mob-ability-p actor +mob-abil-spawn-scarabs+))
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
                                                         nil))
@@ -4665,82 +4674,48 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-spawn-locusts+ :name "Spawn locust" :descr "Spawn a locust next to you. The locust has 8 HP, deals 3-4 flesh damage in melee and lives for 10 turns." 
-                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :id +mob-abil-spawn-locusts+ :name "Spawn locust" :descr "Start the egg laying process. 2 eggs become ready to use in 6 turns and can later quickly develop into locusts. A locust has 8 HP, deals 3-4 flesh damage in melee and lives for 10 turns." 
+                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 100
                                  :start-map-select-func #'player-start-map-select-self
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                ;; target is (x y z)
-                                                (logger (format nil "MOB-SPAWN-LOCUST: ~A [~A] spawns a locust at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
-                                                ;; target here is the item to be reanimated
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*)
-                                                                       (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                       :observed-mob actor)
-                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
-                                                                                                           (format nil "You hear some burping~A. " str)))
-                                                (let ((locust-mob))
-                                                  (if (mob-ability-p actor +mob-abil-acid-locusts+)
-                                                    (setf locust-mob (make-instance 'mob :mob-type +mob-type-acid-locust+ :x (first target) :y (second target) :z (third target)))
-                                                    (setf locust-mob (make-instance 'mob :mob-type +mob-type-locust+ :x (first target) :y (second target) :z (third target))))
-                                                  (if (mob-ability-p actor +mob-abil-tougher-locusts+)
-                                                    (progn
-                                                      (setf (cur-hp locust-mob) 14)
-                                                      (setf (max-hp locust-mob) 14)
-                                                      (set-mob-effect locust-mob :effect-type-id +mob-effect-mortality+ :actor-id (id locust-mob) :cd 15))
-                                                    (set-mob-effect locust-mob :effect-type-id +mob-effect-mortality+ :actor-id (id locust-mob) :cd 10))
-                                                  (add-mob-to-level-list (level *world*) locust-mob))
-
-                                                (decf (cur-fp actor) (cost ability-type))
+                                                (declare (ignore target))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-laying-eggs+ :actor-id (id actor) :cd 6
+                                                                      :param1 #'(lambda ()
+                                                                                  (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-locust-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 2)
+                                                                                                 :spd nil :silent t)
+                                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                         (format nil "2 locust eggs have finished growing inside ~A. "
+                                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
                                                 
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "Locust eggs start to grow inside ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-spawn-locusts+)
-                                                               )
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-laying-eggs+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore ability-type nearest-ally))
-                                                  (let ((final-cell nil))
-                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
-                                                                                                      (when (and terrain
-                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
-                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
-                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor))))
-                                                                                                        (when (null final-cell)
-                                                                                                          (setf final-cell (list dx dy (z actor))))
-                                                                                                        (when (and nearest-enemy
-                                                                                                                   (< (get-distance-3d dx dy (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))
-                                                                                                                      (get-distance-3d (first final-cell) (second final-cell) (third final-cell)
-                                                                                                                                       (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))))
-                                                                                                          (setf final-cell (list dx dy (z actor))))))))
-                                                    (if (and (mob-ability-p actor +mob-abil-spawn-locusts+)
-                                                             (can-invoke-ability actor actor +mob-abil-spawn-locusts+)
-                                                             nearest-enemy
-                                                             final-cell)
-                                                      final-cell
-                                                      nil)))
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-spawn-locusts+)
+                                                           (can-invoke-ability actor actor +mob-abil-spawn-locusts+)
+                                                           (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-eater-locust-egg+)
+                                                                    sum (qty item))
+                                                              2))
+                                                    t
+                                                    nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
-                                                   (declare (ignore nearest-enemy nearest-ally))
-                                                   (mob-invoke-ability actor check-result (id ability-type)))
-                                 :map-select-func #'(lambda (ability-type-id)
-                                                      (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
-                                                                (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
-                                                        (progn
-                                                          (clear-message-list *small-message-box*)
-                                                          (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
-                                                          t)
-                                                        (progn
-                                                          nil))
-                                                      )))
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-ovipositor+ :name "Grow ovipositor" :descr "Evolve to get an ability to lay eggs that can later quickly develop into scarabs. The evolution process takes 15 turns. Scarabs are living bombs that explode acid when contacting an enemy. The ovipositor is mutually exclusive with the spawning sacs." 
-                                 :cost 3 :spd +normal-ap+ :passive nil
+                                 :id +mob-abil-mutate-ovipositor+ :name "Grow ovipositor" :descr "Evolve to get an ability to lay eggs different kind of eggs. The evolution process takes 15 turns." 
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
@@ -4758,7 +4733,6 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-ovipositor+)
-                                                               (not (mob-ability-p actor +mob-abil-spawn-locusts+))
                                                                (not (mob-ability-p actor +mob-abil-oviposit+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
@@ -4776,27 +4750,86 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-oviposit+ :name "Oviposit" :descr "Start the egg laying process. Eggs become ready to use in 6 turns and can later quickly develop into scarabs. Scarabs are living bombs that try to move to the target and explode to deal 6-10 acid damage when contacting an enemy." 
+                                 :id +mob-abil-oviposit+ :name "Ovipositor" :descr "You are able to lay different kinds of eggs." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-spawn-scarabs+ :name "Grow scarab spawning sacs" :descr "Evolve to let your ovipositor spawn scarabs. The evolution process takes 15 turns. Scarabs are living bombs that try to move to the target and explode to deal 6-10 acid damage when contacting an enemy. The scarab spawning sacs are mutually exclusive with the locust spawning sacs." 
+                                 :cost 3 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 15 :param1 (list +mob-abil-spawn-scarabs+ "grows scarab spawning sacs"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-spawn-scarabs+)
+                                                               (not (mob-ability-p actor +mob-abil-spawn-locusts+))
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-spawn-scarabs+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-spawn-scarabs+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-spawn-scarabs+ :name "Spawn scarabs" :descr "Start the scarab egg laying process. Eggs become ready to use in 6 turns and can later quickly develop into scarabs. Scarabs are living bombs that try to move to the target and explode to deal 6-10 acid damage when contacting an enemy." 
                                  :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 0
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (set-mob-effect actor :effect-type-id +mob-effect-laying-eggs+ :actor-id (id actor) :cd 6)
+                                                (set-mob-effect actor :effect-type-id +mob-effect-laying-eggs+ :actor-id (id actor) :cd 6
+                                                                      :param1 #'(lambda ()
+                                                                                  (if (mob-ability-p actor +mob-abil-oviposit-more-eggs+)
+                                                                                    (progn
+                                                                                      (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-scarab-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 2)
+                                                                                                     :spd nil :silent t)
+                                                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                         (format nil "2 scarab eggs have finished growing inside ~A. "
+                                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                                                                    (progn
+                                                                                      (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-scarab-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 1)
+                                                                                                     :spd nil :silent t)
+                                                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                         (format nil "A scarab egg has finished growing inside ~A. "
+                                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))))
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "Eggs start to grow inside ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                       (format nil "Scarab eggs start to grow inside ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (mob-ability-p actor +mob-abil-spawn-scarabs+)
                                                                (not (mob-effect-p actor +mob-effect-laying-eggs+)))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-enemy nearest-ally))
-                                                  (if (and (mob-ability-p actor +mob-abil-oviposit+)
-                                                           (can-invoke-ability actor actor +mob-abil-oviposit+)
+                                                  (if (and (mob-ability-p actor +mob-abil-spawn-scarabs+)
+                                                           (can-invoke-ability actor actor +mob-abil-spawn-scarabs+)
                                                            (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-eater-scarab-egg+)
                                                                     sum (qty item))
                                                                    2))
@@ -4817,7 +4850,7 @@
                                                 (logger (format nil "MOB-ACID-EXPLOSION: ~A [~A] explodes on ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A explodes. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                                       (format nil "~A explodes. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                 
                                                 (let ((targets nil)
                                                       (max-range 1))
@@ -4883,7 +4916,7 @@
                                                         nil))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-acid-locusts+ :name "Morph acidic spawning sacs" :descr "Evolve to make your spawning sacs create locusts with acid (instead of flesh) damage. The evolution process takes 15 turns. This mutation is only available if you already have the spawning sacs." 
+                                 :id +mob-abil-mutate-acid-locusts+ :name "Morph acidic spawning sacs" :descr "Evolve to make your spawning sacs create locusts with acid (instead of flesh) damage. The evolution process takes 15 turns. This mutation is only available if you already have the locust spawning sacs." 
                                  :cost 3 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4920,7 +4953,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-fast-scarabs+ :name "Morph faster scarabs" :descr "Evolve to make your scarabs cover ground quicker. The evolution process takes 15 turns. This mutation is only available if you already have the ovipositor." 
+                                 :id +mob-abil-mutate-fast-scarabs+ :name "Morph faster scarabs" :descr "Evolve to make your scarabs cover ground quicker. The evolution process takes 15 turns. This mutation is only available if you already have the scarab spawning sacs." 
                                  :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4939,7 +4972,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-fast-scarabs+)
-                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (mob-ability-p actor +mob-abil-spawn-scarabs+)
                                                                (not (mob-ability-p actor +mob-abil-fast-scarabs+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
@@ -5022,7 +5055,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-oviposit-more-eggs+ :name "Morph multiple eggcells" :descr "Evolve to make your ovipositor lay 2 eggs at once instead of one. The evolution process takes 15 turns. This mutation is only available if you already have the ovipositor." 
+                                 :id +mob-abil-mutate-oviposit-more-eggs+ :name "Morph multiple eggcells" :descr "Evolve to make your ovipositor lay 2 scarab eggs at once instead of one. The evolution process takes 15 turns. This mutation is only available if you already have the scarab spawning sacs." 
                                  :cost 3 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -5041,7 +5074,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-oviposit-more-eggs+)
-                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (mob-ability-p actor +mob-abil-spawn-scarabs+)
                                                                (not (mob-ability-p actor +mob-abil-oviposit-more-eggs+))
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
@@ -5059,14 +5092,14 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-oviposit-more-eggs+ :name "Multiple eggcells" :descr "Your ovipositor lays 2 eggs at once instead of one." 
+                                 :id +mob-abil-oviposit-more-eggs+ :name "Multiple eggcells" :descr "Your ovipositor lays 2 scarab eggs at once instead of one." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-tougher-locusts+ :name "Morph chitin injection" :descr "Evolve to make your locusts last 15 turns (instead of 10) and have 14 HP (instead of 8). The evolution process takes 15 turns. This mutation is only available if you already have the spawning sacs." 
+                                 :id +mob-abil-mutate-tougher-locusts+ :name "Morph chitin injection" :descr "Evolve to make your locusts last 15 turns (instead of 10) and have 14 HP (instead of 8). The evolution process takes 15 turns. This mutation is only available if you already have the locust spawning sacs." 
                                  :cost 4 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -5499,3 +5532,103 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-hooks-and-suckers+ :name "Grow hooks & sucker cups" :descr "Evolve to give your tentacles hooks and sucker cups which lets you climb walls. The evolution process takes 20 turns." 
+                                 :cost 2 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 20 :param1 (list +mob-abil-climbing+ "can now climb walls"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-hooks-and-suckers+)
+                                                               (not (mob-ability-p actor +mob-abil-climbing+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-hooks-and-suckers+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-hooks-and-suckers+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-disguise-as-human+ :name "Morph facade readjustment" :descr "Evolve to give yourself an ability to disguise as a human at will. The evolution process takes 20 turns. Requires the hooks & sucker cups mutation." 
+                                 :cost 4 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 20 :param1 (list +mob-abil-disguise-as-human+ "can now disguise itself as a human"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-disguise-as-human+)
+                                                               (mob-ability-p actor +mob-abil-climbing+)
+                                                               (not (mob-ability-p actor +mob-abil-disguise-as-human+))
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-disguise-as-human+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-disguise-as-human+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-disguise-as-human+ :name "Disguise as a human" :descr "Disguise yourself as a human." 
+                                 :cost 0 :cd 10 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 25
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                (invoke-disguise actor)
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (not (mob-effect-p actor +mob-effect-disguised+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  ;; if the dst is more than 3 tiles away - stealth, if possible
+                                                  (if (and (path actor)
+                                                           (> (length (path actor)) 3)
+                                                           (mob-ability-p actor +mob-abil-disguise-as-human+)
+                                                           (can-invoke-ability actor actor +mob-abil-disguise-as-human+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

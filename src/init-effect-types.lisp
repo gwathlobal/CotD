@@ -783,15 +783,10 @@
                                                              (declare (ignore effect actor))
                                                              (sdl:color :r 60 :g 179 :b 113))
                                              :on-remove #'(lambda (effect actor)
-
+                                                            (declare (ignore actor))
                                                             (when (eq (cd effect) 0)
-                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                     (format nil "Eggs finished growing inside ~A. " (prepend-article +article-the+ (visible-name actor))))
-                                                              (if (mob-ability-p actor +mob-abil-oviposit-more-eggs+)
-                                                                (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-scarab-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 2)
-                                                                               :spd nil :silent t)
-                                                                (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-scarab-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 1)
-                                                                               :spd nil :silent t)))
+                                                              (funcall (param1 effect))
+                                                              )
                                                             
                                                             )))
 

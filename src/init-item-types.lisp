@@ -381,7 +381,7 @@
 (set-item-type (make-instance 'item-type :id +item-type-eater-scarab-egg+
                                          :name "scarab egg" :plural-name "scarab eggs"
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
-                                         :descr "A egg that can quickly develop ino a full-grown creature that will move to the target and explode splashing acid around. Usable by primordials only."
+                                         :descr "An egg that can quickly develop into a full-grown creature that will move to the target and explode splashing acid around. Usable by primordials only."
                                          :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
                                          :start-map-select-func #'player-start-map-select-nearest-hostile
                                          :on-use #'(lambda (actor target item)
@@ -449,3 +449,74 @@
                                          :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
                                                              (declare (ignore nearest-ally check-result))
                                                              (mob-use-item actor nearest-enemy item))))
+
+(set-item-type (make-instance 'item-type :id +item-type-eater-locust-egg+
+                                         :name "locust egg" :plural-name "locust eggs"
+                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
+                                         :descr "An egg that can spawn a locust next to you. The locust is a small short-lived creature that will attack all enemies in sight until it dies. Usable by primordials only."
+                                         :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
+                                         :start-map-select-func #'player-start-map-select-self
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore item))
+                                                     ;; target is (x y z)
+                                                     (logger (format nil "ITEM-SPAWN-LOCUST: ~A [~A] spawns a locust at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                     ;; target here is the item to be reanimated
+                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                            (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            :observed-mob actor)
+                                                     (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                (format nil "You hear some burping~A. " str)))
+                                                     (let ((locust-mob))
+                                                       (if (mob-ability-p actor +mob-abil-acid-locusts+)
+                                                         (setf locust-mob (make-instance 'mob :mob-type +mob-type-acid-locust+ :x (first target) :y (second target) :z (third target)))
+                                                         (setf locust-mob (make-instance 'mob :mob-type +mob-type-locust+ :x (first target) :y (second target) :z (third target))))
+                                                       (if (mob-ability-p actor +mob-abil-tougher-locusts+)
+                                                         (progn
+                                                           (setf (cur-hp locust-mob) 14)
+                                                           (setf (max-hp locust-mob) 14)
+                                                           (set-mob-effect locust-mob :effect-type-id +mob-effect-mortality+ :actor-id (id locust-mob) :cd 15))
+                                                         (set-mob-effect locust-mob :effect-type-id +mob-effect-mortality+ :actor-id (id locust-mob) :cd 10))
+                                                       (add-mob-to-level-list (level *world*) locust-mob))
+                                                     ;; always remove 1 item
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
+                                                              (declare (ignore item))
+                                                              (if (mob-ability-p actor +mob-abil-primordial+)
+                                                                  t
+                                                                  nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally item))
+                                                          (let ((final-cell nil))
+                                                            (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                            (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                              (when (and terrain
+                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                         (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                         (not (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                                (when (null final-cell)
+                                                                                                                  (setf final-cell (list dx dy (z actor))))
+                                                                                                                (when (and nearest-enemy
+                                                                                                                           (< (get-distance-3d dx dy (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))
+                                                                                                                              (get-distance-3d (first final-cell) (second final-cell) (third final-cell)
+                                                                                                                                               (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))))
+                                                                                                                  (setf final-cell (list dx dy (z actor))))))))
+                                                            (if (and (mob-ability-p actor +mob-abil-spawn-locusts+)
+                                                                     (can-invoke-ability actor actor +mob-abil-spawn-locusts+)
+                                                                     nearest-enemy
+                                                                     final-cell)
+                                                              final-cell
+                                                              nil)))
+                                         :map-select-func #'(lambda (item)
+                                                              (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                       (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                       (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
+                                                                (progn
+                                                                  (clear-message-list *small-message-box*)
+                                                                  (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
+                                                                  t)
+                                                                (progn
+                                                                  nil)))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-ally nearest-enemy))
+                                                             (mob-use-item actor check-result item))))
