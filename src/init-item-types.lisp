@@ -485,7 +485,7 @@
                                                                   t
                                                                   nil))
                                          :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
-                                                          (declare (ignore nearest-ally item))
+                                                          (declare (ignore nearest-ally))
                                                           (let ((final-cell nil))
                                                             (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                             (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
@@ -500,9 +500,140 @@
                                                                                                                               (get-distance-3d (first final-cell) (second final-cell) (third final-cell)
                                                                                                                                                (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))))
                                                                                                                   (setf final-cell (list dx dy (z actor))))))))
-                                                            (if (and (mob-ability-p actor +mob-abil-spawn-locusts+)
-                                                                     (can-invoke-ability actor actor +mob-abil-spawn-locusts+)
+                                                            (if (and (funcall (on-check-applic item) actor item)
                                                                      nearest-enemy
+                                                                     final-cell)
+                                                              final-cell
+                                                              nil)))
+                                         :map-select-func #'(lambda (item)
+                                                              (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                       (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                       (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
+                                                                (progn
+                                                                  (clear-message-list *small-message-box*)
+                                                                  (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
+                                                                  t)
+                                                                (progn
+                                                                  nil)))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-ally nearest-enemy))
+                                                             (mob-use-item actor check-result item))))
+
+(set-item-type (make-instance 'item-type :id +item-type-eater-larva-egg+
+                                         :name "seeker larva egg" :plural-name "seeker larva eggs"
+                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
+                                         :descr "An egg that can spawn a larva next to you. The larva is a small fragile creature that will eat corpses and collect their power for you. Usable by primordials only."
+                                         :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
+                                         :start-map-select-func #'player-start-map-select-self
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore item))
+                                                     ;; target is (x y z)
+                                                     (logger (format nil "ITEM-SPAWN-LARVA: ~A [~A] spawns a larva at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                     ;; target here is the item to be reanimated
+                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                            (format nil "One of the orifices of ~A spawns a small harmless creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            :observed-mob actor)
+                                                     (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                (format nil "You hear some burping~A. " str)))
+                                                     (let ((larva-mob))
+                                                       (setf larva-mob (make-instance 'mob :mob-type +mob-type-seeker-larva+ :x (first target) :y (second target) :z (third target)))
+                                                       (set-mob-effect larva-mob :effect-type-id +mob-effect-primordial-transfer+ :actor-id (id actor) :cd t)
+                                                       (add-mob-to-level-list (level *world*) larva-mob))
+                                                     ;; always remove 1 item
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
+                                                              (declare (ignore item))
+                                                              (if (mob-ability-p actor +mob-abil-primordial+)
+                                                                  t
+                                                                  nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally))
+                                                          (let ((final-cell nil))
+                                                            (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                            (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                              (when (and terrain
+                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                         (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                         (not (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                                (when (null final-cell)
+                                                                                                                  (setf final-cell (list dx dy (z actor))))
+                                                                                                                (when (and nearest-enemy
+                                                                                                                           (< (get-distance-3d dx dy (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))
+                                                                                                                              (get-distance-3d (first final-cell) (second final-cell) (third final-cell)
+                                                                                                                                               (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))))
+                                                                                                                  (setf final-cell (list dx dy (z actor))))))))
+                                                            (if (and (funcall (on-check-applic item) actor item)
+                                                                     nearest-enemy
+                                                                     final-cell)
+                                                              final-cell
+                                                              nil)))
+                                         :map-select-func #'(lambda (item)
+                                                              (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                       (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                       (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
+                                                                (progn
+                                                                  (clear-message-list *small-message-box*)
+                                                                  (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
+                                                                  t)
+                                                                (progn
+                                                                  nil)))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-ally nearest-enemy))
+                                                             (mob-use-item actor check-result item))))
+
+(set-item-type (make-instance 'item-type :id +item-type-eater-colony-egg+
+                                         :name "spore colony egg" :plural-name "spore colony eggs"
+                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
+                                         :descr "An egg that can spawn a spore colony next to you. The colony is large immobile creature that spits acid at the enemies of the primordial's in sight. Usable by primordials only."
+                                         :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
+                                         :start-map-select-func #'player-start-map-select-self
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore item))
+                                                     ;; target is (x y z)
+                                                     (logger (format nil "ITEM-SPAWN-COLONY: ~A [~A] spawns a larva at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                     ;; target here is the item to be reanimated
+                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                            (format nil "One of the orifices of ~A spawns a huge hideous creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            :observed-mob actor)
+                                                     (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                (format nil "You hear some burping~A. " str)))
+                                                     (let ((larva-mob))
+                                                       (setf larva-mob (make-instance 'mob :mob-type +mob-type-spore-colony+ :x (first target) :y (second target) :z (third target)))
+                                                       (add-mob-to-level-list (level *world*) larva-mob))
+                                                     ;; always remove 1 item
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
+                                                              (declare (ignore item))
+                                                              (if (mob-ability-p actor +mob-abil-primordial+)
+                                                                  t
+                                                                  nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-ally))
+                                                          (let ((final-cell nil))
+                                                            (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                            (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                              (when (and terrain
+                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                         (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                         (not (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                                (when (null final-cell)
+                                                                                                                  (setf final-cell (list dx dy (z actor))))
+                                                                                                                (when (and nearest-enemy
+                                                                                                                           (< (get-distance-3d dx dy (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))
+                                                                                                                              (get-distance-3d (first final-cell) (second final-cell) (third final-cell)
+                                                                                                                                               (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))))
+                                                                                                                  (setf final-cell (list dx dy (z actor))))))))
+                                                            (if (and (funcall (on-check-applic item) actor item)
+                                                                     (loop for mob-id in (visible-mobs actor)
+                                                                           for mob = (get-mob-by-id mob-id)
+                                                                           with no-colony-in-sight = t
+                                                                           when (= (mob-type mob) +mob-type-spore-colony+)
+                                                                             do
+                                                                                (setf no-colony-in-sight nil)
+                                                                                (loop-finish)
+                                                                           finally (return no-colony-in-sight))
                                                                      final-cell)
                                                               final-cell
                                                               nil)))

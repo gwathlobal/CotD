@@ -242,17 +242,20 @@
                       :force-sound t))
       ;(print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A cries: \"Help! Help!\" " (visible-name mob)))
       )
-    
+    (if (mob-ability-p mob +mob-abil-immobile+)
+      (move-mob mob 5)
     ;; if can't move away - try any random direction
-    (unless (move-mob mob (x-y-into-dir step-x step-y))
-      (logger (format nil "AI-FUNCTION: ~A [~A] could not flee. Try to move randomly.~%" (name mob) (id mob)))
-      (ai-mob-random-dir mob))
+      (unless (move-mob mob (x-y-into-dir step-x step-y))
+        (logger (format nil "AI-FUNCTION: ~A [~A] could not flee. Try to move randomly.~%" (name mob) (id mob)))
+        (ai-mob-random-dir mob)))
     ))
 
 (defun ai-mob-random-dir (mob)
   (logger (format nil "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob)))
-  (loop for dir = (+ (random 9) 1)
-        until (move-mob mob dir)))
+  (if (mob-ability-p mob +mob-abil-immobile+)
+    (move-mob mob 5)
+    (loop for dir = (+ (random 9) 1)
+          until (move-mob mob dir))))
 
 (defmethod ai-function ((mob mob))
   ;(declare (optimize (speed 3)))
@@ -375,7 +378,7 @@
       (ai-mob-flee mob nearest-enemy)      
       (return-from ai-function))
     
-     ;; if the mob is a split soul, move away from the nearest enemy (without a random action)
+    ;; if the mob is a split soul, move away from the nearest enemy (without a random action)
     (when (and nearest-enemy (mob-ai-split-soul-p mob))
       (logger (format nil "AI-FUNCTION: ~A [~A] is trying to move away from the enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-target) (id nearest-target)))
 
@@ -396,10 +399,7 @@
         (if farthest-tile
           (setf (path-dst mob) farthest-tile nearest-target nil)
           (setf (path-dst mob) (list (x mob) (y mob) (z mob)) nearest-target nil))
-        ))
-      
-
-    
+        ))  
       
     ;; if the mob has horde behavior, compare relative strengths of allies to relative strength of enemies
     ;; if less - flee
@@ -798,6 +798,7 @@
     ;; calculate path to the destination
     (when (and (path-dst mob)
                (not (mob-ai-simple-pathfinding-p mob))
+               (not (mob-ability-p mob +mob-abil-immobile+))
                (or (null (path mob))
                    (mob-ability-p mob +mob-abil-momentum+)))
       (let ((path nil))

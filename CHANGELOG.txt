@@ -4,6 +4,8 @@ CHANGELOG
 - Added a second tier of offesive mutations for the Eater of the dead. These are piercing needles (constricted target have reduced dodge), increased acid strength (acid spit also reduces flesh and acid resistances) and increased cerebellum (corrosive bile always lands to the destination target).
 - Added survival mutations to the Eater of the dead like hooks & sucker cups (lets you climb walls) and facade redjustment (lets you disguise yourself as a human).
 - Spawning mutations are rearranged for the Eater of the dead. The ovipositor is now the prerequisite for all spawning mutations. Then you can branch into locusts or scarabs. Parasites are now dependent on the ovipositor as well. All spawning is no longer immediate - first you need lay eggs and wait before they grow.
+- The Eater of the dead can gain an ability to spawn seeker larvae. These small creatures are harmless but eat corpses and transfer thier power to you.
+- The Eater of the dead can gain an ability to spawn spore colonies. These are immobile creatures that spit acid at their enemies in sight. 
 
 --------------------
 November 25, 2017 v1.2.4

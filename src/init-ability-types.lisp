@@ -1026,6 +1026,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-charge+)
+                                                               (not (mob-ability-p actor +mob-abil-immobile+))
                                                                (not (riding-mob-id actor)))
                                                         t
                                                         nil))
@@ -3846,9 +3847,17 @@
                                                   (incf (max-hp actor))
                                                   (setf (cur-hp actor) (max-hp actor)))
 
-                                                (incf (cur-fp actor))
-                                                (when (> (cur-fp actor) (max-fp actor))
-                                                  (setf (cur-fp actor) (max-fp actor)))
+                                                (if (mob-effect-p actor +mob-effect-primordial-transfer+)
+                                                  (let ((transfer-target (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-primordial-transfer+))))))
+                                                    (when (eq transfer-target *player*)
+                                                      (add-message (format nil "Your larva transfers power to you. ")))
+                                                    (incf (cur-fp transfer-target))
+                                                    (when (> (cur-fp transfer-target) (max-fp transfer-target))
+                                                      (setf (cur-fp transfer-target) (max-fp transfer-target))))
+                                                  (progn
+                                                    (incf (cur-fp actor))
+                                                    (when (> (cur-fp actor) (max-fp actor))
+                                                      (setf (cur-fp actor) (max-fp actor)))))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -4184,7 +4193,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spite is mutually exclusive with the clawed tentacles, corrosive sacs and their upgrades." 
+                                 :id +mob-abil-mutate-acid-spit+ :name "Grow an acid gland" :descr "Evolve to give yourself an ability to spit acid at your enemies. The evolution process takes 10 turns. The acid spit is mutually exclusive with the clawed tentacles, corrosive sacs and their upgrades." 
                                  :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -4674,7 +4683,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-spawn-locusts+ :name "Spawn locust" :descr "Start the egg laying process. 2 eggs become ready to use in 6 turns and can later quickly develop into locusts. A locust has 8 HP, deals 3-4 flesh damage in melee and lives for 10 turns." 
+                                 :id +mob-abil-spawn-locusts+ :name "Spawn locust eggs" :descr "Start the egg laying process. 2 eggs become ready to use in 6 turns and can later quickly develop into locusts. A locust has 8 HP, deals 3-4 flesh damage in melee and lives for 10 turns." 
                                  :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 100
@@ -4777,6 +4786,7 @@
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-mutate-spawn-scarabs+)
                                                                (not (mob-ability-p actor +mob-abil-spawn-locusts+))
+                                                               (not (mob-ability-p actor +mob-abil-spawn-scarabs+))
                                                                (mob-ability-p actor +mob-abil-oviposit+)
                                                                (not (mob-effect-p actor +mob-effect-evolving+)))
                                                         t
@@ -4794,7 +4804,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-spawn-scarabs+ :name "Spawn scarabs" :descr "Start the scarab egg laying process. Eggs become ready to use in 6 turns and can later quickly develop into scarabs. Scarabs are living bombs that try to move to the target and explode to deal 6-10 acid damage when contacting an enemy." 
+                                 :id +mob-abil-spawn-scarabs+ :name "Spawn scarab eggs" :descr "Start the scarab egg laying process. Eggs become ready to use in 6 turns and can later quickly develop into scarabs. Scarabs are living bombs that try to move to the target and explode to deal 6-10 acid damage when contacting an enemy." 
                                  :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 0
@@ -5632,3 +5642,165 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-spawn-larva+ :name "Grow larva spawning sacs" :descr "Evolve to let your ovipositor spawn seeker larvae. The evolution process takes 20 turns. Larvae are small fragile creatures that can not defend themselves but will eat corpses and collect power to you." 
+                                 :cost 3 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 20 :param1 (list +mob-abil-spawn-larva+ "grows larva spawning sacs"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-spawn-larva+)
+                                                               (not (mob-ability-p actor +mob-abil-spawn-larva+))
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-spawn-larva+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-spawn-larva+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-spawn-larva+ :name "Spawn a larva egg" :descr "Start the egg laying process. 1 egg become ready to use in 6 turns and can later quickly develop into a larva. A larva has 6 HP, can not attack and collects power from the corpses for you." 
+                                 :cost 2 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :start-map-select-func #'player-start-map-select-self
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-laying-eggs+ :actor-id (id actor) :cd 6
+                                                                      :param1 #'(lambda ()
+                                                                                  (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-larva-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 1)
+                                                                                                 :spd nil :silent t)
+                                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                         (format nil "A larva egg has finished growing inside ~A. "
+                                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "Larva eggs start to grow inside ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-spawn-larva+)
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-laying-eggs+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-spawn-larva+)
+                                                           (can-invoke-ability actor actor +mob-abil-spawn-larva+)
+                                                           (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-eater-larva-egg+)
+                                                                    sum (qty item))
+                                                              1))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-spore-colony+ :name "Grow spore colony eggcells" :descr "Evolve to let your ovipositor spawn spore colonies. The evolution process takes 20 turns. Spore colonies are immobile mindless creature that spit acid at enemies in their sight." 
+                                 :cost 4 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 20 :param1 (list +mob-abil-spore-colony+ "grows spore colony eggcells"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-mutate-spore-colony+)
+                                                               (not (mob-ability-p actor +mob-abil-spore-colony+))
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-evolving+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-spore-colony+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-spore-colony+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-spore-colony+ :name "Spawn a spore colony egg" :descr "Start the egg laying process. 1 egg become ready to use in 12 turns and can later quickly develop into a spore colony. Spore colonies are immobile mindless creatures that flouresce and spit for 1-4 acid damage at any enemy of the primordials in its sight." 
+                                 :cost 4 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 100
+                                 :start-map-select-func #'player-start-map-select-self
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-laying-eggs+ :actor-id (id actor) :cd 12
+                                                                      :param1 #'(lambda ()
+                                                                                  (mob-pick-item actor (make-instance 'item :item-type +item-type-eater-colony-egg+ :x (x actor) :y (y actor) :z (z actor) :qty 1)
+                                                                                                 :spd nil :silent t)
+                                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                         (format nil "A spore colony egg has finished growing inside ~A. "
+                                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "Spore colony eggs start to grow inside ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-spore-colony+)
+                                                               (mob-ability-p actor +mob-abil-oviposit+)
+                                                               (not (mob-effect-p actor +mob-effect-laying-eggs+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (mob-ability-p actor +mob-abil-spore-colony+)
+                                                           (can-invoke-ability actor actor +mob-abil-spore-colony+)
+                                                           (not nearest-enemy)
+                                                           (< (loop for item in (get-inv-items-by-type (inv actor) +item-type-eater-colony-egg+)
+                                                                    sum (qty item))
+                                                              1))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-immobile+ :name "Immobile" :descr "You are unable to move around." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))

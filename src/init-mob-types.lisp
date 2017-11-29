@@ -506,6 +506,7 @@
                                        :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t :abil-mutate-spawn-locusts t :abil-mutate-ovipositor t :abil-mutate-acid-locusts t
                                        :abil-mutate-fast-scarabs t :abil-mutate-oviposit-more-eggs t :abil-mutate-tougher-locusts t :abil-cure-mutation t :abil-mutate-thick-carapace t :abil-mutate-acidic-tips t :abil-mutate-jump t
                                        :abil-mutate-piercing-needles t :abil-mutate-accurate-bile t :abil-mutate-corroding-secretion t :abil-mutate-hooks-and-suckers t :abil-mutate-disguise-as-human t :abil-mutate-spawn-scarabs t
+                                       :abil-mutate-spawn-larva t :abil-mutate-spore-colony t
                                        :ai-curious t :ai-cannibal t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-locust+
@@ -551,6 +552,29 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-acid-explosion t
                                        :ai-curious t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-seeker-larva+
+                                       :name "seeker larva"
+                                       :glyph-idx 69 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :faction +faction-type-eater+
+                                       :weapon () :base-dodge 15
+                                       :armor ()
+                                       :strength 0
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-no-breathe t :abil-primordial t :abil-cannibalize t
+                                       :ai-coward t :ai-cannibal t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-spore-colony+
+                                       :name "spore colony"
+                                       :glyph-idx 37 :glyph-color (sdl:color :r 150 :g 165 :b 0) :back-color sdl:*black* :max-hp 18 :max-fp 0
+                                       :faction +faction-type-eater+
+                                       :weapon (list "Tentacles & Acid spit" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) (list +weapon-dmg-acid+ 1 4 +normal-ap+ 0 1 100 "spits at" (list :no-charges :corrodes)))
+                                       :base-dodge 0
+                                       :armor (list (list +weapon-dmg-flesh+ 2 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100) (list +weapon-dmg-acid+ 1 0))
+                                       :strength 2
+                                       :base-light-radius 3 
+                                       :abil-no-breathe t :abil-primordial t :abil-constriction t :abil-immobile t :abil-immovable t
+                                       ))
 
 ;;--------------------
 ;; BEASTS

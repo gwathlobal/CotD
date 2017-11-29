@@ -810,3 +810,8 @@
                                              :on-remove #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-armor actor))))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-primordial-transfer+ :name "Primdordial transfer"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)))

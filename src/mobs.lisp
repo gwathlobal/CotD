@@ -87,7 +87,7 @@
                                                                 abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation abil-mutate-thick-carapace abil-thick-carapace
                                                                 abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump abil-mutate-piercing-needles abil-piercing-needles abil-mutate-corroding-secretion abil-corroding-secretion
                                                                 abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
-                                                                abil-mutate-spawn-scarabs)
+                                                                abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -388,6 +388,16 @@
     (setf (gethash +mob-abil-spawn-scarabs+ (abilities mob-type)) t))
   (when abil-mutate-spawn-scarabs
     (setf (gethash +mob-abil-mutate-spawn-scarabs+ (abilities mob-type)) t))
+  (when abil-mutate-spawn-larva
+    (setf (gethash +mob-abil-mutate-spawn-larva+ (abilities mob-type)) t))
+  (when abil-spawn-larva
+    (setf (gethash +mob-abil-spawn-larva+ (abilities mob-type)) t))
+  (when abil-mutate-spore-colony
+    (setf (gethash +mob-abil-mutate-spore-colony+ (abilities mob-type)) t))
+  (when abil-spore-colony
+    (setf (gethash +mob-abil-spore-colony+ (abilities mob-type)) t))
+  (when abil-immobile
+    (setf (gethash +mob-abil-immobile+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
