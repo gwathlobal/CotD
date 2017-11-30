@@ -258,14 +258,56 @@
                                                           (if (and (funcall (on-check-applic item) actor item)
                                                                    nearest-enemy
                                                                    (not (mob-effect-p nearest-enemy +mob-effect-parasite+))
-                                                                   (> (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 4))
+                                                                   (> (get-distance-3d (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)) 4)
+                                                                   (let ((tx 0) (ty 0) (tz 0)
+                                                                         (ex (x nearest-enemy)) (ey (y nearest-enemy)) (ez (z nearest-enemy)))
+                                                                     (declare (type fixnum tx ty tz ex ey ez))
+                                                                     (line-of-sight (x actor) (y actor) (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy)
+                                                                                    #'(lambda (dx dy dz prev-cell)
+                                                                                        (declare (type fixnum dx dy dz))
+                                                                                        (let ((exit-result t))
+                                                                                          (block nil
+                                                                                            (setf tx dx ty dy tz dz)
+                                                                                            
+                                                                                            (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
+                                                                                              (setf exit-result 'exit)
+                                                                                              (return))
+                                                                                            
+                                                                                            )
+                                                                                          exit-result)))
+                                                                     (if (and (= tx ex)
+                                                                              (= ty ey)
+                                                                              (= tz ez))
+                                                                       t
+                                                                       nil)))
                                                             t
                                                             nil))
                                          :map-select-func #'(lambda (item)
                                                               (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                 (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                          mob
-                                                                         (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 7))
+                                                                         (<= (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 8)
+                                                                         (let ((tx 0) (ty 0) (tz 0)
+                                                                               (ex (x mob)) (ey (y mob)) (ez (z mob)))
+                                                                           (declare (type fixnum tx ty tz ex ey ez))
+                                                                           (line-of-sight (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)
+                                                                                          #'(lambda (dx dy dz prev-cell)
+                                                                                              (declare (type fixnum dx dy dz))
+                                                                                              (let ((exit-result t))
+                                                                                                (block nil
+                                                                                                  (setf tx dx ty dy tz dz)
+                                                                                                  
+                                                                                                  (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
+                                                                                                    (setf exit-result 'exit)
+                                                                                                    (return))
+                                                                                                  
+                                                                                                  )
+                                                                                                exit-result)))
+                                                                           (if (and (= tx ex)
+                                                                                    (= ty ey)
+                                                                                    (= tz ez))
+                                                                             t
+                                                                             nil)))
                                                                   (progn
                                                                     (clear-message-list *small-message-box*)
                                                                     (mob-use-item *player* mob item)

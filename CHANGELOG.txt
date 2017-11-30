@@ -5,7 +5,8 @@ CHANGELOG
 - Added survival mutations to the Eater of the dead like hooks & sucker cups (lets you climb walls) and facade redjustment (lets you disguise yourself as a human).
 - Spawning mutations are rearranged for the Eater of the dead. The ovipositor is now the prerequisite for all spawning mutations. Then you can branch into locusts or scarabs. Parasites are now dependent on the ovipositor as well. All spawning is no longer immediate - first you need lay eggs and wait before they grow.
 - The Eater of the dead can gain an ability to spawn seeker larvae. These small creatures are harmless but eat corpses and transfer thier power to you.
-- The Eater of the dead can gain an ability to spawn spore colonies. These are immobile creatures that spit acid at their enemies in sight. 
+- The Eater of the dead can gain an ability to spawn spore colonies. These are immobile creatures that spit acid at their enemies in sight.
+- Fixed the bug when you could throw the parasite throw solid objects.
 
 --------------------
 November 25, 2017 v1.2.4
