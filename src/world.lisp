@@ -36,16 +36,11 @@
       (loop for ny from sy below (+ sy (map-size mob)) do
         (setf (aref (mobs level) nx ny (z mob)) (id mob)))))
 
-  (when (apply-gravity mob)
-      (let ((init-z (z mob)) (cur-dmg 0))
-        (set-mob-location mob (x mob) (y mob) (apply-gravity mob) :apply-gravity nil)
-        (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
-        (decf (cur-hp mob) cur-dmg)
-        (when (> cur-dmg 0)
-          (print-visible-message (x mob) (y mob) (z mob) level
-                                 (format nil "~A falls and takes ~A damage. " (visible-name mob) cur-dmg)))
-        (when (check-dead mob)
-          (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())))))
+  (let ((final-z (z mob)))
+    (when (setf final-z (apply-gravity mob))
+      (set-mob-location mob (x mob) (y mob) final-z :apply-gravity t)))
+
+  )
 
 (defun remove-mob-from-level-list (level mob)
   (setf (mob-id-list level) (remove (id mob) (mob-id-list level)))

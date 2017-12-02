@@ -168,22 +168,9 @@
                                                 
                                                 (logger (format nil "MOB-POSSESS-TARGET: ~A [~A] possesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
                                                 
-                                                (remove-mob-from-level-list (level *world*) target)
-                                                (set-mob-location actor (x target) (y target) (z target))
-                                                                                                
-                                                (setf (master-mob-id target) (id actor))
-                                                (setf (slave-mob-id actor) (id target))
-                                                (set-mob-effect actor :effect-type-id +mob-effect-possessed+ :actor-id (id actor))
-                                                (set-mob-effect target :effect-type-id +mob-effect-possessed+ :actor-id (id target))
-                                                (setf (face-mob-type-id actor) (mob-type target))
                                                 (rem-mob-effect actor +mob-effect-ready-to-possess+)
-                                                (incf (stat-possess actor))
-
-                                                ;; when the target is riding something - replace the rider with the actor
-                                                (when (riding-mob-id target)
-                                                  (setf (riding-mob-id actor) (riding-mob-id target))
-                                                  (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id actor))) (id actor))
-                                                  (setf (riding-mob-id target) nil))
+                                                
+                                                (mob-possess-target actor target)
                                                 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
@@ -210,7 +197,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
-                                                (melee-target actor target)
+                                                (melee-target actor target :kill-possessed nil)
                                                 (logger (format nil "INSIDE PURGING TOUCH: ~A, (check-dead target) ~A~%" (name target) (check-dead target)))
                                                 (when (check-dead target)
                                                   (incf (cur-fp actor))
@@ -1968,6 +1955,7 @@
                                                 (declare (ignore ability-type target))
                                                 (let ((target (get-mob-by-id (slave-mob-id actor))))
                                                   ;; target here is the slave mob
+                                                  (setf (x target) (x actor) (y target) (y actor) (z target) (z actor))
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A destroys its host. "
                                                                                                                                (capitalize-name (prepend-article +article-the+ (visible-name actor)))) :observed-mob actor)
                                                   (setf (cur-hp target) 0)
@@ -5804,3 +5792,183 @@
                                  :final nil :on-touch nil
                                  :on-invoke nil
                                  :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-float+ :name "Floating" :descr "You float in the air and do not take any damage when falling down from any height." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-ghost-possess+ :name "Possess" :descr "You are able to possess humans or corpses from a distance. Note that you can attempt to possess anybody but the ability will fail on inappropriate targets." 
+                                 :cd 6 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                ;; target is either item or mob
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-GHOST-POSSESS: ~A [~A] uses ranged possession on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                ;; you depossess your currently possessed body
+                                                (when (slave-mob-id actor)
+                                                  (let ((slave-mob (get-mob-by-id (slave-mob-id actor))))
+                                                    (cond
+                                                      ((mob-ability-p slave-mob +mob-abil-undead+)
+                                                       (progn
+                                                         (mob-depossess-target actor)
+                                                         (setf (cur-hp slave-mob) 0)
+                                                         (make-dead slave-mob :splatter nil)
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A slumps to the ground. " (capitalize-name (prepend-article +article-the+ (name slave-mob)))))))
+                                                      (t
+                                                       (progn
+                                                         (mob-depossess-target actor))))))
+                                                
+                                                (cond
+                                                  ((subtypep (type-of target) 'mob)
+                                                   (progn
+                                                     (if (and (mob-ability-p target +mob-abil-possessable+)
+                                                              (null (master-mob-id target)))
+                                                       ;; you can possess the target
+                                                       (progn
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
+                                                         
+                                                         (mob-possess-target actor target)
+                                                         )
+                                                       ;; you can not possess the target for any reason
+                                                       (progn
+                                                         (if (or (mob-effect-p target +mob-effect-divine-concealed+)
+                                                                 (and (mob-effect-p target +mob-effect-possessed+)
+                                                                      (not (mob-effect-p target +mob-effect-reveal-true-form+))))
+                                                           (progn
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                    (format nil "~A tries to possess ~A, but suddenly reveals its true form. "
+                                                                                            (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                            (prepend-article +article-the+ (visible-name target))))
+                                                             
+                                                             (rem-mob-effect target +mob-effect-divine-concealed+)
+                                                             (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                    (format nil "It is ~A. " (prepend-article +article-the+ (get-qualified-name target)))))
+                                                           (progn
+                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                    (format nil "~A tries to possess ~A, but fails. "
+                                                                                            (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                            (prepend-article +article-the+ (visible-name target)))))))
+                                                       )))
+                                                  ((subtypep (type-of target) 'item)
+                                                   (progn
+                                                     (let ((mob-corpse-type) (mob-corpse))
+                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A possesses ~A. "
+                                                                                                                                    (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                                                                    (prepend-article +article-the+ (visible-name target))))
+                                                       (cond
+                                                         ((eq (item-ability-p target +item-abil-corpse+) 1) (setf mob-corpse-type +mob-type-reanimated-pwr-1+))
+                                                         ((eq (item-ability-p target +item-abil-corpse+) 2) (setf mob-corpse-type +mob-type-reanimated-pwr-2+))
+                                                         ((eq (item-ability-p target +item-abil-corpse+) 3) (setf mob-corpse-type +mob-type-reanimated-pwr-3+))
+                                                         (t (setf mob-corpse-type +mob-type-reanimated-pwr-4+)))
+                                                       (setf mob-corpse (make-instance 'mob :mob-type mob-corpse-type :x (x target) :y (y target) :z (z target)))
+                                                       (setf (name mob-corpse) (format nil "reanimated ~A" (name target)))
+                                                       (setf (alive-name mob-corpse) (alive-name target))
+                                                       (add-mob-to-level-list (level *world*) mob-corpse)
+                                                       (remove-item-from-level-list (level *world*) target)
+                                                       (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. "
+                                                                                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                       (remove-item-from-world target)
+                                                       (incf (stat-raised-dead actor))
+
+                                                       (mob-possess-target actor mob-corpse)
+                                                       (decf (stat-possess actor))
+                                                       )))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-ghost-possess+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  ;; a little bit of cheating here
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (mob-ability-p nearest-enemy +mob-abil-possessable+)
+                                                           (null (master-mob-id nearest-enemy)))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                            (items (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                            (exit-result nil))
+
+                                                        (setf items (remove-if #'(lambda (a)
+                                                                                   (if (item-ability-p (get-item-by-id a) +item-abil-corpse+)
+                                                                                     nil
+                                                                                     t))
+                                                                               items))
+                                                        (cond
+                                                          ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (or (null mob)
+                                                                    (eq mob *player*))
+                                                                (> (length items) 1))
+                                                           (progn
+                                                             (let ((item-line-list nil)
+                                                                   (item-prompt-list)
+                                                                   (item-list (copy-list items)))
+
+                                                               (setf item-line-list (loop for item-id in item-list
+                                                                                          for item = (get-item-by-id item-id)
+                                                                                          collect (format nil "~A~A"
+                                                                                                          (capitalize-name (name item))
+                                                                                                          (if (> (qty item) 1)
+                                                                                                            (format nil " x~A" (qty item))
+                                                                                                            ""))))
+                                                               ;; populate the ability prompt list
+                                                               (setf item-prompt-list (loop for item-id in item-list
+                                                                                            collect #'(lambda (cur-sel)
+                                                                                                        (declare (ignore cur-sel))
+                                                                                                        "[Enter] Possess  [Escape] Cancel")))
+                                                               
+                                                               ;; show selection window
+                                                               (setf *current-window* (make-instance 'select-obj-window 
+                                                                                                     :return-to *current-window* 
+                                                                                                     :header-line "Choose a body part to possess:"
+                                                                                                     :enter-func #'(lambda (cur-sel)
+                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
+                                                                                                                     (setf *current-window* (return-to (return-to (return-to *current-window*))))
+                                                                                                                     (make-output *current-window*)
+                                                                                                                     (setf exit-result t))
+                                                                                                     :line-list item-line-list
+                                                                                                     :prompt-list item-prompt-list))
+                                                               (make-output *current-window*)
+                                                               (run-window *current-window*))
+                                                             exit-result)
+                                                           )
+                                                          ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (or (null mob)
+                                                                    (eq mob *player*))
+                                                                (= (length items) 1))
+                                                           (progn
+                                                             (clear-message-list *small-message-box*)
+                                                             (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
+                                                             t))
+                                                          ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                mob
+                                                                (not (eq *player* mob)))
+                                                           (progn
+                                                             (clear-message-list *small-message-box*)
+                                                             (mob-invoke-ability *player* mob ability-type-id)
+                                                             t))
+                                                          (t
+                                                           (progn
+                                                             nil)))
+                                                        )
+                                                      )))

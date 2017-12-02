@@ -693,3 +693,7 @@
                                          :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
                                                              (declare (ignore nearest-ally nearest-enemy))
                                                              (mob-use-item actor check-result item))))
+
+(set-item-type (make-instance 'item-type :id +item-type-book-of-rituals+
+                                         :name "Book of Rituals" :plural-name "Books of Rituals"
+                                         :glyph-idx 125 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300))

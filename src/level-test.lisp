@@ -68,12 +68,12 @@
                                   "   .......  ....... #.......d..#                          ......     ......   "
                                   "   .......  ....... #..........#                          ......     ......   "
                                   "   .......  ....... ##########-#                          ......     ......   "
-                                  "                                                                              "
+                                  "                                                       |                      "
                                   "                                                          ......     ......   "
                                   "                                                          ......     ......   "
                                   "   .......                                                ......     ......   "
                                   "   .......                                                ......     ......   "
-                                  "   .......                                                ......     ......   "
+                                  "   .......                                     |          ......     ......   "
                                   "   .......            .....       .....                                       "
                                   "   .......            .....       .bb..                                       "
                                   "                      .....      ......d                                      "
@@ -157,12 +157,12 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+ :x 45 :y 19 :z 3))
+  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 45 :y 19 :z 3))
   (add-mob-to-level-list (level world) *player*)
   
   (let ((soldier (make-instance 'mob :mob-type +mob-type-man+ :x 50 :y 18 :z 2))
-        ;(demon (make-instance 'mob :mob-type +mob-type-star-singer+ :x 49 :y 19 :z 3))
-        ;(angel (make-instance 'mob :mob-type +mob-type-star-mender+ :x 49 :y 17 :z 3))
+        (demon (make-instance 'mob :mob-type +mob-type-demon+ :x 49 :y 19 :z 3))
+        ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 49 :y 17 :z 3))
         )
     (setf (cur-fp *player*) 15)
     (setf (max-hp *player*) 50)
@@ -170,8 +170,8 @@
     ;(setf (cur-fp angel) 5)
    ; (setf (cur-fp demon) 2)
 
-    (mob-set-mutation soldier +mob-abil-corrosive-bile+)
-    (mob-set-mutation soldier +mob-abil-accurate-bile+)
+    ;(mob-set-mutation *player* +mob-abil-clawed-tentacle+)
+    ;(mob-set-mutation *player* +mob-abil-piercing-needles+)
 
     ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
@@ -180,7 +180,7 @@
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-flying+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
-    ;(add-mob-to-level-list (level world) demon)
+    (add-mob-to-level-list (level world) demon)
     ;(add-mob-to-level-list (level world) angel)
     
     ;(setf (mimic-id-list *player*) (list (id angel) (id soldier) (id demon)))
@@ -195,7 +195,7 @@
     ;               :spd nil)
     ;(mob-pick-item demon (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 5) :spd nil :silent t)
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 105))
-    ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
+    (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-half+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-clothing+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-disguise+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))

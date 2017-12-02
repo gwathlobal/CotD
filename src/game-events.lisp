@@ -18,6 +18,7 @@
 (defconstant +game-event-win-for-thief+ 13)
 (defconstant +game-event-rain-falls+ 14)
 (defconstant +game-event-win-for-eater+ 15)
+(defconstant +game-event-win-for-ghost+ 16)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

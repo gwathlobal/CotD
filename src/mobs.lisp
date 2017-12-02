@@ -87,7 +87,7 @@
                                                                 abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation abil-mutate-thick-carapace abil-thick-carapace
                                                                 abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump abil-mutate-piercing-needles abil-piercing-needles abil-mutate-corroding-secretion abil-corroding-secretion
                                                                 abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
-                                                                abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile)
+                                                                abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -398,6 +398,10 @@
     (setf (gethash +mob-abil-spore-colony+ (abilities mob-type)) t))
   (when abil-immobile
     (setf (gethash +mob-abil-immobile+ (abilities mob-type)) t))
+  (when abil-float
+    (setf (gethash +mob-abil-float+ (abilities mob-type)) t))
+  (when abil-ghost-possess
+    (setf (gethash +mob-abil-ghost-possess+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -905,7 +909,8 @@
     (return-from visible-name (values "somebody" +noun-proper+ +noun-singular+)))
   (when (= (faction *player*) (faction mob))
     (return-from visible-name (name mob)))
-  (if (= (face-mob-type-id mob) (mob-type mob))
+  (if (or (= (face-mob-type-id mob) (mob-type mob))
+          (mob-effect-p mob +mob-effect-reveal-true-form+))
     (name mob)
     (values (name (get-mob-type-by-id (face-mob-type-id mob))) +noun-common+ +noun-singular+)))
 
@@ -1227,7 +1232,8 @@
              (not (mob-ability-p mob +mob-abil-animal+))
              (not (mob-ability-p mob +mob-abil-primordial+))
              (not (= (mob-type mob) +mob-type-imp+))
-             (not (= (mob-type mob) +mob-type-shadow-imp+)))
+             (not (= (mob-type mob) +mob-type-shadow-imp+))
+             (not (eq (mob-type mob) +mob-type-ghost+)))
     (let ((name-pick-n))
       (if (mob-ability-p mob +mob-abil-angel+)
         (progn

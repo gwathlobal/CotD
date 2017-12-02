@@ -367,3 +367,6 @@
                                                                    
                                                                    ))
                                                                  )))
+
+(set-feature-type (make-instance 'feature-type :id +feature-sacrificial-circle+ :glyph-idx 124 :glyph-color sdl:*magenta* :back-color nil :name "Sacrificial circle"
+                                               ))

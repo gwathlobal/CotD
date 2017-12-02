@@ -310,17 +310,27 @@
     (return-from ai-function nil))
 
   ;; if the mob possesses smb, there is a chance that the slave will revolt and move randomly
-  (when (and (slave-mob-id mob)
-             (zerop (random (* *possessed-revolt-chance* (mob-ability-value mob +mob-abil-can-possess+)))))
-    (logger (format nil "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)))
-    (when (and (check-mob-visible mob :observer *player*)
-               (or (mob-effect-p mob +mob-effect-reveal-true-form+)
-                   (get-faction-relation (faction mob) (faction *player*))))
-      (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                             (format nil "~A revolts against ~A. " (capitalize-name (prepend-article +article-the+ (name (get-mob-by-id (slave-mob-id mob))))) (prepend-article +article-the+ (name mob)))))
-    (setf (path mob) nil)
-    (ai-mob-random-dir mob)
-    (return-from ai-function nil)
+  (let ((rebel-chance-level (cond
+                              ((mob-ability-value mob +mob-abil-can-possess+) (mob-ability-value mob +mob-abil-can-possess+))
+                              ((mob-ability-p mob +mob-abil-ghost-possess+) (if (and (slave-mob-id mob)
+                                                                                     (mob-ability-p (get-mob-by-id (slave-mob-id mob)) +mob-abil-undead+))
+                                                                                  0
+                                                                                  1))
+                              (t 0))
+                            ))
+    (when (and (slave-mob-id mob)
+               (not (zerop rebel-chance-level))
+               (zerop (random (* *possessed-revolt-chance* rebel-chance-level))))
+      (logger (format nil "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)))
+      (when (and (check-mob-visible mob :observer *player*)
+                 (or (mob-effect-p mob +mob-effect-reveal-true-form+)
+                     (get-faction-relation (faction mob) (faction *player*))))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                               (format nil "~A revolts against ~A. " (capitalize-name (prepend-article +article-the+ (name (get-mob-by-id (slave-mob-id mob))))) (prepend-article +article-the+ (name mob)))))
+      (setf (path mob) nil)
+      (ai-mob-random-dir mob)
+      (return-from ai-function nil)
+      )
     )
   
   ;; calculate a list of hostile & allied mobs
@@ -329,39 +339,40 @@
         (nearest-enemy nil)
         (nearest-ally nil)
         (nearest-target nil))
-    (loop 
-      for mob-id of-type fixnum in (visible-mobs mob)
-      with vis-mob-type = nil
-      do
-         
-         ;; inspect a mob appearance
-         (setf vis-mob-type (get-mob-type-by-id (face-mob-type-id (get-mob-by-id mob-id))))
-         ;; however is you are of the same faction, you know who is who
-         (when (= (faction mob) (faction (get-mob-by-id mob-id)))
-           (setf vis-mob-type (get-mob-type-by-id (mob-type (get-mob-by-id mob-id)))))
-                  
-         (if (or (get-faction-relation (faction mob) (faction vis-mob-type))
-                 (and (mounted-by-mob-id (get-mob-by-id mob-id))
-                      (get-faction-relation (faction mob) (faction (get-mob-by-id (mounted-by-mob-id (get-mob-by-id mob-id)))))))
-           (progn
-             (pushnew mob-id allied-mobs)
-             ;; find the nearest allied mob
-             (unless nearest-ally
-               (setf nearest-ally (get-mob-by-id mob-id)))
-             (when (< (get-distance (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)) (x mob) (y mob))
-                      (get-distance (x nearest-ally) (y nearest-ally) (x mob) (y mob)))
-               (setf nearest-ally (get-mob-by-id mob-id)))
-             )
-           (progn
-             (pushnew mob-id hostile-mobs)
+    
+    (loop for mob-id of-type fixnum in (visible-mobs mob)
+          for target-mob = (get-mob-by-id mob-id)
+          with vis-mob-type = nil
+          do
              
-             ;; find the nearest hostile mob
-             (unless nearest-enemy
-               (setf nearest-enemy (get-mob-by-id mob-id)))
-             (when (< (get-distance (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)) (x mob) (y mob))
-                      (get-distance (x nearest-enemy) (y nearest-enemy) (x mob) (y mob)))
-               (setf nearest-enemy (get-mob-by-id mob-id)))
-             )))
+             ;; inspect a mob appearance
+             (setf vis-mob-type (get-mob-type-by-id (face-mob-type-id target-mob)))
+             ;; however is you are of the same faction, you know who is who
+             (when (= (faction mob) (faction target-mob))
+               (setf vis-mob-type (get-mob-type-by-id (mob-type target-mob))))
+             
+             (if (or (get-faction-relation (faction mob) (faction vis-mob-type))
+                     (and (mounted-by-mob-id target-mob)
+                          (get-faction-relation (faction mob) (faction (get-mob-by-id (mounted-by-mob-id target-mob))))))
+               (progn
+                 (pushnew mob-id allied-mobs)
+                 ;; find the nearest allied mob
+                 (unless nearest-ally
+                   (setf nearest-ally target-mob))
+                 (when (< (get-distance (x target-mob) (y target-mob) (x mob) (y mob))
+                          (get-distance (x nearest-ally) (y nearest-ally) (x mob) (y mob)))
+                   (setf nearest-ally target-mob))
+                 )
+               (progn
+                 (pushnew mob-id hostile-mobs)
+                 
+                 ;; find the nearest hostile mob
+                 (unless nearest-enemy
+                   (setf nearest-enemy target-mob))
+                 (when (< (get-distance (x target-mob) (y target-mob) (x mob) (y mob))
+                          (get-distance (x nearest-enemy) (y nearest-enemy) (x mob) (y mob)))
+                   (setf nearest-enemy target-mob))
+                 )))
 
     ;; by default, the target is the enemy
     (setf nearest-target nearest-enemy)
@@ -425,24 +436,25 @@
     ;; if it is closer than the enemy, go to it
     (when (mob-ai-wants-bless-p mob)
       (let ((nearest-ally nil))
-        (loop 
-          for mob-id in allied-mobs
-          with vis-mob-type = nil
-          do
-             (setf vis-mob-type (get-mob-type-by-id (face-mob-type-id (get-mob-by-id mob-id))))
-              ;; when you are of the same faction, you know who is who
-             (when (= (faction mob) (faction (get-mob-by-id mob-id)))
-               (setf vis-mob-type (get-mob-type-by-id (mob-type (get-mob-by-id mob-id)))))
-             
-             ;; find the nearest allied unblessed mob mob
-             (when (and (mob-ability-p vis-mob-type +mob-abil-can-be-blessed+)
-                        (not (mob-effect-p (get-mob-by-id mob-id) +mob-effect-blessed+)))
-               (unless nearest-ally
-                 (setf nearest-ally (get-mob-by-id mob-id)))
-               (when (< (get-distance (x (get-mob-by-id mob-id)) (y (get-mob-by-id mob-id)) (x mob) (y mob))
-                        (get-distance (x nearest-ally) (y nearest-ally) (x mob) (y mob)))
-                 (setf nearest-ally (get-mob-by-id mob-id))))
-          ) 
+        (loop for mob-id of-type fixnum in allied-mobs
+              for target-mob = (get-mob-by-id mob-id)
+              with vis-mob-type = nil
+              do
+                 (setf vis-mob-type (get-mob-type-by-id (face-mob-type-id target-mob)))
+                 ;; when you are of the same faction, you know who is who
+                 (when (= (faction mob) (faction target-mob))
+                   (setf vis-mob-type (get-mob-type-by-id (mob-type target-mob))))
+                 
+                 ;; find the nearest allied unblessed mob mob
+                 (when (and (mob-ability-p vis-mob-type +mob-abil-can-be-blessed+)
+                            (not (mob-effect-p target-mob +mob-effect-blessed+))
+                            (not (= (mob-type target-mob) +mob-type-ghost+)))
+                   (unless nearest-ally
+                     (setf nearest-ally target-mob))
+                   (when (< (get-distance (x target-mob) (y target-mob) (x mob) (y mob))
+                            (get-distance (x nearest-ally) (y nearest-ally) (x mob) (y mob)))
+                     (setf nearest-ally target-mob)))
+              )
         (logger (format nil "AI-FUNCTION: ~A [~A] wants to give blessings. Nearest unblessed ally ~A [~A]~%" (name mob) (id mob) (if nearest-ally (name nearest-ally) nil) (if nearest-ally (id nearest-ally) nil)))
         (when (or (and nearest-ally
                        (not nearest-enemy))
@@ -979,44 +991,60 @@
     (setf (can-move-if-possessed player) t)
     (loop while (can-move-if-possessed player) do
       (get-input-player))
-        
-    (if (zerop (random (* *possessed-revolt-chance* (mob-ability-value (get-mob-by-id (master-mob-id player)) +mob-abil-can-possess+))))
-      (progn
-        (logger (format nil "AI-FUNCTION: ~A [~A] revolts against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
-        
-        (print-visible-message (x player) (y player) (z player) (level *world*) 
-                               (format nil "~A revolts against ~A. " (capitalize-name (name player)) (name (get-mob-by-id (master-mob-id player))) ))
-        (ai-mob-random-dir (get-mob-by-id (master-mob-id player)))
-        (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player))) (z player) (z (get-mob-by-id (master-mob-id player))))
-        (setf (path (get-mob-by-id (master-mob-id player))) nil)
-        (return-from ai-function nil)
-        )
-      (progn
-        (logger (format nil "AI-FUNCTION: ~A [~A] was unable to revolt against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
-                
-        (ai-function (get-mob-by-id (master-mob-id player)))
-        
-        (when (master-mob-id player)
-          (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player))) (z player) (z (get-mob-by-id (master-mob-id player)))))
-        
-        (make-act player +normal-ap+)
-        (return-from ai-function nil)))
-    )
+
+    (let ((rebel-chance-level (cond
+                                ((mob-ability-value (get-mob-by-id (master-mob-id player)) +mob-abil-can-possess+) (mob-ability-value (get-mob-by-id (master-mob-id player)) +mob-abil-can-possess+))
+                                ((mob-ability-p (get-mob-by-id (master-mob-id player)) +mob-abil-ghost-possess+) 1)
+                                (t 0))
+                              ))
+      (if (and (not (zerop rebel-chance-level))
+               (zerop (random (* *possessed-revolt-chance* rebel-chance-level))))
+        (progn
+          (logger (format nil "AI-FUNCTION: ~A [~A] revolts against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
+          
+          (print-visible-message (x player) (y player) (z player) (level *world*) 
+                                 (format nil "~A revolts against ~A. " (capitalize-name (name player)) (name (get-mob-by-id (master-mob-id player))) ))
+          (ai-mob-random-dir (get-mob-by-id (master-mob-id player)))
+          (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player))) (z player) (z (get-mob-by-id (master-mob-id player))))
+          (setf (path (get-mob-by-id (master-mob-id player))) nil)
+          (return-from ai-function nil)
+          )
+        (progn
+          (logger (format nil "AI-FUNCTION: ~A [~A] was unable to revolt against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
+          
+          (ai-function (get-mob-by-id (master-mob-id player)))
+          
+          (when (master-mob-id player)
+            (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player))) (z player) (z (get-mob-by-id (master-mob-id player)))))
+          
+          (make-act player +normal-ap+)
+          (return-from ai-function nil)))
+      ))
   
   ;; if player possesses somebody & the slave revolts
   ;; wait for a meaningful action and move randomly instead 
   (when (slave-mob-id player)
-    (when (zerop (random (* *possessed-revolt-chance* (mob-ability-value player +mob-abil-can-possess+))))
-      (logger (format nil "AI-FUNCTION: ~A [~A] possesses ~A [~A], but the slave revolts.~%" (name player) (id player) (name (get-mob-by-id (slave-mob-id player))) (slave-mob-id player)))
-      (setf (can-move-if-possessed player) t)
-      (loop while (can-move-if-possessed player) do
-        (get-input-player))
-      
-      (print-visible-message (x player) (y player) (z player) (level *world*) 
-                             (format nil "~A revolts against ~A. " (capitalize-name (name (get-mob-by-id (slave-mob-id player)))) (name player)))
-      (ai-mob-random-dir player)
-      (return-from ai-function nil)
-    ))
+    (let ((rebel-chance-level (cond
+                                ((mob-ability-value player +mob-abil-can-possess+) (mob-ability-value player +mob-abil-can-possess+))
+                                ((mob-ability-p player +mob-abil-ghost-possess+) (if (and (slave-mob-id player)
+                                                                                          (mob-ability-p (get-mob-by-id (slave-mob-id player)) +mob-abil-undead+))
+                                                                                   0
+                                                                                   1))
+                                (t 0))
+                              ))
+      (when (and (not (zerop rebel-chance-level))
+                 (zerop (random (* *possessed-revolt-chance* rebel-chance-level))))
+        (logger (format nil "AI-FUNCTION: ~A [~A] possesses ~A [~A], but the slave revolts.~%" (name player) (id player) (name (get-mob-by-id (slave-mob-id player))) (slave-mob-id player)))
+        (setf (can-move-if-possessed player) t)
+        (loop while (can-move-if-possessed player) do
+          (get-input-player))
+        
+        (print-visible-message (x player) (y player) (z player) (level *world*) 
+                               (format nil "~A revolts against ~A. " (capitalize-name (name (get-mob-by-id (slave-mob-id player)))) (name player)))
+        (ai-mob-random-dir player)
+        (return-from ai-function nil)
+        ))
+    )
   
   ;; player is able to move freely
   ;; pester the player until it makes some meaningful action that can trigger the event chain

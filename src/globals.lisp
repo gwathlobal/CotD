@@ -104,6 +104,7 @@
 (defconstant +mob-type-fast-scarab+ 47)
 (defconstant +mob-type-seeker-larva+ 48)
 (defconstant +mob-type-spore-colony+ 49)
+(defconstant +mob-type-ghost+ 50)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -115,6 +116,7 @@
 (defconstant +faction-type-criminals+ 7)
 (defconstant +faction-type-outsider-wisps+ 8)
 (defconstant +faction-type-eater+ 9)
+(defconstant +faction-type-ghost+ 10)
 
 (defconstant +ai-pref-coward+ 0)
 (defconstant +ai-pref-horde+ 1)
@@ -272,6 +274,8 @@
 (defconstant +mob-abil-mutate-spore-colony+ 141)
 (defconstant +mob-abil-spore-colony+ 142)
 (defconstant +mob-abil-immobile+ 143)
+(defconstant +mob-abil-float+ 144)
+(defconstant +mob-abil-ghost-possess+ 145)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -323,6 +327,7 @@
 (defconstant +mob-effect-regenerate+ 47)
 (defconstant +mob-effect-corroded+ 48)
 (defconstant +mob-effect-primordial-transfer+ 49)
+(defconstant +mob-effect-rest-in-peace+ 50)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)
@@ -359,6 +364,7 @@
 (defconstant +item-type-eater-locust-egg+ 14)
 (defconstant +item-type-eater-larva-egg+ 15)
 (defconstant +item-type-eater-colony-egg+ 16)
+(defconstant +item-type-book-of-rituals+ 17)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants
@@ -384,6 +390,7 @@
 (defconstant +feature-smoke-flare+ 11)
 (defconstant +feature-smoke-flare-final+ 12)
 (defconstant +feature-corrosive-bile-target+ 13)
+(defconstant +feature-sacrificial-circle+ 14)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

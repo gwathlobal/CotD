@@ -42,6 +42,7 @@
 (defconstant +weather-type-rain+ 24)
 (defconstant +player-faction-eater+ 25)
 (defconstant +player-faction-puppet+ 26)
+(defconstant +player-faction-ghost+ 27)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

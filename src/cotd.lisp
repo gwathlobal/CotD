@@ -245,6 +245,17 @@
                                                                        (nth (random (length weather-types)) weather-types)
                                                                        (nth (random (length tod-types)) tod-types)
                                                                        +player-faction-eater+))))))
+        (join-ghost-item (cons "Join as the Lost soul"
+                               #'(lambda (n) 
+                                   (declare (ignore n))
+                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                         (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                         (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                     
+                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                                                    (nth (random (length weather-types)) weather-types)
+                                                                    (nth (random (length tod-types)) tod-types)
+                                                                    +player-faction-ghost+))))))
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
                                         (declare (ignore n))
@@ -296,19 +307,19 @@
       (progn
         (setf *current-window* (make-instance 'start-game-window 
                                               :menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
-                                                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item)
+                                                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-ghost-item)
                                                                 (car custom-scenario-item) (car highscores-item) (car help-item) (car exit-item))
                                               :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
-                                                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item)
+                                                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-ghost-item)
                                                                 (cdr custom-scenario-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))))
       (progn
         (setf *current-window* (make-instance 'start-game-window 
                                               :menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
-                                                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item)
+                                                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-ghost-item)
                                                                 (car custom-scenario-item) (car all-see-item) (car test-level-item)
                                                                 (car highscores-item) (car help-item) (car exit-item))
                                               :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
-                                                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item)
+                                                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-ghost-item)
                                                                 (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
                                                                 (cdr highscores-item) (cdr help-item) (cdr exit-item)))))))
   

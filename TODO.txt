@@ -1,5 +1,9 @@
 - Add the possessor faction
+- Malseraph can turn you into a tree
 - Satanists should decipher demonic runes from walls to gain power
+- Rune to upgrade a zombie into an imp
+- Rune to force a unit back
+- Rune to cast a global spell to constantly reanimate corpses
 - Movement on tiles with mobs should cost more so that they do not bump into each other that often
 - Add courtyard houses like Thief2RL
 - Add the Revolutionaries faction

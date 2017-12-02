@@ -1069,7 +1069,21 @@
 
 (set-building-type (make-building :id +building-city-library-1+ :grid-dim '(4 . 3) :act-dim '(20 . 13) :type +building-type-library+
                                   :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,,"
+                                            (let ((build-template-z-1 (list "00000000000000000000"
+                                                                            "00000000000000000000"
+                                                                            "00000000000000000000"
+                                                                            "00000000000000000000"
+                                                                            "00000000000000000000"
+                                                                            "000000000000#######0"
+                                                                            "000000000000#BB.BB#0"
+                                                                            "000000000000#.....#0"
+                                                                            "000000000000#|....#0"
+                                                                            "000000000000#####.#0"
+                                                                            "0000000000000000#u#0"
+                                                                            "0000000000000000###0"
+                                                                            "00000000000000000000"
+                                                                            ))
+                                                  (build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,,"
                                                                             ",##-####-###-###-##,"
                                                                             ",#.h.|#..........|#,"
                                                                             ",-.t..+..B..B..B..-,"
@@ -1078,9 +1092,9 @@
                                                                             ",`````-..B..B..B..-,"
                                                                             ",`````#..B..B..B..#,"
                                                                             ",`T```#..B..B..B..#,"
-                                                                            ",`````-..B..B..B..-,"
-                                                                            ",,``T`#|..........#,"
-                                                                            ",|,```##-###-###-##,"
+                                                                            ",`````-..B..B..####,"
+                                                                            ",,``T`#|.......+.d#,"
+                                                                            ",|,```##-###-######,"
                                                                             ",,,,,,,,,,,,,,,,,,,,"
                                                                             ))
                                                   (build-template-z-3 (list "                    "
@@ -1098,6 +1112,7 @@
                                                                             "                    "
                                                                         )))
                                               ;; we assume that z = 2
+                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level)
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
                                               )
@@ -1107,9 +1122,9 @@
                                             (values (list (list +mob-type-man+ 3 2 z)
                                                           (list +mob-type-woman+ 10 6 z)
                                                           (list +mob-type-woman+ 13 8 z)
-                                                          (list +mob-type-woman+ 16 10 z))
+                                                          (list +mob-type-woman+ 16 8 z))
                                                     nil
-                                                    nil))))
+                                                    (list (list +item-type-book-of-rituals+ 15 6 (- z 1) 1))))))
 
 ;;=====================
 ;; Satanists' lair
@@ -1166,7 +1181,8 @@
                                                           (list +mob-type-satanist+ 5 5 (+ z 0))
                                                           (list +mob-type-satanist+ 5 2 (+ z -1))
                                                           (list +mob-type-satanist+ 5 5 (+ z -1)))
-                                                    (list (list +feature-blood-stain+ 4 6 (+ z -2))
+                                                    (list (list +feature-sacrificial-circle+ 4 4 (+ z -2))
+                                                          (list +feature-blood-stain+ 4 6 (+ z -2))
                                                           (list +feature-blood-stain+ 2 4 (+ z -2))
                                                           (list +feature-blood-stain+ 6 4 (+ z -2))
                                                           (list +feature-blood-fresh+ 4 5 (+ z -2))
@@ -1187,7 +1203,8 @@
                                                           (list +feature-blood-old+ 5 5 (+ z -2))
                                                           (list +feature-blood-fresh+ 3 7 (+ z -2))
                                                           (list +feature-blood-fresh+ 5 7 (+ z -2))
-                                                          (list +feature-start-satanist-player+ 4 4 (+ z -2)))
+                                                          (list +feature-start-satanist-player+ 4 4 (+ z -2))
+                                                          )
                                                     nil))))
 
 ;;=====================

@@ -573,7 +573,23 @@
                                        :armor (list (list +weapon-dmg-flesh+ 2 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100) (list +weapon-dmg-acid+ 1 0))
                                        :strength 2
                                        :base-light-radius 3 
-                                       :abil-no-breathe t :abil-primordial t :abil-constriction t :abil-immobile t :abil-immovable t
+                                       :abil-no-breathe t :abil-primordial t :abil-constriction t :abil-immobile t :abil-immovable t :abil-piercing-needles t
+                                       ))
+
+;;--------------------
+;; GHOST
+;;--------------------
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-ghost+
+                                       :name "lost soul"
+                                       :glyph-idx 71 :glyph-color (sdl:color :r 153 :g 204 :b 255) :back-color sdl:*black* :max-hp 1 :max-fp 0
+                                       :faction +faction-type-ghost+
+                                       :weapon (list "Ghost touch" (list +weapon-dmg-vorpal+ 1 2 +normal-ap+ 100 ()) ())
+                                       :base-dodge 15
+                                       :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-radiation+ 0 100) (list +weapon-dmg-acid+ 1 0))
+                                       :strength 1 :base-stealth 10
+                                       :base-light-radius 0 
+                                       :abil-no-breathe t :abil-undead t :abil-float t :abil-ghost-possess t
                                        ))
 
 ;;--------------------
@@ -635,35 +651,42 @@
 
 (set-faction-relations +faction-type-humans+
                        (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t) (cons +faction-type-military+ t)
-                       (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil))
+                       (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil)
+                       (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-angels+
                        (cons +faction-type-angels+ t) (cons +faction-type-humans+ t) (cons +faction-type-animals+ t) (cons +faction-type-criminals+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-wisps+ t) (cons +faction-type-eater+ nil))
+                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-wisps+ t) (cons +faction-type-eater+ nil)
+                       (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-demons+
                        (cons +faction-type-demons+ t)
                        (cons +faction-type-angels+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-beasts+ nil)
-                       (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil))
+                       (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-military+
                        (cons +faction-type-military+ t) (cons +faction-type-humans+ t) (cons +faction-type-animals+ t)
                        (cons +faction-type-demons+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil)
-                       (cons +faction-type-eater+ nil))
+                       (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-animals+
                        (cons +faction-type-animals+ t) (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-military+ t) (cons +faction-type-criminals+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil))
+                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-outsider-beasts+
                        (cons +faction-type-outsider-beasts+ nil)
                        (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil)
-                       (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil))
+                       (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-criminals+
                        (cons +faction-type-criminals+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t)
                        (cons +faction-type-humans+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-outsider-wisps+ nil)
-                       (cons +faction-type-eater+ nil))
+                       (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-outsider-wisps+
                        (cons +faction-type-angels+ t) (cons +faction-type-outsider-wisps+ t)
                        (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
-                       (cons +faction-type-criminals+ nil) (cons +faction-type-eater+ nil))
+                       (cons +faction-type-criminals+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
 (set-faction-relations +faction-type-eater+
                        (cons +faction-type-eater+ t)
                        (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil)
+                       (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
+                       (cons +faction-type-criminals+ nil) (cons +faction-type-ghost+ nil))
+(set-faction-relations +faction-type-ghost+
+                       (cons +faction-type-ghost+ t)
+                       (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil)
                        (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
                        (cons +faction-type-criminals+ nil))

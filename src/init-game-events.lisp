@@ -586,3 +586,39 @@
                                                                                 (make-output *current-window*)
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
+
+(set-game-event (make-instance 'game-event :id +game-event-win-for-ghost+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         (if (mob-effect-p *player* +mob-effect-rest-in-peace+)
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                            ;; write highscores
+                                                           (let* ((final-str (format nil "Put itself to rest."))
+                                                                  (score (calculate-player-score 1450))
+                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                                                                                 score
+                                                                                                                                 (if (mimic-id-list *player*)
+                                                                                                                                   (faction-name *player*)
+                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
+                                                                                                                                 (real-game-time world)
+                                                                                                                                 final-str
+                                                                                                                                 (level-layout (level world)))
+                                                                                                          *highscores*)))
+                                                             (write-highscores-to-file *highscores*)
+                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                                                          final-str (return-scenario-stats nil))
+                                                             
+                                                             (add-message (format nil "~%"))
+                                                             (add-message (format nil "Congratulations! You have won the game!~%"))
+                                                             (add-message (format nil "~%Press any key...~%"))
+                                                             (setf *current-window* (make-instance 'cell-window))
+                                                             (make-output *current-window*)
+                                                             (sdl:with-events ()
+                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
+                                                               (:key-down-event () 
+                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-ghost-won+ :highscores-place highscores-place))
+                                                                                (make-output *current-window*)
+                                                                                (run-window *current-window*))
+                                                               (:video-expose-event () (make-output *current-window*)))))))

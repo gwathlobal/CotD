@@ -360,29 +360,37 @@
          )))
 
     ;; apply gravity
-    (when (and apply-gravity
-               (apply-gravity mob))
-      (let ((init-z (z mob)) (cur-dmg 0))
-        (set-mob-location mob (x mob) (y mob) (apply-gravity mob) :apply-gravity nil)
-        (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
-        (decf (cur-hp mob) cur-dmg)
-        (when (> cur-dmg 0)
-          (if (eq mob *player*)
-            (progn
-              ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
-              (set-message-this-turn t)
-              (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))
-              (when (check-dead mob) (setf (killed-by *player*) "falling")))
-            (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                                   (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg) :observed-mob mob)))
-        (when (check-dead mob)
-          (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())
-          (when (mob-effect-p mob +mob-effect-possessed+)
-            (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
-            (setf (x (get-mob-by-id (slave-mob-id mob))) (x mob)
-                  (y (get-mob-by-id (slave-mob-id mob))) (y mob)
-                  (z (get-mob-by-id (slave-mob-id mob))) (z mob))
-            (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())))))
+    (let ((init-z (z mob))
+          (final-z nil)
+          (cur-dmg 0))
+      (when (and apply-gravity
+                 (setf final-z (apply-gravity mob)))
+      
+        (set-mob-location mob (x mob) (y mob) final-z :apply-gravity nil)
+
+        (format t "~A FLOAT ~A~%" (name mob) (mob-ability-p mob +mob-abil-float+))
+        
+        ;; do not take any damage if you can float
+        (when (not (mob-ability-p mob +mob-abil-float+))
+          (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
+          (decf (cur-hp mob) cur-dmg)
+          (when (> cur-dmg 0)
+            (if (eq mob *player*)
+              (progn
+                ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
+                (set-message-this-turn t)
+                (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))
+                (when (check-dead mob) (setf (killed-by *player*) "falling")))
+              (print-visible-message (x mob) (y mob) (z mob) (level *world*)
+                                     (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg) :observed-mob mob)))
+          (when (check-dead mob)
+            (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())
+            (when (mob-effect-p mob +mob-effect-possessed+)
+              (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
+              (setf (x (get-mob-by-id (slave-mob-id mob))) (x mob)
+                    (y (get-mob-by-id (slave-mob-id mob))) (y mob)
+                    (z (get-mob-by-id (slave-mob-id mob))) (z mob))
+              (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))))
     
     ;; apply gravity to the mob, standing on your head, if any
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
@@ -391,7 +399,6 @@
                (not (eq mob (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))))
                (and (mounted-by-mob-id mob)
                     (not (eq (get-mob-by-id (mounted-by-mob-id mob)) (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))))))
-      (format t "HERE~%")
       (set-mob-location (get-mob-* (level *world*) orig-x orig-y (1+ orig-z)) orig-x orig-y (1+ orig-z)))
 
     ;; check if the mob is constricting somebody or being constricted and if the effect should be broken
@@ -824,7 +831,24 @@
                 (z (get-mob-by-id (slave-mob-id target))) (z target))
           (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params nil))
         )))
-                     
+
+(defun mob-possess-target (actor target)
+  (remove-mob-from-level-list (level *world*) target)
+  (set-mob-location actor (x target) (y target) (z target))
+  
+  (setf (master-mob-id target) (id actor))
+  (setf (slave-mob-id actor) (id target))
+  (set-mob-effect actor :effect-type-id +mob-effect-possessed+ :actor-id (id actor))
+  (set-mob-effect target :effect-type-id +mob-effect-possessed+ :actor-id (id target))
+  (setf (face-mob-type-id actor) (mob-type target))
+  (incf (stat-possess actor))
+  
+  ;; when the target is riding something - replace the rider with the actor
+  (when (riding-mob-id target)
+    (setf (riding-mob-id actor) (riding-mob-id target))
+    (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id actor))) (id actor))
+    (setf (riding-mob-id target) nil)))
+
 (defun mob-depossess-target (actor)
   (logger (format nil "MOB-DEPOSSESS-TARGET: Master ~A [~A], slave [~A]~%" (name actor) (id actor) (slave-mob-id actor)))
   (let ((target (get-mob-by-id (slave-mob-id actor))))
@@ -986,7 +1010,7 @@
       (when (check-dead a-target)
         (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-ranged-weapon-aux actor))
           
-        (when (mob-effect-p a-target +mob-effect-possessed+)
+        (when (slave-mob-id a-target)
           (setf (cur-hp (get-mob-by-id (slave-mob-id a-target))) 0)
           (setf (x (get-mob-by-id (slave-mob-id a-target))) (x a-target)
                 (y (get-mob-by-id (slave-mob-id a-target))) (y a-target)
@@ -1026,7 +1050,7 @@
     (make-act actor (truncate +normal-ap+ 2))))
 
 (defun inflict-damage (target &key (min-dmg 0) (max-dmg 0) (dmg-type +weapon-dmg-iron+) (att-spd nil) (weapon-aux nil) (actor nil) (acc 100) (no-dodge nil) (add-blood t) (no-hit-message nil) (no-check-dead nil)
-                                   (specific-hit-string-func nil) (specific-no-dmg-string-func nil))
+                                   (specific-hit-string-func nil) (specific-no-dmg-string-func nil) (kill-possessed t))
   ;; specific-hit-string-func is #'(lambda (cur-dmg) (return string))
   ;; specific-no-dmg-string-func is #'(lambda () (return string))
   (logger (format nil "INFLICT-DAMAGE: target = ~A [~A]~%" (name target) (id target)))
@@ -1297,12 +1321,13 @@
       (when (and (not no-check-dead)
                  (check-dead target))
         (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params weapon-aux)
-        (when (mob-effect-p target +mob-effect-possessed+)
+        (when (and kill-possessed
+                   (slave-mob-id target))
           (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
           (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
                 (y (get-mob-by-id (slave-mob-id target))) (y target)
                 (z (get-mob-by-id (slave-mob-id target))) (z target))
-          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))                                                                                             
+          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))                                                                                           
         )
   
       (when (and actor att-spd) (make-act actor att-spd))
@@ -1310,7 +1335,7 @@
       cur-dmg))
   )
 
-(defun melee-target (attacker target)
+(defun melee-target (attacker target &key (kill-possessed t))
   (logger (format nil "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target)))
   ;; no weapons - no attack
   (when (or (null (weapon attacker))
@@ -1335,7 +1360,7 @@
     
     (inflict-damage target :min-dmg (get-melee-weapon-dmg-min attacker) :max-dmg (get-melee-weapon-dmg-max attacker) :dmg-type (get-melee-weapon-dmg-type attacker)
                            :att-spd melee-spd :weapon-aux (get-melee-weapon-aux-simple (weapon attacker)) :acc (m-acc attacker) :add-blood t 
-                           :actor attacker))
+                           :actor attacker :kill-possessed kill-possessed))
 
   ;; the target has spines active
   (when (mob-effect-p target +mob-effect-spines+)
@@ -1344,12 +1369,12 @@
                       +weapon-dmg-flesh+)))
     
       (inflict-damage attacker :min-dmg 2 :max-dmg 3 :dmg-type dmg-type
-                             :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t
-                             :actor target
-                             :specific-hit-string-func #'(lambda (cur-dmg)
-                                                           (format nil "~A takes ~A damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker))) cur-dmg))
-                             :specific-no-dmg-string-func #'(lambda ()
-                                                              (format nil "~A takes no damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker))))))))
+                               :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t
+                               :actor target
+                               :specific-hit-string-func #'(lambda (cur-dmg)
+                                                             (format nil "~A takes ~A damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker))) cur-dmg))
+                               :specific-no-dmg-string-func #'(lambda ()
+                                                                (format nil "~A takes no damage from spines. " (capitalize-name (prepend-article +article-the+ (name attacker))))))))
   )
 
 (defun check-dead (mob)
@@ -1724,9 +1749,9 @@
           (or (/= (- (x mob) x) 0)
               (/= (- (y mob) y) 0)))
      0)
-    ;((and (mob-effect-p mob +mob-effect-possessed+)
-    ;      (mob-effect-p mob +mob-effect-reveal-true-form+))
-    ; (glyph-idx (get-mob-type-by-id (mob-type (get-mob-by-id (slave-mob-id mob))))))
+    ((and (mob-effect-p mob +mob-effect-possessed+)
+          (mob-effect-p mob +mob-effect-reveal-true-form+))
+     (glyph-idx (get-mob-type-by-id (mob-type (get-mob-by-id (slave-mob-id mob))))))
     (t (glyph-idx (get-mob-type-by-id (face-mob-type-id mob))))))
 
 (defun get-current-mob-glyph-color (mob)
@@ -1900,8 +1925,7 @@
   (setf (face-mob-type-id mob) (mob-type mob))
   (when (mob-effect-p mob +mob-effect-divine-concealed+)
     (setf (face-mob-type-id mob) +mob-type-man+))
-  (when (and (mob-ability-p mob +mob-abil-demon+)
-             (slave-mob-id mob)
+  (when (and (slave-mob-id mob)
              (not (mob-effect-p mob +mob-effect-reveal-true-form+)))
     (setf (face-mob-type-id mob) (mob-type (get-mob-by-id (slave-mob-id mob)))))
   (when (mob-effect-p mob +mob-effect-disguised+)
@@ -1939,7 +1963,7 @@
     (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                (format nil "You hear crackling~A. " str)))
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                           (format nil "~A bends space around itself and disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
     
     (set-mob-location actor dx dy dz)
     
