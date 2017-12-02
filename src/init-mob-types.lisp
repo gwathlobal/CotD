@@ -584,7 +584,7 @@
                                        :name "lost soul"
                                        :glyph-idx 71 :glyph-color (sdl:color :r 153 :g 204 :b 255) :back-color sdl:*black* :max-hp 1 :max-fp 0
                                        :faction +faction-type-ghost+
-                                       :weapon (list "Ghost touch" (list +weapon-dmg-vorpal+ 1 2 +normal-ap+ 100 ()) ())
+                                       :weapon (list "Ghostly touch" (list +weapon-dmg-vorpal+ 1 2 +normal-ap+ 100 ()) ())
                                        :base-dodge 15
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-radiation+ 0 100) (list +weapon-dmg-acid+ 1 0))
                                        :strength 1 :base-stealth 10
@@ -615,6 +615,17 @@
                                        :base-light-radius 0
                                        :abil-animal t
                                        :ai-coward t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-tree+ 
+                                       :name "tree"
+                                       :glyph-idx 52 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 30 :max-fp 0
+                                       :faction +faction-type-animals+
+                                       :weapon (list "Branches" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 0
+                                       :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ -1 0) (list +weapon-dmg-iron+ 0 50) (list +weapon-dmg-mind+ 0 100) (list +weapon-dmg-radiation+ 0 100))
+                                       :strength 0
+                                       :base-light-radius 0
+                                       :abil-no-breathe t :abil-immobile t :abil-immovable t
+                                       ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fiend+ 
                                        :name "fiend"

@@ -316,3 +316,38 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                                     (format nil "~A is cured of all malmutations. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
                                                      )))
+
+(set-card-type (make-instance 'card-type :id +item-card-lignify-other+
+                                         :name "Card of the Tree"
+                                         :on-use #'(lambda (card-type actor)
+                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     ;; polymorph nearby mobs
+                                                     (loop for i from 0 below (length (visible-mobs actor))
+                                                           for target = (get-mob-by-id (nth i (visible-mobs actor)))
+                                                           with polymorphed-once = nil
+                                                           when (not (get-faction-relation (faction actor) (faction target)))
+                                                             do
+                                                                (if (> (1+ (random 6)) (strength target))
+                                                                  (progn
+                                                                    (set-mob-effect target :effect-type-id +mob-effect-polymorph-tree+ :actor-id (id actor) :cd 5 :param1 (list (mob-type target) (max-hp target)))
+                                                                    (setf polymorphed-once t))
+                                                                  (progn
+                                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                           (format nil "~A resists polymorph. "
+                                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
+                                                           finally (when polymorphed-once
+                                                                     (increase-piety-for-god +god-entity-malseraph+ actor 50))    
+                                                           ))))
+
+(set-card-type (make-instance 'card-type :id +item-card-lignify-self+
+                                         :name "Card of the Tree"
+                                         :on-use #'(lambda (card-type actor)
+                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (if (> (1+ (random 6)) (strength actor))
+                                                       (progn
+                                                         (set-mob-effect actor :effect-type-id +mob-effect-polymorph-tree+ :actor-id (id actor) :cd 5 :param1 (list (mob-type actor) (max-hp actor))))
+                                                       (progn
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A resists polymorph. "
+                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                     )))

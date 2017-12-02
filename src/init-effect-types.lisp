@@ -815,3 +815,86 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
                                                              sdl:*white*)))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-polymorph-tree+ :name "Polymorhped"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*magenta*)
+                                             :on-add #'(lambda (effect actor)
+                                                         
+                                                         (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                    (format nil "You hear some strange noise~A. " str)))
+                                                         
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A transforms into a tree. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         
+                                                         (let ((old-max-hp (max-hp actor)))
+                                                           (setf (mob-type actor) +mob-type-tree+)
+                                                           (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                           (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                         (setf (face-mob-type-id actor) (mob-type actor))
+
+                                                         ;; polymorph block mutations
+                                                         (loop for ability-type-id being the hash-key in (abilities actor)
+                                                               with mutation-list = ()
+                                                               when (and (mob-is-ability-mutation actor ability-type-id)
+                                                                         (on-remove-mutation (get-ability-type-by-id ability-type-id)))
+                                                                 do
+                                                                    (mob-remove-mutation actor ability-type-id)
+                                                                    (pushnew ability-type-id mutation-list)
+                                                               finally
+                                                                  (setf (param1 effect) (append (param1 effect) (list mutation-list))))
+                                                         
+                                                         (set-cur-weapons actor)
+                                                         (adjust-abilities actor)
+                                                         (adjust-dodge actor)
+                                                         (adjust-armor actor)
+                                                         (adjust-m-acc actor)
+                                                         (adjust-r-acc actor)
+                                                         (adjust-sight actor)
+                                                         
+                                                         ;; set up current abilities cooldowns
+                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                         
+                                                         
+                                                         (increase-piety-for-god +god-entity-malseraph+ actor 50))
+                                             :on-remove #'(lambda (effect actor)
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                               (format nil "You hear some strange noise~A.~%" str)))
+                                                            
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                           (name (get-mob-type-by-id (first (param1 effect))))))
+                                                            
+                                                            (let ((old-max-hp (max-hp actor)))
+                                                              (setf (mob-type actor) (first (param1 effect)))
+                                                              (setf (max-hp actor) (second (param1 effect)))
+                                                              (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                            (setf (face-mob-type-id actor) (mob-type actor))
+                                                            (set-cur-weapons actor)
+
+                                                            ;; polymorph returns mutations
+                                                            (loop for ability-type-id in (third (param1 effect))
+                                                                  when (on-add-mutation (get-ability-type-by-id ability-type-id))
+                                                                 do
+                                                                    (mob-set-mutation actor ability-type-id))
+                                                            
+                                                            (adjust-abilities actor)
+                                                            (adjust-dodge actor)
+                                                            (adjust-armor actor)
+                                                            (adjust-m-acc actor)
+                                                            (adjust-r-acc actor)
+                                                            (adjust-sight actor)
+                                                            
+                                                            ;; set up current abilities cooldowns
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            
+                                                            
+                                                            (increase-piety-for-god +god-entity-malseraph+ actor 50))
+                                             ))

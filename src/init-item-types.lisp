@@ -160,7 +160,7 @@
                                          :flavor-quote (format nil "\"As for cards, there was no habit to play cards in those circles (mainly literary ones) where Fyodor Mikhailovich used to move. During our 14 years of marriage, my husband played preferans only once, at my relatives' place; and though he had not touched a card for more than 10 years, he played perfectly and even managed to win several roubles from his partners which embarrassed him greatly.\"~%Anna Dostoevskaya. Dostoevsky: Reminiscences.")
                                          :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
                                          :abil-card (list +item-card-curse-other+ +item-card-blindness-other+ +item-card-fear-other+ +item-card-slow-other+ +item-card-silence-other+ +item-card-confuse-other+
-                                                          +item-card-polymorph-other+ +item-card-irradiate-other+)
+                                                          +item-card-polymorph-other+ +item-card-irradiate-other+ +item-card-lignify-other+)
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore target))
                                                      (when (cards item)

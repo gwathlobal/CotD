@@ -24,6 +24,8 @@
 (defconstant +item-card-give-deck+ 21)
 (defconstant +item-card-glowing-all+ 22)
 (defconstant +item-card-cure-mutation+ 23)
+(defconstant +item-card-lignify-other+ 24)
+(defconstant +item-card-lignify-self+ 25)
 
 (defclass card-type ()
   ((id :initarg :id :accessor id)

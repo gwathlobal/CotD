@@ -41,7 +41,7 @@
                                                                             (t 0)))
                                                               (deck-of-damnation (list (list +item-card-polymorph-self+ 120) (list +item-card-irradiate-self+ 60) (list +item-card-teleport+ 80) (list +item-card-confuse-self+ 70)
                                                                                        (list +item-card-silence-self+ 70) (list +item-card-slow-self+ 70) (list +item-card-fear-self+ 50) (list +item-card-blindness-self+ 70)
-                                                                                       (list +item-card-curse-self+ 50)))
+                                                                                       (list +item-card-curse-self+ 50) (list +item-card-lignify-self+ 120)))
                                                               (good-chance (cond
                                                                             ((= piety-level 1) 1)
                                                                             ((= piety-level 2) 5)
@@ -49,7 +49,7 @@
                                                                             (t 0)))
                                                               (deck-of-boons (list (list +item-card-polymorph-other+ t t) (list +item-card-irradiate-other+ t t) (list +item-card-confuse-other+ t t) (list +item-card-silence-other+ t t)
                                                                                    (list +item-card-slow-other+ t t) (list +item-card-fear-other+ t t) (list +item-card-blindness-other+ t t) (list +item-card-curse-other+ t t)
-                                                                                   (list +item-card-give-deck+ nil nil) (list +item-card-cure-mutation+ nil nil)))
+                                                                                   (list +item-card-give-deck+ nil nil) (list +item-card-cure-mutation+ nil nil) (list +item-card-lignify-other+ t t)))
                                                               (neutral-chance (cond
                                                                                 ((= piety-level 1) 3)
                                                                                 ((= piety-level 2) 5)
