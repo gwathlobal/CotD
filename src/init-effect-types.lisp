@@ -898,3 +898,8 @@
                                                             
                                                             (increase-piety-for-god +god-entity-malseraph+ actor 50))
                                              ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-rest-in-peace+ :name "Rest in peace"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*white*)))

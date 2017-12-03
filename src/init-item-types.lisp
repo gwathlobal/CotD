@@ -696,4 +696,32 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-book-of-rituals+
                                          :name "Book of Rituals" :plural-name "Books of Rituals"
-                                         :glyph-idx 125 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300))
+                                         :glyph-idx 125 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore target item))
+
+                                                     (set-mob-effect actor :effect-type-id +mob-effect-rest-in-peace+ :actor-id (id actor) :cd t)
+
+                                                     ;; always remove 1 item
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
+                                                              (declare (ignore item))
+                                                              (if (and (= (mob-type actor) +mob-type-ghost+)
+                                                                       (find-if #'(lambda (a)
+                                                                                    (if (= (feature-type a) +feature-sacrificial-circle+)
+                                                                                      t
+                                                                                      nil))
+                                                                                (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                                :key #'(lambda (a)
+                                                                                         (get-feature-by-id a))))
+                                                                  t
+                                                                nil))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-enemy nearest-ally))
+                                                          (if (and (funcall (on-check-applic item) actor item)
+                                                                   )
+                                                            t
+                                                            nil))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-ally nearest-enemy))
+                                                             (mob-use-item actor check-result item))))

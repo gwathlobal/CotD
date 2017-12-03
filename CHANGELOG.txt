@@ -7,6 +7,7 @@ CHANGELOG
 - The Eater of the dead can gain an ability to spawn seeker larvae. These small creatures are harmless but eat corpses and transfer thier power to you.
 - The Eater of the dead can gain an ability to spawn spore colonies. These are immobile creatures that spit acid at their enemies in sight.
 - Fixed the bug when you could throw the parasite throw solid objects.
+- Added a card that could polymorph enemies into trees. Trees are immobile and do negligible damage but have superior defenses.
 
 --------------------
 November 25, 2017 v1.2.4
