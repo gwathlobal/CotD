@@ -363,34 +363,46 @@
     (let ((init-z (z mob))
           (final-z nil)
           (cur-dmg 0))
+      ()
       (when (and apply-gravity
                  (setf final-z (apply-gravity mob)))
       
         (set-mob-location mob (x mob) (y mob) final-z :apply-gravity nil)
 
-        (format t "~A FLOAT ~A~%" (name mob) (mob-ability-p mob +mob-abil-float+))
-        
         ;; do not take any damage if you can float
-        (when (not (mob-ability-p mob +mob-abil-float+))
+        (when (or (not (mob-ability-p mob +mob-abil-float+))
+                  (and (mob-ability-p mob +mob-abil-float+)
+                       (slave-mob-id mob)))
           (setf cur-dmg (* 5 (1- (- init-z (z mob)))))
           (decf (cur-hp mob) cur-dmg)
           (when (> cur-dmg 0)
-            (if (eq mob *player*)
-              (progn
-                ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
-                (set-message-this-turn t)
-                (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))
-                (when (check-dead mob) (setf (killed-by *player*) "falling")))
-              (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                                     (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg) :observed-mob mob)))
+            (cond
+              ((eq mob *player*)
+               (progn
+                 ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
+                 (set-message-this-turn t)
+                 (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))
+                 (when (check-dead mob) (setf (killed-by *player*) "falling"))))
+              ((eq (id mob) (riding-mob-id *player*))
+               (progn
+                 ;; a hack because sometimes the player's horse may fall somewhere he does not see and then no message will be displayed normally 
+                 (set-message-this-turn t)
+                 (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))))
+              (t (print-visible-message (x mob) (y mob) (z mob) (level *world*)
+                                        (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg) :observed-mob mob))))
           (when (check-dead mob)
             (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())
-            (when (mob-effect-p mob +mob-effect-possessed+)
+            (when (slave-mob-id mob)
               (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
               (setf (x (get-mob-by-id (slave-mob-id mob))) (x mob)
                     (y (get-mob-by-id (slave-mob-id mob))) (y mob)
                     (z (get-mob-by-id (slave-mob-id mob))) (z mob))
-              (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))))
+              (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse (if (= (mob-type mob) +mob-type-ghost+)
+                                                                                                              t
+                                                                                                              nil)
+                                                            :aux-params ())))))
+
+      (format t "APPLY-GRAVITY ~A, FINAL-Z ~A~%" apply-gravity final-z))
     
     ;; apply gravity to the mob, standing on your head, if any
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
@@ -824,12 +836,15 @@
         (melee-target actor target)
         ;; if the target is killed without purging - the slave mob also dies
         (when (and (check-dead target)
-                   (mob-effect-p target +mob-effect-possessed+))
+                   (slave-mob-id target))
           (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
           (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
                 (y (get-mob-by-id (slave-mob-id target))) (y target)
                 (z (get-mob-by-id (slave-mob-id target))) (z target))
-          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params nil))
+          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse (if (= (mob-type target) +mob-type-ghost+)
+                                                                                                             t
+                                                                                                             nil)
+                                                           :aux-params nil))
         )))
 
 (defun mob-possess-target (actor target)
@@ -866,7 +881,8 @@
     ;; if the master is riding something - put slave as the rider
     (when (riding-mob-id actor)
       (setf (riding-mob-id target) (riding-mob-id actor))
-      (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id target))) (id target)))
+      (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id target))) (id target))
+      (setf (riding-mob-id actor) nil))
     
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                            (format nil "~A releases its possession of ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (name target))))
@@ -1015,7 +1031,10 @@
           (setf (x (get-mob-by-id (slave-mob-id a-target))) (x a-target)
                 (y (get-mob-by-id (slave-mob-id a-target))) (y a-target)
                 (z (get-mob-by-id (slave-mob-id a-target))) (z a-target))
-          (make-dead (get-mob-by-id (slave-mob-id a-target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))
+          (make-dead (get-mob-by-id (slave-mob-id a-target)) :splatter nil :msg nil :msg-newline nil :corpse (if (= (mob-type a-target) +mob-type-ghost+)
+                                                                                                               t
+                                                                                                               nil)
+                                                             :aux-params ()))
         ))
     
     (when completely-missed
@@ -1327,7 +1346,10 @@
           (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
                 (y (get-mob-by-id (slave-mob-id target))) (y target)
                 (z (get-mob-by-id (slave-mob-id target))) (z target))
-          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))                                                                                           
+          (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse (if (= (mob-type target) +mob-type-ghost+)
+                                                                                                             t
+                                                                                                             nil)
+                                                           :aux-params ()))                                                                                           
         )
   
       (when (and actor att-spd) (make-act actor att-spd))
@@ -1384,10 +1406,24 @@
 
 (defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()))
   (logger (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
-  (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))))
+  (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob)))))
+        (ghost-that-cheats-death nil))
     
     (when (dead= mob)
       (return-from make-dead nil))
+
+    ;; a hack to make the slave die instead of the master if the mob is a ghost 
+    (when (and (mob-effect-p mob +mob-effect-life-guard+)
+               (slave-mob-id mob))
+      (let ((slave-mob (get-mob-by-id (slave-mob-id mob))))
+        (rem-mob-effect mob +mob-effect-life-guard+)
+        (mob-depossess-target mob)
+        (setf ghost-that-cheats-death mob)
+        (setf mob slave-mob)
+        (setf (brightness mob) (brightness ghost-that-cheats-death))
+        (setf (motion mob) (motion ghost-that-cheats-death))
+        (setf dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob)))))
+        ))
 
     (loop for merged-id in (merged-id-list mob)
           for merged-mob = (get-mob-by-id merged-id)
@@ -1397,7 +1433,7 @@
     
     (when (and (eq mob *player*)
                killer)
-      (setf (killed-by *player*) (multiple-value-list (get-qualified-name killer))))
+      (setf (killed-by *player*) (prepend-article +article-a+ (get-qualified-name killer))))
 
     (when (and killer
                (eq killer *player*))
@@ -1485,7 +1521,9 @@
         ))
     
     (when msg
-      (print-visible-message (x mob) (y mob) (z mob) (level *world*) dead-msg-str)
+      (if (eq (id mob) (riding-mob-id *player*))
+        (add-message dead-msg-str)
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) dead-msg-str))
       (when msg-newline (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%"))))
     
     ;; apply all on-kill abilities of the killer 
@@ -1540,7 +1578,10 @@
       (add-mob-to-level-list (level *world*) (get-mob-by-id (riding-mob-id mob)))
       (setf (riding-mob-id mob) nil))
 
-    
+    (when ghost-that-cheats-death
+      (when (riding-mob-id ghost-that-cheats-death)
+        (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id ghost-that-cheats-death))) (id ghost-that-cheats-death)))
+      (add-mob-to-level-list (level *world*) ghost-that-cheats-death))
     
     ;; place blood stain if req
     (when (and splatter (< (random 100) 75))
@@ -1574,9 +1615,12 @@
   (when (not (mob-ability-p mob +mob-abil-climbing+))
     (rem-mob-effect mob +mob-effect-climbing-mode+))
   
-  (when (mob-effect-p mob +mob-effect-possessed+)
+  (when (slave-mob-id mob)
     (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
-    (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())
+    (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse (if (= (mob-type mob) +mob-type-ghost+)
+                                                                                                    t
+                                                                                                    nil)
+                                                  :aux-params ())
     (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob)))
     (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "Its ascension destroyed its vessel."))
     
@@ -1674,12 +1718,15 @@
           (when (eq mob *player*)
             (setf (killed-by *player*) "drowning"))
           (make-dead mob :splatter nil :msg t)
-          (when (mob-effect-p mob +mob-effect-possessed+)
+          (when (slave-mob-id mob)
             (setf (cur-hp (get-mob-by-id (slave-mob-id mob))) 0)
             (setf (x (get-mob-by-id (slave-mob-id mob))) (x mob)
                   (y (get-mob-by-id (slave-mob-id mob))) (y mob)
                   (z (get-mob-by-id (slave-mob-id mob))) (z mob))
-            (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ())))
+            (make-dead (get-mob-by-id (slave-mob-id mob)) :splatter nil :msg nil :msg-newline nil :corpse (if (= (mob-type mob) +mob-type-ghost+)
+                                                                                                            t
+                                                                                                            nil)
+                                                          :aux-params ())))
         (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%") :observed-mob mob))))
   
   

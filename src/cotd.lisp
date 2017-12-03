@@ -472,6 +472,7 @@
 
        ;; set the same name for mimics if any
        (setf (name *player*) (options-player-name *options*))
+       (setf (alive-name *player*) (name *player*))
        (when (mob-ability-p *player* +mob-abil-trinity-mimic+)
          (loop for mob-id in (mimic-id-list *player*)
                for mob = (get-mob-by-id mob-id)

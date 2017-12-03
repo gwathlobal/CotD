@@ -152,7 +152,7 @@
                                        :name "soldier"
                                        :glyph-idx 32 :glyph-color sdl:*green* :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 100 "shoots" ())) :base-dodge 25
+                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
@@ -164,7 +164,7 @@
                                        :name "sergeant"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 "shoots" ())) :base-dodge 25
+                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t
@@ -176,7 +176,7 @@
                                        :name "chaplain"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 85 :g 107 :b 47) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 1 100 "shoots" ())) :base-dodge 25
+                                       :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
@@ -188,7 +188,7 @@
                                        :name "machine-gunner"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 50 :g 150 :b 50) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 70 "shoots" ())) :base-dodge 25
+                                       :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 6 70 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
@@ -200,7 +200,7 @@
                                        :name "scout"
                                        :glyph-idx 32 :glyph-color (sdl:color :r 60 :g 179 :b 113) :back-color sdl:*black* :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
-                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 120 "shoots" ())) :base-dodge 25
+                                       :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 1 120 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-starts-with-horse t
@@ -568,7 +568,7 @@
                                        :name "spore colony"
                                        :glyph-idx 37 :glyph-color (sdl:color :r 150 :g 165 :b 0) :back-color sdl:*black* :max-hp 18 :max-fp 0
                                        :faction +faction-type-eater+
-                                       :weapon (list "Tentacles & Acid spit" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) (list +weapon-dmg-acid+ 1 4 +normal-ap+ 0 1 100 "spits at" (list :no-charges :corrodes)))
+                                       :weapon (list "Tentacles & Acid spit" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) (list +weapon-dmg-acid+ 1 4 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes)))
                                        :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 2 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100) (list +weapon-dmg-acid+ 1 0))
                                        :strength 2
@@ -589,7 +589,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-radiation+ 0 100) (list +weapon-dmg-acid+ 1 0))
                                        :strength 1 :base-stealth 10
                                        :base-light-radius 0 
-                                       :abil-no-breathe t :abil-undead t :abil-float t :abil-ghost-possess t
+                                       :abil-no-breathe t :abil-undead t :abil-float t :abil-ghost-possess t :abil-no-corpse t
                                        ))
 
 ;;--------------------

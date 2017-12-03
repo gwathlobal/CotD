@@ -22,6 +22,7 @@
     result))
 
 (defun propagate-sound-from-location (target sx sy sz sound-power sound-str-func &key (force-sound nil) (source nil))
+  (format t "ENTERING PROPAGATE ~A [~A]~%" (name target) (id target))
   (let ((sound-pwr sound-power))
     (line-of-sight sx sy sz (x target) (y target) (z target)
                    #'(lambda (dx dy dz prev-cell)
@@ -122,4 +123,5 @@
                                     ((= sound-z -1) " below")
                                     (t ""))))
             (print-visible-message (x target) (y target) (z target) (level *world*) (funcall sound-str-func dir-str))
-            ))))))
+            )))))
+  (format t "LEAVING PROPAGATE~%"))

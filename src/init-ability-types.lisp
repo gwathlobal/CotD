@@ -4231,10 +4231,10 @@
                                                       (if (mob-ability-p actor +mob-abil-corroding-secretion+)
                                                         (setf (weapon actor) (list "Tentacles & Acid spit"
                                                                                  (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
-                                                                                 (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges :corrodes))))
+                                                                                 (list +weapon-dmg-acid+ 1 3 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes))))
                                                         (setf (weapon actor) (list "Tentacles & Acid spit"
                                                                                    (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
-                                                                                   (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges)))))
+                                                                                   (list +weapon-dmg-acid+ 1 3 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges)))))
                                                       (adjust-r-acc actor)
                                                       )
                                  :on-remove-mutation #'(lambda (ability-type actor)
@@ -5794,7 +5794,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-float+ :name "Floating" :descr "You float in the air and do not take any damage when falling down from any height." 
+                                 :id +mob-abil-float+ :name "Floating" :descr "You float in the air and do not take any damage when falling down from any height. Does not work when you possess a corporeal body." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil
@@ -5817,6 +5817,7 @@
                                                     (cond
                                                       ((mob-ability-p slave-mob +mob-abil-undead+)
                                                        (progn
+                                                         (rem-mob-effect actor +mob-effect-life-guard+)
                                                          (mob-depossess-target actor)
                                                          (setf (cur-hp slave-mob) 0)
                                                          (make-dead slave-mob :splatter nil)
@@ -5824,7 +5825,9 @@
                                                                                 (format nil "~A slumps to the ground. " (capitalize-name (prepend-article +article-the+ (name slave-mob)))))))
                                                       (t
                                                        (progn
-                                                         (mob-depossess-target actor))))))
+                                                         (rem-mob-effect actor +mob-effect-life-guard+)
+                                                         (mob-depossess-target actor)
+                                                         )))))
                                                 
                                                 (cond
                                                   ((subtypep (type-of target) 'mob)
@@ -5835,8 +5838,8 @@
                                                        (progn
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
-                                                         
                                                          (mob-possess-target actor target)
+                                                         (set-mob-effect actor :effect-type-id +mob-effect-life-guard+ :actor-id (id actor) :cd t)
                                                          )
                                                        ;; you can not possess the target for any reason
                                                        (progn
@@ -5878,10 +5881,11 @@
                                                        (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. "
                                                                                                                                                    (capitalize-name (prepend-article +article-the+ (visible-name target)))))
                                                        (remove-item-from-world target)
-                                                       (incf (stat-raised-dead actor))
+                                                       (decf (stat-raised-dead actor))
 
                                                        (mob-possess-target actor mob-corpse)
-                                                       (decf (stat-possess actor))
+                                                       (set-mob-effect actor :effect-type-id +mob-effect-life-guard+ :actor-id (id actor) :cd t)
+                                                       (incf (stat-possess actor))
                                                        )))
                                                   )
                                                 )

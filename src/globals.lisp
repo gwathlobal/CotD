@@ -330,6 +330,7 @@
 (defconstant +mob-effect-primordial-transfer+ 49)
 (defconstant +mob-effect-rest-in-peace+ 50)
 (defconstant +mob-effect-polymorph-tree+ 51)
+(defconstant +mob-effect-life-guard+ 52)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)

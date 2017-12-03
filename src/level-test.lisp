@@ -157,11 +157,11 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 45 :y 19 :z 3))
+  (setf *player* (make-instance 'player :mob-type +mob-type-ghost+ :x 45 :y 19 :z 3))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-man+ :x 50 :y 18 :z 2))
-        (demon (make-instance 'mob :mob-type +mob-type-demon+ :x 49 :y 19 :z 3))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-scout+ :x 50 :y 18 :z 2))
+        ;(demon (make-instance 'mob :mob-type +mob-type-horse+ :x 49 :y 19 :z 3))
         ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 49 :y 17 :z 3))
         )
     (setf (cur-fp *player*) 15)
@@ -180,7 +180,7 @@
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-flying+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
-    (add-mob-to-level-list (level world) demon)
+    ;(add-mob-to-level-list (level world) demon)
     ;(add-mob-to-level-list (level world) angel)
     
     ;(setf (mimic-id-list *player*) (list (id angel) (id soldier) (id demon)))

@@ -903,3 +903,58 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
                                                              sdl:*white*)))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-life-guard+ :name "Meat shield"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+
+                                                         (setf (mob-type actor) (mob-type (get-mob-by-id (slave-mob-id actor))))
+                                                         (setf (max-hp actor) (max-hp (get-mob-by-id (slave-mob-id actor))))
+                                                         (setf (cur-hp actor) (cur-hp (get-mob-by-id (slave-mob-id actor))))
+                                                         (setf (weapon actor) (weapon (get-mob-by-id (slave-mob-id actor))))
+
+                                                         (adjust-abilities actor)
+                                                         (adjust-dodge actor)
+                                                         (adjust-armor actor)
+                                                         (adjust-m-acc actor)
+                                                         (adjust-r-acc actor)
+                                                         (adjust-sight actor)
+
+                                                         (mob-set-ability actor +mob-abil-ghost-possess+ t)
+                                                         (mob-remove-ability actor +mob-abil-possessable+)
+                                                         
+                                                         ;; set up current abilities cooldowns
+                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                         
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+
+                                                            (setf (mob-type actor) +mob-type-ghost+)
+                                                            (setf (cur-hp (get-mob-by-id (slave-mob-id actor))) (cur-hp actor))
+                                                            (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                            (setf (cur-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+
+                                                            (set-cur-weapons actor)
+                                                            (adjust-abilities actor)
+                                                            (adjust-dodge actor)
+                                                            (adjust-armor actor)
+                                                            (adjust-m-acc actor)
+                                                            (adjust-r-acc actor)
+                                                            (adjust-sight actor)
+                                                            
+                                                            ;; set up current abilities cooldowns
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                                  when (null (gethash ability-id (abilities-cd actor)))
+                                                                    do
+                                                                       (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            
+                                                            )))
+
+

@@ -47,7 +47,7 @@
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
-   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <max charges> <rate of fire> <accuracy> <shoot str> <list of aux params>))
+   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <cur charges> <max charges> <rate of fire> <accuracy> <shoot str> <list of aux params>))
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
    ;;   :is-fire
@@ -511,12 +511,19 @@
   (when (third weapon)
     (nth 3 (third weapon))))
 
-(defmethod get-ranged-weapon-charges ((mob-type mob-type))
-  (get-ranged-weapon-charges-simple (weapon mob-type)))
+(defmethod get-ranged-weapon-cur-charges ((mob-type mob-type))
+  (get-ranged-weapon-cur-charges-simple (weapon mob-type)))
 
-(defun get-ranged-weapon-charges-simple (weapon)
+(defun get-ranged-weapon-cur-charges-simple (weapon)
   (when (third weapon)
     (nth 4 (third weapon))))
+
+(defmethod get-ranged-weapon-max-charges ((mob-type mob-type))
+  (get-ranged-weapon-max-charges-simple (weapon mob-type)))
+
+(defun get-ranged-weapon-max-charges-simple (weapon)
+  (when (third weapon)
+    (nth 5 (third weapon))))
 
 (defmethod get-ranged-weapon-rof ((mob-type mob-type))
   ;; rate of fire - the number of charges the weapon consumes per shoot 
@@ -525,35 +532,35 @@
 (defun get-ranged-weapon-rof-simple (weapon)
   ;; rate of fire - the number of charges the weapon consumes per shoot 
   (when (third weapon)
-    (nth 5 (third weapon))))
+    (nth 6 (third weapon))))
 
 (defmethod get-ranged-weapon-acc ((mob-type mob-type))
   (get-ranged-weapon-acc-simple (weapon mob-type)))
 
 (defun get-ranged-weapon-acc-simple (weapon)
   (when (third weapon)
-    (nth 6 (third weapon))))
+    (nth 7 (third weapon))))
 
 (defmethod get-ranged-weapon-shoot-str ((mob-type mob-type))
   (get-ranged-weapon-shoot-str-simple (weapon mob-type)))
 
 (defun get-ranged-weapon-shoot-str-simple (weapon)
   (when (third weapon)
-    (nth 7 (third weapon))))
+    (nth 8 (third weapon))))
 
 (defmethod get-ranged-weapon-aux ((mob-type mob-type))
   (get-ranged-weapon-aux-simple (weapon mob-type)))
 
 (defun get-ranged-weapon-aux-simple (weapon)
   (when (third weapon)
-    (nth 8 (third weapon))))
+    (nth 9 (third weapon))))
 
 (defmethod get-ranged-weapon-aux-param ((mob-type mob-type) aux-feature)
   (get-ranged-weapon-aux-param-simple (weapon mob-type) aux-feature))
 
 (defun get-ranged-weapon-aux-param-simple (weapon aux-feature)
   (when (third weapon)
-    (find aux-feature (nth 8 (third weapon)))))
+    (find aux-feature (nth 9 (third weapon)))))
 
 (defmethod get-weapon-descr-line ((mob-type mob-type))
   (let ((str (create-string)))
@@ -668,7 +675,7 @@
    
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
-   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <cur charges> <rate of fire> <accuracy> <shoot str> <list of aux params>))
+   ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <cur charges> <max charges> <rate of fire> <accuracy> <shoot str> <list of aux params>))
    ;; <list of aux params> may contain
    ;;   :chops-body-parts
    ;;   :is-fire
@@ -866,6 +873,25 @@
       (funcall (on-add-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))))
 
 (defun mob-remove-mutation (mob ability-type-id)
+  (when (and (on-remove-mutation (get-ability-type-by-id ability-type-id)))
+    (funcall (on-remove-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))
+  (setf (gethash ability-type-id (abilities mob)) nil)
+  ;; place a non-mutation ability if there is one 
+  (when (gethash ability-type-id (abilities (get-mob-type-by-id (mob-type mob))))
+    (setf (gethash ability-type-id (abilities mob)) (list nil
+                                                          (gethash ability-type-id (abilities (get-mob-type-by-id (mob-type mob))))))))
+
+(defun mob-set-ability (mob ability-type-id &optional (ability-value t))
+  (let ((has-function nil))
+    (when (and (null (gethash ability-type-id (abilities mob)))
+               (on-add-mutation (get-ability-type-by-id ability-type-id)))
+      (setf has-function t))
+    (setf (gethash ability-type-id (abilities mob)) (list nil
+                                                          ability-value))
+    (when has-function
+      (funcall (on-add-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))))
+
+(defun mob-remove-ability (mob ability-type-id)
   (when (and (on-remove-mutation (get-ability-type-by-id ability-type-id)))
     (funcall (on-remove-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))
   (setf (gethash ability-type-id (abilities mob)) nil)
@@ -1089,14 +1115,14 @@
   (get-ranged-weapon-speed-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-charges ((mob mob))
-  (get-ranged-weapon-charges-simple (weapon mob)))
+  (get-ranged-weapon-cur-charges-simple (weapon mob)))
 
 (defun set-ranged-weapon-charges (mob value)
   (when (third (weapon mob))
     (setf (nth 4 (third (weapon mob))) value)))
 
-(defun get-ranged-weapon-max-charges (mob)
-  (get-ranged-weapon-charges (get-mob-type-by-id (mob-type mob))))
+(defmethod get-ranged-weapon-max-charges ((mob mob))
+  (get-ranged-weapon-max-charges-simple (weapon mob)))
 
 (defmethod get-ranged-weapon-rof ((mob mob))
   (get-ranged-weapon-rof-simple (weapon mob)))
@@ -1222,7 +1248,7 @@
 (defmethod get-qualified-name ((mob mob))
   (if (slot-value mob 'name)
     (if (mob-ability-p mob +mob-abil-undead+)
-      (name mob)
+      (values (name mob) +noun-proper+ +noun-singular+)
       (values (format nil "~A the ~A" (name mob) (capitalize-name (name (get-mob-type-by-id (mob-type mob))))) +noun-proper+ +noun-singular+))
     (values (format nil "nameless ~A" (name mob)) +noun-common+ +noun-singular+)))
 

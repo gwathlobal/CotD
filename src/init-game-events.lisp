@@ -160,7 +160,7 @@
                                                            ;; write highscores
                                                            (let* ((final-str (if (null (killed-by *player*))
                                                                                "Killed by unknown forces."
-                                                                               (format nil "Killed by ~A." (prepend-article +article-a+ (values-list (killed-by *player*))))))
+                                                                               (format nil "Killed by ~A." (killed-by *player*))))
                                                                   (score (calculate-player-score 0))
                                                                   (highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 score
