@@ -277,6 +277,7 @@
 (defconstant +mob-abil-immobile+ 143)
 (defconstant +mob-abil-float+ 144)
 (defconstant +mob-abil-ghost-possess+ 145)
+(defconstant +mob-abil-invisibility+ 146)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -331,6 +332,7 @@
 (defconstant +mob-effect-rest-in-peace+ 50)
 (defconstant +mob-effect-polymorph-tree+ 51)
 (defconstant +mob-effect-life-guard+ 52)
+(defconstant +mob-effect-invisibility+ 53)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)

@@ -957,4 +957,8 @@
                                                             
                                                             )))
 
-
+(set-effect-type (make-instance 'effect-type :id +mob-effect-invisibility+ :name "Invisibility"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*cyan*)
+                                             ))

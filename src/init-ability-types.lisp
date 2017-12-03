@@ -5805,7 +5805,7 @@
                                  :cd 6 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
-                                 :start-map-select-func #'player-start-map-select-nearest-hostile
+                                 :start-map-select-func #'player-start-map-select-ghost-possess
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 ;; target is either item or mob
                                                 (declare (ignore ability-type))
@@ -5976,3 +5976,34 @@
                                                              nil)))
                                                         )
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-invisibility+ :name "Invisibility" :descr "Make yourself invisible to enemy's eyes." 
+                                 :cd 20 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 0
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type target))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-invisibility+ :actor-id (id actor) :cd 6)
+                                                (generate-sound actor (x actor) (y actor) (z actor) 30 #'(lambda (str)
+                                                                                                           (format nil "You hear some strange noise~A. " str)))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-invisibility+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  ;; if the dst is more than 3 tiles away - stealth, if possible
+                                                  (if (and (path actor)
+                                                           nearest-enemy
+                                                           (= (cur-hp actor) 1)
+                                                           (mob-ability-p actor +mob-abil-invisibility+)
+                                                           (can-invoke-ability actor actor +mob-abil-invisibility+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

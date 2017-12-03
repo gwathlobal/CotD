@@ -160,7 +160,7 @@
   (setf *player* (make-instance 'player :mob-type +mob-type-ghost+ :x 45 :y 19 :z 3))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-scout+ :x 50 :y 18 :z 2))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-chaplain+ :x 50 :y 18 :z 2))
         ;(demon (make-instance 'mob :mob-type +mob-type-horse+ :x 49 :y 19 :z 3))
         ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 49 :y 17 :z 3))
         )
@@ -172,6 +172,7 @@
 
     ;(mob-set-mutation *player* +mob-abil-clawed-tentacle+)
     ;(mob-set-mutation *player* +mob-abil-piercing-needles+)
+    ;(mob-remove-ability *player* +mob-abil-possessable+)
 
     ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)

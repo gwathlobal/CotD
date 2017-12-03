@@ -87,7 +87,8 @@
                                                                 abil-mutate-oviposit-more-eggs abil-oviposit-more-eggs abil-mutate-tougher-locusts abil-tougher-locusts abil-cure-mutation abil-mutate-thick-carapace abil-thick-carapace
                                                                 abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump abil-mutate-piercing-needles abil-piercing-needles abil-mutate-corroding-secretion abil-corroding-secretion
                                                                 abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
-                                                                abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess)
+                                                                abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess
+                                                                abil-invisibility)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -402,6 +403,8 @@
     (setf (gethash +mob-abil-float+ (abilities mob-type)) t))
   (when abil-ghost-possess
     (setf (gethash +mob-abil-ghost-possess+ (abilities mob-type)) t))
+  (when abil-invisibility
+    (setf (gethash +mob-abil-invisibility+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)
@@ -894,11 +897,7 @@
 (defun mob-remove-ability (mob ability-type-id)
   (when (and (on-remove-mutation (get-ability-type-by-id ability-type-id)))
     (funcall (on-remove-mutation (get-ability-type-by-id ability-type-id)) (get-ability-type-by-id ability-type-id) mob))
-  (setf (gethash ability-type-id (abilities mob)) nil)
-  ;; place a non-mutation ability if there is one 
-  (when (gethash ability-type-id (abilities (get-mob-type-by-id (mob-type mob))))
-    (setf (gethash ability-type-id (abilities mob)) (list nil
-                                                          (gethash ability-type-id (abilities (get-mob-type-by-id (mob-type mob))))))))
+  (setf (gethash ability-type-id (abilities mob)) nil))
 
 (defun set-mob-effect (mob &key effect-type-id actor-id (cd t) (param1 nil))
   (if (mob-effect-p mob effect-type-id)
@@ -1326,6 +1325,8 @@
     (incf visibility (brightness mob))
     (incf visibility (motion mob))
     (decf visibility (cur-stealth mob))
+    (when (mob-effect-p mob +mob-effect-invisibility+)
+      (setf visibility 0))
     (when (< visibility 0)
       (setf visibility 0))
     visibility))
