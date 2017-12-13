@@ -6007,3 +6007,86 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-passwall+ :name "Passwall" :descr "Pass through a row of solid, normally impassable terrain tiles. You must be next to such tile, you location relative to this tile sets the direction of you movement during passwall. You emerge on the other side of the tile row. You are also able to pass up and down through floors and ceilings. If you will not be able to emerge from the given tile row (for any reason), you will not be able to invoke the ability." 
+                                 :cd 6 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :start-map-select-func #'player-start-map-select-self
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target here is list of (x y z) coordinates for the tile which is the first in the row of passwalled tiles
+                                                (let* ((dx (- (first target) (x actor)))
+                                                       (dy (- (second target) (y actor)))
+                                                       (dz (- (third target) (z actor)))
+                                                       (passwall-result (mob-move-passwall actor dx dy dz)))
+                                                  (when passwall-result
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                           (format nil "~A merges into the ~A. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                   (get-terrain-name (get-terrain-* (level *world*) (first target) (second target) (third target)))))
+                                                    (set-mob-location actor (first passwall-result) (second passwall-result) (third passwall-result))
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                           (format nil "~A emerges from the ~A. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                   (get-terrain-name (get-terrain-* (level *world*) (- (x actor) dx) (- (y actor) dy) (- (z actor) dz)))))
+                                                    ))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-passwall+)
+                                                               (not (slave-mob-id actor))
+                                                               (let ((solid-tile nil))
+                                                                 (loop for dx from -1 to 1 do
+                                                                   (loop for dy from -1 to 1 do
+                                                                     (loop for dz from -1 to 1 do
+                                                                       (when (and (>= (+ (x actor) dx) 0) (< (+ (x actor) dx) (array-dimension (terrain (level *world*)) 0))
+                                                                                  (>= (+ (y actor) dy) 0) (< (+ (y actor) dy) (array-dimension (terrain (level *world*)) 1))
+                                                                                  (>= (+ (z actor) dz) 0) (< (+ (z actor) dz) (array-dimension (terrain (level *world*)) 2))
+                                                                                  (get-terrain-* (level *world*) (+ (x actor) dx) (+ (y actor) dy) (+ (z actor) dz))
+                                                                                  (get-terrain-type-trait (get-terrain-* (level *world*) (+ (x actor) dx) (+ (y actor) dy) (+ (z actor) dz)) +terrain-trait-blocks-move+))
+                                                                         (setf solid-tile t)))))
+                                                                 solid-tile))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((step-x 0)
+                                                        (step-y 0))
+                                                    (if (and (mob-ability-p actor +mob-abil-passwall+)
+                                                             (can-invoke-ability actor actor +mob-abil-passwall+)
+                                                             nearest-enemy
+                                                             (setf step-x (cond
+                                                                            ((> (x nearest-enemy) (x actor)) -1)
+                                                                            ((< (x nearest-enemy) (x actor)) 1)
+                                                                            (t 0)))
+                                                             (setf step-y (cond
+                                                                            ((> (y nearest-enemy) (y actor)) -1)
+                                                                            ((< (y nearest-enemy) (y actor)) 1)
+                                                                            (t 0)))
+                                                             (get-terrain-* (level *world*) (+ (x actor) step-x) (+ (y actor) step-y) (z actor))
+                                                             (get-terrain-type-trait (get-terrain-* (level *world*) (+ (x actor) step-x) (+ (y actor) step-y) (z actor)) +terrain-trait-blocks-move+)
+                                                             (mob-move-passwall actor step-x step-y 0)
+                                                             )
+                                                      (list (+ (x actor) step-x) (+ (y actor) step-y) (z actor))
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally nearest-enemy))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((terrain (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (< (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*)) 2)
+                                                                 terrain
+                                                                 (or (get-terrain-type-trait terrain +terrain-trait-blocks-move+)
+                                                                     (and (/= (- (view-z *player*) (z *player*)) 0)
+                                                                          (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)))
+                                                                 (mob-move-passwall *player* (- (view-x *player*) (x *player*)) (- (view-y *player*) (y *player*)) (- (view-z *player*) (z *player*))))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            (format t "DIST ~A~%" (mob-move-passwall *player* (- (view-x *player*) (x *player*)) (- (view-y *player*) (y *player*)) (- (view-z *player*) (z *player*))))
+                                                            nil)))
+                                                      )))

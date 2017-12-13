@@ -1,7 +1,8 @@
 CHANGELOG
 
 - Introduced a new playable character - the Lost soul. It a very fragile (1 HP) non-corporeal being that can possess humans and dead bodies. Unlike demons, its possession ability is improved - it gains all the abilities of the victims and uses their HP instead of its own. When the victim dies, it just leaves the body ready to jump into another target in range.
-- When in ghost form the Lost soul can turn completely invisible and escape any dangerous situation.
+- When in ghost form the Lost soul can turn completely invisible and escape any dangerous situation, as wall as pass through walls and floors.
+- The aim of the Last soul is to find the Book of Rituals stored in the library and use it on the sacrificial circle on the lowest floor of the satanists' lair. 
 - Added a second tier of defensive mutations for the Eater of the dead. These are thick carapace (even more passive damage resistance), acidic tips (extended spines start to deal acid damage) and jump (gain an ability to jump similair to the thief).
 - Added a second tier of offesive mutations for the Eater of the dead. These are piercing needles (constricted target have reduced dodge), increased acid strength (acid spit also reduces flesh and acid resistances) and increased cerebellum (corrosive bile always lands to the destination target).
 - Added survival mutations to the Eater of the dead like hooks & sucker cups (lets you climb walls) and facade redjustment (lets you disguise yourself as a human).

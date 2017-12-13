@@ -2168,6 +2168,26 @@
                                             old-piety (get-worshiped-god-piety (worshiped-god mob))))
         (print-visible-message (x mob) (y mob) (z mob) (level *world*) (return-piety-change-str (get-worshiped-god-type (worshiped-god mob)) (get-worshiped-god-piety (worshiped-god mob)) old-piety))))))
 
+(defun mob-move-passwall (actor dx dy dz)
+  (loop with mx = (x actor)
+        with my = (y actor)
+        with mz = (z actor)
+        with has-path = t
+        do
+           (incf mx dx)
+           (incf my dy)
+           (incf mz dz)
+           (when (or (< mx 0) (>= mx (array-dimension (terrain (level *world*)) 0))
+                     (< my 0) (>= my (array-dimension (terrain (level *world*)) 1))
+                     (< mz 0) (>= mz (array-dimension (terrain (level *world*)) 2)))
+             (setf has-path nil)
+             (loop-finish))
+           (when (eq (check-move-on-level actor mx my mz) t)
+             (loop-finish))
+        finally (if has-path
+                  (return (list mx my mz))
+                  nil)))
+
 (defun player-start-map-select-nearest-hostile ()
   (let ((hostile-mobs))
      ;; find the nearest hostile mob & set it as target

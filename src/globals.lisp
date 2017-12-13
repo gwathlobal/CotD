@@ -278,6 +278,7 @@
 (defconstant +mob-abil-float+ 144)
 (defconstant +mob-abil-ghost-possess+ 145)
 (defconstant +mob-abil-invisibility+ 146)
+(defconstant +mob-abil-passwall+ 147)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
