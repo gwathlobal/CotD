@@ -88,7 +88,7 @@
                                                                 abil-mutate-acidic-tips abil-acidic-tips abil-mutate-jump abil-mutate-piercing-needles abil-piercing-needles abil-mutate-corroding-secretion abil-corroding-secretion
                                                                 abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
                                                                 abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess
-                                                                abil-invisibility abil-passwall)
+                                                                abil-invisibility abil-passwall abil-ghost-release)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -407,6 +407,8 @@
     (setf (gethash +mob-abil-invisibility+ (abilities mob-type)) t))
   (when abil-passwall
     (setf (gethash +mob-abil-passwall+ (abilities mob-type)) t))
+  (when abil-ghost-release
+    (setf (gethash +mob-abil-ghost-release+ (abilities mob-type)) t))
   )
 
 (defun get-mob-type-by-id (mob-type-id)

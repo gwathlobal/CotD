@@ -112,6 +112,14 @@ THE SATANISTS
  - Satanists share the same goal with the Demons - to kill all Angels.
 
 --------------------
+THE LOST SOUL
+
+ - You were the one who triggered the whole invasion. The satanists have sacrificed your body to open the gates to Hell, but your soul lingered in this world.
+ - You start as a frail ghost that will be attacked by everybody. While in ghost form you can pass through walls and turn yourself invisible for a short time. 
+ - You can also possess humans and dead bodies from a distance. Your possession ability is improved as compared to the demons because you retain all the traits and capabilities of your host as well as its faction alliances.
+ - Your task is to find the Book of Rituals and recite certain passages from it while standing on the sacrificial circle, the place of your death, to find the final rest.
+ 
+--------------------
 KEYBINDINGS
 
  Arrow keys, Numpad keys,         - Movement

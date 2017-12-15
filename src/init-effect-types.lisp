@@ -192,13 +192,22 @@
                                                            (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                          (setf (face-mob-type-id actor) (mob-type actor))
                                                          (set-cur-weapons actor)
-                                                         (adjust-abilities actor)
+                                                         (let ((was-ghost nil))
+                                                           (when (mob-ability-p actor +mob-abil-ghost-possess+)
+                                                             (setf was-ghost t))
+                                                           (adjust-abilities actor)
+                                                           (when was-ghost
+                                                             (mob-set-ability actor +mob-abil-ghost-possess+ t)
+                                                             (mob-set-ability actor +mob-abil-ghost-release+ t)
+                                                             (mob-remove-ability actor +mob-abil-possessable+)))
                                                          (adjust-dodge actor)
                                                          (adjust-armor actor)
                                                          (adjust-m-acc actor)
                                                          (adjust-r-acc actor)
                                                          (adjust-sight actor)
                                                          (setf (order actor) (list +mob-order-follow+ (actor-id effect)))
+
+                                                         
                                                          ;(set-name actor)
 
                                                           ;; set up current abilities cooldowns
@@ -219,7 +228,14 @@
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
-                                                            (adjust-abilities actor)
+                                                            (let ((was-ghost nil))
+                                                              (when (mob-ability-p actor +mob-abil-ghost-possess+)
+                                                                (setf was-ghost t))
+                                                              (adjust-abilities actor)
+                                                              (when was-ghost
+                                                                (mob-set-ability actor +mob-abil-ghost-possess+ t)
+                                                                (mob-set-ability actor +mob-abil-ghost-release+ t)
+                                                                (mob-remove-ability actor +mob-abil-possessable+)))
                                                             (adjust-dodge actor)
                                                             (adjust-armor actor)
                                                             (adjust-m-acc actor)
@@ -924,6 +940,7 @@
                                                          (adjust-sight actor)
 
                                                          (mob-set-ability actor +mob-abil-ghost-possess+ t)
+                                                         (mob-set-ability actor +mob-abil-ghost-release+ t)
                                                          (mob-remove-ability actor +mob-abil-possessable+)
                                                          
                                                          ;; set up current abilities cooldowns

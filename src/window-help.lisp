@@ -48,7 +48,7 @@
       (write-text str rect :start-line (cur-str win))
       
       (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
-                                                            "[Up/Down] Scroll text  "
+                                                            "[Shift+Up/Down] Page Up/Down  [Up/Down] Scroll text  "
                                                             ""))
                                10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
       )))
@@ -114,7 +114,7 @@
                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win)))))
                      
                      (cond
-                       ((and (sdl:key= key :sdl-key-up) (= mod 0))
+                       ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (= mod 0))
                         (when (or (= (cur-page win) +win-help-page-overview+)
                                   (= (cur-page win) +win-help-page-concepts-combat+)
                                   (= (cur-page win) +win-help-page-concepts-environment+)
@@ -122,7 +122,23 @@
                                   (= (cur-page win) +win-help-page-keybindings+)
                                   (= (cur-page win) +win-help-page-credits+))
                           (decf (cur-str win))))
-                       ((and (sdl:key= key :sdl-key-down) (= mod 0))
+                       ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                        (when (or (= (cur-page win) +win-help-page-overview+)
+                                  (= (cur-page win) +win-help-page-concepts-combat+)
+                                  (= (cur-page win) +win-help-page-concepts-environment+)
+                                  (= (cur-page win) +win-help-page-concepts-gods+)
+                                  (= (cur-page win) +win-help-page-keybindings+)
+                                  (= (cur-page win) +win-help-page-credits+))
+                          (decf (cur-str win) 30)))
+                       ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                        (when (or (= (cur-page win) +win-help-page-overview+)
+                                  (= (cur-page win) +win-help-page-concepts-combat+)
+                                  (= (cur-page win) +win-help-page-concepts-environment+)
+                                  (= (cur-page win) +win-help-page-concepts-gods+)
+                                  (= (cur-page win) +win-help-page-keybindings+)
+                                  (= (cur-page win) +win-help-page-credits+))
+                          (incf (cur-str win) 30)))
+                       ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (= mod 0))
                         (when (or (= (cur-page win) +win-help-page-overview+)
                                   (= (cur-page win) +win-help-page-concepts-combat+)
                                   (= (cur-page win) +win-help-page-concepts-environment+)

@@ -697,6 +697,9 @@
 (set-item-type (make-instance 'item-type :id +item-type-book-of-rituals+
                                          :name "Book of Rituals" :plural-name "Books of Rituals"
                                          :glyph-idx 125 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :descr "The black leather book. It seems to be whispering something to you. In the languages you do not understand. Only the ghost can use it on the sacrificial circle, the place of its creation."
+                                         :flavor-quote (format nil "\"He quickly went into a stall, drew a circle round him with his finger, uttered some prayers and formulas for exorcism, and then began to read the prayers for the dead in a loud voice and with the fixed resolution not to look up from the book nor take notice of anything.\"~%Nikolai Gogol. The Viy.")
+                              
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore target item))
 
@@ -706,7 +709,7 @@
                                                      t)
                                          :on-check-applic #'(lambda (actor item)
                                                               (declare (ignore item))
-                                                              (if (and (= (mob-type actor) +mob-type-ghost+)
+                                                              (if (and (mob-ability-p actor +mob-abil-ghost-possess+)
                                                                        (find-if #'(lambda (a)
                                                                                     (if (= (feature-type a) +feature-sacrificial-circle+)
                                                                                       t

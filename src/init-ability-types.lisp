@@ -6087,6 +6087,65 @@
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
-                                                            (format t "DIST ~A~%" (mob-move-passwall *player* (- (view-x *player*) (x *player*)) (- (view-y *player*) (y *player*)) (- (view-z *player*) (z *player*))))
                                                             nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-ghost-release+ :name "Release host" :descr "Release your control on your host. Undead host slump back to the ground while alive hosts are released unharmed." 
+                                 :cd 0 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :start-map-select-func #'player-start-map-select-self
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                ;; target is (x y z) coordinates of where the ghost will be placed
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-GHOST-RELEASE: ~A [~A] releases host ~A [~A].~%" (name actor) (id actor)
+                                                                (name (get-mob-by-id (slave-mob-id actor))) (id (get-mob-by-id (slave-mob-id actor)))))
+
+                                                ;; you depossess your currently possessed body
+                                                (let ((slave-mob (get-mob-by-id (slave-mob-id actor))))
+                                                  (cond
+                                                    ((mob-ability-p slave-mob +mob-abil-undead+)
+                                                     (progn
+                                                       (rem-mob-effect actor +mob-effect-life-guard+)
+                                                       (mob-depossess-target actor)
+                                                       (setf (cur-hp slave-mob) 0)
+                                                       (make-dead slave-mob :splatter nil)
+                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                              (format nil "~A slumps to the ground. " (capitalize-name (prepend-article +article-the+ (name slave-mob)))))
+                                                       (set-mob-location actor (first target) (second target) (third target))))
+                                                    (t
+                                                     (progn
+                                                       (rem-mob-effect actor +mob-effect-life-guard+)
+                                                       (mob-depossess-target actor)
+                                                       (set-mob-location actor (first target) (second target) (third target))
+                                                       (set-mob-location slave-mob (x slave-mob) (y slave-mob) (z slave-mob))
+                                                       (setf (brightness slave-mob) (brightness actor))
+                                                       )))
+                                                    
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-ghost-release+)
+                                                               (slave-mob-id actor))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore actor nearest-ally ability-type nearest-enemy))
+                                                  ;; a little bit of cheating here
+                                                  nil)
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally nearest-enemy check-result))
+                                                   (mob-invoke-ability actor nil (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (and (< (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*)) 2)
+                                                               (check-move-on-level *player* (view-x *player*) (view-y *player*) (view-z *player*))
+                                                               )
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil))
                                                       )))
