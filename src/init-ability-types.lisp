@@ -148,7 +148,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-detect-evil+)
-                                                               (mob-effect-p target +mob-effect-possessed+))
+                                                               (mob-effect-p target +mob-effect-possessed+)
+                                                               (not (mob-ability-p target +mob-abil-ghost-possess+)))
                                                         t
                                                         nil))))
 
@@ -199,7 +200,8 @@
                                                 
                                                 (melee-target actor target :kill-possessed nil)
                                                 (logger (format nil "INSIDE PURGING TOUCH: ~A, (check-dead target) ~A~%" (name target) (check-dead target)))
-                                                (when (check-dead target)
+                                                (when (and (check-dead target)
+                                                           (slave-mob-id target))
                                                   (incf (cur-fp actor))
                                                   (mob-depossess-target target))
                                                 )
@@ -207,6 +209,7 @@
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-purging-touch+)
                                                                (mob-effect-p target +mob-effect-possessed+)
+                                                               (not (mob-ability-p target +mob-abil-ghost-possess+))
                                                                (not (mob-effect-p actor +mob-effect-divine-concealed+)))
                                                         t
                                                         nil))))
@@ -5801,8 +5804,8 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-ghost-possess+ :name "Possess" :descr "You are able to possess humans or corpses from a distance. Note that you can attempt to possess anybody but the ability will fail on inappropriate targets." 
-                                 :cd 6 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :id +mob-abil-ghost-possess+ :name "Possess" :descr "You are able to possess humans or corpses from a distance. Note that you can attempt to possess anybody but the ability will fail on inappropriate targets. While in possession of a host, you wear its body as your own, gaining all its abilities and HP as the result. When your host dies, you emerge from the body unscathed (except for cases when an angel kills your zombie host - you will burn together with your body)." 
+                                 :cd 8 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
                                  :start-map-select-func #'player-start-map-select-ghost-possess
@@ -5819,6 +5822,7 @@
                                                        (progn
                                                          (rem-mob-effect actor +mob-effect-life-guard+)
                                                          (mob-depossess-target actor)
+                                                         (mob-transfer-effects actor slave-mob)
                                                          (setf (cur-hp slave-mob) 0)
                                                          (make-dead slave-mob :splatter nil)
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -5827,6 +5831,7 @@
                                                        (progn
                                                          (rem-mob-effect actor +mob-effect-life-guard+)
                                                          (mob-depossess-target actor)
+                                                         (mob-transfer-effects actor slave-mob)
                                                          )))))
                                                 
                                                 (cond
@@ -6009,7 +6014,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-passwall+ :name "Passwall" :descr "Pass through a row of solid, normally impassable terrain tiles. You must be next to such tile, you location relative to this tile sets the direction of you movement during passwall. You emerge on the other side of the tile row. You are also able to pass up and down through floors and ceilings. If you will not be able to emerge from the given tile row (for any reason), you will not be able to invoke the ability." 
+                                 :id +mob-abil-passwall+ :name "Passwall" :descr "Pass through a row of solid, normally impassable terrain tiles. You must be next to such tile, your location relative to this tile sets the direction of your movement during passwall. You emerge on the other side of the tile row. You are also able to pass up and down through floors and ceilings. If you will not be able to emerge from the given tile row (for any reason), you will not be able to invoke the ability." 
                                  :cd 6 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 60
@@ -6091,7 +6096,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-ghost-release+ :name "Release host" :descr "Release your control on your host. Undead host slump back to the ground while alive hosts are released unharmed." 
+                                 :id +mob-abil-ghost-release+ :name "Release host" :descr "Release your control of your host. Undead host slump back to the ground while alive hosts are released unharmed." 
                                  :cd 0 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -6109,6 +6114,7 @@
                                                      (progn
                                                        (rem-mob-effect actor +mob-effect-life-guard+)
                                                        (mob-depossess-target actor)
+                                                       (mob-transfer-effects actor slave-mob)
                                                        (setf (cur-hp slave-mob) 0)
                                                        (make-dead slave-mob :splatter nil)
                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -6118,6 +6124,7 @@
                                                      (progn
                                                        (rem-mob-effect actor +mob-effect-life-guard+)
                                                        (mob-depossess-target actor)
+                                                       (mob-transfer-effects actor slave-mob)
                                                        (set-mob-location actor (first target) (second target) (third target))
                                                        (set-mob-location slave-mob (x slave-mob) (y slave-mob) (z slave-mob))
                                                        (setf (brightness slave-mob) (brightness actor))

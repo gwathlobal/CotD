@@ -1419,11 +1419,16 @@
         (rem-mob-effect mob +mob-effect-life-guard+)
         (mob-depossess-target mob)
         (setf ghost-that-cheats-death mob)
+        (when (and aux-params
+                   (mob-ability-p ghost-that-cheats-death +mob-abil-undead+)
+                   (find :is-fire aux-params))
+          (setf (cur-hp ghost-that-cheats-death) 0))
         (setf mob slave-mob)
         (setf (brightness mob) (brightness ghost-that-cheats-death))
         (setf (motion mob) (motion ghost-that-cheats-death))
         (setf dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob)))))
-        ))
+        )
+      )
 
     (loop for merged-id in (merged-id-list mob)
           for merged-mob = (get-mob-by-id merged-id)
@@ -1578,7 +1583,8 @@
       (add-mob-to-level-list (level *world*) (get-mob-by-id (riding-mob-id mob)))
       (setf (riding-mob-id mob) nil))
 
-    (when ghost-that-cheats-death
+    (when (and ghost-that-cheats-death
+               (not (check-dead ghost-that-cheats-death)))
       (when (riding-mob-id ghost-that-cheats-death)
         (setf (mounted-by-mob-id (get-mob-by-id (riding-mob-id ghost-that-cheats-death))) (id ghost-that-cheats-death)))
       (add-mob-to-level-list (level *world*) ghost-that-cheats-death))
@@ -1809,7 +1815,8 @@
      )
     ((and (or (mob-effect-p mob +mob-effect-possessed+)
               (mob-effect-p mob +mob-effect-disguised+))
-          (= (faction *player*) (faction mob)))
+          (= (faction *player*) (faction mob))
+          (not (mob-effect-p mob +mob-effect-life-guard+)))
      (glyph-color (get-mob-type-by-id (mob-type mob))))
     ((and (mob-ability-p *player* +mob-abil-angel+)
           (= (faction *player*) (faction mob)))
@@ -1981,6 +1988,23 @@
   (when (mob-effect-p mob +mob-effect-disguised+)
     (setf (face-mob-type-id mob) (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-disguised+))))))
 
+(defun mob-transfer-effects (actor target)
+  (loop for effect-id being the hash-value in (effects actor)
+        for effect = (get-effect-by-id effect-id)
+        do
+           (if (mob-effect-p target (effect-type effect))
+             (progn
+               (if (> (cd effect)
+                      (cd (get-effect-by-id (mob-effect-p target (effect-type effect)))))
+                 (setf (cd (get-effect-by-id (mob-effect-p target (effect-type effect))))
+                       (cd effect))
+                 (rem-mob-effect actor (effect-type effect))))
+             (progn
+               (setf (gethash (effect-type effect) (effects target)) effect-id)
+               (setf (actor-id effect) (id target))
+               (funcall (on-add (get-effect-type-by-id (effect-type effect))) effect target)
+               (remhash (effect-type effect) (effects actor))))))
+  
 ;;-------------------------------
 ;; Common cards & abilities funcs
 ;;-------------------------------
