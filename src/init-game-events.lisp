@@ -599,9 +599,7 @@
                                                                   (score (calculate-player-score 1450))
                                                                   (highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                  score
-                                                                                                                                 (if (mimic-id-list *player*)
-                                                                                                                                   (faction-name *player*)
-                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
+                                                                                                                                 (faction-name *player*)
                                                                                                                                  (real-game-time world)
                                                                                                                                  final-str
                                                                                                                                  (level-layout (level world)))

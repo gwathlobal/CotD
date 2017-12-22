@@ -1419,8 +1419,9 @@
         (rem-mob-effect mob +mob-effect-life-guard+)
         (mob-depossess-target mob)
         (setf ghost-that-cheats-death mob)
+        (mob-transfer-effects mob slave-mob)
         (when (and aux-params
-                   (mob-ability-p ghost-that-cheats-death +mob-abil-undead+)
+                   (mob-ability-p slave-mob +mob-abil-undead+)
                    (find :is-fire aux-params))
           (setf (cur-hp ghost-that-cheats-death) 0))
         (setf mob slave-mob)
@@ -1994,8 +1995,9 @@
         do
            (if (mob-effect-p target (effect-type effect))
              (progn
-               (if (> (cd effect)
-                      (cd (get-effect-by-id (mob-effect-p target (effect-type effect)))))
+               (if (or (eq (cd effect) t)
+                       (> (cd effect)
+                          (cd (get-effect-by-id (mob-effect-p target (effect-type effect))))))
                  (setf (cd (get-effect-by-id (mob-effect-p target (effect-type effect))))
                        (cd effect))
                  (rem-mob-effect actor (effect-type effect))))

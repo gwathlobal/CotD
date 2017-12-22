@@ -5814,6 +5814,10 @@
                                                 (declare (ignore ability-type))
                                                 (logger (format nil "MOB-GHOST-POSSESS: ~A [~A] uses ranged possession on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
+                                                ;; remove invisibility
+                                                (when (mob-effect-p actor +mob-effect-invisibility+)
+                                                  (rem-mob-effect actor +mob-effect-invisibility+))
+                                                
                                                 ;; you depossess your currently possessed body
                                                 (when (slave-mob-id actor)
                                                   (let ((slave-mob (get-mob-by-id (slave-mob-id actor))))
@@ -5844,6 +5848,7 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
                                                          (mob-possess-target actor target)
+                                                         (mob-transfer-effects target actor)
                                                          (set-mob-effect actor :effect-type-id +mob-effect-life-guard+ :actor-id (id actor) :cd t)
                                                          )
                                                        ;; you can not possess the target for any reason
