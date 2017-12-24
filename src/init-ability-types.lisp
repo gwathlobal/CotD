@@ -6153,7 +6153,8 @@
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (if (and (< (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*)) 2)
                                                                (check-move-on-level *player* (view-x *player*) (view-y *player*) (view-z *player*))
-                                                               )
+                                                               (not (and (not (mob-ability-p *player* +mob-abil-undead+))
+                                                                         (= (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*)) 0))))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)

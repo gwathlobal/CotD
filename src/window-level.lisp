@@ -412,6 +412,7 @@
                           (let ((abil-name-list nil)
                                 (abil-descr-list nil)
                                 (abil-prompt-list nil)
+                                (abil-color-list nil)
                                 (mob-abilities (get-mob-all-abilities *player*)))
                             
                             ;; filter ability list to leave only non passive and applicable
@@ -443,6 +444,16 @@
                                                             (format nil "CD: ~A turn~:P. " (abil-cur-cd-p *player* ability-type-id)))
                                                           (/ (spd (get-ability-type-by-id ability-type-id)) +normal-ap+))))))
 
+                                ;; populate the ability description list
+                                (setf abil-color-list
+                                      (loop
+                                        for ability-type-id in mob-abilities
+                                        collect (if (or (not (abil-applic-cost-p ability-type-id *player*))
+                                                        (not (abil-applic-cd-p ability-type-id *player*)))
+                                                  sdl:*red*
+                                                  sdl:*white*)
+                                                ))
+
                                 ;; populate the ability prompt list
                                 (setf abil-prompt-list
                                       (loop
@@ -457,6 +468,7 @@
                                                                       :return-to *current-window*
                                                                       :header-line "Choose ability:"
                                                                       :descr-list abil-descr-list
+                                                                      :color-list abil-color-list
                                                                       :enter-func #'(lambda (cur-sel)
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (cond

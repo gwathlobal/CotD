@@ -5,6 +5,7 @@
    (header-line :initform nil :initarg :header-line :accessor header-line)
    (line-list :initarg :line-list :accessor line-list :type list)
    (descr-list :initform nil :initarg :descr-list :accessor descr-list)
+   (color-list :initform nil :initarg :color-list :accessor color-list)
    (prompt-list :initarg :prompt-list :accessor prompt-list :type list) ;; each value is (<func if this prompt should apply with 1 arg - cur-sel> <prompt string proper>)
    (enter-func :initarg :enter-func :accessor enter-func) ;; 1 arg - cur-sel
    )) 
@@ -51,10 +52,14 @@
       (dotimes (i (length (line-list win)))
 	;; choose the description
 	;;(setf lst (append lst (list (aref (line-array win) i))))
-	
+
+        (format t "COLOR-LIST ~A~%" (color-list win))
 	(if (= i cur-str) 
-	    (setf color-list (append color-list (list sdl:*yellow*)))
-	    (setf color-list (append color-list (list sdl:*white*)))))
+          (setf color-list (append color-list (list sdl:*yellow*)))
+          (if (color-list win)
+            (setf color-list (append color-list (list (nth i (color-list win)))))
+            (setf color-list (append color-list (list sdl:*white*)))))
+        )
       (draw-selection-list (line-list win) cur-str (length (line-list win)) (- (truncate *window-width* 2) 150) (1+ y) :color-list color-list :use-letters t))
 
     ;; drawing descriptions
