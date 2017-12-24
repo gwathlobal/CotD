@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+December 24, 2017 v1.2.5
+
 - Introduced a new playable character - the Lost soul. It is a very fragile (1 HP) non-corporeal being that can possess humans and dead bodies. Unlike demons, its possession ability is improved - it gains all the abilities of the victims and uses their HP instead of its own. When the victim dies, it just leaves the body ready to jump into another target in range.
 - When in ghost form the Lost soul can turn completely invisible and escape any dangerous situation, as well as pass through walls and floors.
 - The aim of the Lost soul is to find the Book of Rituals stored in the library and use it on the sacrificial circle on the lowest floor of the satanists' lair. 

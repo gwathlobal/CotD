@@ -9,22 +9,19 @@ The year is 1915. The Great War thunders in the west, but the Hinterland is not 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.2.4
+LATEST CHANGES v1.2.5
 
-- Added signal flares to Scouts. Signal flares prompt the artillery that the military has deployed outside the City to strike at the location of the flare. This strike deals significant iron and fire damage around the location where the strike lands.
-- The Eater of the dead can now mutate and grow various organs that can help it in its quest to destroy the outsiders.
-- For offensive mutations, the Eater of the dead can choose from clawed tentacles (an increased melee attack), acid spite (an additional ranged attack) or corrosive bile (a cooldown ability similar to an artillery strike).
-- For defensive mutations, the Eater of the dead can choose from chitinous plating (a passive direct resistance increase), metabolic boost (an active ability that grants increased speed and dodging) or retracting spines (an active ability that gives increased percentage resistances and inflicts damage to melee attackers).
-- For spawning mutation, the Eater of the dead has either spawning sacs or an ovipositor. The spawning sacs can spawn locusts which are rather weak creatures that can attack in melee but die off naturally after a number of turns. The ovipositor spawns scarabs which are living bombs that roll to the target and explode dealing acid damage to everybody around. You can further enhance your spawns by giving locusts an acid bite and making them tougher or making scarabs roll faster and spawning more of them.
-- From the very start, to boost its combat prowess the Eater of the dead now has an adrenal gland. When the Eater attacks someone, the gland secrets adrenaline which makes all melee and ranged attacks faster.
-- The Eater of the dead can create parasites that can be thrown onto enemies. A parasited character will always reveal its location to the Eater.
-- The Eater of the dead can cure mutations that you do not find helpful.
-- When the Eater of the dead devours corpses, it has a chance to get abilities depending on the type of the corpse.
-- The Eater of the dead can no longer use primordial power.
-- The Eater of the dead starts with 2 power that you can immediately use on mutations. 
-- If an ability requires the player to select a target, the game will initially focus the applicable target (instead of always focusing hostile characters).
-- Irradiation has a small chance to mutate you giving you a minor negative effect.
-- Malseraph can sometimes cure malmutations of its followers.
+- Introduced a new playable character - the Lost soul. It is a very fragile (1 HP) non-corporeal being that can possess humans and dead bodies. Unlike demons, its possession ability is improved - it gains all the abilities of the victims and uses their HP instead of its own. When the victim dies, it just leaves the body ready to jump into another target in range.
+- When in ghost form the Lost soul can turn completely invisible and escape any dangerous situation, as well as pass through walls and floors.
+- The aim of the Lost soul is to find the Book of Rituals stored in the library and use it on the sacrificial circle on the lowest floor of the satanists' lair. 
+- Added a second tier of defensive mutations for the Eater of the dead. These are thick carapace (even more passive damage resistance), acidic tips (extended spines start to deal acid damage) and jump (gain an ability to jump similar to the thief).
+- Added a second tier of offensive mutations for the Eater of the dead. These are piercing needles (constricted target have reduced dodge), increased acid strength (acid spit also reduces flesh and acid resistances) and increased cerebellum (corrosive bile always lands to the destination target).
+- Added survival mutations to the Eater of the dead like hooks & sucker cups (lets you climb walls) and facade readjustment (lets you disguise yourself as a human).
+- Spawning mutations are rearranged for the Eater of the dead. The ovipositor is now the prerequisite for all spawning mutations. Then you can branch into locusts or scarabs. Parasites are now dependent on the ovipositor as well. All spawning is no longer immediate - first, you need to lay eggs and wait before they grow.
+- The Eater of the dead can gain an ability to spawn seeker larvae. These small creatures are harmless but eat corpses and transfer their power to you.
+- The Eater of the dead can gain an ability to spawn spore colonies. These are immobile creatures that spit acid at their enemies in sight.
+- Fixed the bug when you could throw the parasite through solid objects.
+- Added a card that could polymorph enemies into trees. Trees are immobile and do negligible damage but have superior defenses.
 
 --------------------
 FEATURES
