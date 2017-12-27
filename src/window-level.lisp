@@ -469,6 +469,11 @@
                                                                       :header-line "Choose ability:"
                                                                       :descr-list abil-descr-list
                                                                       :color-list abil-color-list
+                                                                      :select-color-func #'(lambda (n)
+                                                                                             (if (or (not (abil-applic-cost-p (nth n mob-abilities) *player*))
+                                                                                                     (not (abil-applic-cd-p (nth n mob-abilities) *player*)))
+                                                                                               (sdl:color :r 255 :g 69 :b 0)
+                                                                                               sdl:*yellow*))
                                                                       :enter-func #'(lambda (cur-sel)
                                                                                       (when (can-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                         (cond

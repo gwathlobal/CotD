@@ -8,6 +8,7 @@
    (color-list :initform nil :initarg :color-list :accessor color-list)
    (prompt-list :initarg :prompt-list :accessor prompt-list :type list) ;; each value is (<func if this prompt should apply with 1 arg - cur-sel> <prompt string proper>)
    (enter-func :initarg :enter-func :accessor enter-func) ;; 1 arg - cur-sel
+   (select-color-func :initform nil :initarg :select-color-func :accessor select-color-func) ;; 1 arg - cur-sel
    )) 
 
 (defmethod make-output ((win select-obj-window))
@@ -53,9 +54,10 @@
 	;; choose the description
 	;;(setf lst (append lst (list (aref (line-array win) i))))
 
-        (format t "COLOR-LIST ~A~%" (color-list win))
-	(if (= i cur-str) 
-          (setf color-list (append color-list (list sdl:*yellow*)))
+        (if (= i cur-str) 
+          (if (select-color-func win)
+            (setf color-list (append color-list (list (funcall (select-color-func win) cur-str)))) 
+            (setf color-list (append color-list (list sdl:*yellow*))))
           (if (color-list win)
             (setf color-list (append color-list (list (nth i (color-list win)))))
             (setf color-list (append color-list (list sdl:*white*)))))
