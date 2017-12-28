@@ -121,6 +121,11 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'test-level-place-mobs mob-func-list)
                                                                                                              
                                                        (push +game-event-lose-game-died+ game-event-list)
@@ -136,6 +141,11 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
@@ -228,6 +238,11 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
@@ -334,7 +349,12 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
-                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
@@ -442,6 +462,11 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
@@ -588,6 +613,11 @@
                                                        (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
                                                                  (populate-world-with-mobs world (list (cons +mob-type-ghost+ 1))
                                                                                            #'find-unoccupied-place-inside))
@@ -726,6 +756,11 @@
                                                        (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
                                                                  (populate-world-with-mobs world (list (cons +mob-type-ghost+ 1))
                                                                                            #'find-unoccupied-place-inside))
@@ -825,6 +860,11 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
@@ -934,6 +974,11 @@
                                                        (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
                                                                  (populate-world-with-mobs world (list (cons +mob-type-ghost+ 1))
                                                                                            #'find-unoccupied-place-inside))
@@ -1039,6 +1084,11 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
@@ -1148,6 +1198,11 @@
                                                        (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
                                                                  (populate-world-with-mobs world (list (cons +mob-type-ghost+ 1))
                                                                                            #'find-unoccupied-place-inside))
@@ -1251,6 +1306,11 @@
                                                        (push #'replace-gold-features-with-items mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
                                                                  (populate-world-with-mobs world (list (cons +mob-type-ghost+ 1))
                                                                                            #'find-unoccupied-place-inside))
@@ -1338,6 +1398,11 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with 1 ghost
@@ -1431,6 +1496,11 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-initial-visibility mob-func-list)
                                                        (push #'replace-gold-features-with-items mob-func-list)
+                                                       (push #'(lambda (world mob-template-list)
+                                                                 (declare (ignore mob-template-list))
+                                                                 ;; populate the world with demonic runes
+                                                                 (place-demonic-runes world))
+                                                             mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; remove the player satanist starting feature

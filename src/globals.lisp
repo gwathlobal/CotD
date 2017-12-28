@@ -398,6 +398,7 @@
 (defconstant +feature-smoke-flare-final+ 12)
 (defconstant +feature-corrosive-bile-target+ 13)
 (defconstant +feature-sacrificial-circle+ 14)
+(defconstant +feature-demonic-rune+ 15)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -419,6 +420,7 @@
 (defconstant +terrain-trait-openable-window+ 13)
 (defconstant +terrain-trait-flammable+ 14)
 (defconstant +terrain-trait-can-jump-over+ 15)
+(defconstant +terrain-trait-can-have-rune+ 16)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)

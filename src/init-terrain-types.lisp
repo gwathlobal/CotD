@@ -98,7 +98,8 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-stone+ :name "stone wall"
                                                :glyph-idx 96 :glyph-color sdl:*white* :back-color sdl:*white* 
-                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-sound 25 :trait-blocks-sound-floor 20 :trait-opaque-floor t))
+                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-sound 25 :trait-blocks-sound-floor 20 :trait-opaque-floor t
+                                               :trait-can-have-rune t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-barricade+ :name "barricade"
                                                :glyph-idx 3 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 

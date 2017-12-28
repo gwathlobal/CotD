@@ -16,6 +16,7 @@
    ;; :trait-no-gravity - +feature-trait-no-gravity+
    ;; :trait-fire - +feature-trait-fire+
    ;; :trait-remove-on-dungeon-generation - +feature-trait-remove-on-dungeon-generation+
+   ;; :trait-can-have-rune - +feature-trait-can-have-rune+
    (can-merge-func :initform #'(lambda (level feature-new)
                                  (let ((result nil))
                                    (loop for feat-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))

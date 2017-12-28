@@ -634,6 +634,29 @@
     )
   )
 
+(defun place-demonic-runes (world)
+  (let ((demonic-runes ())
+        (max-runes 6))
+    (loop with max-x = (array-dimension (terrain (level *world*)) 0)
+          with max-y = (array-dimension (terrain (level *world*)) 1)
+          with max-z = (array-dimension (terrain (level *world*)) 2)
+          for x = (random max-x)
+          for y = (random max-y)
+          for z = (random max-z)
+          while (< (length demonic-runes) max-runes) do
+            (when (and (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-can-have-rune+)
+                       (null (find (list x y z) demonic-runes :test #'(lambda (a b)
+                                                                        (if (and (= (first a) (first b))
+                                                                                 (= (second a) (second b))
+                                                                                 (= (third a) (third b)))
+                                                                          t
+                                                                          nil)))))
+              (push (list x y z) demonic-runes)))
+    (loop for (x y z) in demonic-runes do
+      (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-demonic-rune+ :x x :y y :z z)))))
+            
+          
+
 (defun place-reserved-buildings-forest (reserved-level)
   (let ((result))
     ;; place +building-city-park-tiny+ and +building-city-park-3+ along the borders
