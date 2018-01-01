@@ -5797,7 +5797,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-float+ :name "Floating" :descr "You float in the air and do not take any damage when falling down from any height. Does not work when you possess a corporeal body." 
+                                 :id +mob-abil-float+ :name "Floating" :descr "You float in the air and do not take any damage when falling down from any height. You do not generate any sounds or footprints while moving. Does not work when you possess a corporeal body." 
                                  :passive t :cost 0 :spd 0
                                  :final nil :on-touch nil
                                  :on-invoke nil

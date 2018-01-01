@@ -325,14 +325,16 @@
                (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-stand*)
                
                ;; generate sound
-               (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-stand* #'(lambda (str)
-                                                                                                   (format nil "You hear some scratching~A. " str))))
+               (when (not (mob-ability-p mob +mob-abil-float+))
+                 (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-stand* #'(lambda (str)
+                                                                                                     (format nil "You hear some scratching~A. " str)))))
              (progn
                (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-move*)
                
                ;; generate sound
-               (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-move* #'(lambda (str)
-                                                                                                  (format nil "You hear rustling~A. " str)))
+               (when (not (mob-ability-p mob +mob-abil-float+))
+                 (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-move* #'(lambda (str)
+                                                                                                    (format nil "You hear rustling~A. " str))))
                ))
            
            
@@ -348,14 +350,16 @@
              (incf-mob-motion mob *mob-motion-stand*)
 
              ;; generate sound
-             (generate-sound mob x y z *mob-sound-stand* #'(lambda (str)
-                                                             (format nil "You hear some scratching~A. " str))))
+             (when (not (mob-ability-p mob +mob-abil-float+))
+               (generate-sound mob x y z *mob-sound-stand* #'(lambda (str)
+                                                               (format nil "You hear some scratching~A. " str)))))
            (progn
              (incf-mob-motion mob *mob-motion-move*)
 
              ;; generate sound
-             (generate-sound mob x y z *mob-sound-move* #'(lambda (str)
-                                                            (format nil "You hear rustling~A. " str)))
+             (when (not (mob-ability-p mob +mob-abil-float+))
+               (generate-sound mob x y z *mob-sound-move* #'(lambda (str)
+                                                              (format nil "You hear rustling~A. " str))))
              ))
          )))
 

@@ -52,8 +52,8 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-snow+ :name "snow"
                                                :glyph-idx 95 :glyph-color sdl:*white* :back-color sdl:*black* 
                                                :on-step #'(lambda (mob x y z)
-                                                            (declare (ignore mob))
-                                                            (set-terrain-* (level *world*) x y z +terrain-floor-snow-prints+))
+                                                            (when (not (mob-ability-p mob +mob-abil-float+))
+                                                              (set-terrain-* (level *world*) x y z +terrain-floor-snow-prints+)))
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-snow-prints+ :name "snow"
