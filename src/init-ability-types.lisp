@@ -5471,10 +5471,10 @@
                                  :on-add-mutation #'(lambda (ability-type actor)
                                                       (declare (ignore ability-type))
                                                       (when (and (mob-ability-p actor +mob-abil-corroding-secretion+)
-                                                               (mob-ability-p actor +mob-abil-acid-spit+))
+                                                                 (mob-ability-p actor +mob-abil-acid-spit+))
                                                         (setf (weapon actor) (list "Tentacles & Acid spit"
                                                                                    (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
-                                                                                   (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges :corrodes))))
+                                                                                   (list +weapon-dmg-acid+ 1 3 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes))))
                                                         (adjust-r-acc actor)
                                                         )
                                                       )
@@ -5482,7 +5482,7 @@
                                                          (declare (ignore ability-type))
                                                          (setf (weapon actor) (list "Tentacles & Acid spit"
                                                                                     (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts))
-                                                                                    (list +weapon-dmg-acid+ 1 3 +normal-ap+ 0 1 100 "spits at" (list :no-charges))))
+                                                                                    (list +weapon-dmg-acid+ 1 3 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges))))
                                                          (adjust-r-acc actor)
                                                       )))
 

@@ -1,3 +1,7 @@
+STAIRS
+
+The game does not really have stairs but ramps. To go up the ramp you need to stand on it and move towards the wall. The resulting movement will take you upstairs.
+
 GRAVITY
 
 When you step into a tile with no floor in it (like empty air), you will fall down until you hit something solid. If the distance that you have traveled while falling is more than 1 Z level, you will take 5 damage for each level beyond 1. Falling into water will not lessen the damage.

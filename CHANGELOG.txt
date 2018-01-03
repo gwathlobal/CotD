@@ -1,6 +1,7 @@
 CHANGELOG
 
 - Ghosts leave no footprints on snow and generate no sounds while moving.
+- Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
 
 --------------------
 December 24, 2017 v1.2.5
