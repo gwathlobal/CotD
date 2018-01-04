@@ -5,7 +5,7 @@ CHANGELOG
 - Demon word: Plague lets a satanist spread virulent soul sickness that will deals damage over time.
 - Demon word: Power lets a satanist temporarily gain the power of an Archdemon.
 - Ghosts leave no footprints on snow and generate no sounds while moving.
-- Blessings and divine shield now offer a one-time protection from ghost's possession.
+- Blessings and divine shield now offer complete protection from ghost's possession.
 - Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
 
 --------------------

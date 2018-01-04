@@ -5805,7 +5805,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-ghost-possess+ :name "Possess" :descr "You are able to possess humans or corpses from a distance. Note that you can attempt to possess anybody but the ability will fail on inappropriate targets. An attempt to possess a blessed or divine shielded target will fail but consume the blessing or shield. While in possession of a host, you wear its body as your own, gaining all its abilities and HP as the result. When your host dies, you emerge from the body unscathed (except for cases when an angel kills your zombie host - you will burn together with your body)." 
+                                 :id +mob-abil-ghost-possess+ :name "Possess" :descr "You are able to possess humans or corpses from a distance. Note that you can attempt to possess anybody but the ability will fail on inappropriate targets. You can not possess a blessed or divine shielded character. While in possession of a host, you wear its body as your own, gaining all its abilities and HP as the result. When your host dies, you emerge from the body unscathed (except for cases when an angel kills your zombie host - you will burn together with your body)." 
                                  :cd 8 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -5864,7 +5864,6 @@
                                                                                  (format nil "~A tries to possess ~A, but the blessing protects from it. "
                                                                                          (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                          (prepend-article +article-the+ (visible-name target))))
-                                                          (rem-mob-effect target +mob-effect-blessed+)
                                                           ))
                                                        ;; you failed to possess a divine protected target
                                                        ((and (mob-ability-p target +mob-abil-possessable+)
@@ -5875,7 +5874,6 @@
                                                                                  (format nil "~A tries to possess ~A, but the divine shield protects from it. "
                                                                                          (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                          (prepend-article +article-the+ (visible-name target))))
-                                                          (rem-mob-effect target +mob-effect-divine-shield+)
                                                           ))
                                                        ;; you can not possess the target for any other reason
                                                        (t
