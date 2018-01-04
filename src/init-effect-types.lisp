@@ -609,7 +609,19 @@
                                                              (declare (ignore effect actor))
                                                              sdl:*magenta*)
                                              :on-add #'(lambda (effect actor)
-                                                         
+
+                                                         (when (mob-effect-p actor +mob-effect-avatar-of-brilliance+)
+                                                           (rem-mob-effect actor +mob-effect-avatar-of-brilliance+))
+
+                                                         (when (mob-effect-p actor +mob-effect-empowered-undead+)
+                                                           (rem-mob-effect actor +mob-effect-empowered-undead+))
+
+                                                         (when (mob-effect-p actor +mob-effect-polymorph-tree+)
+                                                           (rem-mob-effect actor +mob-effect-polymorph-tree+))
+
+                                                         (when (mob-effect-p actor +mob-effect-demonic-power+)
+                                                           (rem-mob-effect actor +mob-effect-demonic-power+))
+                                                                                                                  
                                                          (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
@@ -837,7 +849,19 @@
                                                              (declare (ignore effect actor))
                                                              sdl:*magenta*)
                                              :on-add #'(lambda (effect actor)
+
+                                                         (when (mob-effect-p actor +mob-effect-avatar-of-brilliance+)
+                                                           (rem-mob-effect actor +mob-effect-avatar-of-brilliance+))
+
+                                                         (when (mob-effect-p actor +mob-effect-empowered-undead+)
+                                                           (rem-mob-effect actor +mob-effect-empowered-undead+))
+
+                                                         (when (mob-effect-p actor +mob-effect-polymorph-sheep+)
+                                                           (rem-mob-effect actor +mob-effect-polymorph-sheep+))
                                                          
+                                                         (when (mob-effect-p actor +mob-effect-demonic-power+)
+                                                           (rem-mob-effect actor +mob-effect-demonic-power+))
+
                                                          (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                     (format nil "You hear some strange noise~A. " str)))
                                                          
@@ -1014,3 +1038,65 @@
                                                                                                                    (format nil "~A takes no damage from soul sickness. "
                                                                                                                            (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
                                                           )))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-demonic-power+ :name "Demonic power"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*magenta*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (let ((old-max-hp (max-hp actor)))
+                                                           (setf (mob-type actor) +mob-type-satanist-empowered+)
+                                                           (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                           (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                         (setf (face-mob-type-id actor) (mob-type actor))
+                                                         (set-cur-weapons actor)
+                                                         (adjust-abilities actor)
+                                                         (adjust-dodge actor)
+                                                         (adjust-armor actor)
+                                                         (adjust-m-acc actor)
+                                                         (adjust-r-acc actor)
+                                                         (adjust-sight actor)
+                                                         (incf (total-demons *world*))
+                                                         
+                                                         ;; set up current abilities cooldowns
+                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                         
+                                                         (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                                    (format nil "You hear some strange noise~A. " str)))
+                                                         
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A gains demonic power. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (let ((old-max-hp (max-hp actor)))
+                                                              (setf (mob-type actor) +mob-type-satanist+)
+                                                              (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                              (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                            (setf (face-mob-type-id actor) (mob-type actor))
+                                                            (set-cur-weapons actor)
+                                                            (adjust-abilities actor)
+                                                            (adjust-dodge actor)
+                                                            (adjust-armor actor)
+                                                            (adjust-m-acc actor)
+                                                            (adjust-r-acc actor)
+                                                            (adjust-sight actor)
+                                                            (decf (total-demons *world*))
+                                                            
+                                                            ;; set up current abilities cooldowns
+                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                               when (null (gethash ability-id (abilities-cd actor)))
+                                                                 do
+                                                                    (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                            
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                               (format nil "You hear some strange noise~A.~%" str)))
+                                                            
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                   (format nil "~A transforms back into a human being. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                            
+                                                            )
+                                             ))

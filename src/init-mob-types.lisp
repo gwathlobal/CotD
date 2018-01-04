@@ -125,8 +125,20 @@
                                        :base-light-radius 4
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-soul t
                                        :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t :abil-ignite-the-fire t :abil-decipher-rune t
-                                       :abil-demon-word-flesh t :abil-demon-word-plague t
+                                       :abil-demon-word-flesh t :abil-demon-word-plague t :abil-demon-word-power t
                              ))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist-empowered+ 
+                                       :name "empowered satanist"
+                                       :glyph-idx 36 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 30 :max-fp 0
+                                       :faction +faction-type-demons+
+                                       :weapon (list "Vorpal claws" (list +weapon-dmg-vorpal+ 4 8 +normal-ap+ 100 ()) nil) :base-dodge 20
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
+                                       :strength 4
+                                       :base-light-radius 0
+                                       :abil-detect-good t :abil-human t :abil-unholy t :abil-soul t :abil-unholy t :abil-loves-infighting t :abil-demon t :abil-lifesteal t :abil-no-breathe t
+                                       :abil-free-call t :abil-toggle-light t :abil-open-close-door t :abil-charge t :abil-answer-the-call t
+                                       :ai-curious t))
 
 ;;--------------------
 ;; CRIMINALS

@@ -2258,7 +2258,7 @@
                                                       )))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform youself into an Avatar of Brilliance for 6 turns, significantly boosting your combat prowess." 
+                                 :id +mob-abil-avatar-of-brilliance+ :name "Avatar of Brilliance" :descr "Transform yourself into an Avatar of Brilliance for 6 turns, significantly boosting your combat prowess." 
                                  :cost 4 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -6461,3 +6461,39 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-demon-word-power+ :name "Demon word: Power" :descr "Gain the powers of an Archdemon for 7 turns. Available only if you have deciphered demon runes Un and Med." 
+                                 :cd 15 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-demonic-power+ :actor-id (id actor) :cd 7)
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-demon-word-power+)
+                                                               (not (mob-effect-p actor +mob-effect-demonic-power+))
+                                                               (not (mob-effect-p actor +mob-effect-silence+))
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-flesh+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-transform+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (or (and nearest-enemy
+                                                                    (> (strength nearest-enemy) 
+                                                                       (strength actor)))
+                                                               (and nearest-enemy
+                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                       0.3)))
+                                                           (null (riding-mob-id actor))
+                                                           (mob-ability-p actor +mob-abil-demon-word-power+)
+                                                           (can-invoke-ability actor actor +mob-abil-demon-word-power+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

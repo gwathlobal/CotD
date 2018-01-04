@@ -106,6 +106,7 @@
 (defconstant +mob-type-spore-colony+ 49)
 (defconstant +mob-type-ghost+ 50)
 (defconstant +mob-type-tree+ 51)
+(defconstant +mob-type-satanist-empowered+ 52)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-humans+ 1)
@@ -344,6 +345,7 @@
 (defconstant +mob-effect-life-guard+ 52)
 (defconstant +mob-effect-invisibility+ 53)
 (defconstant +mob-effect-soul-sickness+ 54)
+(defconstant +mob-effect-demonic-power+ 55)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)
