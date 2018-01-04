@@ -6203,3 +6203,110 @@
                                                           (progn
                                                             nil))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-decipher-rune+ :name "Decipher rune" :descr "Study a demonic rune and learn its meaning. You must stand next to a rune to study it." 
+                                 :cost 0 :spd (* +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 60
+                                 :start-map-select-func #'player-start-map-select-self
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target here is a feature (demonic rune) to be deciphered
+                                                (logger (format nil "MOB-DECIPHER-RUNE: ~A [~A] deciphers ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor)
+                                                                (name target) (id target) (x target) (y target) (z target)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A deciphers ~A. "
+                                                                                                                             (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                                                             (prepend-article +article-a+ (name target))))
+                                                
+                                                (mob-pick-item actor (make-instance 'item :item-type (get-feature-type-trait target +feature-trait-demonic-rune+) :x (x actor) :y (y actor) :z (z actor) :qty 1)
+                                                               :spd nil :silent t)
+                                                (remove-feature-from-level-list (level *world*) target)
+                                                (remove-feature-from-world target)
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-decipher-rune+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((rune nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (loop for feature-id in (get-features-* (level *world*) dx dy (z actor))
+                                                                                                          for feature = (get-feature-by-id feature-id)
+                                                                                                          when (get-feature-type-trait feature +feature-trait-demonic-rune+)
+                                                                                                            do
+                                                                                                               (setf rune feature)
+                                                                                                               (loop-finish))))
+                                                    (if (and (mob-ability-p actor +mob-abil-decipher-rune+)
+                                                             (can-invoke-ability actor actor +mob-abil-decipher-rune+)
+                                                             (not nearest-enemy)
+                                                             rune
+                                                             )
+                                                      rune
+                                                      nil)))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally nearest-enemy))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((features (remove-if #'(lambda (a)
+                                                                                     (if (get-feature-type-trait (get-feature-by-id a) +feature-trait-demonic-rune+)
+                                                                                       nil
+                                                                                       t))
+                                                                                 (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                            (exit-result nil))
+
+                                                        (cond
+                                                          ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (= (view-z *player*) (z *player*))
+                                                                (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
+                                                                (> (length features) 1))
+                                                           (progn
+                                                             (let ((feature-line-list nil)
+                                                                   (feature-prompt-list)
+                                                                   (feature-list (copy-list features)))
+
+                                                               (setf feature-line-list (loop for feature-id in feature-list
+                                                                                             for feature = (get-feature-by-id feature-id)
+                                                                                             collect (format nil "~A"
+                                                                                                             (capitalize-name (name feature)))))
+                                                               ;; populate the ability prompt list
+                                                               (setf feature-prompt-list (loop for feature-id in feature-list
+                                                                                               collect #'(lambda (cur-sel)
+                                                                                                           (declare (ignore cur-sel))
+                                                                                                           "[Enter] Decipher  [Escape] Cancel")))
+                                                               
+                                                               ;; show selection window
+                                                               (setf *current-window* (make-instance 'select-obj-window 
+                                                                                                     :return-to *current-window* 
+                                                                                                     :header-line "Choose a demonic rune to decipher:"
+                                                                                                     :enter-func #'(lambda (cur-sel)
+                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (mob-invoke-ability *player* (get-feature-by-id (nth cur-sel feature-list)) ability-type-id)
+                                                                                                                     (setf *current-window* (return-to (return-to (return-to *current-window*))))
+                                                                                                                     (make-output *current-window*)
+                                                                                                                     (setf exit-result t))
+                                                                                                     :line-list feature-line-list
+                                                                                                     :prompt-list feature-prompt-list))
+                                                               (make-output *current-window*)
+                                                               (run-window *current-window*))
+                                                             exit-result)
+                                                           )
+                                                          ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                (= (view-z *player*) (z *player*))
+                                                                (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
+                                                                (= (length features) 1))
+                                                           (progn
+                                                             (clear-message-list *small-message-box*)
+                                                             (mob-invoke-ability *player* (get-feature-by-id (first features)) ability-type-id)
+                                                             t))
+                                                          (t
+                                                           (progn
+                                                             nil)))
+                                                        
+                                                        )
+                                                      )))

@@ -371,5 +371,23 @@
 (set-feature-type (make-instance 'feature-type :id +feature-sacrificial-circle+ :glyph-idx 124 :glyph-color sdl:*magenta* :back-color nil :name "Sacrificial circle"
                                  ))
 
-(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune+ :glyph-idx 123 :glyph-color sdl:*red* :back-color nil :name "Demonic rune"
-                                               ))
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-flesh+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Un"
+                                               :trait-demonic-rune +item-type-scroll-demonic-rune-flesh+))
+
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-invite+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Ged"
+                                               :trait-demonic-rune +item-type-scroll-demonic-rune-invite+))
+
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-away+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Veh"
+                                               :trait-demonic-rune +item-type-scroll-demonic-rune-away+))
+
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-transform+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Med"
+                                               :trait-demonic-rune +item-type-scroll-demonic-rune-transform+))
+
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-barrier+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Gon"
+                                               :trait-demonic-rune +item-type-scroll-demonic-rune-barrier+))
+
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-all+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Tal"
+                                               :trait-demonic-rune +item-type-scroll-demonic-rune-all+))
+
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-decay+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Drux"
+                                               :trait-demonic-rune +item-type-scroll-demonic-rune-decay+))

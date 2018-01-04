@@ -119,12 +119,12 @@
                                        :name "satanist"
                                        :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Burning touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 20
+                                       :weapon (list "Burning touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 (list :is-fire)) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-vorpal+ 3 0))
                                        :strength 1
                                        :base-light-radius 4
                                        :abil-detect-good t :abil-human t :abil-unholy t
-                                       :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t
+                                       :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t :abil-ignite-the-fire t :abil-decipher-rune t
                              ))
 
 ;;--------------------

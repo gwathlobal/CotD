@@ -280,6 +280,7 @@
 (defconstant +mob-abil-invisibility+ 146)
 (defconstant +mob-abil-passwall+ 147)
 (defconstant +mob-abil-ghost-release+ 148)
+(defconstant +mob-abil-decipher-rune+ 149)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -372,6 +373,13 @@
 (defconstant +item-type-eater-larva-egg+ 15)
 (defconstant +item-type-eater-colony-egg+ 16)
 (defconstant +item-type-book-of-rituals+ 17)
+(defconstant +item-type-scroll-demonic-rune-flesh+ 18)
+(defconstant +item-type-scroll-demonic-rune-invite+ 19)
+(defconstant +item-type-scroll-demonic-rune-away+ 20)
+(defconstant +item-type-scroll-demonic-rune-transform+ 21)
+(defconstant +item-type-scroll-demonic-rune-barrier+ 22)
+(defconstant +item-type-scroll-demonic-rune-all+ 23)
+(defconstant +item-type-scroll-demonic-rune-decay+ 24)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants
@@ -382,6 +390,7 @@
 (defconstant +feature-trait-no-gravity+ 2)
 (defconstant +feature-trait-fire+ 3)
 (defconstant +feature-trait-remove-on-dungeon-generation+ 4)
+(defconstant +feature-trait-demonic-rune+ 5)
 
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
@@ -398,7 +407,13 @@
 (defconstant +feature-smoke-flare-final+ 12)
 (defconstant +feature-corrosive-bile-target+ 13)
 (defconstant +feature-sacrificial-circle+ 14)
-(defconstant +feature-demonic-rune+ 15)
+(defconstant +feature-demonic-rune-flesh+ 15)
+(defconstant +feature-demonic-rune-invite+ 16)
+(defconstant +feature-demonic-rune-away+ 17)
+(defconstant +feature-demonic-rune-transform+ 18)
+(defconstant +feature-demonic-rune-barrier+ 19)
+(defconstant +feature-demonic-rune-all+ 20)
+(defconstant +feature-demonic-rune-decay+ 21)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

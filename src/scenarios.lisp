@@ -636,24 +636,33 @@
 
 (defun place-demonic-runes (world)
   (let ((demonic-runes ())
-        (max-runes 6))
+        (rune-list (list +feature-demonic-rune-flesh+ +feature-demonic-rune-flesh+
+                         +feature-demonic-rune-invite+ +feature-demonic-rune-invite+
+                         +feature-demonic-rune-away+ +feature-demonic-rune-away+
+                         +feature-demonic-rune-transform+ +feature-demonic-rune-transform+
+                         +feature-demonic-rune-barrier+ +feature-demonic-rune-barrier+
+                         +feature-demonic-rune-all+ +feature-demonic-rune-all+
+                         +feature-demonic-rune-decay+ +feature-demonic-rune-decay+)))
     (loop with max-x = (array-dimension (terrain (level *world*)) 0)
           with max-y = (array-dimension (terrain (level *world*)) 1)
           with max-z = (array-dimension (terrain (level *world*)) 2)
+          with cur-rune = 0
           for x = (random max-x)
           for y = (random max-y)
           for z = (random max-z)
-          while (< (length demonic-runes) max-runes) do
+          while (< (length demonic-runes) (length rune-list)) do
             (when (and (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-can-have-rune+)
                        (null (find (list x y z) demonic-runes :test #'(lambda (a b)
-                                                                        (if (and (= (first a) (first b))
-                                                                                 (= (second a) (second b))
-                                                                                 (= (third a) (third b)))
+                                                                        (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
                                                                           t
-                                                                          nil)))))
-              (push (list x y z) demonic-runes)))
-    (loop for (x y z) in demonic-runes do
-      (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-demonic-rune+ :x x :y y :z z)))))
+                                                                          nil)
+                                                                        ))))
+              (push (list x y z (nth cur-rune rune-list)) demonic-runes)
+              (incf cur-rune)))
+    (loop for (x y z feature-type-id) in demonic-runes do
+      ;;(format t "PLACE RUNE ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id feature-type-id)) x y z)
+      (add-feature-to-level-list (level world) (make-instance 'feature :feature-type feature-type-id :x x :y y :z z))
+      )))
             
           
 
