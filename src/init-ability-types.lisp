@@ -2175,6 +2175,7 @@
                                                            (not (mob-effect-p actor +mob-effect-necrolink+))
                                                            nearest-ally
                                                            (mob-ability-p nearest-ally +mob-abil-undead+)
+                                                           (not (mob-ability-p nearest-ally +mob-abil-ghost-possess+))
                                                            (not (mob-effect-p nearest-ally +mob-effect-empowered-undead+)))
                                                     t
                                                     nil))
@@ -6309,4 +6310,89 @@
                                                              nil)))
                                                         
                                                         )
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-demon-word-flesh+ :name "Demon word: Flesh" :descr "Complete the demon invitation process and turn a zombie into an imp. Available only if you have deciphered demon runes Un and Ged." 
+                                 :cd 10 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 10
+                                 :start-map-select-func #'player-start-map-select-empower-undead
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-DEMON-WORD-FLESH: ~A [~A] uses demon word flesh on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+                                                ;; if used on a ghost the ability will fail
+                                                (if (mob-ability-p target +mob-abil-ghost-possess+)
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~A pronounces Demon word: Flesh, but nothing happens. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~A pronounces Demon word: Flesh and ~A turns into an imp. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                   (prepend-article +article-the+ (visible-name target))))
+                                                    
+                                                    (when (mob-effect-p target +mob-effect-empowered-undead+)
+                                                      (rem-mob-effect target +mob-effect-empowered-undead+))
+                                                    
+                                                    (let ((old-max-hp (max-hp target)))
+                                                      (setf (mob-type target) +mob-type-imp+)
+                                                      (setf (max-hp target) (max-hp (get-mob-type-by-id (mob-type target))))
+                                                      (setf (cur-hp target) (round (* (cur-hp target) (max-hp target)) old-max-hp)))
+                                                    (setf (face-mob-type-id target) (mob-type target))
+                                                    (setf (name target) nil)
+                                                    (set-name target)
+                                                    (set-cur-weapons target)
+                                                    (adjust-abilities target)
+                                                    (adjust-dodge target)
+                                                    (adjust-armor target)
+                                                    (adjust-m-acc target)
+                                                    (adjust-r-acc target)
+                                                    (adjust-sight target)
+                                                    
+                                                    ;; set up current abilities cooldowns
+                                                    (loop for ability-id being the hash-key in (abilities target)
+                                                          when (null (gethash ability-id (abilities-cd target)))
+                                                            do
+                                                               (setf (gethash ability-id (abilities-cd target)) 0))
+                                                    ))
+                                                         
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-demon-word-flesh+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+))
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-flesh+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-invite+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-enemy))
+                                                  ;; a little bit of cheating here
+                                                  (if (and (can-invoke-ability actor nearest-ally (id ability-type))
+                                                           nearest-ally
+                                                           (mob-ability-p nearest-ally +mob-abil-undead+)
+                                                           (not (mob-ability-p nearest-ally +mob-abil-ghost-possess+))
+                                                           )
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy check-result))
+                                                   (mob-invoke-ability actor nearest-ally (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob))
+                                                                 (mob-ability-p mob +mob-abil-undead+))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
                                                       )))

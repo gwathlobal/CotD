@@ -2,7 +2,6 @@
 - Demons should have the following win conditions: conquest (place N dimensional rifts), raid (take N corpses to dimensional rift), corrupt (take a holy relic to a rift and then place something instead of it), defend from angels (destroy all angels in a corrupted city), defend from military (destroy all military in a corrupted city), clash (destroy all angels in a non-corrupted city)
 - Angels should have the following win conditions: assassinate (get to demon's plane and destroy a powerful demon), cut reinforcements (destroy N dimensional rifts), defend (destroy all attacking demons)
 - Military should have the following win conditions: defend from demons (destroy all attacking demons), conquest (destroy N dimensional rifts), raid (take a holy relic from a dimensional plane)
-- Rune to upgrade a zombie into an imp (FLESH Un INVITE Ged)
 - Rune to force a unit back (AWAY Veh TRANSFORM Med)
 - Rune to cast a global spell to constantly reanimate corpses (BARRIER Gon INVITE Ged ALL Tal)
 - Rune to gain powers of demons to be able to fight in melee (FLESH Un TRANSFORM Med)

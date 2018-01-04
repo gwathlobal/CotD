@@ -125,6 +125,7 @@
                                        :base-light-radius 4
                                        :abil-detect-good t :abil-human t :abil-unholy t
                                        :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t :abil-ignite-the-fire t :abil-decipher-rune t
+                                       :abil-demon-word-flesh t
                              ))
 
 ;;--------------------

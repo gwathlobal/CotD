@@ -281,6 +281,12 @@
 (defconstant +mob-abil-passwall+ 147)
 (defconstant +mob-abil-ghost-release+ 148)
 (defconstant +mob-abil-decipher-rune+ 149)
+(defconstant +mob-abil-demon-word-flesh+ 150)
+(defconstant +mob-abil-demon-word-knockback+ 151)
+(defconstant +mob-abil-demon-word-invasion+ 152)
+(defconstant +mob-abil-demon-word-darkness+ 153)
+(defconstant +mob-abil-demon-word-plague+ 154)
+(defconstant +mob-abil-demon-word-power+ 155)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

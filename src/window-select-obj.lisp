@@ -12,7 +12,7 @@
    )) 
 
 (defmethod make-output ((win select-obj-window))
-  (let ((x (- (truncate *window-width* 2) 150)) (y (- (truncate *window-height* 2) 50)) (w 300) (h 65) (descr-h 0))
+  (let ((x (- (truncate *window-width* 2) 150)) (y (- (truncate *window-height* 2) 50)) (w 330) (h 65) (descr-h 0))
     ;; find the descr height
     (when (descr-list win)
       (sdl:with-rectangle (rect (sdl:rectangle :x x :y y :w (- w 8) :h 600))

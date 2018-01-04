@@ -160,7 +160,7 @@
   (setf *player* (make-instance 'player :mob-type +mob-type-satanist+ :x 45 :y 19 :z 3))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-satanist+ :x 50 :y 18 :z 2))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-satanist+ :x 41 :y 19 :z 2))
         ;(demon (make-instance 'mob :mob-type +mob-type-man+ :x 49 :y 19 :z 3))
         ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 49 :y 17 :z 3))
         )
@@ -197,6 +197,8 @@
     ;(mob-pick-item demon (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 5) :spd nil :silent t)
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-coin+ :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 105))
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
+    (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-scroll-demonic-rune-flesh+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
+    (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-scroll-demonic-rune-invite+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-half+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-clothing+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
