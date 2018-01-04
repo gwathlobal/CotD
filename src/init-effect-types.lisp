@@ -979,3 +979,38 @@
                                                              (declare (ignore effect actor))
                                                              sdl:*cyan*)
                                              ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-soul-sickness+ :name "Soul sickness"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*cyan*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                (format nil "~A gets infected with soul sickness. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                         )
+                                             :on-tick #'(lambda (effect actor)
+                                                          (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                          (when (and (get-mob-* (level *world*) dx dy (z actor))
+                                                                                                                     (mob-ability-p (get-mob-* (level *world*) dx dy (z actor)) +mob-abil-soul+)
+                                                                                                                     (not (mob-effect-p (get-mob-* (level *world*) dx dy (z actor)) +mob-effect-soul-sickness+)))
+                                                                                                            (set-mob-effect (get-mob-* (level *world*) dx dy (z actor))
+                                                                                                                            :effect-type-id +mob-effect-soul-sickness+
+                                                                                                                            :actor-id (id actor)
+                                                                                                                            :cd 30))))
+                                                          (when (and (zerop (random 4))
+                                                                     (> (cur-hp actor) 1)
+                                                                     (mob-ability-p actor +mob-abil-soul+))
+                                                            (inflict-damage actor :min-dmg 1 :max-dmg 1
+                                                                                  :dmg-type +weapon-dmg-mind+
+                                                                                  :att-spd nil :weapon-aux () :acc 100 
+                                                                                  :actor (get-mob-by-id (actor-id effect))
+                                                                                  :no-hit-message t
+                                                                                  :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                                (format nil "~A takes ~A damage from soul sickness. "
+                                                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                                                        cur-dmg))
+                                                                                  :specific-no-dmg-string-func #'(lambda ()
+                                                                                                                   (format nil "~A takes no damage from soul sickness. "
+                                                                                                                           (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                          )))

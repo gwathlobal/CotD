@@ -20,7 +20,7 @@
                                        :faction +faction-type-humans+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t 
                                        :abil-toggle-light t :abil-open-close-door t
                                        :ai-coward t))
 
@@ -31,7 +31,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t))
@@ -43,7 +43,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t))
@@ -55,7 +55,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 3
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :ai-coward t))
 
@@ -66,7 +66,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 10 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t))
@@ -78,7 +78,7 @@
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-clothing+ #'(lambda () (random 2))))
                              ))
@@ -90,7 +90,7 @@
                                        :weapon (list "Police baton" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                              ))
@@ -106,7 +106,7 @@
                                        :weapon (list "Cross" (list +weapon-dmg-iron+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 1
                                        :base-light-radius 6
-                                       :abil-can-be-blessed t :abil-detect-evil t :abil-human t :abil-independent t
+                                       :abil-can-be-blessed t :abil-detect-evil t :abil-human t :abil-independent t :abil-soul t
                                        :abil-toggle-light t  :abil-prayer-bless t :abil-open-close-door t :abil-smite t :abil-slow t :abil-prayer-wrath t
                                        :ai-stop t
                              ))
@@ -123,9 +123,9 @@
                                        :armor (list (list +weapon-dmg-vorpal+ 3 0))
                                        :strength 1
                                        :base-light-radius 4
-                                       :abil-detect-good t :abil-human t :abil-unholy t
+                                       :abil-detect-good t :abil-human t :abil-unholy t :abil-soul t
                                        :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t :abil-ignite-the-fire t :abil-decipher-rune t
-                                       :abil-demon-word-flesh t
+                                       :abil-demon-word-flesh t :abil-demon-word-plague t
                              ))
 
 ;;--------------------
@@ -139,7 +139,7 @@
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 30
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-independent t
+                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-independent t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t :abil-sprint t :abil-jump t :abil-make-disguise t :abil-remove-disguise t
                                        :ai-kleptomaniac t :ai-cautious t
                                        :init-items (list (list +item-type-smoke-bomb+ #'(lambda () 3)))
@@ -156,7 +156,7 @@
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                              ))
@@ -168,7 +168,7 @@
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                              ))
@@ -180,8 +180,8 @@
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
-                                       :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t
-                                       :abil-detect-good t :abil-detect-evil t :abil-horseback-riding t :abil-dismount t :abil-independent t :abil-toggle-light t :abil-open-close-door t
+                                       :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-detect-good t :abil-detect-evil t
+                                       :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t :abil-horseback-riding t :abil-dismount t :abil-independent t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                              ))
 
@@ -192,7 +192,7 @@
                                        :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 6 70 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                              ))
@@ -204,8 +204,8 @@
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 1 120 "shoots" ())) :base-dodge 25
                                        :strength 1
                                        :ai-curious t
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-starts-with-horse t
-                                       :abil-independent t :abil-detect-good t :abil-detect-evil t :abil-eagle-eye t :abil-open-close-door t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-independent t :abil-starts-with-horse t :abil-detect-good t :abil-detect-evil t
+                                       :abil-horseback-riding t :abil-dismount t :abil-eagle-eye t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)) (list +item-type-signal-flare+ #'(lambda () 2)))
                              ))
 
@@ -220,7 +220,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-heal-self 1 :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-avatar-of-brilliance t :abil-split-soul t :abil-resurrection t
                                        :ai-wants-bless t :ai-curious t))
@@ -232,7 +232,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 6 9 +normal-ap+ 100 (list :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 4
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-heal-self 2 :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
                                        :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t :abil-split-soul t :abil-resurrection t :abil-remove-disguise t
                                        :ai-wants-bless t :ai-curious t))
@@ -244,7 +244,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-righteous-fury t :abil-pain-link t :abil-resurrection t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t))
@@ -256,7 +256,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-silence t :abil-confuse t :abil-resurrection t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t))
@@ -268,7 +268,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-soul-reinforcement t :abil-resurrection t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t))
@@ -280,7 +280,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-righteous-fury t :abil-pain-link t 
                                        :abil-soul-reinforcement t :abil-resurrection t
@@ -293,7 +293,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-righteous-fury t :abil-pain-link t :abil-silence t :abil-confuse t :abil-resurrection t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t))
@@ -305,7 +305,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-soul-reinforcement t :abil-silence t :abil-confuse t
                                        :abil-resurrection t
@@ -318,7 +318,7 @@
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
-                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t
+                                       :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-righteous-fury t :abil-pain-link t
                                        :abil-soul-reinforcement t :abil-silence t :abil-confuse t :abil-resurrection t
@@ -331,7 +331,7 @@
                                        :weapon (list "Illusory fire" nil nil) :base-dodge 35
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ 0 100))
                                        :strength 0
-                                       :abil-angel t :abil-no-breathe t :abil-restore-soul t
+                                       :abil-angel t :abil-soul t :abil-no-breathe t :abil-restore-soul t
                                        :ai-split-soul t))
 
 ;;--------------------
@@ -590,7 +590,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-radiation+ 0 100) (list +weapon-dmg-acid+ 1 0))
                                        :strength 1 :base-stealth 10
                                        :base-light-radius 0 
-                                       :abil-no-breathe t :abil-undead t :abil-float t :abil-ghost-possess t :abil-no-corpse t :abil-invisibility t :abil-passwall t :abil-ghost-release t
+                                       :abil-no-breathe t :abil-undead t :abil-float t :abil-soul t :abil-ghost-possess t :abil-no-corpse t :abil-invisibility t :abil-passwall t :abil-ghost-release t
                                        ))
 
 ;;--------------------
@@ -604,7 +604,7 @@
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-animal t :abil-momentum 2 :abil-horse-can-be-ridden t
+                                       :abil-animal t :abil-momentum 2 :abil-horse-can-be-ridden t :abil-soul t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sheep+ 
@@ -614,7 +614,7 @@
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-animal t
+                                       :abil-animal t :abil-soul t
                                        :ai-coward t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-tree+ 
@@ -647,7 +647,8 @@
                                        :armor (list (list +weapon-dmg-flesh+ 4 0) (list +weapon-dmg-iron+ 2 0) (list +weapon-dmg-vorpal+ 4 0) (list +weapon-dmg-fire+ 4 0))
                                        :strength 8 :base-sight 7
                                        :map-size 3
-                                       :abil-animal t :abil-angel t :abil-facing t :abil-immovable t :abil-loves-infighting t :abil-mind-burn t :abil-heal-self 1 :abil-gargantaur-teleport t :abil-detect-evil t :abil-no-breathe t
+                                       :abil-animal t :abil-angel t :abil-facing t :abil-immovable t :abil-loves-infighting t  :abil-soul t
+                                       :abil-mind-burn t :abil-heal-self 1 :abil-gargantaur-teleport t :abil-detect-evil t :abil-no-breathe t
                                        :ai-curious t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-wisp+
@@ -658,7 +659,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 1
                                        :base-light-radius 6 :base-sight 0
-                                       :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t 
+                                       :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t :abil-soul t
                                        :ai-curious t))
 
 (set-faction-relations +faction-type-humans+

@@ -6396,3 +6396,68 @@
                                                           (progn
                                                             nil)))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-soul+ :name "Soul" :descr "You have a soul." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-demon-word-plague+ :name "Demon word: Plague" :descr "Infest the target with soul sickness. Soul sickness is a special demon-devised disease that affects only soulful beings (like humans and angels) for 30 turns. Each turn a character affected with soul sickness has a 25% chance to lose 1 HP. However, the disease never takes the last HP. Disease carrier will also infect soulful characters standing nearby. But beware, though you have pledged your service to demons you are still human and can be affected yourself. Available only if you have deciphered demon runes Un and Drux." 
+                                 :cd 10 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 10
+                                 :start-map-select-func #'player-start-map-select-nearest-hostile
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-DEMON-WORD-PLAGUE: ~A [~A] uses demon word plague on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (if (mob-ability-p target +mob-abil-soul+)
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~A pronounces Demon word: Plague. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                    (set-mob-effect target :effect-type-id +mob-effect-soul-sickness+ :actor-id (id actor) :cd 30))
+                                                  (progn
+                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                           (format nil "~A pronounces Demon word: Plague, but ~A is not affected. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                   (prepend-article +article-the+ (visible-name target))))))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-demon-word-plague+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+))
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-flesh+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-decay+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  ;; a little bit of cheating here
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (mob-ability-p nearest-enemy +mob-abil-soul+)
+                                                           (not (mob-effect-p nearest-enemy +mob-effect-soul-sickness+)))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 mob
+                                                                 (not (eq *player* mob)))
+                                                          (progn
+                                                            (clear-message-list *small-message-box*)
+                                                            (mob-invoke-ability *player* mob ability-type-id)
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

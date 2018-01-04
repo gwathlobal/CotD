@@ -287,6 +287,7 @@
 (defconstant +mob-abil-demon-word-darkness+ 153)
 (defconstant +mob-abil-demon-word-plague+ 154)
 (defconstant +mob-abil-demon-word-power+ 155)
+(defconstant +mob-abil-soul+ 156)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -342,6 +343,7 @@
 (defconstant +mob-effect-polymorph-tree+ 51)
 (defconstant +mob-effect-life-guard+ 52)
 (defconstant +mob-effect-invisibility+ 53)
+(defconstant +mob-effect-soul-sickness+ 54)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)
