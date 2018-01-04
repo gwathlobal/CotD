@@ -1,6 +1,7 @@
 CHANGELOG
 
 - Ghosts leave no footprints on snow and generate no sounds while moving.
+- Blessings and divine shield now offer a one-time protection from ghost's possession.
 - Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
 
 --------------------

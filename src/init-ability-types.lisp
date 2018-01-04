@@ -5804,7 +5804,7 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-ghost-possess+ :name "Possess" :descr "You are able to possess humans or corpses from a distance. Note that you can attempt to possess anybody but the ability will fail on inappropriate targets. While in possession of a host, you wear its body as your own, gaining all its abilities and HP as the result. When your host dies, you emerge from the body unscathed (except for cases when an angel kills your zombie host - you will burn together with your body)." 
+                                 :id +mob-abil-ghost-possess+ :name "Possess" :descr "You are able to possess humans or corpses from a distance. Note that you can attempt to possess anybody but the ability will fail on inappropriate targets. An attempt to possess a blessed or divine shielded target will fail but consume the blessing or shield. While in possession of a host, you wear its body as your own, gaining all its abilities and HP as the result. When your host dies, you emerge from the body unscathed (except for cases when an angel kills your zombie host - you will burn together with your body)." 
                                  :cd 8 :cost 0 :spd (truncate +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -5841,36 +5841,62 @@
                                                 (cond
                                                   ((subtypep (type-of target) 'mob)
                                                    (progn
-                                                     (if (and (mob-ability-p target +mob-abil-possessable+)
-                                                              (null (master-mob-id target)))
+                                                     (cond
                                                        ;; you can possess the target
-                                                       (progn
-                                                         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
-                                                         (mob-possess-target actor target)
-                                                         (mob-transfer-effects target actor)
-                                                         (set-mob-effect actor :effect-type-id +mob-effect-life-guard+ :actor-id (id actor) :cd t)
-                                                         )
-                                                       ;; you can not possess the target for any reason
-                                                       (progn
-                                                         (if (or (mob-effect-p target +mob-effect-divine-concealed+)
-                                                                 (and (mob-effect-p target +mob-effect-possessed+)
-                                                                      (not (mob-effect-p target +mob-effect-reveal-true-form+))))
-                                                           (progn
-                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                    (format nil "~A tries to possess ~A, but suddenly reveals its true form. "
-                                                                                            (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                            (prepend-article +article-the+ (visible-name target))))
-                                                             
-                                                             (rem-mob-effect target +mob-effect-divine-concealed+)
-                                                             (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
-                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                    (format nil "It is ~A. " (prepend-article +article-the+ (get-qualified-name target)))))
-                                                           (progn
-                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                    (format nil "~A tries to possess ~A, but fails. "
-                                                                                            (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                            (prepend-article +article-the+ (visible-name target)))))))
+                                                       ((and (mob-ability-p target +mob-abil-possessable+)
+                                                             (null (master-mob-id target))
+                                                             (not (mob-effect-p target +mob-effect-blessed+))
+                                                             (not (mob-effect-p target +mob-effect-divine-shield+)))
+                                                        (progn
+                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                 (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
+                                                          (mob-possess-target actor target)
+                                                          (mob-transfer-effects target actor)
+                                                          (set-mob-effect actor :effect-type-id +mob-effect-life-guard+ :actor-id (id actor) :cd t)
+                                                          ))
+                                                       ;; you failed to possess a blessed target
+                                                       ((and (mob-ability-p target +mob-abil-possessable+)
+                                                             (null (master-mob-id target))
+                                                             (mob-effect-p target +mob-effect-blessed+))
+                                                        (progn
+                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                 (format nil "~A tries to possess ~A, but the blessing protects from it. "
+                                                                                         (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                         (prepend-article +article-the+ (visible-name target))))
+                                                          (rem-mob-effect target +mob-effect-blessed+)
+                                                          ))
+                                                       ;; you failed to possess a divine protected target
+                                                       ((and (mob-ability-p target +mob-abil-possessable+)
+                                                             (null (master-mob-id target))
+                                                             (mob-effect-p target +mob-effect-divine-shield+))
+                                                        (progn
+                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                 (format nil "~A tries to possess ~A, but the divine shield protects from it. "
+                                                                                         (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                         (prepend-article +article-the+ (visible-name target))))
+                                                          (rem-mob-effect target +mob-effect-divine-shield+)
+                                                          ))
+                                                       ;; you can not possess the target for any other reason
+                                                       (t
+                                                        (progn
+                                                          (if (or (mob-effect-p target +mob-effect-divine-concealed+)
+                                                                  (and (mob-effect-p target +mob-effect-possessed+)
+                                                                       (not (mob-effect-p target +mob-effect-reveal-true-form+))))
+                                                            (progn
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                     (format nil "~A tries to possess ~A, but suddenly reveals its true form. "
+                                                                                             (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                             (prepend-article +article-the+ (visible-name target))))
+                                                              
+                                                              (rem-mob-effect target +mob-effect-divine-concealed+)
+                                                              (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                     (format nil "It is ~A. " (prepend-article +article-the+ (get-qualified-name target)))))
+                                                            (progn
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                     (format nil "~A tries to possess ~A, but fails. "
+                                                                                             (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                             (prepend-article +article-the+ (visible-name target))))))))
                                                        )))
                                                   ((subtypep (type-of target) 'item)
                                                    (progn
@@ -5908,15 +5934,30 @@
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore nearest-ally))
                                                   ;; a little bit of cheating here
-                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
-                                                           nearest-enemy
-                                                           (mob-ability-p nearest-enemy +mob-abil-possessable+)
-                                                           (null (master-mob-id nearest-enemy)))
-                                                      t
-                                                      nil))
+                                                  (let ((corpse-items (loop for item-id in (visible-items actor)
+                                                                            for item = (get-item-by-id item-id)
+                                                                            when (and (item-ability-p item +item-abil-corpse+)
+                                                                                      (not (get-mob-* (level *world*) (x item) (y item) (z item))))
+                                                                              collect item))
+                                                        (final-result nil))
+                                                    (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                             (or (null (slave-mob-id actor))
+                                                                 (and nearest-enemy
+                                                                      (mob-ability-p nearest-enemy +mob-abil-angel+)
+                                                                      (mob-ability-p actor +mob-abil-undead+)
+                                                                      (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                         0.4)))
+                                                             (or (and nearest-enemy
+                                                                      (mob-ability-p nearest-enemy +mob-abil-possessable+)
+                                                                      (null (master-mob-id nearest-enemy))
+                                                                      (setf final-result nearest-enemy))
+                                                                 (and corpse-items
+                                                                      (setf final-result (first corpse-items)))))
+                                                      final-result
+                                                      nil)))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
-                                                   (declare (ignore nearest-ally check-result))
-                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))
+                                                   (declare (ignore nearest-ally nearest-enemy))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                             (items (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))

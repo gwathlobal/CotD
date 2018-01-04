@@ -269,7 +269,7 @@
                                         (multiple-value-bind (layout-id weather-id tod-id faction-id) (run-window *current-window*)
                                           (when (and layout-id weather-id tod-id faction-id)
                                             (return-from main-menu (values layout-id weather-id tod-id faction-id)))))))
-        (highscores-item (cons "High Scores"
+        (highscores-item (cons "High scores"
                                #'(lambda (n) 
                                    (declare (ignore n))
                                    (setf *current-window* (make-instance 'highscores-window))
