@@ -4,6 +4,7 @@ CHANGELOG
 - Demon word: Flesh lets a satanist turn a zombie into a full-fledged imp that can later progress and evolve as demons usually do.
 - Demon word: Plague lets a satanist spread virulent soul sickness that will deals damage over time.
 - Demon word: Power lets a satanist temporarily gain the power of an Archdemon.
+- Demon word: Darkness turns off the sun for a period of time.
 - Ghosts leave no footprints on snow and generate no sounds while moving.
 - Blessings and divine shield now offer complete protection from ghost's possession.
 - Fixed the bug with the game freezing after completion of the Increase acid strength mutation.

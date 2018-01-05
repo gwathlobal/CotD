@@ -6467,6 +6467,15 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-DEMON-WORD-POWER: ~A [~A] uses demon word power.~%" (name actor) (id actor)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A pronounces Demon word: Power. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                    
                                                 (set-mob-effect actor :effect-type-id +mob-effect-demonic-power+ :actor-id (id actor) :cd 7)
                                                 
                                                 )
@@ -6490,6 +6499,46 @@
                                                            (null (riding-mob-id actor))
                                                            (mob-ability-p actor +mob-abil-demon-word-power+)
                                                            (can-invoke-ability actor actor +mob-abil-demon-word-power+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-demon-word-darkness+ :name "Demon word: Darkness" :descr "Plead to Nephitis to blot out the sun. The sun's power will eventually prevail but while the enchantment lasts everything will be drowned in darkness. Available only if you have deciphered demon runes Gon, Drux and Tal." 
+                                 :cd 30 :spd (* +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-DEMON-WORD-DARKNESS: ~A [~A] uses demon word darkness.~%" (name actor) (id actor)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A pronounces Demon word: Darkness. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                (pushnew +game-event-unnatural-darkness+ (game-events *world*))
+                                                (add-message "Unnatural darkness falls on the world! ")
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-demon-word-darkness+)
+                                                               (not (find +game-event-unnatural-darkness+ (game-events *world*)))
+                                                               (not (mob-effect-p actor +mob-effect-silence+))
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-barrier+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-decay+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-all+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (null (riding-mob-id actor))
+                                                           (mob-ability-p actor +mob-abil-demon-word-darkness+)
+                                                           (can-invoke-ability actor actor +mob-abil-demon-word-darkness+))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)

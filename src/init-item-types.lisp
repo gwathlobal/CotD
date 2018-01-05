@@ -731,42 +731,42 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-flesh+
                                          :name "scroll with a demonic rune Un" :plural-name "scrolls with a demonic rune Un"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Un inscribed on it. Looking at it makes you feel as if it is looking back at you."
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-invite+
                                          :name "scroll with a demonic rune Ged" :plural-name "scrolls with a demonic rune Ged"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Ged inscribed on it. Looking at it makes you feel as if it is looking back at you."
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-away+
                                          :name "scroll with a demonic rune Veh" :plural-name "scrolls with a demonic rune Veh"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Veh inscribed on it. Looking at it makes you feel as if it is looking back at you."
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-transform+
                                          :name "scroll with a demonic rune Med" :plural-name "scrolls with a demonic rune Med"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Med inscribed on it. Looking at it makes you feel as if it is looking back at you."
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-barrier+
                                          :name "scroll with a demonic rune Gon" :plural-name "scrolls with a demonic rune Gon"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Gon inscribed on it. Looking at it makes you feel as if it is looking back at you."
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-decay+
                                          :name "scroll with a demonic rune Drux" :plural-name "scrolls with a demonic rune Drux"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Drux inscribed on it. Looking at it makes you feel as if it is looking back at you."
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-all+
                                          :name "scroll with a demonic rune Tal" :plural-name "scrolls with a demonic rune Tal"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Tal inscribed on it. Looking at it makes you feel as if it is looking back at you."
                               ))

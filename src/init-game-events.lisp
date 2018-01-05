@@ -463,9 +463,16 @@
                                                          (declare (ignore world))
                                                          t)
                                            :on-trigger #'(lambda (world)
-                                                           (setf (outdoor-light (level world))
-                                                                 (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 12 60 10)) (player-game-time world))))))))
-                                                           )))
+                                                           (cond
+                                                             ((find +game-event-unnatural-darkness+ (game-events world))
+                                                              (progn
+                                                                (setf (outdoor-light (level world))
+                                                                      0)))
+                                                             (t
+                                                              (progn
+                                                                (setf (outdoor-light (level world))
+                                                                      (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 12 60 10)) (player-game-time world))))))))))
+                                                             ))))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-thief+ :disabled nil
                                            :on-check #'(lambda (world)
@@ -620,3 +627,12 @@
                                                                                 (make-output *current-window*)
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
+
+(set-game-event (make-instance 'game-event :id +game-event-unnatural-darkness+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (when (zerop (random 10))
+                                                             (setf (game-events world) (remove +game-event-unnatural-darkness+ (game-events world)))
+                                                             (add-message (format nil "Unnatural darkness is no longer.~%"))))))

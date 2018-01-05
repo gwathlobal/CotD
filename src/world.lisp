@@ -376,7 +376,11 @@
     (format nil "~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d:~2,'0d" year (1+ month) (1+ day) hour min sec)))
 
 (defun return-weather-type-str (world)
-  (cond
-    ((find +game-event-snow-falls+ (game-events world)) "Snow")
-    ((find +game-event-rain-falls+ (game-events world)) "Rain")
-    (t "Clear")))
+  (let ((str (create-string)))
+    (format str "~A" (cond
+                       ((find +game-event-snow-falls+ (game-events world)) "Snow")
+                       ((find +game-event-rain-falls+ (game-events world)) "Rain")
+                       (t "Clear")))
+    (when (find +game-event-unnatural-darkness+ (game-events world))
+      (format str ", Darkness"))
+    str))

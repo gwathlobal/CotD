@@ -30,7 +30,7 @@
 (defparameter *init-human-names* (list "Afanasiy" "Andrey" "Boris" "Ivan" "Dmitry" "Alexey" "Nicolay" "Alexander" "Pyotr" "Pavel" "Vladimir" "Mikhail" "Fyodor" "Gavriil" "Vasiliy" "Denis" "Konstantin" "Sergey" "Vladislav" "Victor"
                                        "Vsevolod" "Grigoriy" "Daniil"))
 (defparameter *init-human-surnames* (list "Grekov" "Plotnikov" "Strakhov" "Verkhovenskiy" "Shatov" "Stavrogin" "Kirillov" "Tushin" "Lebyadkin" "Liputin" "Virginskiy" "Lyamshin" "Tolkachenko" "Shigalev" "Karmazinov" "Nechayev"
-                                          "Lebedev" "Rogozhin" "Ivolgin" "Epanchin" "Ferdishchenko" "Totskiy" "Myshkin" "Pavlishchev" "Burdovskiy" "Radomskiy" "Molovtsov" "Terentyev" "Ptitsin" "Zhadov"))
+                                          "Lebedev" "Rogozhin" "Ivolgin" "Epanchin" "Ferdishchenko" "Totskiy" "Myshkin" "Pavlishchev" "Burdovskiy" "Radomskiy" "Molovtsov" "Terentyev" "Ptitsin" "Zhadov" "Zhuravishkin"))
 
 (defparameter *cur-demon-names* nil)
 (defparameter *cur-angel-names* nil)
