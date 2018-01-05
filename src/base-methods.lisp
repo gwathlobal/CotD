@@ -2189,6 +2189,24 @@
                                         (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
                                         :observed-mob mob)))))
 
+(defun mob-reanimate-corpse (corpse-item)
+  (let ((mob-corpse-type) (mob-corpse))
+    (cond
+      ((eq (item-ability-p corpse-item +item-abil-corpse+) 1) (setf mob-corpse-type +mob-type-reanimated-pwr-1+))
+      ((eq (item-ability-p corpse-item +item-abil-corpse+) 2) (setf mob-corpse-type +mob-type-reanimated-pwr-2+))
+      ((eq (item-ability-p corpse-item +item-abil-corpse+) 3) (setf mob-corpse-type +mob-type-reanimated-pwr-3+))
+      (t (setf mob-corpse-type +mob-type-reanimated-pwr-4+)))
+    (setf mob-corpse (make-instance 'mob :mob-type mob-corpse-type :x (x corpse-item) :y (y corpse-item) :z (z corpse-item)))
+    (setf (name mob-corpse) (format nil "reanimated ~A" (name corpse-item)))
+    (setf (alive-name mob-corpse) (alive-name corpse-item))
+    (add-mob-to-level-list (level *world*) mob-corpse)
+    (remove-item-from-level-list (level *world*) corpse-item)
+    (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. "
+                                                                                                (capitalize-name (prepend-article +article-the+ (visible-name corpse-item)))))
+    (logger (format nil "MOB-REANIMATE-BODY: ~A [~A] is reanimated at (~A ~A ~A).~%" (name corpse-item) (id corpse-item) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
+    (remove-item-from-world corpse-item)
+    ))
+
 (defun set-mob-piety (mob piety-num)
   (when (worshiped-god mob)
     (let ((old-piety (get-worshiped-god-piety (worshiped-god mob))))

@@ -125,7 +125,7 @@
                                        :base-light-radius 4
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-soul t
                                        :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t :abil-ignite-the-fire t :abil-decipher-rune t
-                                       :abil-demon-word-flesh t :abil-demon-word-plague t :abil-demon-word-power t :abil-demon-word-darkness t
+                                       :abil-demon-word-flesh t :abil-demon-word-plague t :abil-demon-word-power t :abil-demon-word-darkness t :abil-demon-word-invasion t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist-empowered+ 

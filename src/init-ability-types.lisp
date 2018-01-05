@@ -2009,24 +2009,10 @@
                                                                        (format nil "~A raises his hands and intones an incantation. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))) :observed-mob actor)
                                                 (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                            (format nil "You hear somebody chanting~A. " str)))
-                                                (let ((mob-corpse-type) (mob-corpse))
-                                                  (cond
-                                                    ((eq (item-ability-p target +item-abil-corpse+) 1) (setf mob-corpse-type +mob-type-reanimated-pwr-1+))
-                                                    ((eq (item-ability-p target +item-abil-corpse+) 2) (setf mob-corpse-type +mob-type-reanimated-pwr-2+))
-                                                    ((eq (item-ability-p target +item-abil-corpse+) 3) (setf mob-corpse-type +mob-type-reanimated-pwr-3+))
-                                                    (t (setf mob-corpse-type +mob-type-reanimated-pwr-4+)))
-                                                  (setf mob-corpse (make-instance 'mob :mob-type mob-corpse-type :x (x target) :y (y target) :z (z target)))
-                                                  (setf (name mob-corpse) (format nil "reanimated ~A" (name target)))
-                                                  (setf (alive-name mob-corpse) (alive-name target))
-                                                  (add-mob-to-level-list (level *world*) mob-corpse)
-                                                  (remove-item-from-level-list (level *world*) target)
-                                                  (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. "
-                                                                                                                                              (capitalize-name (prepend-article +article-the+ (visible-name target)))))
-                                                  (logger (format nil "MOB-REANIMATE-BODY: ~A [~A] is reanimated at (~A ~A ~A).~%" (name actor) (id actor) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
-                                                  (remove-item-from-world target)
-                                                  (incf (stat-raised-dead actor))
-                                                  (when (eq actor *player*)
-                                                    (incf (cur-score *player*) 10)))
+                                                (mob-reanimate-corpse target)
+                                                (incf (stat-raised-dead actor))
+                                                (when (eq actor *player*)
+                                                  (incf (cur-score *player*) 10))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -6536,9 +6522,47 @@
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
                                                   (if (and (not nearest-enemy)
-                                                           (null (riding-mob-id actor))
                                                            (mob-ability-p actor +mob-abil-demon-word-darkness+)
                                                            (can-invoke-ability actor actor +mob-abil-demon-word-darkness+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-demon-word-invasion+ :name "Demon word: Invasion" :descr "Plead to Yosototh to weaken the barriers between the world and let evil spirits reanimate corpses in the city. This enchantment makes corpses constantly reanimate on their own, without your interference. Available only if you have deciphered demon runes Gon, Ged and Tal." 
+                                 :cd 30 :spd (* +normal-ap+ 4) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-DEMON-WORD-INVASION: ~A [~A] uses demon word invasion.~%" (name actor) (id actor)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A pronounces Demon word: Invasion. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                (pushnew +game-event-constant-reanimation+ (game-events *world*))
+                                                (add-message "You seem to start hearing whispers from beyond! ")
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-demon-word-invasion+)
+                                                               (not (find +game-event-constant-reanimation+ (game-events *world*)))
+                                                               (not (mob-effect-p actor +mob-effect-silence+))
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-barrier+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-invite+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-all+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-demon-word-invasion+)
+                                                           (can-invoke-ability actor actor +mob-abil-demon-word-invasion+))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)

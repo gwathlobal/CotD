@@ -1,5 +1,4 @@
 - Rune to force a unit back (AWAY Veh TRANSFORM Med)
-- Rune to cast a global spell to constantly reanimate corpses (BARRIER Gon INVITE Ged ALL Tal)
 - Custom win conditions for scenarios
 - Demons should have the following win conditions: conquest (place N dimensional rifts), raid (take N corpses to dimensional rift), corrupt (take a holy relic to a rift and then place something instead of it), defend from angels (destroy all angels in a corrupted city), defend from military (destroy all military in a corrupted city), clash (destroy all angels in a non-corrupted city)
 - Angels should have the following win conditions: assassinate (get to demon's plane and destroy a powerful demon), cut reinforcements (destroy N dimensional rifts), defend (destroy all attacking demons)

@@ -20,6 +20,7 @@
 (defconstant +game-event-win-for-eater+ 15)
 (defconstant +game-event-win-for-ghost+ 16)
 (defconstant +game-event-unnatural-darkness+ 17)
+(defconstant +game-event-constant-reanimation+ 18)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

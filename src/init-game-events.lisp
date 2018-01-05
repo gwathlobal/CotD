@@ -636,3 +636,31 @@
                                                            (when (zerop (random 10))
                                                              (setf (game-events world) (remove +game-event-unnatural-darkness+ (game-events world)))
                                                              (add-message (format nil "Unnatural darkness is no longer.~%"))))))
+
+(set-game-event (make-instance 'game-event :id +game-event-constant-reanimation+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (let ((corpse-items (loop for item-id in (item-id-list (level world))
+                                                                                     for item = (get-item-by-id item-id)
+                                                                                     when (and (item-ability-p item +item-abil-corpse+)
+                                                                                               (not (get-mob-* (level world) (x item) (y item) (z item))))
+                                                                                       collect item)))
+                                                             (loop with failure-result = t
+                                                                   while (and (eq failure-result t)
+                                                                              corpse-items)
+                                                                   do
+                                                                     (setf failure-result nil)
+                                                                     (when (zerop (random 3))
+                                                                       (setf failure-result t))
+                                                                     (let ((item (nth (random (length corpse-items))
+                                                                                      corpse-items)))
+                                                                       (when (not (get-mob-* (level world) (x item) (y item) (z item)))
+                                                                         (print-visible-message (x item) (y item) (z item) (level *world*) (format nil "An evil spirit has entered ~A. "
+                                                                                                                                                   (prepend-article +article-the+ (visible-name item))))
+                                                                         (mob-reanimate-corpse item)
+                                                                         (setf corpse-items (remove item corpse-items))
+                                                                       ))))
+                                                           
+                                                           )))
