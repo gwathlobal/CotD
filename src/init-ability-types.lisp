@@ -6531,7 +6531,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-demon-word-invasion+ :name "Demon word: Invasion" :descr "Plead to Yosototh to weaken the barriers between the world and let evil spirits reanimate corpses in the city. This enchantment makes corpses constantly reanimate on their own, without your interference. Available only if you have deciphered demon runes Gon, Ged and Tal." 
+                                 :id +mob-abil-demon-word-invasion+ :name "Demon word: Invasion" :descr "Plead to Yosototh to weaken the barriers between the worlds and let evil spirits reanimate corpses in the city. This enchantment makes corpses constantly reanimate on their own, without your interference. Available only if you have deciphered demon runes Gon, Ged and Tal." 
                                  :cd 30 :spd (* +normal-ap+ 4) :passive nil
                                  :final t :on-touch nil
                                  :motion 50
@@ -6563,6 +6563,57 @@
                                                   (if (and (not nearest-enemy)
                                                            (mob-ability-p actor +mob-abil-demon-word-invasion+)
                                                            (can-invoke-ability actor actor +mob-abil-demon-word-invasion+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-demon-word-knockback+ :name "Demon word: Knockback" :descr "Push all characters around you away. Available only if you have deciphered demon runes Veh and Med." 
+                                 :cd 10 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-DEMON-WORD-KNOCKBACK: ~A [~A] uses demon word knockback.~%" (name actor) (id actor)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear someone chanting~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A pronounces Demon word: Knockback. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+
+                                                (let ((mobs))
+                                                  (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                  (when (get-mob-* (level *world*) dx dy (z actor))
+                                                                                                    (pushnew (get-mob-* (level *world*) dx dy (z actor)) mobs))))
+                                                  (loop for target in mobs
+                                                        for dx = (- (x target) (x actor))
+                                                        for dy = (- (y target) (y actor))
+                                                        when (eq (check-move-on-level target (+ (x target) dx) (+ (y target) dy) (z target)) t)
+                                                          do
+                                                             (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                       (format nil "~A is pushed away from ~A. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name target)))
+                                                                               (prepend-article +article-the+ (visible-name actor))))
+                                                             (set-mob-location target (+ (x target) dx) (+ (y target) dy) (z target))
+                                                        ))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-demon-word-knockback+)
+                                                               (not (mob-effect-p actor +mob-effect-silence+))
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-away+)
+                                                               (get-inv-items-by-type (inv actor) +item-type-scroll-demonic-rune-transform+))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and nearest-enemy
+                                                           (mob-ability-p actor +mob-abil-demon-word-knockback+)
+                                                           (can-invoke-ability actor actor +mob-abil-demon-word-knockback+))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
