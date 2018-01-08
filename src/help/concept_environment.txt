@@ -1,6 +1,11 @@
-STAIRS
+STAIRS & SLOPES
 
-The game does not really have stairs but ramps. To go up the ramp you need to stand on it and move towards the wall. The resulting movement will take you upstairs.
+The game does not really have stairs, only ramps. 
+Yo go up a ramp you need to have the following condtions met:
+- on your Z level in the direction you want to move there is a terrain obstacle that blocks movement,
+- you are standing on a slope up,
+- on the Z level above you the tile to the west is empty.
+The resulting movement will take you upstairs.
 
 GRAVITY
 
