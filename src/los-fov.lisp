@@ -507,6 +507,42 @@
                                   exit-result))))
   (logger (format nil "UPDATE-VISIBLE-ITEMS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-items mob))))
 
+(defun update-visible-items-player ()
+  (let ((vision-power (1+ (cur-sight *player*)))
+        (vision-pwr (1+ (cur-sight *player*))))
+    (draw-fov (x *player*) (y *player*) (z *player*) (cur-sight *player*)
+              #'(lambda (dx dy dz prev-cell)
+                  (let ((exit-result t) (pwr-decrease))
+                    (block nil
+                      (when (> (get-distance-3d (x *player*) (y *player*) (z *player*) dx dy dz) (1+ (cur-sight *player*)))
+                        (setf exit-result 'exit)
+                        (return))
+                      
+                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t ))
+                      (unless pwr-decrease
+                        (setf exit-result 'exit)
+                        (return))
+                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                      (decf vision-pwr)
+                      
+                      (when (get-items-* (level *world*) dx dy dz) 
+                        (loop for n-item-id in (get-items-* (level *world*) dx dy dz)
+                              do
+                                 (pushnew n-item-id (visible-items *player*))))
+
+                      (when (<= vision-pwr 0)
+                        (setf exit-result 'exit)
+                        (return))
+                                         
+                      )
+                    exit-result))
+              :LOS-start-func #'(lambda ()
+                                  (setf vision-pwr (1+ (cur-sight *player*))))
+              :no-z nil
+              )) 
+  
+  )
+
 (defun reveal-cell-on-map (level map-x map-y map-z &key (reveal-mob t))
   ;; drawing terrain
   (let ((glyph-idx)

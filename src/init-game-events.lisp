@@ -659,7 +659,7 @@
                                                                        (when (not (get-mob-* (level world) (x item) (y item) (z item)))
                                                                          (print-visible-message (x item) (y item) (z item) (level *world*) (format nil "An evil spirit has entered ~A. "
                                                                                                                                                    (prepend-article +article-the+ (visible-name item))))
-                                                                         (mob-reanimate-corpse item)
+                                                                         (invoke-reanimate-body item)
                                                                          (setf corpse-items (remove item corpse-items))
                                                                        ))))
                                                            

@@ -2189,7 +2189,7 @@
                                         (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
                                         :observed-mob mob)))))
 
-(defun mob-reanimate-corpse (corpse-item)
+(defun invoke-reanimate-body (corpse-item)
   (let ((mob-corpse-type) (mob-corpse))
     (cond
       ((eq (item-ability-p corpse-item +item-abil-corpse+) 1) (setf mob-corpse-type +mob-type-reanimated-pwr-1+))
@@ -2203,7 +2203,7 @@
     (remove-item-from-level-list (level *world*) corpse-item)
     (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A starts to move. "
                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name corpse-item)))))
-    (logger (format nil "MOB-REANIMATE-BODY: ~A [~A] is reanimated at (~A ~A ~A).~%" (name corpse-item) (id corpse-item) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
+    (logger (format nil "INVOKE-REANIMATE-BODY: ~A [~A] is reanimated at (~A ~A ~A).~%" (name corpse-item) (id corpse-item) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
     (remove-item-from-world corpse-item)
     ))
 
@@ -2416,7 +2416,7 @@
 
 (defun player-start-map-select-corpse ()
   (let ((corpses nil))
-    (update-visible-items *player*)
+    (update-visible-items-player)
     (loop for item-id in (visible-items *player*)
           for item = (get-item-by-id item-id)
           when (and (item-ability-p item +item-abil-corpse+))
@@ -2543,7 +2543,7 @@
 
 (defun player-start-map-resurrect ()
   (let ((corpses nil))
-    (update-visible-items *player*)
+    (update-visible-items-player)
     (loop for item-id in (visible-items *player*)
           for item = (get-item-by-id item-id)
           when (and (item-ability-p item +item-abil-corpse+)
@@ -2568,7 +2568,7 @@
 (defun player-start-map-select-ghost-possess ()
   (let ((corpses nil)
         (possessable-mobs))
-    (update-visible-items *player*)
+    (update-visible-items-player)
     (loop for item-id in (visible-items *player*)
           for item = (get-item-by-id item-id)
           when (and (item-ability-p item +item-abil-corpse+))
@@ -2596,3 +2596,21 @@
       (setf (view-x *player*) (x (first corpses)) (view-y *player*) (y (first corpses)) (view-z *player*) (z (first corpses)))
       (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
       )))
+
+(defun player-start-map-select-rune ()
+  (let ((runes ()))
+    (check-surroundings (x *player*) (y *player*) nil
+                        #'(lambda (dx dy)
+                            (when (remove-if #'(lambda (a)
+                                                 (if (get-feature-type-trait (get-feature-by-id a) +feature-trait-demonic-rune+)
+                                                   nil
+                                                   t))
+                                             (get-features-* (level *world*) dx dy (z *player*)))
+                              (setf runes (list dx dy (z *player*))))
+                            ))
+    
+    (if runes
+      (setf (view-x *player*) (first runes) (view-y *player*) (second runes) (view-z *player*) (third runes))
+      (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
+      ))
+  )

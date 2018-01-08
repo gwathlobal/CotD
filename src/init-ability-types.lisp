@@ -2009,7 +2009,7 @@
                                                                        (format nil "~A raises his hands and intones an incantation. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))) :observed-mob actor)
                                                 (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                            (format nil "You hear somebody chanting~A. " str)))
-                                                (mob-reanimate-corpse target)
+                                                (invoke-reanimate-body target)
                                                 (incf (stat-raised-dead actor))
                                                 (when (eq actor *player*)
                                                   (incf (cur-score *player*) 10))
@@ -6194,7 +6194,7 @@
                                  :cost 0 :spd (* +normal-ap+ 2) :passive nil
                                  :final t :on-touch nil
                                  :motion 60
-                                 :start-map-select-func #'player-start-map-select-self
+                                 :start-map-select-func #'player-start-map-select-rune
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is a feature (demonic rune) to be deciphered

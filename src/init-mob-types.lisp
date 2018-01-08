@@ -495,7 +495,7 @@
                                        :name "empowered corpse"
                                        :glyph-idx 58 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 15 :max-fp 0
                                        :faction +faction-type-demons+
-                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 4 6 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.1))
+                                       :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 4 6 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd +normal-ap+
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 2
                                        :base-light-radius 0

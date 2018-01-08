@@ -10,6 +10,7 @@ CHANGELOG
 - Ghosts leave no footprints on snow and generate no sounds while moving.
 - Blessings and divine shield now offer complete protection from ghost's possession.
 - Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
+- Empowered undead now have normal movement speed and can keep up with the satanists when following them.
 
 --------------------
 December 24, 2017 v1.2.5

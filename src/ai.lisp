@@ -596,7 +596,8 @@
             (setf (order mob) nil))
           (progn
             (when (and (< (get-distance (x mob) (y mob) (x leader) (y leader)) 8)
-                       (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2))
+                       (> (get-distance (x mob) (y mob) (x leader) (y leader)) 2)
+                       (not nearest-enemy))
               (logger (format nil "AI-FUNCTION: Mob (~A, ~A, ~A) wants to follow the leader to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (x leader) (y leader) (z leader)))
               (setf nearest-target leader))))
         ))
