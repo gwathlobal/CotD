@@ -6531,7 +6531,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-demon-word-invasion+ :name "Demon word: Invasion" :descr "Plead to Yosototh to weaken the barriers between the worlds and let evil spirits reanimate corpses in the city. This enchantment makes corpses constantly reanimate on their own, without your interference. Available only if you have deciphered demon runes Gon, Ged and Tal." 
+                                 :id +mob-abil-demon-word-invasion+ :name "Demon word: Invasion" :descr "Plead to Yosototh to weaken the barriers between the worlds and let evil spirits reanimate corpses in the city. This enchantment makes corpses reanimate on their own from time to time, without your interference. Available only if you have deciphered demon runes Gon, Ged and Tal." 
                                  :cd 30 :spd (* +normal-ap+ 4) :passive nil
                                  :final t :on-touch nil
                                  :motion 50

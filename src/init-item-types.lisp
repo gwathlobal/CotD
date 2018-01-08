@@ -699,7 +699,6 @@
                                          :glyph-idx 125 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
                                          :descr "A black leather book. It seems to be whispering something to you. In the languages you do not understand. Only the ghost can use it on the sacrificial circle, the place of its creation."
                                          :flavor-quote (format nil "\"He quickly went into a stall, drew a circle round him with his finger, uttered some prayers and formulas for exorcism, and then began to read the prayers for the dead in a loud voice and with the fixed resolution not to look up from the book nor take notice of anything.\"~%Nikolai Gogol. The Viy.")
-                              
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore target item))
 
@@ -731,42 +730,49 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-flesh+
                                          :name "scroll with a demonic rune Un" :plural-name "scrolls with a demonic rune Un"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Un inscribed on it. Looking at it makes you feel as if it is looking back at you."
+                                         :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-invite+
                                          :name "scroll with a demonic rune Ged" :plural-name "scrolls with a demonic rune Ged"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Ged inscribed on it. Looking at it makes you feel as if it is looking back at you."
+                                         :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-away+
                                          :name "scroll with a demonic rune Veh" :plural-name "scrolls with a demonic rune Veh"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Veh inscribed on it. Looking at it makes you feel as if it is looking back at you."
+                                         :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-transform+
                                          :name "scroll with a demonic rune Med" :plural-name "scrolls with a demonic rune Med"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Med inscribed on it. Looking at it makes you feel as if it is looking back at you."
+                                         :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-barrier+
                                          :name "scroll with a demonic rune Gon" :plural-name "scrolls with a demonic rune Gon"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Gon inscribed on it. Looking at it makes you feel as if it is looking back at you."
+                                         :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-decay+
                                          :name "scroll with a demonic rune Drux" :plural-name "scrolls with a demonic rune Drux"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Drux inscribed on it. Looking at it makes you feel as if it is looking back at you."
+                                         :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-all+
                                          :name "scroll with a demonic rune Tal" :plural-name "scrolls with a demonic rune Tal"
-                                         :glyph-idx 1 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Tal inscribed on it. Looking at it makes you feel as if it is looking back at you."
+                                         :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
