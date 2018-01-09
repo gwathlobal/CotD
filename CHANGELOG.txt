@@ -11,6 +11,7 @@ CHANGELOG
 - Blessings and divine shield now offer complete protection from ghost's possession.
 - Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
 - Empowered undead now have normal movement speed and can keep up with the satanists when following them.
+- Fixed the bug when you could target characters unseen by you with abilities.
 
 --------------------
 December 24, 2017 v1.2.5

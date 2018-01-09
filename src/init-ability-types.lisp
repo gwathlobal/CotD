@@ -1120,7 +1120,8 @@
                                                                (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
                                                                (get-faction-relation (faction *player*) (faction (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +mob-abil-horse-can-be-ridden+)
-                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))))
+                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                               (find (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (visible-mobs *player*)))
                                                         (progn
                                                           (clear-message-list *small-message-box*)
                                                           (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
@@ -1280,7 +1281,8 @@
                                                                (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
                                                                (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
                                                                (mob-ability-p (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +mob-abil-fiend-can-be-ridden+)
-                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))))
+                                                               (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                                                               (find (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (visible-mobs *player*)))
                                                         (progn
                                                           (clear-message-list *small-message-box*)
                                                           (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
@@ -1368,7 +1370,8 @@
                                                                  (not (and (mob-ability-p mob +mob-abil-demon+)
                                                                            (not (mob-effect-p mob +mob-effect-possessed+))))
                                                                  (not (and (mob-ability-p mob +mob-abil-angel+)
-                                                                           (not (mob-effect-p mob +mob-effect-divine-concealed+)))))
+                                                                           (not (mob-effect-p mob +mob-effect-divine-concealed+))))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -1430,7 +1433,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -1596,7 +1600,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -1692,6 +1697,7 @@
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
                                                                  (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*))
                                                                  (> (z *player*) (z mob))
                                                                  (< (get-distance (x *player*) (y *player*) (x mob) (y mob)) 3)
                                                                  (funcall #'(lambda ()
@@ -2174,7 +2180,8 @@
                                                                  target
                                                                  (get-faction-relation (faction *player*) (faction target))
                                                                  (mob-ability-p target +mob-abil-undead+)
-                                                                 (not (mob-effect-p target +mob-effect-empowered-undead+)))
+                                                                 (not (mob-effect-p target +mob-effect-empowered-undead+))
+                                                                 (find (id target) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* target ability-type-id)
@@ -2337,9 +2344,9 @@
                                  :map-select-func #'(lambda (ability-type-id)
                                                       (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                 
                                                                  target
-                                                                 (not (eq *player* target)))
+                                                                 (not (eq *player* target))
+                                                                 (find (id target) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* target ability-type-id)
@@ -2403,7 +2410,7 @@
                                                                     
                                                                     (decf (cur-hp target) cur-dmg)
                                                                     (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                           (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (name target))) cur-dmg))
+                                                                                           (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg))
                                                                     (when (check-dead target)
                                                                       (when (mob-effect-p target +mob-effect-possessed+)
                                                                         (mob-depossess-target target))
@@ -2443,7 +2450,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -2493,7 +2501,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -2685,7 +2694,8 @@
                                                                  (or (and (get-terrain-type-trait terrain +terrain-trait-light-source+)
                                                                           (not (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+))))
                                                                      (and (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
-                                                                          (> (cur-light (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) 0))))
+                                                                          (> (cur-light (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) 0)
+                                                                          (find (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (visible-mobs *player*)))))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
@@ -2787,6 +2797,7 @@
                                                         (if (and (< (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*)) 2)
                                                                  target
                                                                  (not (eq target *player*))
+                                                                 (find (id target) (visible-mobs *player*))
                                                                  (find (id target) (mimic-id-list *player*))
                                                                  (not (mob-effect-p target +mob-effect-possessed+))
                                                                  (not (riding-mob-id target))
@@ -2937,7 +2948,8 @@
                                                       (let ((target (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and target
                                                                  (get-faction-relation (faction *player*) (faction target))
-                                                                 (check-mob-visible target :observer *player* :complete-check t))
+                                                                 (check-mob-visible target :observer *player* :complete-check t)
+                                                                 (find (id target) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* target ability-type-id)
@@ -3031,7 +3043,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -3148,7 +3161,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -3208,7 +3222,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -3743,7 +3758,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -4051,7 +4067,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)
@@ -6002,7 +6019,8 @@
                                                              t))
                                                           ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                 mob
-                                                                (not (eq *player* mob)))
+                                                                (not (eq *player* mob))
+                                                                (find (id mob) (visible-mobs *player*)))
                                                            (progn
                                                              (clear-message-list *small-message-box*)
                                                              (mob-invoke-ability *player* mob ability-type-id)
@@ -6372,6 +6390,7 @@
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
                                                                  (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*))
                                                                  (mob-ability-p mob +mob-abil-undead+))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
@@ -6437,7 +6456,8 @@
                                                       (let ((mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  mob
-                                                                 (not (eq *player* mob)))
+                                                                 (not (eq *player* mob))
+                                                                 (find (id mob) (visible-mobs *player*)))
                                                           (progn
                                                             (clear-message-list *small-message-box*)
                                                             (mob-invoke-ability *player* mob ability-type-id)

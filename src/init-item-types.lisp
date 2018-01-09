@@ -287,6 +287,7 @@
                                                                 (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                          mob
                                                                          (<= (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 8)
+                                                                         (find (id mob) (visible-mobs *player*))
                                                                          (let ((tx 0) (ty 0) (tz 0)
                                                                                (ex (x mob)) (ey (y mob)) (ez (z mob)))
                                                                            (declare (type fixnum tx ty tz ex ey ez))
@@ -481,6 +482,7 @@
                                                                 (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                          mob
                                                                          (not (eq mob *player*))
+                                                                         (find (id mob) (visible-mobs *player*))
                                                                          (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 7))
                                                                   (progn
                                                                     (clear-message-list *small-message-box*)
