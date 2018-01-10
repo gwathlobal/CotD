@@ -7,10 +7,12 @@ CHANGELOG
 - Demon word: Darkness turns off the sun for a period of time.
 - Demon word: Invasion places an enchantment on the map that constantly reanimates corpses.
 - Demon word: Knockback pushes all characters around the satanist away.
+- Satanists now inflict vorpal damage instead of fire damage.
 - Ghosts leave no footprints on snow and generate no sounds while moving.
 - Blessings and divine shield now offer complete protection from ghost's possession.
-- Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
 - Empowered undead now have normal movement speed and can keep up with the satanists when following them.
+- Scout's artillery strike ignites appropriate affected tiles. 
+- Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
 - Fixed the bug when you could target characters unseen by you with abilities.
 
 --------------------
