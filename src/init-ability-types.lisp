@@ -1968,7 +1968,7 @@
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A destroys its host. "
                                                                                                                                (capitalize-name (prepend-article +article-the+ (visible-name actor)))) :observed-mob actor)
                                                   (setf (cur-hp target) 0)
-                                                  (make-dead target :splatter t :msg t :killer actor :corpse nil :aux-params ())
+                                                  (make-dead target :splatter t :msg nil :killer actor :corpse nil :aux-params ())
                                                   
                                                   (loop repeat 8
                                                         for (dx dy) = (multiple-value-list (x-y-dir (1+ (random 9))))

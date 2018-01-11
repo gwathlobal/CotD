@@ -233,7 +233,7 @@
                                                                                           (format nil "Artillery shoots. "))
                                                                    
                                                                    (let ((targets nil)
-                                                                         (cell-targets nil)
+                                                                         ;;(cell-targets nil)
                                                                          (max-range 2))
                                                                      (draw-fov (x feature) (y feature) (z feature) max-range
                                                                                #'(lambda (dx dy dz prev-cell)
@@ -249,9 +249,9 @@
 
                                                                                        (place-animation dx dy dz +anim-type-fire-dot+ :params ())
 
-                                                                                       (when (and (get-terrain-* level dx dy dz)
-                                                                                                  (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-flammable+))
-                                                                                         (push (list dx dy dz) cell-targets))
+                                                                                       ;;(when (and (get-terrain-* level dx dy dz)
+                                                                                       ;;           (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-flammable+))
+                                                                                       ;;  (push (list dx dy dz) cell-targets))
                                                                                        
                                                                                        (when (and (get-mob-* level dx dy dz) 
                                                                                                   )
@@ -286,13 +286,14 @@
                                                                                         (z (get-mob-by-id (slave-mob-id target))) (z target))
                                                                                   (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))
 
-                                                                     ;; place fires 
-                                                                     (loop for (dx dy dz) in cell-targets
-                                                                           when (and (zerop (random 5))
-                                                                                     (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-flammable+))
-                                                                             do
-                                                                                (ignite-tile level dx dy dz dx dy dz)
-                                                                           )
+                                                                     ;; place fires
+                                                                     ;; TODO: should not be implemented until ignite-tile properly sets ignited tile connectivity
+                                                                     ;;(loop for (dx dy dz) in cell-targets
+                                                                     ;;      when (and (zerop (random 5))
+                                                                     ;;                (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-flammable+))
+                                                                     ;;        do
+                                                                     ;;           (ignite-tile level dx dy dz dx dy dz)
+                                                                     ;;      )
 
                                                                      (remove-feature-from-level-list level feature)
                                                                      (remove-feature-from-world feature)

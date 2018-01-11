@@ -1,11 +1,12 @@
 STAIRS & SLOPES
 
 The game does not really have stairs, only ramps. 
-Yo go up a ramp you need to have the following condtions met:
-- on your Z level in the direction you want to move there is a terrain obstacle that blocks movement,
+You go up a ramp you need to have the following conditions met:
+- on your Z level in the direction, you want to move there is a terrain obstacle that blocks movement,
 - you are standing on a slope up,
-- on the Z level above you the tile to the west is empty.
+- on the Z level above you, the tile in the direction of your movement is empty.
 The resulting movement will take you upstairs.
+
 
 GRAVITY
 

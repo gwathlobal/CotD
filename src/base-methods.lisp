@@ -861,6 +861,14 @@
   (set-mob-effect target :effect-type-id +mob-effect-possessed+ :actor-id (id target))
   (setf (face-mob-type-id actor) (mob-type target))
   (incf (stat-possess actor))
+
+  ;; give all items to the master
+  (loop for item-id in (inv target)
+        for item = (get-item-by-id item-id)
+        do
+           (setf (inv target) (remove-from-inv item (inv target)))
+           (setf (inv actor) (add-to-inv item (inv actor) (id actor))))
+
   
   ;; when the target is riding something - replace the rider with the actor
   (when (riding-mob-id target)
@@ -881,6 +889,13 @@
     (rem-mob-effect actor +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-reveal-true-form+)
+
+    ;; give all items to the slave
+    (loop for item-id in (inv actor)
+          for item = (get-item-by-id item-id)
+          do
+             (setf (inv actor) (remove-from-inv item (inv actor)))
+             (setf (inv target) (add-to-inv item (inv target) (id target))))
 
     ;; if the master is riding something - put slave as the rider
     (when (riding-mob-id actor)
@@ -1343,7 +1358,7 @@
       
       (when (and (not no-check-dead)
                  (check-dead target))
-        (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params weapon-aux)
+        (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params weapon-aux :keep-items (not kill-possessed))
         (when (and kill-possessed
                    (slave-mob-id target))
           (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
@@ -1408,7 +1423,7 @@
     (return-from check-dead t))
   nil)
 
-(defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()))
+(defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()) (keep-items nil))
   (logger (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
   (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob)))))
         (ghost-that-cheats-death nil))
@@ -1473,10 +1488,11 @@
                (rem-mob-effect mob (effect-type effect))))
     
     ;; place the inventory on the ground
-    (loop for item-id in (inv mob)
-          for item = (get-item-by-id item-id)
-          do
-             (mob-drop-item mob item :spd nil :silent t))
+    (unless keep-items
+      (loop for item-id in (inv mob)
+            for item = (get-item-by-id item-id)
+            do
+               (mob-drop-item mob item :spd nil :silent t)))
     
     ;; place the corpse
     (when (and corpse

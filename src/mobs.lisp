@@ -1381,7 +1381,7 @@
 
     ;; you always see people of you own faction
     (when (and observer
-               (get-faction-relation (faction mob) (faction observer)))
+               (eq (faction mob) (faction observer)))
       (setf result t))
     
     result))
