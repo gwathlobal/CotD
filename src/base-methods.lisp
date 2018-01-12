@@ -2260,7 +2260,7 @@
      ;; find the nearest hostile mob & set it as target
     (loop for mob-id in (visible-mobs *player*)
           for mob = (get-mob-by-id mob-id)
-          when (and (not (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob)))))
+          when (and (not (get-faction-relation (faction *player*) (get-visible-faction mob)))
                     (not (and (riding-mob-id *player*)
                               (= (riding-mob-id *player*) mob-id))))
             do

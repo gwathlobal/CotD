@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+January 12, 2018 v1.2.6
+
 - With the demons invading, strange glyphs start to appear on the walls. The satanists are now able to decipher these demonic runes and use this knowledge to harness even more power.
 - Demon word: Flesh lets a satanist turn a zombie into a full-fledged imp that can later progress and evolve as demons usually do.
 - Demon word: Plague lets a satanist spread virulent soul sickness that will deal damage over time.
