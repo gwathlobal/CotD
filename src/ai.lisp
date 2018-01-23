@@ -848,8 +848,10 @@
           (setf step-x (- (first step) (x mob)))
           (setf step-y (- (second step) (y mob)))
           (setf step-z (- (third step) (z mob)))
+
+          (setf move-result (check-move-on-level mob (first step) (second step) (third step)))
           
-          (unless (check-move-on-level mob (first step) (second step) (third step))
+          (unless move-result
             (logger (format nil "AI-FUNCTION: Can't move to target - (~A ~A ~A)~%" (first step) (second step) (third step)))
             (setf (path mob) nil)
             (setf (path-dst mob) nil)
@@ -860,6 +862,58 @@
             (setf (path mob) nil)
             (setf (path-dst mob) nil)
             (return-from ai-function))
+
+          ;; check if there is somebody on the target square
+          (logger (format nil
+                          "AI-FUNCTION: MOVE-RESULT = ~A, NOT T = ~A, FACTION-RELATION = ~A, NOT LOVES-INFIGHTING = ~A, BLESS+BLESSED = ~A~%"
+                          move-result
+                          (not (eq move-result t))
+                          (if (and move-result
+                                   (not (eq move-result t))
+                                   (eq (first move-result) :mobs))
+                            (get-faction-relation (faction mob) (get-visible-faction (first (second move-result))))
+                            nil)
+                          (not (mob-ability-p mob +mob-abil-loves-infighting+))
+                          (if (and move-result
+                                   (not (eq move-result t))
+                                   (eq (first move-result) :mobs))
+                            (or (not (mob-ability-p mob +mob-abil-blessing-touch+))
+                                (and (mob-ability-p mob +mob-abil-blessing-touch+)
+                                     (mob-effect-p (first (second move-result)) +mob-effect-blessed+)
+                                     (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))
+                                (and (mob-ability-p mob +mob-abil-blessing-touch+)
+                                     (not (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))))
+                            nil)))
+          ;(logger (format nil "AI-FUNCTION: MOVE-RESULT = ~A~%" move-result))
+          
+          (when (and move-result
+                     (not (eq move-result t))
+                     (eq (first move-result) :mobs)
+                     (get-faction-relation (faction mob) (get-visible-faction (first (second move-result))))
+                     (not (mob-ability-p mob +mob-abil-loves-infighting+))
+                     (or (not (mob-ability-p mob +mob-abil-blessing-touch+))
+                         (and (mob-ability-p mob +mob-abil-blessing-touch+)
+                              (mob-effect-p (first (second move-result)) +mob-effect-blessed+)
+                              (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))
+                         (and (mob-ability-p mob +mob-abil-blessing-touch+)
+                              (not (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))))
+                     )
+            (let ((final-cell nil))
+              (when (path mob)
+                (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
+                                                            (when (eq (check-move-on-level mob dx dy (z mob)) t)
+                                                              (unless final-cell
+                                                                (setf final-cell (list dx dy)))
+                                                              (when (< (get-distance-3d dx dy (z mob)
+                                                                                        (first (first (last (path mob)))) (second (first (last (path mob)))) (third (first (last (path mob)))))
+                                                                       (get-distance-3d (first final-cell) (second final-cell) (z mob)
+                                                                                        (first (first (last (path mob)))) (second (first (last (path mob)))) (third (first (last (path mob))))))
+                                                                (setf final-cell (list dx dy)))))))
+              (when final-cell
+                (setf step-x (- (first final-cell) (x mob)))
+                (setf step-y (- (second final-cell) (y mob))))
+              ))
+            
           
           (setf move-result (move-mob mob (x-y-into-dir step-x step-y) :dir-z step-z))
 

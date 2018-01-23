@@ -1,5 +1,7 @@
 CHANGELOG
 
+- AI will bump into friendly mobs much less often and will try to navigate around them to get to its target.
+
 --------------------
 January 12, 2018 v1.2.6
 
