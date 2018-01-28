@@ -108,7 +108,6 @@
                                        :base-light-radius 6
                                        :abil-can-be-blessed t :abil-detect-evil t :abil-human t :abil-independent t :abil-soul t
                                        :abil-toggle-light t  :abil-prayer-bless t :abil-open-close-door t :abil-smite t :abil-slow t :abil-prayer-wrath t
-                                       :ai-stop t
                              ))
 
 ;;--------------------
@@ -153,7 +152,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-independent t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t :abil-sprint t :abil-jump t :abil-make-disguise t :abil-remove-disguise t
-                                       :ai-kleptomaniac t :ai-cautious t
+                                       :ai-kleptomaniac t :ai-takes-items t :ai-cautious t
                                        :init-items (list (list +item-type-smoke-bomb+ #'(lambda () 3)))
                              ))
 

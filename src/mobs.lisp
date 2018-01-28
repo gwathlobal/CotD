@@ -20,7 +20,7 @@
    (max-ap :initform +normal-ap+ :initarg :max-ap :accessor max-ap)
 
    (strength :initform 0 :initarg :strength :accessor strength) ;; relative mob strength for AI to assess its chances
-   (ai-prefs :initform (make-hash-table) :accessor ai-prefs)
+   (ai-packages :initform (make-hash-table) :accessor ai-packages)
    ;; The following keys may be used in make-instance
    ;;   :ai-coward - mob will flee if there are enemies in sight
    ;;   :ai-horde  - mob will attack only if the relative strength of allies in sight is more than the relative strength of enemies, otherwise it will flee
@@ -67,7 +67,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-stop ai-curious ai-kleptomaniac ai-cautious ai-simple-pathfinding ai-trinity-mimic ai-split-soul ai-cannibal
+                                                                ai-coward ai-horde ai-wants-bless ai-curious ai-takes-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-cannibal
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -97,27 +97,25 @@
   
   ;; set up AI prefs
   (when ai-coward
-    (setf (gethash +ai-pref-coward+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-coward+ (ai-packages mob-type)) t))
   (when ai-horde
-    (setf (gethash +ai-pref-horde+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-horde+ (ai-packages mob-type)) t))
   (when ai-wants-bless
-    (setf (gethash +ai-pref-wants-bless+ (ai-prefs mob-type)) t))
-  (when ai-stop
-    (setf (gethash +ai-pref-stop+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-wants-bless+ (ai-packages mob-type)) t))
   (when ai-curious
-    (setf (gethash +ai-pref-curious+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-curious+ (ai-packages mob-type)) t))
+  (when ai-takes-items
+    (setf (gethash +ai-package-takes-items+ (ai-packages mob-type)) t))
   (when ai-kleptomaniac
-    (setf (gethash +ai-pref-kleptomaniac+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-kleptomaniac+ (ai-packages mob-type)) t))
   (when ai-cautious
-    (setf (gethash +ai-pref-cautious+ (ai-prefs mob-type)) t))
-  (when ai-simple-pathfinding
-    (setf (gethash +ai-pref-simple-pathfinding+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-cautious+ (ai-packages mob-type)) t))
   (when ai-trinity-mimic
-    (setf (gethash +ai-pref-trinity-mimic+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-trinity-mimic+ (ai-packages mob-type)) t))
   (when ai-split-soul
-    (setf (gethash +ai-pref-split-soul+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-split-soul+ (ai-packages mob-type)) t))
   (when ai-cannibal
-    (setf (gethash +ai-pref-cannibal+ (ai-prefs mob-type)) t))
+    (setf (gethash +ai-package-cannibal+ (ai-packages mob-type)) t))
 
   ;; set up abilities
   (when abil-can-possess
@@ -835,38 +833,11 @@
 (defmethod evolve-into ((mob mob))
   (evolve-mob-id (get-mob-type-by-id (mob-type mob))))
 
-(defmethod mob-ai-coward-p ((mob mob))
-  (gethash +ai-pref-coward+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+(defmethod ai-packages ((mob mob))
+  (ai-packages (get-mob-type-by-id (mob-type mob))))
 
-(defmethod mob-ai-horde-p ((mob mob))
-  (gethash +ai-pref-horde+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-wants-bless-p ((mob mob))
-  (gethash +ai-pref-wants-bless+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-stop-p ((mob mob))
-  (gethash +ai-pref-stop+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-curious-p ((mob mob))
-  (gethash +ai-pref-curious+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-kleptomaniac-p ((mob mob))
-  (gethash +ai-pref-kleptomaniac+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-cautious-p ((mob mob))
-  (gethash +ai-pref-cautious+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-simple-pathfinding-p ((mob mob))
-  (gethash +ai-pref-simple-pathfinding+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-trinity-mimic-p ((mob mob))
-  (gethash +ai-pref-trinity-mimic+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-split-soul-p ((mob mob))
-  (gethash +ai-pref-split-soul+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
-
-(defmethod mob-ai-cannibal-p ((mob mob))
-  (gethash +ai-pref-cannibal+ (ai-prefs (get-mob-type-by-id (mob-type mob)))))
+(defun mob-get-ai-package (mob ai-package-id)
+  (gethash ai-package-id (ai-packages mob)))
 
 (defun mob-effect-p (mob effect-type-id)
   (gethash effect-type-id (effects mob)))

@@ -406,7 +406,7 @@
                                                                                                               nil)
                                                             :aux-params ())))))
 
-      (format t "APPLY-GRAVITY ~A, FINAL-Z ~A~%" apply-gravity final-z))
+      )
     
     ;; apply gravity to the mob, standing on your head, if any
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
