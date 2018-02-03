@@ -114,7 +114,13 @@
                                                                    (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
                                                                    nearest-enemy
                                                                    (< (/ (cur-hp actor) (max-hp actor)) 
-                                                                      0.4))
+                                                                      0.4)
+                                                                   (not (find +feature-smoke-thick+ (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                              :key #'(lambda (a)
+                                                                                       (feature-type (get-feature-by-id a)))))
+                                                                   (not (find +feature-smoke-thin+ (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                               :key #'(lambda (a)
+                                                                                       (feature-type (get-feature-by-id a))))))
                                                             t
                                                             nil))
                                          :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)

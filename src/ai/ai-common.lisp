@@ -328,3 +328,153 @@
           (bt:condition-wait (path-cv *world*) (path-lock *world*)))
         
         ))))
+
+(defun ai-set-path-dst (actor tx ty tz)
+  (logger (format nil "AI-SET-PATH-DST: level-connected-p = ~A, level-connected actor = ~A, level-connected target = ~A~%"
+                  (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
+                                                                                                    (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                    (map-size actor))
+                                           (get-mob-move-mode actor))
+                  (get-level-connect-map-value (level *world*) (x actor) (y actor) (z actor) (if (riding-mob-id actor)
+                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                               (map-size actor))
+                                               (get-mob-move-mode actor))
+                  (get-level-connect-map-value (level *world*) tx ty tz (if (riding-mob-id actor)
+                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                          (map-size actor))
+                                               (get-mob-move-mode actor))))
+  (cond
+    ((level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
+                                                                                       (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                       (map-size actor))
+                              (get-mob-move-mode actor))
+     (setf (path-dst actor) (list tx ty tz))
+     (setf (path actor) nil))
+    ((and (> (map-size actor) 1)
+          (ai-find-move-around actor tx ty))
+     (setf (path-dst actor) (ai-find-move-around actor tx ty))
+     (setf (path actor) nil))
+    (t
+     (setf (path-dst actor) nil)
+     (setf (path actor) nil))))
+
+(defun ai-plot-path-to-dst (actor tx ty tz)
+  (let ((path nil))
+    (when (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
+                                                                                            (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                            (map-size actor))
+                                   (get-mob-move-mode actor))
+      (logger (format nil "AI-PLOT-PATH-TO-DST: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x actor) (y actor) (z actor) tx ty tz))
+      (setf path (a-star (list (x actor) (y actor) (z actor)) (list tx ty tz) 
+                         #'(lambda (dx dy dz cx cy cz) 
+                             ;; checking for impassable objects
+                             (check-move-for-ai actor dx dy dz cx cy cz :final-dst (list tx ty tz))
+                             )
+                         #'(lambda (dx dy dz)
+                             ;; a magic hack here - as values of more than 10 give an unexplainable slowdown
+                             (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
+                                (move-spd (get-mob-type-by-id (mob-type actor)))
+                                1/10))))
+      
+      (pop path)
+      (logger (format nil "AI-PLOT-PATH-TO-DST: Set mob path - ~A~%" path))
+      (setf (path actor) path)
+      )))
+
+(defun ai-move-along-path (actor)
+  (when (path actor)
+    (let ((step) (step-x) (step-y) (step-z) (move-result nil))
+      
+      (logger (format nil "AI-MOVE-AlONG-PATH: Move mob along the path - ~A~%" (path actor)))
+      (setf step (pop (path actor)))
+      
+      (setf step-x (- (first step) (x actor)))
+      (setf step-y (- (second step) (y actor)))
+      (setf step-z (- (third step) (z actor)))
+      
+      (setf move-result (check-move-on-level actor (first step) (second step) (third step)))
+      
+      (unless move-result
+        (logger (format nil "AI-MOVE-AlONG-PATH: Can't move to target - (~A ~A ~A)~%" (first step) (second step) (third step)))
+        (setf (path actor) nil)
+        (setf (path-dst actor) nil)
+        (return-from ai-move-along-path nil))
+      
+      (unless (x-y-into-dir step-x step-y)
+        (logger (format nil "AI-MOVE-AlONG-PATH: Wrong direction supplied (~A ~A)~%" (first step) (second step)))
+        (setf (path actor) nil)
+        (setf (path-dst actor) nil)
+        (return-from ai-move-along-path nil))
+      
+      ;; check if there is somebody on the target square
+      (logger (format nil
+                      "AI-MOVE-AlONG-PATH: MOVE-RESULT = ~A, NOT T = ~A, FACTION-RELATION = ~A, NOT LOVES-INFIGHTING = ~A, BLESS+BLESSED = ~A~%"
+                      move-result
+                      (not (eq move-result t))
+                      (if (and move-result
+                               (not (eq move-result t))
+                               (eq (first move-result) :mobs))
+                        (get-faction-relation (faction actor) (get-visible-faction (first (second move-result))))
+                        nil)
+                      (not (mob-ability-p actor +mob-abil-loves-infighting+))
+                      (if (and move-result
+                               (not (eq move-result t))
+                               (eq (first move-result) :mobs))
+                        (or (not (mob-ability-p actor +mob-abil-blessing-touch+))
+                            (and (mob-ability-p actor +mob-abil-blessing-touch+)
+                                 (mob-effect-p (first (second move-result)) +mob-effect-blessed+)
+                                 (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))
+                            (and (mob-ability-p actor +mob-abil-blessing-touch+)
+                                 (not (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))))
+                        nil)))
+      
+      (when (and move-result
+                 (not (eq move-result t))
+                 (eq (first move-result) :mobs)
+                 (get-faction-relation (faction actor) (get-visible-faction (first (second move-result))))
+                 (not (mob-ability-p actor +mob-abil-loves-infighting+))
+                 (or (not (mob-ability-p actor +mob-abil-blessing-touch+))
+                     (and (mob-ability-p actor +mob-abil-blessing-touch+)
+                          (mob-effect-p (first (second move-result)) +mob-effect-blessed+)
+                          (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))
+                     (and (mob-ability-p actor +mob-abil-blessing-touch+)
+                          (not (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))))
+                 )
+        (let ((final-cell nil))
+          (when (and (path-dst actor)
+                     (>= (get-distance-3d (x actor) (y actor) (z actor) (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))
+                        2))
+            (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                        (when (eq (check-move-on-level actor dx dy (z actor)) t)
+                                                          (unless final-cell
+                                                            (setf final-cell (list dx dy)))
+                                                          (when (< (get-distance-3d dx dy (z actor)
+                                                                                    (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))
+                                                                   (get-distance-3d (first final-cell) (second final-cell) (z actor)
+                                                                                    (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                            (setf final-cell (list dx dy)))))))
+          (when final-cell
+            (setf step-x (- (first final-cell) (x actor)))
+            (setf step-y (- (second final-cell) (y actor))))
+          ))
+      
+      
+      (setf move-result (move-mob actor (x-y-into-dir step-x step-y) :dir-z step-z))
+      
+      (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A ~A), MOVE-RESULT ~A~%" (path-dst actor) (x actor) (y actor) (z actor) move-result))
+      (if move-result
+        (progn
+          (when (and (path-dst actor)
+                     (= (x actor) (first (path-dst actor)))
+                     (= (y actor) (second (path-dst actor)))
+                     (= (z actor) (third (path-dst actor))))
+            (setf (path-dst actor) nil))
+          (return-from ai-move-along-path t))
+        (progn
+          (logger (format nil "AI-FUNCTION: Move failed ~A~%" move-result))
+          (setf (path-dst actor) nil)
+          (setf (path actor) nil)
+          (return-from ai-move-along-path nil)))
+      
+      )
+    nil))

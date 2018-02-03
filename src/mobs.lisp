@@ -67,7 +67,8 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-curious ai-takes-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-cannibal
+                                                                ai-coward ai-horde ai-wants-bless ai-curious ai-takes-valuable-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-cannibal ai-use-ability ai-use-item
+                                                                ai-reload-ranged-weapon ai-shoot-enemy ai-follow-leader ai-approach-target ai-attack-nearest-enemy ai-find-random-location
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -104,8 +105,8 @@
     (setf (gethash +ai-package-wants-bless+ (ai-packages mob-type)) t))
   (when ai-curious
     (setf (gethash +ai-package-curious+ (ai-packages mob-type)) t))
-  (when ai-takes-items
-    (setf (gethash +ai-package-takes-items+ (ai-packages mob-type)) t))
+  (when ai-takes-valuable-items
+    (setf (gethash +ai-package-takes-valuable-items+ (ai-packages mob-type)) t))
   (when ai-kleptomaniac
     (setf (gethash +ai-package-kleptomaniac+ (ai-packages mob-type)) t))
   (when ai-cautious
@@ -116,7 +117,23 @@
     (setf (gethash +ai-package-split-soul+ (ai-packages mob-type)) t))
   (when ai-cannibal
     (setf (gethash +ai-package-cannibal+ (ai-packages mob-type)) t))
-
+  (when ai-use-ability
+    (setf (gethash +ai-package-use-ability+ (ai-packages mob-type)) t))
+  (when ai-use-item
+    (setf (gethash +ai-package-use-item+ (ai-packages mob-type)) t))
+  (when ai-reload-ranged-weapon
+    (setf (gethash +ai-package-reload-ranged-weapon+ (ai-packages mob-type)) t))
+  (when ai-shoot-enemy
+    (setf (gethash +ai-package-shoot-enemy+ (ai-packages mob-type)) t))
+  (when ai-follow-leader
+    (setf (gethash +ai-package-follow-leader+ (ai-packages mob-type)) t))
+  (when ai-approach-target
+    (setf (gethash +ai-package-approach-target+ (ai-packages mob-type)) t))
+  (when ai-attack-nearest-enemy
+    (setf (gethash +ai-package-attack-nearest-enemy+ (ai-packages mob-type)) t))
+  (when ai-find-random-location
+    (setf (gethash +ai-package-find-random-location+ (ai-packages mob-type)) t))
+  
   ;; set up abilities
   (when abil-can-possess
     (setf (gethash +mob-abil-can-possess+ (abilities mob-type)) abil-can-possess))

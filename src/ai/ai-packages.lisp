@@ -2,7 +2,6 @@
 
 (defclass ai-package ()
   ((id :initarg :id :accessor id)
-   (final :initform nil :initarg :final :accessor final)
    (priority :initform 0 :initarg :priority :accessor priority)
    (on-check-ai :initform nil :initarg :on-check-ai :accessor on-check-ai)  ;; a function that checks for the AI package if it can and should be invoked now
    (on-invoke-ai :initform nil :initarg :on-invoke-ai :accessor on-invoke-ai) ;; a function that invokes the AI package
