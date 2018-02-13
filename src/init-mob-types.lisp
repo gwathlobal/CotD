@@ -10,14 +10,14 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-player+ 
                                        :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 20 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :abil-see-all t :abil-open-close-door t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-human+ 
                                        :name "human"
                                        :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t 
@@ -27,7 +27,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-man+ 
                                        :name "man"
                                        :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
@@ -39,7 +39,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-woman+ 
                                        :name "woman"
                                        :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
@@ -51,7 +51,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-child+ 
                                        :name "child"
                                        :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 5 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 3
@@ -62,7 +62,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-clerk+ 
                                        :name "clerk"
                                        :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
@@ -87,7 +87,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-policeman+ 
                                        :name "police officer"
                                        :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-civilians+
                                        :weapon (list "Police baton" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
@@ -104,7 +104,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-priest+ 
                                        :name "priest"
                                        :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 8 :max-fp 0
-                                       :faction +faction-type-humans+
+                                       :faction +faction-type-church+
                                        :weapon (list "Cross" (list +weapon-dmg-iron+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 1
                                        :base-light-radius 6
@@ -120,7 +120,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 
                                        :name "satanist"
                                        :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 0
-                                       :faction +faction-type-demons+
+                                       :faction +faction-type-satanists+
                                        :weapon (list "Vorpal touch" (list +weapon-dmg-vorpal+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-vorpal+ 3 0))
                                        :strength 1
@@ -134,7 +134,7 @@
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist-empowered+ 
                                        :name "empowered satanist"
                                        :glyph-idx 36 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 30 :max-fp 0
-                                       :faction +faction-type-demons+
+                                       :faction +faction-type-satanists+
                                        :weapon (list "Vorpal claws" (list +weapon-dmg-vorpal+ 4 8 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 4
@@ -690,44 +690,3 @@
                                        :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t :abil-soul t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
-(set-faction-relations +faction-type-humans+
-                       (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t) (cons +faction-type-military+ t)
-                       (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil)
-                       (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-angels+
-                       (cons +faction-type-angels+ t) (cons +faction-type-humans+ t) (cons +faction-type-animals+ t) (cons +faction-type-criminals+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-wisps+ t) (cons +faction-type-eater+ nil)
-                       (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-demons+
-                       (cons +faction-type-demons+ t)
-                       (cons +faction-type-angels+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-beasts+ nil)
-                       (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-military+
-                       (cons +faction-type-military+ t) (cons +faction-type-humans+ t) (cons +faction-type-animals+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil)
-                       (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-animals+
-                       (cons +faction-type-animals+ t) (cons +faction-type-humans+ t) (cons +faction-type-angels+ t) (cons +faction-type-military+ t) (cons +faction-type-criminals+ t)
-                       (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-outsider-beasts+
-                       (cons +faction-type-outsider-beasts+ nil)
-                       (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil)
-                       (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-criminals+
-                       (cons +faction-type-criminals+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t)
-                       (cons +faction-type-humans+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-outsider-wisps+ nil)
-                       (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-outsider-wisps+
-                       (cons +faction-type-angels+ t) (cons +faction-type-outsider-wisps+ t)
-                       (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
-                       (cons +faction-type-criminals+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-eater+
-                       (cons +faction-type-eater+ t)
-                       (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil)
-                       (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
-                       (cons +faction-type-criminals+ nil) (cons +faction-type-ghost+ nil))
-(set-faction-relations +faction-type-ghost+
-                       (cons +faction-type-ghost+ t)
-                       (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil)
-                       (cons +faction-type-animals+ nil) (cons +faction-type-humans+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
-                       (cons +faction-type-criminals+ nil))

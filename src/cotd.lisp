@@ -260,7 +260,7 @@
                                     #'(lambda (n)
                                         (declare (ignore n))
                                         (setf *current-window* (make-instance 'custom-scenario-window
-                                                                              :layout-list (get-all-scenario-features-by-type +scenario-feature-city-layout+ (not *cotd-release*))
+                                                                              :mission-list (get-all-mission-scenarios-list)
                                                                               :weather-list (get-all-scenario-features-by-type +scenario-feature-weather+ (not *cotd-release*))
                                                                               :tod-list (get-all-scenario-features-by-type +scenario-feature-time-of-day+ (not *cotd-release*))
                                                                               :player-faction-list (get-all-scenario-features-by-type +scenario-feature-player-faction+ (not *cotd-release*))))

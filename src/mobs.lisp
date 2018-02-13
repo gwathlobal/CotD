@@ -1408,28 +1408,6 @@
 ;; FACTIONS
 ;;----------------------
 
-;; values should be (faction . realtion)
-(defun set-faction-relations (faction-type &rest values)
-  (let ((faction-table (make-hash-table)))
-    (loop
-      for (faction . rel) in values 
-      do
-         (setf (gethash faction faction-table) rel))
-    (setf (gethash faction-type *faction-table*) faction-table)
-  ))
-  
-(defun get-faction-relation (faction-type-1 faction-type-2)
-  (let ((faction-table))
-    (setf faction-table (gethash faction-type-1 *faction-table*))
-    
-    ;; not a relation set for faction-type-2, which means they are enemies to everybody 
-    (unless faction-table
-      (return-from get-faction-relation nil))
-    
-    ;; return the relation for faction-type-2, if not set - then they are enemies
-    (gethash faction-type-2 faction-table)
-    ))
-
 (defun get-visible-faction (mob &key (viewer *player*))
   (let ((result-faction))
     ;; see the faction of the mob's appearance

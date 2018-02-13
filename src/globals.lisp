@@ -109,7 +109,7 @@
 (defconstant +mob-type-satanist-empowered+ 52)
 
 (defconstant +faction-type-none+ 0)
-(defconstant +faction-type-humans+ 1)
+(defconstant +faction-type-civilians+ 1)
 (defconstant +faction-type-angels+ 2)
 (defconstant +faction-type-demons+ 3)
 (defconstant +faction-type-military+ 4)
@@ -119,6 +119,8 @@
 (defconstant +faction-type-outsider-wisps+ 8)
 (defconstant +faction-type-eater+ 9)
 (defconstant +faction-type-ghost+ 10)
+(defconstant +faction-type-satanists+ 11)
+(defconstant +faction-type-church+ 12)
 
 (defconstant +ai-package-coward+ 0)
 (defconstant +ai-package-horde+ 1)
@@ -527,6 +529,7 @@
 (defparameter *card-types* (make-array (list 0) :adjustable t))
 (defparameter *gods* (make-array (list 0) :adjustable t))
 (defparameter *ai-packages* (make-array (list 0) :adjustable t))
+(defparameter *faction-types* (make-array (list 0) :adjustable t))
 
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))
