@@ -82,6 +82,8 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-satanist-player+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Player Satanist Starting Position" :trait-remove-on-dungeon-generation t))
 
+(set-feature-type (make-instance 'feature-type :id +feature-delayed-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Arrival Point"))
+
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-small+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Small Gold Pile Placeholder"))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-big+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Big Gold Pile Placeholder"))

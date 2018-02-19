@@ -94,7 +94,7 @@
              ))
   )
   
-(defun init-game (layout-id weather-id tod-id faction-id)
+(defun init-game (layout-id weather-id tod-id faction-id faction-list)
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
@@ -116,7 +116,7 @@
 
   (setf *world* (make-instance 'world))
   
-  (create-world *world* layout-id weather-id tod-id faction-id)
+  (create-world *world* layout-id weather-id tod-id faction-id faction-list)
 
   (setf (name *player*) "Player")
 
@@ -266,9 +266,9 @@
                                                                               :player-faction-list (get-all-scenario-features-by-type +scenario-feature-player-faction+ (not *cotd-release*))))
                                         (setf (menu-items *current-window*) (populate-custom-scenario-win-menu *current-window* (cur-step *current-window*)))
                                         (make-output *current-window*)
-                                        (multiple-value-bind (layout-id weather-id tod-id faction-id) (run-window *current-window*)
-                                          (when (and layout-id weather-id tod-id faction-id)
-                                            (return-from main-menu (values layout-id weather-id tod-id faction-id)))))))
+                                        (multiple-value-bind (layout-id weather-id tod-id faction-id faction-list) (run-window *current-window*)
+                                          (when (and layout-id weather-id tod-id faction-id faction-list)
+                                            (return-from main-menu (values layout-id weather-id tod-id faction-id faction-list)))))))
         (highscores-item (cons "High scores"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -420,7 +420,7 @@
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (setf *start-func* #'(lambda () (go start-tag)))
      start-tag
-       (multiple-value-bind (layout-id weather-id tod-id faction-id) (main-menu)
+       (multiple-value-bind (layout-id weather-id tod-id faction-id faction-list) (main-menu)
          (setf *current-window* (make-instance 'loading-window 
                                                :update-func #'(lambda (win)
                                                                 (when (/= *max-progress-bar* 0) 
@@ -432,7 +432,7 @@
                                                                                               (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
                                                                                               :color sdl:*white*))
                                                                   ))))
-         (init-game layout-id weather-id tod-id faction-id))
+         (init-game layout-id weather-id tod-id faction-id faction-list))
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
        (let ((out *standard-output*))

@@ -251,7 +251,7 @@
                                                                                             nil))
                                                                                  (ref-faction-list win))
                                                                         (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+))
-                                                               (format str "[Enter] Include as defender  "))
+                                                               (format str "[Space] Include as defender  "))
                                                              (when (and (find-if #'(lambda (a)
                                                                                      (if (and (= (second a) +mission-faction-defender+)
                                                                                               (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
@@ -265,7 +265,7 @@
                                                                                             nil))
                                                                                  (ref-faction-list win))
                                                                         (= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+))
-                                                               (format str "[Enter] Exclude as defender  "))
+                                                               (format str "[Space] Exclude as defender  "))
                                                              (when (and (find-if #'(lambda (a)
                                                                                      (if (and (= (second a) +mission-faction-delayed+)
                                                                                               (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
@@ -352,7 +352,7 @@
                         (return-from run-window (values nil nil nil nil)))
 
                        ;; Enter - include/exclude faction as a defender
-                       ((and (or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                       ((and (sdl:key= key :sdl-key-space)
                              (= (cur-step win) +custom-scenario-win-factions+)
                              (find-if #'(lambda (a)
                                           (if (and (= (second a) +mission-faction-defender+)
@@ -414,7 +414,7 @@
                         (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
                         )
 
-                       ;; p - include/exclude faction as present
+                       ;; space - include/exclude faction as present
                        ((and (sdl:key= key :sdl-key-space)
                              (= (cur-step win) +custom-scenario-win-factions+)
                              (find-if #'(lambda (a)
@@ -447,7 +447,8 @@
                             (return-from run-window (values (nth (cur-layout win) (layout-list win))
                                                             (nth (cur-weather win) (weather-list win))
                                                             (nth (cur-tod win) (tod-list win))
-                                                            (nth (cur-player-faction win) (player-faction-list win)))))))
+                                                            (nth (cur-player-faction win) (player-faction-list win))
+                                                            (cur-faction-list win))))))
                        )
 
                      (cond

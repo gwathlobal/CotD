@@ -1249,11 +1249,11 @@
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid-nofreeze+)
                                                 (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid-nofreeze+)))
                                             (values nil
-                                                    nil
+                                                    (list (list +feature-delayed-arrival-point+ 2 2 z))
                                                     nil))))
 
 ;;=====================
-;; Pier
+;; Sea
 ;;=====================
 
 (set-building-type (make-building :id +building-city-sea+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1336,7 +1336,7 @@
                                                     nil))))
 
 ;;=====================
-;; Island ground border
+;; Borders
 ;;=====================
 
 (set-building-type (make-building :id +building-city-island-ground-border+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
@@ -1354,6 +1354,65 @@
 
                                             (values nil nil nil)
                                             )))
+
+(set-building-type (make-building :id +building-city-land-border+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y z template-level)
+                                            (declare (ignore x y template-level))
+
+                                            (values nil
+                                                    (list (list +feature-delayed-arrival-point+ 2 2 z))
+                                                    nil)
+                                            )))
+
+(set-building-type (make-building :id +building-city-forest-border+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y z template-level)
+                                            (if (zerop (random 5))
+                                              (progn
+                                                ;; place a large birch tree
+                                                (let ((r (random 4)))
+                                                  (cond
+                                                    ((= r 3) (level-place-birch-mature-4 template-level (+ 1 x) (+ 1 y) z))
+                                                    ((= r 2) (level-place-birch-mature-3 template-level (+ 1 x) (+ 1 y) z))
+                                                    ((= r 1) (level-place-birch-mature-2 template-level (+ 1 x) (+ 1 y) z))
+                                                    (t (level-place-birch-mature-1 template-level (+ 1 x) (+ 1 y) z)))
+                                                  )
+                                                (values nil nil)
+                                                )
+                                              (progn
+                                                ;; populate the area with trees, leaving the border untouched
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3 do
+                                                    (when (zerop (random 3))
+                                                      (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+))))
+                                                
+                                                ;; make sure that each tree has no more than two adjacent trees
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3
+                                                        with tree-num
+                                                        do
+                                                           (setf tree-num 0)
+                                                           (check-surroundings (+ x dx) (+ y dy) nil
+                                                                               #'(lambda (x y)
+                                                                                   (when (= (aref template-level x y z) +terrain-tree-birch+)
+                                                                                     (incf tree-num))))
+                                                           (when (> tree-num 2)
+                                                             (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-dirt+))))
+                                                
+                                                ;; place grass around trees
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3 do
+                                                    (when (= (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-birch+)
+                                                      (check-surroundings (+ x dx) (+ y dy) nil
+                                                                          #'(lambda (x y)
+                                                                              (if (or (= (aref template-level x y z) +terrain-border-floor+)
+                                                                                      (= (aref template-level x y z) +terrain-border-grass+))
+                                                                                (setf (aref template-level x y z) +terrain-border-grass+)
+                                                                                (setf (aref template-level x y z) +terrain-floor-grass+)))))))
+                                                
+                                                (values nil
+                                                        (list (list +feature-delayed-arrival-point+ 2 2 z))
+                                                        nil))))
+                                  ))
 
 ;;=====================
 ;; Barricades

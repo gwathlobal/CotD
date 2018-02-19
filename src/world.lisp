@@ -23,6 +23,7 @@
    (light-sources :initform (make-array '(0) :adjustable t) :accessor light-sources)
    (wind-dir :initform 5 :initarg :wind-dir :accessor wind-dir)
    (level-layout :initform 0 :initarg :level-layout :accessor level-layout)
+   (delayed-arrival-points :initform () :initarg :delayed-arrival-points :accessor delayed-arrival-points) ;; is of type ((x y z) (...) ...)
    ))
    
 (defun add-mob-to-level-list (level mob)

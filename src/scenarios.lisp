@@ -163,6 +163,319 @@
 ;; Auxuliary scenario functions
 ;;---------------------------------
 
+(defun set-building-types-for-factions (faction-list building-type-hash-table)
+  ;; satanists are absent
+  (unless (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-satanists+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+    (setf (gethash +building-type-satanists+ building-type-hash-table) 0))
+  ;; the church is absent
+  (unless (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-church+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+    (setf (gethash +building-type-church+ building-type-hash-table) 0))
+  building-type-hash-table)
+
+(defun scenario-present-faction-setup (player-faction-scenario-id faction-list mob-func-list)
+  (push #'adjust-initial-visibility mob-func-list)
+  (push #'replace-gold-features-with-items mob-func-list)
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            ;; populate the world with demonic runes
+            (place-demonic-runes world))
+        mob-func-list)
+
+  ;; remove the land arrival feature and add delayed arrival points to level
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            
+            (loop for feature-id in (feature-id-list (level world))
+                  for lvl-feature = (get-feature-by-id feature-id)
+                  when (= (feature-type lvl-feature) +feature-delayed-arrival-point+)
+                            
+                    do
+                       (when (not (get-terrain-type-trait (get-terrain-* (level world) (x lvl-feature) (y lvl-feature) (z lvl-feature)) +terrain-trait-blocks-move+))
+                         (push (list (x lvl-feature) (y lvl-feature) (z lvl-feature)) (delayed-arrival-points (level world))))
+                       (remove-feature-from-level-list (level world) lvl-feature)
+                       (remove-feature-from-world lvl-feature))
+            )
+        mob-func-list)
+  
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            ;; remove the player satanist starting feature
+            (loop for feature-id in (feature-id-list (level world))
+                  for lvl-feature = (get-feature-by-id feature-id)
+                  when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
+                    do
+                       (remove-feature-from-level-list (level world) lvl-feature)
+                       (remove-feature-from-world lvl-feature))
+            )
+        mob-func-list)
+
+  ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            
+            (loop for mob-id in (mob-id-list (level world))
+                  for horse = (get-mob-by-id mob-id)
+                  for rider = (if (mounted-by-mob-id horse)
+                                (get-mob-by-id (mounted-by-mob-id horse))
+                                nil)
+                  when rider
+                    do
+                       (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+            ;; remove the glitch from (0, 0, 0)
+            (setf (aref (mobs (level world)) 0 0 0) nil)
+            )
+        mob-func-list)
+  
+  ;; populate the world with 1 ghost
+  (when (and (/= player-faction-scenario-id +player-faction-ghost+)
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-ghost+)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)))
+                            t
+                            nil))
+                      faction-list))
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              
+              (populate-world-with-mobs world (list (cons +mob-type-ghost+ 1))
+                                        #'find-unoccupied-place-inside))
+          mob-func-list))
+  
+  ;; populate the world with 1 eater of the dead
+  (when (and (/= player-faction-scenario-id +player-faction-eater+)
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-eater+)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)))
+                            t
+                            nil))
+                      faction-list))
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              
+              (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+                                        #'find-unoccupied-place-water))
+          mob-func-list))
+  
+  ;; populate the world with 1 thief
+  (when (and (/= player-faction-scenario-id +player-faction-thief+)
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-criminals+)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)))
+                            t
+                            nil))
+                      faction-list))
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              
+              (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
+                                        #'find-unoccupied-place-on-top))
+          mob-func-list))
+
+  ;; populate the world with the 5 groups of military, where each group has 1 chaplain, 2 sargeants and 3 soldiers
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-military+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+    (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+              
+              (loop repeat 5
+                    do
+                       (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
+                         (find-unoccupied-place-outside world chaplain)
+                         (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
+                                                               (cons +mob-type-scout+ 1)
+                                                               (cons +mob-type-soldier+ 2)
+                                                               (cons +mob-type-gunner+ 1))
+                                                   #'(lambda (world mob)
+                                                       (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
+              )
+          mob-func-list))
+
+  ;; add an additional group of military if there is no player chaplain
+  (when (and (/= player-faction-scenario-id +player-faction-military-chaplain+)
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-military+)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)))
+                            t
+                            nil))
+                      faction-list))
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              
+              (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
+                (find-unoccupied-place-outside world chaplain)
+                (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
+                                                      (cons +mob-type-scout+ 1)
+                                                      (cons +mob-type-soldier+ 2)
+                                                      (cons +mob-type-gunner+ 1))
+                                          #'(lambda (world mob)
+                                              (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
+          mob-func-list))
+  
+  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-angels+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            
+            (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                  (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
+                                      #'find-unoccupied-place-inside))
+        mob-func-list))
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-demons+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            
+            (populate-world-with-mobs world (list (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                      #'find-unoccupied-place-inside))
+        mob-func-list))
+
+  ;; populate the world with the number of angels = humans / 11
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-angels+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              
+              (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 11) 1)))
+                                        #'find-unoccupied-place-outside)
+              )
+          mob-func-list))
+  
+  ;; populate the world with trinity mimics
+  (when (and (/= player-faction-scenario-id +player-faction-trinity-mimics+)
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-angels+)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)))
+                            t
+                            nil))
+                      faction-list))
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              
+              ;; set up trinity mimics
+              (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+))
+                    (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+))
+                    (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+)))
+                
+                (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                
+                (find-unoccupied-place-mimic world mob1 mob2 mob3 :inside nil)))
+          mob-func-list))
+
+  ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
+  ;; make some of them shadow demons if there is dark in the city
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-demons+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              (multiple-value-bind (year month day hour min sec) (get-current-date-time (player-game-time world))
+                (declare (ignore year month day min sec))
+                (populate-world-with-mobs world (if (and (>= hour 7) (< hour 19))
+                                                  (list (cons +mob-type-archdemon+ 1)
+                                                        (cons +mob-type-demon+ 15)
+                                                        (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
+                                                  (list (if (zerop (random 2)) (cons +mob-type-archdemon+ 1) (cons +mob-type-shadow-devil+ 1))
+                                                        (cons +mob-type-demon+ 7)
+                                                        (cons +mob-type-shadow-demon+ 8)
+                                                        (cons +mob-type-imp+ (- (truncate (total-humans world) 8) 16))
+                                                        (cons +mob-type-shadow-imp+ (- (truncate (total-humans world) 8) 16))))
+                                          #'find-unoccupied-place-inside)))
+          mob-func-list))
+
+  ;; populate world with malseraph puppets
+  (when (and (or (/= player-faction-scenario-id +player-faction-puppet+))
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-demons+)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)))
+                            t
+                            nil))
+                      faction-list))
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            (populate-world-with-mobs world (list (cons +mob-type-malseraph-puppet+ 1))
+                                      #'find-unoccupied-place-inside))
+        mob-func-list))
+  
+  (push #'create-mobs-from-template mob-func-list)
+  mob-func-list)
+
+(defun place-land-arrival-border (reserved-level)
+  (let ((result))
+    (loop for x from 0 below (array-dimension reserved-level 0)
+          do
+             (setf (aref reserved-level x 0 2) +building-city-land-border+)
+             (setf (aref reserved-level x (1- (array-dimension reserved-level 1)) 2) +building-city-land-border+))
+
+    (loop for y from 0 below (array-dimension reserved-level 1)
+          do
+             (setf (aref reserved-level 0 y 2) +building-city-land-border+)
+             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y 2) +building-city-land-border+))
+
+    (loop for x from 0 below (array-dimension reserved-level 0) do
+      (loop for y from 0 below (array-dimension reserved-level 1) do
+        (when (= (aref reserved-level x y 2) +building-city-land-border+)
+          (push (list (aref reserved-level x y 2) x y 2) result))))
+    result))
+
 (defun place-city-river-e (reserved-level)
   (let ((max-x (1- (truncate (array-dimension reserved-level 0) 2)))
         (min-x 0))
@@ -239,6 +552,9 @@
 
 (defun place-reserved-buildings-river (reserved-level)
   (let ((result) (r) (n nil) (s nil) (w nil) (e nil))
+
+    (place-land-arrival-border reserved-level)
+    
     (setf r (random 11))
     (cond
       ((= r 0) (setf w t e t))           ;; 0 - we
@@ -262,7 +578,8 @@
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
         (when (or (= (aref reserved-level x y 2) +building-city-river+)
-                  (= (aref reserved-level x y 2) +building-city-bridge+))
+                  (= (aref reserved-level x y 2) +building-city-bridge+)
+                  (= (aref reserved-level x y 2) +building-city-land-border+))
           (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
@@ -290,11 +607,6 @@
                (level-city-reserve-build-on-grid random-warehouse-2 x 5 2 reserved-level)
                (push (list random-warehouse-2 x 5 2) result)))
     
-    (loop for x from 0 below (array-dimension reserved-level 0) do
-      (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y 2) +building-city-sea+)
-                  (= (aref reserved-level x y 2) +building-city-pier+))
-          (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
 (defun place-reserved-buildings-port-s (reserved-level)
@@ -321,11 +633,6 @@
                (level-city-reserve-build-on-grid random-warehouse-2 x (- max-y 6) 2 reserved-level)
                (push (list random-warehouse-2 x (- max-y 6) 2) result)))
     
-    (loop for x from 0 below (array-dimension reserved-level 0) do
-      (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y 2) +building-city-sea+)
-                  (= (aref reserved-level x y 2) +building-city-pier+))
-          (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
 (defun place-reserved-buildings-port-e (reserved-level)
@@ -352,11 +659,6 @@
                (level-city-reserve-build-on-grid random-warehouse-2 (- max-x 6) y 2 reserved-level)
                (push (list random-warehouse-2 (- max-x 6) y 2) result)))
     
-    (loop for x from 0 below (array-dimension reserved-level 0) do
-      (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y 2) +building-city-sea+)
-                  (= (aref reserved-level x y 2) +building-city-pier+))
-          (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
 (defun place-reserved-buildings-port-w (reserved-level)
@@ -384,11 +686,6 @@
                (level-city-reserve-build-on-grid random-warehouse-2 5 y z reserved-level)
                (push (list random-warehouse-2 5 y z) result)))
     
-    (loop for x from 0 below (array-dimension reserved-level 0) do
-      (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (or (= (aref reserved-level x y 2) +building-city-sea+)
-                  (= (aref reserved-level x y 2) +building-city-pier+))
-          (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
 (defun create-mobs-from-template (world mob-template-list)
@@ -671,8 +968,8 @@
     ;; place +building-city-park-tiny+ and +building-city-park-3+ along the borders
     (loop for x from 0 below (array-dimension reserved-level 0)
           do
-             (setf (aref reserved-level x 0 2) +building-city-park-tiny+)
-             (setf (aref reserved-level x (1- (array-dimension reserved-level 1)) 2) +building-city-park-tiny+)
+             (setf (aref reserved-level x 0 2) +building-city-forest-border+)
+             (setf (aref reserved-level x (1- (array-dimension reserved-level 1)) 2) +building-city-forest-border+)
              (when (level-city-can-place-build-on-grid +building-city-park-3+ x 1 2 reserved-level)
                (level-city-reserve-build-on-grid +building-city-park-3+ x 1 2 reserved-level)
                (push (list +building-city-park-3+ x 1 2) result))
@@ -681,8 +978,8 @@
                (push (list +building-city-park-3+ x (- (array-dimension reserved-level 1) 3) 2) result)))
     (loop for y from 0 below (array-dimension reserved-level 1)
           do
-             (setf (aref reserved-level 0 y 2) +building-city-park-tiny+)
-             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y 2) +building-city-park-tiny+)
+             (setf (aref reserved-level 0 y 2) +building-city-forest-border+)
+             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y 2) +building-city-forest-border+)
              (when (level-city-can-place-build-on-grid +building-city-park-3+ 1 y 2 reserved-level)
                (level-city-reserve-build-on-grid +building-city-park-3+ 1 y 2 reserved-level)
                (push (list +building-city-park-3+ 1 y 2) result))
@@ -692,7 +989,8 @@
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do
-        (when (= (aref reserved-level x y 2) +building-city-park-tiny+)
+        (when (or (= (aref reserved-level x y 2) +building-city-park-tiny+)
+                  (= (aref reserved-level x y 2) +building-city-forest-border+))
           (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
@@ -753,6 +1051,8 @@
 
 (defun place-reserved-buildings-barricaded-city (reserved-level)
   (let ((result))
+
+    (place-land-arrival-border reserved-level)
    
     (loop for x from 1 below (1- (array-dimension reserved-level 0))
           do
@@ -784,7 +1084,8 @@
                   (= (aref reserved-level x y 2) +building-city-barricade-ne+)
                   (= (aref reserved-level x y 2) +building-city-barricade-se+)
                   (= (aref reserved-level x y 2) +building-city-barricade-sw+)
-                  (= (aref reserved-level x y 2) +building-city-barricade-nw+))
+                  (= (aref reserved-level x y 2) +building-city-barricade-nw+)
+                  (= (aref reserved-level x y 2) +building-city-land-border+))
           (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
