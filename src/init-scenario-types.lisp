@@ -51,8 +51,6 @@
                                                                                                             #'place-land-arrival-border
                                                                                                             )))
                                                        
-                                                       (push +game-event-military-arrive+ game-event-list)
-                                                                                                              
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-river+
@@ -63,8 +61,7 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-river)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-river)))
                                                                                                             #'place-reserved-buildings-river)))
-                                                       (push +game-event-military-arrive+ game-event-list)
-                                                                                                              
+                                                       
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-port+
@@ -90,11 +87,6 @@
                                                                                                                                   (= (aref reserved-level x y 2) +building-city-land-border+))
                                                                                                                           (push (list (aref reserved-level x y 2) x y 2) result))))
                                                                                                                     result)))))
-                                                         (cond
-                                                           ((= r 0) (push +game-event-military-arrive-port-n+ game-event-list)) ;; north
-                                                           ((= r 1) (push +game-event-military-arrive-port-s+ game-event-list)) ;; south
-                                                           ((= r 2) (push +game-event-military-arrive-port-e+ game-event-list)) ;; east
-                                                           ((= r 3) (push +game-event-military-arrive-port-w+ game-event-list))) ;; west
                                                          )
                                                                                                               
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -107,7 +99,6 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-normal)))
                                                                                                             #'place-reserved-buildings-forest)))
-                                                       (push +game-event-military-arrive+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
@@ -120,7 +111,6 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-river)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-river)))
                                                                                                             #'place-reserved-buildings-island)))
-                                                       (push +game-event-military-arrive-island+ game-event-list)
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
@@ -132,8 +122,7 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-normal)))
                                                                                                             #'place-reserved-buildings-barricaded-city)))
-                                                       (push +game-event-military-arrive+ game-event-list)
-                                                                                                                                                                     
+                                                                                                                                                                                                                            
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 ;;======================
@@ -167,6 +156,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-player+))
@@ -185,6 +176,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-angel+))
@@ -205,6 +198,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-imp+))
@@ -225,6 +220,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+))
@@ -239,19 +236,7 @@
                                                                                                (find-unoccupied-place-around world mob (x *player*) (y *player*) (z *player*)))))
                                                              mob-func-list)
 
-                                                       ;; remove all "military arrives" events; after the function returns, all nils are to be deleted from the game-event-list  
-                                                       ;; I could use remove, but I am afraid that whether game-event-list may not be modified because it is implementation-dependent  
-                                                       (loop for i from 0 below (length game-event-list)
-                                                             for game-event-id = (nth i game-event-list)
-                                                             when (or (= game-event-id +game-event-military-arrive+)
-                                                                      (= game-event-id +game-event-military-arrive-port-n+)
-                                                                      (= game-event-id +game-event-military-arrive-port-s+)
-                                                                      (= game-event-id +game-event-military-arrive-port-e+)
-                                                                      (= game-event-id +game-event-military-arrive-port-w+)
-                                                                      (= game-event-id +game-event-military-arrive-island+))
-                                                               do
-                                                                  (setf (nth i game-event-list) nil))
-                                                       
+                                                                                                              
                                                        (push +game-event-lose-game-died+ game-event-list)
                                                        (push +game-event-lose-game-possessed+ game-event-list)
                                                        (push +game-event-win-for-humans+ game-event-list)
@@ -265,6 +250,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-scout+))
@@ -273,19 +260,6 @@
                                                                  )
                                                              mob-func-list)
 
-                                                       ;; remove all "military arrives" events; after the function returns, all nils are to be deleted from the game-event-list  
-                                                       ;; I could use remove, but I am afraid that whether game-event-list may not be modified because it is implementation-dependent  
-                                                       (loop for i from 0 below (length game-event-list)
-                                                             for game-event-id = (nth i game-event-list)
-                                                             when (or (= game-event-id +game-event-military-arrive+)
-                                                                      (= game-event-id +game-event-military-arrive-port-n+)
-                                                                      (= game-event-id +game-event-military-arrive-port-s+)
-                                                                      (= game-event-id +game-event-military-arrive-port-e+)
-                                                                      (= game-event-id +game-event-military-arrive-port-w+)
-                                                                      (= game-event-id +game-event-military-arrive-island+))
-                                                               do
-                                                                  (setf (nth i game-event-list) nil))
-                                                       
                                                        (push +game-event-lose-game-died+ game-event-list)
                                                        (push +game-event-lose-game-possessed+ game-event-list)
                                                        (push +game-event-win-for-humans+ game-event-list)
@@ -299,6 +273,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-thief+))
@@ -320,6 +296,8 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
 
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-satanist+))
                                                                  (find-player-start-position world *player* +feature-start-satanist-player+)
@@ -340,6 +318,8 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
 
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-priest+))
                                                                  (find-player-start-position world *player* +feature-start-church-player+)
@@ -359,6 +339,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-shadow-imp+))
@@ -379,6 +361,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (let ((mob1 (make-instance 'player :mob-type +mob-type-star-singer+))
@@ -408,6 +392,8 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
 
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+))
                                                                  (find-unoccupied-place-water world *player*)
@@ -428,6 +414,8 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
 
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-malseraph-puppet+))
                                                                  (find-unoccupied-place-inside world *player*)
@@ -447,6 +435,8 @@
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-ghost+))

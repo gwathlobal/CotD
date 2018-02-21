@@ -1,6 +1,6 @@
 (in-package :cotd)
 
-(defparameter *game-events-military-list* (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-soldier+ +mob-type-gunner+ +mob-type-gunner+ +mob-type-sergeant+ +mob-type-scout+ +mob-type-chaplain+))
+(defparameter *game-events-military-list* (list +mob-type-soldier+ +mob-type-soldier+ +mob-type-gunner+ +mob-type-sergeant+ +mob-type-scout+ +mob-type-chaplain+))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-angels+ :disabled nil
                                            :on-check #'(lambda (world)
@@ -228,36 +228,6 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-military-arrive+ :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
-                                                           t
-                                                           nil))
-                                           :on-trigger #'(lambda (world)
-                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived!~%"))
-                                                           
-                                                           ;; find a suitable place for the military along the map borders
-                                                           ;; four groups are created - north-east, south-east, north-west and south-west
-                                                           ;; place the units
-                                                           (let ((placement-list-horiz (list (cons 1 1)                                        ;; north-east
-                                                                                             (cons 1 (- (array-dimension (terrain (level world)) 1) 2))                      ;; south-east
-                                                                                             (cons (- (array-dimension (terrain (level world)) 0) 15) 1)                     ;; north-west
-                                                                                             (cons (- (array-dimension (terrain (level world)) 0) 15) (- (array-dimension (terrain (level world)) 1) 2)))) ;; south-west
-                                                                 )
-                                                                 
-
-                                                             ;; place for north and south horizontally
-                                                             (loop for (sx . sy) in placement-list-horiz do
-                                                               (loop for x from 0 to 9
-                                                                     for military-picked = (nth (random (length *game-events-military-list*)) *game-events-military-list*)
-                                                                     when (and (not (get-mob-* (level world) (+ sx x) sy 2))
-                                                                               (not (get-terrain-type-trait (get-terrain-* (level world) (+ sx x) sy 2) +terrain-trait-blocks-move+)))
-                                                                       do
-                                                                          (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x (+ sx x) :y sy :z 2))))
-                                                             
-                                                             ))
-                               ))
-
 (set-game-event (make-instance 'game-event :id +game-event-snow-falls+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
@@ -271,192 +241,6 @@
                                                                       (logger (format nil "GAME-EVENT: Snow falls at (~A ~A)~%" x y))
                                                                       (set-terrain-* (level world) x y 2 +terrain-floor-snow+))
                                                            )))
-
-(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-n+ :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
-                                                           t
-                                                           nil))
-                                           :on-trigger #'(lambda (world)
-                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the northern piers!~%"))
-
-                                                           ;; find the suitable place on the northern piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for y from 0 below (array-dimension (terrain (level world)) 1)
-                                                                 with max-units = 40
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-                                                           )
-                               ))
-
-(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-s+ :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
-                                                           t
-                                                           nil))
-                                           :on-trigger #'(lambda (world)
-                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the southern piers!~%"))
-
-                                                           ;; find the suitable place on the southern piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for y from (1- (array-dimension (terrain (level world)) 1)) downto 0
-                                                                 with max-units = 40
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-                                                           )
-                               ))
-
-(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-w+ :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
-                                                           t
-                                                           nil))
-                                           :on-trigger #'(lambda (world)
-                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the western piers!~%"))
-
-                                                           ;; find the suitable place on the western piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for x from 0 below (array-dimension (terrain (level world)) 0)
-                                                                 with max-units = 40
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-                                                           )
-                               ))
-
-(set-game-event (make-instance 'game-event :id +game-event-military-arrive-port-e+ :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
-                                                           t
-                                                           nil))
-                                           :on-trigger #'(lambda (world)
-                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the eastern piers!~%"))
-
-                                                           ;; find the suitable place on the eastern piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for x from (1- (array-dimension (terrain (level world)) 0)) downto 0 
-                                                                 with max-units = 40
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-                                                           )
-                               ))
-
-(set-game-event (make-instance 'game-event :id +game-event-military-arrive-island+ :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
-                                                           t
-                                                           nil))
-                                           :on-trigger #'(lambda (world)
-                                                           (logger (format nil "GAME-EVENT: Cavalry has arrived to the island!~%"))
-
-                                                           ;; find the suitable place on the eastern piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for x from (1- (array-dimension (terrain (level world)) 0)) downto 0 
-                                                                 with max-units = 10
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-
-                                                           ;; find the suitable place on the western piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for x from 0 below (array-dimension (terrain (level world)) 0)
-                                                                 with max-units = 10
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for y from 0 below (array-dimension (terrain (level world)) 1)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-
-                                                           ;; find the suitable place on the southern piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for y from (1- (array-dimension (terrain (level world)) 1)) downto 0
-                                                                 with max-units = 10
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-
-                                                           ;; find the suitable place on the northern piers for the military
-                                                           ;; place the units until the total number is reached
-                                                           (loop for y from 0 below (array-dimension (terrain (level world)) 1)
-                                                                 with max-units = 10
-                                                                 with military-list = *game-events-military-list*
-                                                                 do
-                                                                    (loop for x from 0 below (array-dimension (terrain (level world)) 0)
-                                                                          for military-picked = (nth (random (length military-list)) military-list)
-                                                                          when (and (not (get-mob-* (level world) x y 2))
-                                                                                    (not (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-blocks-move+))
-                                                                                    (get-terrain-type-trait (get-terrain-* (level world) x y 2) +terrain-trait-opaque-floor+))
-                                                                            do
-                                                                               (add-mob-to-level-list (level world) (make-instance 'mob :mob-type military-picked :x x :y y :z 2))
-                                                                               (decf max-units)
-                                                                               (when (zerop max-units) (loop-finish)))
-                                                                    (when (zerop max-units) (loop-finish)))
-                                                           )
-                               ))
 
 (set-game-event (make-instance 'game-event :id +game-event-adjust-outdoor-light+ :disabled nil
                                            :on-check #'(lambda (world)
@@ -664,3 +448,112 @@
                                                                        ))))
                                                            
                                                            )))
+
+(set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-military+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (real-game-time world) 2) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "~%GAME-EVENT: The military has arrived!~%"))
+
+                                                           ;; find a suitable arrival point to accomodate 4 groups of military
+                                                           (let ((arrival-points (copy-list (delayed-arrival-points (level world)))))
+                                                             (loop with max-troops = 4
+                                                                   while (not (zerop max-troops))
+                                                                   for n = (random (length arrival-points))
+                                                                   for arrival-point = (nth n arrival-points)
+                                                                   do
+                                                                      (let ((free-cells 0) (m-picked 0))
+                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                            #'(lambda (dx dy)
+                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
+                                                                                                  (incf free-cells))))
+                                                                        (when (>= free-cells (1- (length *game-events-military-list*)))
+                                                                          
+                                                                          (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                              #'(lambda (dx dy)
+                                                                                                  (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                             (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
+                                                                                                             (<= m-picked (1- (length *game-events-military-list*))))
+                                                                                                    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type (nth m-picked *game-events-military-list*)
+                                                                                                                                                             :x dx :y dy :z (third arrival-point)))
+                                                                                                    (incf m-picked))))
+                                                                          (decf max-troops)
+                                                                          ))
+                                                                   ))
+                                                           )
+                               ))
+
+(set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-angels+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (real-game-time world) 3) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "~%GAME-EVENT: The angels have arrived!~%"))
+
+                                                           (let ((arrival-points (copy-list (delayed-arrival-points (level world)))))
+                                                             ;; find a suitable arrival point to accomodate trinity mimics
+                                                             (loop with positioned = nil
+                                                                   with trinity-mimic-list = (list +mob-type-star-singer+ +mob-type-star-gazer+ +mob-type-star-mender+)
+                                                                   while (null positioned)
+                                                                   for n = (random (length arrival-points))
+                                                                   for arrival-point = (nth n arrival-points)
+                                                                   do
+                                                                      (let ((free-cells ()))
+                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                            #'(lambda (dx dy)
+                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
+                                                                                                  (push (list dx dy (third arrival-point)) free-cells))))
+                                                                        (when (>= (length free-cells) (length trinity-mimic-list))
+                                                                          (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+ :x (first (nth 0 free-cells)) :y (second (nth 0 free-cells)) :z (third (nth 0 free-cells))))
+                                                                                (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+ :x (first (nth 1 free-cells)) :y (second (nth 1 free-cells)) :z (third (nth 1 free-cells))))
+                                                                                (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+ :x (first (nth 2 free-cells)) :y (second (nth 2 free-cells)) :z (third (nth 2 free-cells)))))
+                                                                            
+                                                                            (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                                                                            (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                                                                            (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                                                                            (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                                                                            
+                                                                            (add-mob-to-level-list (level world) mob1)
+                                                                            (add-mob-to-level-list (level world) mob2)
+                                                                            (add-mob-to-level-list (level world) mob3))
+                                                                          
+                                                                          (setf positioned t)
+                                                                          ))
+                                                                   )
+                                                             (loop with positioned = nil
+                                                                   with max-angels = 5
+                                                                   while (null positioned)
+                                                                   for n = (random (length arrival-points))
+                                                                   for arrival-point = (nth n arrival-points)
+                                                                   do
+                                                                      (let ((free-cells 0) (m-picked 0))
+                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                            #'(lambda (dx dy)
+                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
+                                                                                                  (incf free-cells))))
+                                                                        (when (>= free-cells max-angels)
+                                                                          
+                                                                          (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                              #'(lambda (dx dy)
+                                                                                                  (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                             (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
+                                                                                                             (<= m-picked max-angels))
+                                                                                                    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-angel+
+                                                                                                                                                             :x dx :y dy :z (third arrival-point)))
+                                                                                                    (incf m-picked))))
+                                                                          (setf positioned t)
+                                                                          ))
+                                                                   ))
+                                                           )
+                               ))

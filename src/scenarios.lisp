@@ -186,6 +186,28 @@
     (setf (gethash +building-type-church+ building-type-hash-table) 0))
   building-type-hash-table)
 
+(defun scenario-delayed-faction-setup (faction-list game-event-list)
+
+  ;; add delayed military
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-military+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 faction-list)
+    (push +game-event-delayed-arrival-military+ game-event-list))
+
+  ;; add delayed angels
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-angels+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 faction-list)
+    (push +game-event-delayed-arrival-angels+ game-event-list))
+  
+  game-event-list)
+
 (defun scenario-present-faction-setup (player-faction-scenario-id faction-list mob-func-list)
   (push #'adjust-initial-visibility mob-func-list)
   (push #'replace-gold-features-with-items mob-func-list)
