@@ -17,7 +17,7 @@
 
 (defun set-faction-type (faction-type)
   (when (>= (id faction-type) (length *faction-types*))
-    (adjust-array *faction-types* (list (1+ (id faction-type)))))
+    (adjust-array *faction-types* (list (1+ (id faction-type))) :initial-element nil))
   (setf (aref *faction-types* (id faction-type)) faction-type))
 
 (defun get-faction-type-by-id (faction-type-id)

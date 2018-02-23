@@ -86,13 +86,19 @@
 ;; MISSION-SCENARIOS
 ;;----------------------------------------
 
-(set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-raid+
-                                                       :name "Demonic raid"
+(set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-attack+
+                                                       :name "Demonic attack"
                                                        :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-military+ +mission-faction-delayed+)
                                                                            (list +faction-type-angels+ +mission-faction-defender+)
                                                                            (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                           (list +faction-type-angels+ +mission-faction-absent+))
+                                                                           (list +faction-type-angels+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-defender+)
+                                                                           (list +faction-type-satanists+ +mission-faction-attacker+)
+                                                                           (list +faction-type-eater+ +mission-faction-attacker+)
+                                                                           (list +faction-type-criminals+ +mission-faction-defender+)
+                                                                           (list +faction-type-ghost+ +mission-faction-defender+)
+                                                                           )
                                                        ))

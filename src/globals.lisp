@@ -530,7 +530,7 @@
 (defparameter *card-types* (make-array (list 0) :adjustable t))
 (defparameter *gods* (make-array (list 0) :adjustable t))
 (defparameter *ai-packages* (make-array (list 0) :adjustable t))
-(defparameter *faction-types* (make-array (list 0) :adjustable t))
+(defparameter *faction-types* (make-array (list 0) :initial-element nil :adjustable t))
 
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))

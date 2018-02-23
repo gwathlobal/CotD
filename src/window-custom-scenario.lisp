@@ -17,12 +17,12 @@
    (cur-sel :initform 0 :accessor cur-sel)
    (menu-items :initform () :accessor menu-items)
    (mission-list :initarg :mission-list :accessor mission-list)
-   (layout-list :initarg :layout-list :accessor layout-list)
+   (layout-list :accessor layout-list)
    (weather-list :initarg :weather-list :accessor weather-list)
    (tod-list :initarg :tod-list :accessor tod-list)
-   (player-faction-list :initarg :player-faction-list :accessor player-faction-list)
-   (ref-faction-list :initarg :ref-faction-list :accessor ref-faction-list)
-   (cur-faction-list :initarg :cur-faction-list :accessor cur-faction-list)
+   (player-faction-list :accessor player-faction-list)
+   (ref-faction-list :accessor ref-faction-list)
+   (cur-faction-list :accessor cur-faction-list)
    (cur-mission :initform 0 :initarg :cur-mission :accessor cur-mission)
    (cur-layout :initform 0 :initarg :cur-layout :accessor cur-layout)
    (cur-weather :initform 0 :initarg :cur-weather :accessor cur-weather)
@@ -306,6 +306,18 @@
                                                                                             t
                                                                                             nil))
                                                                                  (ref-faction-list win))
+                                                                        (not (find-if #'(lambda (a)
+                                                                                          (if (and (= (second a) +mission-faction-defender+)
+                                                                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                                                                            t
+                                                                                            nil))
+                                                                                      (ref-faction-list win)))
+                                                                        (not (find-if #'(lambda (a)
+                                                                                          (if (and (= (second a) +mission-faction-attacker+)
+                                                                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                                                                            t
+                                                                                            nil))
+                                                                                      (ref-faction-list win)))
                                                                         (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-present+))
                                                                (format str "[Space] Include as present faction  "))
                                                              (when (and (find-if #'(lambda (a)
@@ -322,7 +334,7 @@
                                                                                  (ref-faction-list win))
                                                                         (= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-present+))
                                                                (format str "[Space] Exclude as present faction  "))
-                                                             (format str " [Right] Next step  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")))
+                                                             (format str "[Right] Next step  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")))
         (t (format str "[Enter/Right] Select  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")))
       (write-text str rect)))
   
@@ -351,7 +363,7 @@
                         (setf *current-window* (return-to win))
                         (return-from run-window (values nil nil nil nil)))
 
-                       ;; Enter - include/exclude faction as a defender
+                       ;; Space - include/exclude faction as a defender
                        ((and (sdl:key= key :sdl-key-space)
                              (= (cur-step win) +custom-scenario-win-factions+)
                              (find-if #'(lambda (a)
@@ -428,7 +440,19 @@
                                                    (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
                                             t
                                             nil))
-                                      (ref-faction-list win)))
+                                      (ref-faction-list win))
+                             (not (find-if #'(lambda (a)
+                                               (if (and (= (second a) +mission-faction-defender+)
+                                                        (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                                 t
+                                                 nil))
+                                           (ref-faction-list win)))
+                             (not (find-if #'(lambda (a)
+                                               (if (and (= (second a) +mission-faction-attacker+)
+                                                        (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                                 t
+                                                 nil))
+                                           (ref-faction-list win))))
                         (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-present+)
                           (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-present+)
                           (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+))
@@ -444,7 +468,8 @@
                               (setf (cur-step win) +custom-scenario-win-player-faction+))
                             (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))
                           (progn
-                            (return-from run-window (values (nth (cur-layout win) (layout-list win))
+                            (return-from run-window (values (nth (cur-mission win) (mission-list win))
+                                                            (nth (cur-layout win) (layout-list win))
                                                             (nth (cur-weather win) (weather-list win))
                                                             (nth (cur-tod win) (tod-list win))
                                                             (nth (cur-player-faction win) (player-faction-list win))

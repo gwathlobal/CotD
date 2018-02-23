@@ -94,7 +94,8 @@
              ))
   )
   
-(defun init-game (layout-id weather-id tod-id faction-id faction-list)
+(defun init-game (mission-id layout-id weather-id tod-id faction-id faction-list)
+  (declare (ignore mission-id))
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
@@ -125,137 +126,297 @@
   ;(update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
   )  
 
+(defun find-random-scenario-options (player-faction-type)
+  (let ((available-faction-list)
+        (available-layout-list)
+        (available-mission-list)
+        (mission-id)
+        (layout-id)
+        (faction-list))
+
+    (setf available-faction-list (loop for faction-type across *faction-types*
+                                       when (and faction-type
+                                                 (find player-faction-type (scenario-faction-list faction-type)))
+                                         collect (id faction-type)))
+    (setf available-layout-list
+          (loop for mission-district across *mission-districts* 
+                when (eq t (loop with result = nil
+                                 for faction-type-id in available-faction-list
+                                 when (and mission-district
+                                           (find-if #'(lambda (a)
+                                                        (if (and (or (= (second a) +mission-faction-attacker+)
+                                                                     (= (second a) +mission-faction-defender+))
+                                                                 (= (first a) faction-type-id))
+                                                          t
+                                                          nil))
+                                                    (faction-list mission-district)))
+                                   do
+                                      (setf result t)
+                                      (loop-finish)
+                                 finally (return-from nil result)))
+                  collect (id mission-district)))
+    
+    (setf available-mission-list (loop for mission-scenario across *mission-scenarios*
+                                       when (or (eq t (loop with result = nil
+                                                            for layout-id in available-layout-list
+                                                            when (find layout-id (district-layout-list mission-scenario)) do
+                                                              (setf result t)
+                                                              (loop-finish)
+                                                            finally (return-from nil result)))
+                                                (eq t (loop with result = nil
+                                                            for faction-type-id in available-faction-list
+                                                            when (find-if #'(lambda (a)
+                                                                              (if (and (or (= (second a) +mission-faction-attacker+)
+                                                                                           (= (second a) +mission-faction-defender+))
+                                                                                       (= (first a) faction-type-id))
+                                                                                t
+                                                                                nil))
+                                                                          (faction-list mission-scenario))
+                                                              do
+                                                                 (setf result t)
+                                                                 (loop-finish)
+                                                            finally (return-from nil result))))
+                                         collect (id mission-scenario)))
+    
+    (setf mission-id (nth (random (length available-mission-list)) available-mission-list))
+    
+    (setf layout-id (nth (random (length (district-layout-list (get-mission-scenario-by-id mission-id)))) (district-layout-list (get-mission-scenario-by-id mission-id))))
+    
+    ;; collecting all available factions with the structure (faction-id (<faction-present> <faction-present> ...)) 
+    (setf faction-list (loop with result = ()
+                             for (faction-id faction-present) in (append (faction-list (get-mission-district-by-id layout-id))
+                                                                         (faction-list (get-mission-scenario-by-id mission-id)))
+                             for faction-obj = (find faction-id result :key #'(lambda (a) (first a)))
+                             do
+                                (if faction-obj
+                                  (progn
+                                    (pushnew faction-present (second faction-obj)))
+                                  (progn
+                                    (push (list faction-id (list faction-present)) result)))
+                             finally (return-from nil result)))
+    
+    ;; remove +mission-faction-present+ if there are +mission-faction-defender+ or +mission-faction-attacker+ options available for this faction
+    (loop for (faction-id faction-present-list) in faction-list
+          for n from 0
+          when (and (find +mission-faction-present+ faction-present-list)
+                    (or (find +mission-faction-attacker+ faction-present-list)
+                        (find +mission-faction-defender+ faction-present-list)))
+            do
+               (setf (nth n faction-list) (list faction-id (remove +mission-faction-present+ faction-present-list))))
+    
+    ;; set up random presence options in the faction list
+    (loop for (faction-id faction-present-list) in faction-list
+          for n from 0
+          do
+             (setf (nth n faction-list) (list faction-id (nth (random (length faction-present-list)) faction-present-list))))
+    
+    (return-from find-random-scenario-options (values mission-id
+                                                      layout-id
+                                                      faction-list))))
+
 (defun main-menu ()
   (let ((join-heaven-item (cons "Join the Celestial Communion (as a Chrome angel)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                           (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
-                                      
-                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                          (mission-id)
+                                          (layout-id)
+                                          (faction-list))
+
+                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-angels+))
+
+                                      (return-from main-menu (values mission-id
+                                                                     layout-id
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
-                                                                     +player-faction-angels+))))))
+                                                                     +player-faction-angels+
+                                                                     faction-list))))))
         (join-trinity-item (cons "Join the Celestial Communion (as a Trinity mimic)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                           (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                          (mission-id)
+                                          (layout-id)
+                                          (faction-list))
+
+                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-trinity-mimics+))
                                       
-                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                      (return-from main-menu (values mission-id
+                                                                     layout-id
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
-                                                                     +player-faction-trinity-mimics+))))))
+                                                                     +player-faction-trinity-mimics+
+                                                                     faction-list))))))
         (join-legion-item (cons "Join the Pandemonium Hierarchy (as a Crimson imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                           (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                          (mission-id)
+                                          (layout-id)
+                                          (faction-list))
+
+                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-demons+))
                                       
-                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                      (return-from main-menu (values mission-id
+                                                                     layout-id
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
-                                                                     +player-faction-demons+))))))
+                                                                     +player-faction-demons+
+                                                                     faction-list))))))
         (join-shadow-item (cons "Join the Pandemonium Hierarchy (as a Shadow imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                          (mission-id)
+                                          (layout-id)
+                                          (faction-list))
+
+                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-shadows+))
                                       
-                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                      (return-from main-menu (values mission-id
+                                                                     layout-id
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      +tod-type-evening+
-                                                                     +player-faction-shadows+))))))
+                                                                     +player-faction-shadows+
+                                                                     faction-list))))))
         (join-puppet-item (cons "Join the Pandemonium Hierarchy (as Malseraph's puppet)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil))
-                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil)))
+                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                          (mission-id)
+                                          (layout-id)
+                                          (faction-list))
+
+                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-puppet+))
                                       
-                                      (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                      (return-from main-menu (values mission-id
+                                                                     layout-id
                                                                      (nth (random (length weather-types)) weather-types)
                                                                      (nth (random (length tod-types)) tod-types)
-                                                                     +player-faction-puppet+))))))
+                                                                     +player-faction-puppet+
+                                                                     faction-list))))))
         (join-chaplain-item (cons "Join the Military (as a Chaplain)"
                                   #'(lambda (n) 
                                       (declare (ignore n))
                                       (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                             (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                            (mission-id)
+                                            (layout-id)
+                                            (faction-list))
+
+                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-military-chaplain+))
                                         
-                                        (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                        (return-from main-menu (values mission-id
+                                                                       layout-id
                                                                        (nth (random (length weather-types)) weather-types)
                                                                        (nth (random (length tod-types)) tod-types)
-                                                                       +player-faction-military-chaplain+))))))
+                                                                       +player-faction-military-chaplain+
+                                                                       faction-list))))))
         (join-scout-item (cons "Join the Military (as a Scout)"
                                #'(lambda (n) 
                                    (declare (ignore n))
                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                         (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                         (mission-id)
+                                         (layout-id)
+                                         (faction-list))
+
+                                     (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-military-scout+))
                                      
-                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                     (return-from main-menu (values mission-id
+                                                                    layout-id
                                                                     (nth (random (length weather-types)) weather-types)
                                                                     (nth (random (length tod-types)) tod-types)
-                                                                    +player-faction-military-scout+))))))
+                                                                    +player-faction-military-scout+
+                                                                    faction-list))))))
         (join-thief-item (cons "Join as the Thief"
                                #'(lambda (n) 
                                    (declare (ignore n))
                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                         (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                         (mission-id)
+                                         (layout-id)
+                                         (faction-list))
+
+                                     (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-thief+))
                                      
-                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                     (return-from main-menu (values mission-id
+                                                                    layout-id
                                                                     (nth (random (length weather-types)) weather-types)
                                                                     +tod-type-evening+
-                                                                    +player-faction-thief+))))))
+                                                                    +player-faction-thief+
+                                                                    faction-list))))))
         (join-satanist-item (cons "Join the Satanists"
                                   #'(lambda (n) 
                                       (declare (ignore n))
                                       (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                             (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                            (mission-id)
+                                            (layout-id)
+                                            (faction-list))
+
+                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-satanist+))
                                         
-                                        (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                        (return-from main-menu (values mission-id
+                                                                       layout-id
                                                                        (nth (random (length weather-types)) weather-types)
                                                                        (nth (random (length tod-types)) tod-types)
-                                                                       +player-faction-satanist+))))))
+                                                                       +player-faction-satanist+
+                                                                       faction-list))))))
         (join-church-item (cons "Join the Church"
                                   #'(lambda (n) 
                                       (declare (ignore n))
                                       (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                             (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                            (mission-id)
+                                            (layout-id)
+                                            (faction-list))
+
+                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-church+))
                                         
-                                        (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                        (return-from main-menu (values mission-id
+                                                                       layout-id
                                                                        (nth (random (length weather-types)) weather-types)
                                                                        (nth (random (length tod-types)) tod-types)
-                                                                       +player-faction-church+))))))
+                                                                       +player-faction-church+
+                                                                       faction-list))))))
         (join-eater-item (cons "Join as the Eater of the dead"
                                   #'(lambda (n) 
                                       (declare (ignore n))
                                       (let ((weather-types (remove +weather-type-snow+ (get-all-scenario-features-by-type +scenario-feature-weather+ nil)))
                                             (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                            (mission-id)
+                                            (layout-id)
+                                            (faction-list))
+
+                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-eater+))
                                         
-                                        (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                        (return-from main-menu (values mission-id
+                                                                       layout-id
                                                                        (nth (random (length weather-types)) weather-types)
                                                                        (nth (random (length tod-types)) tod-types)
-                                                                       +player-faction-eater+))))))
+                                                                       +player-faction-eater+
+                                                                       faction-list))))))
         (join-ghost-item (cons "Join as the Lost soul"
                                #'(lambda (n) 
                                    (declare (ignore n))
                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                         (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                         (mission-id)
+                                         (layout-id)
+                                         (faction-list))
+
+                                     (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-ghost+))
                                      
-                                     (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                     (return-from main-menu (values mission-id
+                                                                    layout-id
                                                                     (nth (random (length weather-types)) weather-types)
                                                                     (nth (random (length tod-types)) tod-types)
-                                                                    +player-faction-ghost+))))))
+                                                                    +player-faction-ghost+
+                                                                    faction-list))))))
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
                                         (declare (ignore n))
@@ -263,12 +424,12 @@
                                                                               :mission-list (get-all-mission-scenarios-list)
                                                                               :weather-list (get-all-scenario-features-by-type +scenario-feature-weather+ (not *cotd-release*))
                                                                               :tod-list (get-all-scenario-features-by-type +scenario-feature-time-of-day+ (not *cotd-release*))
-                                                                              :player-faction-list (get-all-scenario-features-by-type +scenario-feature-player-faction+ (not *cotd-release*))))
+                                                                              ))
                                         (setf (menu-items *current-window*) (populate-custom-scenario-win-menu *current-window* (cur-step *current-window*)))
                                         (make-output *current-window*)
-                                        (multiple-value-bind (layout-id weather-id tod-id faction-id faction-list) (run-window *current-window*)
-                                          (when (and layout-id weather-id tod-id faction-id faction-list)
-                                            (return-from main-menu (values layout-id weather-id tod-id faction-id faction-list)))))))
+                                        (multiple-value-bind (mission-id layout-id weather-id tod-id faction-id faction-list) (run-window *current-window*)
+                                          (when (and mission-id layout-id weather-id tod-id faction-id faction-list)
+                                            (return-from main-menu (values mission-id layout-id weather-id tod-id faction-id faction-list)))))))
         (highscores-item (cons "High scores"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -290,19 +451,27 @@
                                 (declare (ignore n))
                                 (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
                                       (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                      (city-layouts (get-all-scenario-features-by-type +scenario-feature-city-layout+ nil)))
+                                      (mission-id)
+                                      (layout-id)
+                                      (faction-list))
+
+                                  (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +player-faction-angels+))
                                   
-                                  (return-from main-menu (values (nth (random (length city-layouts)) city-layouts)
+                                  (return-from main-menu (values mission-id
+                                                                 layout-id
                                                                  (nth (random (length weather-types)) weather-types)
                                                                  (nth (random (length tod-types)) tod-types)
-                                                                 +player-faction-player+))))))
+                                                                 +player-faction-player+
+                                                                 faction-list))))))
         (test-level-item (cons "Test level"
                                #'(lambda (n) 
                                    (declare (ignore n))
-                                   (return-from main-menu (values +city-layout-test+
+                                   (return-from main-menu (values 0
+                                                                  +city-layout-test+
                                                                   +weather-type-clear+
                                                                   +tod-type-night+
-                                                                  +player-faction-test+))))))
+                                                                  +player-faction-test+
+                                                                  nil))))))
     (if *cotd-release*
       (progn
         (setf *current-window* (make-instance 'start-game-window 
@@ -420,7 +589,7 @@
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (setf *start-func* #'(lambda () (go start-tag)))
      start-tag
-       (multiple-value-bind (layout-id weather-id tod-id faction-id faction-list) (main-menu)
+       (multiple-value-bind (mission-id layout-id weather-id tod-id faction-id faction-list) (main-menu)
          (setf *current-window* (make-instance 'loading-window 
                                                :update-func #'(lambda (win)
                                                                 (when (/= *max-progress-bar* 0) 
@@ -432,7 +601,7 @@
                                                                                               (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
                                                                                               :color sdl:*white*))
                                                                   ))))
-         (init-game layout-id weather-id tod-id faction-id faction-list))
+         (init-game mission-id layout-id weather-id tod-id faction-id faction-list))
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
        (let ((out *standard-output*))

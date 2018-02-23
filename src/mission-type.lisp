@@ -28,7 +28,7 @@
 
 (defun set-mission-district (mission-district)
   (when (>= (id mission-district) (length *mission-districts*))
-    (adjust-array *mission-districts* (list (1+ (id mission-district)))))
+    (adjust-array *mission-districts* (list (1+ (id mission-district))) :initial-element nil))
   (setf (aref *mission-districts* (id mission-district)) mission-district))
 
 (defun get-mission-district-by-id (mission-district-id)
@@ -38,7 +38,7 @@
 ;; MISSION-SCENARIOS
 ;;========================================
 
-(defconstant +mission-scenario-demon-raid+ 0)
+(defconstant +mission-scenario-demon-attack+ 0)
 
 (defclass mission-scenario ()
   ((id :initarg :id :accessor id :type fixnum)
