@@ -27,6 +27,8 @@
   (update-visible-mobs mob)
   (update-visible-items mob)
 
+  (setf (aref (memory-map mob) (truncate (x mob) 10) (truncate (y mob) 10)) (real-game-time *world*))
+
   ;; if the mob is blind - move in random direction
   (when (mob-effect-p mob +mob-effect-blind+)
     (logger (format nil "AI-FUNCTION: ~A [~A] is blind, moving in random direction.~%" (name mob) (id mob)))
@@ -131,6 +133,11 @@
             when (/= (priority ai-package) +ai-priority-never+)
               do
                  (setf (aref ai-package-array (priority ai-package)) (pushnew ai-package (aref ai-package-array (priority ai-package)))))
+
+      (when (and (objectives mob)
+                 (ai-package-id (get-objective-type-by-id (objectives mob))))
+        (setf (aref ai-package-array (priority (get-ai-package-by-id (ai-package-id (get-objective-type-by-id (objectives mob))))))
+              (pushnew (get-ai-package-by-id (ai-package-id (get-objective-type-by-id (objectives mob)))) (aref ai-package-array (priority (get-ai-package-by-id (ai-package-id (get-objective-type-by-id (objectives mob)))))))))
 
       (unless *cotd-release*
         (logger (format nil "AI-FUNCTION: ai-package-array~%"))

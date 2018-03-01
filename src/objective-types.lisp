@@ -2,7 +2,8 @@
 
 (defclass objective-type ()
   ((id :initarg :id :accessor id)
-   (descr :initarg :descr :accessor descr)))
+   (descr :initarg :descr :accessor descr)
+   (ai-package-id :initform nil :initarg :ai-package-id :accessor ai-package-id)))
 
 
 (defun set-objective-type (objective-type)

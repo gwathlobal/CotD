@@ -157,18 +157,20 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+ :x 45 :y 19 :z 3))
+  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 45 :y 19 :z 3))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-man+ :x 41 :y 19 :z 2))
-        (demon (make-instance 'mob :mob-type +mob-type-man+ :x 42 :y 15 :z 3))
-        (angel (make-instance 'mob :mob-type +mob-type-man+ :x 43 :y 16 :z 3))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 41 :y 19 :z 2))
+        ;(demon (make-instance 'mob :mob-type +mob-type-angel+ :x 42 :y 15 :z 3))
+        ;(angel (make-instance 'mob :mob-type +mob-type-angel+ :x 43 :y 16 :z 3))
         )
     (setf (cur-fp *player*) 15)
     (setf (max-hp *player*) 50)
     (setf (cur-hp *player*) 50)
     ;(setf (cur-fp angel) 5)
    ; (setf (cur-fp demon) 2)
+
+    (setf (objectives soldier) +objective-demon-attack-defender+)
 
     ;(mob-set-mutation *player* +mob-abil-clawed-tentacle+)
     ;(mob-set-mutation *player* +mob-abil-piercing-needles+)
@@ -181,8 +183,8 @@
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-blessed+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
-    (add-mob-to-level-list (level world) demon)
-    (add-mob-to-level-list (level world) angel)
+    ;(add-mob-to-level-list (level world) demon)
+    ;(add-mob-to-level-list (level world) angel)
     
     ;(setf (mimic-id-list *player*) (list (id angel) (id soldier) (id demon)))
     ;(setf (mimic-id-list soldier) (list (id angel) (id soldier) (id demon)))

@@ -213,7 +213,7 @@
   game-event-list)
 
 (defun scenario-present-faction-setup (player-faction-scenario-id faction-list mob-func-list)
-  (push #'adjust-initial-visibility mob-func-list)
+  (push #'adjust-mobs-after-creation mob-func-list)
   (push #'replace-gold-features-with-items mob-func-list)
   (push #'(lambda (world mob-template-list)
             (declare (ignore mob-template-list))
@@ -728,13 +728,15 @@
              (funcall placement-func world (make-instance 'mob :mob-type mob-template-id :objectives (setup-objective-based-on-faction mob-template-id (mission-scenario (level world)))))))
   )
 
-(defun adjust-initial-visibility (world mob-template-list)
+(defun adjust-mobs-after-creation (world mob-template-list)
   (declare (ignore mob-template-list))
-  ;(format t "ADJUST-INITIAL-VISIBILITY~%")
   (loop for mob-id in (mob-id-list (level world))
         for mob = (get-mob-by-id mob-id)
         do
-           (update-visible-mobs mob)))
+           (update-visible-mobs mob)
+           (setf (memory-map mob) (make-array (list (ceiling (array-dimension (terrain (level world)) 0) 10)
+                                                    (ceiling (array-dimension (terrain (level world)) 1) 10))
+                                              :initial-element -1))))
 
 (defun find-unoccupied-place-around (world mob sx sy sz)
   (loop with min-x = sx

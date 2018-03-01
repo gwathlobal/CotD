@@ -140,6 +140,7 @@
 (defconstant +ai-package-approach-target+ 15)
 (defconstant +ai-package-attack-nearest-enemy+ 16)
 (defconstant +ai-package-find-random-location+ 17)
+(defconstant +ai-package-patrol-district+ 18)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)

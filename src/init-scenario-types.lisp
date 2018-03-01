@@ -135,7 +135,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        (declare (ignore faction-list))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
-                                                       (push #'adjust-initial-visibility mob-func-list)
+                                                       (push #'adjust-mobs-after-creation mob-func-list)
                                                        (push #'(lambda (world mob-template-list)
                                                                  (declare (ignore mob-template-list))
                                                                  ;; populate the world with demonic runes

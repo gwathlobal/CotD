@@ -699,6 +699,7 @@
    
    (order :initform nil :accessor order)
    (objectives :initform nil :initarg :objectives :accessor objectives)
+   (memory-map :initform nil :initarg :memory-map :accessor memory-map)
    
    (riding-mob-id :initform nil :accessor riding-mob-id)        ;; mob is riding this mob-id
    (mounted-by-mob-id :initform nil :accessor mounted-by-mob-id) ;; mob is being ridden by this mob-id

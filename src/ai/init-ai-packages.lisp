@@ -766,6 +766,110 @@
                                                              
                                                              )))
 
+(set-ai-package (make-instance 'ai-package :id +ai-package-patrol-district+
+                                           :priority 5
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore actor nearest-ally hostile-mobs allied-mobs))
+                                                            (if (and (not nearest-enemy)
+                                                                     )
+                                                              t
+                                                              nil)
+                                                            )
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
+
+                                                             (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob (~A, ~A, ~A) wants to patrol the district~%" (x actor) (y actor) (z actor)))
+                                                             (block ai-function
+                                                               ;; take N attempts to find a random destination spot in the nearest sector that has not been visited recently if no path is set
+                                                               (when (null (path-dst actor))
+                                                                 (let ((nearest-sector nil)
+                                                                       (rx 0) 
+                                                                       (ry 0)
+                                                                       (rz 0)
+                                                                       )
+                                                                   (declare (type fixnum rx ry rz))
+                                                                   (loop for dx from 0 below (array-dimension (memory-map actor) 0) do
+                                                                     (loop for dy from 0 below (array-dimension (memory-map actor) 1) do
+                                                                       (unless nearest-sector
+                                                                         (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy))))
+                                                                       (cond
+                                                                         ((< (aref (memory-map actor) dx dy)
+                                                                             (third nearest-sector))
+                                                                          (progn
+                                                                            (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy)))))
+                                                                         ((and (= (aref (memory-map actor) dx dy)
+                                                                                  (third nearest-sector))
+                                                                               (< (get-distance (truncate (x actor) 10) (truncate (y actor) 10) dx dy)
+                                                                                  (get-distance (truncate (x actor) 10) (truncate (y actor) 10) (first nearest-sector) (second nearest-sector))))
+                                                                          (progn
+                                                                            (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy))))))
+                                                                       ))
+
+                                                                   (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: NEAREST-SECTOR ~A vs CUR-SECTOR ~A~%" nearest-sector (list (truncate (x actor) 10) (truncate (y actor) 10))))
+                                                                   
+                                                                   (setf rx (+ (* (first nearest-sector) 10) (random 10)))
+                                                                   (setf ry (+ (* (second nearest-sector) 10) (random 10)))
+                                                                   (setf rz (- (+ 5 (z actor)) (1+ (random 10))))
+                                                                 
+                                                                   (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: TERRAIN ~A~%" (get-terrain-* (level *world*) (x actor) (y actor) (z actor))))
+                                                                   (loop while (or (< rx 0) (< ry 0) (< rz 0)
+                                                                                   (>= rx (array-dimension (terrain (level *world*)) 0))
+                                                                                   (>= ry (array-dimension (terrain (level *world*)) 1))
+                                                                                   (>= rz (array-dimension (terrain (level *world*)) 2))
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
+                                                                                   (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (mob-effect-p actor +mob-effect-flying+)))
+                                                                                   (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
+                                                                                                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                                                          (map-size actor))
+                                                                                                                 (get-mob-move-mode actor)))
+                                                                                   )
+                                                                         do
+                                                                            (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                                            rx ry rz
+                                                                                            (get-terrain-* (level *world*) rx ry rz)
+                                                                                            (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
+                                                                                                                                   (id (get-mob-* (level *world*) rx ry rz))
+                                                                                                                                   nil)
+                                                                                            (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
+                                                                                                                                                                              (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                                                              (map-size actor))
+                                                                                                                     (get-mob-move-mode actor))))
+                                                                            (setf rx (+ (* (first nearest-sector) 10) (random 10)))
+                                                                            (setf ry (+ (* (second nearest-sector) 10) (random 10)))
+                                                                            (setf rz (- (+ 5 (z actor)) (1+ (random 10))))
+                                                                            (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: NEW R (~A ~A ~A)~%" rx ry rz)))
+                                                                   (ai-set-path-dst actor rx ry rz)
+                                                                   (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob's destination is randomly set to (~A, ~A, ~A)~%"
+                                                                                   (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))))
+                                                               
+                                                               (let ((move-result nil))
+                                                                 ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
+                                                                 (when (null (path-dst actor))
+                                                                   (ai-mob-random-dir actor)
+                                                                   (return-from ai-function))
+                                                                     
+                                                                 ;; make a path to the destination target if there is no path plotted
+                                                                 (when (or (null (path actor))
+                                                                           (mob-ability-p actor +mob-abil-momentum+))
+                                                                   (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                                 
+                                                                 ;; make a step along the path to the path-dst
+                                                                 (setf move-result (ai-move-along-path actor))
+                                                                 (cond
+                                                                   ;; if the move failed - move in a random direction
+                                                                   ((null move-result)
+                                                                    (setf (path-dst actor) nil)
+                                                                    (ai-mob-random-dir actor)
+                                                                    (return-from ai-function)
+                                                                    )
+                                                                   ;; success
+                                                                   (t
+                                                                    (return-from ai-function))))
+                                                               
+                                                             ))))
+
 (set-ai-package (make-instance 'ai-package :id +ai-package-find-random-location+
                                            :priority 4
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
