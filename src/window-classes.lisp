@@ -6,6 +6,7 @@
 (defconstant +cotd-unicode-latin-a-small+ 97)
 (defconstant +cotd-unicode-latin-f-small+ 102)
 (defconstant +cotd-unicode-latin-i-small+ 105)
+(defconstant +cotd-unicode-latin-j-small+ 106)
 (defconstant +cotd-unicode-latin-l-small+ 108)
 (defconstant +cotd-unicode-latin-m-small+ 109)
 (defconstant +cotd-unicode-latin-r-small+ 114)

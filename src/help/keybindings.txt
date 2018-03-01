@@ -14,6 +14,7 @@ Arrow keys, Numpad keys,         - Movement
 
 [Shift] + [2]                    - Character screen
 [i]                              - Inventory
+[j]                              - Journal
 [m]                              - View messages
 [?]                              - Help
 [Shift] + [q]                    - Quit to main menu

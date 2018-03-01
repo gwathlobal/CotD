@@ -180,9 +180,10 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-angel+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :objectives (setup-objective-based-on-faction +mob-type-angel+ (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-outside world *player*)
-                                                                 (setf (faction-name *player*) "Chrome Angel"))
+                                                                 (setf (faction-name *player*) "Chrome Angel")
+                                                                 )
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
@@ -202,7 +203,7 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-imp+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-imp+ :objectives (setup-objective-based-on-faction +mob-type-imp+ (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-inside world *player*)
                                                                  (setf (faction-name *player*) "Crimson Imp"))
                                                              mob-func-list)
@@ -224,7 +225,7 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+ :objectives (setup-objective-based-on-faction +mob-type-chaplain+ (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-outside world *player*)
                                                                  (setf (faction-name *player*) "Military Chaplain")
                                                                  ;; place the first group of military around the player
@@ -254,7 +255,7 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-scout+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-scout+ :objectives (setup-objective-based-on-faction +mob-type-scout+ (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-outside world *player*)
                                                                  (setf (faction-name *player*) "Military Scout")
                                                                  )
@@ -277,7 +278,7 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-thief+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-thief+ :objectives (setup-objective-based-on-faction +mob-type-thief+ (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-on-top world *player*)
                                                                  (setf (faction-name *player*) "Thief"))
                                                              mob-func-list)
@@ -299,7 +300,7 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-satanist+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-satanist+ :objectives (setup-objective-based-on-faction +mob-type-satanist+ (mission-scenario (level world)))))
                                                                  (find-player-start-position world *player* +feature-start-satanist-player+)
                                                                  (setf (faction-name *player*) "Satanist"))
                                                              mob-func-list)
@@ -321,7 +322,7 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-priest+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-priest+ :objectives (setup-objective-based-on-faction +mob-type-priest+ (mission-scenario (level world)))))
                                                                  (find-player-start-position world *player* +feature-start-church-player+)
                                                                  (setf (faction-name *player*) "Church"))
                                                              mob-func-list)
@@ -343,7 +344,8 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-shadow-imp+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-shadow-imp+ :objectives (setup-objective-based-on-faction +mob-type-shadow-imp+
+                                                                                                                                                                                     (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-inside world *player*)
                                                                  (setf (faction-name *player*) "Shadow Imp"))
                                                              mob-func-list)
@@ -365,9 +367,12 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (let ((mob1 (make-instance 'player :mob-type +mob-type-star-singer+))
-                                                                       (mob2 (make-instance 'player :mob-type +mob-type-star-gazer+))
-                                                                       (mob3 (make-instance 'player :mob-type +mob-type-star-mender+)))
+                                                                 (let ((mob1 (make-instance 'player :mob-type +mob-type-star-singer+ :objectives (setup-objective-based-on-faction +mob-type-star-singer+
+                                                                                                                                                                                   (mission-scenario (level world)))))
+                                                                       (mob2 (make-instance 'player :mob-type +mob-type-star-gazer+ :objectives (setup-objective-based-on-faction +mob-type-star-gazer+
+                                                                                                                                                                                  (mission-scenario (level world)))))
+                                                                       (mob3 (make-instance 'player :mob-type +mob-type-star-mender+ :objectives (setup-objective-based-on-faction +mob-type-star-mender+
+                                                                                                                                                                                   (mission-scenario (level world))))))
 
                                                                    (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
                                                                    (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
@@ -395,7 +400,8 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+ :objectives (setup-objective-based-on-faction +mob-type-eater-of-the-dead+
+                                                                                                                                                                                            (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-water world *player*)
                                                                  (setf (faction-name *player*) "Eater of the dead"))
                                                              mob-func-list)
@@ -417,7 +423,8 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-malseraph-puppet+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-malseraph-puppet+ :objectives (setup-objective-based-on-faction +mob-type-malseraph-puppet+
+                                                                                                                                                                                           (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-inside world *player*)
                                                                  (setf (faction-name *player*) "Malseraph's puppet"))
                                                              mob-func-list)
@@ -439,7 +446,8 @@
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
-                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-ghost+))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-ghost+ :objectives (setup-objective-based-on-faction +mob-type-ghost+
+                                                                                                                                                                                (mission-scenario (level world)))))
                                                                  (find-unoccupied-place-inside world *player*)
                                                                  (setf (faction-name *player*) "Lost soul"))
                                                              mob-func-list)

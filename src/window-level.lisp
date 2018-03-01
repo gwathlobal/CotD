@@ -641,6 +641,13 @@
 								:return-to *current-window*))
                           (make-output *current-window*))
                         ;;------------------
+			;; view journal - j
+                        (when (or (and (sdl:key= key :sdl-key-j) (= mod 0))
+                                  (eq unicode +cotd-unicode-latin-j-small+))
+			  (setf *current-window* (make-instance 'journal-window 
+								:return-to *current-window*))
+                          (make-output *current-window*))
+                        ;;------------------
 			;; quit to menu - Shift + q
                         (when (or (and (sdl:key= key :sdl-key-q) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
                                   (eq unicode +cotd-unicode-latin-q-captial+))

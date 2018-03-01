@@ -14,7 +14,7 @@
     
     (values layout-func post-processing-func-list mob-func-list game-event-list)))
 
-(defun create-world (world layout-id weather-id tod-id faction-id faction-list)
+(defun create-world (world mission-id layout-id weather-id tod-id faction-id faction-list)
   
   (let ((mob-template-result)
         (feature-template-result)
@@ -62,6 +62,7 @@
     (setf (level world) (create-level-from-template result-template))
 
     (setf (level-layout (level world)) layout-id)
+    (setf (mission-scenario (level world)) mission-id)
     
     ;; check map for connectivity
 

@@ -186,6 +186,10 @@
     (setf (gethash +building-type-church+ building-type-hash-table) 0))
   building-type-hash-table)
 
+(defun setup-objective-based-on-faction (mob-type-id mission-id)
+  (second (find (faction (get-mob-type-by-id mob-type-id)) (objective-list (get-mission-scenario-by-id mission-id)) :key #'(lambda (a)
+                                                                                                                             (first a)))))
+
 (defun scenario-delayed-faction-setup (faction-list game-event-list)
 
   ;; add delayed military
@@ -327,7 +331,8 @@
               
               (loop repeat 5
                     do
-                       (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
+                       (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+ :objectives (setup-objective-based-on-faction +mob-type-chaplain+
+                                                                                                                                       (mission-scenario (level world))))))
                          (find-unoccupied-place-outside world chaplain)
                          (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
                                                                (cons +mob-type-scout+ 1)
@@ -351,7 +356,8 @@
     (push #'(lambda (world mob-template-list)
               (declare (ignore mob-template-list))
               
-              (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
+              (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+ :objectives (setup-objective-based-on-faction +mob-type-chaplain+
+                                                                                                                              (mission-scenario (level world))))))
                 (find-unoccupied-place-outside world chaplain)
                 (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
                                                       (cons +mob-type-scout+ 1)
@@ -423,9 +429,9 @@
               (declare (ignore mob-template-list))
               
               ;; set up trinity mimics
-              (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+))
-                    (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+))
-                    (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+)))
+              (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+ :objectives (setup-objective-based-on-faction +mob-type-star-singer+ (mission-scenario (level world)))))
+                    (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+ :objectives (setup-objective-based-on-faction +mob-type-star-gazer+ (mission-scenario (level world)))))
+                    (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+ :objectives (setup-objective-based-on-faction +mob-type-star-mender+ (mission-scenario (level world))))))
                 
                 (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
                 (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
@@ -719,7 +725,7 @@
   (loop for (mob-template-id . num) in mob-template-list do
     (loop repeat num
           do
-             (funcall placement-func world (make-instance 'mob :mob-type mob-template-id))))
+             (funcall placement-func world (make-instance 'mob :mob-type mob-template-id :objectives (setup-objective-based-on-faction mob-template-id (mission-scenario (level world)))))))
   )
 
 (defun adjust-initial-visibility (world mob-template-list)

@@ -33,7 +33,7 @@
    ;;   :ai-cannibal - mob will try to go to the nearest corpse
    ;;   :ai-trinity-mimic
    ;;   :ai-split-soul
-      
+         
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The pattern of naming keys that may be used in make-instance is like <name of mob ability constant> minus the 'mob-' part
    ;; For example,
@@ -698,6 +698,7 @@
    (momentum-dir :initform (cons 0 0) :accessor momentum-dir)
    
    (order :initform nil :accessor order)
+   (objectives :initform nil :initarg :objectives :accessor objectives)
    
    (riding-mob-id :initform nil :accessor riding-mob-id)        ;; mob is riding this mob-id
    (mounted-by-mob-id :initform nil :accessor mounted-by-mob-id) ;; mob is being ridden by this mob-id
@@ -710,7 +711,7 @@
    (effects :initform (make-hash-table) :accessor effects)
    (abilities-cd :initform (make-hash-table) :accessor abilities-cd)
    (abilities :initform (make-hash-table) :accessor abilities)  ;; each value is (<is mutation t/nil> <power level>)
-   
+
    (weapon :initform nil :initarg :weapon :accessor weapon)
    ;; of type (<weapon name> (<dmg-type> <dmg min> <dmg max> <attack speed> <accuracy> <list of aux params>)
    ;;                        (<dmg-type> <dmg min> <dmg max> <attack speed> <cur charges> <max charges> <rate of fire> <accuracy> <shoot str> <list of aux params>))

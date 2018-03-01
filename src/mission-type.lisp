@@ -4,12 +4,6 @@
 ;; MISSION-DISTRICTS
 ;;========================================
 
-(defconstant +mission-type-demon-raid-1+ 0)
-(defconstant +mission-type-demon-raid-2+ 1)
-(defconstant +mission-type-demon-raid-3+ 2)
-(defconstant +mission-type-demon-raid-4+ 3)
-(defconstant +mission-type-demon-raid-5+ 4)
-
 (defconstant +mission-type-district-layout-living+ 0)
 (defconstant +mission-type-district-layout-abandoned+ 1)
 (defconstant +mission-type-district-layout-corrupted+ 2)
@@ -44,7 +38,9 @@
   ((id :initarg :id :accessor id :type fixnum)
    (name :initarg :name :accessor name :type string)
    (district-layout-list :initarg :district-layout-list :accessor district-layout-list)
-   (faction-list :initarg :faction-list :accessor faction-list)))
+   (faction-list :initarg :faction-list :accessor faction-list)
+   (objective-list :initform () :initarg :objective-list :accessor objective-list) ;; of type ((<faction-id> <objective-type-id>)...)
+   ))
 
 (defparameter *mission-scenarios* (make-array (list 0) :adjustable t))
 

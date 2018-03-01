@@ -23,6 +23,7 @@
    (light-sources :initform (make-array '(0) :adjustable t) :accessor light-sources)
    (wind-dir :initform 5 :initarg :wind-dir :accessor wind-dir)
    (level-layout :initform 0 :initarg :level-layout :accessor level-layout)
+   (mission-scenario :initform nil :initarg :mission-scenario :accessor mission-scenario)
    (delayed-arrival-points :initform () :initarg :delayed-arrival-points :accessor delayed-arrival-points) ;; is of type ((x y z) (...) ...)
    ))
    

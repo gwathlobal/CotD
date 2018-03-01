@@ -137,6 +137,7 @@ KEYBINDINGS
 
  [Shift] + [2]                    - Character screen
  [i]                              - Inventory
+ [j]                              - Journal
  [m]                              - View messages
  [?]                              - Help
  

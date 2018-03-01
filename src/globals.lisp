@@ -519,6 +519,17 @@
 
 (defconstant +god-entity-malseraph+ 0)
 
+;;--------------------
+;; OBJECTIVE-TYPE Constants
+;;--------------------
+
+(defconstant +objective-demon-attack-attacker+ 0)
+(defconstant +objective-demon-attack-defender+ 1)
+(defconstant +objective-demon-attack-eater+ 2)
+(defconstant +objective-demon-attack-thief+ 3)
+(defconstant +objective-demon-attack-ghost+ 4)
+(defconstant +objective-demon-attack-scout+ 5)
+
 (defparameter *faction-table* (make-hash-table))
 
 (defparameter *ability-types* (make-array (list 0) :adjustable t))
@@ -531,6 +542,7 @@
 (defparameter *gods* (make-array (list 0) :adjustable t))
 (defparameter *ai-packages* (make-array (list 0) :adjustable t))
 (defparameter *faction-types* (make-array (list 0) :initial-element nil :adjustable t))
+(defparameter *objective-types* (make-array (list 0) :adjustable t))
 
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))

@@ -95,7 +95,6 @@
   )
   
 (defun init-game (mission-id layout-id weather-id tod-id faction-id faction-list)
-  (declare (ignore mission-id))
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
@@ -117,11 +116,11 @@
 
   (setf *world* (make-instance 'world))
   
-  (create-world *world* layout-id weather-id tod-id faction-id faction-list)
-
+  (create-world *world* mission-id layout-id weather-id tod-id faction-id faction-list)
+  
   (setf (name *player*) "Player")
 
-  (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%"))
+  (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%To view your current objective, press 'j'.~%"))
 
   ;(update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
   )  
