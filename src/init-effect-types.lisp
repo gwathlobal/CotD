@@ -135,7 +135,7 @@
                                                          
                                                          (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor))
 
-                                                          ;; set up current abilities cooldowns
+                                                         ;; set up current abilities cooldowns
                                                          (loop for ability-id being the hash-key in (abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do

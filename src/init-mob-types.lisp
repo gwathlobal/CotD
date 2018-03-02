@@ -81,7 +81,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-clothing+ #'(lambda () (random 2))))
-                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t
+                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-policeman+ 
@@ -94,7 +94,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
-                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t
+                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t
                              ))
 
 ;;--------------------
@@ -157,7 +157,7 @@
                                        :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-independent t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t :abil-sprint t :abil-jump t :abil-make-disguise t :abil-remove-disguise t
                                        :init-items (list (list +item-type-smoke-bomb+ #'(lambda () 3)))
-                                       :ai-kleptomaniac t :ai-takes-valuable-items t :ai-cautious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t
+                                       :ai-kleptomaniac t :ai-takes-valuable-items t :ai-cautious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-avoid-possession t
                              ))
 
 ;;--------------------
@@ -173,7 +173,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
-                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t
+                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sergeant+ 
@@ -185,7 +185,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
-                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t
+                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
@@ -209,7 +209,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
-                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t
+                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scout+ 
@@ -221,7 +221,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-independent t :abil-starts-with-horse t :abil-detect-good t :abil-detect-evil t
                                        :abil-horseback-riding t :abil-dismount t :abil-eagle-eye t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)) (list +item-type-signal-flare+ #'(lambda () 2)))
-                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t
+                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-possession t
                              ))
 
 ;;--------------------

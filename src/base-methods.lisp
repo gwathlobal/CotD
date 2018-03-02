@@ -1617,7 +1617,8 @@
     (setf (dead= mob) t)))
 
 (defun mob-evolve (mob)
-  (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A assumes a superior form of ~A! " (capitalize-name (prepend-article +article-the+ (name mob))) (prepend-article +article-a+ (name (get-mob-type-by-id (evolve-into mob))))))
+  (print-visible-message (x mob) (y mob) (z mob) (level *world*)
+                         (format nil "~A assumes a superior form of ~A! " (capitalize-name (prepend-article +article-the+ (name mob))) (prepend-article +article-a+ (name (get-mob-type-by-id (evolve-into mob))))))
   
   (setf (mob-type mob) (evolve-into mob))
   (setf (cur-hp mob) (max-hp mob))
@@ -1632,6 +1633,7 @@
       (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "It will be hereby known as ~A! " (name mob)))))
   
   (set-cur-weapons mob)
+  (adjust-abilities mob)
   (adjust-dodge mob)
   (adjust-armor mob)
   (adjust-m-acc mob)

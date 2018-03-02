@@ -13,38 +13,39 @@
                                                              (ai-mob-flee actor nearest-enemy)
                                                              )))
 
-(set-ai-package (make-instance 'ai-package :id +ai-package-split-soul+
-                                           :priority 7
+(set-ai-package (make-instance 'ai-package :id +ai-package-avoid-possession+
+                                           :priority 9
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
-                                                            (declare (ignore actor nearest-ally hostile-mobs allied-mobs))
-                                                            (if nearest-enemy
-                                                              t
-                                                              nil))
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                            (let ((free-cells ()))
+                                                              (if (and nearest-enemy
+                                                                       (= (z actor) (z nearest-enemy))
+                                                                       (< (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)
+                                                                       (mob-ability-p actor +mob-abil-possessable+)
+                                                                       (mob-ability-p nearest-enemy +mob-abil-can-possess+)
+                                                                       (not (mob-effect-p actor +mob-effect-blessed+))
+                                                                       (not (mob-effect-p actor +mob-effect-divine-shield+)))
+                                                                (progn
+                                                                  (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                                  (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                                    (when (and terrain
+                                                                                                                               (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                               (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                               (not (get-mob-* (level *world*) dx dy (z actor)))
+                                                                                                                               (>= (get-distance dx dy (x nearest-enemy) (y nearest-enemy)) 2))
+                                                                                                                      (push (list dx dy) free-cells)))
+                                                                                                                  ))
+                                                                  (if free-cells
+                                                                    free-cells
+                                                                    nil))
+                                                                nil)))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
-                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs check-result))
-                                                             (logger (format nil "AI-PACKAGE-SPLIT-SOUL: ~A [~A] is trying to move away from the enemy ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
-
-                                                             (if (mob-ability-p actor +mob-abil-immobile+)
-                                                               (move-mob actor 5)
-                                                               (progn
-                                                                 ;; 1) find the tile farthest from the nearest enemy
-                                                                 (let ((farthest-tile nil))
-                                                                   (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
-                                                                                                                   (when (eq (check-move-on-level actor dx dy (z actor)) t)
-                                                                                                                     (unless farthest-tile
-                                                                                                                       (setf farthest-tile (list dx dy (z actor))))
-                                                                                                                     (when (> (get-distance dx dy (x nearest-enemy) (y nearest-enemy))
-                                                                                                                              (get-distance (first farthest-tile) (second farthest-tile) (x nearest-enemy) (y nearest-enemy)))
-                                                                                                                       (setf farthest-tile (list dx dy (z actor)))))))
-                                                                   (if farthest-tile
-                                                                     (setf (path-dst actor) farthest-tile)
-                                                                     (setf (path-dst actor) (list (x actor) (y actor) (z actor))))
-                                                                   )
-
-                                                                 ;; 2) move to that tile
-                                                                 (move-mob actor (x-y-into-dir (- (first (path-dst actor)) (x actor))
-                                                                                               (- (second (path-dst actor)) (y actor))))
-                                                                 ))
+                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                             (logger (format nil "AI-PACKAGE-AVOID-POSSESSION: ~A [~A] does not want to be possessed by ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
+                                                             (let ((cell (first check-result)))
+                                                               (setf (path-dst actor) nil)
+                                                               (setf (path actor) (list (list (first cell) (second cell) (z actor)))))
+                                                             (ai-move-along-path actor)
                                                              )))
 
 (set-ai-package (make-instance 'ai-package :id +ai-package-horde+
@@ -208,6 +209,40 @@
                                                                              (name actor) (id actor) (name (first check-result)) (id (first check-result))))
                                                              (mob-pick-item actor (first check-result))
                                                              
+                                                             )))
+
+(set-ai-package (make-instance 'ai-package :id +ai-package-split-soul+
+                                           :priority 7
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore actor nearest-ally hostile-mobs allied-mobs))
+                                                            (if nearest-enemy
+                                                              t
+                                                              nil))
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs check-result))
+                                                             (logger (format nil "AI-PACKAGE-SPLIT-SOUL: ~A [~A] is trying to move away from the enemy ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
+
+                                                             (if (mob-ability-p actor +mob-abil-immobile+)
+                                                               (move-mob actor 5)
+                                                               (progn
+                                                                 ;; 1) find the tile farthest from the nearest enemy
+                                                                 (let ((farthest-tile nil))
+                                                                   (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                                   (when (eq (check-move-on-level actor dx dy (z actor)) t)
+                                                                                                                     (unless farthest-tile
+                                                                                                                       (setf farthest-tile (list dx dy (z actor))))
+                                                                                                                     (when (> (get-distance dx dy (x nearest-enemy) (y nearest-enemy))
+                                                                                                                              (get-distance (first farthest-tile) (second farthest-tile) (x nearest-enemy) (y nearest-enemy)))
+                                                                                                                       (setf farthest-tile (list dx dy (z actor)))))))
+                                                                   (if farthest-tile
+                                                                     (setf (path-dst actor) farthest-tile)
+                                                                     (setf (path-dst actor) (list (x actor) (y actor) (z actor))))
+                                                                   )
+
+                                                                 ;; 2) move to that tile
+                                                                 (move-mob actor (x-y-into-dir (- (first (path-dst actor)) (x actor))
+                                                                                               (- (second (path-dst actor)) (y actor))))
+                                                                 ))
                                                              )))
 
 (set-ai-package (make-instance 'ai-package :id +ai-package-kleptomaniac+

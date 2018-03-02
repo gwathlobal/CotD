@@ -2,6 +2,7 @@ CHANGELOG
 
 - AI will bump into friendly mobs much less often and will try to navigate around them to get to its target.
 - Added a journal where you can see objectives for the current mission. The journal is displayed using the 'j' button.
+- Possessable creatures will try to get away from you if you are the one that can possess them.
 
 --------------------
 January 12, 2018 v1.2.6

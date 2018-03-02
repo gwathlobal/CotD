@@ -68,7 +68,7 @@
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
                                                                 ai-coward ai-horde ai-wants-bless ai-curious ai-takes-valuable-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-cannibal ai-use-ability ai-use-item
-                                                                ai-reload-ranged-weapon ai-shoot-enemy ai-follow-leader ai-approach-target ai-attack-nearest-enemy ai-find-random-location
+                                                                ai-reload-ranged-weapon ai-shoot-enemy ai-follow-leader ai-approach-target ai-attack-nearest-enemy ai-find-random-location ai-avoid-possession
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -133,6 +133,8 @@
     (setf (gethash +ai-package-attack-nearest-enemy+ (ai-packages mob-type)) t))
   (when ai-find-random-location
     (setf (gethash +ai-package-find-random-location+ (ai-packages mob-type)) t))
+  (when ai-avoid-possession
+    (setf (gethash +ai-package-avoid-possession+ (ai-packages mob-type)) t))
   
   ;; set up abilities
   (when abil-can-possess
