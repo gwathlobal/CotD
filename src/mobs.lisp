@@ -767,6 +767,12 @@
   
   (setf (face-mob-type-id mob) (mob-type mob))
 
+  (when (and *world*
+             (level *world*))
+    (setf (memory-map mob) (make-array (list (ceiling (array-dimension (terrain (level *world*)) 0) 10)
+                                             (ceiling (array-dimension (terrain (level *world*)) 1) 10))
+                                       :initial-element -1)))
+
   (adjust-abilities mob)
 
   ;; when starting with a horse - create a horse on the spot and mount it

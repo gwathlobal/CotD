@@ -1779,3 +1779,40 @@
                                             (values nil
                                                     nil
                                                     nil))))
+
+;;=====================
+;; Army posts
+;;=====================
+
+(set-building-type (make-building :id +building-city-army-post+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,"
+                                                                            ",,,,,,,,,,"
+                                                                            ",,##,,##,,"
+                                                                            ",,#,,,,#,,"
+                                                                            ",,,,,|,,,,"
+                                                                            ",,,,,,,,,,"
+                                                                            ",,#,,,,#,,"
+                                                                            ",,##,,##,,"
+                                                                            ",,,,,,,,,,"
+                                                                            ",,,,,,,,,,"))
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
+                                              (setf (aref template-level (+ x 2) (+ y 2) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 3) (+ y 2) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y 3) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 6) (+ y 2) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 7) (+ y 2) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 7) (+ y 3) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y 6) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 2) (+ y 7) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 3) (+ y 7) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 6) (+ y 7) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 7) (+ y 7) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 7) (+ y 6) z) +terrain-wall-barricade+)
+                                              )
+                                            (values nil
+                                                    (list (list +feature-start-repel-demons+ 5 5 z)
+                                                          (list +feature-start-military-point+ 5 5 z))
+                                                    nil))))

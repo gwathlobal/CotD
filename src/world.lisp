@@ -238,20 +238,46 @@
   )
 
 (defun level-aux-map-connect-p (level room-id-start room-id-end map-size move-mode)
-  ;; TODO: add recursion so that it could be possible to connect rooms through several intermediate connections
   (unless (aref (aux-connect-map level) map-size)
     (return-from level-aux-map-connect-p nil))
   (unless (aref (aref (aux-connect-map level) map-size) move-mode)
     (return-from level-aux-map-connect-p nil))
   
   (let ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode)))
-    (if (find-if #'(lambda (a)
+    (when (find-if #'(lambda (a)
                      (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
                              (and (= (first a) room-id-end) (= (second a) room-id-start)))
                        t
                        nil))
                  connect-list)
-      t
+      (return-from level-aux-map-connect-p t))
+
+    ;; if no direct connection found - try to find connected rooms through intermediate connections
+    (if (and (find-if #'(lambda (a) (if (or (= (first a) room-id-start) (= (second a) room-id-start)) t nil)) connect-list)
+             (find-if #'(lambda (a) (if (or (= (first a) room-id-end) (= (second a) room-id-end)) t nil)) connect-list))
+      (progn
+        (let ((open-nodes ())
+              (closed-nodes ()))
+          (push room-id-start open-nodes)
+          (loop for node = (first open-nodes)
+                while (and node (/= node room-id-end)) do
+                  (pop open-nodes)
+                  (loop for (start end connection) in connect-list
+                        for is-closed = (or (find start closed-nodes)
+                                            (find end closed-nodes))
+                        when (and (= start node)
+                                  (not is-closed))
+                          do
+                                 (push end open-nodes)
+                        when (and (= end node)
+                                  (not is-closed))
+                          do
+                             (push start open-nodes))
+                  (push node closed-nodes)
+                )
+          (if open-nodes
+            t
+            nil)))
       nil)))
 
 (defun set-aux-map-connection (level room-id-start room-id-end map-size move-mode)

@@ -124,6 +124,8 @@
       (ai-mob-flee mob nearest-enemy)      
       (return-from ai-function))
 
+    (format t "HERE~%")
+    
     ;; find and apply the AI package
     (let ((ai-package-array (make-array (list (1+ +ai-priority-always+)) :initial-element ())))
 

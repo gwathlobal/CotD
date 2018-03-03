@@ -65,6 +65,7 @@
 (defconstant +building-city-church-2+ 40)
 (defconstant +building-city-land-border+ 41)
 (defconstant +building-city-forest-border+ 42)
+(defconstant +building-city-army-post+ 43)
 
 (defparameter *level-grid-size* 5)
 

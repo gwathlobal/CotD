@@ -198,6 +198,8 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-repel-demons+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Repel Demons Starting Location" :trait-remove-on-dungeon-generation t))
 
+(set-feature-type (make-instance 'feature-type :id +feature-start-military-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Military Defender Starting Position" :trait-remove-on-dungeon-generation t))
+
 (set-feature-type (make-instance 'feature-type :id +feature-smoke-flare+ :glyph-idx 98 :glyph-color sdl:*magenta* :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-flare+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)

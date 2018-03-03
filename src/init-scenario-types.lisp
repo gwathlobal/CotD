@@ -43,85 +43,97 @@
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-normal+
                                              :type +scenario-feature-city-layout+
-                                             :name "An ordinary city"
+                                             :name "An ordinary district"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-normal)))
-                                                                                                            #'place-land-arrival-border
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-land-arrival-border))
                                                                                                             )))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-river+
                                              :type +scenario-feature-city-layout+
-                                             :name "A city upon a river"
+                                             :name "A district upon a river"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-river)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-river)))
-                                                                                                            #'place-reserved-buildings-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-river)))))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-port+
                                              :type +scenario-feature-city-layout+
-                                             :name "A seaport city"
+                                             :name "A seaport district"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        (let ((r (random 4)))
                                                          (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                               #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-port)))
                                                                                                               #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-port)))
                                                                                                               #'(lambda (reserved-level)
-                                                                                                                  (place-land-arrival-border reserved-level)
-                                                                                                                  (let ((result))
-                                                                                                                    (cond
-                                                                                                                      ((= r 0) (setf result (place-reserved-buildings-port-n reserved-level))) ;; north
-                                                                                                                      ((= r 1) (setf result (place-reserved-buildings-port-s reserved-level))) ;; south
-                                                                                                                      ((= r 2) (setf result (place-reserved-buildings-port-e reserved-level))) ;; east
-                                                                                                                      ((= r 3) (setf result (place-reserved-buildings-port-w reserved-level)))) ;; west
-                                                                                                                    (loop for x from 0 below (array-dimension reserved-level 0) do
-                                                                                                                      (loop for y from 0 below (array-dimension reserved-level 1) do
-                                                                                                                        (when (or (= (aref reserved-level x y 2) +building-city-sea+)
-                                                                                                                                  (= (aref reserved-level x y 2) +building-city-pier+)
-                                                                                                                                  (= (aref reserved-level x y 2) +building-city-land-border+))
-                                                                                                                          (push (list (aref reserved-level x y 2) x y 2) result))))
-                                                                                                                    result)))))
+                                                                                                                  (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                         #'(lambda (reserved-level)
+                                                                                                                                                             (place-land-arrival-border reserved-level)
+                                                                                                                                                             (let ((result))
+                                                                                                                                                               (cond
+                                                                                                                                                                 ;; north
+                                                                                                                                                                 ((= r 0) (setf result (place-reserved-buildings-port-n reserved-level)))
+                                                                                                                                                                 ;; south
+                                                                                                                                                                 ((= r 1) (setf result (place-reserved-buildings-port-s reserved-level)))
+                                                                                                                                                                 ;; east
+                                                                                                                                                                 ((= r 2) (setf result (place-reserved-buildings-port-e reserved-level)))
+                                                                                                                                                                 ;; west
+                                                                                                                                                                 ((= r 3) (setf result (place-reserved-buildings-port-w reserved-level)))) 
+                                                                                                                                                               (loop for x from 0 below (array-dimension reserved-level 0) do
+                                                                                                                                                                 (loop for y from 0 below (array-dimension reserved-level 1) do
+                                                                                                                                                                   (when (or (= (aref reserved-level x y 2) +building-city-sea+)
+                                                                                                                                                                             (= (aref reserved-level x y 2) +building-city-pier+)
+                                                                                                                                                                             (= (aref reserved-level x y 2) +building-city-land-border+))
+                                                                                                                                                                     (push (list (aref reserved-level x y 2) x y 2) result))))
+                                                                                                                                                               result))))
+                                                                                                              )))
                                                          )
                                                                                                               
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-forest+
                                              :type +scenario-feature-city-layout+
-                                             :name "A city in the woods"
+                                             :name "Outskirts of the city"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-normal)))
-                                                                                                            #'place-reserved-buildings-forest)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-forest)))))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-island+
                                              :type +scenario-feature-city-layout+
-                                             :name "An island city"
+                                             :name "An island district"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; place tiny forest along the borders
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-river)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-river)))
-                                                                                                            #'place-reserved-buildings-island)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-island)))))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-barricaded-city+
                                              :type +scenario-feature-city-layout+
-                                             :name "A barricaded city"
+                                             :name "A barricaded district"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-normal)))
-                                                                                                            #'place-reserved-buildings-barricaded-city)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-barricaded-city)))))
                                                                                                                                                                                                                             
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
@@ -175,7 +187,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-angels+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
@@ -198,7 +210,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-demons+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
@@ -220,18 +232,36 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-military-chaplain+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+ :objectives (setup-objective-based-on-faction +mob-type-chaplain+ (mission-scenario (level world)))))
-                                                                 (find-unoccupied-place-outside world *player*)
+                                                                 ;; place the chaplains at the army post if the military is defending
+                                                                 (if (find-if #'(lambda (a)
+                                                                                  (if (and (= (first a) +faction-type-military+)
+                                                                                           (= (second a) +mission-faction-defender+))
+                                                                                    t
+                                                                                    nil))
+                                                                              faction-list)
+                                                                   (progn
+                                                                     (loop for feature-id in (feature-id-list (level world))
+                                                                           for lvl-feature = (get-feature-by-id feature-id)
+                                                                           when (= (feature-type lvl-feature) +feature-start-military-point+)
+                                                                             do
+                                                                                (setf (x *player*) (x lvl-feature) (y *player*) (y lvl-feature) (z *player*) (z lvl-feature))
+                                                                                (add-mob-to-level-list (level world) *player*)
+                                                                                (remove-feature-from-level-list (level world) lvl-feature)
+                                                                                (remove-feature-from-world lvl-feature)
+                                                                                (loop-finish))
+                                                                     )
+                                                                   (find-unoccupied-place-outside world *player*))
                                                                  (setf (faction-name *player*) "Military Chaplain")
                                                                  ;; place the first group of military around the player
                                                                  (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
                                                                                                        (cons +mob-type-scout+ 1)
-                                                                                                       (cons +mob-type-soldier+ 2)
+                                                                                                       (cons +mob-type-soldier+ 3)
                                                                                                        (cons +mob-type-gunner+ 1))
                                                                                            #'(lambda (world mob)
                                                                                                (find-unoccupied-place-around world mob (x *player*) (y *player*) (z *player*)))))
@@ -250,13 +280,29 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-military-scout+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-scout+ :objectives (setup-objective-based-on-faction +mob-type-scout+ (mission-scenario (level world)))))
-                                                                 (find-unoccupied-place-outside world *player*)
+                                                                 (if (find-if #'(lambda (a)
+                                                                                  (if (and (= (first a) +faction-type-military+)
+                                                                                           (= (second a) +mission-faction-defender+))
+                                                                                    t
+                                                                                    nil))
+                                                                              faction-list)
+                                                                   (progn
+                                                                     (loop for feature-id in (feature-id-list (level world))
+                                                                           for lvl-feature = (get-feature-by-id feature-id)
+                                                                           when (= (feature-type lvl-feature) +feature-start-military-point+)
+                                                                             do
+                                                                                (setf (x *player*) (x lvl-feature) (y *player*) (1+ (y lvl-feature)) (z *player*) (z lvl-feature))
+                                                                                (add-mob-to-level-list (level world) *player*)
+                                                                                )
+                                                                     )
+                                                                   (find-unoccupied-place-outside world *player*))
+                                                                 
                                                                  (setf (faction-name *player*) "Military Scout")
                                                                  )
                                                              mob-func-list)
@@ -273,7 +319,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-thief+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
@@ -295,7 +341,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-satanist+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
@@ -317,7 +363,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-church+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
@@ -339,7 +385,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-shadows+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
                                                        
@@ -362,7 +408,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-trinity-mimics+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
@@ -395,7 +441,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-eater+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
@@ -418,7 +464,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-puppet+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 
@@ -441,7 +487,7 @@
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
-                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
+                                                       (setf mob-func-list (scenario-present-faction-setup +player-faction-ghost+ faction-list mob-func-list))
 
                                                        (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
 

@@ -117,6 +117,8 @@
   (setf *world* (make-instance 'world))
   
   (create-world *world* mission-id layout-id weather-id tod-id faction-id faction-list)
+
+  (format t "FACTION-LIST ~A~%" faction-list)
   
   (setf (name *player*) "Player")
 
@@ -202,6 +204,14 @@
                         (find +mission-faction-defender+ faction-present-list)))
             do
                (setf (nth n faction-list) (list faction-id (remove +mission-faction-present+ faction-present-list))))
+
+    ;; remove +mission-faction-delayed+ for the player faction
+    (loop for (faction-id faction-present-list) in faction-list
+          for n from 0
+          when (and (find +mission-faction-delayed+ faction-present-list)
+                    (find faction-id available-faction-list))
+            do
+               (setf (nth n faction-list) (list faction-id (remove +mission-faction-delayed+ faction-present-list))))
     
     ;; set up random presence options in the faction list
     (loop for (faction-id faction-present-list) in faction-list

@@ -439,6 +439,7 @@
 (defconstant +feature-demonic-rune-all+ 20)
 (defconstant +feature-demonic-rune-decay+ 21)
 (defconstant +feature-delayed-arrival-point+ 22)
+(defconstant +feature-start-military-point+ 23)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

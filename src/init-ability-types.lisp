@@ -846,9 +846,9 @@
                                                            (not (zerop (loop for mob-id in (visible-mobs actor)
                                                                              for mob = (get-mob-by-id mob-id)
                                                                              when (and (= (faction actor) (faction mob))
-                                                                                       (not (= (mob-type mob) +mob-type-chaplain+)))
+                                                                                       (not (mob-ability-p mob +mob-abil-independent+)))
                                                                                count mob-id)))
-                                                           (zerop (random 3)))
+                                                           )
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)

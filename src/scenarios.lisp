@@ -184,6 +184,17 @@
                        nil))
                  faction-list)
     (setf (gethash +building-type-church+ building-type-hash-table) 0))
+  ;; the lost soul is present so satanists' lair should also be present
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-ghost+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+    (setf (gethash +building-type-satanists+ building-type-hash-table) 1)
+    (setf (gethash +building-type-library+ building-type-hash-table) 1))
   building-type-hash-table)
 
 (defun setup-objective-based-on-faction (mob-type-id mission-id)
@@ -236,10 +247,10 @@
                        (remove-feature-from-world lvl-feature))
             )
         mob-func-list)
-  
+
+  ;; remove the starting features
   (push #'(lambda (world mob-template-list)
             (declare (ignore mob-template-list))
-            ;; remove the player satanist starting feature
             (loop for feature-id in (feature-id-list (level world))
                   for lvl-feature = (get-feature-by-id feature-id)
                   when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
@@ -317,7 +328,7 @@
                                         #'find-unoccupied-place-on-top))
           mob-func-list))
 
-  ;; populate the world with the 5 groups of military, where each group has 1 chaplain, 2 sargeants and 3 soldiers
+  ;; populate the world with the 3 groups of military, where each group has 1 chaplain, 2 sargeants and 3 soldiers
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-military+)
                               (or (= (second a) +mission-faction-present+)
@@ -329,14 +340,32 @@
     (push #'(lambda (world mob-template-list)
             (declare (ignore mob-template-list))
               
-              (loop repeat 5
+              (loop repeat 3
                     do
                        (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+ :objectives (setup-objective-based-on-faction +mob-type-chaplain+
                                                                                                                                        (mission-scenario (level world))))))
-                         (find-unoccupied-place-outside world chaplain)
+                         ;; place the chaplains at the army post if the military is defending
+                         (if (find-if #'(lambda (a)
+                                          (if (and (= (first a) +faction-type-military+)
+                                                   (= (second a) +mission-faction-defender+))
+                                            t
+                                            nil))
+                                      faction-list)
+                           (progn
+                             (loop for feature-id in (feature-id-list (level world))
+                                   for lvl-feature = (get-feature-by-id feature-id)
+                                   when (= (feature-type lvl-feature) +feature-start-military-point+)
+                                     do
+                                        (setf (x chaplain) (x lvl-feature) (y chaplain) (y lvl-feature) (z chaplain) (z lvl-feature))
+                                        (add-mob-to-level-list (level world) chaplain)
+                                        (remove-feature-from-level-list (level world) lvl-feature)
+                                        (remove-feature-from-world lvl-feature)
+                                        (loop-finish))
+                             )
+                           (find-unoccupied-place-outside world chaplain))
                          (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
                                                                (cons +mob-type-scout+ 1)
-                                                               (cons +mob-type-soldier+ 2)
+                                                               (cons +mob-type-soldier+ 3)
                                                                (cons +mob-type-gunner+ 1))
                                                    #'(lambda (world mob)
                                                        (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
@@ -358,10 +387,28 @@
               
               (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+ :objectives (setup-objective-based-on-faction +mob-type-chaplain+
                                                                                                                               (mission-scenario (level world))))))
-                (find-unoccupied-place-outside world chaplain)
+                ;; place the chaplains at the army post if the military is defending
+                (if (find-if #'(lambda (a)
+                                 (if (and (= (first a) +faction-type-military+)
+                                          (= (second a) +mission-faction-defender+))
+                                   t
+                                   nil))
+                             faction-list)
+                  (progn
+                    (loop for feature-id in (feature-id-list (level world))
+                          for lvl-feature = (get-feature-by-id feature-id)
+                          when (= (feature-type lvl-feature) +feature-start-military-point+)
+                            do
+                               (setf (x chaplain) (x lvl-feature) (y chaplain) (y lvl-feature) (z chaplain) (z lvl-feature))
+                               (add-mob-to-level-list (level world) chaplain)
+                               (remove-feature-from-level-list (level world) lvl-feature)
+                               (remove-feature-from-world lvl-feature)
+                               (loop-finish))
+                    )
+                  (find-unoccupied-place-outside world chaplain))
                 (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
                                                       (cons +mob-type-scout+ 1)
-                                                      (cons +mob-type-soldier+ 2)
+                                                      (cons +mob-type-soldier+ 3)
                                                       (cons +mob-type-gunner+ 1))
                                           #'(lambda (world mob)
                                               (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
@@ -376,13 +423,13 @@
                        t
                        nil))
                  faction-list)
-  (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
             
-            (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                  (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
-                                      #'find-unoccupied-place-inside))
-        mob-func-list))
+              (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
+                                                    (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
+                                        #'find-unoccupied-place-inside))
+          mob-func-list))
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-demons+)
                               (or (= (second a) +mission-faction-present+)
@@ -391,12 +438,12 @@
                        t
                        nil))
                  faction-list)
-  (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
-            
-            (populate-world-with-mobs world (list (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
-                                      #'find-unoccupied-place-inside))
-        mob-func-list))
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              
+              (populate-world-with-mobs world (list (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
+                                        #'find-unoccupied-place-inside))
+          mob-func-list))
 
   ;; populate the world with the number of angels = humans / 11
   (when (find-if #'(lambda (a)
@@ -734,9 +781,7 @@
         for mob = (get-mob-by-id mob-id)
         do
            (update-visible-mobs mob)
-           (setf (memory-map mob) (make-array (list (ceiling (array-dimension (terrain (level world)) 0) 10)
-                                                    (ceiling (array-dimension (terrain (level world)) 1) 10))
-                                              :initial-element -1))))
+           ))
 
 (defun find-unoccupied-place-around (world mob sx sy sz)
   (loop with min-x = sx
@@ -1118,6 +1163,66 @@
                   (= (aref reserved-level x y 2) +building-city-land-border+))
           (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
+
+(defun place-reserved-buildings-for-factions (faction-list reserved-level init-place-func)
+  (let ((building-list) (removed-build-coords ()) (added-builds ()))
+    (setf building-list (funcall init-place-func reserved-level))
+
+    (cond
+      ;; if the military is present - place posts in the district
+      ((find-if #'(lambda (a)
+                    (if (and (= (first a) +faction-type-military+)
+                             (= (second a) +mission-faction-defender+))
+                      t
+                      nil))
+                faction-list)
+       (progn
+         (setf (aref reserved-level 4 4 2) +building-city-army-post+)
+         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) 4 2) +building-city-army-post+)
+         (setf (aref reserved-level 4 (- (array-dimension reserved-level 1) 5) 2) +building-city-army-post+)
+         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 5) 2) +building-city-army-post+)
+         
+         (setf removed-build-coords (list (list 4 4 2)
+                                          (list 4 5 2)
+                                          (list 5 4 2)
+                                          (list 5 5 2)
+                                          (list (- (array-dimension reserved-level 0) 5) 4 2)
+                                          (list (- (array-dimension reserved-level 0) 5) 5 2)
+                                          (list (- (array-dimension reserved-level 0) 6) 4 2)
+                                          (list (- (array-dimension reserved-level 0) 6) 5 2)
+                                          (list 4 (- (array-dimension reserved-level 1) 5) 2)
+                                          (list 5 (- (array-dimension reserved-level 1) 6) 2)
+                                          (list 4 (- (array-dimension reserved-level 1) 6) 2)
+                                          (list 5 (- (array-dimension reserved-level 1) 5) 2)
+                                          (list (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 5) 2)
+                                          (list (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 5) 2)
+                                          (list (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 6) 2)
+                                          (list (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)))
+
+         (loop for (x y z) in removed-build-coords do
+           (setf (aref reserved-level x y z) +building-city-army-post+))
+
+         (setf added-builds (list (list +building-city-army-post+ 4 4 2)
+                                  (list +building-city-army-post+ (- (array-dimension reserved-level 0) 6) 4 2)
+                                  (list +building-city-army-post+ 4 (- (array-dimension reserved-level 1) 6) 2)
+                                  (list +building-city-army-post+ (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)
+                                  )))))
+    
+    ;; remove the buildings from the designated places if there were any
+    (loop for (x y z) in removed-build-coords do
+      (setf building-list (remove (find-if #'(lambda (a)
+                                               (if (and (= (second a) x)
+                                                        (= (third a) y)
+                                                        (= (fourth a) z))
+                                                 t
+                                                 nil))
+                                           building-list)
+                                  building-list)))
+
+    (when added-builds
+      (setf building-list (append building-list added-builds)))
+    
+    building-list))
 
 (defun set-up-outdoor-light (level light-power)
   (setf (outdoor-light level) light-power)
