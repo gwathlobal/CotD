@@ -174,6 +174,7 @@
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
+                                       :ai-avoid-melee t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sergeant+ 
@@ -186,6 +187,7 @@
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
+                                       :ai-avoid-melee t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
@@ -197,7 +199,7 @@
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-detect-good t :abil-detect-evil t
                                        :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t :abil-horseback-riding t :abil-dismount t :abil-independent t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
-                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t
+                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-melee t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
@@ -210,6 +212,7 @@
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
+                                       :ai-avoid-melee t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scout+ 
@@ -221,7 +224,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-independent t :abil-starts-with-horse t :abil-detect-good t :abil-detect-evil t
                                        :abil-horseback-riding t :abil-dismount t :abil-eagle-eye t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)) (list +item-type-signal-flare+ #'(lambda () 2)))
-                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-possession t
+                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-possession t :ai-avoid-melee t
                              ))
 
 ;;--------------------
@@ -534,7 +537,7 @@
                                        :abil-mutate-fast-scarabs t :abil-mutate-oviposit-more-eggs t :abil-mutate-tougher-locusts t :abil-cure-mutation t :abil-mutate-thick-carapace t :abil-mutate-acidic-tips t :abil-mutate-jump t
                                        :abil-mutate-piercing-needles t :abil-mutate-accurate-bile t :abil-mutate-corroding-secretion t :abil-mutate-hooks-and-suckers t :abil-mutate-disguise-as-human t :abil-mutate-spawn-scarabs t
                                        :abil-mutate-spawn-larva t :abil-mutate-spore-colony t
-                                       :ai-curious t :ai-cannibal t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-shoot-enemy t))
+                                       :ai-curious t :ai-cannibal t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-shoot-enemy t :ai-avoid-melee t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-locust+
                                        :name "locust"

@@ -246,15 +246,21 @@
                                                                                     nil))
                                                                               faction-list)
                                                                    (progn
-                                                                     (loop for feature-id in (feature-id-list (level world))
+                                                                     (loop with feature-list = ()
+                                                                           with chosen-feature = nil
+                                                                           for feature-id in (feature-id-list (level world))
                                                                            for lvl-feature = (get-feature-by-id feature-id)
                                                                            when (= (feature-type lvl-feature) +feature-start-military-point+)
                                                                              do
-                                                                                (setf (x *player*) (x lvl-feature) (y *player*) (y lvl-feature) (z *player*) (z lvl-feature))
+                                                                                (push lvl-feature feature-list)
+                                                                           finally
+                                                                              (when feature-list
+                                                                                (setf chosen-feature (nth (random (length feature-list)) feature-list))
+                                                                                (setf (x *player*) (x chosen-feature) (y *player*) (y chosen-feature) (z *player*) (z chosen-feature))
                                                                                 (add-mob-to-level-list (level world) *player*)
-                                                                                (remove-feature-from-level-list (level world) lvl-feature)
-                                                                                (remove-feature-from-world lvl-feature)
-                                                                                (loop-finish))
+                                                                                (remove-feature-from-level-list (level world) chosen-feature)
+                                                                                (remove-feature-from-world chosen-feature))
+                                                                           )
                                                                      )
                                                                    (find-unoccupied-place-outside world *player*))
                                                                  (setf (faction-name *player*) "Military Chaplain")

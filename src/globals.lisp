@@ -142,6 +142,7 @@
 (defconstant +ai-package-find-random-location+ 17)
 (defconstant +ai-package-patrol-district+ 18)
 (defconstant +ai-package-avoid-possession+ 19)
+(defconstant +ai-package-avoid-melee+ 20)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)

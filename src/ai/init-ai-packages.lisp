@@ -48,6 +48,39 @@
                                                              (ai-move-along-path actor)
                                                              )))
 
+(set-ai-package (make-instance 'ai-package :id +ai-package-avoid-melee+
+                                           :priority 9
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                            (let ((free-cells ()))
+                                                              (if (and nearest-enemy
+                                                                       (= (z actor) (z nearest-enemy))
+                                                                       (< (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)
+                                                                       (is-weapon-ranged actor)
+                                                                       (is-weapon-melee nearest-enemy))
+                                                                (progn
+                                                                  (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                                  (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                                    (when (and terrain
+                                                                                                                               (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                               (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                               (not (get-mob-* (level *world*) dx dy (z actor)))
+                                                                                                                               (>= (get-distance dx dy (x nearest-enemy) (y nearest-enemy)) 2))
+                                                                                                                      (push (list dx dy) free-cells)))
+                                                                                                                  ))
+                                                                  (if free-cells
+                                                                    free-cells
+                                                                    nil))
+                                                                nil)))
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                             (logger (format nil "AI-PACKAGE-AVOID-MELEE: ~A [~A] does not want to have melee combat with by ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
+                                                             (let ((cell (first check-result)))
+                                                               (setf (path-dst actor) nil)
+                                                               (setf (path actor) (list (list (first cell) (second cell) (z actor)))))
+                                                             (ai-move-along-path actor)
+                                                             )))
+
 (set-ai-package (make-instance 'ai-package :id +ai-package-horde+
                                            :priority 8
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)

@@ -5,6 +5,7 @@ CHANGELOG
 - Added a journal where you can see objectives for the current mission. The journal is displayed using the 'j' button.
 - Defending military will be stationed inside the city.
 - Possessable creatures will try to get away from you if you are the one that can possess them.
+- Characters with a ranged weapons will try to step out of melee combat.
 
 --------------------
 January 12, 2018 v1.2.6
