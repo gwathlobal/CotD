@@ -17,6 +17,7 @@
 (defconstant +game-event-constant-reanimation+ 12)
 (defconstant +game-event-delayed-arrival-military+ 13)
 (defconstant +game-event-delayed-arrival-angels+ 14)
+(defconstant +game-event-player-died+ 15)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

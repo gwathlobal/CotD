@@ -17,6 +17,13 @@
 
            ;; we need this for events to get triggered only once  
            (setf (turn-finished *world*) nil)
+
+           (when (check-dead *player*)
+             (update-visible-mobs *player*)
+             (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+             (make-output *current-window*)
+             (format t "REAL-GAME-TIME = ~A~%" (real-game-time *world*))
+             (pause-for-poll))
            
            ;; iterate through all the mobs
            ;; those who are not dead and have cur-ap > 0 can make a move

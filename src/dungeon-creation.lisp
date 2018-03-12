@@ -1,16 +1,16 @@
 (in-package :cotd)
 
-(defun return-scenario-functions (weather layout player-faction faction-list)
+(defun return-scenario-functions (weather layout player-faction-scenario faction-list mission-id)
   (let ((post-processing-func-list nil) (layout-func nil) (mob-func-list nil) (game-event-list nil))
 
     (when (sf-func weather)
-      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func weather) layout-func post-processing-func-list mob-func-list game-event-list faction-list)))
+      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func weather) layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
 
     (when (sf-func layout)
-      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func layout) layout-func post-processing-func-list mob-func-list game-event-list faction-list)))
+      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func layout) layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
     
-    (when (sf-func player-faction)
-      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func player-faction) layout-func post-processing-func-list mob-func-list game-event-list faction-list)))
+    (when (sf-func player-faction-scenario)
+      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func player-faction-scenario) layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
     
     (values layout-func post-processing-func-list mob-func-list game-event-list)))
 
@@ -24,7 +24,7 @@
 
         (weather (get-scenario-feature-by-id weather-id))
         (city-layout (get-scenario-feature-by-id layout-id))
-        (player-faction (get-scenario-feature-by-id faction-id))
+        (player-faction-scenario (get-scenario-feature-by-id faction-id))
 
         (layout-func)
         (post-processing-func-list)
@@ -37,7 +37,7 @@
     
     (funcall *update-screen-closure* "Generating map")
 
-    (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (return-scenario-functions weather city-layout player-faction faction-list))
+    (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (return-scenario-functions weather city-layout player-faction-scenario faction-list mission-id))
 
     ;; remove all nils from game-event-list, if any
     (setf game-event-list (remove nil game-event-list))

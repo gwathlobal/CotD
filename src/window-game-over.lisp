@@ -11,7 +11,9 @@
 
 (defclass final-stats-window (window)
   ((game-over-type :initarg :game-over-type :accessor game-over-type)
-   (highscores-place :initform nil :initarg :highscores-place :accessor highscores-place)))
+   (highscores-place :initform nil :initarg :highscores-place :accessor highscores-place)
+   (player-died :initform nil :initarg :player-died :accessor player-died)
+   (player-won :initform nil :initarg :player-won :accessor player-won)))
 
 (defmethod make-output ((win final-stats-window))
   ;; fill the screen black
@@ -19,16 +21,26 @@
     (sdl:fill-surface sdl:*black* :template a-rect))
  
   ;; displaying the type of game over
-  (let ((str) (color))
+  (let ((str (create-string)) (color))
+    (if (player-won win)
+      (progn
+        (format str "VICTORY! ")
+        (setf color sdl:*green*))
+      (progn
+        (format str "DEFEAT! ")
+        (setf color sdl:*red*)))
+    (when (player-died win)
+      (format str "YOU DIED, BUT "))
     (cond
-      ((= (game-over-type win) +game-over-player-dead+) (setf str (format nil "YOU ARE DEAD")) (setf color sdl:*red*))
-      ((= (game-over-type win) +game-over-demons-won+) (setf str (format nil "THE PANDEMONIUM HIERARCHY WON")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-angels-won+) (setf str (format nil "THE CELESTIAL COMMUNION WON")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-military-won+) (setf str (format nil "THE MILITARY WON")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-player-possessed+) (setf str (format nil "YOU ARE POSSESSED")) (setf color sdl:*red*))
-      ((= (game-over-type win) +game-over-thief-won+) (setf str (format nil "YOU HAVE COLLECTED ENOUGH VALUABLES AND MANAGED TO ESCAPE THE CITY")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-eater-won+) (setf str (format nil "YOU HAVE KILLED ALL OUTSIDERS")) (setf color sdl:*green*))
-      ((= (game-over-type win) +game-over-ghost-won+) (setf str (format nil "YOU HAVE PUT YOURSELF TO REST")) (setf color sdl:*green*)))
+      ((= (game-over-type win) +game-over-player-dead+) (setf str (format str "YOU ARE DEAD")))
+      ((= (game-over-type win) +game-over-demons-won+) (format str "THE PANDEMONIUM HIERARCHY WON"))
+      ((= (game-over-type win) +game-over-angels-won+) (format str "THE CELESTIAL COMMUNION WON"))
+      ((= (game-over-type win) +game-over-military-won+) (format str "THE MILITARY WON"))
+      ((= (game-over-type win) +game-over-player-possessed+) (setf str (format nil "YOU ARE POSSESSED")))
+      ((= (game-over-type win) +game-over-thief-won+) (setf str (format nil "YOU HAVE COLLECTED ENOUGH VALUABLES AND MANAGED TO ESCAPE THE CITY")))
+      ((= (game-over-type win) +game-over-eater-won+) (setf str (format nil "YOU HAVE KILLED ALL OUTSIDERS")))
+      ((= (game-over-type win) +game-over-ghost-won+) (setf str (format nil "YOU HAVE PUT YOURSELF TO REST"))))
+    
     (sdl:draw-string-solid-* str  (truncate *window-width* 2) 10 :justify :center :color color)
     )
   

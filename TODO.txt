@@ -7,7 +7,7 @@
 - Add courtyard houses like Thief2RL
 - Add the Revolutionaries faction
 - Add a Thief/Spy campaign
-- Move display code to a separate entity (separate thread maybe?) so that you could have some basic movement animation going on (0,5 sec). This will alleviate the performance problem (the game will be still calculating AI while the player movement animation is played) and will generally look good.
+- Move display code to a separate entity (separate thread maybe?) so that you could have some basic movement animation going on (0,5 sec). This will alleviate the performance problem (the game will be still calculating AI while the player movement animation is played) and will generally look good. Make a separate draw loop and a separate game loop
 - Optimize connectivity map creation
 - Recalculate connectivity after terrain destruction
 - Scout's artillery strike ignites appropriate affected tiles. 

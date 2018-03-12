@@ -43,6 +43,7 @@
 (defconstant +player-faction-eater+ 25)
 (defconstant +player-faction-puppet+ 26)
 (defconstant +player-faction-ghost+ 27)
+(defconstant +player-faction-dead-player+ 28)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -1262,3 +1263,18 @@
                (remove-feature-from-world lvl-feature)
           )
     ))
+
+(defun set-up-win-conditions (game-event-list faction-list mission-id)
+  (loop for (faction-id game-event-id) in (win-condition-list (get-mission-scenario-by-id mission-id))
+        when (find-if #'(lambda (a)
+                          (if (and (= (first a) faction-id)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)
+                                       (= (second a) +mission-faction-delayed+)))
+                            t
+                            nil))
+                      faction-list)
+          do
+             (pushnew game-event-id game-event-list))
+  game-event-list)

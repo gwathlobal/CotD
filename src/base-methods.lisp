@@ -2632,3 +2632,17 @@
       (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
       ))
   )
+
+(defun player-check-dead ()
+  (if (or (and (not (mob-ability-p *player* +mob-abil-trinity-mimic+))
+               (check-dead *player*))
+          (and (mob-ability-p *player* +mob-abil-trinity-mimic+)
+               (loop for mimic-id in (mimic-id-list *player*)
+                     for mimic = (get-mob-by-id mimic-id)
+                     with dead = 0
+                     when (check-dead mimic)
+                       do
+                          (incf dead)
+                     finally (return (= dead (length (mimic-id-list *player*)))))))
+    t
+    nil))

@@ -711,7 +711,8 @@
    
    (master-mob-id :initform nil :accessor master-mob-id)        ;; mob that controls this mob
    (slave-mob-id :initform nil :accessor slave-mob-id)          ;; mob that is being controlled by this mob
-   (face-mob-type-id ::initform nil :accessor face-mob-type-id) ;; others see this mob as this mob type 
+   (face-mob-type-id :initform nil :accessor face-mob-type-id) ;; others see this mob as this mob type
+   (loyal-faction :initform +faction-type-none+ :accessor loyal-faction)
 
    (effects :initform (make-hash-table) :accessor effects)
    (abilities-cd :initform (make-hash-table) :accessor abilities-cd)
@@ -795,6 +796,8 @@
   ;; add permanent flying effect, if the mob can fly
   (when (mob-ability-p mob +mob-abil-flying+)
     (set-mob-effect mob :effect-type-id +mob-effect-flying+ :actor-id (id mob)))
+
+  (setf (loyal-faction mob) (faction (get-mob-type-by-id (mob-type mob))))
   
   (set-cur-weapons mob)
   

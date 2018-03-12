@@ -387,3 +387,32 @@
 	 (incf cur-line))
     (values cur-line final-txt)))
 
+(defun pause-for-poll ()
+  (sdl:with-events (:poll)
+    (:quit-event () (funcall (quit-func *current-window*)) t)
+    (:key-down-event (:key key :mod mod :unicode unicode)
+                     (declare (ignore mod unicode))
+                     (cond
+                       ;; escape - quit
+                       ((sdl:key= key :sdl-key-escape)
+                        (setf *current-window* (make-instance 'select-obj-window 
+                                                              :return-to *current-window*
+                                                              :header-line "Are you sure you want to quit?"
+                                                              :enter-func #'(lambda (cur-sel)
+                                                                              (if (= cur-sel 0)
+                                                                                (funcall *start-func*)
+                                                                                (setf *current-window* (return-to *current-window*)))
+                                                                              )
+                                                              :line-list (list "Yes" "No")
+                                                              :prompt-list (list #'(lambda (cur-sel)
+                                                                                     (declare (ignore cur-sel))
+                                                                                     "[Enter] Select  [Esc] Exit")
+                                                                                 #'(lambda (cur-sel)
+                                                                                     (declare (ignore cur-sel))
+                                                                                     "[Enter] Select  [Esc] Exit"))))
+                        (make-output *current-window*)
+                        (run-window *current-window*))
+                       )
+                     )
+    (:video-expose-event () (make-output *current-window*))
+    (:idle () (return-from pause-for-poll))))

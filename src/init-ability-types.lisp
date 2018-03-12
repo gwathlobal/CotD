@@ -3370,11 +3370,11 @@
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
                                                   (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
-                                                    (format t "CHECK-AI-RESTORE-SOUL: ~A [~A], source ~A, cur-hp ~A, ratio ~A, nearest-enemy ~A, can-invoke ~A~%"
-                                                            (name actor) (id actor) (name source) (cur-hp source) (/ (cur-hp source) (max-hp source))
-                                                            (or (null nearest-enemy)
-                                                                (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
-                                                            (can-invoke-ability actor actor +mob-abil-restore-soul+))
+                                                    (logger (format nil "CHECK-AI-RESTORE-SOUL: ~A [~A], source ~A, cur-hp ~A, ratio ~A, nearest-enemy ~A, can-invoke ~A~%"
+                                                                    (name actor) (id actor) (name source) (cur-hp source) (/ (cur-hp source) (max-hp source))
+                                                                    (or (null nearest-enemy)
+                                                                        (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
+                                                                    (can-invoke-ability actor actor +mob-abil-restore-soul+)))
                                                     (if (and (< (/ (cur-hp source) (max-hp source)) 
                                                                 0.3)
                                                              (null (riding-mob-id source))
