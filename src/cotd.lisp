@@ -6,6 +6,12 @@
         do
            ;;(format t "GAME-LOOP: Start loop~%")
            (setf turn-finished t)
+
+           ;; check for the player's win conditions first
+           (when (and *player*
+                      (find (loyal-faction *player*) (game-events *world*))
+                      (funcall (on-check (get-game-event-by-id (find (loyal-faction *player*) (game-events *world*)))) *world*))
+             (funcall (on-trigger (get-game-event-by-id (find (loyal-faction *player*) (game-events *world*)))) *world*))
            
            ;; check all available game events
            (loop for game-event-id of-type fixnum in (game-events *world*)

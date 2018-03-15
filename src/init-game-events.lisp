@@ -13,22 +13,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-angels+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (or (zerop (total-demons world))
-                                                                 (and (mob-ability-p *player* +mob-abil-angel+)
-                                                                      (= (mob-type *player*) +mob-type-angel+)
-                                                                      (or (and (mob-ability-p *player* +mob-abil-trinity-mimic+)
-                                                                               (loop for mimic-id in (mimic-id-list *player*)
-                                                                                     for mimic = (get-mob-by-id mimic-id)
-                                                                                     with cur-fp = 0
-                                                                                     with max-fp = 0
-                                                                                     when (not (check-dead mimic))
-                                                                                       do
-                                                                                          (incf max-fp (max-fp mimic))
-                                                                                          (incf cur-fp (cur-fp mimic))
-                                                                                     finally (return (>= cur-fp max-fp)))
-                                                                               )
-                                                                          (and (not (mob-ability-p *player* +mob-abil-trinity-mimic+))
-                                                                               (>= (cur-fp *player*) (max-fp *player*))))))
+                                                         (if (and (> (total-angels world) 0)
+                                                                  (zerop (total-demons world)))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
@@ -92,10 +78,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-demons+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (or (zerop (total-angels world))
-                                                                 (and (mob-ability-p *player* +mob-abil-demon+)
-                                                                      (= (mob-type *player*) +mob-type-archdemon+)
-                                                                      (>= (cur-fp *player*) (max-fp *player*))))
+                                                         (if (and (> (total-demons world) 0)
+                                                                  (zerop (total-angels world)))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
@@ -150,7 +134,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-humans+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (zerop (total-demons world))
+                                                         (if (and (> (total-humans world) 0)
+                                                                  (zerop (total-demons world)))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)

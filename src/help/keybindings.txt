@@ -9,8 +9,8 @@ Arrow keys, Numpad keys,         - Movement
 [r]                              - Reload
 [p], [g], [,]                    - Pick up an item
 
-[Shift] + [,]                    - Look/Climb/Swim up
-[Shift] + [.]                    - Look/Climb/Swim down
+[Shift] + [,]                    - Look up (while in Look mode) or Climb/Swim up
+[Shift] + [.]                    - Look down (while in Look mode) or Climb/Swim down
 
 [Shift] + [2]                    - Character screen
 [i]                              - Inventory
