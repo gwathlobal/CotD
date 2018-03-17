@@ -11,7 +11,9 @@
     (values final-str score)
     ))
 
-(set-game-event (make-instance 'game-event :id +game-event-win-for-angels+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-win-for-angels+
+                                           :descr "To win, destroy all demons in the district. To lose, have all angels killed."
+                                           :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-angels world) 0)
                                                                   (zerop (total-demons world)))
@@ -76,7 +78,9 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-win-for-demons+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-win-for-demons+
+                                           :descr "To win, destroy all angels in the district. To lose, have all demons killed."
+                                           :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-demons world) 0)
                                                                   (zerop (total-angels world)))
@@ -132,7 +136,9 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-win-for-humans+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-win-for-humans+
+                                           :descr "To win, destroy all demons in the district. To lose, have all military killed."
+                                           :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-humans world) 0)
                                                                   (zerop (total-demons world)))
@@ -144,7 +150,16 @@
                                                                                ((zerop (total-demons world)) "Enemies eliminated.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1500 (* 10 (total-humans world)))))
-                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                  (highscores-place)
+                                                                  (player-faction (if (= (loyal-faction *player*) +faction-type-military+)
+                                                                                    t
+                                                                                    nil))
+                                                                  (player-died (player-check-dead)))
+
+                                                             (when player-died
+                                                               (multiple-value-setq (final-str score) (dump-when-dead)))
+
+                                                             (setf highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                 score
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
@@ -152,14 +167,21 @@
                                                                                                                                 (real-game-time world)
                                                                                                                                 final-str
                                                                                                                                 (level-layout (level world)))
-                                                                                                         *highscores*)))
+                                                                                                          *highscores*))
+                                                             
                                                              (write-highscores-to-file *highscores*)
                                                              (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
-                                                             (add-message (format nil "~%"))
-                                                             (add-message (format nil "Congratulations! You have won the game!~%"))
-                                                             (add-message (format nil "~%Press any key...~%"))
+                                                             (if player-faction
+                                                               (progn
+                                                                 (add-message (format nil "~%"))
+                                                                 (add-message (format nil "Congratulations! Your faction has won!~%"))
+                                                                 (add-message (format nil "~%Press any key...~%")))
+                                                               (progn
+                                                                 (add-message (format nil "~%"))
+                                                                 (add-message (format nil "Curses! Your faction has lost!~%"))
+                                                                 (add-message (format nil "~%Press any key...~%"))))
                                                              (setf *current-window* (make-instance 'cell-window))
                                                              (make-output *current-window*)
                                                              (sdl:with-events ()
@@ -212,13 +234,17 @@
 (set-game-event (make-instance 'game-event :id +game-event-player-died+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
-                                                         (player-check-dead))
+                                                         (if (and (player-check-dead)
+                                                                  (null (dead-message-displayed *player*)))
+                                                           t
+                                                           nil))
                                            :on-trigger #'(lambda (world)
+                                                           (declare (ignore world))
                                                            (add-message (create-string "~%"))
                                                            (add-message (create-string "You are dead.~%"))
-                                                           (add-message (create-string "Wait while the scenario is resolved.~%~%"))
+                                                           (add-message (create-string "Wait while the scenario is resolved...~%~%"))
                                                                                                                       
-                                                           (setf (game-events world) (remove +game-event-player-died+ (game-events world))))))
+                                                           (setf (dead-message-displayed *player*) t))))
 
 (set-game-event (make-instance 'game-event :id +game-event-lose-game-possessed+ :disabled nil
                                            :on-check #'(lambda (world)
@@ -289,7 +315,9 @@
                                                                       (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 12 60 10)) (player-game-time world))))))))))
                                                              ))))
 
-(set-game-event (make-instance 'game-event :id +game-event-win-for-thief+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-win-for-thief+
+                                           :descr "To win, gather at least $1500 worth of items and leave the district by moving to its border. To lose, die or get possessed."
+                                           :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (>= (get-overall-value (inv *player*)) *thief-win-value*)
                                                                   (or (<= (x *player*) 1) (>= (x *player*) (- (array-dimension (terrain (level world)) 0) 2))
@@ -371,7 +399,9 @@
                                                                 )
                                                            )))
 
-(set-game-event (make-instance 'game-event :id +game-event-win-for-eater+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-win-for-eater+
+                                           :descr "To win, destroy all angels and demons in the district. To lose, die."
+                                           :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (zerop (total-demons world))
                                                                   (zerop (total-angels world)))
@@ -411,7 +441,9 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-win-for-ghost+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-win-for-ghost+
+                                           :descr "To win, find the Book of Rituals in the library and read it while standing on a summoning circle in the satanists' lair. To lose, die."
+                                           :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
                                                          (if (mob-effect-p *player* +mob-effect-rest-in-peace+)

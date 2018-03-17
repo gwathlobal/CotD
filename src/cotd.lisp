@@ -218,13 +218,15 @@
             do
                (setf (nth n faction-list) (list faction-id (remove +mission-faction-present+ faction-present-list))))
 
-    ;; remove +mission-faction-delayed+ for the player faction
+    ;; remove +mission-faction-delayed+ and +mission-faction-absent+ for the player faction
     (loop for (faction-id faction-present-list) in faction-list
           for n from 0
-          when (and (find +mission-faction-delayed+ faction-present-list)
+          when (and (or (find +mission-faction-delayed+ faction-present-list)
+                        (find +mission-faction-absent+ faction-present-list) )
                     (find faction-id available-faction-list))
             do
-               (setf (nth n faction-list) (list faction-id (remove +mission-faction-delayed+ faction-present-list))))
+               (setf (nth n faction-list) (list faction-id (remove +mission-faction-delayed+ faction-present-list)))
+               (setf (nth n faction-list) (list faction-id (remove +mission-faction-absent+ faction-present-list))))
     
     ;; set up random presence options in the faction list
     (loop for (faction-id faction-present-list) in faction-list

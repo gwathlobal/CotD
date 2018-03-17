@@ -61,14 +61,7 @@
                                                :faction-relations (list (cons +faction-type-eater+ t)
                                                                         (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-civilians+ nil)
                                                                         (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil)
-                                                                        (cons +faction-type-ghost+ nil) (cons +faction-type-church+ nil) (cons +faction-type-satanists+ nil))))
-
-(set-faction-type (make-instance 'faction-type :id +faction-type-ghost+
-                                               :name "Ghost"
-                                               :faction-relations (list (cons +faction-type-ghost+ t)
-                                                                        (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-animals+ nil)
-                                                                        (cons +faction-type-civilians+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
-                                                                        (cons +faction-type-criminals+ nil) (cons +faction-type-church+ nil) (cons +faction-type-satanists+ nil))
+                                                                        (cons +faction-type-ghost+ nil) (cons +faction-type-church+ nil) (cons +faction-type-satanists+ nil))
                                                :scenario-faction-list (list +player-faction-eater+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-ghost+

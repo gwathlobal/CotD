@@ -1,11 +1,11 @@
 (in-package :cotd)
 
 (set-objective-type (make-instance 'objective-type :id +objective-demon-attack-attacker+
-                                                   :descr "To win, destroy all angels in the district. To lose, die."
+                                                   :descr "To win, destroy all angels in the district. To lose, have all demons killed."
                                                    :ai-package-id +ai-package-patrol-district+))
 
 (set-objective-type (make-instance 'objective-type :id +objective-demon-attack-defender+
-                                                   :descr "To win, destroy all demons in the district. To lose, die."
+                                                   :descr "To win, destroy all demons in the district. To lose, have all angels killed."
                                                    :ai-package-id +ai-package-patrol-district+))
 
 (set-objective-type (make-instance 'objective-type :id +objective-demon-attack-eater+

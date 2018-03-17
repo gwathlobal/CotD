@@ -1407,6 +1407,7 @@
    (view-x :initform 0 :accessor view-x)
    (view-y :initform 0 :accessor view-y)
    (view-z :initform 0 :accessor view-z)
+   (dead-message-displayed :initform nil :accessor dead-message-displayed)
    (sense-evil-id :initform nil :accessor sense-evil-id)
    (sense-good-id :initform nil :accessor sense-good-id)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)

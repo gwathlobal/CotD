@@ -1564,7 +1564,9 @@
                 (and (mob-ability-p killer +mob-abil-demon+)
                      (mob-ability-p mob +mob-abil-demon+)))
         (logger (format nil "MAKE-DEAD: ~A [~A] Real mob strength to be transferred to the killer ~A [~A] is ~A~%" (name mob) (id mob) (name killer) (id killer) (strength (get-mob-type-by-id (mob-type mob)))))
-        (incf (cur-fp killer) (1+ (strength (get-mob-type-by-id (mob-type mob))))))
+        (incf (cur-fp killer) (1+ (strength (get-mob-type-by-id (mob-type mob)))))
+        (when (> (cur-fp killer) (max-fp killer))
+          (setf (cur-fp killer) (max-fp killer))))
       
       (if (gethash (mob-type mob) (stat-kills killer))
         (incf (gethash (mob-type mob) (stat-kills killer)))

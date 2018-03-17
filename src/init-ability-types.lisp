@@ -3424,6 +3424,9 @@
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)
 
+                                                  (when (eq mob-corpse *player*)
+                                                    (setf (dead-message-displayed *player*) nil))
+                                                  
                                                   (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A stands up and walks. "
                                                                                                                                               (capitalize-name (prepend-article +article-the+ (visible-name mob-corpse)))))
                                                   (logger (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name actor) (id actor) (x mob-corpse) (y mob-corpse) (z mob-corpse)))

@@ -21,6 +21,7 @@
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)
+   (descr :initarg :descr :accessor descr)
    (disabled :initform nil :initarg :disabled :accessor disabled)
    (on-check :initarg :on-check :accessor on-check)
    (on-trigger :initarg :on-trigger :accessor on-trigger)))

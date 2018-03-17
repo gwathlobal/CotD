@@ -11,12 +11,26 @@
   (let* ((x 10)
          (y (+ 0 (* 2 (sdl:char-height sdl:*default-font*))))
          (w (- *window-width* 20))
-         (h (- *window-height* 20 (sdl:char-height sdl:*default-font*) y)))
+         (h (- *window-height* 20 (sdl:char-height sdl:*default-font*) y))
+         (str (create-string)))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
 
-      (write-text (format nil "~A" (descr (get-objective-type-by-id (objectives *player*))))
-                  a-rect :color sdl:*white*))
+      (when (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*)))) :key #'(lambda (a)
+                                                                                                                                         (first a)))
+        (format str "~A~%~%~%" (descr (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                                                                        :key #'(lambda (a)
+                                                                                 (first a))))))))
+      (format str "Faction relations~%")
+      (loop for faction-type across *faction-types*
+            when (and faction-type
+                      (not (= (id faction-type) (faction *player*))))
+              do
+                 (format str "  ~20A : ~A~%" (name faction-type) (if (get-faction-relation (id faction-type) (faction *player*))
+                                                                 "ALLY"
+                                                                 "ENEMY")))
+
+      (write-text str a-rect :color sdl:*white*))
     )
 
   (sdl:draw-string-solid-* (format nil "[Esc] Exit")
