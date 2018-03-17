@@ -587,7 +587,7 @@
       (setf *random-state* (make-random-state t))
 
       (setf *window-width* (+ 350 (+ 30 (* *glyph-w* *max-x-view*))) 
-            *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (sdl:char-height sdl:*default-font*)))
+            *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (* 3 (sdl:char-height sdl:*default-font*))))
 
       (when (<= *window-height* 384)
         (incf *window-height* (+ (* 6 (sdl:char-height sdl:*default-font*)) 0)))

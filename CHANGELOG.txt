@@ -9,7 +9,8 @@ CHANGELOG
 - Defending military will be stationed inside the city.
 - Possessable creatures will try to get away from you if you are the one that can possess them.
 - Characters with a ranged weapons will try to step out of melee combat.
-- Ghosts can now sense the direction to the sacrificial circle and the Book of Rituals. 
+- Ghosts can now sense the direction to the sacrificial circle and the Book of Rituals.
+- Abilities on cooldown will be displayed in the status string.
 
 --------------------
 January 12, 2018 v1.2.6

@@ -179,8 +179,6 @@
   (loop with y1 = y
         for mob-id in visible-mobs
         for vmob = (get-mob-by-id mob-id)
-        ;finally
-        ;   (format t "VISIBLE-MOBS ~A~%" visible-mobs)
         do
            (when (and (> (length visible-mobs) (truncate h *glyph-h*))
                       (> (+ y1 (* 1 *glyph-h*)) (+ y h)))
@@ -205,6 +203,31 @@
                                    (return-weather-type-str *world*))
                            x y :color sdl:*white*))
 
+(defun show-abilities-on-cooldown (x y)
+  (loop with str = (create-string)
+        with need-comma = nil
+        for ability-type-id in (stable-sort (loop for ability-type-id in (get-mob-all-abilities *player*)
+                                                  when (not (abil-applic-cd-p ability-type-id *player*))
+                                                    collect ability-type-id)
+                                            #'(lambda (a b)
+                                                (if (> (abil-cur-cd-p *player* a)
+                                                       (abil-cur-cd-p *player* b))
+                                                  t
+                                                  nil)))
+        do
+           (when (> (+ (* (length str) (sdl:char-width sdl:*default-font*)) (* (+ (length (name (get-ability-type-by-id ability-type-id))) 7) (sdl:char-width sdl:*default-font*)))
+                    (+ 20 (* *glyph-w* *max-x-view*)))
+             (format str " ...")
+             (loop-finish))
+           (format str "~A~A [~A]"
+                   (if need-comma ", " "")
+                   (name (get-ability-type-by-id ability-type-id))
+                   (abil-cur-cd-p *player* ability-type-id)
+                   )
+           (setf need-comma t)
+        finally (sdl:draw-string-solid-* str x y :color sdl:*red*))
+  )
+
 (defun update-screen (win)
   
   ;; filling the background with black rectangle
@@ -222,7 +245,8 @@
                                                          :front-color sdl:*white*
                                                          :back-color sdl:*black*))
                                   ))
-    
+
+  (show-abilities-on-cooldown 10 (- *window-height* *msg-box-window-height* 20 (* (sdl:char-height sdl:*default-font*) 2)))
   (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   (show-message-box 10 (- *window-height* *msg-box-window-height* 20) (- *window-width* 260 10))
   (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height*)
