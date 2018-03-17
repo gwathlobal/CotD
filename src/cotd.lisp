@@ -24,11 +24,13 @@
            ;; we need this for events to get triggered only once  
            (setf (turn-finished *world*) nil)
 
-           (when (check-dead *player*)
+           (when (or (check-dead *player*)
+                     (master-mob-id *player*))
+             (when (master-mob-id *player*)
+               (setf (x *player*) (x (get-mob-by-id (master-mob-id *player*))) (y *player*) (y (get-mob-by-id (master-mob-id *player*))) (z *player*) (z (get-mob-by-id (master-mob-id *player*)))))
              (update-visible-mobs *player*)
              (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
              (make-output *current-window*)
-             (format t "REAL-GAME-TIME = ~A~%" (real-game-time *world*))
              (pause-for-poll))
            
            ;; iterate through all the mobs

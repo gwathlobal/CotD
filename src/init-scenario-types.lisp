@@ -170,6 +170,7 @@
                                              :type +scenario-feature-player-faction+ :debug t
                                              :name "Player"
                                              :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
@@ -182,8 +183,7 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
-                                                                                                              
+                                                                                                                                                                     
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-dead-player+
@@ -226,8 +226,7 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
-                                                       (push +game-event-win-for-angels+ game-event-list)
+                                                       (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
 
@@ -248,7 +247,6 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -302,7 +300,6 @@
 
                                                                                                               
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -341,7 +338,6 @@
                                                              mob-func-list)
 
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -386,7 +382,6 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -408,7 +403,6 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -431,7 +425,6 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -464,7 +457,6 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
@@ -511,7 +503,6 @@
                                                              mob-func-list)
                                                        
                                                        (push +game-event-player-died+ game-event-list)
-                                                       (push +game-event-lose-game-possessed+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
                                                        (values layout-func post-processing-func-list mob-func-list game-event-list))))
