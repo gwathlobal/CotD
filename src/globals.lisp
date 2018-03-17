@@ -304,6 +304,7 @@
 (defconstant +mob-abil-demon-word-plague+ 154)
 (defconstant +mob-abil-demon-word-power+ 155)
 (defconstant +mob-abil-soul+ 156)
+(defconstant +mob-abil-detect-unnatural+ 157)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

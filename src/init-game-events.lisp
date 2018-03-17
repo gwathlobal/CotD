@@ -442,7 +442,7 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-ghost+
-                                           :descr "To win, find the Book of Rituals in the library and read it while standing on a summoning circle in the satanists' lair. To lose, die."
+                                           :descr "To win, find the Book of Rituals in the library and read it while standing on a sacrificial circle in the satanists' lair. To lose, die."
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))

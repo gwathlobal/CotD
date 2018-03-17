@@ -128,6 +128,9 @@
     (when (sense-good-id *player*)
       (when first (format str "~%") (setf first nil))
       (format str "Sense good: ~A~%" (general-direction-str (x *player*) (y *player*) (x (get-mob-by-id (sense-good-id *player*))) (y (get-mob-by-id (sense-good-id *player*))))))
+    (when (sense-unnatural-pos *player*)
+      (when first (format str "~%") (setf first nil))
+      (format str "Sense unnatural: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-unnatural-pos *player*)) (second (sense-unnatural-pos *player*)))))
     str))
 
 (defun general-direction-str (sx sy tx ty)

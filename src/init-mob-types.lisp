@@ -620,7 +620,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-radiation+ 0 100) (list +weapon-dmg-acid+ 1 0))
                                        :strength 1 :base-stealth 10
                                        :base-light-radius 0 
-                                       :abil-no-breathe t :abil-undead t :abil-float t :abil-soul t :abil-ghost-possess t :abil-no-corpse t :abil-invisibility t :abil-passwall t :abil-ghost-release t
+                                       :abil-no-breathe t :abil-undead t :abil-float t :abil-soul t :abil-ghost-possess t :abil-no-corpse t :abil-invisibility t :abil-passwall t :abil-ghost-release t :abil-detect-unnatural t
                                        :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t
                                        ))
 

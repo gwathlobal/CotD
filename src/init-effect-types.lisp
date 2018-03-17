@@ -965,6 +965,7 @@
 
                                                          (mob-set-ability actor +mob-abil-ghost-possess+ t)
                                                          (mob-set-ability actor +mob-abil-ghost-release+ t)
+                                                         (mob-set-ability actor +mob-abil-detect-unnatural+ t)
                                                          (mob-remove-ability actor +mob-abil-possessable+)
                                                          
                                                          ;; set up current abilities cooldowns

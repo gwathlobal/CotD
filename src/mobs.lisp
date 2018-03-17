@@ -90,7 +90,7 @@
                                                                 abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
                                                                 abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess
                                                                 abil-invisibility abil-passwall abil-ghost-release abil-decipher-rune abil-demon-word-flesh abil-demon-word-knockback abil-demon-word-invasion abil-demon-word-darkness
-                                                                abil-demon-word-plague abil-demon-word-power abil-soul)
+                                                                abil-demon-word-plague abil-demon-word-power abil-soul abil-detect-unnatural)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -444,7 +444,9 @@
   (when abil-demon-word-power
     (setf (gethash +mob-abil-demon-word-power+ (abilities mob-type)) t))
   (when abil-soul
-    (setf (gethash +mob-abil-soul+ (abilities mob-type)) t)))
+    (setf (gethash +mob-abil-soul+ (abilities mob-type)) t))
+  (when abil-detect-unnatural
+    (setf (gethash +mob-abil-detect-unnatural+ (abilities mob-type)) t)))
 
 (defun get-mob-type-by-id (mob-type-id)
   (aref *mob-types* mob-type-id))
@@ -1410,6 +1412,7 @@
    (dead-message-displayed :initform nil :accessor dead-message-displayed)
    (sense-evil-id :initform nil :accessor sense-evil-id)
    (sense-good-id :initform nil :accessor sense-good-id)
+   (sense-unnatural-pos :initform nil :accessor sense-unnatural-pos)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)
    (killed-by :initform nil :accessor killed-by)
    (faction-name :initform nil :accessor faction-name)

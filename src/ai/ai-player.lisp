@@ -20,6 +20,8 @@
     (sense-good))
   (when (mob-ability-p *player* +mob-abil-detect-evil+)
     (sense-evil))
+  (when (mob-ability-p *player* +mob-abil-detect-unnatural+)
+    (sense-unnatural))
 
   ;; print out the items on the player's tile
   (loop for item-id in (get-items-* (level *world*) (x *player*) (y *player*) (z *player*))

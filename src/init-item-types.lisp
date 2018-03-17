@@ -713,7 +713,7 @@
                                                      (set-mob-effect actor :effect-type-id +mob-effect-rest-in-peace+ :actor-id (id actor) :cd t)
 
                                                      ;; always remove 1 item
-                                                     t)
+                                                     nil)
                                          :on-check-applic #'(lambda (actor item)
                                                               (declare (ignore item))
                                                               (if (and (mob-ability-p actor +mob-abil-ghost-possess+)

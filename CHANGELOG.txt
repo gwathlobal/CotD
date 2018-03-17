@@ -2,12 +2,14 @@ CHANGELOG
 
 - If you die, this is no longer the end of the world. The battle will go one until one of the sides wins. You might even get ressurected by your allies and continue fighting as if nothing happened.
 - You can no longer win the game by ascending beyond Angel or Archdemon/Shadow Devil.
+- As a Scout you can no longer lose game by getting possessed.
 - You will now be able to customize the factions you want to see in a scenario.
 - AI will bump into friendly mobs much less often and will try to navigate around them to get to its target.
 - Added a journal where you can see objectives for the current mission and your relations with other factions. The journal is displayed using the 'j' button.
 - Defending military will be stationed inside the city.
 - Possessable creatures will try to get away from you if you are the one that can possess them.
 - Characters with a ranged weapons will try to step out of melee combat.
+- Ghosts can now sense the direction to the sacrificial circle and the Book of Rituals. 
 
 --------------------
 January 12, 2018 v1.2.6
