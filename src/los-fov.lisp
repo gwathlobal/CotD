@@ -454,6 +454,7 @@
   (setf (visible-mobs mob) nil)
   (setf (proper-visible-mobs mob) nil)
   (setf (shared-visible-mobs mob) nil)
+  (setf (hear-range-mobs mob) nil)
   
   
   (if (mob-ability-p mob +mob-abil-see-all+)

@@ -355,7 +355,7 @@
                                        :weapon (list "Illusory fire" nil nil) :base-dodge 35
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ 0 100))
                                        :strength 0
-                                       :abil-angel t :abil-soul t :abil-no-breathe t :abil-restore-soul t
+                                       :abil-angel t :abil-soul t :abil-no-breathe t :abil-restore-soul t :abil-no-corpse t
                                        :ai-split-soul t :ai-use-ability t))
 
 ;;--------------------

@@ -1283,7 +1283,8 @@
              (not (mob-ability-p mob +mob-abil-primordial+))
              (not (= (mob-type mob) +mob-type-imp+))
              (not (= (mob-type mob) +mob-type-shadow-imp+))
-             (not (eq (mob-type mob) +mob-type-ghost+)))
+             (not (= (mob-type mob) +mob-type-ghost+))
+             (not (= (mob-type mob) +mob-type-angel-image+)))
     (let ((name-pick-n))
       (if (mob-ability-p mob +mob-abil-angel+)
         (progn

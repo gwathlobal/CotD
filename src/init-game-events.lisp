@@ -517,7 +517,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-military+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 2) (turn-finished world))
+                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
@@ -556,7 +556,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-angels+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 3) (turn-finished world))
+                                                         (if (and (= (real-game-time world) 220) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)

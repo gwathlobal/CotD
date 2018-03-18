@@ -471,7 +471,7 @@
                                                              sdl:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
-                                                            ;; param1 - id of the mob, affected by the +mob-effect-pain-link-source+
+                                                            ;; param1 - id of the mob, affected by the +mob-effect-split-soul-target+
                                                             (when (param1 effect)
                                                               (rem-mob-effect (get-mob-by-id (param1 effect)) +mob-effect-split-soul-target+))
                                                             )))

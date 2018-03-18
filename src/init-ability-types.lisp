@@ -693,7 +693,7 @@
                                                   ;; if able to pray - do it
                                                   (if (and (mob-ability-p actor +mob-abil-prayer-shield+)
                                                            (can-invoke-ability actor actor +mob-abil-prayer-shield+)
-                                                           (zerop (random 3)))
+                                                           (zerop (random 4)))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
@@ -789,7 +789,7 @@
                                                   (if (and (mob-ability-p actor +mob-abil-prayer-reveal+)
                                                            (can-invoke-ability actor actor +mob-abil-prayer-reveal+)
                                                            (not (zerop (length (visible-mobs actor))))
-                                                           (zerop (random 3)))
+                                                           (zerop (random 4)))
                                                     t
                                                     nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
@@ -3250,10 +3250,11 @@
                                                                                 'player
                                                                                 'mob)
                                                                               :mob-type +mob-type-angel-image+ :x (first target) :y (second target) :z (third target))))
-                                                        (setf (name image) (format nil "~A's image" (name actor)))
-                                                        (set-mob-effect image :effect-type-id +mob-effect-split-soul-target+ :actor-id (id actor) :cd 6)
-                                                        (set-mob-effect actor :effect-type-id +mob-effect-split-soul-source+ :actor-id (id actor) :cd 6 :param1 (id image))
-                                                        (add-mob-to-level-list (level *world*) image))
+                                                    (setf (name image) (format nil "~A's image" (name actor)))
+                                                    (setf (alive-name image) (name image))
+                                                    (set-mob-effect image :effect-type-id +mob-effect-split-soul-target+ :actor-id (id actor) :cd 6)
+                                                    (set-mob-effect actor :effect-type-id +mob-effect-split-soul-source+ :actor-id (id actor) :cd 6 :param1 (id image))
+                                                    (add-mob-to-level-list (level *world*) image))
                                                   )
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
@@ -3369,21 +3370,26 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally))
-                                                  (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
-                                                    (logger (format nil "CHECK-AI-RESTORE-SOUL: ~A [~A], source ~A, cur-hp ~A, ratio ~A, nearest-enemy ~A, can-invoke ~A~%"
-                                                                    (name actor) (id actor) (name source) (cur-hp source) (/ (cur-hp source) (max-hp source))
-                                                                    (or (null nearest-enemy)
-                                                                        (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
-                                                                    (can-invoke-ability actor actor +mob-abil-restore-soul+)))
-                                                    (if (and (< (/ (cur-hp source) (max-hp source)) 
-                                                                0.3)
-                                                             (null (riding-mob-id source))
-                                                             (or (null nearest-enemy)
-                                                                 (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
-                                                             (mob-ability-p actor +mob-abil-restore-soul+)
-                                                             (can-invoke-ability actor actor +mob-abil-restore-soul+))
-                                                      t
-                                                      nil)))
+                                                  (if (mob-effect-p actor +mob-effect-split-soul-target+)
+                                                    (progn
+                                                      (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
+                                                        (logger (format nil "CHECK-AI-RESTORE-SOUL: ~A [~A], source ~A, cur-hp ~A, ratio ~A, nearest-enemy ~A, can-invoke ~A~%"
+                                                                        (name actor) (id actor) (name source) (cur-hp source) (/ (cur-hp source) (max-hp source))
+                                                                        (or (null nearest-enemy)
+                                                                            (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
+                                                                        (can-invoke-ability actor actor +mob-abil-restore-soul+)))
+                                                        (if (and (mob-ability-p actor +mob-abil-restore-soul+)
+                                                                 (can-invoke-ability actor actor +mob-abil-restore-soul+)
+                                                                 (< (/ (cur-hp source) (max-hp source)) 
+                                                                    0.3)
+                                                                 (null (riding-mob-id source))
+                                                                 (or (null nearest-enemy)
+                                                                     (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
+                                                                 
+                                                                 )
+                                                          t
+                                                          nil)))
+                                                    nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
@@ -3429,7 +3435,7 @@
                                                   
                                                   (print-visible-message (x mob-corpse) (y mob-corpse) (z mob-corpse) (level *world*) (format nil "~A stands up and walks. "
                                                                                                                                               (capitalize-name (prepend-article +article-the+ (visible-name mob-corpse)))))
-                                                  (logger (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name actor) (id actor) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
+                                                  (logger (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name mob-corpse) (id mob-corpse) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
                                                   (remove-item-from-world target)
                                                   (incf (stat-raised-dead actor))
                                                   (when (and (mob-ability-p mob-corpse +mob-abil-angel+)

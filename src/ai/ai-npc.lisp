@@ -133,10 +133,12 @@
               do
                  (setf (aref ai-package-array (priority ai-package)) (pushnew ai-package (aref ai-package-array (priority ai-package)))))
 
-      (when (and (objectives mob)
-                 (ai-package-id (get-objective-type-by-id (objectives mob))))
-        (setf (aref ai-package-array (priority (get-ai-package-by-id (ai-package-id (get-objective-type-by-id (objectives mob))))))
-              (pushnew (get-ai-package-by-id (ai-package-id (get-objective-type-by-id (objectives mob)))) (aref ai-package-array (priority (get-ai-package-by-id (ai-package-id (get-objective-type-by-id (objectives mob)))))))))
+      ;; adding objective packages
+      (when (and (get-objective-based-on-faction (loyal-faction mob) (mission-scenario (level *world*)))
+                 (ai-package-id (get-objective-type-by-id (get-objective-based-on-faction (loyal-faction mob) (mission-scenario (level *world*))))))
+        (let ((objective-package-id (ai-package-id (get-objective-type-by-id (get-objective-based-on-faction (loyal-faction mob) (mission-scenario (level *world*)))))))
+          (setf (aref ai-package-array (priority (get-ai-package-by-id objective-package-id)))
+                (pushnew (get-ai-package-by-id objective-package-id) (aref ai-package-array (priority (get-ai-package-by-id objective-package-id)))))))
 
       (unless *cotd-release*
         (logger (format nil "AI-FUNCTION: ai-package-array~%"))

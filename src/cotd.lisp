@@ -6,6 +6,7 @@
         do
            ;;(format t "GAME-LOOP: Start loop~%")
            (setf turn-finished t)
+           (logger (format nil "REAL-GAME-TURN: ~A~%~%" (real-game-time *world*)))
 
            ;; check for the player's win conditions first
            (when (and *player*
@@ -30,6 +31,7 @@
                (setf (x *player*) (x (get-mob-by-id (master-mob-id *player*))) (y *player*) (y (get-mob-by-id (master-mob-id *player*))) (z *player*) (z (get-mob-by-id (master-mob-id *player*)))))
              (update-visible-mobs *player*)
              (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+             
              (make-output *current-window*)
              (pause-for-poll))
            
@@ -87,6 +89,8 @@
            
            (when turn-finished
              (incf (real-game-time *world*))
+             (when (check-dead *player*)
+               (incf (player-game-time *world*) +normal-ap+))
              (setf (turn-finished *world*) t)
              (set-message-this-turn nil)
              (loop for mob of-type mob across *mobs* do

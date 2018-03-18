@@ -880,7 +880,8 @@
                                                                    (setf rz (- (+ 5 (z actor)) (1+ (random 10))))
                                                                  
                                                                    (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: TERRAIN ~A~%" (get-terrain-* (level *world*) (x actor) (y actor) (z actor))))
-                                                                   (loop while (or (< rx 0) (< ry 0) (< rz 0)
+                                                                   (loop with attempt-num = 0
+                                                                         while (or (< rx 0) (< ry 0) (< rz 0)
                                                                                    (>= rx (array-dimension (terrain (level *world*)) 0))
                                                                                    (>= ry (array-dimension (terrain (level *world*)) 1))
                                                                                    (>= rz (array-dimension (terrain (level *world*)) 2))
@@ -891,8 +892,7 @@
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                           (map-size actor))
-                                                                                                                 (get-mob-move-mode actor)))
-                                                                                   )
+                                                                                                                 (get-mob-move-mode actor))))
                                                                          do
                                                                             (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
                                                                                             rx ry rz
@@ -907,10 +907,20 @@
                                                                             (setf rx (+ (* (first nearest-sector) 10) (random 10)))
                                                                             (setf ry (+ (* (second nearest-sector) 10) (random 10)))
                                                                             (setf rz (- (+ 5 (z actor)) (1+ (random 10))))
-                                                                            (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: NEW R (~A ~A ~A)~%" rx ry rz)))
-                                                                   (ai-set-path-dst actor rx ry rz)
-                                                                   (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob's destination is randomly set to (~A, ~A, ~A)~%"
-                                                                                   (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))))
+                                                                            (incf attempt-num)
+                                                                            (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: NEW R (~A ~A ~A)~%" rx ry rz))
+                                                                            (when (> attempt-num 200)
+                                                                              (loop-finish))
+                                                                         finally (if (> attempt-num 200)
+                                                                                   (progn
+                                                                                     (setf (path-dst actor) nil)
+                                                                                     (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob cannot set the destination after 200 attempts~%")))
+                                                                                   (progn
+                                                                                     (ai-set-path-dst actor rx ry rz)
+                                                                                     (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob's destination is randomly set to (~A, ~A, ~A)~%"
+                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))))
+                                                                   
+                                                                   ))
                                                                
                                                                (let ((move-result nil))
                                                                  ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
