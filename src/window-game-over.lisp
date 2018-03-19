@@ -32,7 +32,7 @@
     (when (player-died win)
       (format str "YOU DIED, BUT "))
     (cond
-      ((= (game-over-type win) +game-over-player-dead+) (setf str (format str "YOU ARE DEAD")))
+      ((= (game-over-type win) +game-over-player-dead+) (setf str (format nil "YOU ARE DEAD")))
       ((= (game-over-type win) +game-over-demons-won+) (format str "THE PANDEMONIUM HIERARCHY WON"))
       ((= (game-over-type win) +game-over-angels-won+) (format str "THE CELESTIAL COMMUNION WON"))
       ((= (game-over-type win) +game-over-military-won+) (format str "THE MILITARY WON"))

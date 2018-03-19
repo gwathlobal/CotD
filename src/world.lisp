@@ -357,6 +357,7 @@
    (total-angels :initform 0 :accessor total-angels)
    (total-blessed :initform 0 :accessor total-blessed)
    (total-undead :initform 0 :accessor total-undead)
+   (total-faction-list :initform (loop for faction across *faction-types* collect 0) :accessor total-faction-list)
 
    (game-events :initform () :accessor game-events)
 

@@ -838,6 +838,8 @@
     (incf (total-angels *world*))
     (incf (initial-angels *world*)))
 
+  (incf (nth (loyal-faction mob) (total-faction-list *world*)))
+
   )
 
 (defun get-mob-by-id (mob-id)

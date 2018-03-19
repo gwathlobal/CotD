@@ -369,7 +369,8 @@
           (cur-dmg 0))
       ()
       (when (and apply-gravity
-                 (setf final-z (apply-gravity mob)))
+                 (setf final-z (apply-gravity mob))
+                 (not (check-dead mob)))
       
         (set-mob-location mob (x mob) (y mob) final-z :apply-gravity nil)
 
@@ -1476,6 +1477,7 @@
     (when (and (mob-ability-p mob +mob-abil-angel+)
                (not (mob-ability-p mob +mob-abil-animal+)))
       (decf (total-angels *world*)))
+    (decf (nth (loyal-faction mob) (total-faction-list *world*)))
     
     ;; set stat-gold before dropping inventory
     (setf (stat-gold mob) (get-overall-value (inv mob)))

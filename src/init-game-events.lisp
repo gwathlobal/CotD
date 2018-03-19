@@ -82,8 +82,13 @@
                                            :descr "To win, destroy all angels in the district. To lose, have all demons killed."
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (> (total-demons world) 0)
-                                                                  (zerop (total-angels world)))
+                                                         (if (or (and (/= (loyal-faction *player*) +faction-type-military+)
+                                                                      (> (total-demons world) 0)
+                                                                      (zerop (total-angels world)))
+                                                                 (and (= (loyal-faction *player*) +faction-type-military+)
+                                                                      (> (total-demons world) 0)
+                                                                      (zerop (nth +faction-type-military+ (total-faction-list world)))
+                                                                      (zerop (total-angels world))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
@@ -187,7 +192,8 @@
                                                              (sdl:with-events ()
                                                                (:quit-event () (funcall (quit-func *current-window*)) t)
                                                                (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-military-won+ :highscores-place highscores-place))
+                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-military-won+ :highscores-place highscores-place
+                                                                                                                      :player-won player-faction :player-died player-died))
                                                                                 (make-output *current-window*)
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
@@ -319,7 +325,8 @@
                                            :descr "To win, gather at least $1500 worth of items and leave the district by moving to its border. To lose, die or get possessed."
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (>= (get-overall-value (inv *player*)) *thief-win-value*)
+                                                         (if (and (= (loyal-faction *player*) +faction-type-criminals+)
+                                                                  (>= (get-overall-value (inv *player*)) *thief-win-value*)
                                                                   (or (<= (x *player*) 1) (>= (x *player*) (- (array-dimension (terrain (level world)) 0) 2))
                                                                       (<= (y *player*) 1) (>= (y *player*) (- (array-dimension (terrain (level world)) 1) 2))))
                                                            t

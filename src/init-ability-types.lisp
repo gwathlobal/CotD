@@ -2303,16 +2303,17 @@
 
                                                 (generate-sound actor (x target) (y target) (z target) 80 #'(lambda (str)
                                                                                                               (format nil "You hear metal clanking~A. " str)))
-                                                
+
+                                                (set-mob-effect target :effect-type-id +mob-effect-gravity-pull+ :actor-id (id actor) :cd 3)
                                                 (inflict-damage target :min-dmg 2 :max-dmg 4 :dmg-type +weapon-dmg-vorpal+
                                                                        :att-spd nil :weapon-aux () :acc 100 :add-blood nil :no-dodge t
                                                                        :actor actor
                                                                        :specific-hit-string-func #'(lambda (cur-dmg)
                                                                                                      (format nil "~A takes ~A dmg. " (capitalize-name (prepend-article +article-the+ (name target))) cur-dmg)))
-
+                                                
                                                 (rem-mob-effect target +mob-effect-climbing-mode+)
                                                 (rem-mob-effect target +mob-effect-flying+)
-                                                (set-mob-effect target :effect-type-id +mob-effect-gravity-pull+ :actor-id (id actor) :cd 3)
+                                                
                                                 (when (apply-gravity target)
                                                   (set-mob-location target (x target) (y target) (z target)))
 
@@ -3414,6 +3415,7 @@
                                                   (setf (dead= mob-corpse) nil)
                                                   (setf (cur-hp mob-corpse) (max-hp mob-corpse))
                                                   (setf (cur-fp mob-corpse) 0)
+                                                  (setf (cur-ap mob-corpse) (max-ap mob-corpse))
                                                   (when (merged-id-list mob-corpse)
                                                     (loop for mob-id in (merged-id-list mob-corpse)
                                                           for mob = (get-mob-by-id mob-id)
@@ -3425,7 +3427,8 @@
                                                                         (not (mob-ability-p mob +mob-abil-animal+)))
                                                                (incf (total-angels *world*)))
                                                              (when (mob-ability-p mob +mob-abil-human+)
-                                                               (incf (total-humans *world*))))
+                                                               (incf (total-humans *world*)))
+                                                             (incf (nth (loyal-faction mob) (total-faction-list *world*))))
                                                     (set-mob-effect mob-corpse :effect-type-id +mob-effect-merged+ :actor-id (id mob-corpse) :param1 (mob-type mob-corpse)))
                                                   (add-mob-to-level-list (level *world*) mob-corpse)
                                                   (remove-item-from-level-list (level *world*) target)

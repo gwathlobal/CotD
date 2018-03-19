@@ -87,7 +87,7 @@
                    (not (get-terrain-type-trait (get-terrain-* (level *world*) nx ny cz) +terrain-trait-opaque-floor+)))
           (setf move-result t))
 
-        ;; can go from horizontally if the landing tile has opaque floor and there is no final destination
+        ;; can go horizontally if the landing tile has opaque floor and there is no final destination
         ;; or can go horizontally if the landing tile has opaque floor and it is NOT the final distination
         ;; or can go horizontally if the landing tile is the final destination (and we do not care about the floor)
         (when (or (and (= (- dz cz) 0)
@@ -273,7 +273,6 @@
                           (1+ (random 20))))
                    (rz (- (+ 5 (z mob))
                           (1+ (random 10))))
-                   (path nil)
                    )
               (declare (type fixnum rx ry))
 
@@ -282,7 +281,7 @@
                 (loop while (or (< rx 0) (< ry 0) (< rz 0) (>= rx (array-dimension (terrain (level *world*)) 0)) (>= ry (array-dimension (terrain (level *world*)) 1)) (>= rz (array-dimension (terrain (level *world*)) 2))
                                 (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                 ;(not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
-                                (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
+                                (and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+)
                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
                                      (not (mob-effect-p mob +mob-effect-flying+)))
                                 (not (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)
@@ -304,20 +303,7 @@
                                                                                                                                                              (map-size mob))
                                              (get-mob-move-mode mob))
                 (logger (format nil "THREAD: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) stream)
-                (setf path (a-star (list (x mob) (y mob) (z mob)) (list (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) 
-                                    #'(lambda (dx dy dz cx cy cz) 
-                                        ;; checking for impassable objects
-                                        (check-move-for-ai mob dx dy dz cx cy cz)
-                                        )
-                                    #'(lambda (dx dy dz)
-                                        ;; a magic hack here - as values of more than 10 give an unexplainable slowdown
-                                        (* (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-move-cost-factor+)
-                                           (move-spd (get-mob-type-by-id (mob-type mob)))
-                                           1/10))))
-                 
-                (pop path)
-                (logger (format nil "THREAD: Set mob path - ~A~%" path) stream)
-                (setf (path mob) path)
+                (ai-plot-path-to-dst mob (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)))
                 ))
             )
           (incf (cur-mob-path *world*))
