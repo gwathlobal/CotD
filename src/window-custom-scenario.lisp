@@ -59,7 +59,8 @@
                                           do
                                              (setf result (append result (scenario-faction-list faction-obj)))
                                         finally (when (not *cotd-release*)
-                                                  (push +player-faction-player+ result))
+                                                  (push +player-faction-player+ result)
+                                                  (push +player-faction-dead-player+ result))
                                                 (remove-duplicates result)
                                                 (return-from nil result)))
   (setf (cur-player-faction win) (random (length (player-faction-list win))))
@@ -102,8 +103,8 @@
                                             do
                                                (setf result (append result (scenario-faction-list faction-obj)))
                                           finally (when (not *cotd-release*)
-                                                    (push +player-faction-player+ result))
-                                                  (push +player-faction-dead-player+ result)
+                                                    (push +player-faction-player+ result)
+                                                    (push +player-faction-dead-player+ result))
                                                   (remove-duplicates result)
                                                   (return-from nil result)))
     (if (position cur-faction-id (player-faction-list win))

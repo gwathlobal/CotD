@@ -2,9 +2,9 @@
 
 (defparameter *game-events* (make-hash-table))
 
-(defconstant +game-event-win-for-angels+ 0)
-(defconstant +game-event-win-for-demons+ 1)
-(defconstant +game-event-win-for-humans+ 2)
+(defconstant +game-event-demon-attack-win-for-angels+ 0)
+(defconstant +game-event-demon-attack-win-for-demons+ 1)
+(defconstant +game-event-demon-attack-win-for-military+ 2)
 (defconstant +game-event-lose-game-died+ 3)
 (defconstant +game-event-snow-falls+ 4)
 (defconstant +game-event-lose-game-possessed+ 5)
@@ -18,6 +18,8 @@
 (defconstant +game-event-delayed-arrival-military+ 13)
 (defconstant +game-event-delayed-arrival-angels+ 14)
 (defconstant +game-event-player-died+ 15)
+(defconstant +game-event-demon-attack-win-for-church+ 16)
+(defconstant +game-event-demon-attack-win-for-satanists+ 17)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

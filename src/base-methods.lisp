@@ -862,6 +862,7 @@
   (set-mob-effect target :effect-type-id +mob-effect-possessed+ :actor-id (id target))
   (setf (face-mob-type-id actor) (mob-type target))
   (incf (stat-possess actor))
+  (decf (nth (loyal-faction target) (total-faction-list *world*)))
 
   ;; give all items to the master
   (loop for item-id in (inv target)
@@ -890,6 +891,7 @@
     (rem-mob-effect actor +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-reveal-true-form+)
+    (incf (nth (loyal-faction target) (total-faction-list *world*)))
 
     ;; give all items to the slave
     (loop for item-id in (inv actor)
@@ -1478,6 +1480,9 @@
                (not (mob-ability-p mob +mob-abil-animal+)))
       (decf (total-angels *world*)))
     (decf (nth (loyal-faction mob) (total-faction-list *world*)))
+    ;; increase total faction count of the slave mob otherwise it will be decreased twice - once during possession and once during death
+    (when (master-mob-id mob)
+      (incf (nth (loyal-faction mob) (total-faction-list *world*))))
     
     ;; set stat-gold before dropping inventory
     (setf (stat-gold mob) (get-overall-value (inv mob)))

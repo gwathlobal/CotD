@@ -8,6 +8,8 @@
 (defconstant +game-over-thief-won+ 5)
 (defconstant +game-over-eater-won+ 6)
 (defconstant +game-over-ghost-won+ 7)
+(defconstant +game-over-church-won+ 8)
+(defconstant +game-over-satanists-won+ 9)
 
 (defclass final-stats-window (window)
   ((game-over-type :initarg :game-over-type :accessor game-over-type)
@@ -36,6 +38,8 @@
       ((= (game-over-type win) +game-over-demons-won+) (format str "THE PANDEMONIUM HIERARCHY WON"))
       ((= (game-over-type win) +game-over-angels-won+) (format str "THE CELESTIAL COMMUNION WON"))
       ((= (game-over-type win) +game-over-military-won+) (format str "THE MILITARY WON"))
+      ((= (game-over-type win) +game-over-church-won+) (format str "THE CHURCH WON"))
+      ((= (game-over-type win) +game-over-satanists-won+) (format str "THE SATANISTS WON"))
       ((= (game-over-type win) +game-over-player-possessed+) (setf str (format nil "YOU ARE POSSESSED")))
       ((= (game-over-type win) +game-over-thief-won+) (setf str (format nil "YOU HAVE COLLECTED ENOUGH VALUABLES AND MANAGED TO ESCAPE THE CITY")))
       ((= (game-over-type win) +game-over-eater-won+) (setf str (format nil "YOU HAVE KILLED ALL OUTSIDERS")))

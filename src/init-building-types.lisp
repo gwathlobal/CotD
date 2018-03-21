@@ -538,8 +538,7 @@
 
                                             ;; place a large oak tree
                                             (let ((dx (random 7))
-                                                  (dy (random 7))
-                                                  (r (random 1)))
+                                                  (dy (random 7)))
                                               (cond
                                                 (t (level-place-oak-mature-1 template-level (+ dx x) (+ dy y) z)))
                                               )
