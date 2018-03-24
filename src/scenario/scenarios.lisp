@@ -16,36 +16,58 @@
 
 ;; layout constants are used in highscores, so old ones should not be edited otherwise the the information presented from highscores table will be retroactively changed
 
-(defconstant +weather-type-clear+ 0)
-(defconstant +weather-type-snow+ 1)
 (defconstant +city-layout-test+ 2)
 (defconstant +city-layout-normal+ 3)
 (defconstant +city-layout-river+ 4)
 (defconstant +city-layout-port+ 5)
-(defconstant +player-faction-player+ 6)
-(defconstant +player-faction-test+ 7)
-(defconstant +player-faction-angels+ 8)
-(defconstant +player-faction-demons+ 9)
 (defconstant +city-layout-forest+ 10)
 (defconstant +city-layout-island+ 11)
-(defconstant +player-faction-military-chaplain+ 12)
 (defconstant +city-layout-barricaded-city+ 13)
-(defconstant +player-faction-military-scout+ 14)
-(defconstant +tod-type-night+ 15)
-(defconstant +tod-type-day+ 16)
-(defconstant +tod-type-morning+ 17)
-(defconstant +tod-type-evening+ 18)
-(defconstant +player-faction-thief+ 19)
-(defconstant +player-faction-satanist+ 20)
-(defconstant +player-faction-church+ 21)
-(defconstant +player-faction-shadows+ 22)
-(defconstant +player-faction-trinity-mimics+ 23)
-(defconstant +weather-type-rain+ 24)
-(defconstant +player-faction-eater+ 25)
-(defconstant +player-faction-puppet+ 26)
-(defconstant +player-faction-ghost+ 27)
-(defconstant +player-faction-dead-player+ 28)
-(defconstant +mission-sf-demonic-raid+ 29)
+
+(defconstant +weather-type-clear+ 15)
+(defconstant +weather-type-snow+ 16)
+(defconstant +weather-type-rain+ 17)
+
+(defconstant +player-faction-test+ 20)
+
+(defconstant +tod-type-night+ 21)
+(defconstant +tod-type-day+ 22)
+(defconstant +tod-type-morning+ 23)
+(defconstant +tod-type-evening+ 24)
+
+(defconstant +mission-sf-demonic-raid+ 25)
+
+(defconstant +sf-faction-demonic-attack-player+ 30)
+(defconstant +sf-faction-demonic-attack-dead-player+ 31)
+(defconstant +sf-faction-demonic-attack-angel-chrome+ 32)
+(defconstant +sf-faction-demonic-attack-demon-crimson+ 33)
+(defconstant +sf-faction-demonic-attack-military-chaplain+ 34)
+(defconstant +sf-faction-demonic-attack-military-scout+ 35)
+(defconstant +sf-faction-demonic-attack-thief+ 36)
+(defconstant +sf-faction-demonic-attack-satanist+ 37)
+(defconstant +sf-faction-demonic-attack-priest+ 38)
+(defconstant +sf-faction-demonic-attack-demon-shadow+ 39)
+(defconstant +sf-faction-demonic-attack-angel-trinity+ 40)
+(defconstant +sf-faction-demonic-attack-eater+ 41)
+(defconstant +sf-faction-demonic-attack-demon-malseraph+ 42)
+(defconstant +sf-faction-demonic-attack-ghost+ 43)
+
+(defconstant +sf-faction-demonic-raid-player+ 45)
+(defconstant +sf-faction-demonic-raid-dead-player+ 46)
+(defconstant +sf-faction-demonic-raid-angel-chrome+ 47)
+(defconstant +sf-faction-demonic-raid-demon-crimson+ 48)
+(defconstant +sf-faction-demonic-raid-military-chaplain+ 49)
+(defconstant +sf-faction-demonic-raid-military-scout+ 50)
+(defconstant +sf-faction-demonic-raid-thief+ 51)
+(defconstant +sf-faction-demonic-raid-satanist+ 52)
+(defconstant +sf-faction-demonic-raid-priest+ 53)
+(defconstant +sf-faction-demonic-raid-demon-shadow+ 54)
+(defconstant +sf-faction-demonic-raid-angel-trinity+ 55)
+(defconstant +sf-faction-demonic-raid-eater+ 56)
+(defconstant +sf-faction-demonic-raid-demon-malseraph+ 57)
+(defconstant +sf-faction-demonic-raid-ghost+ 58)
+
+
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -59,7 +81,7 @@
 
 (defun set-scenario-feature (scenario-feature)
   (when (>= (sf-id scenario-feature) (length *scenario-features*))
-    (adjust-array *scenario-features* (list (1+ (sf-id scenario-feature)))))
+    (adjust-array *scenario-features* (list (1+ (sf-id scenario-feature))) :initial-element nil))
   (setf (aref *scenario-features* (sf-id scenario-feature)) scenario-feature))
 
 (defun get-scenario-feature-by-id (scenario-feature-id)
@@ -67,13 +89,14 @@
 
 (defun get-all-scenario-features-by-type (scenario-feature-type-id &optional (include-debug t))
   (loop for sf across *scenario-features*
-        when (or (and (= (sf-type sf) scenario-feature-type-id)
-                      include-debug
-                      (not (sf-disabled sf)))
-                 (and (= (sf-type sf) scenario-feature-type-id)
-                      (not include-debug)
-                      (not (sf-debug sf))
-                      (not (sf-disabled sf))))
+        when (and sf
+                  (or (and (= (sf-type sf) scenario-feature-type-id)
+                           include-debug
+                           (not (sf-disabled sf)))
+                      (and (= (sf-type sf) scenario-feature-type-id)
+                           (not include-debug)
+                           (not (sf-debug sf))
+                           (not (sf-disabled sf)))))
           collect (sf-id sf)))
 
 ;;---------------------------------
@@ -228,313 +251,7 @@
   
   game-event-list)
 
-(defun scenario-present-faction-setup (player-faction-scenario-id faction-list mob-func-list)
-  (push #'adjust-mobs-after-creation mob-func-list)
-  (push #'replace-gold-features-with-items mob-func-list)
-  (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
-            ;; populate the world with demonic runes
-            (place-demonic-runes world))
-        mob-func-list)
 
-  ;; remove the land arrival feature and add delayed arrival points to level
-  (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
-            
-            (loop for feature-id in (feature-id-list (level world))
-                  for lvl-feature = (get-feature-by-id feature-id)
-                  when (= (feature-type lvl-feature) +feature-delayed-arrival-point+)
-                            
-                    do
-                       (when (not (get-terrain-type-trait (get-terrain-* (level world) (x lvl-feature) (y lvl-feature) (z lvl-feature)) +terrain-trait-blocks-move+))
-                         (push (list (x lvl-feature) (y lvl-feature) (z lvl-feature)) (delayed-arrival-points (level world))))
-                       (remove-feature-from-level-list (level world) lvl-feature)
-                       (remove-feature-from-world lvl-feature))
-            )
-        mob-func-list)
-
-  ;; remove the starting features
-  (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
-            (loop for feature-id in (feature-id-list (level world))
-                  for lvl-feature = (get-feature-by-id feature-id)
-                  when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
-                    do
-                       (remove-feature-from-level-list (level world) lvl-feature)
-                       (remove-feature-from-world lvl-feature))
-            )
-        mob-func-list)
-
-  ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
-  (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
-            
-            (loop for mob-id in (mob-id-list (level world))
-                  for horse = (get-mob-by-id mob-id)
-                  for rider = (if (mounted-by-mob-id horse)
-                                (get-mob-by-id (mounted-by-mob-id horse))
-                                nil)
-                  when rider
-                    do
-                       (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
-            ;; remove the glitch from (0, 0, 0)
-            (setf (aref (mobs (level world)) 0 0 0) nil)
-            )
-        mob-func-list)
-  
-  ;; populate the world with 1 ghost
-  (when (and (/= player-faction-scenario-id +player-faction-ghost+)
-             (find-if #'(lambda (a)
-                          (if (and (= (first a) +faction-type-ghost+)
-                                   (or (= (second a) +mission-faction-present+)
-                                       (= (second a) +mission-faction-attacker+)
-                                       (= (second a) +mission-faction-defender+)))
-                            t
-                            nil))
-                      faction-list))
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              (populate-world-with-mobs world (list (cons +mob-type-ghost+ 1))
-                                        #'find-unoccupied-place-inside))
-          mob-func-list))
-  
-  ;; populate the world with 1 eater of the dead
-  (when (and (/= player-faction-scenario-id +player-faction-eater+)
-             (find-if #'(lambda (a)
-                          (if (and (= (first a) +faction-type-eater+)
-                                   (or (= (second a) +mission-faction-present+)
-                                       (= (second a) +mission-faction-attacker+)
-                                       (= (second a) +mission-faction-defender+)))
-                            t
-                            nil))
-                      faction-list))
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
-                                        #'find-unoccupied-place-water))
-          mob-func-list))
-  
-  ;; populate the world with 1 thief
-  (when (and (/= player-faction-scenario-id +player-faction-thief+)
-             (find-if #'(lambda (a)
-                          (if (and (= (first a) +faction-type-criminals+)
-                                   (or (= (second a) +mission-faction-present+)
-                                       (= (second a) +mission-faction-attacker+)
-                                       (= (second a) +mission-faction-defender+)))
-                            t
-                            nil))
-                      faction-list))
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              (populate-world-with-mobs world (list (cons +mob-type-thief+ 1))
-                                        #'find-unoccupied-place-on-top))
-          mob-func-list))
-
-  ;; populate the world with the 3 groups of military, where each group has 1 chaplain, 2 sargeants and 3 soldiers
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-military+)
-                              (or (= (second a) +mission-faction-present+)
-                                  (= (second a) +mission-faction-attacker+)
-                                  (= (second a) +mission-faction-defender+)))
-                       t
-                       nil))
-                 faction-list)
-    (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
-              
-              (loop repeat 3
-                    do
-                       (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
-                         ;; place the chaplains at the army post if the military is defending
-                         (if (find-if #'(lambda (a)
-                                          (if (and (= (first a) +faction-type-military+)
-                                                   (= (second a) +mission-faction-defender+))
-                                            t
-                                            nil))
-                                      faction-list)
-                           (progn
-                             (loop for feature-id in (feature-id-list (level world))
-                                   for lvl-feature = (get-feature-by-id feature-id)
-                                   when (= (feature-type lvl-feature) +feature-start-military-point+)
-                                     do
-                                        (setf (x chaplain) (x lvl-feature) (y chaplain) (y lvl-feature) (z chaplain) (z lvl-feature))
-                                        (add-mob-to-level-list (level world) chaplain)
-                                        (remove-feature-from-level-list (level world) lvl-feature)
-                                        (remove-feature-from-world lvl-feature)
-                                        (loop-finish))
-                             )
-                           (find-unoccupied-place-outside world chaplain))
-                         (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
-                                                               (cons +mob-type-scout+ 1)
-                                                               (cons +mob-type-soldier+ 3)
-                                                               (cons +mob-type-gunner+ 1))
-                                                   #'(lambda (world mob)
-                                                       (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
-              )
-          mob-func-list))
-
-  ;; add an additional group of military if there is no player chaplain
-  (when (and (/= player-faction-scenario-id +player-faction-military-chaplain+)
-             (find-if #'(lambda (a)
-                          (if (and (= (first a) +faction-type-military+)
-                                   (or (= (second a) +mission-faction-present+)
-                                       (= (second a) +mission-faction-attacker+)
-                                       (= (second a) +mission-faction-defender+)))
-                            t
-                            nil))
-                      faction-list))
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
-                ;; place the chaplains at the army post if the military is defending
-                (if (find-if #'(lambda (a)
-                                 (if (and (= (first a) +faction-type-military+)
-                                          (= (second a) +mission-faction-defender+))
-                                   t
-                                   nil))
-                             faction-list)
-                  (progn
-                    (loop for feature-id in (feature-id-list (level world))
-                          for lvl-feature = (get-feature-by-id feature-id)
-                          when (= (feature-type lvl-feature) +feature-start-military-point+)
-                            do
-                               (setf (x chaplain) (x lvl-feature) (y chaplain) (y lvl-feature) (z chaplain) (z lvl-feature))
-                               (add-mob-to-level-list (level world) chaplain)
-                               (remove-feature-from-level-list (level world) lvl-feature)
-                               (remove-feature-from-world lvl-feature)
-                               (loop-finish))
-                    )
-                  (find-unoccupied-place-outside world chaplain))
-                (populate-world-with-mobs world (list (cons +mob-type-sergeant+ 1)
-                                                      (cons +mob-type-scout+ 1)
-                                                      (cons +mob-type-soldier+ 3)
-                                                      (cons +mob-type-gunner+ 1))
-                                          #'(lambda (world mob)
-                                              (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
-          mob-func-list))
-  
-  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-angels+)
-                              (or (= (second a) +mission-faction-present+)
-                                  (= (second a) +mission-faction-attacker+)
-                                  (= (second a) +mission-faction-defender+)))
-                       t
-                       nil))
-                 faction-list)
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-            
-              (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                    (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
-                                        #'find-unoccupied-place-inside))
-          mob-func-list))
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-demons+)
-                              (or (= (second a) +mission-faction-present+)
-                                  (= (second a) +mission-faction-attacker+)
-                                  (= (second a) +mission-faction-defender+)))
-                       t
-                       nil))
-                 faction-list)
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              (populate-world-with-mobs world (list (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
-                                        #'find-unoccupied-place-inside))
-          mob-func-list))
-
-  ;; populate the world with the number of angels = humans / 11
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-angels+)
-                              (or (= (second a) +mission-faction-present+)
-                                  (= (second a) +mission-faction-attacker+)
-                                  (= (second a) +mission-faction-defender+)))
-                       t
-                       nil))
-                 faction-list)
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 11) 1)))
-                                        #'find-unoccupied-place-outside)
-              )
-          mob-func-list))
-  
-  ;; populate the world with trinity mimics
-  (when (and (/= player-faction-scenario-id +player-faction-trinity-mimics+)
-             (find-if #'(lambda (a)
-                          (if (and (= (first a) +faction-type-angels+)
-                                   (or (= (second a) +mission-faction-present+)
-                                       (= (second a) +mission-faction-attacker+)
-                                       (= (second a) +mission-faction-defender+)))
-                            t
-                            nil))
-                      faction-list))
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              ;; set up trinity mimics
-              (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+))
-                    (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+))
-                    (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+)))
-                
-                (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
-                (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
-                (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
-                (setf (name mob2) (name mob1) (name mob3) (name mob1))
-                
-                (find-unoccupied-place-mimic world mob1 mob2 mob3 :inside nil)))
-          mob-func-list))
-
-  ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
-  ;; make some of them shadow demons if there is dark in the city
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-demons+)
-                              (or (= (second a) +mission-faction-present+)
-                                  (= (second a) +mission-faction-attacker+)
-                                  (= (second a) +mission-faction-defender+)))
-                       t
-                       nil))
-                 faction-list)
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              (multiple-value-bind (year month day hour min sec) (get-current-date-time (player-game-time world))
-                (declare (ignore year month day min sec))
-                (populate-world-with-mobs world (if (and (>= hour 7) (< hour 19))
-                                                  (list (cons +mob-type-archdemon+ 1)
-                                                        (cons +mob-type-demon+ 15)
-                                                        (cons +mob-type-imp+ (- (truncate (total-humans world) 4) 16)))
-                                                  (list (if (zerop (random 2)) (cons +mob-type-archdemon+ 1) (cons +mob-type-shadow-devil+ 1))
-                                                        (cons +mob-type-demon+ 7)
-                                                        (cons +mob-type-shadow-demon+ 8)
-                                                        (cons +mob-type-imp+ (- (truncate (total-humans world) 8) 16))
-                                                        (cons +mob-type-shadow-imp+ (- (truncate (total-humans world) 8) 16))))
-                                          #'find-unoccupied-place-inside)))
-          mob-func-list))
-
-  ;; populate world with malseraph puppets
-  (when (and (or (/= player-faction-scenario-id +player-faction-puppet+))
-             (find-if #'(lambda (a)
-                          (if (and (= (first a) +faction-type-demons+)
-                                   (or (= (second a) +mission-faction-present+)
-                                       (= (second a) +mission-faction-attacker+)
-                                       (= (second a) +mission-faction-defender+)))
-                            t
-                            nil))
-                      faction-list))
-  (push #'(lambda (world mob-template-list)
-            (declare (ignore mob-template-list))
-            (populate-world-with-mobs world (list (cons +mob-type-malseraph-puppet+ 1))
-                                      #'find-unoccupied-place-inside))
-        mob-func-list))
-  
-  (push #'create-mobs-from-template mob-func-list)
-  mob-func-list)
 
 (defun place-land-arrival-border (reserved-level)
   (let ((result))
@@ -940,6 +657,28 @@
                                        (setf result nil)
                                        (loop-finish)
                                   finally (return result)))))
+        finally (setf (x mob) x (y mob) y (z mob) z)
+                (add-mob-to-level-list (level world) mob)))
+
+(defun find-unoccupied-place-portal (world mob)
+  (loop with portals-list = (loop for feature-id in (feature-id-list (level world))
+                                  for feature = (get-feature-by-id feature-id)
+                                  when (= (feature-type feature) +feature-demonic-portal+)
+                                    collect feature)
+        for portal = (nth (random (length portals-list)) portals-list)
+        for x = (+ (1- (x portal)) (random 3))
+        for y = (+ (1- (y portal)) (random 3))
+        for z = 2
+        until (and (or (/= x (x portal)) (/= y (y portal)))
+                   (eq (check-move-on-level mob x y z) t)
+                   (not (get-mob-* (level world) x y z))
+                   (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
+                   (/= (get-level-connect-map-value (level world) x y z (if (riding-mob-id mob)
+                                                                          (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                          (map-size mob))
+                                                    (get-mob-move-mode mob))
+                       +connect-room-none+)
+                   )
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 

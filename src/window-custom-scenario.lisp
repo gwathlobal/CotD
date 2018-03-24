@@ -154,7 +154,7 @@
                                                                        ((= faction-present +mission-faction-delayed+) "[d]")
                                                                        (t "[-]"))
                                                                      (name (get-faction-type-by-id faction-id))))))
-    ((= step +custom-scenario-win-specific-faction+) (return-from populate-custom-scenario-win-menu
+    ((= step +custom-scenario-win-specific-faction+) (format t "~A~%" (specific-faction-list win))(return-from populate-custom-scenario-win-menu
                                                        (loop for specific-faction-type in (specific-faction-list win)
                                                              when (find specific-faction-type (scenario-faction-list (get-mission-scenario-by-id (nth (cur-mission win) (mission-list win))))
                                                                         :key #'(lambda (a) (first a)))

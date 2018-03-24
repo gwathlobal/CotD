@@ -24,9 +24,6 @@
 
 (defun return-player-faction-scenario (specific-faction-type mission-id)
   (cond
-    ((= specific-faction-type +specific-faction-type-player+)
-     (progn
-       (return-from return-player-faction-scenario +player-faction-player+)))
     ((= specific-faction-type +specific-faction-type-test+)
      (progn
        (return-from return-player-faction-scenario +player-faction-test+)))
@@ -88,8 +85,6 @@
 
     (setf (level-layout (level world)) layout-id)
     (setf (mission-scenario (level world)) mission-id)
-
-    (format t "post-processing-func = ~A~%" post-processing-func-list)
 
     ;; apply the post-processing function, if any
     (loop for post-processing-func in post-processing-func-list do
