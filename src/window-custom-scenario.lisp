@@ -210,7 +210,7 @@
         ((= (cur-step win) +custom-scenario-win-weather+) (setf color-3 sdl:*yellow*))
         ((= (cur-step win) +custom-scenario-win-time-of-day+) (setf color-4 sdl:*yellow*))
         ((= (cur-step win) +custom-scenario-win-factions+) (setf color-5 sdl:*yellow*))
-        ((= (cur-step win) +custom-scenario-win-player-faction+) (setf color-6 sdl:*yellow*)))
+        ((= (cur-step win) +custom-scenario-win-specific-faction+) (setf color-6 sdl:*yellow*)))
 
       (sdl:draw-string-solid-* (format nil "1. Mission") 10 (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :left :color color-1)
       (sdl:draw-string-solid-* (format nil "2. City layout") (* 5 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-2)
@@ -233,7 +233,7 @@
     (let ((str (create-string)))
       (cond
         ((= (cur-step win) +custom-scenario-win-mission+) (format str "[Enter/Right] Select  [Up/Down] Move selection  [Esc] Exit"))
-        ((= (cur-step win) +custom-scenario-win-player-faction+) (format str "[Enter] Start game  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit"))
+        ((= (cur-step win) +custom-scenario-win-specific-faction+) (format str "[Enter] Start game  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit"))
         ((= (cur-step win) +custom-scenario-win-factions+) (progn
                                                              (when (and (find-if #'(lambda (a)
                                                                                      (if (and (= (second a) +mission-faction-attacker+)
@@ -248,7 +248,7 @@
                                                                                        nil))
                                                                                  (ref-faction-list win))
                                                                         (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-attacker+))
-                                                               (format str "[a] Include as attacker  "))
+                                                               (format str "[Space] Include as attacker  "))
                                                              (when (and (find-if #'(lambda (a)
                                                                                      (if (and (= (second a) +mission-faction-attacker+)
                                                                                               (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
@@ -262,7 +262,7 @@
                                                                                        nil))
                                                                                  (ref-faction-list win))
                                                                         (= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-attacker+))
-                                                               (format str "[a] Exclude as attacker  "))
+                                                               (format str "[Space] Exclude as attacker  "))
                                                              (when (and (find-if #'(lambda (a)
                                                                                      (if (and (= (second a) +mission-faction-defender+)
                                                                                               (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
@@ -379,8 +379,8 @@
                        
                        ((sdl:key= key :sdl-key-right)
                         (incf (cur-step win))
-                        (when (> (cur-step win) +custom-scenario-win-player-faction+)
-                          (setf (cur-step win) +custom-scenario-win-player-faction+))
+                        (when (> (cur-step win) +custom-scenario-win-specific-faction+)
+                          (setf (cur-step win) +custom-scenario-win-specific-faction+))
                         (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))
                        
                        ;; escape - quit
@@ -430,8 +430,8 @@
                         (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
                         )
 
-                       ;; a - include/exclude faction as an attacker
-                       ((and (sdl:key= key :sdl-key-a)
+                       ;; Space - include/exclude faction as an attacker
+                       ((and (sdl:key= key :sdl-key-space)
                              (= (cur-step win) +custom-scenario-win-factions+)
                              (find-if #'(lambda (a)
                                           (if (and (= (second a) +mission-faction-attacker+)
@@ -486,11 +486,11 @@
                        
                        ;; enter - select
                        ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-                        (if (< (cur-step win) +custom-scenario-win-player-faction+)
+                        (if (< (cur-step win) +custom-scenario-win-specific-faction+)
                           (progn
                             (incf (cur-step win))
-                            (when (> (cur-step win) +custom-scenario-win-player-faction+)
-                              (setf (cur-step win) +custom-scenario-win-player-faction+))
+                            (when (> (cur-step win) +custom-scenario-win-specific-faction+)
+                              (setf (cur-step win) +custom-scenario-win-specific-faction+))
                             (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))
                           (progn
                             (return-from run-window (values (nth (cur-mission win) (mission-list win))
