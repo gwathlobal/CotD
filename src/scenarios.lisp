@@ -8,6 +8,7 @@
 (defconstant +scenario-feature-city-layout+ 1)
 (defconstant +scenario-feature-player-faction+ 2)
 (defconstant +scenario-feature-time-of-day+ 3)
+(defconstant +scenario-feature-mission+ 4)
 
 ;;---------------------------------
 ;; SCENARIO-FEATURE Constants
@@ -44,6 +45,7 @@
 (defconstant +player-faction-puppet+ 26)
 (defconstant +player-faction-ghost+ 27)
 (defconstant +player-faction-dead-player+ 28)
+(defconstant +mission-sf-demonic-raid+ 29)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

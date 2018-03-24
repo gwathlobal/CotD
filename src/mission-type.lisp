@@ -43,6 +43,7 @@
    (scenario-faction-list :initarg :scenario-faction-list :accessor scenario-faction-list)
    (objective-list :initform () :initarg :objective-list :accessor objective-list) ;; of type ((<faction-id> <objective-type-id>)...)
    (win-condition-list :initform () :initarg :win-condition-list :accessor win-condition-list) ;; of type ((<faction-id> <game-event-id>)...)
+   (post-sf-id :initform nil :initarg :post-sf-id :accessor post-sf-id)
    ))
 
 (defparameter *mission-scenarios* (make-array (list 0) :adjustable t))

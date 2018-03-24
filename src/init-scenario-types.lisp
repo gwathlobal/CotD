@@ -12,21 +12,21 @@
 (set-scenario-feature (make-scenario-feature :id +weather-type-snow+
                                              :type +scenario-feature-weather+
                                              :name "Snow"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore faction-list mission-id))
-                                                       (push #'change-level-to-snow post-processing-func-list)
+                                                       (push #'change-level-to-snow template-processing-func-list)
                                                        (pushnew +game-event-snow-falls+ game-event-list)
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +weather-type-rain+
                                              :type +scenario-feature-weather+
                                              :name "Rain"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore faction-list mission-id))
                                                        (pushnew +game-event-rain-falls+ game-event-list)
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 ;;======================
 ;; LAYOUT
@@ -35,16 +35,16 @@
 (set-scenario-feature (make-scenario-feature :id +city-layout-test+
                                              :type +scenario-feature-city-layout+ :debug t :disabled t
                                              :name "Test"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore faction-list mission-id))
                                                        (setf layout-func #'(lambda () (create-template-test-city *max-x-level* *max-y-level* *max-z-level* nil)))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-normal+
                                              :type +scenario-feature-city-layout+
                                              :name "An ordinary district"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
@@ -53,12 +53,12 @@
                                                                                                                                                                               #'place-land-arrival-border))
                                                                                                             )))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-river+
                                              :type +scenario-feature-city-layout+
                                              :name "A district upon a river"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-river)))
@@ -66,12 +66,12 @@
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
                                                                                                                                                                               #'place-reserved-buildings-river)))))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-port+
                                              :type +scenario-feature-city-layout+
                                              :name "A seaport district"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        (let ((r (random 4)))
                                                          (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
@@ -101,12 +101,12 @@
                                                                                                               )))
                                                          )
                                                                                                               
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-forest+
                                              :type +scenario-feature-city-layout+
                                              :name "Outskirts of the city"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
@@ -114,12 +114,12 @@
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
                                                                                                                                                                               #'place-reserved-buildings-forest)))))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-island+
                                              :type +scenario-feature-city-layout+
                                              :name "An island district"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-river)))
@@ -127,12 +127,12 @@
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
                                                                                                                                                                               #'place-reserved-buildings-island)))))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-barricaded-city+
                                              :type +scenario-feature-city-layout+
                                              :name "A barricaded district"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-normal)))
@@ -140,7 +140,7 @@
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
                                                                                                                                                                               #'place-reserved-buildings-barricaded-city)))))
                                                                                                                                                                                                                             
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 ;;======================
 ;; FACTIONS
@@ -149,7 +149,7 @@
 (set-scenario-feature (make-scenario-feature :id +player-faction-test+
                                              :type +scenario-feature-player-faction+ :debug t :disabled t
                                              :name "Test"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore faction-list mission-id))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
                                                        (push #'adjust-mobs-after-creation mob-func-list)
@@ -164,12 +164,12 @@
                                                        (push +game-event-win-for-thief+ game-event-list)
                                                        ;(push +game-event-lose-game-possessed+ game-event-list)
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-player+
                                              :type +scenario-feature-player-faction+ :debug t
                                              :name "Player"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
@@ -184,12 +184,12 @@
                                                        
                                                        (push +game-event-lose-game-died+ game-event-list)
                                                                                                                                                                      
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-dead-player+
                                              :type +scenario-feature-player-faction+ :debug t
                                              :name "Dead player"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-player+ faction-list mob-func-list))
@@ -206,12 +206,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                                                                               
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-angels+
                                              :type +scenario-feature-player-faction+
                                              :name "Celestial Communion (as Chrome angel)"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-angels+ faction-list mob-func-list))
@@ -228,12 +228,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-demons+
                                              :type +scenario-feature-player-faction+
                                              :name "Pandemonium Hierarchy (as Crimson imp)"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-demons+ faction-list mob-func-list))
@@ -249,12 +249,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-military-chaplain+
                                              :type +scenario-feature-player-faction+
                                              :name "Military (as Chaplain)"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-military-chaplain+ faction-list mob-func-list))
@@ -302,12 +302,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-military-scout+
                                              :type +scenario-feature-player-faction+
                                              :name "Military (as Scout)"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-military-scout+ faction-list mob-func-list))
@@ -340,12 +340,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-thief+
                                              :type +scenario-feature-player-faction+
                                              :name "Thief"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
@@ -363,12 +363,12 @@
                                                        (push +game-event-lose-game-possessed+ game-event-list)
                                                        (push +game-event-win-for-thief+ game-event-list)
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-satanist+
                                              :type +scenario-feature-player-faction+
                                              :name "Satanists"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-satanist+ faction-list mob-func-list))
@@ -384,12 +384,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-church+
                                              :type +scenario-feature-player-faction+
                                              :name "Church"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-church+ faction-list mob-func-list))
@@ -405,12 +405,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-shadows+
                                              :type +scenario-feature-player-faction+
                                              :name "Pandemonium Hierarchy (as Shadow imp)"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-shadows+ faction-list mob-func-list))
@@ -426,12 +426,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-trinity-mimics+
                                              :type +scenario-feature-player-faction+
                                              :name "Celestial Communion (as Trinity mimics)"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-trinity-mimics+ faction-list mob-func-list))
@@ -455,12 +455,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-eater+
                                              :type +scenario-feature-player-faction+
                                              :name "Eater of the dead"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
@@ -478,12 +478,12 @@
                                                        (push +game-event-lose-game-possessed+ game-event-list)
                                                        (push +game-event-win-for-eater+ game-event-list)
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-puppet+
                                              :type +scenario-feature-player-faction+
                                              :name "Pandemonium Hierarchy (as Malseraph's puppet)"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
                                                        (setf mob-func-list (scenario-present-faction-setup +player-faction-puppet+ faction-list mob-func-list))
@@ -499,12 +499,12 @@
                                                        (push +game-event-player-died+ game-event-list)
                                                        (setf game-event-list (set-up-win-conditions game-event-list faction-list mission-id))
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +player-faction-ghost+
                                              :type +scenario-feature-player-faction+
                                              :name "Lost soul"
-                                             :func #'(lambda (layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
 
@@ -522,7 +522,7 @@
                                                        (push +game-event-lose-game-possessed+ game-event-list)
                                                        (push +game-event-win-for-ghost+ game-event-list)
                                                        
-                                                       (values layout-func post-processing-func-list mob-func-list game-event-list))))
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 ;;======================
 ;; TIME OF DAY
@@ -551,3 +551,42 @@
                                              :name "Evening"
                                              :func #'(lambda (level)
                                                        (set-up-outdoor-light level 50))))
+
+;;======================
+;; MISSION
+;;======================
+
+(set-scenario-feature (make-scenario-feature :id +mission-sf-demonic-raid+
+                                             :type +scenario-feature-mission+
+                                             :name "Demonic raid (SF)"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore faction-list mission-id))
+                                                       (push #'(lambda (world)
+                                                                 (let ((portals ())
+                                                                       (max-portals 8))
+                                                                   (loop with max-x = (- (array-dimension (terrain (level world)) 0) 60)
+                                                                         with max-y = (- (array-dimension (terrain (level world)) 1) 60)
+                                                                         with cur-portal = 0
+                                                                         for free-place = t
+                                                                         for x = (+ (random max-x) 30)
+                                                                         for y = (+ (random max-y) 30)
+                                                                         while (< (length portals) max-portals) do
+                                                                           (check-surroundings x y t #'(lambda (dx dy)
+                                                                                                         (when (or (get-terrain-type-trait (get-terrain-* (level world) dx dy 2) +terrain-trait-blocks-move+)
+                                                                                                                   (not (get-terrain-type-trait (get-terrain-* (level world) dx dy 2) +terrain-trait-opaque-floor+))
+                                                                                                                   (get-terrain-type-trait (get-terrain-* (level world) dx dy 2) +terrain-trait-water+))
+                                                                                                           (setf free-place nil))))
+                                                                           (when (and free-place
+                                                                                      (not (find (list x y 2) portals :test #'(lambda (a b)
+                                                                                                                                (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
+                                                                                                                                  t
+                                                                                                                                  nil)
+                                                                                                                                ))))
+                                                                             (push (list x y 2) portals)
+                                                                             (incf cur-portal)))
+                                                                   (loop for (x y z) in portals do
+                                                                     ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id +feature-demonic-portal+)) x y z)
+                                                                     (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-demonic-portal+ :x x :y y :z z))))) 
+                                                             post-processing-func-list)
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))

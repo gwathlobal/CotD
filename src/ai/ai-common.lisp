@@ -330,6 +330,13 @@
                                                                           (map-size actor))
                                                (get-mob-move-mode actor))))
   (cond
+    ((= +connect-room-none+ (get-level-connect-map-value (level *world*) (x actor) (y actor) (z actor) (if (riding-mob-id actor)
+                                                                                                         (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                         (map-size actor))
+                                                         (get-mob-move-mode actor)))
+     (logger (format nil "AI-SET-PATH-DST: level-connected actor = ~A, need to move randomly~%" +connect-room-none+))
+     (setf (path-dst actor) nil)
+     (setf (path actor) nil))
     ((level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
                                                                                        (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                        (map-size actor))

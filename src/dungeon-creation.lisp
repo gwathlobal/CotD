@@ -1,18 +1,26 @@
 (in-package :cotd)
 
 (defun return-scenario-functions (weather layout player-faction-scenario faction-list mission-id)
-  (let ((post-processing-func-list nil) (layout-func nil) (mob-func-list nil) (game-event-list nil))
+  (let ((template-processing-func-list nil) (post-processing-func-list nil) (layout-func nil) (mob-func-list nil) (game-event-list nil))
 
     (when (sf-func weather)
-      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func weather) layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
+      (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)
+        (funcall (sf-func weather) layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
 
     (when (sf-func layout)
-      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func layout) layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
+      (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)
+        (funcall (sf-func layout) layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
     
     (when (sf-func player-faction-scenario)
-      (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (funcall (sf-func player-faction-scenario) layout-func post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
+      (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)
+        (funcall (sf-func player-faction-scenario) layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
+
+    (when (and (post-sf-id (get-mission-scenario-by-id mission-id))
+               (sf-func (get-scenario-feature-by-id (post-sf-id (get-mission-scenario-by-id mission-id)))))
+      (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)
+        (funcall (sf-func (get-scenario-feature-by-id (post-sf-id (get-mission-scenario-by-id mission-id)))) layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
     
-    (values layout-func post-processing-func-list mob-func-list game-event-list)))
+    (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)))
 
 (defun return-player-faction-scenario (specific-faction-type mission-id)
   (cond
@@ -41,6 +49,7 @@
 
         (layout-func)
         (post-processing-func-list)
+        (template-processing-func-list)
         (mob-func-list)
         (game-event-list)
 	)
@@ -53,7 +62,7 @@
     
     (funcall *update-screen-closure* "Generating map")
 
-    (multiple-value-setq (layout-func post-processing-func-list mob-func-list game-event-list) (return-scenario-functions weather city-layout player-faction-scenario faction-list mission-id))
+    (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list) (return-scenario-functions weather city-layout player-faction-scenario faction-list mission-id))
 
     ;; remove all nils from game-event-list, if any
     (setf game-event-list (remove nil game-event-list))
@@ -66,9 +75,9 @@
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* nil)
     
-    ;; apply the post-processing function, if any
-    (loop for post-processing-func in post-processing-func-list do
-      (setf result-template (funcall post-processing-func result-template)))
+    ;; apply the template-processing function, if any
+    (loop for template-processing-func in template-processing-func-list do
+      (setf result-template (funcall template-processing-func result-template)))
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
@@ -79,9 +88,14 @@
 
     (setf (level-layout (level world)) layout-id)
     (setf (mission-scenario (level world)) mission-id)
+
+    (format t "post-processing-func = ~A~%" post-processing-func-list)
+
+    ;; apply the post-processing function, if any
+    (loop for post-processing-func in post-processing-func-list do
+      (funcall post-processing-func world))
     
     ;; check map for connectivity
-
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Creating connectivity maps")
 
