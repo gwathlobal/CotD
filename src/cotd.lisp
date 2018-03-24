@@ -137,11 +137,11 @@
   
   (create-world *world* mission-id layout-id weather-id tod-id specific-faction-type faction-list)
 
-  (format t "FACTION-LIST ~A~%" faction-list)
+  ;;(format t "FACTION-LIST ~A~%" faction-list)
   
   (setf (name *player*) "Player")
 
-  (add-message (format nil "Welcome to City of the Damned. To view help, press '?'.~%To view your current objective, press 'j'.~%"))
+  (add-message (format nil "Welcome to City of the Damned.~%This is a ~(~A~)!~%~%To view help, press '?'.~%To view your current objective, press 'j'.~%" (name (get-mission-scenario-by-id mission-id))))
 
   )  
 
@@ -619,6 +619,8 @@
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (setf *start-func* #'(lambda () (go start-tag)))
      start-tag
+       (when (and *path-thread* (bt:thread-alive-p *path-thread*))
+         (bt:destroy-thread *path-thread*))
        (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (main-menu)
          (setf *current-window* (make-instance 'loading-window 
                                                :update-func #'(lambda (win)
@@ -635,6 +637,7 @@
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
        (let ((out *standard-output*))
+         
          (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
            (t ()
              (logger "MAIN: This system does not support multithreading!~%")))

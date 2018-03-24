@@ -282,6 +282,7 @@
                                 (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                 ;(not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
                                 (and (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+)
+                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
                                      (not (mob-effect-p mob +mob-effect-flying+)))
                                 (not (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)

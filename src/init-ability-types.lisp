@@ -6660,3 +6660,71 @@
                                  :passive t :cost 0 :spd 0 
                                  :final nil
                                  ))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-throw-corpse-into-portal+ :name "Throw corpses into portal" :descr "Throw all corpses you have into a demonic portal. You must be standing on top of the demonic portal and have corpses in your inventory to do that. Increases your flesh points that count towards victory during demonic raid." 
+                                 :spd (truncate +normal-ap+ 1.5) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 90
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (let ((corpses-list (loop for item-id in (inv actor)
+                                                                          for item = (get-item-by-id item-id)
+                                                                          when (item-ability-p item +item-abil-corpse+)
+                                                                            collect item))
+                                                      (portal (loop for feature-id in (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                    for feature = (get-feature-by-id feature-id)
+                                                                    when (= (feature-type feature) +feature-demonic-portal+)
+                                                                      do
+                                                                         (return feature))))
+                                                  (logger (format nil "MOB-THROW-CORPSE-INTO-PORTAL: ~A [~A] throws the following corpses ~A into portal ~A [~A].~%" (name actor) (id actor)
+                                                                  (loop for item in corpses-list
+                                                                    collect (format nil "[~A] " (id item)))
+                                                                  (name portal)
+                                                                  (id portal)))
+                                                  
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
+                                                                                                             (format nil "You hear something heavy being moved~A." str)))
+                                                  
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A throws corpses into the demonic portal. "
+                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                  
+                                                  (loop for corpse-item in corpses-list
+                                                        for pts = (item-ability-p corpse-item +item-abil-corpse+)
+                                                        do
+                                                           (if (param1 portal)
+                                                             (incf (param1 portal) (* (qty corpse-item) pts))
+                                                             (setf (param1 portal) (* (qty corpse-item) pts)))
+                                                    
+                                                    (incf (stat-corpses-thrown actor) (* (qty corpse-item) pts))
+                                                    (when (eq actor *player*)
+                                                      (incf (cur-score *player*) (* 3 pts (qty corpse-item))))
+                                                    (setf (inv actor) (remove-from-inv corpse-item (inv actor)))
+                                                    (remove-item-from-world corpse-item))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
+                                                               (loop for item-id in (inv actor)
+                                                                     for item = (get-item-by-id item-id)
+                                                                     when (item-ability-p item +item-abil-corpse+)
+                                                                       collect item)
+                                                               (loop for feature-id in (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                     for feature = (get-feature-by-id feature-id)
+                                                                     when (= (feature-type feature) +feature-demonic-portal+)
+                                                                       do
+                                                                          (return feature)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
+                                                           (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
+                                                           (can-invoke-ability actor actor +mob-abil-throw-corpse-into-portal+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

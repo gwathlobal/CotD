@@ -223,7 +223,7 @@
     (setf (gethash +building-type-library+ building-type-hash-table) 1))
   building-type-hash-table)
 
-(defun get-objective-based-on-faction (faction-id mission-id)
+(defun get-objectives-based-on-faction (faction-id mission-id)
   (if (find faction-id (objective-list (get-mission-scenario-by-id mission-id)) :key #'(lambda (a) (first a)))
     (progn
       (second (find faction-id (objective-list (get-mission-scenario-by-id mission-id)) :key #'(lambda (a) (first a)))))

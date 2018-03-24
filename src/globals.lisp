@@ -147,7 +147,7 @@
 (defconstant +ai-package-cautious+ 6)
 (defconstant +ai-package-trinity-mimic+ 7)
 (defconstant +ai-package-split-soul+ 8)
-(defconstant +ai-package-cannibal+ 9)
+(defconstant +ai-package-search-corpses+ 9)
 (defconstant +ai-package-use-ability+ 10)
 (defconstant +ai-package-use-item+ 11)
 (defconstant +ai-package-reload-ranged-weapon+ 12)
@@ -159,6 +159,8 @@
 (defconstant +ai-package-patrol-district+ 18)
 (defconstant +ai-package-avoid-possession+ 19)
 (defconstant +ai-package-avoid-melee+ 20)
+(defconstant +ai-package-takes-corpses+ 21)
+(defconstant +ai-package-return-to-portal+ 22)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)
@@ -321,6 +323,7 @@
 (defconstant +mob-abil-demon-word-power+ 155)
 (defconstant +mob-abil-soul+ 156)
 (defconstant +mob-abil-detect-unnatural+ 157)
+(defconstant +mob-abil-throw-corpse-into-portal+ 158)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -617,6 +620,7 @@
 (defparameter *mob-sound-pick-drop* 40)
 
 (defparameter *thief-win-value* 1500)
+(defparameter *demonic-raid-win-value* 200)
 
 (defparameter *max-oxygen-level* 5)
 (defparameter *lack-oxygen-dmg* 5)

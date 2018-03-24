@@ -134,8 +134,8 @@
                  (setf (aref ai-package-array (priority ai-package)) (pushnew ai-package (aref ai-package-array (priority ai-package)))))
 
       ;; adding objective packages
-      (when (get-objective-based-on-faction (loyal-faction mob) (mission-scenario (level *world*)))
-        (let ((ai-objective-package-id (get-objective-based-on-faction (loyal-faction mob) (mission-scenario (level *world*)))))
+      (when (get-objectives-based-on-faction (loyal-faction mob) (mission-scenario (level *world*)))
+        (loop for ai-objective-package-id in (get-objectives-based-on-faction (loyal-faction mob) (mission-scenario (level *world*))) do
           (setf (aref ai-package-array (priority (get-ai-package-by-id ai-objective-package-id)))
                 (pushnew (get-ai-package-by-id ai-objective-package-id) (aref ai-package-array (priority (get-ai-package-by-id ai-objective-package-id)))))))
 

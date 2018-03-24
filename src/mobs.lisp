@@ -90,7 +90,7 @@
                                                                 abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
                                                                 abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess
                                                                 abil-invisibility abil-passwall abil-ghost-release abil-decipher-rune abil-demon-word-flesh abil-demon-word-knockback abil-demon-word-invasion abil-demon-word-darkness
-                                                                abil-demon-word-plague abil-demon-word-power abil-soul abil-detect-unnatural)
+                                                                abil-demon-word-plague abil-demon-word-power abil-soul abil-detect-unnatural abil-throw-corpse-into-portal)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -446,7 +446,9 @@
   (when abil-soul
     (setf (gethash +mob-abil-soul+ (abilities mob-type)) t))
   (when abil-detect-unnatural
-    (setf (gethash +mob-abil-detect-unnatural+ (abilities mob-type)) t)))
+    (setf (gethash +mob-abil-detect-unnatural+ (abilities mob-type)) t))
+  (when abil-throw-corpse-into-portal
+    (setf (gethash +mob-abil-throw-corpse-into-portal+ (abilities mob-type)) t)))
 
 (defun get-mob-type-by-id (mob-type-id)
   (aref *mob-types* mob-type-id))
@@ -753,6 +755,7 @@
    (stat-gold :initform 0 :accessor stat-gold)
    (stat-possess :initform 0 :accessor stat-possess)
    (stat-raised-dead :initform 0 :accessor stat-raised-dead)
+   (stat-corpses-thrown :initform 0 :accessor stat-corpses-thrown)
 
    (inv :initform () :accessor inv)
 

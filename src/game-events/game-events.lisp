@@ -20,6 +20,11 @@
 (defconstant +game-event-player-died+ 15)
 (defconstant +game-event-demon-attack-win-for-church+ 16)
 (defconstant +game-event-demon-attack-win-for-satanists+ 17)
+(defconstant +game-event-demon-raid-win-for-angels+ 18)
+(defconstant +game-event-demon-raid-win-for-demons+ 19)
+(defconstant +game-event-demon-raid-win-for-military+ 20)
+(defconstant +game-event-demon-raid-win-for-church+ 21)
+(defconstant +game-event-demon-raid-win-for-satanists+ 22)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

@@ -497,37 +497,8 @@
                                               (find-unoccupied-place-around world mob (x chaplain) (y chaplain) (z chaplain))))))
           mob-func-list))
   
-  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-angels+)
-                              (or (= (second a) +mission-faction-present+)
-                                  (= (second a) +mission-faction-attacker+)
-                                  (= (second a) +mission-faction-defender+)))
-                       t
-                       nil))
-                 faction-list)
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-            
-              (populate-world-with-mobs world (list (cons +mob-type-gargantaur+ 1)
-                                                    (cons +mob-type-wisp+ (truncate (total-humans world) 15)))
-                                        #'find-unoccupied-place-inside))
-          mob-func-list))
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-demons+)
-                              (or (= (second a) +mission-faction-present+)
-                                  (= (second a) +mission-faction-attacker+)
-                                  (= (second a) +mission-faction-defender+)))
-                       t
-                       nil))
-                 faction-list)
-    (push #'(lambda (world mob-template-list)
-              (declare (ignore mob-template-list))
-              
-              (populate-world-with-mobs world (list (cons +mob-type-fiend+ (truncate (total-humans world) 15)))
-                                        #'find-unoccupied-place-inside))
-          mob-func-list))
-
+  ;; no outsider beasts 
+  
   ;; populate the world with the number of angels = humans / 11
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-angels+)

@@ -2695,3 +2695,11 @@
                      finally (return (= dead (length (mimic-id-list *player*)))))))
     t
     nil))
+
+(defun get-demon-raid-overall-points (world)
+  (loop for feature-id in (feature-id-list (level world))
+        for feature = (get-feature-by-id feature-id)
+        when (= (feature-type feature) +feature-demonic-portal+)
+          sum (if (param1 feature)
+                (param1 feature)
+                0)))

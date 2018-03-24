@@ -43,19 +43,22 @@
                                      for (faction-id faction-present) in (ref-faction-list win)
                                      for faction-obj = (find faction-id result :key #'(lambda (a) (first a)))
                                      do
-                                       (if faction-obj
-                                         (progn
-                                           (when (not (eq faction-present (second faction-obj)))
-                                             (setf (second faction-obj) +mission-faction-absent+)))
-                                         (progn
-                                           (push (list faction-id faction-present) result)))
+                                        (if faction-obj
+                                          (progn
+                                            (when (not (eq faction-present (second faction-obj)))
+                                              (when (zerop (random 2))
+                                                (setf (second faction-obj) faction-present))))
+                                          (progn
+                                            (push (list faction-id faction-present) result)))
+
                                      finally (return-from nil result)))
   (setf (cur-faction win) (random (length (cur-faction-list win))))
   (setf (specific-faction-list win) (loop with result = ()
                                                    for (faction-id faction-present) in (cur-faction-list win)
                                                    for faction-obj = (get-faction-type-by-id faction-id)
                                                    when (or (= faction-present +mission-faction-attacker+)
-                                                            (= faction-present +mission-faction-defender+))
+                                                            (= faction-present +mission-faction-defender+)
+                                                            (= faction-present +mission-faction-present+))
                                                      do
                                                         (loop for specific-faction-type in (specific-faction-list faction-obj)
                                                               when (find specific-faction-type (scenario-faction-list (get-mission-scenario-by-id (nth (cur-mission win) (mission-list win))))
@@ -91,12 +94,13 @@
                                      for (faction-id faction-present) in (ref-faction-list win)
                                      for faction-obj = (find faction-id result :key #'(lambda (a) (first a)))
                                      do
-                                       (if faction-obj
-                                         (progn
-                                           (when (not (eq faction-present (second faction-obj)))
-                                             (setf (second faction-obj) +mission-faction-absent+)))
-                                         (progn
-                                           (push (list faction-id faction-present) result)))
+                                        (if faction-obj
+                                          (progn
+                                            (when (not (eq faction-present (second faction-obj)))
+                                              (when (zerop (random 2))
+                                                (setf (second faction-obj) faction-present))))
+                                          (progn
+                                            (push (list faction-id faction-present) result)))
                                        finally (return-from nil result)))
   (setf (cur-faction win) (random (length (cur-faction-list win))))
   (readjust-after-faction-change win))
@@ -107,7 +111,8 @@
                                                      for (faction-id faction-present) in (cur-faction-list win)
                                                      for faction-obj = (get-faction-type-by-id faction-id)
                                                      when (or (= faction-present +mission-faction-attacker+)
-                                                              (= faction-present +mission-faction-defender+))
+                                                              (= faction-present +mission-faction-defender+)
+                                                              (= faction-present +mission-faction-present+))
                                                        do
                                                           (loop for specific-faction-type in (specific-faction-list faction-obj)
                                                                 when (find specific-faction-type (scenario-faction-list (get-mission-scenario-by-id (nth (cur-mission win) (mission-list win))))
@@ -154,7 +159,7 @@
                                                                        ((= faction-present +mission-faction-delayed+) "[d]")
                                                                        (t "[-]"))
                                                                      (name (get-faction-type-by-id faction-id))))))
-    ((= step +custom-scenario-win-specific-faction+) (format t "~A~%" (specific-faction-list win))(return-from populate-custom-scenario-win-menu
+    ((= step +custom-scenario-win-specific-faction+) (return-from populate-custom-scenario-win-menu
                                                        (loop for specific-faction-type in (specific-faction-list win)
                                                              when (find specific-faction-type (scenario-faction-list (get-mission-scenario-by-id (nth (cur-mission win) (mission-list win))))
                                                                         :key #'(lambda (a) (first a)))
@@ -250,13 +255,7 @@
                                                                         (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-attacker+))
                                                                (format str "[Space] Include as attacker  "))
                                                              (when (and (find-if #'(lambda (a)
-                                                                                     (if (and (= (second a) +mission-faction-attacker+)
-                                                                                              (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                                                                       t
-                                                                                       nil))
-                                                                                 (ref-faction-list win))
-                                                                        (find-if #'(lambda (a)
-                                                                                     (if (and (/= (second a) +mission-faction-attacker+)
+                                                                                     (if (and (= (second a) +mission-faction-absent+)
                                                                                               (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
                                                                                        t
                                                                                        nil))
@@ -270,24 +269,18 @@
                                                                                        nil))
                                                                                  (ref-faction-list win))
                                                                         (find-if #'(lambda (a)
-                                                                                          (if (and (/= (second a) +mission-faction-defender+)
-                                                                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                                                                            t
-                                                                                            nil))
-                                                                                 (ref-faction-list win))
-                                                                        (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+))
-                                                               (format str "[Space] Include as defender  "))
-                                                             (when (and (find-if #'(lambda (a)
-                                                                                     (if (and (= (second a) +mission-faction-defender+)
+                                                                                     (if (and (/= (second a) +mission-faction-defender+)
                                                                                               (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
                                                                                        t
                                                                                        nil))
                                                                                  (ref-faction-list win))
-                                                                        (find-if #'(lambda (a)
-                                                                                          (if (and (/= (second a) +mission-faction-defender+)
-                                                                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                                                                            t
-                                                                                            nil))
+                                                                        (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+))
+                                                               (format str "[Space] Include as defender  "))
+                                                             (when (and (find-if #'(lambda (a)
+                                                                                     (if (and (= (second a) +mission-faction-absent+)
+                                                                                              (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                                                                       t
+                                                                                       nil))
                                                                                  (ref-faction-list win))
                                                                         (= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+))
                                                                (format str "[Space] Exclude as defender  "))
@@ -306,16 +299,10 @@
                                                                         (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-delayed+))
                                                                (format str "[d] Include as delayed faction  "))
                                                              (when (and (find-if #'(lambda (a)
-                                                                                     (if (and (= (second a) +mission-faction-delayed+)
+                                                                                     (if (and (= (second a) +mission-faction-absent+)
                                                                                               (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
                                                                                        t
                                                                                        nil))
-                                                                                 (ref-faction-list win))
-                                                                        (find-if #'(lambda (a)
-                                                                                          (if (and (/= (second a) +mission-faction-delayed+)
-                                                                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                                                                            t
-                                                                                            nil))
                                                                                  (ref-faction-list win))
                                                                         (= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-delayed+))
                                                                (format str "[d] Exclude as delayed faction  "))
@@ -405,7 +392,13 @@
                                       (ref-faction-list win)))
                         (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+)
                           (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+))
+                          (when (find-if #'(lambda (a)
+                                             (if (and (= (second a) +mission-faction-absent+)
+                                                      (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                               t
+                                               nil))
+                                         (ref-faction-list win))
+                            (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+)))
                         (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
                         )
 
@@ -426,7 +419,13 @@
                                       (ref-faction-list win)))
                         (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-delayed+)
                           (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-delayed+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+))
+                          (when (find-if #'(lambda (a)
+                                             (if (and (= (second a) +mission-faction-absent+)
+                                                      (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                               t
+                                               nil))
+                                         (ref-faction-list win))
+                            (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+)))
                         (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
                         )
 
@@ -447,7 +446,13 @@
                                       (ref-faction-list win)))
                         (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-attacker+)
                           (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-attacker+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+))
+                          (when (find-if #'(lambda (a)
+                                             (if (and (= (second a) +mission-faction-absent+)
+                                                      (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
+                                               t
+                                               nil))
+                                         (ref-faction-list win))
+                            (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+)))
                         (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
                         )
 
