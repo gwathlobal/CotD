@@ -33,12 +33,14 @@
 ;;========================================
 
 (defconstant +mission-scenario-demon-attack+ 0)
+(defconstant +mission-scenario-demon-raid+ 1)
 
 (defclass mission-scenario ()
   ((id :initarg :id :accessor id :type fixnum)
    (name :initarg :name :accessor name :type string)
    (district-layout-list :initarg :district-layout-list :accessor district-layout-list)
    (faction-list :initarg :faction-list :accessor faction-list)
+   (scenario-faction-list :initarg :scenario-faction-list :accessor scenario-faction-list)
    (objective-list :initform () :initarg :objective-list :accessor objective-list) ;; of type ((<faction-id> <objective-type-id>)...)
    (win-condition-list :initform () :initarg :win-condition-list :accessor win-condition-list) ;; of type ((<faction-id> <game-event-id>)...)
    ))

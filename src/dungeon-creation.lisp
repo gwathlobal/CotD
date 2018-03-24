@@ -14,7 +14,20 @@
     
     (values layout-func post-processing-func-list mob-func-list game-event-list)))
 
-(defun create-world (world mission-id layout-id weather-id tod-id faction-id faction-list)
+(defun return-player-faction-scenario (specific-faction-type mission-id)
+  (cond
+    ((= specific-faction-type +specific-faction-type-player+)
+     (progn
+       (return-from return-player-faction-scenario +player-faction-player+)))
+    ((= specific-faction-type +specific-faction-type-test+)
+     (progn
+       (return-from return-player-faction-scenario +player-faction-test+)))
+    (t
+     (progn
+       (return-from return-player-faction-scenario
+         (second (find specific-faction-type (scenario-faction-list (get-mission-scenario-by-id mission-id)) :key #'(lambda (a) (first a)))))))))
+
+(defun create-world (world mission-id layout-id weather-id tod-id specific-faction-type faction-list)
   
   (let ((mob-template-result)
         (feature-template-result)
@@ -24,7 +37,7 @@
 
         (weather (get-scenario-feature-by-id weather-id))
         (city-layout (get-scenario-feature-by-id layout-id))
-        (player-faction-scenario (get-scenario-feature-by-id faction-id))
+        (player-faction-scenario (get-scenario-feature-by-id (return-player-faction-scenario specific-faction-type mission-id)))
 
         (layout-func)
         (post-processing-func-list)
@@ -34,6 +47,9 @@
     ;; resetting the progress bar
     (setf *max-progress-bar* 10)
     (setf *cur-progress-bar* 0)
+
+    (logger (format nil "CREATE-WORLD: mission-id = ~A, specific-faction-type = ~A, player-faction-scenario = ~A~%" mission-id specific-faction-type (sf-id player-faction-scenario)))
+    (logger (format nil "CREATE-WORLD: faction-list = ~A~%" faction-list))
     
     (funcall *update-screen-closure* "Generating map")
 

@@ -11,7 +11,7 @@
                                                :faction-relations (list (cons +faction-type-angels+ t) (cons +faction-type-civilians+ t) (cons +faction-type-animals+ t) (cons +faction-type-criminals+ t) (cons +faction-type-church+ t)
                                                                         (cons +faction-type-demons+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-wisps+ t)
                                                                         (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil) (cons +faction-type-satanists+ nil))
-                                               :scenario-faction-list (list +player-faction-angels+ +player-faction-trinity-mimics+)))
+                                               :specific-faction-list (list +specific-faction-type-angel-chrome+ +specific-faction-type-angel-trinity+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-demons+
                                                :name "Demons"
@@ -19,14 +19,14 @@
                                                                         (cons +faction-type-angels+ nil) (cons +faction-type-civilians+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-military+ nil)
                                                                         (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil)
                                                                         (cons +faction-type-ghost+ nil) (cons +faction-type-church+ nil))
-                                               :scenario-faction-list (list +player-faction-demons+ +player-faction-shadows+ +player-faction-puppet+)))
+                                               :specific-faction-list (list +specific-faction-type-demon-crimson+ +specific-faction-type-demon-shadow+ +specific-faction-type-demon-malseraph+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-military+
                                                :name "Military"
                                                :faction-relations (list (cons +faction-type-military+ t) (cons +faction-type-civilians+ t) (cons +faction-type-animals+ t) (cons +faction-type-church+ t)
                                                                         (cons +faction-type-demons+ nil) (cons +faction-type-angels+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-criminals+ nil)
                                                                         (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil) (cons +faction-type-satanists+ nil))
-                                               :scenario-faction-list (list +player-faction-military-chaplain+ +player-faction-military-scout+)))
+                                               :specific-faction-list (list +specific-faction-type-military-chaplain+ +specific-faction-type-military-scout+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-animals+
                                                :name "Animals"
@@ -47,7 +47,7 @@
                                                                         (cons +faction-type-civilians+ nil) (cons +faction-type-military+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil)
                                                                         (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil) (cons +faction-type-church+ nil)
                                                                         (cons +faction-type-satanists+ nil))
-                                               :scenario-faction-list (list +player-faction-thief+)))
+                                               :specific-faction-list (list +specific-faction-type-thief+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-outsider-wisps+
                                                :name "Wisps"
@@ -62,7 +62,7 @@
                                                                         (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-civilians+ nil)
                                                                         (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil)
                                                                         (cons +faction-type-ghost+ nil) (cons +faction-type-church+ nil) (cons +faction-type-satanists+ nil))
-                                               :scenario-faction-list (list +player-faction-eater+)))
+                                               :specific-faction-list (list +specific-faction-type-eater+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-ghost+
                                                :name "Ghost"
@@ -70,14 +70,14 @@
                                                                         (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil) (cons +faction-type-animals+ nil)
                                                                         (cons +faction-type-civilians+ nil) (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil)
                                                                         (cons +faction-type-criminals+ nil) (cons +faction-type-church+ nil) (cons +faction-type-satanists+ nil))
-                                               :scenario-faction-list (list +player-faction-ghost+)))
+                                               :specific-faction-list (list +specific-faction-type-ghost+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-church+
                                                :name "Church"
                                                :faction-relations (list (cons +faction-type-church+ t) (cons +faction-type-civilians+ t) (cons +faction-type-angels+ t) (cons +faction-type-animals+ t) (cons +faction-type-military+ t)
                                                                         (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil)
                                                                         (cons +faction-type-eater+ nil) (cons +faction-type-ghost+ nil) (cons +faction-type-satanists+ nil))
-                                               :scenario-faction-list (list +player-faction-church+)))
+                                               :specific-faction-list (list +specific-faction-type-priest+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-satanists+
                                                :name "Satanists"
@@ -85,4 +85,4 @@
                                                                         (cons +faction-type-angels+ nil) (cons +faction-type-civilians+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-military+ nil)
                                                                         (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-criminals+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-eater+ nil)
                                                                         (cons +faction-type-ghost+ nil) (cons +faction-type-church+ nil))
-                                               :scenario-faction-list (list +player-faction-satanist+)))
+                                               :specific-faction-list (list +specific-faction-type-satanist+)))

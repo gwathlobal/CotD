@@ -867,8 +867,8 @@
                                                                        (format nil "~A channels the heavenly light. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
                                                 (logger (format nil "MOB-BLIND: ~A [~A] casts blindness.~%" (name actor) (id actor)))
                                                 ;; blind nearby non-angel mobs
-                                                (loop for i from 0 below (length (visible-mobs actor))
-                                                      for mob = (get-mob-by-id (nth i (visible-mobs actor)))
+                                                (loop for i from 0 below (length (proper-visible-mobs actor))
+                                                      for mob = (get-mob-by-id (nth i (proper-visible-mobs actor)))
                                                       when (not (mob-ability-p mob +mob-abil-angel+))
                                                         do
                                                            (set-mob-effect mob :effect-type-id +mob-effect-blind+ :actor-id (id actor) :cd 2)
@@ -900,7 +900,7 @@
                                                                                count mob-id)))
                                                            (or (and (<= (cur-hp actor) (truncate (max-hp actor) 4))
                                                                     nearest-enemy
-                                                                    (get-faction-relation (faction actor) (get-visible-faction nearest-enemy)))
+                                                                    )
                                                                (< (strength actor) (loop for mob-id in (visible-mobs actor)
                                                                                          for mob = (get-mob-by-id mob-id)
                                                                                          when (not (get-faction-relation (faction actor) (get-visible-faction mob)))

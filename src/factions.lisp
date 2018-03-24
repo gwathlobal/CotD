@@ -4,7 +4,7 @@
   ((id :initarg :id :accessor id)
    (name :initarg :name :accessor name)
    (faction-relations :initarg :faction-relations :accessor faction-relations)
-   (scenario-faction-list :initform () :initarg :scenario-faction-list :accessor scenario-faction-list)))
+   (specific-faction-list :initform () :initarg :specific-faction-list :accessor specific-faction-list)))
 
 (defmethod initialize-instance :after ((faction-type faction-type) &key)
   (let ((faction-table (make-hash-table)))

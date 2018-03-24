@@ -122,6 +122,22 @@
 (defconstant +faction-type-satanists+ 11)
 (defconstant +faction-type-church+ 12)
 
+(defconstant +specific-faction-type-dead-player+ -3)
+(defconstant +specific-faction-type-test+ -2)
+(defconstant +specific-faction-type-player+ -1)
+(defconstant +specific-faction-type-angel-chrome+ 0)
+(defconstant +specific-faction-type-angel-trinity+ 1)
+(defconstant +specific-faction-type-demon-crimson+ 2)
+(defconstant +specific-faction-type-demon-shadow+ 3)
+(defconstant +specific-faction-type-demon-malseraph+ 4)
+(defconstant +specific-faction-type-military-chaplain+ 5)
+(defconstant +specific-faction-type-military-scout+ 6)
+(defconstant +specific-faction-type-thief+ 7)
+(defconstant +specific-faction-type-satanist+ 8)
+(defconstant +specific-faction-type-priest+ 9)
+(defconstant +specific-faction-type-eater+ 10)
+(defconstant +specific-faction-type-ghost+ 11)
+
 (defconstant +ai-package-coward+ 0)
 (defconstant +ai-package-horde+ 1)
 (defconstant +ai-package-wants-bless+ 2)
@@ -442,6 +458,7 @@
 (defconstant +feature-demonic-rune-decay+ 21)
 (defconstant +feature-delayed-arrival-point+ 22)
 (defconstant +feature-start-military-point+ 23)
+(defconstant +feature-demonic-portal+ 24)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
