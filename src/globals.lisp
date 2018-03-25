@@ -159,7 +159,7 @@
 (defconstant +ai-package-patrol-district+ 18)
 (defconstant +ai-package-avoid-possession+ 19)
 (defconstant +ai-package-avoid-melee+ 20)
-(defconstant +ai-package-takes-corpses+ 21)
+(defconstant +ai-package-pick-corpses+ 21)
 (defconstant +ai-package-return-to-portal+ 22)
 
 (defconstant +ai-priority-never+ 0)

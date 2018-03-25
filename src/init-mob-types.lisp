@@ -543,7 +543,7 @@
                                        :abil-mutate-fast-scarabs t :abil-mutate-oviposit-more-eggs t :abil-mutate-tougher-locusts t :abil-cure-mutation t :abil-mutate-thick-carapace t :abil-mutate-acidic-tips t :abil-mutate-jump t
                                        :abil-mutate-piercing-needles t :abil-mutate-accurate-bile t :abil-mutate-corroding-secretion t :abil-mutate-hooks-and-suckers t :abil-mutate-disguise-as-human t :abil-mutate-spawn-scarabs t
                                        :abil-mutate-spawn-larva t :abil-mutate-spore-colony t
-                                       :ai-curious t :ai-cannibal t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-shoot-enemy t :ai-avoid-melee t))
+                                       :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-shoot-enemy t :ai-avoid-melee t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-locust+
                                        :name "locust"
@@ -598,7 +598,7 @@
                                        :strength 0
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-no-breathe t :abil-primordial t :abil-cannibalize t
-                                       :ai-coward t :ai-cannibal t :ai-use-ability t :ai-find-random-location t))
+                                       :ai-coward t :ai-search-corpses t :ai-use-ability t :ai-find-random-location t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-spore-colony+
                                        :name "spore colony"

@@ -9,7 +9,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-player+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-player+))
@@ -28,7 +28,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-dead-player+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-player+))
@@ -50,7 +50,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-angel-chrome+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-angel+))
@@ -72,7 +72,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-angel-trinity+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (let ((mob1 (make-instance 'player :mob-type +mob-type-star-singer+))
@@ -101,7 +101,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-demon-crimson+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-imp+))
@@ -122,7 +122,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-demon-shadow+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-shadow-imp+))
@@ -143,7 +143,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-demon-malseraph+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-malseraph-puppet+))
@@ -164,7 +164,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-military-chaplain+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-chaplain+))
@@ -217,7 +217,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-military-scout+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-scout+))
@@ -256,7 +256,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-thief+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-thief+))
@@ -278,7 +278,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-satanist+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-satanist+))
@@ -299,7 +299,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-priest+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
                                                        
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-priest+))
@@ -321,7 +321,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-eater+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+))
@@ -344,7 +344,7 @@
 
                                                        (setf mob-func-list (scenario-present-faction-setup-demonic-raid +specific-faction-type-ghost+ faction-list mob-func-list))
 
-                                                       (setf game-event-list (scenario-delayed-faction-setup faction-list game-event-list))
+                                                       (setf game-event-list (scenario-delayed-faction-setup-demonic-raid faction-list game-event-list))
 
                                                        (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
                                                                  (setf *player* (make-instance 'player :mob-type +mob-type-ghost+))

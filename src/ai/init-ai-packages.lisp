@@ -244,7 +244,7 @@
                                                              
                                                              )))
 
-(set-ai-package (make-instance 'ai-package :id +ai-package-takes-corpses+
+(set-ai-package (make-instance 'ai-package :id +ai-package-pick-corpses+
                                            :priority 8
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))

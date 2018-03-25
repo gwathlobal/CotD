@@ -30,7 +30,7 @@
    ;;   :ai-kleptomaniac - mob will try to collect as much valuable items as possible
    ;;   :ai-cautious - mob will not attack smb of higher strength
    ;;   :ai-simple-pathfinding - mob will not use Astar pathfinding and will move in the general direction towards the target
-   ;;   :ai-cannibal - mob will try to go to the nearest corpse
+   ;;   :ai-search-corpses - mob will try to go to the nearest corpse
    ;;   :ai-trinity-mimic
    ;;   :ai-split-soul
          
@@ -67,7 +67,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-curious ai-takes-valuable-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-cannibal ai-use-ability ai-use-item
+                                                                ai-coward ai-horde ai-wants-bless ai-curious ai-takes-valuable-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-search-corpses ai-use-ability ai-use-item
                                                                 ai-reload-ranged-weapon ai-shoot-enemy ai-follow-leader ai-approach-target ai-attack-nearest-enemy ai-find-random-location ai-avoid-possession ai-avoid-melee
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
@@ -115,8 +115,8 @@
     (setf (gethash +ai-package-trinity-mimic+ (ai-packages mob-type)) t))
   (when ai-split-soul
     (setf (gethash +ai-package-split-soul+ (ai-packages mob-type)) t))
-  (when ai-cannibal
-    (setf (gethash +ai-package-cannibal+ (ai-packages mob-type)) t))
+  (when ai-search-corpses
+    (setf (gethash +ai-package-search-corpses+ (ai-packages mob-type)) t))
   (when ai-use-ability
     (setf (gethash +ai-package-use-ability+ (ai-packages mob-type)) t))
   (when ai-use-item

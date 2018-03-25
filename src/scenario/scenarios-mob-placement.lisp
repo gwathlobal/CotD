@@ -1,5 +1,49 @@
 (in-package :cotd)
 
+(defun scenario-delayed-faction-setup-demonic-attack (faction-list game-event-list)
+
+  ;; add delayed military
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-military+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 faction-list)
+    (push +game-event-demon-attack-delayed-arrival-military+ game-event-list))
+
+  ;; add delayed angels
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-angels+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 faction-list)
+    (push +game-event-demon-attack-delayed-arrival-angels+ game-event-list))
+  
+  game-event-list)
+
+(defun scenario-delayed-faction-setup-demonic-raid (faction-list game-event-list)
+
+  ;; add delayed military
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-military+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 faction-list)
+    (push +game-event-demon-raid-delayed-arrival-military+ game-event-list))
+
+  ;; add delayed angels
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-angels+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 faction-list)
+    (push +game-event-demon-raid-delayed-arrival-angels+ game-event-list))
+  
+  game-event-list)
+
 (defun scenario-present-faction-setup-demonic-attack (specific-faction-type faction-list mob-func-list)
   (push #'adjust-mobs-after-creation mob-func-list)
   (push #'replace-gold-features-with-items mob-func-list)

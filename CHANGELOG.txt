@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added a new mission - Demonic raid. The demons opened the portals in order to gather flesh from the city. Their goal for this mission is to kill mobs, pick up their corpses and throw into portals. 
 - If you die, this is no longer the end of the world. The battle will go one until one of the sides wins. You might even get ressurected by your allies and continue fighting as if nothing happened.
 - You can no longer win the game by ascending beyond Angel or Archdemon/Shadow Devil.
 - As a Scout you can no longer lose game by getting possessed.

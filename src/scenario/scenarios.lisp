@@ -229,30 +229,6 @@
       (second (find faction-id (objective-list (get-mission-scenario-by-id mission-id)) :key #'(lambda (a) (first a)))))
     nil))
 
-(defun scenario-delayed-faction-setup (faction-list game-event-list)
-
-  ;; add delayed military
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-military+)
-                              (= (second a) +mission-faction-delayed+))
-                       t
-                       nil))
-                 faction-list)
-    (push +game-event-delayed-arrival-military+ game-event-list))
-
-  ;; add delayed angels
-  (when (find-if #'(lambda (a)
-                     (if (and (= (first a) +faction-type-angels+)
-                              (= (second a) +mission-faction-delayed+))
-                       t
-                       nil))
-                 faction-list)
-    (push +game-event-delayed-arrival-angels+ game-event-list))
-  
-  game-event-list)
-
-
-
 (defun place-land-arrival-border (reserved-level)
   (let ((result))
     (loop for x from 0 below (array-dimension reserved-level 0)
