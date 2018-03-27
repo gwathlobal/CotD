@@ -1,9 +1,10 @@
 CHANGELOG
 
-- Added a new mission - Demonic raid. The demons opened the portals in order to gather flesh from the city. Their goal for this mission is to kill mobs, pick up their corpses and throw into portals. 
-- If you die, this is no longer the end of the world. The battle will go one until one of the sides wins. You might even get ressurected by your allies and continue fighting as if nothing happened.
+- The concept of missions was introduced. The previous scenario where the demons wanted to kill all angels in the city became the 'Demonic attack' mission.
+- A new mission was added - Demonic raid. The demons opened the portals in order to gather flesh from the city. Their goal for this mission is to kill mobs, pick up their corpses and throw into portals, while the military and the angels want to kill all of them.
+- If you die, this is no longer the end of the world. The battle will go on until one of the sides wins. You might even get ressurected by your allies and continue fighting as if nothing happened.
 - You can no longer win the game by ascending beyond Angel or Archdemon/Shadow Devil.
-- As a Scout you can no longer lose game by getting possessed.
+- As a Scout you can no longer lose the game by getting possessed. Though you will lose the control over your character until you get purged (or the end of the mission).
 - You will now be able to customize the factions you want to see in a scenario.
 - AI will bump into friendly mobs much less often and will try to navigate around them to get to its target.
 - Added a journal where you can see objectives for the current mission and your relations with other factions. The journal is displayed using the 'j' button.
@@ -12,6 +13,7 @@ CHANGELOG
 - Characters with a ranged weapons will try to step out of melee combat.
 - Ghosts can now sense the direction to the sacrificial circle and the Book of Rituals.
 - Abilities on cooldown will be displayed in the status string.
+- The game over screen now also shows the comparison of statistics between the character who earned the title and the player.
 
 --------------------
 January 12, 2018 v1.2.6

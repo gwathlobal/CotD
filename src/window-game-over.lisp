@@ -49,14 +49,19 @@
     )
   
   ;; display scenario stats
-  (let ((str (return-scenario-stats)))
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 13 (sdl:get-font-height))))
-      (write-text str a-rect)))
+  (let* ((str (return-scenario-stats))
+         (max-lines))
+    
+    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 1 (sdl:get-font-height))))
+      (setf max-lines (write-text str a-rect :count-only t)))
+    
+    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* max-lines (sdl:get-font-height))))
+      (write-text str a-rect))
 
-  (show-message-box 6 (+ 40 (* 13 (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* 14 (sdl:get-font-height))) *full-message-box*)
-
-  (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] High Scores")
-                           10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
+    (show-message-box 6 (+ 40 (* max-lines (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* (1+ max-lines) (sdl:get-font-height))) *full-message-box*)
+    
+    (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] High Scores")
+                             10 (- *window-height* 13 (sdl:char-height sdl:*default-font*))))
   
   (sdl:update-display))
 

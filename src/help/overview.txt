@@ -16,7 +16,6 @@ THE CELESTIAL COMMUNION
  - You can bless humans to gain power.
  - You are able to hide your divinity and disguise yourself as a human to lure enemies to you.
  - Your strength is the ability to heal yourself when needed. You are also able to see what all other Angels see.
- - To win, kill all demons. Survival of mankind is not required.
  
 THE PANDEMONIUM HIERARCHY
  - The Pandemonium Hierarchy is represented with two rows of units: a Crimson imp, Crimson demon, and Archdemon, on the one hand, and a Shadow imp, Shadow demon, and Shadow devil, on the other.
@@ -28,7 +27,6 @@ THE PANDEMONIUM HIERARCHY
  - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
  - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
  - Remember, "friendly fire" is allowed for your faction. Be cautious when walking side-by-side with your "friends".
- - To win, kill all angels. Destruction of mankind is not enough.
  
 OUTSIDER BEASTS
  - Outsider beasts are half-sentient creatures of various origin that will actively attack everything in sight, including their own kin.
@@ -52,7 +50,6 @@ THE CHURCH
  - Smiting damage increases with the number of humans the priest sees.
  - Priests can also give fire-based melee attacks to themselves and their followers by praying for wrath.
  - Priests start in the church.
- - Their goal is to destroy all demons. 
  
 THE MILITARY 
  - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
@@ -65,7 +62,6 @@ THE MILITARY
  - If you side with the military, you may start as a Chaplain or as a Scout. 
  - Chaplains are accompanied by a host of loyal troops. 
  - Scouts start alone but compensate that with unsurpassed speed. Be careful, though - unlike a Chaplain, you do not have protection from possession. So if a demon traps you in your own body, the you will have to travel with that demon until you are killed with it or freed from it by some angel.
- - To win, you need to kill all demons. Destruction of angels is unnecessary though sometimes inevitable.
  
 THE CRIMINALS
  - The criminals (who are opposed to the citizens and the military, but will not attack the Communion) are kept mainly in the prison (except for the Thief).
@@ -80,7 +76,6 @@ THE SATANISTS
  - Satanists are allied with demons. They are able to call demons to them for free, curse all enemies in sight with inaccuracy and raise dead.
  - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
  - You may play as a Satanist. But beware of the military - you will not be able to conceal the fact that you are an enemy of humankind.
- - To win, destroy the Communion.
  
 THE LOST SOUL
  - You were the one who triggered the whole invasion. The satanists have sacrificed your body to open the gates to Hell, but your soul lingered in this world.

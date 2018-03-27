@@ -165,7 +165,8 @@
                                  when (and mission-district
                                            (find-if #'(lambda (a)
                                                         (if (and (or (= (second a) +mission-faction-attacker+)
-                                                                     (= (second a) +mission-faction-defender+))
+                                                                     (= (second a) +mission-faction-defender+)
+                                                                     (= (second a) +mission-faction-present+))
                                                                  (= (first a) faction-type-id))
                                                           t
                                                           nil))
@@ -187,7 +188,8 @@
                                                             for faction-type-id in available-faction-list
                                                             when (find-if #'(lambda (a)
                                                                               (if (and (or (= (second a) +mission-faction-attacker+)
-                                                                                           (= (second a) +mission-faction-defender+))
+                                                                                           (= (second a) +mission-faction-defender+)
+                                                                                           (= (second a) +mission-faction-present+))
                                                                                        (= (first a) faction-type-id))
                                                                                 t
                                                                                 nil))
