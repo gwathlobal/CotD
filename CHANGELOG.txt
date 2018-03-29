@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Fixed the bug with player's choosing the resurrect ability that could freeze the game.
+
 --------------------
 March 29, 2018 v1.3.0
 

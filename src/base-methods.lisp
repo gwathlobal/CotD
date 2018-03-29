@@ -2614,11 +2614,11 @@
     (loop for item-id in (visible-items *player*)
           for item = (get-item-by-id item-id)
           when (and (item-ability-p item +item-abil-corpse+)
+                    (dead-mob item)
                     (not (mob-ability-p (get-mob-by-id (dead-mob item)) +mob-abil-demon+))
                     (= (item-type item) +item-type-body-part-full+))
             do
                (push item corpses))
-
     (setf corpses (sort corpses
                         #'(lambda (item-1 item-2)
                             (if (and (< (get-distance (x *player*) (y *player*) (x item-1) (y item-1))
@@ -2626,7 +2626,6 @@
                                    t
                                    nil))
                         ))
-
     (if corpses
       (setf (view-x *player*) (x (first corpses)) (view-y *player*) (y (first corpses)) (view-z *player*) (z (first corpses)))
       (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))

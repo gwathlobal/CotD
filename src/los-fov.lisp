@@ -509,6 +509,7 @@
   (logger (format nil "UPDATE-VISIBLE-ITEMS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-items mob))))
 
 (defun update-visible-items-player ()
+  (setf (visible-items *player*) nil)
   (let ((vision-power (1+ (cur-sight *player*)))
         (vision-pwr (1+ (cur-sight *player*))))
     (draw-fov (x *player*) (y *player*) (z *player*) (cur-sight *player*)
