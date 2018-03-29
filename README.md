@@ -21,6 +21,7 @@ March 29, 2018 v1.3.0
 - Ghosts can now sense the direction to the sacrificial circle and the Book of Rituals.
 - Abilities on cooldown will be displayed in the status string.
 - The game over screen now also shows the comparative statistics between the character who earned the title and the player.
+
 CURRENT CHANGELOG
 
 See the [CHANGELOG.txt](https://github.com/gwathlobal/CotD/blob/master/CHANGELOG.txt) file for the changes in the upcoming version.
