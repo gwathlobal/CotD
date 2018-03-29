@@ -8,7 +8,7 @@ GENERAL TIPS
  - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.
  - Angels and Demons gain power when killing each other proportional to the strength of the slain adversary.
  - Stockpile power to get promoted or spend it on available abilities.
-  - The objective depends on the mission scenario.
+ - The objective depends on the mission scenario.
   
 THE CELESTIAL COMMUNION
  - The ranks of the Celestial Communion are filled with Chrome angels who can temporarily transform themselves into Avatars of Brilliance.

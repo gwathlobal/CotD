@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+March 29, 2018 v1.3.0
+
 - The concept of missions was introduced. The previous scenario where the demons wanted to kill all angels in the city became the 'Demonic attack' mission.
 - A new mission was added - Demonic raid. The demons opened the portals in order to gather flesh from the city. Their goal for this mission is to kill citizens, pick up their corpses and throw them into portals, while the military and the angels want to stop and destroy demons.
 - If you die, this is no longer the end of the world. The battle will go on until one of the sides wins. You might even get resurrected by your allies and continue fighting as if nothing happened.
