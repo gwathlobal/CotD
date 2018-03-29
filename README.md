@@ -5,22 +5,22 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-January 12, 2018 v1.2.6
+March 29, 2018 v1.3.0
 
-- With the demons invading, strange glyphs start to appear on the walls. The satanists are now able to decipher these demonic runes and use this knowledge to harness even more power.
-- Demon word: Flesh lets a satanist turn a zombie into a full-fledged imp that can later progress and evolve as demons usually do.
-- Demon word: Plague lets a satanist spread virulent soul sickness that will deal damage over time.
-- Demon word: Power lets a satanist temporarily gain the power of an Archdemon.
-- Demon word: Darkness turns off the sun for a period of time.
-- Demon word: Invasion places an enchantment on the map that constantly reanimates corpses.
-- Demon word: Knockback pushes all characters around the satanist away.
-- Satanists now inflict vorpal damage instead of fire damage.
-- Ghosts leave no footprints on snow and generate no sounds while moving.
-- Blessings and divine shield now offer complete protection from ghost's possession.
-- Empowered undead now have normal movement speed and can keep up with the satanists when following them.
-- Fixed the bug with the game freezing after completion of the Increase acid strength mutation.
-- Fixed the bug when you could target characters unseen by you with abilities.
-
+- The concept of missions was introduced. The previous scenario where the demons wanted to kill all angels in the city became the 'Demonic attack' mission.
+- A new mission was added - Demonic raid. The demons opened the portals in order to gather flesh from the city. Their goal for this mission is to kill citizens, pick up their corpses and throw them into portals, while the military and the angels want to stop and destroy demons.
+- If you die, this is no longer the end of the world. The battle will go on until one of the sides wins. You might even get resurrected by your allies and continue fighting as if nothing happened.
+- You can no longer win the game by ascending beyond Angel or Archdemon/Shadow Devil.
+- As a Scout, you can no longer lose the game by getting possessed. Though you will lose the control over your character until you get purged (or the end of the mission).
+- You will now be able to customize the factions you want to see in a scenario.
+- AI will bump into friendly mobs much less often and will try to navigate around them to get to its target.
+- Added a journal where you can see objectives for the current mission and your relations with other factions. The journal is displayed using the 'j' button.
+- Defending military will be stationed inside the city.
+- Possessable creatures will try to get away from you if you are the one that can possess them.
+- Characters with ranged weapons will try to step out of melee combat.
+- Ghosts can now sense the direction to the sacrificial circle and the Book of Rituals.
+- Abilities on cooldown will be displayed in the status string.
+- The game over screen now also shows the comparative statistics between the character who earned the title and the player.
 CURRENT CHANGELOG
 
 See the [CHANGELOG.txt](https://github.com/gwathlobal/CotD/blob/master/CHANGELOG.txt) file for the changes in the upcoming version.
