@@ -1,6 +1,5 @@
 - Custom scenarios
 - Colored message text
-- Display winner vs player in titles section
 - Add Twosoul character for satanists
 - Add Flamethrower operator to the miliatry
 - Add courtyard houses like Thief2RL

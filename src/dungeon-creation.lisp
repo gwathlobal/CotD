@@ -200,6 +200,13 @@
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Finalizing")
 
+    ;; setting up demonic portals so that mobs could access them directly without iterating through the whole list of features
+    (loop for feature-id in (feature-id-list (level world))
+          for feature = (get-feature-by-id feature-id)
+          when (= (feature-type feature) +feature-demonic-portal+)
+            do
+               (push feature-id (demonic-portals (level world))))
+    
     (create-connect-map-aux (level world))
     
     world))

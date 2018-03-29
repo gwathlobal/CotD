@@ -28,6 +28,7 @@ LATEST CHANGES v1.2.6
 --------------------
 FEATURES
 
+ - Different scenarios
  - Giant overland City
  - Angels and Demons battling in its streets
  - Factions and allies
@@ -45,24 +46,22 @@ GENERAL TIPS
  - You are not alone and should not be able to overcome all obstacles by yourself, some enemies will require aid from your allies.
  - Your enemies are able to hide their true appearance, so observe and learn their tactics to avoid nasty surprises.
  - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.
- - Your resource is power. You can stockpile it to get a "level up" or spend it on your abilities.
- - You gain power proportional to the strength of killed enemies. Besides each party has other special ways to gain power.
+ - For non-human factions the main resource is power. Each faction has its own way to gain it. You can spend power on your abilities.
+ - The objective depends on the mission scenario.
 
 --------------------
 THE CELESTIAL COMMUNION
 
  - You can start as a Chrome Angel who can easily dispatch lowly Imps.
  - Alternatively, you can start a group of Trinity mimics, each having distinct role and abilities.
- - Bless humans to gain power.
- - To win, kill all demons or ascend beyond the angel. Survival of mankind is not required.
+ - To gain power, bless humans or kill demons.
  
 -------------------- 
 THE PANDEMONIUM HIERARCHY
 
  - You start as a puny Crimson or Shadow imp who is no match for a Chrome Angel.
  - You can also start as a worshipper of a Demon God Malseraph.
- - Kill humans to gain power. Beware of blessed ones. 
- - To win, kill all angels or ascend beyond Archdemon or Shadow devil. Destruction of mankind is not enough.
+ - To gain power, kill humans or angels. Beware of blessed ones. If you gain enough power you can be promoted.
 
 -------------------- 
 THE PRIMORDIAL
@@ -76,13 +75,13 @@ CITIZENS OF THE CITY
 
  - Humans are generally weak and frail.
  - Citizens of the City will mostly try to flee whenever there is an enemy in sight.
- - But beware of the military that will arrive later in the battle.
+ - But beware of the military that can arrive later in the battle.
 
 --------------------
 THE CHURCH
 
  - Priests start in the church and are able to gain followers, grant divine protection, smite demons from afar and slow them.
- - To win, kill all demons.
+ - Priests share the goal with angels.
 
 --------------------
 THE MILITARY
@@ -92,7 +91,6 @@ THE MILITARY
  - You may start as a Chaplain or as a Scout.
  - The Chaplain can lead troops, reveal disguised enemies and provide divine protection to allies.
  - The Scout starts with a horse. He is armed with a powerful rifle, can reveal disguised enemies and call for an artillery strike.
- - To win, kill all demons. But do not let angels stand in your way.
 
 --------------------
 THE CRIMINALS
@@ -108,7 +106,7 @@ THE SATANISTS
  - The Satanists are those who opened the gates for the Hierarchy to enter. They are allied with Demons and thus are enemies of everyone else.
  - Satanists are able to curse to cause inaccuracy, summon demons and raise dead. You may start as one.
  - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
- - Satanists share the same goal with the Demons - to kill all Angels.
+ - Satanists share the same goal with the Demons.
 
 --------------------
 THE LOST SOUL

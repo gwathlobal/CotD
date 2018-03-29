@@ -20,7 +20,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
@@ -87,7 +87,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-angels world)) "Enemies eliminated.")
+                                                                               ((zerop (total-angels world)) "Flesh successfully gathered.")
                                                                                ))
                                                                   (score (calculate-player-score 1450))
                                                                   (highscores-place)
@@ -145,9 +145,9 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
                                                                                ))
-                                                                  (score (calculate-player-score (+ 1500 (* 10 (total-humans world)))))
+                                                                  (score (calculate-player-score (+ 1450 (* 7 (total-humans world)))))
                                                                   (highscores-place)
                                                                   (player-faction (if (= (loyal-faction *player*) +faction-type-military+)
                                                                                     t
@@ -203,7 +203,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
@@ -271,7 +271,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-angels world)) "Enemies eliminated.")
+                                                                               ((zerop (total-angels world)) "Flesh successfully gathered.")
                                                                                ))
                                                                   (score (calculate-player-score 1450))
                                                                   (highscores-place)

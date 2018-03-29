@@ -70,9 +70,6 @@ the goal, and may depend on many factors"
     (loop for node = (first open-nodes)
           while (and node (not (pos-equal node goal-node))) do
 
-            (format t "OPEN-NODES = ~A~%" (length open-nodes))
-            (format t "CLOSED-NODES = ~A~%~%" (length closed-nodes))
-            
             (pop open-nodes)
             ;; Check all the adjacent coordinates.  This method counts
             ;; diagonals as well.  If you don't want diagonals, you can

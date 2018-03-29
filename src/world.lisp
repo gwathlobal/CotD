@@ -25,6 +25,7 @@
    (level-layout :initform 0 :initarg :level-layout :accessor level-layout)
    (mission-scenario :initform nil :initarg :mission-scenario :accessor mission-scenario)
    (delayed-arrival-points :initform () :initarg :delayed-arrival-points :accessor delayed-arrival-points) ;; is of type ((x y z) (...) ...)
+   (demonic-portals :initform () :initarg :demonic-portals :accessor demonic-portals)
    ))
    
 (defun add-mob-to-level-list (level mob)

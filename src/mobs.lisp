@@ -1276,7 +1276,8 @@
 
 (defmethod get-qualified-name ((mob mob))
   (if (slot-value mob 'name)
-    (if (mob-ability-p mob +mob-abil-undead+)
+    (if (and (mob-ability-p mob +mob-abil-undead+)
+             (not (eq mob *player*)))
       (values (name mob) +noun-proper+ +noun-singular+)
       (values (format nil "~A the ~A" (name mob) (capitalize-name (name (get-mob-type-by-id (mob-type mob))))) +noun-proper+ +noun-singular+))
     (values (format nil "nameless ~A" (name mob)) +noun-common+ +noun-singular+)))
