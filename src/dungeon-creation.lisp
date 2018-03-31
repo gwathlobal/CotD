@@ -83,6 +83,16 @@
     (logger (format nil "Creating actual level ~A~%" 0))
     (setf (level world) (create-level-from-template result-template))
 
+    (setf (mob-quadrant-map (level world)) (make-array (list (ceiling (array-dimension (terrain (level world)) 0) 10)
+                                                             (ceiling (array-dimension (terrain (level world)) 1) 10))
+                                                       :initial-element ()))
+    (setf (item-quadrant-map (level world)) (make-array (list (ceiling (array-dimension (terrain (level world)) 0) 10)
+                                                              (ceiling (array-dimension (terrain (level world)) 1) 10))
+                                                        :initial-element ()))
+    (setf (light-quadrant-map (level world)) (make-array (list (ceiling (array-dimension (terrain (level world)) 0) 10)
+                                                               (ceiling (array-dimension (terrain (level world)) 1) 10))
+                                                         :initial-element ()))
+
     (setf (level-layout (level world)) layout-id)
     (setf (mission-scenario (level world)) mission-id)
 

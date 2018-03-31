@@ -81,7 +81,17 @@
                  (update-map-area))
                
                (when (<= (cur-ap mob) 0)
-                 (on-tick mob))))
+                 (on-tick mob))
+
+               ;; checking for inconsistences between *items* and item-quadrant-map 
+               (when *cotd-release*
+                 (loop for y from 0 below (array-dimension (item-quadrant-map (level *world*)) 1) do
+                   (loop for x from 0 below (array-dimension (item-quadrant-map (level *world*)) 0) do
+                     (loop for item-id in (aref (item-quadrant-map (level *world*)) x y)
+                           unless (get-item-by-id item-id) do
+                             (error (format nil "ITEM ID ~A AT (~A ~A) NIL, FAILED!!!" item-id x y))))))
+
+               ))
                       
            (bt:with-lock-held ((path-lock *world*))
              (when (and *path-thread* (bt:thread-alive-p *path-thread*))

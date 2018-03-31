@@ -228,10 +228,21 @@
   (when (eq mob *player*)
     (setf (nearby-light-mobs *player*) nil)
     (setf (nearby-light-sources *player*) nil))
-  
-  ;; check through all stationary light sources
-  (loop for (x y z light-radius) across (light-sources (level *world*))
-        for i of-type fixnum from 0 below (length (light-sources (level *world*)))
+
+  (let ((quad-x (truncate (x mob) 10))
+        (quad-y (truncate (y mob) 10)))
+    (declare (type fixnum quad-x quad-y))
+    ;; check through all stationary light sources
+  (loop with light-list = (loop with result = ()
+                                for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
+                                when (and (>= (+ quad-x qx) 0) (>= (+ quad-y qy) 0)
+                                          (< (+ quad-x qx) (array-dimension (light-quadrant-map (level *world*)) 0))
+                                          (< (+ quad-y qy) (array-dimension (light-quadrant-map (level *world*)) 1)))
+                                  do
+                                     (setf result (append result (aref (light-quadrant-map (level *world*)) (+ quad-x qx) (+ quad-y qy))))
+                                finally (return result))
+        for (x y z light-radius) of-type (fixnum fixnum fixnum fixnum) in light-list
+        for i of-type fixnum from 0 below (length light-list)
         for light-power of-type fixnum = (* *light-power-faloff* light-radius) 
         for vision-pwr of-type fixnum = light-radius
         for vision-power of-type fixnum = light-radius
@@ -270,7 +281,14 @@
              (push (list x y z light-radius) (nearby-light-sources *player*)))
         )
   
-  (loop for mob-id of-type fixnum in (mob-id-list (level *world*))
+  (loop for mob-id of-type fixnum in (loop with result = ()
+                                           for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
+                                           when (and (>= (+ quad-x qx) 0) (>= (+ quad-y qy) 0)
+                                                     (< (+ quad-x qx) (array-dimension (mob-quadrant-map (level *world*)) 0))
+                                                     (< (+ quad-y qy) (array-dimension (mob-quadrant-map (level *world*)) 1)))
+                                             do
+                                                (setf result (append result (aref (mob-quadrant-map (level *world*)) (+ quad-x qx) (+ quad-y qy))))
+                                           finally (return result))
         for tmob of-type mob = (get-mob-by-id mob-id)
         for vision-pwr of-type fixnum = (cur-sight mob)
         for vision-power of-type fixnum = (cur-sight mob)
@@ -387,7 +405,7 @@
                       (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) *max-hearing-range*))
              (pushnew mob-id (hear-range-mobs mob)))
         )
-
+    )
   (when (eq mob *player*)
     (calc-lit-tiles-for-player *player*))
   
@@ -469,9 +487,17 @@
   )
 
 (defun update-visible-items (mob)
+  (declare (optimize (speed 3) (safety 0)))
   (setf (visible-items mob) nil)
   
-  (loop for item-id in (item-id-list (level *world*))
+  (loop for item-id in (loop with result = ()
+                             for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
+                             when (and (>= (+ (truncate (x mob) 10) qx) 0) (>= (+ (truncate (y mob) 10) qy) 0)
+                                       (< (+ (truncate (x mob) 10) qx) (array-dimension (item-quadrant-map (level *world*)) 0))
+                                       (< (+ (truncate (y mob) 10) qy) (array-dimension (item-quadrant-map (level *world*)) 1)))
+                               do
+                                  (setf result (append result (aref (item-quadrant-map (level *world*)) (+ (truncate (x mob) 10) qx) (+ (truncate (y mob) 10) qy))))
+                             finally (return result))
         for item = (get-item-by-id item-id)
         for vision-pwr = (cur-sight mob)
         for vision-power = (cur-sight mob)

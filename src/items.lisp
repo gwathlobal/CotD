@@ -39,6 +39,8 @@
 
 (defun remove-item-from-world (item)
   (setf (item-id-list (level *world*)) (remove (id item) (item-id-list (level *world*))))
+  (setf (aref (item-quadrant-map (level *world*)) (truncate (x item) 10) (truncate (y item) 10))
+        (remove (id item) (aref (item-quadrant-map (level *world*)) (truncate (x item) 10) (truncate (y item) 10))))
   (setf (aref *items* (id item)) nil))
 
 (defclass item ()

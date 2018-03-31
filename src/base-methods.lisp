@@ -248,9 +248,14 @@
                               (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob))))
                                 (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob)))) nmob nx ny (z nmob)))
                               (setf (aref (mobs (level *world*)) nx ny (z nmob)) nil)))
+
+                          (setf (aref (mob-quadrant-map (level *world*)) (truncate (x nmob) 10) (truncate (y nmob) 10))
+                                (remove (id nmob) (aref (mob-quadrant-map (level *world*)) (truncate (x nmob) 10) (truncate (y nmob) 10))))
                           
                           ;; change the coords of the center of the mob
                           (setf (x nmob) x (y nmob) y (z nmob) z)
+
+                          (push (id nmob) (aref (mob-quadrant-map (level *world*)) (truncate (x nmob) 10) (truncate (y nmob) 10)))
                           
                           ;; calculate the new coords of the mob's NE corner
                           (setf sx (- (x nmob) (truncate (1- (map-size nmob)) 2)))
@@ -286,10 +291,15 @@
          
          (funcall place-func (get-mob-by-id (riding-mob-id mob)))
 
+         (setf (aref (mob-quadrant-map (level *world*)) (truncate (x mob) 10) (truncate (y mob) 10))
+               (remove (id mob) (aref (mob-quadrant-map (level *world*)) (truncate (x mob) 10) (truncate (y mob) 10))))
+         
          ;; place the rider
          (setf (x mob) x (y mob) y (z mob) z)
          (setf (aref (mobs (level *world*)) x y z) (id mob))
 
+         (push (id mob) (aref (mob-quadrant-map (level *world*)) (truncate (x mob) 10) (truncate (y mob) 10)))
+         
           ;; set motion
          (if (and (= orig-x x) (= orig-y y) (= orig-z z))
            (incf-mob-motion mob *mob-motion-stand*)
@@ -308,12 +318,17 @@
            (setf (aref (mobs (level *world*)) rider-orig-x rider-orig-y rider-orig-z) nil)
            
            (funcall place-func mob)
+
+           (setf (aref (mob-quadrant-map (level *world*)) (truncate (x (get-mob-by-id (mounted-by-mob-id mob))) 10) (truncate (y (get-mob-by-id (mounted-by-mob-id mob))) 10))
+                 (remove (id (get-mob-by-id (mounted-by-mob-id mob))) (aref (mob-quadrant-map (level *world*)) (truncate (x (get-mob-by-id (mounted-by-mob-id mob))) 10) (truncate (y (get-mob-by-id (mounted-by-mob-id mob))) 10))))
            
            ;; place the rider
            (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
                  (y (get-mob-by-id (mounted-by-mob-id mob))) y
                  (z (get-mob-by-id (mounted-by-mob-id mob))) z)
            (setf (aref (mobs (level *world*)) (x mob) (y mob) (z mob)) (mounted-by-mob-id mob))
+
+           (push (id (get-mob-by-id (mounted-by-mob-id mob))) (aref (mob-quadrant-map (level *world*)) (truncate (x (get-mob-by-id (mounted-by-mob-id mob))) 10) (truncate (y (get-mob-by-id (mounted-by-mob-id mob))) 10)))
            
            ;; set motion
            (if (and (= orig-x x) (= orig-y y) (= orig-z z))

@@ -26,6 +26,9 @@
    (mission-scenario :initform nil :initarg :mission-scenario :accessor mission-scenario)
    (delayed-arrival-points :initform () :initarg :delayed-arrival-points :accessor delayed-arrival-points) ;; is of type ((x y z) (...) ...)
    (demonic-portals :initform () :initarg :demonic-portals :accessor demonic-portals)
+   (mob-quadrant-map :initform nil :initarg :mob-quadrant-map :accessor mob-quadrant-map)
+   (item-quadrant-map :initform nil :initarg :item-quadrant-map :accessor item-quadrant-map)
+   (light-quadrant-map :initform nil :initarg :light-quadrant-map :accessor light-quadrant-map)
    ))
    
 (defun add-mob-to-level-list (level mob)
@@ -39,6 +42,8 @@
       (loop for ny from sy below (+ sy (map-size mob)) do
         (setf (aref (mobs level) nx ny (z mob)) (id mob)))))
 
+  (push (id mob) (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10)))
+  
   (let ((final-z (z mob)))
     (when (setf final-z (apply-gravity mob))
       (set-mob-location mob (x mob) (y mob) final-z :apply-gravity t)))
@@ -55,6 +60,10 @@
     (loop for nx from sx below (+ sx (map-size mob)) do
       (loop for ny from sy below (+ sy (map-size mob)) do
         (setf (aref (mobs level) nx ny (z mob)) nil))))
+
+  (setf (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10))
+        (remove (id mob) (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10))))
+  
   (logger (format nil "REMOVE-MOB-FROM-LEVEL-LIST: ~A [~A] (~A ~A ~A) = ~A~%" (name mob) (id mob) (x mob) (y mob) (z mob) (get-mob-* level (x mob) (y mob) (z mob)))))
 
 (defun add-feature-to-level-list (level feature)
@@ -79,7 +88,7 @@
   (setf (aref (features level) (x feature) (y feature) (z feature)) (remove (id feature) (aref (features level) (x feature) (y feature) (z feature)))))
 
 (defun add-item-to-level-list (level item)
-  (pushnew (id item) (item-id-list level))
+  
   (if (apply-gravity item)
     (progn
       (setf (z item) (apply-gravity item))
@@ -87,10 +96,15 @@
             (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil)))
     (progn
       (setf (aref (items level) (x item) (y item) (z item))
-            (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil)))))
+            (add-to-inv item (aref (items level) (x item) (y item) (z item)) nil))))
+  (when (get-item-by-id (id item))
+    (pushnew (id item) (item-id-list level))
+    (push (id item) (aref (item-quadrant-map level) (truncate (x item) 10) (truncate (y item) 10)))))
 
 (defun remove-item-from-level-list (level item)
   (setf (item-id-list level) (remove (id item) (item-id-list level)))
+  (setf (aref (item-quadrant-map level) (truncate (x item) 10) (truncate (y item) 10))
+        (remove (id item) (aref (item-quadrant-map level) (truncate (x item) 10) (truncate (y item) 10))))
   (setf (aref (items level) (x item) (y item) (z item))
         (remove-from-inv item (aref (items level) (x item) (y item) (z item))))
   item)
@@ -335,7 +349,8 @@
 
 (defun add-light-source (level light-source)
   (adjust-array (light-sources level) (list (1+ (length (light-sources level)))))
-  (setf (aref (light-sources level) (1- (length (light-sources level)))) light-source))
+  (setf (aref (light-sources level) (1- (length (light-sources level)))) light-source)
+  (push light-source (aref (light-quadrant-map level) (truncate (first light-source) 10) (truncate (second light-source) 10))))
 
 ;;----------------------
 ;; WORLD
