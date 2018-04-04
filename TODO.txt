@@ -1,5 +1,4 @@
 - Custom scenarios
-- Colored message text
 - Add Twosoul character for satanists
 - Add Flamethrower operator to the miliatry
 - Add courtyard houses like Thief2RL

@@ -102,14 +102,6 @@
     (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 2) (+ y1 (1- *glyph-h*)) :color color)
     (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (- (+ y1 (1- *glyph-h*)) 1) :color color)
     (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (- (+ y1 (1- *glyph-h*)) 2) :color color)
-  ;(sdl:with-rectangle (l-rect (sdl:rectangle :x x1 :y y1 :w 1 :h *glyph-h*))
-  ;  (sdl:fill-surface color :template l-rect))
-  ;(sdl:with-rectangle (r-rect (sdl:rectangle :x (+ x1 (1- *glyph-w*)) :y y1 :w 1 :h *glyph-h*))
-  ;  (sdl:fill-surface color :template r-rect))
-  ;(sdl:with-rectangle (t-rect (sdl:rectangle :x x1 :y y1 :w *glyph-w* :h 1))
-  ;  (sdl:fill-surface color :template t-rect))
-  ;(sdl:with-rectangle (b-rect (sdl:rectangle :x x1 :y (+ y1 (1- *glyph-h*)) :w *glyph-w* :h 1))
-  ;  (sdl:fill-surface color :template b-rect))
     ))
 
 (defun check-tile-on-map (map-x map-y map-z sx sy max-x-view max-y-view view-z)
@@ -385,6 +377,51 @@
 	   (sdl:draw-string-solid-* (subseq txt prev-pos cur-pos) x y :justify justify :surface surface :font font :color color)
 	   (incf y (sdl:char-height font)))
 	 (incf cur-line))
+    (values cur-line final-txt)))
+
+(defun write-colored-text (txt-struct rect &key (surface sdl:*default-surface*) (font sdl:*default-font*) (count-only nil) (start-line 0))
+  ;;(format t "write-colored-text~%")
+  (let ((x (sdl:x rect)) (y (sdl:y rect)) (eol) (word-length) (prev-pos) (cur-pos) (read-pos2) (cur-line 0)
+        (final-txt (create-string)))
+    (loop for (txt color) in txt-struct
+          for txt-length = (length txt)
+          for read-pos = 0
+          do
+             ;;(format t "TXT = ~A~%~%" txt)
+             (loop until (or (>= read-pos txt-length) (>= y (+ (sdl:y rect) (sdl:height rect)))) do
+               (setf prev-pos read-pos)
+               (setf cur-pos prev-pos)
+               (loop until (or (>= read-pos txt-length) (>= x (+ (sdl:x rect) (sdl:width rect)))) do
+                 (when (eql eol t) (loop-finish))
+                 (multiple-value-setq (read-pos2 word-length eol) (read-word txt read-pos))
+                 (if (< (+ x (* word-length (sdl:char-width font))) (+ (sdl:x rect) (sdl:width rect)))
+                   (progn 
+                     (setf read-pos read-pos2)
+                     ;;(format t "read-pos = ~A, cur-pos = ~A, cur-pos + world-length = ~A " read-pos cur-pos (+ cur-pos word-length))
+                     ;;(format t "txt = ~A~%" (subseq txt cur-pos (+ cur-pos word-length)))
+                     (when (>= cur-line start-line)
+                       (format final-txt "~A" (subseq txt cur-pos (+ cur-pos word-length)))
+                       (when (null count-only)
+                         (sdl:draw-string-solid-* (subseq txt cur-pos (+ cur-pos word-length)) x y :justify :left :surface surface :font font :color color)))
+                     (incf x (* word-length (sdl:char-width font)))
+                     (incf cur-pos word-length))
+                   (progn (setf eol t) (loop-finish)))
+                     )
+
+               ;;(format t "X = ~A, Y = ~A, EOL = ~A, read-pos = ~A, txt-length = ~A~%" x y eol read-pos txt-length)
+
+               (when eol
+                 (setf x (sdl:x rect))
+                 (setf eol nil)
+                 (when (>= cur-line start-line)
+                   (format final-txt "~A~%" (new-line))
+                   (when (null count-only)
+                     (incf y (sdl:char-height font))))
+                 (incf cur-line))
+                   )
+          )
+    ;;(format t "final-txt = ~A~%" final-txt)
+    
     (values cur-line final-txt)))
 
 (defun pause-for-poll ()

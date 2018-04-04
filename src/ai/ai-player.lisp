@@ -29,13 +29,13 @@
         with n = 0
         do
            (when (zerop n)
-             (add-message "You see "))
+             (add-message "You see " (sdl:color :r 100 :g 100 :b 100)))
            (when (not (zerop n))
-             (add-message ", "))
-           (add-message (format nil "~A" (prepend-article +article-a+ (visible-name item))))
+             (add-message ", " (sdl:color :r 100 :g 100 :b 100)))
+           (add-message (format nil "~A" (prepend-article +article-a+ (visible-name item))) (sdl:color :r 100 :g 100 :b 100))
            (incf n)
         finally (when (not (zerop n))
-                  (add-message (format nil ".~%"))))
+                  (add-message (format nil ".~%") (sdl:color :r 100 :g 100 :b 100))))
   
   (make-output *current-window*) 
 

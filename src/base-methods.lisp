@@ -90,14 +90,14 @@
           (t (funcall func (+ x dx) (+ y dy) (+ z dz))))))))
   
 
-(defun print-visible-message (x y z level str &key (observed-mob nil))
+(defun print-visible-message (x y z level str &key (observed-mob nil) (color sdl:*white*))
   (when (or (and (null observed-mob)
                  (get-single-memo-visibility (get-memo-* level x y z)))
             (and observed-mob
                  (get-single-memo-visibility (get-memo-* level x y z))
                  (check-mob-visible observed-mob :observer *player* :complete-check t)))
     (set-message-this-turn t)
-    (add-message str)))
+    (add-message str color)))
 
 (defun place-animation (x y z animation-type-id &key (params nil))
   (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue *world*)))
@@ -968,7 +968,11 @@
   
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                         (format nil "~A reloads his ~(~A~). " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-weapon-name actor)))
+                         (format nil "~A reloads his ~(~A~). " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-weapon-name actor))
+                         :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                                  *shared-mind-msg-color*
+                                  sdl:*white*))
 
   (make-act actor +normal-ap+))
 
@@ -996,7 +1000,11 @@
       (setf bullets-left (get-ranged-weapon-rof actor)))
     
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A ~A ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-ranged-weapon-shoot-str actor) (prepend-article +article-the+ (visible-name target))))
+                           (format nil "~A ~A ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-ranged-weapon-shoot-str actor) (prepend-article +article-the+ (visible-name target)))
+                           :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                           (not (find (id actor) (proper-visible-mobs *player*))))
+                                    *shared-mind-msg-color*
+                                    sdl:*white*))
     
     (loop repeat bullets-left
           with rx
@@ -1057,9 +1065,17 @@
     (loop for (a-target . dmg) in affected-targets do
       (if (zerop dmg)
           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                 (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name a-target)))))
+                                 (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))))
+                                 :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                 (not (find (id actor) (proper-visible-mobs *player*))))
+                                          *shared-mind-msg-color*
+                                          sdl:*white*))
           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                 (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))) dmg)))
+                                 (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))) dmg)
+                                 :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                 (not (find (id actor) (proper-visible-mobs *player*))))
+                                          *shared-mind-msg-color*
+                                          sdl:*white*)))
       (when (check-dead a-target)
         (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-ranged-weapon-aux actor))
           
@@ -1076,7 +1092,11 @@
     
     (when completely-missed
       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                             (format nil "~A misses. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                             (format nil "~A misses. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                             :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                             (not (find (id actor) (proper-visible-mobs *player*))))
+                                      *shared-mind-msg-color*
+                                      sdl:*white*))
       )
     (let ((ranged-spd (get-ranged-weapon-speed actor)))
       (when (mob-effect-p actor +mob-effect-adrenaline+)
@@ -1120,7 +1140,11 @@
                                      (prepend-article +article-the+ (visible-name target))
                                      (prepend-article +article-the+ (visible-name target))))
       (print-visible-message (x target) (y target) (z target) (level *world*) 
-                             (format nil "~A is not harmed. " (capitalize-name (prepend-article +article-the+ (visible-name target))))))
+                             (format nil "~A is not harmed. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                             :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                             (not (find (id target) (proper-visible-mobs *player*))))
+                                      *shared-mind-msg-color*
+                                      sdl:*white*)))
     (rem-mob-effect target +mob-effect-divine-shield+)
     (when (and actor att-spd) (make-act actor att-spd))
     (return-from inflict-damage 0))
@@ -1133,12 +1157,20 @@
       (when (or (check-mob-visible actor :observer *player*)
                 (check-mob-visible target :observer *player*))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor))))))
+                               (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor)))
+                               :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                             (not (find (id actor) (proper-visible-mobs *player*))))
+                                        *shared-mind-msg-color*
+                                        sdl:*white*))))
     (when (and actor
                (mob-effect-p actor +mob-effect-possessed+))
       (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor)))))
+                               (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor)))
+                               :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                               (not (find (id actor) (proper-visible-mobs *player*))))
+                                        *shared-mind-msg-color*
+                                        sdl:*white*)))
       (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)))
 
   ;; if the attacker is disguised - remove the disguise
@@ -1176,14 +1208,22 @@
                                           (format nil "~A attacks ~A, but ~A evades the attack. "
                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                   (prepend-article +article-the+ (visible-name target))
-                                                  (prepend-article +article-the+ (visible-name target))))))
+                                                  (prepend-article +article-the+ (visible-name target)))
+                                          :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                          (not (find (id actor) (proper-visible-mobs *player*))))
+                                                   *shared-mind-msg-color*
+                                                   sdl:*white*))))
                 ((and actor
                       (not no-hit-message)
                       (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor)))
                       (check-mob-visible actor :observer *player*))
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                          (format nil "~A attacks somebody, but it evades the attack. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                          (format nil "~A attacks somebody, but it evades the attack. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                          :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                          (not (find (id actor) (proper-visible-mobs *player*))))
+                                                   *shared-mind-msg-color*
+                                                   sdl:*white*))))
                 ((and (not no-hit-message)
                       (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target)))
                       (check-mob-visible target :observer *player*))
@@ -1191,7 +1231,11 @@
                    (print-visible-message (x target) (y target) (z target) (level *world*) 
                                           (format nil "Somebody attacks ~A, but ~A evades the attack. "
                                                   (prepend-article +article-the+ (visible-name target))
-                                                  (prepend-article +article-the+ (visible-name target)))))))
+                                                  (prepend-article +article-the+ (visible-name target)))
+                                          :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                          (not (find (id target) (proper-visible-mobs *player*))))
+                                                   *shared-mind-msg-color*
+                                                   sdl:*white*)))))
               
               (set-mob-location target x y (z target))
 
@@ -1236,7 +1280,11 @@
                 (setf cur-dmg (1- (cur-hp target)))
                 (rem-mob-effect target +mob-effect-soul-reinforcement+)
                 (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                       (format nil "Reinforced soul of ~A prevents a fatal blow. " (prepend-article +article-the+ (visible-name target)))))
+                                       (format nil "Reinforced soul of ~A prevents a fatal blow. " (prepend-article +article-the+ (visible-name target)))
+                                       :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                       (not (find (id target) (proper-visible-mobs *player*))))
+                                                *shared-mind-msg-color*
+                                                sdl:*yellow*)))
               
               (decf (cur-hp target) cur-dmg)
               ;; place a blood spattering
@@ -1260,33 +1308,53 @@
                                               (format nil "~A hits ~A, but ~A is not hurt. "
                                                       (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                       (prepend-article +article-the+ (visible-name target))
-                                                      (prepend-article +article-the+ (visible-name target))))))
+                                                      (prepend-article +article-the+ (visible-name target)))
+                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and actor
                           (not no-hit-message)
                           (not specific-no-dmg-string-func)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                              (format nil "~A hits somebody, but it is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                              (format nil "~A hits somebody, but it is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and actor
                           (not no-hit-message)
                           (not specific-no-dmg-string-func)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "Somebody hits ~A, but ~A is not hurt. " (prepend-article +article-the+ (visible-name target)) (prepend-article +article-the+ (visible-name target))))))
+                                              (format nil "Somebody hits ~A, but ~A is not hurt. " (prepend-article +article-the+ (visible-name target)) (prepend-article +article-the+ (visible-name target)))
+                                              :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and (not actor)
                           (not no-hit-message)
                           (not specific-no-dmg-string-func)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
+                                              (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                              :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and specific-no-dmg-string-func
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (funcall specific-no-dmg-string-func))))))
+                                              (funcall specific-no-dmg-string-func)
+                                              :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))))
                 (progn
                   (cond
                     ((and actor
@@ -1295,30 +1363,50 @@
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                              (format nil "~A hits ~A for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)) cur-dmg))))
+                                              (format nil "~A hits ~A for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)) cur-dmg)
+                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and actor
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                              (format nil "~A hits somebody for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) cur-dmg))))
+                                              (format nil "~A hits somebody for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) cur-dmg)
+                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and actor
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "Somebody hits ~A for ~A damage. " (prepend-article +article-the+ (visible-name target)) cur-dmg))))
+                                              (format nil "Somebody hits ~A for ~A damage. " (prepend-article +article-the+ (visible-name target)) cur-dmg)
+                                              :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and (not actor)
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg))))
+                                              (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)
+                                              :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))
                     ((and specific-hit-string-func
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                              (funcall specific-hit-string-func cur-dmg))))))
+                                              (funcall specific-hit-string-func cur-dmg)
+                                              :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                             (not (find (id target) (proper-visible-mobs *player*))))
+                                                       *shared-mind-msg-color*
+                                                       sdl:*white*))))))
                 )
               ;; if the attacker can constrict - constrict around the target
               (when (and actor
@@ -1333,7 +1421,11 @@
                     (set-mob-effect actor :effect-type-id +mob-effect-constriction-source+ :actor-id (id actor) :param1 (list (list (x actor) (y actor) (z actor))
                                                                                                                               (list (id target))))))
                 (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                       (format nil "~A grabs ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))))
+                                       (format nil "~A grabs ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))
+                                       :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                       (not (find (id target) (proper-visible-mobs *player*))))
+                                                *shared-mind-msg-color*
+                                                sdl:*white*)))
 
               ;; if the attack corrodes - corrode the target
               (when (and weapon-aux
@@ -1349,19 +1441,31 @@
                   (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                      (format nil "~A misses ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target))))))
+                                      (format nil "~A misses ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))
+                                      :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                      (not (find (id actor) (proper-visible-mobs *player*))))
+                                               *shared-mind-msg-color*
+                                               sdl:*white*))))
             ((and actor
                   (not no-hit-message)
                   (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                      (format nil "~A misses somebody. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                      (format nil "~A misses somebody. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                      :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                      (not (find (id actor) (proper-visible-mobs *player*))))
+                                               *shared-mind-msg-color*
+                                               sdl:*white*))))
             ((and actor
                   (not no-hit-message)
                   (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
              (progn
                (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                      (format nil "Somebody misses ~A. " (prepend-article +article-the+ (visible-name target)))))))
+                                      (format nil "Somebody misses ~A. " (prepend-article +article-the+ (visible-name target)))
+                                      :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                      (not (find (id actor) (proper-visible-mobs *player*))))
+                                               *shared-mind-msg-color*
+                                               sdl:*white*)))))
           
           ))
 
@@ -1571,7 +1675,7 @@
     (when msg
       (if (eq (id mob) (riding-mob-id *player*))
         (add-message dead-msg-str)
-        (print-visible-message (x mob) (y mob) (z mob) (level *world*) dead-msg-str))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) dead-msg-str :color (sdl:color :r 150 :g 0 :b 0)))
       (when msg-newline (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%"))))
     
     ;; apply all on-kill abilities of the killer 

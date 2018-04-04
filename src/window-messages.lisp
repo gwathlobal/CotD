@@ -11,15 +11,17 @@
   (sdl:draw-string-solid-* "MESSAGES" (truncate *window-width* 2) 0 :justify :center)
 
   (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (+ 10 (sdl:char-height sdl:*default-font*)) :w (- *window-width* 10) :h (- *window-height* (+ 10 (sdl:char-height sdl:*default-font*)) (sdl:char-height sdl:*default-font*) 20)))
-    (let ((max-str (write-text (get-msg-str-list) rect :count-only t)))
+    (let ((max-str (write-colored-text (colored-txt-list (message-box-strings *full-message-box*)) rect :count-only t)))
 
       (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
         (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
       
       (when (< (cur-str win) 0)
         (setf (cur-str win) 0))
+
+      (format t "CUR-STR= ~A~%" (cur-str win))
       
-      (write-text (get-msg-str-list) rect :start-line (cur-str win))
+      (write-colored-text (colored-txt-list (message-box-strings *full-message-box*)) rect :start-line (cur-str win))
       )
     )
     

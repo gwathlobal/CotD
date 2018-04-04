@@ -625,6 +625,8 @@
 (defparameter *max-oxygen-level* 5)
 (defparameter *lack-oxygen-dmg* 5)
 
+(defparameter *shared-mind-msg-color* (sdl:color :r 0 :g 128 :b 128))
+
 (defparameter *water-move-factor* 1.5)
 
 (defconstant +connect-room-none+ -1)

@@ -281,130 +281,132 @@
              (push (list x y z light-radius) (nearby-light-sources *player*)))
         )
   
-  (loop for mob-id of-type fixnum in (loop with result = ()
+    (loop for mob-id of-type fixnum in (if (mob-ability-p mob +mob-abil-shared-minds+)
+                                         (mob-id-list (level *world*))
+                                         (loop with result = ()
                                            for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
                                            when (and (>= (+ quad-x qx) 0) (>= (+ quad-y qy) 0)
                                                      (< (+ quad-x qx) (array-dimension (mob-quadrant-map (level *world*)) 0))
                                                      (< (+ quad-y qy) (array-dimension (mob-quadrant-map (level *world*)) 1)))
                                              do
                                                 (setf result (append result (aref (mob-quadrant-map (level *world*)) (+ quad-x qx) (+ quad-y qy))))
-                                           finally (return result))
-        for tmob of-type mob = (get-mob-by-id mob-id)
-        for vision-pwr of-type fixnum = (cur-sight mob)
-        for vision-power of-type fixnum = (cur-sight mob)
-        for light-power of-type fixnum = (* *light-power-faloff* (abs (cur-light tmob)))
-        for light-pwr of-type fixnum = (abs (cur-light tmob))
-        for light-power-base of-type fixnum = (abs (cur-light tmob))
-        do
-           ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
-           ;; except for trinity mimic - they share minds only with their own union
-           (when (and (not (eq mob tmob))
-                      (mob-ability-p mob +mob-abil-shared-minds+)
-                      (mob-ability-p tmob +mob-abil-shared-minds+)
-                      (= (faction mob) (faction tmob))
-                      (or (and (not (mob-ability-p mob +mob-abil-trinity-mimic+))
-                               (not (mob-ability-p tmob +mob-abil-trinity-mimic+)))
-                          (and (mob-ability-p mob +mob-abil-trinity-mimic+)
-                               (mob-ability-p tmob +mob-abil-trinity-mimic+)
-                               (find (id mob) (mimic-id-list tmob)))))
-             (pushnew mob-id (shared-visible-mobs mob))
+                                           finally (return result)))
+          for tmob of-type mob = (get-mob-by-id mob-id)
+          for vision-pwr of-type fixnum = (cur-sight mob)
+          for vision-power of-type fixnum = (cur-sight mob)
+          for light-power of-type fixnum = (* *light-power-faloff* (abs (cur-light tmob)))
+          for light-pwr of-type fixnum = (abs (cur-light tmob))
+          for light-power-base of-type fixnum = (abs (cur-light tmob))
+          do
+             ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
+             ;; except for trinity mimic - they share minds only with their own union
+             (when (and (not (eq mob tmob))
+                        (mob-ability-p mob +mob-abil-shared-minds+)
+                        (mob-ability-p tmob +mob-abil-shared-minds+)
+                        (= (faction mob) (faction tmob))
+                        (or (and (not (mob-ability-p mob +mob-abil-trinity-mimic+))
+                                 (not (mob-ability-p tmob +mob-abil-trinity-mimic+)))
+                            (and (mob-ability-p mob +mob-abil-trinity-mimic+)
+                                 (mob-ability-p tmob +mob-abil-trinity-mimic+)
+                                 (find (id mob) (mimic-id-list tmob)))))
+               (pushnew mob-id (shared-visible-mobs mob))
                ;(format t "~A [~A] sees ~A~%" (name tmob) (id tmob) (visible-mobs tmob))
-             (loop for vmob-id in (proper-visible-mobs tmob)
-                   when (and (not (check-dead (get-mob-by-id vmob-id)))
-                             (not (is-merged (get-mob-by-id vmob-id))))
-                     do
-                        (pushnew vmob-id (shared-visible-mobs mob)))
-             (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
-
-           ;; you see all mobs that you have parasites on
-           (when (and (not (eq mob tmob))
-                      (mob-ability-p mob +mob-abil-primordial+)
-                      (mob-effect-p tmob +mob-effect-parasite+))
-             (pushnew mob-id (shared-visible-mobs mob))
+               (loop for vmob-id in (proper-visible-mobs tmob)
+                     when (and (not (check-dead (get-mob-by-id vmob-id)))
+                               (not (is-merged (get-mob-by-id vmob-id))))
+                       do
+                          (pushnew vmob-id (shared-visible-mobs mob)))
+               (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
              
-             (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
-           
-           ;; set up visible mobs
-           (when (and (not (eq mob tmob))
-                      (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob)))
-             (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
-                            #'(lambda (dx dy dz prev-cell)
-                                (declare (type fixnum dx dy dz))
-                                (let* ((exit-result t) (mob-id 0) (pwr-decrease 0)) 
-                                  (declare (type fixnum mob-id))
-                                  
-                                  (block nil
+             ;; you see all mobs that you have parasites on
+             (when (and (not (eq mob tmob))
+                        (mob-ability-p mob +mob-abil-primordial+)
+                      (mob-effect-p tmob +mob-effect-parasite+))
+               (pushnew mob-id (shared-visible-mobs mob))
+               
+               (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
+             
+             ;; set up visible mobs
+             (when (and (not (eq mob tmob))
+                        (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob)))
+               (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
+                              #'(lambda (dx dy dz prev-cell)
+                                  (declare (type fixnum dx dy dz))
+                                  (let* ((exit-result t) (mob-id 0) (pwr-decrease 0)) 
+                                    (declare (type fixnum mob-id))
                                     
-                                    (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
-                                    (unless pwr-decrease
-                                      (setf exit-result 'exit)
+                                    (block nil
+                                      
+                                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                      (unless pwr-decrease
+                                        (setf exit-result 'exit)
                                         (return))
-                                    (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
-                                    (decf vision-pwr)
-                                    
-                                    (when (and (get-mob-* (level *world*) dx dy dz) 
-                                               (not (eq (get-mob-* (level *world*) dx dy dz) mob))
-                                               (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer mob))
+                                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                      (decf vision-pwr)
+                                      
+                                      (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                 (not (eq (get-mob-* (level *world*) dx dy dz) mob))
+                                                 (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer mob))
                                         ;(format t "VISIBILITY ~A ~A" (name (get-mob-* (level *world*) dx dy dz)) (get-mob-visibility (get-mob-* (level *world*) dx dy dz)))
-                                      (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
-                                      (pushnew mob-id (proper-visible-mobs mob)))
-                                    
-                                    (when (<= vision-pwr 0)
-                                      (setf exit-result 'exit)
-                                      (return))
-                                    
-                                    )
-                                  exit-result))))
-           ;; set up mob brightness
-           (when (and (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (abs (cur-light tmob)))
+                                        (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
+                                        (pushnew mob-id (proper-visible-mobs mob)))
+                                      
+                                      (when (<= vision-pwr 0)
+                                        (setf exit-result 'exit)
+                                        (return))
+                                      
+                                      )
+                                    exit-result))))
+             ;; set up mob brightness
+             (when (and (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (abs (cur-light tmob)))
                       ;(not (eq mob tmob))
-                      )
-             (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
-                            #'(lambda (dx dy dz prev-cell)
-                                (declare (type fixnum dx dy dz))
-                                (let* ((exit-result t) (pwr-decrease 0)) 
-                                  (block nil
+                        )
+               (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
+                              #'(lambda (dx dy dz prev-cell)
+                                  (declare (type fixnum dx dy dz))
+                                  (let* ((exit-result t) (pwr-decrease 0)) 
+                                    (block nil
+                                      
+                                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                      (unless pwr-decrease
+                                        (setf exit-result 'exit)
+                                        (return))
+                                      (decf light-pwr (truncate (* light-power-base pwr-decrease) 100))
+                                      (decf light-pwr)
+                                      
+                                      (if (> (cur-light tmob) 0)
+                                        (progn
+                                          ;; if the light emitted by a mob is positive - increase brightness
+                                          (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                     (eq (get-mob-* (level *world*) dx dy dz) mob)
+                                                     (> light-power (brightness mob)))
+                                            (setf (brightness mob) light-power))
+                                          (decf light-power *light-power-faloff*))
+                                        (progn
+                                          ;; if the light emitted by a mob is positive - increase darkness
+                                          (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                     (eq (get-mob-* (level *world*) dx dy dz) mob)
+                                                     (> light-power (darkness mob)))
+                                            (setf (darkness mob) light-power))
+                                          (decf light-power *dark-power-faloff*)))
+                                      
+                                      (when (<= light-pwr 0)
+                                        (setf exit-result 'exit)
+                                        (return)))
                                     
-                                    (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
-                                    (unless pwr-decrease
-                                      (setf exit-result 'exit)
-                                      (return))
-                                    (decf light-pwr (truncate (* light-power-base pwr-decrease) 100))
-                                    (decf light-pwr)
-
-                                    (if (> (cur-light tmob) 0)
-                                      (progn
-                                        ;; if the light emitted by a mob is positive - increase brightness
-                                        (when (and (get-mob-* (level *world*) dx dy dz) 
-                                                   (eq (get-mob-* (level *world*) dx dy dz) mob)
-                                                   (> light-power (brightness mob)))
-                                          (setf (brightness mob) light-power))
-                                        (decf light-power *light-power-faloff*))
-                                      (progn
-                                        ;; if the light emitted by a mob is positive - increase darkness
-                                        (when (and (get-mob-* (level *world*) dx dy dz) 
-                                                   (eq (get-mob-* (level *world*) dx dy dz) mob)
-                                                   (> light-power (darkness mob)))
-                                          (setf (darkness mob) light-power))
-                                        (decf light-power *dark-power-faloff*)))
-
-                                    (when (<= light-pwr 0)
-                                      (setf exit-result 'exit)
-                                      (return)))
-                                    
-                                  exit-result))))
-
-           ;; set up nearby mobs that are light sources for player
-           (when (and (eq mob *player*)
-                      (not (zerop (cur-light tmob)))
-                      (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (+ (cur-light tmob) (cur-sight mob))))
-             (push (id tmob) (nearby-light-mobs *player*)))
-           
-           ;; set up mobs that potentially hear you
-           (when (and (not (eq mob tmob))
-                      (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) *max-hearing-range*))
-             (pushnew mob-id (hear-range-mobs mob)))
-        )
+                                    exit-result))))
+             
+             ;; set up nearby mobs that are light sources for player
+             (when (and (eq mob *player*)
+                        (not (zerop (cur-light tmob)))
+                        (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (+ (cur-light tmob) (cur-sight mob))))
+               (push (id tmob) (nearby-light-mobs *player*)))
+             
+             ;; set up mobs that potentially hear you
+             (when (and (not (eq mob tmob))
+                        (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) *max-hearing-range*))
+               (pushnew mob-id (hear-range-mobs mob)))
+          )
     )
   (when (eq mob *player*)
     (calc-lit-tiles-for-player *player*))

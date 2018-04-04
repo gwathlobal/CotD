@@ -19,7 +19,11 @@
                                                                                                              (format nil "You hear some strange noise~A. " str)))
                                                   
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A invokes divine powers to heal itself for ~A. " (capitalize-name (prepend-article +article-the+  (visible-name actor))) heal-pwr))))
+                                                                         (format nil "~A invokes divine powers to heal itself for ~A. " (capitalize-name (prepend-article +article-the+  (visible-name actor))) heal-pwr)
+                                                                         :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (not (mob-effect-p actor +mob-effect-divine-concealed+))
@@ -55,7 +59,11 @@
                                                                                                            (format nil "You hear some strange noise~A. " str)))
                                                 (when (check-mob-visible actor :observer *player*)
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                         (format nil "~A invokes divine powers to disguise itself as a human. " (capitalize-name (prepend-article +article-the+  (name actor)))))))
+                                                                         (format nil "~A invokes divine powers to disguise itself as a human. " (capitalize-name (prepend-article +article-the+  (name actor))))
+                                                                         :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (not (mob-effect-p actor +mob-effect-reveal-true-form+))
@@ -88,7 +96,11 @@
                                                                                                            (format nil "You hear some strange noise~A. " str)))
                                                  (when (check-mob-visible actor :observer *player*)
                                                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                          (format nil "~A reveals its true divine form. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                                          (format nil "~A reveals its true divine form. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                          :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-effect-p actor +mob-effect-divine-concealed+)
@@ -125,7 +137,11 @@
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A reveals the true form of ~A. "
                                                                                (capitalize-name (prepend-article +article-the+  (visible-name actor)))
-                                                                               (prepend-article +article-the+ (get-qualified-name target)))))
+                                                                               (prepend-article +article-the+ (get-qualified-name target)))
+                                                                       :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*)))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
                                                       (if (and (mob-ability-p actor +mob-abil-detect-good+)
@@ -143,7 +159,11 @@
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                          (format nil "~A reveals the true form of ~A. "
                                                                                  (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                 (prepend-article +article-the+ (get-qualified-name target)))))
+                                                                                 (prepend-article +article-the+ (get-qualified-name target)))
+                                                                         :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*)))
                                                 (set-mob-effect target :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
@@ -174,7 +194,11 @@
                                                 (mob-possess-target actor target)
                                                 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target))))
+                                                                       (format nil "~A possesses ~A. " (capitalize-name (prepend-article +article-the+ (name actor))) (prepend-article +article-the+ (visible-name target)))
+                                                                       :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))
@@ -227,7 +251,11 @@
                                                 (set-mob-effect target :effect-type-id +mob-effect-blessed+ :actor-id (id actor))
                                                 (incf (cur-fp actor))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A blesses ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target))))
+                                                                       (format nil "~A blesses ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))
+                                                                       :color (if (and (find (id actor) (shared-visible-mobs *player*))
+                                                                                       (not (find (id actor) (proper-visible-mobs *player*))))
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type))

@@ -17,6 +17,7 @@
     ((:file "logger")
      (:file "astar")
      (:file "globals")
+     (:file "colored-text")
      (:file "message-box")
      (:file "options")
      (:file "game-events/game-events")

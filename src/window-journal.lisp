@@ -12,25 +12,27 @@
          (y (+ 0 (* 2 (sdl:char-height sdl:*default-font*))))
          (w (- *window-width* 20))
          (h (- *window-height* 20 (sdl:char-height sdl:*default-font*) y))
-         (str (create-string)))
+         (txt-struct (make-colored-txt)))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
 
       (when (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*)))) :key #'(lambda (a)
                                                                                                                                          (first a)))
-        (format str "~A~%~%~%" (descr (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
-                                                                        :key #'(lambda (a)
-                                                                                 (first a))))))))
-      (format str "Faction relations~%")
+        (add-colored-str txt-struct (format nil "~A~%~%~%" (descr (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                                                                                      :key #'(lambda (a)
+                                                                                               (first a))))))))
+        )
+      (add-colored-str txt-struct (format nil "Faction relations~%"))
+            
       (loop for faction-type across *faction-types*
             when (and faction-type
                       (not (= (id faction-type) (faction *player*))))
               do
-                 (format str "  ~20A : ~A~%" (name faction-type) (if (get-faction-relation (id faction-type) (faction *player*))
-                                                                 "ALLY"
-                                                                 "ENEMY")))
-
-      (write-text str a-rect :color sdl:*white*))
+                 (add-colored-str txt-struct (format nil "  ~20A : ~A~%" (name faction-type) (if (get-faction-relation (id faction-type) (faction *player*))
+                                                                                               "ALLY"
+                                                                                               "ENEMY"))))
+      
+      (write-colored-text (colored-txt-list txt-struct) a-rect))
     )
 
   (sdl:draw-string-solid-* (format nil "[Esc] Exit")
