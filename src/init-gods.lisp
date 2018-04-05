@@ -66,7 +66,11 @@
                                                                   (card-type-id (first (nth r deck-of-damnation)))
                                                                   (piety-gain (second (nth r deck-of-damnation))))
                                                              (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                    (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id))))
+                                                                                    (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))
+                                                                                    :color (if (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                    (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                             *shared-mind-msg-color*
+                                                                                             sdl:*magenta*))
                                                              (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) mob)
                                                              (incf new-piety piety-gain)
 
@@ -86,7 +90,11 @@
                                                                    finally
                                                                       (when (>= enemy-strength (strength mob))
                                                                         (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                               (format nil "Malseraph bursts with laughter. "))
+                                                                                               (format nil "Malseraph bursts with laughter. ")
+                                                                                               :color (if (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                               (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                                        *shared-mind-msg-color*
+                                                                                                        sdl:*magenta*))
                                                                         (incf new-piety 40)))))
 
                                                          ;; Malseraph is interested and something good is about to happen
@@ -113,7 +121,11 @@
                                                                          (and (not print-msg)
                                                                               (eq mob *player*)))
                                                                  (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                        (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))))
+                                                                                        (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))
+                                                                                        :color (if (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                        (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                                 *shared-mind-msg-color*
+                                                                                                 sdl:*magenta*)))
                                                                (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) mob))
 
                                                              ))
@@ -126,7 +138,11 @@
                                                            (let* ((r (random (length deck-of-neutrality)))
                                                                   (card-type-id (first (nth r deck-of-neutrality))))
                                                              (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                    (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id))))
+                                                                                    (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))
+                                                                                    :color (if (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                    (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                             *shared-mind-msg-color*
+                                                                                             sdl:*magenta*))
                                                              (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) mob)
                                                              ))
 
@@ -142,7 +158,11 @@
                                                                finally
                                                                   (when (> enemy-strength (+ (get-worshiped-god-param1 (worshiped-god mob)) (strength mob)))
                                                                         (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                               (format nil "Malseraph giggles. "))
+                                                                                               (format nil "Malseraph giggles. ")
+                                                                                               :color (if (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                               (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                                        *shared-mind-msg-color*
+                                                                                                        sdl:*magenta*))
                                                                         (incf new-piety 40)
                                                                         (set-mob-worshiped-god-param1 mob enemy-strength))
                                                                   

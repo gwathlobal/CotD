@@ -723,7 +723,10 @@
                                   (when (or (check-mob-visible mob :observer *player*)
                                             (check-mob-visible target-mob :observer *player*))
                                     (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                           (format nil "~A pushes ~A. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) (prepend-article +article-the+ (visible-name target-mob))))))
+                                                           (format nil "~A pushes ~A. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) (prepend-article +article-the+ (visible-name target-mob)))
+                                                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                    *shared-mind-msg-color*
+                                                                    sdl:*white*))))
                                 ))
                             (on-bump target-mob mob)))
                       finally
@@ -969,8 +972,7 @@
   (set-ranged-weapon-charges actor (get-ranged-weapon-max-charges actor))
   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                          (format nil "~A reloads his ~(~A~). " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-weapon-name actor))
-                         :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                         (not (find (id actor) (proper-visible-mobs *player*))))
+                         :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                   *shared-mind-msg-color*
                                   sdl:*white*))
 
@@ -1001,8 +1003,7 @@
     
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                            (format nil "~A ~A ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-ranged-weapon-shoot-str actor) (prepend-article +article-the+ (visible-name target)))
-                           :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                           (not (find (id actor) (proper-visible-mobs *player*))))
+                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                     *shared-mind-msg-color*
                                     sdl:*white*))
     
@@ -1066,14 +1067,12 @@
       (if (zerop dmg)
           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                  (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))))
-                                 :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                 (not (find (id actor) (proper-visible-mobs *player*))))
+                                 :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                           *shared-mind-msg-color*
                                           sdl:*white*))
           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                  (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))) dmg)
-                                 :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                 (not (find (id actor) (proper-visible-mobs *player*))))
+                                 :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                           *shared-mind-msg-color*
                                           sdl:*white*)))
       (when (check-dead a-target)
@@ -1093,8 +1092,7 @@
     (when completely-missed
       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                              (format nil "~A misses. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                             :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                             (not (find (id actor) (proper-visible-mobs *player*))))
+                             :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                       *shared-mind-msg-color*
                                       sdl:*white*))
       )
@@ -1158,8 +1156,7 @@
                 (check-mob-visible target :observer *player*))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor)))
-                               :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                             (not (find (id actor) (proper-visible-mobs *player*))))
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                         *shared-mind-msg-color*
                                         sdl:*white*))))
     (when (and actor
@@ -1167,8 +1164,7 @@
       (unless (mob-effect-p actor +mob-effect-reveal-true-form+)
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                (format nil "~A reveals the true form of ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (get-qualified-name actor)))
-                               :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                               (not (find (id actor) (proper-visible-mobs *player*))))
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                         *shared-mind-msg-color*
                                         sdl:*white*)))
       (set-mob-effect actor :effect-type-id +mob-effect-reveal-true-form+ :actor-id (id actor) :cd 5)))
@@ -1209,8 +1205,7 @@
                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                   (prepend-article +article-the+ (visible-name target))
                                                   (prepend-article +article-the+ (visible-name target)))
-                                          :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                          (not (find (id actor) (proper-visible-mobs *player*))))
+                                          :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                    *shared-mind-msg-color*
                                                    sdl:*white*))))
                 ((and actor
@@ -1220,8 +1215,7 @@
                  (progn
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~A attacks somebody, but it evades the attack. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                          :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                          (not (find (id actor) (proper-visible-mobs *player*))))
+                                          :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                    *shared-mind-msg-color*
                                                    sdl:*white*))))
                 ((and (not no-hit-message)
@@ -1309,8 +1303,7 @@
                                                       (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                       (prepend-article +article-the+ (visible-name target))
                                                       (prepend-article +article-the+ (visible-name target)))
-                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                        *shared-mind-msg-color*
                                                        sdl:*white*))))
                     ((and actor
@@ -1320,8 +1313,7 @@
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                               (format nil "~A hits somebody, but it is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                        *shared-mind-msg-color*
                                                        sdl:*white*))))
                     ((and actor
@@ -1364,8 +1356,7 @@
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                               (format nil "~A hits ~A for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)) cur-dmg)
-                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                        *shared-mind-msg-color*
                                                        sdl:*white*))))
                     ((and actor
@@ -1374,8 +1365,7 @@
                      (progn
                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                               (format nil "~A hits somebody for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) cur-dmg)
-                                              :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                              (not (find (id actor) (proper-visible-mobs *player*))))
+                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                        *shared-mind-msg-color*
                                                        sdl:*white*))))
                     ((and actor
@@ -1442,8 +1432,7 @@
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                       (format nil "~A misses ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)))
-                                      :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                      (not (find (id actor) (proper-visible-mobs *player*))))
+                                      :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                *shared-mind-msg-color*
                                                sdl:*white*))))
             ((and actor
@@ -1452,8 +1441,7 @@
              (progn
                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                       (format nil "~A misses somebody. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                      :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                      (not (find (id actor) (proper-visible-mobs *player*))))
+                                      :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                *shared-mind-msg-color*
                                                sdl:*white*))))
             ((and actor
@@ -1462,8 +1450,7 @@
              (progn
                (print-visible-message (x target) (y target) (z target) (level *world*) 
                                       (format nil "Somebody misses ~A. " (prepend-article +article-the+ (visible-name target)))
-                                      :color (if (and (find (id actor) (shared-visible-mobs *player*))
-                                                      (not (find (id actor) (proper-visible-mobs *player*))))
+                                      :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                *shared-mind-msg-color*
                                                sdl:*white*)))))
           
@@ -1746,7 +1733,10 @@
 
 (defun mob-evolve (mob)
   (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                         (format nil "~A assumes a superior form of ~A! " (capitalize-name (prepend-article +article-the+ (name mob))) (prepend-article +article-a+ (name (get-mob-type-by-id (evolve-into mob))))))
+                         (format nil "~A assumes a superior form of ~A! " (capitalize-name (prepend-article +article-the+ (name mob))) (prepend-article +article-a+ (name (get-mob-type-by-id (evolve-into mob)))))
+                         :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                  *shared-mind-msg-color*
+                                  sdl:*white*))
   
   (setf (mob-type mob) (evolve-into mob))
   (setf (cur-hp mob) (max-hp mob))
@@ -1758,7 +1748,10 @@
   (when (= (mob-type mob) +mob-type-demon+) 
     (set-name mob)
     (unless (eq mob *player*)
-      (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "It will be hereby known as ~A! " (name mob)))))
+      (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "It will be hereby known as ~A! " (name mob))
+                             :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                      *shared-mind-msg-color*
+                                      sdl:*white*))))
   
   (set-cur-weapons mob)
   (adjust-abilities mob)
@@ -1779,7 +1772,10 @@
                                                                                                     nil)
                                                   :aux-params ())
     (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-blood-stain+ :x (x mob) :y (y mob)))
-    (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "Its ascension destroyed its vessel."))
+    (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "Its ascension destroyed its vessel.")
+                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                    *shared-mind-msg-color*
+                                    sdl:*white*))
     
     (rem-mob-effect mob +mob-effect-possessed+)
     (setf (master-mob-id mob) nil)
@@ -1870,7 +1866,10 @@
         (decf (cur-oxygen mob)))
       (when (zerop (cur-oxygen mob))
         (decf (cur-hp mob) *lack-oxygen-dmg*)
-        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A can not breath and takes ~A dmg. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) *lack-oxygen-dmg*) :observed-mob mob)
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~A can not breath and takes ~A dmg. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) *lack-oxygen-dmg*) :observed-mob mob
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                        *shared-mind-msg-color*
+                                        sdl:*white*))
         (when (check-dead mob)
           (when (eq mob *player*)
             (setf (killed-by *player*) "drowning"))
@@ -1884,7 +1883,10 @@
                                                                                                             t
                                                                                                             nil)
                                                           :aux-params ())))
-        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%") :observed-mob mob))))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "~%") :observed-mob mob
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                        *shared-mind-msg-color*
+                                        sdl:*white*)))))
   
   
   )
@@ -2229,14 +2231,20 @@
     (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                (format nil "You hear crackling~A. " str)))
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A bends space around itself and disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                           (format nil "~A bends space around itself and disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                    *shared-mind-msg-color*
+                                    sdl:*white*))
     
     (set-mob-location actor dx dy dz)
     
     (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                (format nil "You hear crackling~A. " str)))
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                           (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                    *shared-mind-msg-color*
+                                    sdl:*white*))
     ))
 
 (defun invoke-teleport-self (actor min-distance z)
@@ -2260,20 +2268,6 @@
                                                     (get-mob-move-mode actor))
                        +connect-room-none+))
           do
-             ;(format t "RX = ~A, RX = ~A, DIST = ~A, TERRAIN-FLOOR = ~A, CHECK-MOVE = ~A, CONNECT = ~A~%"
-             ;        rx ry (get-distance (x actor) (y actor) rx ry)
-             ;        (if (and (>= rx 0) (>= ry 0) (< rx max-x) (< ry max-y))
-             ;          (get-terrain-type-trait (get-terrain-* (level *world*) rx ry (z actor)) +terrain-trait-opaque-floor+)
-             ;          nil)
-             ;        (if (and (>= rx 0) (>= ry 0) (< rx max-x) (< ry max-y))
-             ;          (check-move-on-level actor rx ry (z actor))
-             ;          nil)
-             ;        (if (and (>= rx 0) (>= ry 0) (< rx max-x) (< ry max-y))
-             ;          (get-level-connect-map-value (level *world*) rx ry (z actor) (if (riding-mob-id actor)
-             ;                                                                         (map-size (get-mob-by-id (riding-mob-id actor)))
-             ;                                                                         (map-size actor))
-             ;                                       (get-mob-move-mode actor))
-             ;          nil))
              (decf n)
              (when (zerop n)
                (loop-finish))
@@ -2287,17 +2281,26 @@
         (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
                                                                     (format nil "You hear crackling~A." str)))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                               (format nil "~A disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                        *shared-mind-msg-color*
+                                        sdl:*white*))
         (set-mob-location actor rx ry z)
         (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
                                                                     (format nil "You hear crackling~A." str)))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                               (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                        *shared-mind-msg-color*
+                                        sdl:*white*)))
       (progn
         (generate-sound actor (x actor) (y actor) (z actor) 120 #'(lambda (str)
                                                                     (format nil "You hear crackling~A." str)))
         (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                               (format nil "~A blinks for a second, but remains in place. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                               (format nil "~A blinks for a second, but remains in place. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                        *shared-mind-msg-color*
+                                        sdl:*white*))))
     ))
 
 (defun invoke-disguise (actor)
@@ -2308,7 +2311,10 @@
                             +mob-type-woman+)))
   
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                           (format nil "~A disguises itself as ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-a+ (name (get-mob-type-by-id face-mob-type-id)))))
+                           (format nil "~A disguises itself as ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-a+ (name (get-mob-type-by-id face-mob-type-id))))
+                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                    *shared-mind-msg-color*
+                                    sdl:*white*))
     (set-mob-effect actor :effect-type-id +mob-effect-disguised+ :actor-id (id actor) :param1 face-mob-type-id)
     (adjust-disguise-for-mob actor)))
 
@@ -2345,13 +2351,19 @@
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~A's curse removed divine protection from ~A. "
                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                  (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id)))))
+                                                  (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id))))
+                                          :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                   *shared-mind-msg-color*
+                                                   sdl:*white*))
                    )
                  (progn
                    (logger (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
                    (set-mob-effect (get-mob-by-id enemy-mob-id) :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                          (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id))))))))
+                                          (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id)))))
+                                          :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                   *shared-mind-msg-color*
+                                                   sdl:*white*))))
             )
       
       )))
@@ -2369,11 +2381,17 @@
                  (set-mob-effect mob :effect-type-id +mob-effect-fear+ :actor-id (id actor) :cd 3)
                  (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                         (format nil "~A is feared. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
-                                        :observed-mob mob))
+                                        :observed-mob mob
+                                        :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                 *shared-mind-msg-color*
+                                                 sdl:*white*)))
                (progn
                  (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                         (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
-                                        :observed-mob mob)))))
+                                        :observed-mob mob
+                                        :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                 *shared-mind-msg-color*
+                                                 sdl:*white*))))))
 
 (defun invoke-reanimate-body (corpse-item)
   (let ((mob-corpse-type) (mob-corpse))
@@ -2403,7 +2421,10 @@
       (when (and (eq mob *player*)
                  (check-piety-level-changed (get-worshiped-god-type (worshiped-god mob))
                                             old-piety (get-worshiped-god-piety (worshiped-god mob))))
-        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (return-piety-change-str (get-worshiped-god-type (worshiped-god mob)) (get-worshiped-god-piety (worshiped-god mob)) old-piety))))))
+        (print-visible-message (x mob) (y mob) (z mob) (level *world*) (return-piety-change-str (get-worshiped-god-type (worshiped-god mob)) (get-worshiped-god-piety (worshiped-god mob)) old-piety)
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                        *shared-mind-msg-color*
+                                        sdl:*magenta*))))))
 
 (defun mob-move-passwall (actor dx dy dz)
   (loop with mx = (x actor)

@@ -57,6 +57,9 @@
                          (and (subtypep (type-of mob) 'player)
                               (mob-effect-p mob +mob-effect-split-soul-source+)))
                  (setf *player* mob))
+
+               (setf (if-cur-mob-seen-through-shared-vision *player*) (and (find (id mob) (shared-visible-mobs *player*))
+                                                                           (not (find (id mob) (proper-visible-mobs *player*)))))
                
                (ai-function mob)
                (when (get-message-this-turn) (add-message (format nil "~%")))
@@ -109,6 +112,9 @@
                  ;; increase cur-ap by max-ap
                  (incf (cur-ap mob) (max-ap mob))
                  ;; tick piety if the mob worships a god
+                 (setf (if-cur-mob-seen-through-shared-vision *player*) (and (find (id mob) (shared-visible-mobs *player*))
+                                                                             (not (find (id mob) (proper-visible-mobs *player*)))))
+                 
                  (when (worshiped-god mob)
                    (funcall (piety-tick-func (get-god-by-id (get-worshiped-god-type (worshiped-god mob)))) (get-god-by-id (get-worshiped-god-type (worshiped-god mob))) mob))))
              (loop for feature-id of-type fixnum in (feature-id-list (level *world*))

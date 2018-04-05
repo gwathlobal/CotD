@@ -1425,7 +1425,8 @@
    (faction-name :initform nil :accessor faction-name)
    (cur-score :initform 0 :accessor cur-score)
    (nearby-light-mobs :initform () :accessor nearby-light-mobs)
-   (nearby-light-sources :initform () :accessor nearby-light-sources)))
+   (nearby-light-sources :initform () :accessor nearby-light-sources)
+   (if-cur-mob-seen-through-shared-vision :initform nil :accessor if-cur-mob-seen-through-shared-vision)))
 
 (defmethod name ((mob player))
   (values (slot-value mob 'name) +noun-proper+ +noun-singular+))

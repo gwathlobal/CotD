@@ -49,7 +49,11 @@
                                                                 (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                                                                 (setf (visible-mobs mob) nil))
                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
-                                                                                     (format nil "~A is blind. " (capitalize-name (prepend-article +article-the+ (visible-name mob)))))
+                                                                                     (format nil "~A is blind. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
+                                                                                     :color (if (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                     (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                              *shared-mind-msg-color*
+                                                                                              sdl:*white*))
                                                            ))))
 
 (set-card-type (make-instance 'card-type :id +item-card-fear-other+
@@ -68,7 +72,11 @@
                                                            do
                                                               (set-mob-effect target :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 5)
                                                               (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                     (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                                                     (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                     :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                     (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                              *shared-mind-msg-color*
+                                                                                              sdl:*white*))
                                                            )
                                                      )))
 
@@ -82,7 +90,11 @@
                                                            do
                                                               (set-mob-effect target :effect-type-id +mob-effect-silence+ :actor-id (id actor) :cd 5)
                                                               (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                     (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                                                     (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                     :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                     (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                              *shared-mind-msg-color*
+                                                                                              sdl:*white*))
                                                            ))))
 
 (set-card-type (make-instance 'card-type :id +item-card-confuse-other+
@@ -97,14 +109,21 @@
                                                                 (progn
                                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                          (format nil "~A is confused. "
-                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name target)))
-                                                                                                 ))
+                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                         :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                         (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                                  *shared-mind-msg-color*
+                                                                                                  sdl:*white*))
                                                                   
                                                                   (set-mob-effect target :effect-type-id +mob-effect-confuse+ :actor-id (id actor) :cd 4))
                                                                 (progn
                                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                          (format nil "~A resists confusion. "
-                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
+                                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                         :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                         (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                                  *shared-mind-msg-color*
+                                                                                                  sdl:*white*))))
                                                            ))))
 
 (set-card-type (make-instance 'card-type :id +item-card-polymorph-other+
@@ -124,7 +143,11 @@
                                                                   (progn
                                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                            (format nil "~A resists polymorph. "
-                                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
+                                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                           :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                           (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                                    *shared-mind-msg-color*
+                                                                                                    sdl:*white*))))
                                                            finally (when polymorphed-once
                                                                      (increase-piety-for-god +god-entity-malseraph+ actor 50))    
                                                            ))))
@@ -139,7 +162,10 @@
                                                        (progn
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists polymorph. "
-                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*))))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-irradiate-other+
@@ -156,7 +182,10 @@
                                                                 (progn
                                                                   (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                     (format nil "~A is irradiated. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))
+                                                                                     (format nil "~A is irradiated. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                     :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                              *shared-mind-msg-color*
+                                                                                              sdl:*white*))
                                                            ))))
 
 (set-card-type (make-instance 'card-type :id +item-card-irradiate-self+
@@ -187,7 +216,10 @@
                                                        (progn
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists confusion. "
-                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor))))))))))
+                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*)))))))
 
 (set-card-type (make-instance 'card-type :id +item-card-silence-self+
                                          :name "Card of Silence"
@@ -195,7 +227,10 @@
                                                      (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (set-mob-effect actor :effect-type-id +mob-effect-silence+ :actor-id (id actor) :cd 5)
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                            (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                            (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-slow-self+
@@ -204,7 +239,10 @@
                                                      (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (set-mob-effect actor :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 5)
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                            (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                            (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-fear-self+
@@ -216,11 +254,17 @@
                                                          (set-mob-effect actor :effect-type-id +mob-effect-fear+ :actor-id (id actor) :cd 3)
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A is feared. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :observed-mob actor))
+                                                                                :observed-mob actor
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*)))
                                                        (progn
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :observed-mob actor))))))
+                                                                                :observed-mob actor
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*)))))))
 
 (set-card-type (make-instance 'card-type :id +item-card-blindness-self+
                                          :name "Card of Blindness"
@@ -231,7 +275,10 @@
                                                        (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                                                        (setf (visible-mobs actor) nil))
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                            (format nil "~A is blind. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))
+                                                                            (format nil "~A is blind. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-curse-self+
@@ -253,13 +300,19 @@
                                                            (logger (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name actor) (id actor)))
                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                   (format nil "Malseraph's curse removed divine protection from ~A. "
-                                                                                          (prepend-article +article-the+ (visible-name actor))))
+                                                                                          (prepend-article +article-the+ (visible-name actor)))
+                                                                                  :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                           *shared-mind-msg-color*
+                                                                                           sdl:*white*))
                                                            )
                                                          (progn
                                                            (logger (format nil "MOB-CURSE: Malseraph affects ~A [~A] with a curse~%" (name actor) (id actor)))
                                                            (set-mob-effect actor :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                  (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                                                  (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                                  :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                           *shared-mind-msg-color*
+                                                                                           sdl:*white*))))
                                                        ))))
 
 (set-card-type (make-instance 'card-type :id +item-card-give-deck+
@@ -272,7 +325,10 @@
                                                        (when (or (eq actor *player*)
                                                                  (not (mob-effect-p actor +mob-effect-disguised+)))
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "Malseraph grants ~A ~A. " (prepend-article +article-the+ (visible-name actor)) (prepend-article +article-a+ (visible-name deck-item)))))
+                                                                                (format nil "Malseraph grants ~A ~A. " (prepend-article +article-the+ (visible-name actor)) (prepend-article +article-a+ (visible-name deck-item)))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*)))
                                                        (mob-pick-item actor deck-item :spd nil :silent t))
                                                      )))
 
@@ -296,7 +352,11 @@
                                                        (loop for target in targets do
                                                          (set-mob-effect target :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
                                                          (print-visible-message (x target) (y target) (z target) (level *world*) 
-                                                                                (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
+                                                                                (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                :color (if (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*))))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-cure-mutation+
@@ -315,7 +375,10 @@
                                                          (setf was-cured t))
                                                        (when was-cured
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                                    (format nil "~A is cured of all malmutations. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                                                (format nil "~A is cured of all malmutations. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*))))
                                                      )))
 
 (set-card-type (make-instance 'card-type :id +item-card-lignify-other+
@@ -335,7 +398,10 @@
                                                                   (progn
                                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                            (format nil "~A resists polymorph. "
-                                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name target)))))))
+                                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                    *shared-mind-msg-color*
+                                                                                                    sdl:*white*))))
                                                            finally (when polymorphed-once
                                                                      (increase-piety-for-god +god-entity-malseraph+ actor 50))    
                                                            ))))
@@ -350,5 +416,8 @@
                                                        (progn
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists polymorph. "
-                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*))))
                                                      )))

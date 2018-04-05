@@ -42,7 +42,10 @@
                                                                                                                   (format nil "You hear some rustling sounds~A. " str)))
                                                        
                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                              (format nil "~A uses a medkit to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr)))
+                                                                              (format nil "~A uses a medkit to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr)
+                                                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                       *shared-mind-msg-color*
+                                                                                       sdl:*white*)))
                                                      ;; remove after use
                                                      t)
                                          :on-check-applic #'(lambda (actor item)
@@ -99,7 +102,10 @@
                                                                                                                     (format nil "You hear some hiss~A. " str)))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                                (format nil "~A uses a smoke bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))))))
+                                                                                (format nil "~A uses a smoke bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*))))
                                                      ;; remove after use
                                                      t)
                                          :on-check-applic (lambda (actor item)
@@ -174,7 +180,10 @@
                                                          (setf card-type-id (pop (cards item)))
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A draws the ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                        (name (get-card-type-by-id card-type-id))))
+                                                                                        (name (get-card-type-by-id card-type-id)))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*))
                                                          (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor))
                                                        )
 
@@ -214,7 +223,10 @@
                                                          (setf card-type-id (pop (cards item)))
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A draws the ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                        (name (get-card-type-by-id card-type-id))))
+                                                                                        (name (get-card-type-by-id card-type-id)))
+                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                         *shared-mind-msg-color*
+                                                                                         sdl:*white*))
                                                          (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor)))
 
                                                      ;; remove if there are no cards in the deck
@@ -250,7 +262,10 @@
                                                      (declare (ignore item))
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A throws a parasite onto ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                    (prepend-article +article-the+ (visible-name target))))
+                                                                                    (prepend-article +article-the+ (visible-name target)))
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      (set-mob-effect target :effect-type-id +mob-effect-parasite+ :actor-id (id actor) :cd 99)
                                                      ;; always remove 1 item
                                                      t)
@@ -364,7 +379,10 @@
                                                                                                                   (format nil "You hear someone shooting~A. " str)))
                                                        
                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                              (format nil "~A uses a flare. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))))
+                                                                              (format nil "~A uses a flare. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                       *shared-mind-msg-color*
+                                                                                       sdl:*white*)))
                                                      
                                                      ;; remove after use
                                                      t)
@@ -437,7 +455,10 @@
                                                      (declare (ignore item))
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A spawns a scarab and sets it on ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
-                                                                                    (prepend-article +article-the+ (visible-name target))))
+                                                                                    (prepend-article +article-the+ (visible-name target)))
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                 (format nil "You hear some burping~A. " str)))
                                                      
@@ -513,7 +534,10 @@
                                                      ;; target here is the item to be reanimated
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                            :observed-mob actor)
+                                                                            :observed-mob actor
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                 (format nil "You hear some burping~A. " str)))
                                                      (let ((locust-mob))
@@ -583,7 +607,10 @@
                                                      ;; target here is the item to be reanimated
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a small harmless creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                            :observed-mob actor)
+                                                                            :observed-mob actor
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                 (format nil "You hear some burping~A. " str)))
                                                      (let ((larva-mob))
@@ -646,7 +673,10 @@
                                                      ;; target here is the item to be reanimated
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a huge hideous creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                            :observed-mob actor)
+                                                                            :observed-mob actor
+                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     *shared-mind-msg-color*
+                                                                                     sdl:*white*))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                                 (format nil "You hear some burping~A. " str)))
                                                      (let ((larva-mob))
