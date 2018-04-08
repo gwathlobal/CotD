@@ -128,6 +128,7 @@
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-soul t
                                        :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t :abil-decipher-rune t
                                        :abil-demon-word-flesh t :abil-demon-word-plague t :abil-demon-word-power t :abil-demon-word-darkness t :abil-demon-word-invasion t :abil-demon-word-knockback t :abil-throw-corpse-into-portal t
+                                       :abil-throw-relic-into-portal t
                                        :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -140,7 +141,7 @@
                                        :strength 4
                                        :base-light-radius 0
                                        :abil-detect-good t :abil-human t :abil-unholy t :abil-soul t :abil-unholy t :abil-loves-infighting t :abil-demon t :abil-lifesteal t :abil-no-breathe t
-                                       :abil-free-call t :abil-toggle-light t :abil-open-close-door t :abil-charge t :abil-answer-the-call t :abil-throw-corpse-into-portal t
+                                       :abil-free-call t :abil-toggle-light t :abil-open-close-door t :abil-charge t :abil-answer-the-call t :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 ;;--------------------
@@ -373,6 +374,7 @@
                                        :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t :abil-bend-space t :abil-throw-corpse-into-portal t
+                                       :abil-throw-relic-into-portal t
                                        :ai-horde t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
@@ -386,6 +388,7 @@
                                        :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3 :abil-no-breathe t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t :abil-bend-space t :abil-throw-corpse-into-portal t
+                                       :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archdemon+
@@ -398,7 +401,7 @@
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-gravity-chains t :abil-bend-space t :abil-throw-corpse-into-portal t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-gravity-chains t :abil-bend-space t :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 
@@ -412,7 +415,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-cast-shadow t :abil-throw-corpse-into-portal t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-cast-shadow t :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-horde t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-demon+
@@ -425,7 +428,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t :abil-toggle-light t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-cast-shadow t :abil-throw-corpse-into-portal t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-cast-shadow t :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-devil+
@@ -439,7 +442,7 @@
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-charge t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-umbral-aura t :abil-cast-shadow t
-                                       :abil-throw-corpse-into-portal t
+                                       :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 
@@ -453,7 +456,7 @@
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-toggle-light t
-                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-remove-disguise t :abil-irradiate t :abil-fission t :abil-throw-corpse-into-portal t
+                                       :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-remove-disguise t :abil-irradiate t :abil-fission t :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 ;;--------------------
@@ -469,7 +472,7 @@
                                        :strength 1
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
-                                       :abil-throw-corpse-into-portal t
+                                       :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -482,7 +485,7 @@
                                        :strength 1
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
-                                       :abil-throw-corpse-into-portal t
+                                       :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -495,7 +498,7 @@
                                        :strength 1
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
-                                       :abil-throw-corpse-into-portal t
+                                       :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -508,7 +511,7 @@
                                        :strength 1
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
-                                       :abil-throw-corpse-into-portal t
+                                       :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -521,7 +524,7 @@
                                        :strength 2
                                        :base-light-radius 0
                                        :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
-                                       :abil-throw-corpse-into-portal t
+                                       :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t
                                        ))
 

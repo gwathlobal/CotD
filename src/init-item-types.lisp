@@ -814,3 +814,9 @@
                                          :descr "A scroll with a demonic rune Tal inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
+
+(set-item-type (make-instance 'item-type :id +item-type-church-reliс+
+                                         :name "relic" :plural-name "relics"
+                                         :glyph-idx 127 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :descr "A holy relic. Demons seek it to capture and place under the wards in their world."
+                              ))

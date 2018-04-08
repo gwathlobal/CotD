@@ -7220,3 +7220,70 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-throw-relic-into-portal+ :name "Throw relic into portal" :descr "Throw the relic you have into a demonic portal. You must be standing on top of the demonic portal and have the relic in your inventory to do that." 
+                                 :spd (truncate +normal-ap+ 1.5) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 90
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (let ((relic-list (loop for item-id in (inv actor)
+                                                                          for item = (get-item-by-id item-id)
+                                                                          when (= (item-type item) +item-type-church-reliс+)
+                                                                            collect item))
+                                                      (portal (loop for feature-id in (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                    for feature = (get-feature-by-id feature-id)
+                                                                    when (= (feature-type feature) +feature-demonic-portal+)
+                                                                      do
+                                                                         (return feature))))
+                                                  (logger (format nil "MOB-THROW-RELIC-INTO-PORTAL: ~A [~A] throws the relic ~A into portal ~A [~A].~%" (name actor) (id actor)
+                                                                  (loop for item in relic-list
+                                                                    collect (format nil "[~A] " (id item)))
+                                                                  (name portal)
+                                                                  (id portal)))
+                                                  
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
+                                                                                                             (format nil "You hear some buzzing sound~A." str)))
+                                                  
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A throws the relic into the demonic portal. "
+                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                         :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))
+                                                  
+                                                  (loop for relic-item in relic-list
+                                                        do
+                                                           (setf (param1 portal) t)
+                                                           
+                                                           (when (eq actor *player*)
+                                                             (incf (cur-score *player*) (* 200 (qty relic-item))))
+                                                           (setf (inv actor) (remove-from-inv relic-item (inv actor)))
+                                                           (remove-item-from-world relic-item))
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
+                                                               (loop for item-id in (inv actor)
+                                                                     for item = (get-item-by-id item-id)
+                                                                     when (= (item-type item) +item-type-church-reliс+)
+                                                                       collect item)
+                                                               (loop for feature-id in (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                     for feature = (get-feature-by-id feature-id)
+                                                                     when (= (feature-type feature) +feature-demonic-portal+)
+                                                                       do
+                                                                          (return feature)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (if (and (= (mission-scenario (level *world*)) +mission-scenario-demon-steal+)
+                                                           (mob-ability-p actor +mob-abil-throw-relic-into-portal+)
+                                                           (can-invoke-ability actor actor +mob-abil-throw-relic-into-portal+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

@@ -66,7 +66,8 @@
 
     ;; apply city layout function, if any
     (when layout-func
-      (multiple-value-setq (result-template feature-template-result mob-template-result item-template-result) (funcall layout-func)))
+      (loop while (null result-template) do
+        (multiple-value-setq (result-template feature-template-result mob-template-result item-template-result) (funcall layout-func))))
 
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
@@ -96,10 +97,6 @@
     (setf (level-layout (level world)) layout-id)
     (setf (mission-scenario (level world)) mission-id)
 
-    ;; apply the post-processing function, if any
-    (loop for post-processing-func in post-processing-func-list do
-      (funcall post-processing-func world))
-    
     ;; check map for connectivity
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Creating connectivity maps")
@@ -196,6 +193,10 @@
     ;; adjusting the progress bar
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Adding mobs")
+
+    ;; apply the post-processing function, if any
+    (loop for post-processing-func in post-processing-func-list do
+      (funcall post-processing-func world))
     
     ;; set up mobs
     (loop for mob-func in mob-func-list do

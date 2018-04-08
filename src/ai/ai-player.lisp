@@ -22,6 +22,13 @@
     (sense-evil))
   (when (mob-ability-p *player* +mob-abil-detect-unnatural+)
     (sense-unnatural))
+  (when (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                 (= (loyal-faction *player*) +faction-type-angels+)
+                 (= (loyal-faction *player*) +faction-type-church+)
+                 (= (loyal-faction *player*) +faction-type-satanists+)
+                 (= (loyal-faction *player*) +faction-type-military+))
+             (= (mission-scenario (level *world*)) +mission-scenario-demon-steal+))
+    (sense-relic))
 
   ;; print out the items on the player's tile
   (loop for item-id in (get-items-* (level *world*) (x *player*) (y *player*) (z *player*))

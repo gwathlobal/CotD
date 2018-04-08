@@ -265,6 +265,27 @@
                                                              
                                                              )))
 
+(set-ai-package (make-instance 'ai-package :id +ai-package-pick-relic+
+                                           :priority 8
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                            (let ((relic-items))
+                                                              (if (and (null nearest-enemy)
+                                                                       (setf relic-items (loop for item-id in (get-items-* (level *world*) (x actor) (y actor) (z actor))
+                                                                                               for item = (get-item-by-id item-id)
+                                                                                               when (= (item-type item) +item-type-church-reliс+)
+                                                                                                 collect item)))
+                                                                relic-items
+                                                                nil)))
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
+
+                                                             (logger (format nil "AI-PACKAGE-TAKES-RELIC: ~A [~A] decided to take item ~A [~A].~%"
+                                                                             (name actor) (id actor) (name (first check-result)) (id (first check-result))))
+                                                             (mob-pick-item actor (first check-result))
+                                                             
+                                                             )))
+
 (set-ai-package (make-instance 'ai-package :id +ai-package-split-soul+
                                            :priority 7
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
@@ -481,6 +502,79 @@
                                                                    with move-result = nil
                                                                    while t do
                                                                      (logger (format nil "AI-PACKAGE-SEARCH-CORPSES: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%"
+                                                                                     (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item)))
+                                                                     ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
+                                                                     (when (or (null (path-dst actor))
+                                                                               (/= (first (path-dst actor)) (x item))
+                                                                               (/= (second (path-dst actor)) (y item))
+                                                                               (/= (third (path-dst actor)) (z item)))
+                                                                       (ai-set-path-dst actor (x item) (y item) (z item)))
+                                                                     
+                                                                     ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
+                                                                     (when (null (path-dst actor))
+                                                                       (ai-mob-random-dir actor)
+                                                                       (loop-finish))
+                                                                     
+                                                                     ;; make a path to the destination target if there is no path plotted
+                                                                     (when (or (null (path actor))
+                                                                               (mob-ability-p actor +mob-abil-momentum+))
+                                                                       (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                                     
+                                                                     ;; make a step along the path to the path-dst
+                                                                     (setf move-result (ai-move-along-path actor))
+                                                                     (cond
+                                                                       ;; if the move failed twice - move in a random direction
+                                                                       ((and move-failed-once
+                                                                             (null move-result))
+                                                                        (ai-mob-random-dir actor)
+                                                                        (loop-finish))
+                                                                       ;; if the move failed - reset path-dst and start anew
+                                                                       ((and (null move-failed-once)
+                                                                             (null move-result))
+                                                                        (setf (path-dst actor) nil)
+                                                                        (setf move-failed-once t)
+                                                                        )
+                                                                       ;; success
+                                                                       (t
+                                                                        (loop-finish))))
+                                                             )))
+
+(set-ai-package (make-instance 'ai-package :id +ai-package-search-relic+
+                                           :priority 7
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                            (let ((relic-items))
+                                                              (if (and (null nearest-enemy)
+                                                                       (setf relic-items (loop for item-id in (visible-items actor)
+                                                                                               for item = (get-item-by-id item-id)
+                                                                                               when (and (= (item-type item) +item-type-church-reliс+)
+                                                                                                         (not (and (= (x item) (x actor))
+                                                                                                                   (= (y item) (y actor))
+                                                                                                                   (= (z item) (z actor))))
+                                                                                                         (or (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) (x item) (y item) (z item)
+                                                                                                                                      (if (riding-mob-id actor)
+                                                                                                                                        (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                        (map-size actor))
+                                                                                                                                      (get-mob-move-mode actor))
+                                                                                                             (and (> (map-size actor) 1)
+                                                                                                                  (ai-find-move-around actor (x item) (y item)))))
+                                                                                                 collect item)))
+                                                                relic-items
+                                                                nil)))
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
+
+                                                             ;; when mob is a cannibal go to the nearest visible item and try to eat it
+                                                             (loop with visible-items = (stable-sort check-result #'(lambda (a b)
+                                                                                                                      (if (< (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
+                                                                                                                             (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
+                                                                                                                        t
+                                                                                                                        nil)))
+                                                                   with item = (first visible-items)
+                                                                   with move-failed-once = nil
+                                                                   with move-result = nil
+                                                                   while t do
+                                                                     (logger (format nil "AI-PACKAGE-SEARCH-RELIC: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%"
                                                                                      (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item)))
                                                                      ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
                                                                      (when (or (null (path-dst actor))
@@ -855,7 +949,7 @@
                                                              
                                                              )))
 
-(set-ai-package (make-instance 'ai-package :id +ai-package-return-to-portal+
+(set-ai-package (make-instance 'ai-package :id +ai-package-return-corpses-to-portal+
                                            :priority 6
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
@@ -864,6 +958,102 @@
                                                                      (loop for item-id in (inv actor)
                                                                            for item = (get-item-by-id item-id)
                                                                            when (item-ability-p item +item-abil-corpse+)
+                                                                             do (return t)))
+                                                              t
+                                                              nil)
+                                                            )
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
+
+                                                             (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob (~A, ~A, ~A) wants to return to the nearest portal~%" (x actor) (y actor) (z actor)))
+                                                             (block ai-function
+                                                               ;; iterate through all the portals to get to the nearest one
+                                                               (when (null (path-dst actor))
+                                                                 (let ((rx 0) 
+                                                                       (ry 0)
+                                                                       (rz 0)
+                                                                       (portal-list (stable-sort (loop for feature-id in (demonic-portals (level *world*))
+                                                                                                       for feature = (get-feature-by-id feature-id)
+                                                                                                       collect feature)
+                                                                                                 #'(lambda (a b)
+                                                                                                     (if (< (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
+                                                                                                            (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
+                                                                                                       t
+                                                                                                       nil)))))
+                                                                   (declare (type fixnum rx ry rz))
+
+                                                                   (setf rx (x (first portal-list)) ry (y (first portal-list)) rz (z (first portal-list)))
+                                                                   
+                                                                   (loop with portal-num = 0
+                                                                         while (or (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
+                                                                                   (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (mob-effect-p actor +mob-effect-flying+)))
+                                                                                   (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
+                                                                                                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                                                          (map-size actor))
+                                                                                                                 (get-mob-move-mode actor))))
+                                                                         do
+                                                                            (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                                            rx ry rz
+                                                                                            (get-terrain-* (level *world*) rx ry rz)
+                                                                                            (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
+                                                                                                                                   (id (get-mob-* (level *world*) rx ry rz))
+                                                                                                                                   nil)
+                                                                                            (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
+                                                                                                                                                                              (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                                                              (map-size actor))
+                                                                                                                     (get-mob-move-mode actor))))
+                                                                            (setf rx (x (nth portal-num portal-list)) ry (y (nth portal-num portal-list)) rz (z (nth portal-num portal-list)))
+                                                                            (incf portal-num)
+                                                                            (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: NEW R (~A ~A ~A)~%" rx ry rz))
+                                                                            (when (>= portal-num (length portal-list))
+                                                                              (loop-finish))
+                                                                         finally (if (>= portal-num (length portal-list))
+                                                                                   (progn
+                                                                                     (setf (path-dst actor) nil)
+                                                                                     (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob cannot set the destination after exhausting all portals~%")))
+                                                                                   (progn
+                                                                                     (ai-set-path-dst actor rx ry rz)
+                                                                                     (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob's destination is set to (~A, ~A, ~A)~%"
+                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))))
+                                                                   
+                                                                   ))
+                                                               
+                                                               (let ((move-result nil))
+                                                                 ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
+                                                                 (when (null (path-dst actor))
+                                                                   (ai-mob-random-dir actor)
+                                                                   (return-from ai-function))
+                                                                     
+                                                                 ;; make a path to the destination target if there is no path plotted
+                                                                 (when (or (null (path actor))
+                                                                           (mob-ability-p actor +mob-abil-momentum+))
+                                                                   (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                                 
+                                                                 ;; make a step along the path to the path-dst
+                                                                 (setf move-result (ai-move-along-path actor))
+                                                                 (cond
+                                                                   ;; if the move failed - move in a random direction
+                                                                   ((null move-result)
+                                                                    (setf (path-dst actor) nil)
+                                                                    (ai-mob-random-dir actor)
+                                                                    (return-from ai-function)
+                                                                    )
+                                                                   ;; success
+                                                                   (t
+                                                                    (return-from ai-function))))
+                                                               
+                                                               ))))
+
+(set-ai-package (make-instance 'ai-package :id +ai-package-return-relic-to-portal+
+                                           :priority 6
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-enemy nearest-ally hostile-mobs allied-mobs))
+                                                            (if (and (loop for item-id in (inv actor)
+                                                                           for item = (get-item-by-id item-id)
+                                                                           when (= (item-type item) +item-type-church-reliс+)
                                                                              do (return t)))
                                                               t
                                                               nil)

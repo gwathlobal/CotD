@@ -196,7 +196,11 @@
 								
 (set-feature-type (make-instance 'feature-type :id +feature-start-church-player+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Player Church Starting Position" :trait-remove-on-dungeon-generation t))
 
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-church-relic+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Church Relic Starting Position" :trait-remove-on-dungeon-generation t))
+
 (set-feature-type (make-instance 'feature-type :id +feature-start-repel-demons+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Repel Demons Starting Location" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-start-strong-repel-demons+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Repel Demons Starting Location" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-military-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Military Defender Starting Position" :trait-remove-on-dungeon-generation t))
 

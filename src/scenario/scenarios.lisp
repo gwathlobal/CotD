@@ -36,6 +36,7 @@
 (defconstant +tod-type-evening+ 24)
 
 (defconstant +mission-sf-demonic-raid+ 25)
+(defconstant +mission-sf-demonic-steal+ 26)
 
 (defconstant +sf-faction-demonic-attack-player+ 30)
 (defconstant +sf-faction-demonic-attack-dead-player+ 31)
@@ -67,6 +68,20 @@
 (defconstant +sf-faction-demonic-raid-demon-malseraph+ 57)
 (defconstant +sf-faction-demonic-raid-ghost+ 58)
 
+(defconstant +sf-faction-demonic-steal-player+ 60)
+(defconstant +sf-faction-demonic-steal-dead-player+ 61)
+(defconstant +sf-faction-demonic-steal-angel-chrome+ 62)
+(defconstant +sf-faction-demonic-steal-demon-crimson+ 63)
+(defconstant +sf-faction-demonic-steal-military-chaplain+ 64)
+(defconstant +sf-faction-demonic-steal-military-scout+ 65)
+(defconstant +sf-faction-demonic-steal-thief+ 66)
+(defconstant +sf-faction-demonic-steal-satanist+ 67)
+(defconstant +sf-faction-demonic-steal-priest+ 68)
+(defconstant +sf-faction-demonic-steal-demon-shadow+ 69)
+(defconstant +sf-faction-demonic-steal-angel-trinity+ 70)
+(defconstant +sf-faction-demonic-steal-eater+ 71)
+(defconstant +sf-faction-demonic-steal-demon-malseraph+ 72)
+(defconstant +sf-faction-demonic-steal-ghost+ 73)
 
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
@@ -460,7 +475,8 @@
     result))
 
 (defun create-mobs-from-template (world mob-template-list)
-  (loop for (mob-type-id x y z) in mob-template-list 
+  (loop for (mob-type-id x y z) in mob-template-list
+        when (null (get-mob-* (level world) x y z))
         do
            (add-mob-to-level-list (level world) (make-instance 'mob :mob-type mob-type-id :x x :y y :z z))))
 
@@ -550,7 +566,12 @@
                                   for feature = (get-feature-by-id feature-id)
                                   with result = t
                                   when (and (= (feature-type feature) +feature-start-repel-demons+)
-                                            (< (get-distance x y (x feature) (y feature)) 15))
+                                            (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                                    do
+                                       (setf result nil)
+                                       (loop-finish)
+                                  when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                            (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
                                     do
                                        (setf result nil)
                                        (loop-finish)
@@ -628,7 +649,12 @@
                                   for feature = (get-feature-by-id feature-id)
                                   with result = t
                                   when (and (= (feature-type feature) +feature-start-repel-demons+)
-                                            (< (get-distance x y (x feature) (y feature)) 15))
+                                            (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                                    do
+                                       (setf result nil)
+                                       (loop-finish)
+                                  when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                            (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
                                     do
                                        (setf result nil)
                                        (loop-finish)

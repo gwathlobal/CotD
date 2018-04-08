@@ -2079,6 +2079,37 @@
     
     (setf (sense-unnatural-pos *player*) nearest-power)))
 
+(defun sense-relic ()
+  (setf (sense-relic-pos *player*) nil)
+  (let ((nearest-power nil))
+    ;; search for item on the map
+    (loop for item-id in (item-id-list (level *world*))
+          for item = (get-item-by-id item-id)
+          when (= (item-type item) +item-type-church-reliс+)
+            do
+               (unless nearest-power (setf nearest-power (list (x item) (y item))))
+               (when (< (get-distance (x *player*) (y *player*) (x item) (y item))
+                        (get-distance (x *player*) (y *player*) (first nearest-power) (second nearest-power)))
+                 (setf nearest-power (list (x item) (y item)))))
+    ;; search for mob's inventories
+    (loop for mob-id in (mob-id-list (level *world*))
+          for mob = (get-mob-by-id mob-id)
+          when (and (not (check-dead mob))
+                    (not (eq mob *player*)))
+            do
+               (loop for item-id in (inv mob)
+                     for item = (get-item-by-id item-id)
+                     when (= (item-type item) +item-type-church-reliс+)
+                       do
+                          (unless nearest-power (setf nearest-power (list (x mob) (y mob))))
+                          (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
+                                   (get-distance (x *player*) (y *player*) (first nearest-power) (second nearest-power)))
+                            (setf nearest-power (list (x mob) (y mob)))
+                            (loop-finish)))
+          )
+        
+    (setf (sense-relic-pos *player*) nearest-power)))
+
 (defun mob-pick-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))) (silent nil))
   (logger (format nil "MOB-PICK-ITEM: ~A [~A] picks up ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
   (if (null (inv-id item))
@@ -2842,3 +2873,13 @@
           sum (if (param1 feature)
                 (param1 feature)
                 0)))
+
+(defun get-demon-steal-check-relic-captured (world)
+  (loop for feature-id in (feature-id-list (level world))
+        for feature = (get-feature-by-id feature-id)
+        when (= (feature-type feature) +feature-demonic-portal+)
+          do
+             (when (param1 feature)
+               (return-from get-demon-steal-check-relic-captured t))
+        )
+  nil)

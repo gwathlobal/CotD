@@ -27,6 +27,13 @@
 (defconstant +game-event-demon-raid-win-for-satanists+ 22)
 (defconstant +game-event-demon-raid-delayed-arrival-military+ 23)
 (defconstant +game-event-demon-raid-delayed-arrival-angels+ 24)
+(defconstant +game-event-demon-steal-win-for-angels+ 25)
+(defconstant +game-event-demon-steal-win-for-demons+ 26)
+(defconstant +game-event-demon-steal-win-for-military+ 27)
+(defconstant +game-event-demon-steal-win-for-church+ 28)
+(defconstant +game-event-demon-steal-win-for-satanists+ 29)
+(defconstant +game-event-demon-steal-delayed-arrival-military+ 30)
+(defconstant +game-event-demon-steal-delayed-arrival-angels+ 31)
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

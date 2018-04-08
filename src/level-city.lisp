@@ -22,7 +22,6 @@
          (reserved-building-types (make-hash-table))
          )
 
-   
     ;; set up maximum building types for this kind of map
     (when set-max-buildings-func
       (setf max-building-types (funcall set-max-buildings-func)))
@@ -30,7 +29,7 @@
     ;; set up reserved building types for this kind of map
     (when set-reserved-buildings-func
       (setf reserved-building-types (funcall set-reserved-buildings-func)))
-    
+
     ;; all grid cells along the borders are reserved, while everything inside is free for claiming
     (loop for y from 1 below (1- reserv-max-y) do
       (loop for x from 1 below (1- reserv-max-x) do
@@ -66,8 +65,8 @@
                                     (level-city-can-place-build-on-grid build-picked x y 2 reserved-level)))
                      do
                         (when (= i 9)
-                          (setf build-picked nil)
-                          (loop-finish))
+                          (logger (format nil "CREATE-TEMPLATE-CITY: Could not place reserved building ~A~%" build-picked))
+                          (return-from create-template-city (values nil nil nil nil)))
                         (setf x (random reserv-max-x))
                         (setf y (random reserv-max-y)))
                

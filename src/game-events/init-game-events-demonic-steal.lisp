@@ -4,8 +4,8 @@
 ;; WIN EVENTS
 ;;===========================
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-angels+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, have all angels killed or let the demons collect ~A pts of flesh (corpses)." *demonic-raid-win-value*)
+(set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-angels+
+                                           :descr "To win, destroy all demons in the district. To lose, have all angels killed or let the demons capture the relic."
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
@@ -20,7 +20,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
+                                                                               ((zerop (total-demons world)) "Demonic theivery attempt prevented.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
@@ -76,18 +76,18 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-demons+
-                                           :descr (format nil "To win, collect ~A pts of flesh by throwing corpses into the demonic portals (use your ability for that). To lose, have all demons killed." *demonic-raid-win-value*)
+(set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-demons+
+                                           :descr "To win, capture the relic in the church and throw it into a demonic portal (use your ability for that). To lose, have all demons killed."
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-demons world) 0)
-                                                                  (>= (get-demon-raid-overall-points world) *demonic-raid-win-value*))
+                                                                  (get-demon-steal-check-relic-captured world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str "Flesh successfully gathered.")
-                                                                  (score (calculate-player-score 1450))
+                                                           (let* ((final-str "Relic sucessfully captured.")
+                                                                  (score (calculate-player-score 1300))
                                                                   (highscores-place)
                                                                   (player-faction (if (or (= (loyal-faction *player*) +faction-type-demons+)
                                                                                           (= (loyal-faction *player*) +faction-type-satanists+))
@@ -132,8 +132,8 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-military+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, have all military killed or let the demons collect the ~A pts of flesh they want." *demonic-raid-win-value*)
+(set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-military+
+                                           :descr "To win, destroy all demons in the district. To lose, have all military killed or let the demons capture the relic."
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-humans world) 0)
@@ -143,7 +143,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
+                                                                               ((zerop (total-demons world)) "Demonic theivery attempt prevented.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1450 (* 7 (total-humans world)))))
                                                                   (highscores-place)
@@ -189,8 +189,8 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-church+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons collect ~A pts of flesh they want." *demonic-raid-win-value*)
+(set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-church+
+                                           :descr "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons capture the relic."
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-church+)
@@ -201,7 +201,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
+                                                                               ((zerop (total-demons world)) "Demonic theivery attempt prevented.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
@@ -257,18 +257,18 @@
                                                                                 (run-window *current-window*))
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-satanists+
-                                           :descr (format nil "To win, collect ~A pts of flesh by throwing corpses into the demonic portals. To lose, get all satanists and demons killed." *demonic-raid-win-value*)
+(set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-satanists+
+                                           :descr "To win, capture the relic in the church and throw it into a demonic portal (use your ability for that). To lose, get all satanists and demons killed."
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)
                                                                   (> (nth +faction-type-satanists+ (total-faction-list world)) 0)
-                                                                  (>= (get-demon-raid-overall-points world) *demonic-raid-win-value*))
+                                                                  (get-demon-steal-check-relic-captured world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str "Flesh successfully gathered.")
+                                                           (let* ((final-str "Relic sucessfully captured.")
                                                                   (score (calculate-player-score 1450))
                                                                   (highscores-place)
                                                                   (player-faction (if (or (= (loyal-faction *player*) +faction-type-demons+)
@@ -318,7 +318,7 @@
 ;; ARRIVAL EVENTS
 ;;===========================
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-raid-delayed-arrival-military+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-demon-steal-delayed-arrival-military+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (real-game-time world) 60) (turn-finished world))
                                                            t
@@ -358,7 +358,7 @@
                                ))
 
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-raid-delayed-arrival-angels+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-demon-steal-delayed-arrival-angels+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (real-game-time world) 40) (turn-finished world))
                                                            t

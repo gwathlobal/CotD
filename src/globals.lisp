@@ -160,7 +160,10 @@
 (defconstant +ai-package-avoid-possession+ 19)
 (defconstant +ai-package-avoid-melee+ 20)
 (defconstant +ai-package-pick-corpses+ 21)
-(defconstant +ai-package-return-to-portal+ 22)
+(defconstant +ai-package-return-corpses-to-portal+ 22)
+(defconstant +ai-package-search-relic+ 23)
+(defconstant +ai-package-pick-relic+ 24)
+(defconstant +ai-package-return-relic-to-portal+ 25)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)
@@ -324,6 +327,7 @@
 (defconstant +mob-abil-soul+ 156)
 (defconstant +mob-abil-detect-unnatural+ 157)
 (defconstant +mob-abil-throw-corpse-into-portal+ 158)
+(defconstant +mob-abil-throw-relic-into-portal+ 159)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -425,6 +429,7 @@
 (defconstant +item-type-scroll-demonic-rune-barrier+ 22)
 (defconstant +item-type-scroll-demonic-rune-all+ 23)
 (defconstant +item-type-scroll-demonic-rune-decay+ 24)
+(defconstant +item-type-church-reliс+ 25)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants
@@ -462,6 +467,8 @@
 (defconstant +feature-delayed-arrival-point+ 22)
 (defconstant +feature-start-military-point+ 23)
 (defconstant +feature-demonic-portal+ 24)
+(defconstant +feature-start-place-church-relic+ 25)
+(defconstant +feature-start-strong-repel-demons+ 26)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -624,6 +631,9 @@
 
 (defparameter *max-oxygen-level* 5)
 (defparameter *lack-oxygen-dmg* 5)
+
+(defparameter *repel-demons-dist* 5)
+(defparameter *repel-demons-dist-strong* 15)
 
 (defparameter *shared-mind-msg-color* (sdl:color :r 0 :g 128 :b 128))
 

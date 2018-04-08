@@ -141,6 +141,9 @@
     (when (sense-unnatural-pos *player*)
       (when first (format str "~%") (setf first nil))
       (format str "Sense unnatural: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-unnatural-pos *player*)) (second (sense-unnatural-pos *player*)))))
+    (when (sense-relic-pos *player*)
+      (when first (format str "~%") (setf first nil))
+      (format str "Sense relic: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-relic-pos *player*)) (second (sense-relic-pos *player*)))))
     str))
 
 (defun general-direction-str (sx sy tx ty)

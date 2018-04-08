@@ -205,6 +205,58 @@
                                              :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore faction-list mission-id))
                                                        (push #'(lambda (world)
+                                                                 (logger (format nil "POST-PROCESSING FUNC: Demonic raid, placing portals~%"))
+                                                                 (let ((portals ())
+                                                                       (max-portals 6))
+                                                                   (loop with max-x = (- (array-dimension (terrain (level world)) 0) 60)
+                                                                         with max-y = (- (array-dimension (terrain (level world)) 1) 60)
+                                                                         with cur-portal = 0
+                                                                         for free-place = t
+                                                                         for x = (+ (random max-x) 30)
+                                                                         for y = (+ (random max-y) 30)
+                                                                         while (< (length portals) max-portals) do
+                                                                           (check-surroundings x y t #'(lambda (dx dy)
+                                                                                                         (when (or (get-terrain-type-trait (get-terrain-* (level world) dx dy 2) +terrain-trait-blocks-move+)
+                                                                                                                   (not (get-terrain-type-trait (get-terrain-* (level world) dx dy 2) +terrain-trait-opaque-floor+))
+                                                                                                                   (get-terrain-type-trait (get-terrain-* (level world) dx dy 2) +terrain-trait-water+))
+                                                                                                           (setf free-place nil))))
+                                                                           (when (and free-place
+                                                                                      (not (find (list x y 2) portals :test #'(lambda (a b)
+                                                                                                                                (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
+                                                                                                                                  t
+                                                                                                                                  nil)
+                                                                                                                                )))
+                                                                                      (loop for feature-id in (feature-id-list (level world))
+                                                                                            for feature = (get-feature-by-id feature-id)
+                                                                                            with result = t
+                                                                                            when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                                                                                      (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                                                                                              do
+                                                                                                 (setf result nil)
+                                                                                                 (loop-finish)
+                                                                                            when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                                                                                      (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
+                                                                                              do
+                                                                                                 (setf result nil)
+                                                                                                 (loop-finish)
+                                                                                            finally (return result)))
+                                                                             (push (list x y 2) portals)
+                                                                             (incf cur-portal)))
+                                                                   (loop for (x y z) in portals do
+                                                                     ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id +feature-demonic-portal+)) x y z)
+                                                                     (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-demonic-portal+ :x x :y y :z z))))) 
+                                                             post-processing-func-list)
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +mission-sf-demonic-steal+
+                                             :type +scenario-feature-mission+
+                                             :name "Demonic steal (SF)"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore faction-list mission-id))
+                                                       ;; place portals
+                                                       (push #'(lambda (world)
+                                                                 (logger (format nil "POST-PROCESSING FUNC: Demonic steal, placing portals~%"))
                                                                  (let ((portals ())
                                                                        (max-portals 8))
                                                                    (loop with max-x = (- (array-dimension (terrain (level world)) 0) 60)
@@ -224,12 +276,26 @@
                                                                                                                                 (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
                                                                                                                                   t
                                                                                                                                   nil)
-                                                                                                                                ))))
+                                                                                                                                )))
+                                                                                      (loop for feature-id in (feature-id-list (level world))
+                                                                                            for feature = (get-feature-by-id feature-id)
+                                                                                            with result = t
+                                                                                            when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                                                                                      (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                                                                                              do
+                                                                                                 (setf result nil)
+                                                                                                 (loop-finish)
+                                                                                            when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                                                                                      (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
+                                                                                              do
+                                                                                                 (setf result nil)
+                                                                                                 (loop-finish)
+                                                                                            finally (return result)))
                                                                              (push (list x y 2) portals)
                                                                              (incf cur-portal)))
                                                                    (loop for (x y z) in portals do
                                                                      ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id +feature-demonic-portal+)) x y z)
                                                                      (add-feature-to-level-list (level world) (make-instance 'feature :feature-type +feature-demonic-portal+ :x x :y y :z z))))) 
                                                              post-processing-func-list)
-                                                       
+                                                                                                              
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))

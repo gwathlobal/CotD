@@ -785,7 +785,7 @@
 (set-building-type (make-building :id +building-city-church-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-church+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list "```,,,,,,,,,,```,"
-                                                                            "`T````#####```T`,"
+                                                                            "`T````#-#-#```T`,"
                                                                             "`````##...##````,"
                                                                             ",##-##.....##-##,"
                                                                             ",#.............#,"
@@ -872,13 +872,14 @@
                                                           (list +mob-type-man+ 10 11 z)
                                                           (list +mob-type-woman+ 6 11 z))
                                                     (list (list +feature-start-church-player+ 8 2 z)
-                                                          (list +feature-start-repel-demons+ 8 9 z))
+                                                          (list +feature-start-place-church-relic+ 8 2 z)
+                                                          (list +feature-start-strong-repel-demons+ 8 9 z))
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-church-2+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-church+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list "```,,,,,,,,,,,,,,"
-                                                                            "`T``#########```,"
+                                                                            "`T``###-#-###```,"
                                                                             "````#.......#`T`,"
                                                                             ",```#.......#```,"
                                                                             ",####.......####,"
@@ -1001,7 +1002,8 @@
                                                           (list +mob-type-man+ 10 11 z)
                                                           (list +mob-type-woman+ 6 11 z))
                                                     (list (list +feature-start-church-player+ 8 6 z)
-                                                          (list +feature-start-repel-demons+ 8 9 z))
+                                                          (list +feature-start-place-church-relic+ 8 2 z)
+                                                          (list +feature-start-strong-repel-demons+ 8 9 z))
                                                     nil))))
 
 ;;=====================
@@ -1554,7 +1556,7 @@
 ;; Mansions
 ;;=====================
 
-(set-building-type (make-building :id +building-city-mansion-1+ :grid-dim '(4 . 3) :act-dim '(18 . 14) :type +building-type-mansion+
+(set-building-type (make-building :id +building-city-mansion-1+ :grid-dim '(4 . 3) :act-dim '(19 . 14) :type +building-type-mansion+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,"
                                                                             ",,,,,,,,,,,,,,,,,,,"
@@ -1613,7 +1615,7 @@
                                                     nil
                                                     (list (list +item-type-coin+ 5 4 (+ z 1) (+ 150 (random 151))))))))
 
-(set-building-type (make-building :id +building-city-mansion-2+ :grid-dim '(4 . 3) :act-dim '(18 . 14) :type +building-type-mansion+
+(set-building-type (make-building :id +building-city-mansion-2+ :grid-dim '(4 . 3) :act-dim '(19 . 14) :type +building-type-mansion+
                                   :func #'(lambda (x y z template-level)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,"
                                                                             ",,,,,,,,,,,,,,,,,,,"
