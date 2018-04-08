@@ -687,7 +687,6 @@
   ;; remove the starting features
   (push #'(lambda (world mob-template-list)
             (declare (ignore mob-template-list))
-            (format t "DUNG GEN REMOVING FEATURES~%")
             (loop for feature-id in (feature-id-list (level world))
                   for lvl-feature = (get-feature-by-id feature-id)
                   when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
@@ -698,15 +697,16 @@
         mob-func-list)
 
   ;; add a relic
-  
   (push #'(lambda (world mob-template-list)
             (declare (ignore mob-template-list))
-            (format t "DUNG FEATURES ~A~%" (feature-id-list (level world)))
-            (loop for feature-id in (feature-id-list (level world))
+            (loop with item = nil
+                  for feature-id in (feature-id-list (level world))
                   for lvl-feature = (get-feature-by-id feature-id)
                   when (= (feature-type lvl-feature) +feature-start-place-church-relic+)
                     do
-                       (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-church-reliс+ :x (x lvl-feature) :y (y lvl-feature) :z (z lvl-feature))))
+                       (setf item (make-instance 'item :item-type +item-type-church-reliс+ :x (x lvl-feature) :y (y lvl-feature) :z (z lvl-feature))) 
+                       (add-item-to-level-list (level world) item)
+                       (setf (relic-id (level world)) (id item)))
             )
         mob-func-list)
 

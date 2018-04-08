@@ -543,34 +543,32 @@
                                            :priority 7
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
-                                                            (let ((relic-items))
+                                                            (let ((relic-item))
                                                               (if (and (null nearest-enemy)
-                                                                       (setf relic-items (loop for item-id in (visible-items actor)
-                                                                                               for item = (get-item-by-id item-id)
-                                                                                               when (and (= (item-type item) +item-type-church-reliс+)
-                                                                                                         (not (and (= (x item) (x actor))
-                                                                                                                   (= (y item) (y actor))
-                                                                                                                   (= (z item) (z actor))))
-                                                                                                         (or (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) (x item) (y item) (z item)
-                                                                                                                                      (if (riding-mob-id actor)
-                                                                                                                                        (map-size (get-mob-by-id (riding-mob-id actor)))
-                                                                                                                                        (map-size actor))
-                                                                                                                                      (get-mob-move-mode actor))
-                                                                                                             (and (> (map-size actor) 1)
-                                                                                                                  (ai-find-move-around actor (x item) (y item)))))
-                                                                                                 collect item)))
-                                                                relic-items
+                                                                       (relic-id (level *world*))
+                                                                       (setf relic-item (get-item-by-id (relic-id (level *world*))))
+                                                                       (null (inv-id relic-item))
+                                                                       (not (and (= (x relic-item) (x actor))
+                                                                                 (= (y relic-item) (y actor))
+                                                                                 (= (z relic-item) (z actor))))
+                                                                       (or (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor)
+                                                                                                    (x relic-item)
+                                                                                                    (y relic-item)
+                                                                                                    (z relic-item)
+                                                                                                    (if (riding-mob-id actor)
+                                                                                                      (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                      (map-size actor))
+                                                                                                    (get-mob-move-mode actor))
+                                                                           (and (> (map-size actor) 1)
+                                                                                (ai-find-move-around actor (x relic-item) (y relic-item))))
+                                                                       )
+                                                                relic-item
                                                                 nil)))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
                                                              ;; when mob is a cannibal go to the nearest visible item and try to eat it
-                                                             (loop with visible-items = (stable-sort check-result #'(lambda (a b)
-                                                                                                                      (if (< (get-distance-3d (x actor) (y actor) (z actor) (x a) (y a) (z a))
-                                                                                                                             (get-distance-3d (x actor) (y actor) (z actor) (x b) (y b) (z b)))
-                                                                                                                        t
-                                                                                                                        nil)))
-                                                                   with item = (first visible-items)
+                                                             (loop with item = check-result
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do

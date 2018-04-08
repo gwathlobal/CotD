@@ -258,7 +258,7 @@
                                                        (push #'(lambda (world)
                                                                  (logger (format nil "POST-PROCESSING FUNC: Demonic steal, placing portals~%"))
                                                                  (let ((portals ())
-                                                                       (max-portals 8))
+                                                                       (max-portals 6))
                                                                    (loop with max-x = (- (array-dimension (terrain (level world)) 0) 60)
                                                                          with max-y = (- (array-dimension (terrain (level world)) 1) 60)
                                                                          with cur-portal = 0

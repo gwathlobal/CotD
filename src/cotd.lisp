@@ -86,13 +86,33 @@
                (when (<= (cur-ap mob) 0)
                  (on-tick mob))
 
-               ;; checking for inconsistences between *items* and item-quadrant-map 
-               (when *cotd-release*
+               (unless *cotd-release*
+                 ;; checking for inconsistences between *items* and item-quadrant-map 
                  (loop for y from 0 below (array-dimension (item-quadrant-map (level *world*)) 1) do
                    (loop for x from 0 below (array-dimension (item-quadrant-map (level *world*)) 0) do
                      (loop for item-id in (aref (item-quadrant-map (level *world*)) x y)
                            unless (get-item-by-id item-id) do
-                             (error (format nil "ITEM ID ~A AT (~A ~A) NIL, FAILED!!!" item-id x y))))))
+                             (error (format nil "ITEM ID ~A AT (~A ~A) NIL, FAILED!!!" item-id x y)))))
+                 ;; checking for inconsistences between actual number of angels on map and (total-angels *world*)
+                 (loop with result = 0
+                       for mob-id in (mob-id-list (level *world*))
+                       for mob = (get-mob-by-id mob-id)
+                       when (and (not (check-dead mob))
+                                 (and (mob-ability-p mob +mob-abil-angel+)
+                                      (not (mob-ability-p mob +mob-abil-animal+))))
+                         do
+                            (incf result)
+                            (loop for merged-id in (merged-id-list mob)
+                                  for merged-mob = (get-mob-by-id merged-id)
+                                  when (and (not (check-dead merged-mob))
+                                            (and (mob-ability-p merged-mob +mob-abil-angel+)
+                                                 (not (mob-ability-p merged-mob +mob-abil-animal+))))
+                                    do
+                                       (incf result))
+                       finally (when (/= (total-angels *world*) result)
+                                 (error (format nil "FAILED!!! TOTAL ANGELS = ~A, ACTUAL ANGELS ALIVE = ~A" (total-angels *world*) result))))
+                     
+                 )
 
                ))
                       
