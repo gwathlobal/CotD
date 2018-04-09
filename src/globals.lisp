@@ -469,6 +469,7 @@
 (defconstant +feature-demonic-portal+ 24)
 (defconstant +feature-start-place-church-relic+ 25)
 (defconstant +feature-start-strong-repel-demons+ 26)
+(defconstant +feature-start-place-church-angels+ 27)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

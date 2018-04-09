@@ -633,10 +633,10 @@
                                                         (cons +mob-type-shadow-demon+ 8)
                                                         (cons +mob-type-imp+ (if (> (+ (truncate (total-humans world) 4) 16) 46)
                                                                                (- (/ 46 2) 16)
-                                                                               (- (truncate (total-humans world) 8) 16)))
+                                                                               (truncate (- (/ (total-humans world) 4) 16) 2)))
                                                         (cons +mob-type-shadow-imp+ (if (> (+ (truncate (total-humans world) 4) 16) 46)
                                                                                       (- (/ 46 2) 16)
-                                                                                      (- (truncate (total-humans world) 8) 16)))))
+                                                                                      (truncate (- (/ (total-humans world) 4) 16) 2)))))
                                           #'find-unoccupied-place-portal)))
           mob-func-list))
 
@@ -876,8 +876,28 @@
     (push #'(lambda (world mob-template-list)
               (declare (ignore mob-template-list))
               
-              (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 11) 1)))
-                                        #'find-unoccupied-place-outside)
+              (loop with arrival-points = (loop for feature-id in (feature-id-list (level world))
+                                                for lvl-feature = (get-feature-by-id feature-id)
+                                                when (= (feature-type lvl-feature) +feature-start-place-church-angels+) 
+                                                  collect (list (x lvl-feature) (y lvl-feature) (z lvl-feature)))
+                    with positioned = nil
+                    with max-angels = (- (truncate (total-humans world) 11) 1)
+                    while (null positioned)
+                    for n = (random (length arrival-points))
+                    for arrival-point = (nth n arrival-points)
+                    do
+                       (check-surroundings (first arrival-point) (second arrival-point) t
+                                           #'(lambda (dx dy)
+                                               (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                          (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                          (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
+                                                          (not (zerop max-angels)))
+                                                 (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-angel+
+                                                                                                          :x dx :y dy :z (third arrival-point)))
+                                                 (decf max-angels)
+                                                 )))
+                       (when (zerop max-angels)
+                         (setf positioned t)))
               )
           mob-func-list))
   
@@ -893,18 +913,44 @@
                       faction-list))
     (push #'(lambda (world mob-template-list)
               (declare (ignore mob-template-list))
+              ;; find a suitable arrival point to accomodate trinity mimics
+              (loop with arrival-points = (loop for feature-id in (feature-id-list (level world))
+                                                for lvl-feature = (get-feature-by-id feature-id)
+                                                when (= (feature-type lvl-feature) +feature-start-place-church-angels+) 
+                                                  collect (list (x lvl-feature) (y lvl-feature) (z lvl-feature)))
+                    with positioned = nil
+                    with trinity-mimic-list = (list +mob-type-star-singer+ +mob-type-star-gazer+ +mob-type-star-mender+)
+                    while (null positioned)
+                    for n = (random (length arrival-points))
+                    for arrival-point = (nth n arrival-points)
+                    do
+                       (let ((free-cells ()))
+                         (check-surroundings (first arrival-point) (second arrival-point) t
+                                             #'(lambda (dx dy)
+                                                 (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                            (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                            (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
+                                                   (push (list dx dy (third arrival-point)) free-cells))))
+                         (when (>= (length free-cells) (length trinity-mimic-list))
+                           (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+ :x (first (nth 0 free-cells)) :y (second (nth 0 free-cells)) :z (third (nth 0 free-cells))))
+                                 (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+ :x (first (nth 1 free-cells)) :y (second (nth 1 free-cells)) :z (third (nth 1 free-cells))))
+                                 (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+ :x (first (nth 2 free-cells)) :y (second (nth 2 free-cells)) :z (third (nth 2 free-cells)))))
+                             
+                             (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                             (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                             (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                             (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                             
+                             (add-mob-to-level-list (level world) mob1)
+                             (add-mob-to-level-list (level world) mob2)
+                             (add-mob-to-level-list (level world) mob3))
+                           
+                           (setf positioned t)
+                           ))
+                      )
               
-              ;; set up trinity mimics
-              (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+))
-                    (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+))
-                    (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+)))
-                
-                (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
-                (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
-                (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
-                (setf (name mob2) (name mob1) (name mob3) (name mob1))
-                
-                (find-unoccupied-place-mimic world mob1 mob2 mob3 :inside nil)))
+             
+              )
           mob-func-list))
 
   ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
@@ -932,13 +978,15 @@
                                                         (cons +mob-type-shadow-demon+ 8)
                                                         (cons +mob-type-imp+ (if (> (+ (truncate (total-humans world) 4) 16) 46)
                                                                                (- (/ 46 2) 16)
-                                                                               (- (truncate (total-humans world) 8) 16)))
+                                                                               (truncate (- (/ (total-humans world) 4) 16) 2)))
                                                         (cons +mob-type-shadow-imp+ (if (> (+ (truncate (total-humans world) 4) 16) 46)
                                                                                       (- (/ 46 2) 16)
-                                                                                      (- (truncate (total-humans world) 8) 16)))))
+                                                                                      (truncate (- (/ (total-humans world) 4) 16) 2)))))
                                           #'find-unoccupied-place-portal)))
           mob-func-list))
 
+  
+  
   ;; populate world with malseraph puppets
   (when (and (or (/= specific-faction-type +specific-faction-type-demon-malseraph+))
              (find-if #'(lambda (a)

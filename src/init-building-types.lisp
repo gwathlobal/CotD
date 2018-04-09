@@ -873,7 +873,12 @@
                                                           (list +mob-type-woman+ 6 11 z))
                                                     (list (list +feature-start-church-player+ 8 2 z)
                                                           (list +feature-start-place-church-relic+ 8 2 z)
-                                                          (list +feature-start-strong-repel-demons+ 8 9 z))
+                                                          (list +feature-start-strong-repel-demons+ 8 9 z)
+                                                          (list +feature-start-strong-repel-demons+ 8 9 z)
+                                                          (list +feature-start-place-church-angels+ 8 5 z)
+                                                          (list +feature-start-place-church-angels+ 8 8 z)
+                                                          (list +feature-start-place-church-angels+ 8 11 z)
+                                                          (list +feature-start-place-church-angels+ 8 14 z))
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-church-2+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-church+
@@ -1003,7 +1008,11 @@
                                                           (list +mob-type-woman+ 6 11 z))
                                                     (list (list +feature-start-church-player+ 8 6 z)
                                                           (list +feature-start-place-church-relic+ 8 2 z)
-                                                          (list +feature-start-strong-repel-demons+ 8 9 z))
+                                                          (list +feature-start-strong-repel-demons+ 8 9 z)
+                                                          (list +feature-start-place-church-angels+ 8 5 z)
+                                                          (list +feature-start-place-church-angels+ 8 8 z)
+                                                          (list +feature-start-place-church-angels+ 8 11 z)
+                                                          (list +feature-start-place-church-angels+ 8 14 z))
                                                     nil))))
 
 ;;=====================
