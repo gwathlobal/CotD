@@ -154,7 +154,6 @@
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
-    (setf (gethash +building-type-bank+ max-building-types) 0)
     max-building-types))
 
 ;;---------------------------------

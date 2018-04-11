@@ -1358,7 +1358,10 @@
                                               (format nil "~A hits ~A for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-the+ (visible-name target)) cur-dmg)
                                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                        *shared-mind-msg-color*
-                                                       sdl:*white*))))
+                                                       (if (or (eq *player* actor)
+                                                               (eq *player* target))
+                                                         (sdl:color :r 255 :g 140 :b 0)
+                                                         sdl:*yellow*)))))
                     ((and actor
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x actor) (y actor) (z actor))))
@@ -1367,7 +1370,9 @@
                                               (format nil "~A hits somebody for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) cur-dmg)
                                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                        *shared-mind-msg-color*
-                                                       sdl:*white*))))
+                                                       (if (eq *player* actor)
+                                                         (sdl:color :r 255 :g 140 :b 0)
+                                                         sdl:*yellow*)))))
                     ((and actor
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
@@ -1377,7 +1382,9 @@
                                               :color (if (and (find (id target) (shared-visible-mobs *player*))
                                                               (not (find (id target) (proper-visible-mobs *player*))))
                                                        *shared-mind-msg-color*
-                                                       sdl:*white*))))
+                                                       (if (eq *player* target)
+                                                         (sdl:color :r 255 :g 140 :b 0)
+                                                         sdl:*yellow*)))))
                     ((and (not actor)
                           (not no-hit-message)
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
@@ -1387,16 +1394,22 @@
                                               :color (if (and (find (id target) (shared-visible-mobs *player*))
                                                               (not (find (id target) (proper-visible-mobs *player*))))
                                                        *shared-mind-msg-color*
-                                                       sdl:*white*))))
+                                                       (if (eq *player* target)
+                                                         (sdl:color :r 255 :g 140 :b 0)
+                                                         sdl:*yellow*)))))
                     ((and specific-hit-string-func
                           (get-single-memo-visibility (get-memo-* (level *world*) (x target) (y target) (z target))))
                      (progn
                        (print-visible-message (x target) (y target) (z target) (level *world*) 
                                               (funcall specific-hit-string-func cur-dmg)
                                               :color (if (and (find (id target) (shared-visible-mobs *player*))
-                                             (not (find (id target) (proper-visible-mobs *player*))))
+                                                              (not (find (id target) (proper-visible-mobs *player*))))
                                                        *shared-mind-msg-color*
-                                                       sdl:*white*))))))
+                                                       (if (or (and actor
+                                                                    (eq *player* actor))
+                                                               (eq *player* target))
+                                                         (sdl:color :r 255 :g 140 :b 0)
+                                                         sdl:*yellow*)))))))
                 )
               ;; if the attacker can constrict - constrict around the target
               (when (and actor

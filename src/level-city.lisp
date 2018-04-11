@@ -47,6 +47,11 @@
             with build-picked = nil
             with x = 0
             with y = 0
+            for avail-cells-list = (loop with result = ()
+                                         for x1 from 0 below reserv-max-x do
+                                           (loop for y1 from 0 below reserv-max-y do
+                                             (push (list x1 y1) result))
+                                         finally (return result))
             do
                ;; prepare a list of buildings of this reserved type
                (setf build-cur-list (prepare-spec-build-id-list gen-building-type-id))
@@ -54,22 +59,19 @@
                ;; pick a specific building type
                (setf build-picked (nth (random (length build-cur-list)) build-cur-list))
                
-               ;; try 10 times to pick an unoccupied place
-               (loop initially (setf x (random reserv-max-x))
-                               (setf y (random reserv-max-y))
-                     for i from 0 below 10
-                     until (or (and (gethash (building-type (get-building-type build-picked)) max-building-types)
-                                    (> (gethash (building-type (get-building-type build-picked)) max-building-types) 0)
-                                    (level-city-can-place-build-on-grid build-picked x y 2 reserved-level))
-                               (and (not (gethash (building-type (get-building-type build-picked)) max-building-types))
-                                    (level-city-can-place-build-on-grid build-picked x y 2 reserved-level)))
+               ;; try to pick an unoccupied place
+               (loop for cell-pick = (nth (random (length avail-cells-list)) avail-cells-list)
+                     
+                     until (level-city-can-place-build-on-grid build-picked (first cell-pick) (second cell-pick) 2 reserved-level)
                      do
-                        (when (= i 9)
-                          (logger (format nil "CREATE-TEMPLATE-CITY: Could not place reserved building ~A~%" build-picked))
+                        (setf avail-cells-list (remove cell-pick avail-cells-list))
+                        (when (null avail-cells-list)
+                          (logger (format nil "~%CREATE-TEMPLATE-CITY: Could not place reserved building ~A~%" build-picked))
+                          (print-reserved-level reserved-level)
+                          (setf *reserved-level* reserved-level)
                           (return-from create-template-city (values nil nil nil nil)))
-                        (setf x (random reserv-max-x))
-                        (setf y (random reserv-max-y)))
-               
+                     finally (setf x (first cell-pick) y (second cell-pick)))
+
                ;; if an unoccupied place is found, place the building
                (when build-picked
                  ;; add the building to the building list

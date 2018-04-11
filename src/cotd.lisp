@@ -58,8 +58,11 @@
                               (mob-effect-p mob +mob-effect-split-soul-source+)))
                  (setf *player* mob))
 
-               (setf (if-cur-mob-seen-through-shared-vision *player*) (and (find (id mob) (shared-visible-mobs *player*))
-                                                                           (not (find (id mob) (proper-visible-mobs *player*)))))
+               (setf (if-cur-mob-seen-through-shared-vision *player*) (if (mounted-by-mob-id mob)
+                                                                        (and (find (mounted-by-mob-id mob) (shared-visible-mobs *player*))
+                                                                             (not (find (mounted-by-mob-id mob) (proper-visible-mobs *player*))))
+                                                                        (and (find (id mob) (shared-visible-mobs *player*))
+                                                                             (not (find (id mob) (proper-visible-mobs *player*))))))
                
                (ai-function mob)
                (when (get-message-this-turn) (add-message (format nil "~%")))

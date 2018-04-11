@@ -54,7 +54,7 @@
     (setf *max-progress-bar* 10)
     (setf *cur-progress-bar* 0)
 
-    (logger (format nil "CREATE-WORLD: mission-id = ~A, specific-faction-type = ~A, player-faction-scenario = ~A~%" mission-id specific-faction-type (sf-id player-faction-scenario)))
+    (logger (format nil "CREATE-WORLD: mission-id = ~A, layout-id = ~A, specific-faction-type = ~A, player-faction-scenario = ~A~%" mission-id layout-id specific-faction-type (sf-id player-faction-scenario)))
     (logger (format nil "CREATE-WORLD: faction-list = ~A~%" faction-list))
     
     (funcall *update-screen-closure* "Generating map")
