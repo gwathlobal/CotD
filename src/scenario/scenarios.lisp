@@ -83,6 +83,21 @@
 (defconstant +sf-faction-demonic-steal-demon-malseraph+ 72)
 (defconstant +sf-faction-demonic-steal-ghost+ 73)
 
+(defconstant +sf-faction-demonic-conquest-player+ 75)
+(defconstant +sf-faction-demonic-conquest-dead-player+ 76)
+(defconstant +sf-faction-demonic-conquest-angel-chrome+ 77)
+(defconstant +sf-faction-demonic-conquest-demon-crimson+ 78)
+(defconstant +sf-faction-demonic-conquest-military-chaplain+ 79)
+(defconstant +sf-faction-demonic-conquest-military-scout+ 80)
+(defconstant +sf-faction-demonic-conquest-thief+ 81)
+(defconstant +sf-faction-demonic-conquest-satanist+ 82)
+(defconstant +sf-faction-demonic-conquest-priest+ 83)
+(defconstant +sf-faction-demonic-conquest-demon-shadow+ 84)
+(defconstant +sf-faction-demonic-conquest-angel-trinity+ 85)
+(defconstant +sf-faction-demonic-conquest-eater+ 86)
+(defconstant +sf-faction-demonic-conquest-demon-malseraph+ 87)
+(defconstant +sf-faction-demonic-conquest-ghost+ 88)
+
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

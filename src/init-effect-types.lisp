@@ -509,8 +509,9 @@
                                                             (rem-mob-effect (get-mob-by-id (actor-id effect)) +mob-effect-split-soul-source+)
                                                             ;; have to avoid recursion in make-dead with this
                                                             (rem-mob-effect-simple actor +mob-effect-split-soul-target+)
-                                                            (setf (cur-hp actor) 0)
-                                                            (make-dead actor :splatter nil :msg nil :msg-newline nil :killer nil :corpse nil :aux-params nil)
+                                                            (when (> (cur-hp actor) 0)
+                                                              (setf (cur-hp actor) 0)
+                                                              (make-dead actor :splatter nil :msg nil :msg-newline nil :killer nil :corpse nil :aux-params nil))
                                                             )))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-sprint+ :name "Sprint" 
@@ -1170,3 +1171,20 @@
                                                             
                                                             )
                                              ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-demonic-sigil+ :name "Demonic sigil"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (push (id actor) (demonic-sigils (level *world*)))
+                                                         (setf (param1 effect) 0))
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (setf (demonic-sigils (level *world*)) (remove (id actor) (demonic-sigils (level *world*))))                                                            
+                                                            )
+                                             :on-tick #'(lambda (effect actor)
+                                                          (declare (ignore actor))
+                                                          (when (< (param1 effect) *demonic-conquest-win-sigils-turns*)
+                                                            (incf (param1 effect)))                                                          
+                                                          )))

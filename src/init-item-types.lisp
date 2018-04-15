@@ -533,7 +533,7 @@
                                                      (logger (format nil "ITEM-SPAWN-LOCUST: ~A [~A] spawns a locust at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
                                                      ;; target here is the item to be reanimated
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
-                                                                            (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (prepend-article +article-the+ (visible-name actor)))
                                                                             :observed-mob actor
                                                                             :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                                                      *shared-mind-msg-color*

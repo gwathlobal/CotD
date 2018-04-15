@@ -90,7 +90,7 @@
                                                                 abil-mutate-accurate-bile abil-accurate-bile abil-mutate-hooks-and-suckers abil-mutate-disguise-as-human abil-disguise-as-human abil-spawn-scarabs
                                                                 abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess
                                                                 abil-invisibility abil-passwall abil-ghost-release abil-decipher-rune abil-demon-word-flesh abil-demon-word-knockback abil-demon-word-invasion abil-demon-word-darkness
-                                                                abil-demon-word-plague abil-demon-word-power abil-soul abil-detect-unnatural abil-throw-corpse-into-portal abil-throw-relic-into-portal)
+                                                                abil-demon-word-plague abil-demon-word-power abil-soul abil-detect-unnatural abil-throw-corpse-into-portal abil-throw-relic-into-portal abil-create-demon-sigil)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -450,7 +450,9 @@
   (when abil-throw-corpse-into-portal
     (setf (gethash +mob-abil-throw-corpse-into-portal+ (abilities mob-type)) t))
   (when abil-throw-relic-into-portal
-    (setf (gethash +mob-abil-throw-relic-into-portal+ (abilities mob-type)) t)))
+    (setf (gethash +mob-abil-throw-relic-into-portal+ (abilities mob-type)) t))
+  (when abil-create-demon-sigil
+    (setf (gethash +mob-abil-create-demon-sigil+ (abilities mob-type)) t)))
 
 (defun get-mob-type-by-id (mob-type-id)
   (aref *mob-types* mob-type-id))
@@ -1292,7 +1294,8 @@
              (not (= (mob-type mob) +mob-type-imp+))
              (not (= (mob-type mob) +mob-type-shadow-imp+))
              (not (= (mob-type mob) +mob-type-ghost+))
-             (not (= (mob-type mob) +mob-type-angel-image+)))
+             (not (= (mob-type mob) +mob-type-angel-image+))
+             (not (= (mob-type mob) +mob-type-demon-sigil+)))
     (let ((name-pick-n))
       (if (mob-ability-p mob +mob-abil-angel+)
         (progn
@@ -1423,6 +1426,7 @@
    (sense-good-id :initform nil :accessor sense-good-id)
    (sense-unnatural-pos :initform nil :accessor sense-unnatural-pos)
    (sense-relic-pos :initform nil :accessor sense-relic-pos)
+   (sense-sigil-pos :initform nil :accessor sense-sigil-pos)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)
    (killed-by :initform nil :accessor killed-by)
    (faction-name :initform nil :accessor faction-name)

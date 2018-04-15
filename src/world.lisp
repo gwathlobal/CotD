@@ -27,6 +27,7 @@
    (delayed-arrival-points :initform () :initarg :delayed-arrival-points :accessor delayed-arrival-points) ;; is of type ((x y z) (...) ...)
    (demonic-portals :initform () :initarg :demonic-portals :accessor demonic-portals)
    (relic-id :initform () :initarg :relic-id :accessor relic-id)
+   (demonic-sigils :initform () :initarg :demonic-sigils :accessor demonic-sigils)
    (mob-quadrant-map :initform nil :initarg :mob-quadrant-map :accessor mob-quadrant-map)
    (item-quadrant-map :initform nil :initarg :item-quadrant-map :accessor item-quadrant-map)
    (light-quadrant-map :initform nil :initarg :light-quadrant-map :accessor light-quadrant-map)

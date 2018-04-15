@@ -107,6 +107,7 @@
 (defconstant +mob-type-ghost+ 50)
 (defconstant +mob-type-tree+ 51)
 (defconstant +mob-type-satanist-empowered+ 52)
+(defconstant +mob-type-demon-sigil+ 53)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-civilians+ 1)
@@ -164,6 +165,7 @@
 (defconstant +ai-package-search-relic+ 23)
 (defconstant +ai-package-pick-relic+ 24)
 (defconstant +ai-package-return-relic-to-portal+ 25)
+(defconstant +ai-package-find-sigil+ 26)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)
@@ -328,6 +330,7 @@
 (defconstant +mob-abil-detect-unnatural+ 157)
 (defconstant +mob-abil-throw-corpse-into-portal+ 158)
 (defconstant +mob-abil-throw-relic-into-portal+ 159)
+(defconstant +mob-abil-create-demon-sigil+ 160)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -385,6 +388,7 @@
 (defconstant +mob-effect-invisibility+ 53)
 (defconstant +mob-effect-soul-sickness+ 54)
 (defconstant +mob-effect-demonic-power+ 55)
+(defconstant +mob-effect-demonic-sigil+ 56)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)
@@ -629,6 +633,9 @@
 
 (defparameter *thief-win-value* 1500)
 (defparameter *demonic-raid-win-value* 200)
+(defparameter *demonic-conquest-win-sigils-num* 4)
+(defparameter *demonic-conquest-win-sigils-turns* 100)
+(defparameter *demonic-conquest-win-sigils-dist* 30)
 
 (defparameter *max-oxygen-level* 5)
 (defparameter *lack-oxygen-dmg* 5)

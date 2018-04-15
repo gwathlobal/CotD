@@ -610,6 +610,81 @@
                                                                         (loop-finish))))
                                                              )))
 
+(set-ai-package (make-instance 'ai-package :id +ai-package-find-sigil+
+                                           :priority 7
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                            (let ((sigil-mob))
+                                                              (if (and (null nearest-enemy)
+                                                                       (setf sigil-mob (loop with sigil = nil
+                                                                                             for mob-id in (demonic-sigils (level *world*))
+                                                                                             for mob = (get-mob-by-id mob-id)
+                                                                                             when (= (mob-type mob) +mob-type-demon-sigil+)
+                                                                                               do
+                                                                                                  (unless sigil (setf sigil mob))
+                                                                                                  (when (< (get-distance (x actor) (y actor) (x mob) (y mob))
+                                                                                                           (get-distance (x actor) (y actor) (x sigil) (y sigil)))
+                                                                                                    (setf sigil mob))
+                                                                                             finally (return sigil)))
+                                                                       (or (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor)
+                                                                                                    (x sigil-mob)
+                                                                                                    (y sigil-mob)
+                                                                                                    (z sigil-mob)
+                                                                                                    (if (riding-mob-id actor)
+                                                                                                      (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                      (map-size actor))
+                                                                                                    (get-mob-move-mode actor))
+                                                                           (and (> (map-size actor) 1)
+                                                                                (ai-find-move-around actor (x sigil-mob) (y sigil-mob))))
+                                                                       )
+                                                                sigil-mob
+                                                                nil)))
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
+
+                                                             ;; when mob is a cannibal go to the nearest visible item and try to eat it
+                                                             (loop with sigil = check-result
+                                                                   with move-failed-once = nil
+                                                                   with move-result = nil
+                                                                   while t do
+                                                                     (logger (format nil "AI-PACKAGE-FIND-SIGIL: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)~%"
+                                                                                     (x actor) (y actor) (z actor) (name sigil) (id sigil) (x sigil) (y sigil) (z sigil)))
+                                                                     ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
+                                                                     (when (or (null (path-dst actor))
+                                                                               (/= (first (path-dst actor)) (x sigil))
+                                                                               (/= (second (path-dst actor)) (y sigil))
+                                                                               (/= (third (path-dst actor)) (z sigil)))
+                                                                       (ai-set-path-dst actor (x sigil) (y sigil) (z sigil)))
+                                                                     
+                                                                     ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
+                                                                     (when (null (path-dst actor))
+                                                                       (ai-mob-random-dir actor)
+                                                                       (loop-finish))
+                                                                     
+                                                                     ;; make a path to the destination target if there is no path plotted
+                                                                     (when (or (null (path actor))
+                                                                               (mob-ability-p actor +mob-abil-momentum+))
+                                                                       (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                                     
+                                                                     ;; make a step along the path to the path-dst
+                                                                     (setf move-result (ai-move-along-path actor))
+                                                                     (cond
+                                                                       ;; if the move failed twice - move in a random direction
+                                                                       ((and move-failed-once
+                                                                             (null move-result))
+                                                                        (ai-mob-random-dir actor)
+                                                                        (loop-finish))
+                                                                       ;; if the move failed - reset path-dst and start anew
+                                                                       ((and (null move-failed-once)
+                                                                             (null move-result))
+                                                                        (setf (path-dst actor) nil)
+                                                                        (setf move-failed-once t)
+                                                                        )
+                                                                       ;; success
+                                                                       (t
+                                                                        (loop-finish))))
+                                                             )))
+
 (set-ai-package (make-instance 'ai-package :id +ai-package-use-ability+
                                            :priority 8
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
@@ -1144,8 +1219,10 @@
 (set-ai-package (make-instance 'ai-package :id +ai-package-patrol-district+
                                            :priority 5
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
-                                                            (declare (ignore actor nearest-ally hostile-mobs allied-mobs))
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
                                                             (if (and (not nearest-enemy)
+                                                                     (not (mob-ability-p actor +mob-abil-immobile+))
+                                                                     (not (mob-effect-p actor +mob-abil-immobile+))
                                                                      )
                                                               t
                                                               nil)

@@ -7199,6 +7199,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
+                                                               (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)
                                                                      when (item-ability-p item +item-abil-corpse+)
@@ -7266,6 +7267,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
+                                                               (= (mission-scenario (level *world*)) +mission-scenario-demon-steal+)
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)
                                                                      when (= (item-type item) +item-type-church-reliс+)
@@ -7287,3 +7289,78 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-create-demon-sigil+ :name "Summon demonic sigil" :descr (format nil "Summon a demonic sigil next to you. You can not summon sigils closer than ~A tiles to each other." *demonic-conquest-win-sigils-dist*)
+                                 :spd (truncate +normal-ap+ 1.5) :passive nil
+                                 :cd 50 :final t :on-touch nil
+                                 :motion 100
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                ;; target is (x y z)
+                                                (logger (format nil "MOB-CREATE-DEMON-SIGIL: ~A [~A] spawns a demon sigil at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                       (format nil "~A creates a demonic sigil. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :observed-mob actor
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
+                                                                                                           (format nil "You hear otherworldly sounds~A. " str)))
+                                                (let ((sigil-mob))
+                                                  (setf sigil-mob (make-instance 'mob :mob-type +mob-type-demon-sigil+ :x (first target) :y (second target) :z (third target)))
+                                                  (add-mob-to-level-list (level *world*) sigil-mob)
+                                                  (set-mob-effect sigil-mob :effect-type-id +mob-effect-demonic-sigil+ :actor-id (id sigil-mob) :cd t))
+                                                                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+)
+                                                               (mob-ability-p actor +mob-abil-create-demon-sigil+)
+                                                               (loop with result = t
+                                                                     for sigil-id in (demonic-sigils (level *world*))
+                                                                     for sigil = (get-mob-by-id sigil-id)
+                                                                     when (< (get-distance (x actor) (y actor) (x sigil) (y sigil)) *demonic-conquest-win-sigils-dist*)
+                                                                       do
+                                                                          (setf result nil)
+                                                                          (loop-finish)
+                                                                     finally (return result)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (let ((final-cell nil))
+                                                    (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                    (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
+                                                                                                      (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
+                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                        (when (null final-cell)
+                                                                                                          (setf final-cell (list dx dy (z actor))))
+                                                                                                        (when (and nearest-enemy
+                                                                                                                   (> (get-distance-3d dx dy (z actor) (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))
+                                                                                                                      (get-distance-3d (first final-cell) (second final-cell) (third final-cell)
+                                                                                                                                       (x nearest-enemy) (y nearest-enemy) (z nearest-enemy))))
+                                                                                                          (setf final-cell (list dx dy (z actor))))))))
+                                                    (if (and (mob-ability-p actor +mob-abil-create-demon-sigil+)
+                                                             (can-invoke-ability actor actor +mob-abil-create-demon-sigil+)
+                                                             final-cell)
+                                                    final-cell
+                                                    nil))
+                                                  )
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                               (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                               (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
+                                                               (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
+                                                        (progn
+                                                          (clear-message-list *small-message-box*)
+                                                          (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
+                                                          t)
+                                                        (progn
+                                                          nil))
+                                                      )))

@@ -464,6 +464,11 @@
         (c-dir))
     (declare (type fixnum dx dy))
 
+    ;; if immobile - do not move
+    (when (or (mob-ability-p mob +mob-abil-immobile+)
+              (mob-effect-p mob +mob-abil-immobile+))
+      (setf dir 5)
+      (setf dir-z 0))
 
     ;; if being ridden - restore the direction from the order being given by the rider
     (when (and (mounted-by-mob-id mob)
@@ -2123,6 +2128,21 @@
         
     (setf (sense-relic-pos *player*) nearest-power)))
 
+(defun sense-sigil ()
+  (setf (sense-sigil-pos *player*) nil)
+  (let ((nearest-power nil))
+    ;; search for item on the map
+    (loop for mob-id in (mob-id-list (level *world*))
+          for mob = (get-mob-by-id mob-id)
+          when (= (mob-type mob) +mob-type-demon-sigil+)
+            do
+               (unless nearest-power (setf nearest-power (list (x mob) (y mob))))
+               (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
+                        (get-distance (x *player*) (y *player*) (first nearest-power) (second nearest-power)))
+                 (setf nearest-power (list (x mob) (y mob)))))
+        
+    (setf (sense-sigil-pos *player*) nearest-power)))
+
 (defun mob-pick-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))) (silent nil))
   (logger (format nil "MOB-PICK-ITEM: ~A [~A] picks up ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
   (if (null (inv-id item))
@@ -2896,3 +2916,14 @@
                (return-from get-demon-steal-check-relic-captured t))
         )
   nil)
+
+(defun get-demon-conquest-turns-left (world)
+  (loop for sigil-id in (stable-sort (demonic-sigils (level world)) #'(lambda (a b)
+                                                                        (if (> (param1 (get-effect-by-id (mob-effect-p (get-mob-by-id a) +mob-effect-demonic-sigil+)))
+                                                                               (param1 (get-effect-by-id (mob-effect-p (get-mob-by-id b) +mob-effect-demonic-sigil+))))
+                                                                          t
+                                                                          nil)))
+        repeat *demonic-conquest-win-sigils-num*
+        for sigil = (get-mob-by-id sigil-id)
+        for effect = (get-effect-by-id (mob-effect-p sigil +mob-effect-demonic-sigil+))
+        minimize (param1 effect)))

@@ -68,7 +68,6 @@
                         (when (null avail-cells-list)
                           (logger (format nil "~%CREATE-TEMPLATE-CITY: Could not place reserved building ~A~%" build-picked))
                           (print-reserved-level reserved-level)
-                          (setf *reserved-level* reserved-level)
                           (return-from create-template-city (values nil nil nil nil)))
                      finally (setf x (first cell-pick) y (second cell-pick)))
 

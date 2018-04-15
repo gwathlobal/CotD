@@ -30,7 +30,7 @@
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
+      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
                         (cur-hp *player*) (max-hp *player*) 
                         (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
@@ -53,6 +53,17 @@
                           (format nil "Flesh left: ~A pts~%" (if (> (- *demonic-raid-win-value* (get-demon-raid-overall-points *world*)) 0)
                                                             (- *demonic-raid-win-value* (get-demon-raid-overall-points *world*))
                                                             0))
+                          "")
+                        (if (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                                     (= (loyal-faction *player*) +faction-type-angels+)
+                                     (= (loyal-faction *player*) +faction-type-church+)
+                                     (= (loyal-faction *player*) +faction-type-satanists+)
+                                     (= (loyal-faction *player*) +faction-type-military+))
+                                 (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+))
+                          (format nil "Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*
+                                  (if (>= (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*)
+                                    (format nil "~D turn~:P left" (- *demonic-conquest-win-sigils-turns* (get-demon-conquest-turns-left *world*)))
+                                    "none"))
                           "")
                         (if (/= (cur-oxygen *player*) *max-oxygen-level*)
                           (format nil "Oxygen: ~A/~A~%" (cur-oxygen *player*) *max-oxygen-level*)
@@ -144,6 +155,13 @@
     (when (sense-relic-pos *player*)
       (when first (format str "~%") (setf first nil))
       (format str "Sense relic: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-relic-pos *player*)) (second (sense-relic-pos *player*)))))
+    (when (sense-sigil-pos *player*)
+      (when first (format str "~%") (setf first nil))
+      (format str "Sense sigil: ~A~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-sigil-pos *player*)) (second (sense-sigil-pos *player*)))
+              (if (and (mob-ability-p *player* +mob-abil-create-demon-sigil+)
+                       (>= (get-distance (x *player*) (y *player*) (first (sense-sigil-pos *player*)) (second (sense-sigil-pos *player*))) *demonic-conquest-win-sigils-dist*))
+                " (available)"
+                "")))
     str))
 
 (defun general-direction-str (sx sy tx ty)
