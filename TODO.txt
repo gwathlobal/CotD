@@ -1,4 +1,3 @@
-- Fix military defender buildings in seaport 
 - Custom scenarios
 - Add Twosoul character for satanists
 - Add Flamethrower operator to the miliatry

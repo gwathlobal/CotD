@@ -939,7 +939,7 @@
          (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) 4 2) +building-city-army-post+)
          (setf (aref reserved-level 4 (- (array-dimension reserved-level 1) 5) 2) +building-city-army-post+)
          (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 5) 2) +building-city-army-post+)
-         
+
          (setf removed-build-coords (list (list 4 4 2)
                                           (list 4 5 2)
                                           (list 5 4 2)
@@ -969,11 +969,12 @@
     ;; remove the buildings from the designated places if there were any
     (loop for (x y z) in removed-build-coords do
       (setf building-list (remove (find-if #'(lambda (a)
-                                               (if (and (= (second a) x)
-                                                        (= (third a) y)
-                                                        (= (fourth a) z))
-                                                 t
-                                                 nil))
+                                               (multiple-value-bind (bw bh) (get-building-grid-dim (get-building-type (first a)))
+                                                 (if (and (>= x (second a)) (< x (+ (second a) bw))
+                                                          (>= y (third a)) (< y (+ (third a) bh))
+                                                          (= (fourth a) z))
+                                                   t
+                                                   nil)))
                                            building-list)
                                   building-list)))
 
