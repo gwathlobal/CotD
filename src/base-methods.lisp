@@ -1070,16 +1070,22 @@
     
     (loop for (a-target . dmg) in affected-targets do
       (if (zerop dmg)
-          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                 (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))))
-                                 :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                          *shared-mind-msg-color*
-                                          sdl:*white*))
+        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                               (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))))
+                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                        *shared-mind-msg-color*
+                                        sdl:*white*))
+        (progn
           (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                  (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name a-target))) dmg)
                                  :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                           *shared-mind-msg-color*
-                                          sdl:*white*)))
+                                          sdl:*white*))
+          ;; show message for LOW HP
+          (when (and (eq *player* a-target)
+                     (< (/ (cur-hp a-target) (max-hp a-target)) 
+                        0.3))
+            (add-message "LOW HP!!! " sdl:*red*))))
       (when (check-dead a-target)
         (make-dead a-target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (get-ranged-weapon-aux actor))
           
@@ -1414,7 +1420,13 @@
                                                                     (eq *player* actor))
                                                                (eq *player* target))
                                                          (sdl:color :r 255 :g 140 :b 0)
-                                                         sdl:*yellow*)))))))
+                                                         sdl:*yellow*))))))
+                  ;; show message for LOW HP
+                  (when (and (eq *player* target)
+                             (< (/ (cur-hp target) (max-hp target)) 
+                                0.3))
+                    (add-message "LOW HP!!! " sdl:*red*))
+                  )
                 )
               ;; if the attacker can constrict - constrict around the target
               (when (and actor
