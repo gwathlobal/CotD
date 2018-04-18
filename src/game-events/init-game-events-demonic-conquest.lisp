@@ -82,6 +82,7 @@
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-demons world) 0)
                                                                   (get-demon-conquest-turns-left world)
+                                                                  (>= (length (demonic-sigils (level world))) *demonic-conquest-win-sigils-num*)
                                                                   (>= (get-demon-conquest-turns-left world) *demonic-conquest-win-sigils-turns*))
                                                            t
                                                            nil))
@@ -265,6 +266,7 @@
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)
                                                                   (> (nth +faction-type-satanists+ (total-faction-list world)) 0)
                                                                   (get-demon-conquest-turns-left world)
+                                                                  (>= (length (demonic-sigils (level world))) *demonic-conquest-win-sigils-num*)
                                                                   (>= (get-demon-conquest-turns-left world) *demonic-conquest-win-sigils-turns*))
                                                            t
                                                            nil))

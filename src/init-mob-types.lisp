@@ -464,16 +464,17 @@
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon-sigil+
-                                       :name "Demonic sigil"
+                                       :name "demonic sigil"
                                        :glyph-idx 128 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 25 :max-fp 12
                                        :faction +faction-type-demons+
                                        :weapon (list "None" nil nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 100))
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-no-breathe t :abil-immobile t :abil-immovable t
+                                       :abil-unholy t :abil-demon t :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t
                                        :abil-free-call t
-                                       :ai-use-ability t))
+                                       :ai-use-ability t
+                             ))
 
 ;;--------------------
 ;; UNDEAD

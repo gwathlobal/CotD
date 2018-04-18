@@ -540,7 +540,7 @@
                                                              )))
 
 (set-ai-package (make-instance 'ai-package :id +ai-package-search-relic+
-                                           :priority 7
+                                           :priority 5
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
                                                             (let ((relic-item))
@@ -611,7 +611,7 @@
                                                              )))
 
 (set-ai-package (make-instance 'ai-package :id +ai-package-find-sigil+
-                                           :priority 7
+                                           :priority 5
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
                                                             (let ((sigil-mob))
@@ -1217,7 +1217,7 @@
                                                              ))))
 
 (set-ai-package (make-instance 'ai-package :id +ai-package-patrol-district+
-                                           :priority 5
+                                           :priority 4
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
                                                             (if (and (not nearest-enemy)
@@ -1334,7 +1334,7 @@
                                                              ))))
 
 (set-ai-package (make-instance 'ai-package :id +ai-package-find-random-location+
-                                           :priority 4
+                                           :priority 3
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore actor nearest-ally hostile-mobs allied-mobs))
                                                             (if (and (not nearest-enemy)

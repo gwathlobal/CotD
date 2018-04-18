@@ -1614,7 +1614,9 @@
                                                                                      (capitalize-name (prepend-article +article-the+ (visible-name actor))) cur-dmg (prepend-article +article-the+ (visible-name target)))
                                                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                                                       *shared-mind-msg-color*
-                                                                                      sdl:*white*))
+                                                                                      (if (eq *player* actor)
+                                                                                        (sdl:color :r 255 :g 140 :b 0)
+                                                                                        sdl:*yellow*)))
                                                       (when (eq actor *player*)
                                                         (setf (killed-by *player*) "trying to dominate the gargantaur"))
                                                       (make-dead actor :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ()))
@@ -1624,7 +1626,9 @@
                                                                                      (capitalize-name (prepend-article +article-the+ (visible-name actor))) cur-dmg (prepend-article +article-the+ (visible-name target)))
                                                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                                                       *shared-mind-msg-color*
-                                                                                      sdl:*white*))
+                                                                                      (if (eq *player* actor)
+                                                                                        (sdl:color :r 255 :g 140 :b 0)
+                                                                                        sdl:*yellow*)))
 
                                                       ;; reveal the true form of those who ride fiends
                                                       (when (mob-effect-p actor +mob-effect-divine-concealed+)
@@ -1633,12 +1637,21 @@
                                                                                (format nil " to reveal itself as ~A" (prepend-article +article-the+ (get-qualified-name actor)))
                                                                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                                                         *shared-mind-msg-color*
-                                                                                        sdl:*white*)))
+                                                                                        (if (eq *player* actor)
+                                                                                          (sdl:color :r 255 :g 140 :b 0)
+                                                                                          sdl:*yellow*))))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                              (format nil ". ")
                                                                              :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                                                       *shared-mind-msg-color*
-                                                                                      sdl:*white*))
+                                                                                      (if (eq *player* actor)
+                                                                                        (sdl:color :r 255 :g 140 :b 0)
+                                                                                        sdl:*yellow*)))
+                                                      ;; show message for LOW HP
+                                                      (when (and (eq *player* actor)
+                                                                 (< (/ (cur-hp actor) (max-hp actor)) 
+                                                                    0.3))
+                                                        (add-message "LOW HP!!! " sdl:*red*))
                                                       
                                                       (setf (mounted-by-mob-id target) (id actor))
                                                       (setf (riding-mob-id actor) (id target))
@@ -2601,7 +2614,15 @@
                                                                                            (format nil "~A is hit for ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)
                                                                                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                     *shared-mind-msg-color*
-                                                                                                    sdl:*white*))
+                                                                                                    (if (eq *player* target)
+                                                                                                      (sdl:color :r 255 :g 140 :b 0)
+                                                                                                      sdl:*yellow*)))
+                                                                    ;; show message for LOW HP
+                                                                    (when (and (eq *player* target)
+                                                                               (< (/ (cur-hp target) (max-hp target)) 
+                                                                                  0.3))
+                                                                      (add-message "LOW HP!!! " sdl:*red*))
+                                                                    
                                                                     (when (check-dead target)
                                                                       (when (mob-effect-p target +mob-effect-possessed+)
                                                                         (mob-depossess-target target))
@@ -7223,7 +7244,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-throw-relic-into-portal+ :name "Throw relic into portal" :descr "Throw the relic you have into a demonic portal. You must be standing on top of the demonic portal and have the relic in your inventory to do that." 
+                                 :id +mob-abil-throw-relic-into-portal+ :name "Throw relic into portal" :descr "Throw the relic you have into a demonic portal. You must be standing on top of the demonic portal and have the relic in your inventory to do that. Usable only during the demonic thievery scenario." 
                                  :spd (truncate +normal-ap+ 1.5) :passive nil
                                  :final t :on-touch nil
                                  :motion 90
@@ -7291,7 +7312,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-create-demon-sigil+ :name "Summon demonic sigil" :descr (format nil "Summon a demonic sigil next to you. You can not summon sigils closer than ~A tiles to each other." *demonic-conquest-win-sigils-dist*)
+                                 :id +mob-abil-create-demon-sigil+ :name "Summon demonic sigil" :descr (format nil "Summon a demonic sigil next to you. You can not summon sigils closer than ~A tiles to each other. Usable only during the demonic conquest scenario." *demonic-conquest-win-sigils-dist*)
                                  :spd (truncate +normal-ap+ 1.5) :passive nil
                                  :cd 50 :final t :on-touch nil
                                  :motion 100

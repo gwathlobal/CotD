@@ -819,4 +819,4 @@
                                          :name "relic" :plural-name "relics"
                                          :glyph-idx 127 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A holy relic. Demons seek it to capture and place under the wards in their world."
-                              ))
+                                         :flavor-quote (format nil "\"Our sacred ideals persist not because of their utility but because of our faith in them. We will even refuse to defend any sacred ideals in which we no longer beleove, unlike the ancient priests who, in the twilight of paganism, defended the idols which they had long ceased to consider as gods. Not a single of our sacred ideals is threatened by free inquiry, but this is precisely because they are strong in reality.\"~%Fyodor Dostoevsky. A Writer's Diary.")))

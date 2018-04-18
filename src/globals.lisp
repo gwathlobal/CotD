@@ -635,7 +635,7 @@
 (defparameter *demonic-raid-win-value* 200)
 (defparameter *demonic-conquest-win-sigils-num* 4)
 (defparameter *demonic-conquest-win-sigils-turns* 100)
-(defparameter *demonic-conquest-win-sigils-dist* 30)
+(defparameter *demonic-conquest-win-sigils-dist* 35)
 
 (defparameter *max-oxygen-level* 5)
 (defparameter *lack-oxygen-dmg* 5)

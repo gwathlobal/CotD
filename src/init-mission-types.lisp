@@ -244,7 +244,7 @@
                                                                                     )
                                                        :objective-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
                                                                              (list +faction-type-angels+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
-                                                                             (list +faction-type-military+ (list +ai-package-patrol-district+))
+                                                                             (list +faction-type-military+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
                                                                              (list +faction-type-church+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
                                                                              (list +faction-type-satanists+ (list +ai-package-patrol-district+))
                                                                              (list +faction-type-eater+ (list +ai-package-patrol-district+))

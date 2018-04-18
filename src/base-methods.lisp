@@ -401,15 +401,32 @@
                (progn
                  ;; a hack because sometimes the player may fall somewhere he does not see (when riding a horse for example) and then no message will be displayed normally 
                  (set-message-this-turn t)
-                 (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))
+                 (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg)
+                              (if (eq *player* mob)
+                                (sdl:color :r 255 :g 140 :b 0)
+                                sdl:*yellow*))
+                 ;; show message for LOW HP
+                 (when (and (eq *player* mob)
+                            (< (/ (cur-hp mob) (max-hp mob)) 
+                               0.3))
+                   (add-message "LOW HP!!! " sdl:*red*))
                  (when (check-dead mob) (setf (killed-by *player*) "falling"))))
               ((eq (id mob) (riding-mob-id *player*))
                (progn
                  ;; a hack because sometimes the player's horse may fall somewhere he does not see and then no message will be displayed normally 
                  (set-message-this-turn t)
-                 (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg))))
+                 (add-message (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg)
+                              (if (eq *player* mob)
+                                (sdl:color :r 255 :g 140 :b 0)
+                                sdl:*yellow*))))
               (t (print-visible-message (x mob) (y mob) (z mob) (level *world*)
-                                        (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg) :observed-mob mob))))
+                                        (format nil "~A falls and takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name mob))) cur-dmg) :observed-mob mob
+                                        :color (if (and (find (id mob) (shared-visible-mobs *player*))
+                                                        (not (find (id mob) (proper-visible-mobs *player*))))
+                                                 *shared-mind-msg-color*
+                                                 (if (eq *player* mob)
+                                                   (sdl:color :r 255 :g 140 :b 0)
+                                                   sdl:*yellow*))))))
           (when (check-dead mob)
             (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())
             (when (slave-mob-id mob)
@@ -1423,6 +1440,7 @@
                                                          sdl:*yellow*))))))
                   ;; show message for LOW HP
                   (when (and (eq *player* target)
+                             (not no-hit-message)
                              (< (/ (cur-hp target) (max-hp target)) 
                                 0.3))
                     (add-message "LOW HP!!! " sdl:*red*))
@@ -1900,6 +1918,11 @@
                                :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                         *shared-mind-msg-color*
                                         sdl:*white*))
+        ;; show message for LOW HP
+        (when (and (eq *player* mob)
+                   (< (/ (cur-hp mob) (max-hp mob)) 
+                      0.3))
+          (add-message "LOW HP!!! " sdl:*red*))
         (when (check-dead mob)
           (when (eq mob *player*)
             (setf (killed-by *player*) "drowning"))
