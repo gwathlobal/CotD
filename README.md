@@ -5,22 +5,14 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-March 29, 2018 v1.3.0
+April 21, 2018 v1.3.1
 
-- The concept of missions was introduced. The previous scenario where the demons wanted to kill all angels in the city became the 'Demonic attack' mission.
-- A new mission was added - Demonic raid. The demons opened the portals in order to gather flesh from the city. Their goal for this mission is to kill citizens, pick up their corpses and throw them into portals, while the military and the angels want to stop and destroy demons.
-- If you die, this is no longer the end of the world. The battle will go on until one of the sides wins. You might even get resurrected by your allies and continue fighting as if nothing happened.
-- You can no longer win the game by ascending beyond Angel or Archdemon/Shadow Devil.
-- As a Scout, you can no longer lose the game by getting possessed. Though you will lose the control over your character until you get purged (or the end of the mission).
-- You will now be able to customize the factions you want to see in a scenario.
-- AI will bump into friendly mobs much less often and will try to navigate around them to get to its target.
-- Added a journal where you can see objectives for the current mission and your relations with other factions. The journal is displayed using the 'j' button.
-- Defending military will be stationed inside the city.
-- Possessable creatures will try to get away from you if you are the one that can possess them.
-- Characters with ranged weapons will try to step out of melee combat.
-- Ghosts can now sense the direction to the sacrificial circle and the Book of Rituals.
-- Abilities on cooldown will be displayed in the status string.
-- The game over screen now also shows the comparative statistics between the character who earned the title and the player.
+- A new mission was added - Demonic thievery. The demons opened portals in order to steal a holy relic from the church and return it to their dimension. The military and the angels want to stop and destroy them.
+- A new mission was added - Demonic conquest. The demons opened portals in order to conquer the district by placing and charging sigils in it. The military and the angels want to stop and destroy them.
+- Fixed the bug with player's choosing the resurrect ability that could freeze the game.
+- Fixed warehouses being mixed with barricades when military defenders are present in a seaport.
+- Strings in the message log are of different colors now depending on the type of the message (instead of white used everywhere previously).
+
 
 CURRENT CHANGELOG
 

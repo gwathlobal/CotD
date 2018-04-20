@@ -1,4 +1,5 @@
 - Custom scenarios
+- Scenario with attacking a battleship
 - Add Twosoul character for satanists
 - Add Flamethrower operator to the miliatry
 - Add courtyard houses like Thief2RL

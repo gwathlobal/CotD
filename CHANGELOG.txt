@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+April 21, 2018 v1.3.1
+
 - A new mission was added - Demonic thievery. The demons opened portals in order to steal a holy relic from the church and return it to their dimension. The military and the angels want to stop and destroy them.
 - A new mission was added - Demonic conquest. The demons opened portals in order to conquer the district by placing and charging sigils in it. The military and the angels want to stop and destroy them.
 - Fixed the bug with player's choosing the resurrect ability that could freeze the game.

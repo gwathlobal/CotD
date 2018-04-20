@@ -151,11 +151,15 @@
                                                                                          sdl:*white*)))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
-                                                            (let ((old-max-hp (max-hp actor)))
+                                                            (let ((old-max-hp (max-hp actor))
+                                                                  (null-hp (if (<= (cur-hp actor))
+                                                                             t
+                                                                             nil)))
                                                               (setf (mob-type actor) +mob-type-angel+)
                                                               (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
-                                                              (if (zerop (cur-hp actor))
+                                                              (when (and (zerop (cur-hp actor))
+                                                                         (not (null null-hp)))
                                                                 (setf (cur-hp actor) 1)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
@@ -233,11 +237,15 @@
                                                                                          *shared-mind-msg-color*
                                                                                          sdl:*white*)))
                                              :on-remove #'(lambda (effect actor)
-                                                            (let ((old-max-hp (max-hp actor)))
+                                                            (let ((old-max-hp (max-hp actor))
+                                                                  (null-hp (if (<= (cur-hp actor))
+                                                                             t
+                                                                             nil)))
                                                               (setf (mob-type actor) (param1 effect))
                                                               (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
-                                                              (if (zerop (cur-hp actor))
+                                                              (when (and (zerop (cur-hp actor))
+                                                                         (not (null null-hp)))
                                                                 (setf (cur-hp actor) 1)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
@@ -410,7 +418,9 @@
                                                            (loop for mob-id in (append (list (id actor)) (merged-id-list actor))
                                                                  for mob = (get-mob-by-id mob-id)
                                                                  do
-                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (merged-id-list actor))))))))))
+                                                                    (setf (cur-hp mob) (truncate cur-hp (length (append (list (id actor)) (merged-id-list actor)))))
+                                                                    (when (check-dead mob)
+                                                                      (make-dead mob :splatter t :msg t :msg-newline t :killer nil :corpse t :aux-params () :keep-items nil)))))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-righteous-fury+ :name "Righteous fury"
                                              :color-func #'(lambda (effect actor)
@@ -666,12 +676,16 @@
                                                                                          *shared-mind-msg-color*
                                                                                          sdl:*white*))
                                                          
-                                                         (let ((old-max-hp (max-hp actor)))
+                                                         (let ((old-max-hp (max-hp actor))
+                                                               (null-hp (if (<= (cur-hp actor))
+                                                                             t
+                                                                             nil)))
                                                            (setf (mob-type actor) +mob-type-sheep+)
                                                            (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                            (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
-                                                           (if (zerop (cur-hp actor))
-                                                             (setf (cur-hp actor) 1)))
+                                                           (when (and (zerop (cur-hp actor))
+                                                                      (not (null null-hp)))
+                                                                (setf (cur-hp actor) 1)))
                                                          (setf (face-mob-type-id actor) (mob-type actor))
 
                                                          ;; polymorph block mutations
@@ -712,11 +726,15 @@
                                                                                             *shared-mind-msg-color*
                                                                                             sdl:*white*))
                                                             
-                                                            (let ((old-max-hp (max-hp actor)))
+                                                            (let ((old-max-hp (max-hp actor))
+                                                                  (null-hp (if (<= (cur-hp actor))
+                                                                             t
+                                                                             nil)))
                                                               (setf (mob-type actor) (first (param1 effect)))
                                                               (setf (max-hp actor) (second (param1 effect)))
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
-                                                              (if (zerop (cur-hp actor))
+                                                              (when (and (zerop (cur-hp actor))
+                                                                         (not (null null-hp)))
                                                                 (setf (cur-hp actor) 1)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
@@ -966,11 +984,15 @@
                                                                                             *shared-mind-msg-color*
                                                                                             sdl:*white*))
                                                             
-                                                            (let ((old-max-hp (max-hp actor)))
+                                                            (let ((old-max-hp (max-hp actor))
+                                                                  (null-hp (if (<= (cur-hp actor))
+                                                                             t
+                                                                             nil)))
                                                               (setf (mob-type actor) (first (param1 effect)))
                                                               (setf (max-hp actor) (second (param1 effect)))
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
-                                                              (if (zerop (cur-hp actor))
+                                                              (when (and (zerop (cur-hp actor))
+                                                                         (not (null null-hp)))
                                                                 (setf (cur-hp actor) 1)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)
@@ -1138,11 +1160,15 @@
                                                                                          sdl:*white*)))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
-                                                            (let ((old-max-hp (max-hp actor)))
+                                                            (let ((old-max-hp (max-hp actor))
+                                                                  (null-hp (if (<= (cur-hp actor))
+                                                                             t
+                                                                             nil)))
                                                               (setf (mob-type actor) +mob-type-satanist+)
                                                               (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
                                                               (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
-                                                              (if (zerop (cur-hp actor))
+                                                              (when (and (zerop (cur-hp actor))
+                                                                         (not (null null-hp)))
                                                                 (setf (cur-hp actor) 1)))
                                                             (setf (face-mob-type-id actor) (mob-type actor))
                                                             (set-cur-weapons actor)

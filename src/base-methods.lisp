@@ -1001,6 +1001,7 @@
   (make-act actor +normal-ap+))
 
 (defun mob-shoot-target (actor target)
+  (logger (format nil "MOB-SHOOT-TARGET: ~A [~A] shoots ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   (let ((cur-dmg 0) (bullets-left) (affected-targets nil) (completely-missed t))
     (unless (is-weapon-ranged actor)
       (return-from mob-shoot-target nil))
@@ -1074,9 +1075,9 @@
              (when target1
                (setf completely-missed nil)
 
-               (setf cur-dmg (inflict-damage target :min-dmg (get-ranged-weapon-dmg-min actor) :max-dmg (get-ranged-weapon-dmg-max actor) :dmg-type (get-ranged-weapon-dmg-type actor)
-                                                    :att-spd nil :weapon-aux (get-ranged-weapon-aux actor) :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
-                                                    :actor actor))
+               (setf cur-dmg (inflict-damage target1 :min-dmg (get-ranged-weapon-dmg-min actor) :max-dmg (get-ranged-weapon-dmg-max actor) :dmg-type (get-ranged-weapon-dmg-type actor)
+                                                     :att-spd nil :weapon-aux (get-ranged-weapon-aux actor) :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
+                                                     :actor actor))
                            
                (if (find target1 affected-targets :key #'(lambda (n) (car n)))
                  (incf (cdr (find target1 affected-targets :key #'(lambda (n) (car n)))) cur-dmg)
