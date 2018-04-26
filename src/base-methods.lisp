@@ -1028,7 +1028,10 @@
                            (format nil "~A ~A ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (get-ranged-weapon-shoot-str actor) (prepend-article +article-the+ (visible-name target)))
                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                     *shared-mind-msg-color*
-                                    sdl:*white*))
+                                    (if (or (eq *player* actor)
+                                            (eq *player* a-target))
+                                      (sdl:color :r 255 :g 140 :b 0)
+                                      sdl:*yellow*)))
     
     (loop repeat bullets-left
           with rx
