@@ -80,7 +80,8 @@
                  (level-city-reserve-build-on-grid build-picked x y 2 reserved-level)
 
                  ;; decrease the maximum available number of buildings of this type
-                 (when (gethash (building-type (get-building-type build-picked)) max-building-types)
+                 (when (and (gethash (building-type (get-building-type build-picked)) max-building-types)
+                            (not (eq (gethash (building-type (get-building-type build-picked)) max-building-types) t)))
                    (decf (gethash (building-type (get-building-type build-picked)) max-building-types))))
             ))
     
@@ -92,16 +93,16 @@
             do
                ;; prepare the list of buildings
                ;; so that it becomes ((1 2 3) (4) (5 6) ...)
-               (setf build-cur-list (prepare-gen-build-id-list))
+               (setf build-cur-list (prepare-gen-build-id-list max-building-types +building-type-house+))
                
                ;; randomly pick a building and remove it from the list if it does not fit or the maximum number of this kind of buildings have been reached
                ;; until we find a building that fits or nothing is left 
                (loop initially (multiple-value-setq (build-picked build-cur-list) (pick-building-randomly build-cur-list))
                      until (or (and (gethash (building-type (get-building-type build-picked)) max-building-types)
-                                    (> (gethash (building-type (get-building-type build-picked)) max-building-types) 0)
+                                    (or (eq (gethash (building-type (get-building-type build-picked)) max-building-types) t)
+                                        (> (gethash (building-type (get-building-type build-picked)) max-building-types) 0))
                                     (level-city-can-place-build-on-grid build-picked x y 2 reserved-level))
-                               (and (not (gethash (building-type (get-building-type build-picked)) max-building-types))
-                                    (level-city-can-place-build-on-grid build-picked x y 2 reserved-level)))
+                               )
                      do
                         (unless build-cur-list
                           (setf build-picked nil)
@@ -118,7 +119,8 @@
                  (level-city-reserve-build-on-grid build-picked x y 2 reserved-level)
 
                  ;; decrease the maximum available number of buildings of this type
-                 (when (gethash (building-type (get-building-type build-picked)) max-building-types)
+                 (when (and (gethash (building-type (get-building-type build-picked)) max-building-types)
+                            (not (eq (gethash (building-type (get-building-type build-picked)) max-building-types) t)))
                    (decf (gethash (building-type (get-building-type build-picked)) max-building-types)))
                  )
             ))
@@ -252,13 +254,12 @@
     
     (values building-picked build-cur-list)))
 
-(defun prepare-gen-build-id-list ()
+(defun prepare-gen-build-id-list (max-building-types &optional increased-build-type-id)
   ;; a hack to make houses appear 3 times more frequently
   (append (loop repeat 3
-                collect (prepare-spec-build-id-list +building-type-house+))
-          (loop for gen-build-type-id being the hash-key in *general-building-types*
-                when (/= gen-build-type-id +building-type-none+)
-                  collect (prepare-spec-build-id-list gen-build-type-id))))
+                collect (prepare-spec-build-id-list increased-build-type-id))
+          (loop for gen-build-type-id being the hash-key in max-building-types
+                collect (prepare-spec-build-id-list gen-build-type-id))))
 
 (defun prepare-spec-build-id-list (gen-build-type-id)
   (loop for spec-build-type being the hash-value in *building-types*

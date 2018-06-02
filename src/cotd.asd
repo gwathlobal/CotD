@@ -38,6 +38,7 @@
      (:file "character-dump" :depends-on ("base-methods"))
      (:file "buildings" :depends-on ("globals"))
      (:file "init-building-types" :depends-on ("buildings"))
+     (:file "init-ruined-building-types" :depends-on ("buildings"))
      (:file "level-city" :depends-on ("init-building-types"))
      (:file "level-test" :depends-on ("base-methods"))
      (:file "mission-type")

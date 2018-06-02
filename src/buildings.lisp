@@ -19,6 +19,15 @@
 (defconstant +building-type-bank+ 12)
 (defconstant +building-type-graveyard+ 13)
 
+(defconstant +building-type-ruined-house+ 14)
+(defconstant +building-type-ruined-townhall+ 15)
+(defconstant +building-type-ruined-park+ 16)
+(defconstant +building-type-ruined-prison+ 17)
+(defconstant +building-type-ruined-warehouse+ 18)
+(defconstant +building-type-ruined-library+ 19)
+(defconstant +building-type-ruined-mansion+ 20)
+(defconstant +building-type-ruined-bank+ 21)
+
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
 ;;--------------------------------------
@@ -66,6 +75,28 @@
 (defconstant +building-city-land-border+ 41)
 (defconstant +building-city-forest-border+ 42)
 (defconstant +building-city-army-post+ 43)
+
+(defconstant +building-city-ruined-house-1+ 45)
+(defconstant +building-city-ruined-house-2+ 46)
+(defconstant +building-city-ruined-house-3+ 47)
+(defconstant +building-city-ruined-house-4+ 48)
+(defconstant +building-city-ruined-townhall-1+ 49)
+(defconstant +building-city-ruined-townhall-2+ 50)
+(defconstant +building-city-ruined-townhall-3+ 51)
+(defconstant +building-city-ruined-townhall-4+ 52)
+(defconstant +building-city-ruined-park-1+ 53)
+(defconstant +building-city-ruined-park-2+ 54)
+(defconstant +building-city-ruined-park-3+ 55)
+(defconstant +building-city-ruined-park-4+ 56)
+(defconstant +building-city-ruined-prison-1+ 57)
+(defconstant +building-city-ruined-warehouse-1+ 58)
+(defconstant +building-city-ruined-library-1+ 59)
+(defconstant +building-city-ruined-warehouse-port-1+ 60)
+(defconstant +building-city-ruined-warehouse-port-2+ 61)
+(defconstant +building-city-ruined-mansion-1+ 62)
+(defconstant +building-city-ruined-mansion-2+ 63)
+(defconstant +building-city-ruined-bank-1+ 64)
+
 
 (defparameter *level-grid-size* 5)
 

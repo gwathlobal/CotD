@@ -98,6 +98,12 @@
 (defconstant +sf-faction-demonic-conquest-demon-malseraph+ 87)
 (defconstant +sf-faction-demonic-conquest-ghost+ 88)
 
+(defconstant +city-layout-ruined-normal+ 90)
+(defconstant +city-layout-ruined-river+ 91)
+(defconstant +city-layout-ruined-port+ 92)
+(defconstant +city-layout-ruined-forest+ 93)
+(defconstant +city-layout-ruined-island+ 94)
+
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -135,6 +141,11 @@
 
 (defun get-max-buildings-normal ()
   (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-house+ max-building-types) t)
+    (setf (gethash +building-type-townhall+ max-building-types) t)
+    (setf (gethash +building-type-park+ max-building-types) t)
+    (setf (gethash +building-type-mansion+ max-building-types) t)
+    
     (setf (gethash +building-type-church+ max-building-types) 1)
     (setf (gethash +building-type-satanists+ max-building-types) 1)
     (setf (gethash +building-type-warehouse+ max-building-types) 1)
@@ -148,6 +159,11 @@
 
 (defun get-max-buildings-river ()
   (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-house+ max-building-types) t)
+    (setf (gethash +building-type-townhall+ max-building-types) t)
+    (setf (gethash +building-type-park+ max-building-types) t)
+    (setf (gethash +building-type-mansion+ max-building-types) t)
+    
     (setf (gethash +building-type-church+ max-building-types) 1)
     (setf (gethash +building-type-satanists+ max-building-types) 1)
     (setf (gethash +building-type-warehouse+ max-building-types) 1)
@@ -161,6 +177,11 @@
 
 (defun get-max-buildings-port ()
   (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-house+ max-building-types) t)
+    (setf (gethash +building-type-townhall+ max-building-types) t)
+    (setf (gethash +building-type-park+ max-building-types) t)
+    (setf (gethash +building-type-mansion+ max-building-types) t)
+    
     (setf (gethash +building-type-church+ max-building-types) 1)
     (setf (gethash +building-type-satanists+ max-building-types) 1)
     (setf (gethash +building-type-warehouse+ max-building-types) 0)
@@ -168,6 +189,53 @@
     (setf (gethash +building-type-prison+ max-building-types) 1)
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-bank+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 0)
+    max-building-types))
+
+(defun get-max-buildings-ruined-normal ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-house+ max-building-types) t)
+    (setf (gethash +building-type-ruined-townhall+ max-building-types) t)
+    (setf (gethash +building-type-ruined-park+ max-building-types) t)
+    (setf (gethash +building-type-ruined-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-ruined-warehouse+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-library+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 4)
+    (setf (gethash +building-type-graveyard+ max-building-types) 1)
+    max-building-types))
+
+(defun get-max-buildings-ruined-river ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-house+ max-building-types) t)
+    (setf (gethash +building-type-ruined-townhall+ max-building-types) t)
+    (setf (gethash +building-type-ruined-park+ max-building-types) t)
+    (setf (gethash +building-type-ruined-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-ruined-warehouse+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-library+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 0)
+    (setf (gethash +building-type-graveyard+ max-building-types) 1)
+    max-building-types))
+
+(defun get-max-buildings-ruined-port ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-house+ max-building-types) t)
+    (setf (gethash +building-type-ruined-townhall+ max-building-types) t)
+    (setf (gethash +building-type-ruined-park+ max-building-types) t)
+    (setf (gethash +building-type-ruined-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-ruined-warehouse+ max-building-types) 0)
+    (setf (gethash +building-type-ruined-library+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
     max-building-types))
 
@@ -210,6 +278,39 @@
     (setf (gethash +building-type-prison+ reserved-building-types) 1)
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
     (setf (gethash +building-type-bank+ reserved-building-types) 1)
+    (setf (gethash +building-type-lake+ reserved-building-types) 0)
+    (setf (gethash +building-type-graveyard+ reserved-building-types) 0)
+    reserved-building-types))
+
+(defun get-reserved-buildings-ruined-normal ()
+  (let ((reserved-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-warehouse+ reserved-building-types) 1)
+    (setf (gethash +building-type-ruined-library+ reserved-building-types) 1)
+    (setf (gethash +building-type-ruined-prison+ reserved-building-types) 1)
+    (setf (gethash +building-type-stables+ reserved-building-types) 0)
+    (setf (gethash +building-type-ruined-bank+ reserved-building-types) 1)
+    (setf (gethash +building-type-lake+ reserved-building-types) 2)
+    (setf (gethash +building-type-graveyard+ reserved-building-types) 1)
+    reserved-building-types))
+
+(defun get-reserved-buildings-ruined-river ()
+  (let ((reserved-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-warehouse+ reserved-building-types) 1)
+    (setf (gethash +building-type-ruined-library+ reserved-building-types) 1)
+    (setf (gethash +building-type-ruined-prison+ reserved-building-types) 1)
+    (setf (gethash +building-type-stables+ reserved-building-types) 0)
+    (setf (gethash +building-type-ruined-bank+ reserved-building-types) 1)
+    (setf (gethash +building-type-lake+ reserved-building-types) 0)
+    (setf (gethash +building-type-graveyard+ reserved-building-types) 1)
+    reserved-building-types))
+
+(defun get-reserved-buildings-ruined-port ()
+  (let ((reserved-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-warehouse+ reserved-building-types) 0)
+    (setf (gethash +building-type-ruined-library+ reserved-building-types) 1)
+    (setf (gethash +building-type-ruined-prison+ reserved-building-types) 1)
+    (setf (gethash +building-type-stables+ reserved-building-types) 0)
+    (setf (gethash +building-type-ruined-bank+ reserved-building-types) 1)
     (setf (gethash +building-type-lake+ reserved-building-types) 0)
     (setf (gethash +building-type-graveyard+ reserved-building-types) 0)
     reserved-building-types))
@@ -474,6 +575,111 @@
           for random-warehouse-2 = (if (zerop (random 2))
                                      +building-city-warehouse-port-1+
                                      +building-city-warehouse-port-2+)
+          with z = 2
+          do
+             (setf (aref reserved-level 0 y z) +building-city-sea+)
+             (setf (aref reserved-level 1 y z) building-type-id)
+             (setf (aref reserved-level 2 y z) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 3 y z reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 3 y z reserved-level)
+               (push (list random-warehouse-1 3 y z) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 5 y z reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 5 y z reserved-level)
+               (push (list random-warehouse-2 5 y z) result)))
+    
+    result))
+
+(defun place-reserved-buildings-ruined-port-n (reserved-level)
+  (let ((result))
+    (loop for x from 0 below (array-dimension reserved-level 0)
+          for building-type-id = (if (and (zerop (mod (1+ x) 5))
+                                          (/= x (1- (array-dimension reserved-level 0))))
+                                   +building-city-pier+
+                                   +building-city-sea+)
+          for random-warehouse-1 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
+          for random-warehouse-2 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
+          do
+             (setf (aref reserved-level x 0 2) +building-city-sea+)
+             (setf (aref reserved-level x 1 2) building-type-id)
+             (setf (aref reserved-level x 2 2) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 x 3 2 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 x 3 2 reserved-level)
+               (push (list random-warehouse-1 x 3 2) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 x 5 2 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 x 5 2 reserved-level)
+               (push (list random-warehouse-2 x 5 2) result)))
+    
+    result))
+
+(defun place-reserved-buildings-ruined-port-s (reserved-level)
+  (let ((result) (max-y (1- (array-dimension reserved-level 1))))
+    (loop for x from 0 below (array-dimension reserved-level 0)
+          for building-type-id = (if (and (zerop (mod (1+ x) 5))
+                                          (/= x (1- (array-dimension reserved-level 0))))
+                                   +building-city-pier+
+                                   +building-city-sea+)
+          for random-warehouse-1 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
+          for random-warehouse-2 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
+          do
+             (setf (aref reserved-level x (- max-y 0) 2) +building-city-sea+)
+             (setf (aref reserved-level x (- max-y 1) 2) building-type-id)
+             (setf (aref reserved-level x (- max-y 2) 2) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 x (- max-y 4) 2 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 x (- max-y 4) 2 reserved-level)
+               (push (list random-warehouse-1 x (- max-y 4) 2) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 x (- max-y 6) 2 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 x (- max-y 6) 2 reserved-level)
+               (push (list random-warehouse-2 x (- max-y 6) 2) result)))
+    
+    result))
+
+(defun place-reserved-buildings-ruined-port-e (reserved-level)
+  (let ((result) (max-x (1- (array-dimension reserved-level 0))))
+    (loop for y from 0 below (array-dimension reserved-level 1)
+          for building-type-id = (if (and (zerop (mod (1+ y) 5))
+                                          (/= y (1- (array-dimension reserved-level 1))))
+                                   +building-city-pier+
+                                   +building-city-sea+)
+          for random-warehouse-1 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
+          for random-warehouse-2 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
+          do
+             (setf (aref reserved-level (- max-x 0) y 2) +building-city-sea+)
+             (setf (aref reserved-level (- max-x 1) y 2) building-type-id)
+             (setf (aref reserved-level (- max-x 2) y 2) building-type-id)
+             (when (level-city-can-place-build-on-grid random-warehouse-1 (- max-x 4) y 2 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-1 (- max-x 4) y 2 reserved-level)
+               (push (list random-warehouse-1 (- max-x 4) y 2) result))
+             (when (level-city-can-place-build-on-grid random-warehouse-2 (- max-x 6) y 2 reserved-level)
+               (level-city-reserve-build-on-grid random-warehouse-2 (- max-x 6) y 2 reserved-level)
+               (push (list random-warehouse-2 (- max-x 6) y 2) result)))
+    
+    result))
+
+(defun place-reserved-buildings-ruined-port-w (reserved-level)
+  (let ((result))
+    (loop for y from 0 below (array-dimension reserved-level 1)
+          for building-type-id = (if (and (zerop (mod (1+ y) 5))
+                                          (/= y (1- (array-dimension reserved-level 1))))
+                                   +building-city-pier+
+                                   +building-city-sea+)
+          for random-warehouse-1 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
+          for random-warehouse-2 = (if (zerop (random 2))
+                                     +building-city-ruined-warehouse-port-1+
+                                     +building-city-ruined-warehouse-port-2+)
           with z = 2
           do
              (setf (aref reserved-level 0 y z) +building-city-sea+)
@@ -819,6 +1025,37 @@
              (when (level-city-can-place-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y 2 reserved-level)
                (level-city-reserve-build-on-grid +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y 2 reserved-level)
                (push (list +building-city-park-3+ (- (array-dimension reserved-level 0) 3) y 2) result)))
+    
+    (loop for x from 0 below (array-dimension reserved-level 0) do
+      (loop for y from 0 below (array-dimension reserved-level 1) do
+        (when (or (= (aref reserved-level x y 2) +building-city-park-tiny+)
+                  (= (aref reserved-level x y 2) +building-city-forest-border+))
+          (push (list (aref reserved-level x y 2) x y 2) result))))
+    result))
+
+(defun place-reserved-buildings-ruined-forest (reserved-level)
+  (let ((result))
+    ;; place +building-city-park-tiny+ and +building-city-park-3+ along the borders
+    (loop for x from 0 below (array-dimension reserved-level 0)
+          do
+             (setf (aref reserved-level x 0 2) +building-city-forest-border+)
+             (setf (aref reserved-level x (1- (array-dimension reserved-level 1)) 2) +building-city-forest-border+)
+             (when (level-city-can-place-build-on-grid +building-city-ruined-park-3+ x 1 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-ruined-park-3+ x 1 2 reserved-level)
+               (push (list +building-city-ruined-park-3+ x 1 2) result))
+             (when (level-city-can-place-build-on-grid +building-city-ruined-park-3+ x (- (array-dimension reserved-level 1) 3) 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-ruined-park-3+ x (- (array-dimension reserved-level 1) 3) 2 reserved-level)
+               (push (list +building-city-ruined-park-3+ x (- (array-dimension reserved-level 1) 3) 2) result)))
+    (loop for y from 0 below (array-dimension reserved-level 1)
+          do
+             (setf (aref reserved-level 0 y 2) +building-city-forest-border+)
+             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y 2) +building-city-forest-border+)
+             (when (level-city-can-place-build-on-grid +building-city-ruined-park-3+ 1 y 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-ruined-park-3+ 1 y 2 reserved-level)
+               (push (list +building-city-ruined-park-3+ 1 y 2) result))
+             (when (level-city-can-place-build-on-grid +building-city-ruined-park-3+ (- (array-dimension reserved-level 0) 3) y 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-ruined-park-3+ (- (array-dimension reserved-level 0) 3) y 2 reserved-level)
+               (push (list +building-city-ruined-park-3+ (- (array-dimension reserved-level 0) 3) y 2) result)))
     
     (loop for x from 0 below (array-dimension reserved-level 0) do
       (loop for y from 0 below (array-dimension reserved-level 1) do

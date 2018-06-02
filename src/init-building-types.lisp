@@ -447,6 +447,7 @@
                                               )
                                             (values (list (list +mob-type-man+ 4 6 z)
                                                           (list +mob-type-woman+ 4 1 z))
+                                                    nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-park-3+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-park+

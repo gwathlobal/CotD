@@ -599,7 +599,9 @@
     (push #'(lambda (world mob-template-list)
               (declare (ignore mob-template-list))
               
-              (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 11) 1)))
+              (populate-world-with-mobs world (list (cons +mob-type-angel+ (if (> (+ (total-angels world) (truncate (total-humans world) 11)) *min-angels-number*)
+                                                                             (- (truncate (total-humans world) 11) 1)
+                                                                             (- *min-angels-number* (total-angels world)))))
                                         #'find-unoccupied-place-outside)
               )
           mob-func-list))
@@ -903,7 +905,9 @@
                                                 when (= (feature-type lvl-feature) +feature-start-place-church-angels+) 
                                                   collect (list (x lvl-feature) (y lvl-feature) (z lvl-feature)))
                     with positioned = nil
-                    with max-angels = (- (truncate (total-humans world) 11) 1)
+                    with max-angels = (if (> (+ (total-angels world) (truncate (total-humans world) 11)) *min-angels-number*)
+                                        (- (truncate (total-humans world) 11) 1)
+                                        (- *min-angels-number* (total-angels world)))
                     while (null positioned)
                     for n = (random (length arrival-points))
                     for arrival-point = (nth n arrival-points)
@@ -1260,7 +1264,9 @@
     (push #'(lambda (world mob-template-list)
               (declare (ignore mob-template-list))
               
-              (populate-world-with-mobs world (list (cons +mob-type-angel+ (- (truncate (total-humans world) 11) 1)))
+              (populate-world-with-mobs world (list (cons +mob-type-angel+ (if (> (+ (total-angels world) (truncate (total-humans world) 11)) *min-angels-number*)
+                                                                             (- (truncate (total-humans world) 11) 1)
+                                                                             (- *min-angels-number* (total-angels world)))))
                                         #'find-unoccupied-place-outside)
               )
           mob-func-list))

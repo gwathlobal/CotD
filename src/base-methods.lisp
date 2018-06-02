@@ -1029,7 +1029,7 @@
                            :color (if (if-cur-mob-seen-through-shared-vision *player*)
                                     *shared-mind-msg-color*
                                     (if (or (eq *player* actor)
-                                            (eq *player* a-target))
+                                            (eq *player* target))
                                       (sdl:color :r 255 :g 140 :b 0)
                                       sdl:*yellow*)))
     

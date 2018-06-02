@@ -76,6 +76,51 @@
                                                                            (list +faction-type-ghost+ +mission-faction-present+)
                                                                            (list +faction-type-ghost+ +mission-faction-absent+))))
 
+(set-mission-district (make-instance 'mission-district :id +city-layout-ruined-normal+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-ruined-forest+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-ruined-port+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-ruined-island+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-ruined-river+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
 ;;----------------------------------------
 ;; MISSION-SCENARIOS
 ;;----------------------------------------
@@ -262,3 +307,37 @@
                                                                                  )
                                                        :post-sf-id +mission-sf-demonic-steal+
                                                        ))
+
+(set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-raid-ruined+
+                                                       :name "Demonic raid"
+                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+)
+                                                       :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
+                                                                           (list +faction-type-military+ +mission-faction-defender+)
+                                                                           (list +faction-type-military+ +mission-faction-delayed+)
+                                                                           (list +faction-type-angels+ +mission-faction-defender+)
+                                                                           (list +faction-type-angels+ +mission-faction-delayed+)
+                                                                           )
+                                                       :scenario-faction-list (list (list +specific-faction-type-player+ +sf-faction-demonic-raid-player+)
+                                                                                    (list +specific-faction-type-dead-player+ +sf-faction-demonic-raid-dead-player+)
+                                                                                    (list +specific-faction-type-angel-chrome+ +sf-faction-demonic-raid-angel-chrome+)
+                                                                                    (list +specific-faction-type-angel-trinity+ +sf-faction-demonic-raid-angel-trinity+)
+                                                                                    (list +specific-faction-type-demon-crimson+ +sf-faction-demonic-raid-demon-crimson+)
+                                                                                    (list +specific-faction-type-demon-shadow+ +sf-faction-demonic-raid-demon-shadow+)
+                                                                                    (list +specific-faction-type-demon-malseraph+ +sf-faction-demonic-raid-demon-malseraph+)
+                                                                                    (list +specific-faction-type-military-chaplain+ +sf-faction-demonic-raid-military-chaplain+)
+                                                                                    (list +specific-faction-type-military-scout+ +sf-faction-demonic-raid-military-scout+)
+                                                                                    (list +specific-faction-type-eater+ +sf-faction-demonic-raid-eater+)
+                                                                                    )
+                                                       :objective-list (list (list +faction-type-demons+ (list +ai-package-search-corpses+ +ai-package-pick-corpses+ +ai-package-return-corpses-to-portal+
+                                                                                                               +ai-package-patrol-district+))
+                                                                             (list +faction-type-angels+ (list +ai-package-patrol-district+))
+                                                                             (list +faction-type-military+ (list +ai-package-patrol-district+))
+                                                                             (list +faction-type-eater+ (list +ai-package-patrol-district+))
+                                                                             )
+                                                       :win-condition-list (list (list +faction-type-demons+ +game-event-demon-raid-win-for-demons+)
+                                                                                 (list +faction-type-angels+ +game-event-demon-raid-win-for-angels+)
+                                                                                 (list +faction-type-military+ +game-event-demon-raid-win-for-military+)
+                                                                                 (list +faction-type-eater+ +game-event-win-for-eater+)
+                                                                                 )
+                                                       :post-sf-id +mission-sf-demonic-raid+
+                                     ))

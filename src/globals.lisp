@@ -643,6 +643,8 @@
 (defparameter *repel-demons-dist* 5)
 (defparameter *repel-demons-dist-strong* 15)
 
+(defparameter *min-angels-number* 9)
+
 (defparameter *shared-mind-msg-color* (sdl:color :r 0 :g 128 :b 128))
 
 (defparameter *water-move-factor* 1.5)

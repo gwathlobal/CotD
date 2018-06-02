@@ -142,6 +142,99 @@
                                                                                                                                                                                                                             
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-ruined-normal+
+                                             :type +scenario-feature-city-layout+
+                                             :name "An abandoned district"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-ruined-normal)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-normal)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-land-arrival-border))
+                                                                                                            )))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-ruined-river+
+                                             :type +scenario-feature-city-layout+
+                                             :name "An abandoned district upon a river"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-ruined-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-river)))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-ruined-port+
+                                             :type +scenario-feature-city-layout+
+                                             :name "An abandoned seaport district"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (let ((r (random 4)))
+                                                         (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                              #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-ruined-port)))
+                                                                                                              #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-port)))
+                                                                                                              #'(lambda (reserved-level)
+                                                                                                                  (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                         #'(lambda (reserved-level)
+                                                                                                                                                             (place-land-arrival-border reserved-level)
+                                                                                                                                                             (let ((result))
+                                                                                                                                                               (cond
+                                                                                                                                                                 ;; north
+                                                                                                                                                                 ((= r 0) (setf result (place-reserved-buildings-ruined-port-n
+                                                                                                                                                                                        reserved-level)))
+                                                                                                                                                                 ;; south
+                                                                                                                                                                 ((= r 1) (setf result (place-reserved-buildings-ruined-port-s
+                                                                                                                                                                                        reserved-level)))
+                                                                                                                                                                 ;; east
+                                                                                                                                                                 ((= r 2) (setf result (place-reserved-buildings-ruined-port-e
+                                                                                                                                                                                        reserved-level)))
+                                                                                                                                                                 ;; west
+                                                                                                                                                                 ((= r 3) (setf result (place-reserved-buildings-ruined-port-w
+                                                                                                                                                                                        reserved-level)))) 
+                                                                                                                                                               (loop for x from 0 below (array-dimension reserved-level 0) do
+                                                                                                                                                                 (loop for y from 0 below (array-dimension reserved-level 1) do
+                                                                                                                                                                   (when (or (= (aref reserved-level x y 2) +building-city-sea+)
+                                                                                                                                                                             (= (aref reserved-level x y 2) +building-city-pier+)
+                                                                                                                                                                             (= (aref reserved-level x y 2) +building-city-land-border+))
+                                                                                                                                                                     (push (list (aref reserved-level x y 2) x y 2) result))))
+                                                                                                                                                               result))))
+                                                                                                              )))
+                                                         )
+                                                                                                              
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-ruined-forest+
+                                             :type +scenario-feature-city-layout+
+                                             :name "Abandoned outskirts of the city"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-ruined-normal)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-normal)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-ruined-forest)))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-ruined-island+
+                                             :type +scenario-feature-city-layout+
+                                             :name "An abandoned island district"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-ruined-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-island)))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
 ;;======================
 ;; FACTIONS
 ;;======================
