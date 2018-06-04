@@ -644,6 +644,8 @@
 (defparameter *repel-demons-dist-strong* 15)
 
 (defparameter *min-angels-number* 9)
+(defparameter *min-imps-number* 6)
+(defparameter *max-imps-number* 26)
 
 (defparameter *shared-mind-msg-color* (sdl:color :r 0 :g 128 :b 128))
 

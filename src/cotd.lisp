@@ -180,7 +180,11 @@
   
   (setf (name *player*) "Player")
 
-  (add-message (format nil "Welcome to City of the Damned.~%This is a ~(~A~)!~%~%To view help, press '?'.~%To view your current objective, press 'j'.~%" (name (get-mission-scenario-by-id mission-id))))
+  (add-message (format nil "Welcome to City of the Damned.~%This is a "))
+  (add-message (format nil "~(~A~)" (name (get-mission-scenario-by-id mission-id))) sdl:*yellow*)
+  (add-message (format nil " in "))
+  (add-message (format nil "~(~A~)" (sf-name (get-scenario-feature-by-id (level-layout (level *world*))))) sdl:*yellow*)
+  (add-message (format nil "!~%~%To view help, press '?'.~%To view your current objective, press 'j'.~%"))
 
   )  
 

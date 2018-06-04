@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Added a set of abandoned districts (which were left by the civilians) and two missions for them: a Demonic raid and Demonic conquest.
+
 --------------------
 April 21, 2018 v1.3.1
 

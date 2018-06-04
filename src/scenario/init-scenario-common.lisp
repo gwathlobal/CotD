@@ -105,7 +105,7 @@
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-forest+
                                              :type +scenario-feature-city-layout+
-                                             :name "Outskirts of the city"
+                                             :name "The outskirts of the city"
                                              :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
