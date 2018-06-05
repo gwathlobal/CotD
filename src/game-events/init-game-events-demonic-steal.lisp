@@ -5,7 +5,8 @@
 ;;===========================
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-angels+
-                                           :descr "To win, destroy all demons in the district. To lose, have all angels killed or let the demons capture the relic."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all demons in the district. To lose, have all angels killed or let the demons capture the relic.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
@@ -77,7 +78,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-demons+
-                                           :descr "To win, capture the relic in the church and throw it into a demonic portal (use your ability for that). To lose, have all demons killed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, capture the relic in the church and throw it into a demonic portal (use your ability for that). To lose, have all demons killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-demons world) 0)
@@ -133,7 +135,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-military+
-                                           :descr "To win, destroy all demons in the district. To lose, have all military killed or let the demons capture the relic."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all demons in the district. To lose, have all military killed or let the demons capture the relic.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-humans world) 0)
@@ -190,7 +193,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-church+
-                                           :descr "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons capture the relic."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons capture the relic.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-church+)
@@ -258,7 +262,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-steal-win-for-satanists+
-                                           :descr "To win, capture the relic in the church and throw it into a demonic portal (use your ability for that). To lose, get all satanists and demons killed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, capture the relic in the church and throw it into a demonic portal (use your ability for that). To lose, get all satanists and demons killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)

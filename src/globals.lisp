@@ -632,7 +632,7 @@
 (defparameter *mob-sound-pick-drop* 40)
 
 (defparameter *thief-win-value* 1500)
-(defparameter *demonic-raid-win-value* 200)
+(defparameter *demonic-raid-win-value* 0)
 (defparameter *demonic-conquest-win-sigils-num* 4)
 (defparameter *demonic-conquest-win-sigils-turns* 100)
 (defparameter *demonic-conquest-win-sigils-dist* 35)

@@ -18,9 +18,9 @@
 
       (when (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*)))) :key #'(lambda (a)
                                                                                                                                          (first a)))
-        (add-colored-str txt-struct (format nil "~A~%~%~%" (descr (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
-                                                                                      :key #'(lambda (a)
-                                                                                               (first a))))))))
+        (add-colored-str txt-struct (format nil "~A~%~%~%" (funcall (descr-func (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                                                                                                                    :key #'(lambda (a)
+                                                                                                                             (first a)))))))))
         )
       (add-colored-str txt-struct (format nil "Faction relations~%"))
             

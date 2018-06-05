@@ -44,7 +44,7 @@
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)
-   (descr :initarg :descr :accessor descr)
+   (descr-func :initarg :descr-func :accessor descr-func) ;; a lambda with no params
    (disabled :initform nil :initarg :disabled :accessor disabled)
    (on-check :initarg :on-check :accessor on-check)
    (on-trigger :initarg :on-trigger :accessor on-trigger)))

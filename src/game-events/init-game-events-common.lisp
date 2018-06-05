@@ -16,7 +16,8 @@
 ;;===========================
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-thief+
-                                           :descr "To win, gather at least $1500 worth of items and leave the district by moving to its border. To lose, die or get possessed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, gather at least $1500 worth of items and leave the district by moving to its border. To lose, die or get possessed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-criminals+)
@@ -57,7 +58,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-eater+
-                                           :descr "To win, destroy all angels and demons in the district. To lose, die."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all angels and demons in the district. To lose, die.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (zerop (total-demons world))
@@ -99,7 +101,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-ghost+
-                                           :descr "To win, find the Book of Rituals in the library and read it while standing on a sacrificial circle in the satanists' lair. To lose, die."
+                                           :descr-func #'(lambda ()
+                                                           "To win, find the Book of Rituals in the library and read it while standing on a sacrificial circle in the satanists' lair. To lose, die.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))

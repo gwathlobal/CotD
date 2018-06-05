@@ -5,7 +5,9 @@
 ;;===========================
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-angels+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, have all angels killed or let the demons collect ~A pts of flesh (corpses)." *demonic-raid-win-value*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, destroy all demons in the district. To lose, have all angels killed or let the demons collect ~A pts of flesh (corpses)."
+                                                                   *demonic-raid-win-value*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
@@ -77,7 +79,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-demons+
-                                           :descr (format nil "To win, collect ~A pts of flesh by throwing corpses into the demonic portals (use your ability for that). To lose, have all demons killed." *demonic-raid-win-value*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, collect ~A pts of flesh by throwing corpses into the demonic portals (use your ability for that). To lose, have all demons killed."
+                                                                   *demonic-raid-win-value*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-demons world) 0)
@@ -133,7 +137,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-military+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, have all military killed or let the demons collect the ~A pts of flesh they want." *demonic-raid-win-value*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, destroy all demons in the district. To lose, have all military killed or let the demons collect the ~A pts of flesh they want."
+                                                                   *demonic-raid-win-value*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-humans world) 0)
@@ -190,7 +196,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-church+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons collect ~A pts of flesh they want." *demonic-raid-win-value*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons collect ~A pts of flesh they want."
+                                                                   *demonic-raid-win-value*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-church+)
@@ -258,7 +266,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-satanists+
-                                           :descr (format nil "To win, collect ~A pts of flesh by throwing corpses into the demonic portals. To lose, get all satanists and demons killed." *demonic-raid-win-value*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, collect ~A pts of flesh by throwing corpses into the demonic portals. To lose, get all satanists and demons killed."
+                                                                   *demonic-raid-win-value*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)

@@ -5,7 +5,8 @@
 ;;===========================
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-angels+
-                                           :descr "To win, destroy all demons in the district. To lose, have all angels killed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all demons in the district. To lose, have all angels killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
@@ -77,7 +78,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-demons+
-                                           :descr "To win, destroy all angels in the district. To lose, have all demons killed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all angels in the district. To lose, have all demons killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-demons+)
@@ -141,7 +143,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-military+
-                                           :descr "To win, destroy all demons in the district. To lose, have all military killed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all demons in the district. To lose, have all military killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-humans world) 0)
@@ -198,7 +201,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-church+
-                                           :descr "To win, destroy all demons in the district. To lose, get all priests and angels killed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all demons in the district. To lose, get all priests and angels killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-church+)
@@ -266,7 +270,8 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-satanists+
-                                           :descr "To win, destroy all angels in the district. To lose, get all satanists and demons killed."
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all angels in the district. To lose, get all satanists and demons killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)

@@ -215,6 +215,8 @@
                                                                                  (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                                                                  )
                                                        :post-sf-id +mission-sf-demonic-raid+
+                                                       :win-value-func #'(lambda ()
+                                                                           (setf *demonic-raid-win-value* 200))
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-steal+
@@ -339,6 +341,8 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-id +mission-sf-demonic-raid+
+                                                       :win-value-func #'(lambda ()
+                                                                           (setf *demonic-raid-win-value* 100))
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest-ruined+

@@ -5,7 +5,9 @@
 ;;===========================
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-angels+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, have all angels killed or let the demons create ~A demonic sigils and let them charge for ~A turns." *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, destroy all demons in the district. To lose, have all angels killed or let the demons create ~A demonic sigils and let them charge for ~A turns."
+                                                                   *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
@@ -77,7 +79,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-demons+
-                                           :descr (format nil "To win, create at least ~A demonic sigils (using your ability) and let them charge for ~A turns. To lose, have all demons killed." *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, create at least ~A demonic sigils (using your ability) and let them charge for ~A turns. To lose, have all demons killed."
+                                                                   *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-demons world) 0)
@@ -135,7 +139,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-military+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, have all military killed or let the demons create ~A demonic sigils and let them charge for ~A turns." *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, destroy all demons in the district. To lose, have all military killed or let the demons create ~A demonic sigils and let them charge for ~A turns."
+                                                                   *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-humans world) 0)
@@ -192,7 +198,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-church+
-                                           :descr (format nil "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons create ~A demonic sigils and let them charge for ~A turns." *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons create ~A demonic sigils and let them charge for ~A turns."
+                                                                   *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-church+)
@@ -260,7 +268,9 @@
                                                                (:video-expose-event () (make-output *current-window*)))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-satanists+
-                                           :descr (format nil "To win, create at least ~A demonic sigils (using your ability) and let them charge for ~A turns. To lose, get all satanists and demons killed." *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*)
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, create at least ~A demonic sigils (using your ability) and let them charge for ~A turns. To lose, get all satanists and demons killed."
+                                                                   *demonic-conquest-win-sigils-num* *demonic-conquest-win-sigils-turns*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)
