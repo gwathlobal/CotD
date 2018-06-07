@@ -392,3 +392,42 @@
                                                              post-processing-func-list)
                                                                                                               
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +mission-sf-ruined-district+
+                                             :type +scenario-feature-mission+
+                                             :name "Abandoned district (SF)"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore faction-list mission-id))
+                                                       ;; place blood spatters
+                                                       (push #'(lambda (world)
+                                                                 (logger (format nil "POST-PROCESSING FUNC: Abandoned district, placing blood~%"))
+                                                                 (let ((blood ())
+                                                                       (max-blood (sqrt (* (array-dimension (terrain (level world)) 0)
+                                                                                           (array-dimension (terrain (level world)) 1)))))
+                                                                   (loop with max-x = (array-dimension (terrain (level world)) 0)
+                                                                         with max-y = (array-dimension (terrain (level world)) 1)
+                                                                         with max-z = (array-dimension (terrain (level world)) 2)
+                                                                         with cur-blood = 0
+                                                                         for x = (random max-x)
+                                                                         for y = (random max-y)
+                                                                         for z = (random max-z)
+                                                                         while (< cur-blood max-blood) do
+                                                                           (when (and (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
+                                                                                      (not (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-blocks-move+))
+                                                                                      (not (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-water+)))
+                                                                             (if (zerop (random 2))
+                                                                               (push (list x y z +feature-blood-stain+) blood)
+                                                                               (push (list x y z +feature-blood-old+) blood))
+                                                                             (incf cur-blood)
+                                                                             (check-surroundings x y nil #'(lambda (dx dy)
+                                                                                                             (when (and (get-terrain-type-trait (get-terrain-* (level world) dx dy z) +terrain-trait-opaque-floor+)
+                                                                                                                        (not (get-terrain-type-trait (get-terrain-* (level world) dx dy z) +terrain-trait-water+)))
+                                                                                                               (when (zerop (random 4))
+                                                                                                                 (push (list dx dy z +feature-blood-old+) blood))))))
+                                                                         )
+                                                                   (loop for (x y z feature-type-id) in blood do
+                                                                     ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id feature-type-id)) x y z)
+                                                                     (add-feature-to-level-list (level world) (make-instance 'feature :feature-type feature-type-id :x x :y y :z z))))) 
+                                                             post-processing-func-list)
+                                                                                                              
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))

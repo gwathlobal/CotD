@@ -47,7 +47,7 @@
    (scenario-faction-list :initarg :scenario-faction-list :accessor scenario-faction-list)
    (objective-list :initform () :initarg :objective-list :accessor objective-list) ;; of type ((<faction-id> <objective-type-id>)...)
    (win-condition-list :initform () :initarg :win-condition-list :accessor win-condition-list) ;; of type ((<faction-id> <game-event-id>)...)
-   (post-sf-id :initform nil :initarg :post-sf-id :accessor post-sf-id)
+   (post-sf-list :initform () :initarg :post-sf-list :accessor post-sf-list)  ;; a list of scenario ids
    (win-value-func :initform nil :initarg :win-value-func :accessor win-value-func) ;; a lambda with no params
    ))
 

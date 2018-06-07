@@ -37,6 +37,7 @@
 
 (defconstant +mission-sf-demonic-raid+ 25)
 (defconstant +mission-sf-demonic-steal+ 26)
+(defconstant +mission-sf-ruined-district+ 27)
 
 (defconstant +sf-faction-demonic-attack-player+ 30)
 (defconstant +sf-faction-demonic-attack-dead-player+ 31)
@@ -104,6 +105,27 @@
 (defconstant +city-layout-ruined-forest+ 93)
 (defconstant +city-layout-ruined-island+ 94)
 
+(defconstant +sf-faction-demonic-raid-ruined-player+ 100)
+(defconstant +sf-faction-demonic-raid-ruined-dead-player+ 101)
+(defconstant +sf-faction-demonic-raid-ruined-angel-chrome+ 102)
+(defconstant +sf-faction-demonic-raid-ruined-demon-crimson+ 103)
+(defconstant +sf-faction-demonic-raid-ruined-military-chaplain+ 104)
+(defconstant +sf-faction-demonic-raid-ruined-military-scout+ 105)
+(defconstant +sf-faction-demonic-raid-ruined-demon-shadow+ 106)
+(defconstant +sf-faction-demonic-raid-ruined-angel-trinity+ 107)
+(defconstant +sf-faction-demonic-raid-ruined-eater+ 108)
+(defconstant +sf-faction-demonic-raid-ruined-demon-malseraph+ 110)
+
+(defconstant +sf-faction-demonic-conquest-ruined-player+ 120)
+(defconstant +sf-faction-demonic-conquest-ruined-dead-player+ 121)
+(defconstant +sf-faction-demonic-conquest-ruined-angel-chrome+ 122)
+(defconstant +sf-faction-demonic-conquest-ruined-demon-crimson+ 123)
+(defconstant +sf-faction-demonic-conquest-ruined-military-chaplain+ 124)
+(defconstant +sf-faction-demonic-conquest-ruined-military-scout+ 125)
+(defconstant +sf-faction-demonic-conquest-ruined-demon-shadow+ 126)
+(defconstant +sf-faction-demonic-conquest-ruined-angel-trinity+ 127)
+(defconstant +sf-faction-demonic-conquest-ruined-eater+ 128)
+(defconstant +sf-faction-demonic-conquest-ruined-demon-malseraph+ 129)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

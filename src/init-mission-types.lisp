@@ -214,7 +214,7 @@
                                                                                  (list +faction-type-criminals+ +game-event-win-for-thief+)
                                                                                  (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                                                                  )
-                                                       :post-sf-id +mission-sf-demonic-raid+
+                                                       :post-sf-list (list +mission-sf-demonic-raid+)
                                                        :win-value-func #'(lambda ()
                                                                            (setf *demonic-raid-win-value* 200))
                                      ))
@@ -261,7 +261,7 @@
                                                                                  (list +faction-type-criminals+ +game-event-win-for-thief+)
                                                                                  (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                                                                  )
-                                                       :post-sf-id +mission-sf-demonic-steal+
+                                                       :post-sf-list (list +mission-sf-demonic-steal+)
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest+
@@ -307,7 +307,7 @@
                                                                                  (list +faction-type-criminals+ +game-event-win-for-thief+)
                                                                                  (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                                                                  )
-                                                       :post-sf-id +mission-sf-demonic-steal+
+                                                       :post-sf-list (list +mission-sf-demonic-steal+)
                                                        ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-raid-ruined+
@@ -318,15 +318,15 @@
                                                                            (list +faction-type-angels+ +mission-faction-defender+)
                                                                            (list +faction-type-angels+ +mission-faction-delayed+)
                                                                            )
-                                                       :scenario-faction-list (list (list +specific-faction-type-player+ +sf-faction-demonic-raid-player+)
-                                                                                    (list +specific-faction-type-dead-player+ +sf-faction-demonic-raid-dead-player+)
-                                                                                    (list +specific-faction-type-angel-chrome+ +sf-faction-demonic-raid-angel-chrome+)
-                                                                                    (list +specific-faction-type-angel-trinity+ +sf-faction-demonic-raid-angel-trinity+)
-                                                                                    (list +specific-faction-type-demon-crimson+ +sf-faction-demonic-raid-demon-crimson+)
-                                                                                    (list +specific-faction-type-demon-shadow+ +sf-faction-demonic-raid-demon-shadow+)
-                                                                                    (list +specific-faction-type-demon-malseraph+ +sf-faction-demonic-raid-demon-malseraph+)
-                                                                                    (list +specific-faction-type-military-chaplain+ +sf-faction-demonic-raid-military-chaplain+)
-                                                                                    (list +specific-faction-type-military-scout+ +sf-faction-demonic-raid-military-scout+)
+                                                       :scenario-faction-list (list (list +specific-faction-type-player+ +sf-faction-demonic-raid-ruined-player+)
+                                                                                    (list +specific-faction-type-dead-player+ +sf-faction-demonic-raid-ruined-dead-player+)
+                                                                                    (list +specific-faction-type-angel-chrome+ +sf-faction-demonic-raid-ruined-angel-chrome+)
+                                                                                    (list +specific-faction-type-angel-trinity+ +sf-faction-demonic-raid-ruined-angel-trinity+)
+                                                                                    (list +specific-faction-type-demon-crimson+ +sf-faction-demonic-raid-ruined-demon-crimson+)
+                                                                                    (list +specific-faction-type-demon-shadow+ +sf-faction-demonic-raid-ruined-demon-shadow+)
+                                                                                    (list +specific-faction-type-demon-malseraph+ +sf-faction-demonic-raid-ruined-demon-malseraph+)
+                                                                                    (list +specific-faction-type-military-chaplain+ +sf-faction-demonic-raid-ruined-military-chaplain+)
+                                                                                    (list +specific-faction-type-military-scout+ +sf-faction-demonic-raid-ruined-military-scout+)
                                                                                     (list +specific-faction-type-eater+ +sf-faction-demonic-raid-eater+)
                                                                                     )
                                                        :objective-list (list (list +faction-type-demons+ (list +ai-package-search-corpses+ +ai-package-pick-corpses+ +ai-package-return-corpses-to-portal+
@@ -340,7 +340,8 @@
                                                                                  (list +faction-type-military+ +game-event-demon-raid-win-for-military+)
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
-                                                       :post-sf-id +mission-sf-demonic-raid+
+                                                       :post-sf-list (list +mission-sf-demonic-raid+
+                                                                           +mission-sf-ruined-district+)
                                                        :win-value-func #'(lambda ()
                                                                            (setf *demonic-raid-win-value* 100))
                                      ))
@@ -356,16 +357,16 @@
                                                                            (list +faction-type-angels+ +mission-faction-delayed+)
                                                                            (list +faction-type-church+ +mission-faction-absent+)
                                                                            )
-                                                       :scenario-faction-list (list (list +specific-faction-type-player+ +sf-faction-demonic-conquest-player+)
-                                                                                    (list +specific-faction-type-dead-player+ +sf-faction-demonic-conquest-dead-player+)
-                                                                                    (list +specific-faction-type-angel-chrome+ +sf-faction-demonic-conquest-angel-chrome+)
-                                                                                    (list +specific-faction-type-angel-trinity+ +sf-faction-demonic-conquest-angel-trinity+)
-                                                                                    (list +specific-faction-type-demon-crimson+ +sf-faction-demonic-conquest-demon-crimson+)
-                                                                                    (list +specific-faction-type-demon-shadow+ +sf-faction-demonic-conquest-demon-shadow+)
-                                                                                    (list +specific-faction-type-demon-malseraph+ +sf-faction-demonic-conquest-demon-malseraph+)
-                                                                                    (list +specific-faction-type-military-chaplain+ +sf-faction-demonic-conquest-military-chaplain+)
-                                                                                    (list +specific-faction-type-military-scout+ +sf-faction-demonic-conquest-military-scout+)
-                                                                                    (list +specific-faction-type-eater+ +sf-faction-demonic-conquest-eater+)
+                                                       :scenario-faction-list (list (list +specific-faction-type-player+ +sf-faction-demonic-conquest-ruined-player+)
+                                                                                    (list +specific-faction-type-dead-player+ +sf-faction-demonic-conquest-ruined-dead-player+)
+                                                                                    (list +specific-faction-type-angel-chrome+ +sf-faction-demonic-conquest-ruined-angel-chrome+)
+                                                                                    (list +specific-faction-type-angel-trinity+ +sf-faction-demonic-conquest-ruined-angel-trinity+)
+                                                                                    (list +specific-faction-type-demon-crimson+ +sf-faction-demonic-conquest-ruined-demon-crimson+)
+                                                                                    (list +specific-faction-type-demon-shadow+ +sf-faction-demonic-conquest-ruined-demon-shadow+)
+                                                                                    (list +specific-faction-type-demon-malseraph+ +sf-faction-demonic-conquest-ruined-demon-malseraph+)
+                                                                                    (list +specific-faction-type-military-chaplain+ +sf-faction-demonic-conquest-ruined-military-chaplain+)
+                                                                                    (list +specific-faction-type-military-scout+ +sf-faction-demonic-conquest-ruined-military-scout+)
+                                                                                    (list +specific-faction-type-eater+ +sf-faction-demonic-conquest-ruined-eater+)
                                                                                     )
                                                        :objective-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
                                                                              (list +faction-type-angels+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
@@ -377,5 +378,6 @@
                                                                                  (list +faction-type-military+ +game-event-demon-conquest-win-for-military+)
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
-                                                       :post-sf-id +mission-sf-demonic-steal+
+                                                       :post-sf-list (list +mission-sf-demonic-steal+
+                                                                           +mission-sf-ruined-district+)
                                                        ))

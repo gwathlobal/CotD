@@ -15,10 +15,11 @@
       (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)
         (funcall (sf-func player-faction-scenario) layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
 
-    (when (and (post-sf-id (get-mission-scenario-by-id mission-id))
-               (sf-func (get-scenario-feature-by-id (post-sf-id (get-mission-scenario-by-id mission-id)))))
-      (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)
-        (funcall (sf-func (get-scenario-feature-by-id (post-sf-id (get-mission-scenario-by-id mission-id)))) layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)))
+    (when (post-sf-list (get-mission-scenario-by-id mission-id))
+      (dolist (post-sf-id (post-sf-list (get-mission-scenario-by-id mission-id)))
+        (when (sf-func (get-scenario-feature-by-id post-sf-id))
+          (multiple-value-setq (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)
+            (funcall (sf-func (get-scenario-feature-by-id post-sf-id)) layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)))))
     
     (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list)))
 

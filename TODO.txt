@@ -1,5 +1,6 @@
 - Custom scenarios
 - Scenario with attacking a battleship
+- Add Fenix-like eater that can change skins, with ability to upgrade skins (ranged->immovable sentry, melee,flyer->pack)
 - Add Twosoul character for satanists
 - Add Flamethrower operator to the miliatry
 - Add courtyard houses like Thief2RL
