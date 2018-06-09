@@ -355,7 +355,6 @@
                                                                            (list +faction-type-military+ +mission-faction-absent+)
                                                                            (list +faction-type-angels+ +mission-faction-defender+)
                                                                            (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                           (list +faction-type-church+ +mission-faction-absent+)
                                                                            )
                                                        :scenario-faction-list (list (list +specific-faction-type-player+ +sf-faction-demonic-conquest-ruined-player+)
                                                                                     (list +specific-faction-type-dead-player+ +sf-faction-demonic-conquest-ruined-dead-player+)
