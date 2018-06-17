@@ -41,6 +41,10 @@
 (defconstant +game-event-demon-conquest-win-for-satanists+ 36)
 (defconstant +game-event-demon-conquest-delayed-arrival-military+ 37)
 (defconstant +game-event-demon-conquest-delayed-arrival-angels+ 38)
+(defconstant +game-event-military-conquest-win-for-angels+ 39)
+(defconstant +game-event-military-conquest-win-for-demons+ 40)
+(defconstant +game-event-military-conquest-win-for-military+ 41)
+
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

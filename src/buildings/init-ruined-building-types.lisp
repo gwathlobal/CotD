@@ -926,3 +926,38 @@
                                             (values nil
                                                     nil
                                                     nil))))
+
+;;=====================
+;; Sigil posts
+;;=====================
+
+(set-building-type (make-building :id +building-city-sigil-post+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-none+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,,"
+                                                                            ",uuuuuuu,"
+                                                                            ",u00000u,"
+                                                                            ",u00000u,"
+                                                                            ",u00000u,"
+                                                                            ",u00000u,"
+                                                                            ",u00000u,"
+                                                                            ",uuuuuuu,"
+                                                                            ",,,,,,,,,"
+                                                                            ))
+                                                  (build-template-z-3 (list "         "
+                                                                            " ddddddd "
+                                                                            " d,,,,,d "
+                                                                            " d,,,,,d "
+                                                                            " d,,,,,d "
+                                                                            " d,,,,,d "
+                                                                            " d,,,,,d "
+                                                                            " ddddddd "
+                                                                            "         "
+                                                                            ))
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              )
+                                            (values nil
+                                                    (list (list +feature-start-sigil-point+ 4 4 (+ z 1)))
+                                                    nil))))

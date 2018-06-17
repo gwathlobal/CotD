@@ -10,9 +10,17 @@
 
            ;; check for the player's win conditions first
            (when (and *player*
-                      (find (loyal-faction *player*) (game-events *world*))
-                      (funcall (on-check (get-game-event-by-id (find (loyal-faction *player*) (game-events *world*)))) *world*))
-             (funcall (on-trigger (get-game-event-by-id (find (loyal-faction *player*) (game-events *world*)))) *world*))
+                      (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                            :key #'(lambda (a)
+                                     (first a)))
+                      (funcall (on-check (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                                                                             :key #'(lambda (a)
+                                                                                      (first a))))))
+                               *world*))
+             (funcall (on-trigger (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                                                                             :key #'(lambda (a)
+                                                                                      (first a))))))
+                      *world*))
            
            ;; check all available game events
            (loop for game-event-id of-type fixnum in (game-events *world*)
@@ -635,7 +643,7 @@
       (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
       (setf *random-state* (make-random-state t))
 
-      (setf *window-width* (+ 350 (+ 30 (* *glyph-w* *max-x-view*))) 
+      (setf *window-width* (+ 380 (+ 30 (* *glyph-w* *max-x-view*))) 
             *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (* 3 (sdl:char-height sdl:*default-font*))))
 
       (when (<= *window-height* 384)

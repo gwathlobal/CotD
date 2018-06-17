@@ -59,13 +59,16 @@
                                      (= (loyal-faction *player*) +faction-type-angels+)
                                      (= (loyal-faction *player*) +faction-type-church+)
                                      (= (loyal-faction *player*) +faction-type-satanists+)
-                                     (= (loyal-faction *player*) +faction-type-military+))
-                                 (or (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+)
-                                     (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-ruined+)))
-                          (format nil "Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*
-                                  (if (>= (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*)
-                                    (format nil "~D turn~:P left" (- *demonic-conquest-win-sigils-turns* (get-demon-conquest-turns-left *world*)))
-                                    "none"))
+                                     (= (loyal-faction *player*) +faction-type-military+)))
+                          (cond
+                            ((or (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+)
+                                 (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-ruined+))
+                             (format nil "Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*
+                                     (if (>= (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*)
+                                       (format nil "~D turn~:P left" (- *demonic-conquest-win-sigils-turns* (get-demon-conquest-turns-left *world*)))
+                                       "none")))
+                            ((or (= (mission-scenario (level *world*)) +mission-scenario-military-conquest-ruined+))
+                             (format nil "Demonic sigils: ~A/~A~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*)))
                           "")
                         (if (/= (cur-oxygen *player*) *max-oxygen-level*)
                           (format nil "Oxygen: ~A/~A~%" (cur-oxygen *player*) *max-oxygen-level*)

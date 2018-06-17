@@ -97,6 +97,7 @@
 (defconstant +building-city-ruined-mansion-2+ 63)
 (defconstant +building-city-ruined-bank-1+ 64)
 
+(defconstant +building-city-sigil-post+ 65)
 
 (defparameter *level-grid-size* 5)
 

@@ -3728,6 +3728,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-resurrection+)
+                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+))
                                                                (not (mob-effect-p actor +mob-effect-silence+)))
                                                         t
                                                         nil))

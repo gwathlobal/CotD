@@ -474,6 +474,7 @@
 (defconstant +feature-start-place-church-relic+ 25)
 (defconstant +feature-start-strong-repel-demons+ 26)
 (defconstant +feature-start-place-church-angels+ 27)
+(defconstant +feature-start-sigil-point+ 28)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -643,7 +644,7 @@
 (defparameter *repel-demons-dist* 5)
 (defparameter *repel-demons-dist-strong* 15)
 
-(defparameter *min-angels-number* 9)
+(defparameter *min-angels-number* 10)
 (defparameter *min-imps-number* 6)
 (defparameter *max-imps-number* 26)
 

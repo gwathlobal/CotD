@@ -2966,3 +2966,13 @@
         for sigil = (get-mob-by-id sigil-id)
         for effect = (get-effect-by-id (mob-effect-p sigil +mob-effect-demonic-sigil+))
         minimize (param1 effect)))
+
+(defun get-military-conquest-check-alive-sigils (world)
+  (loop for mob-id in (mob-id-list (level world))
+        for mob = (get-mob-by-id mob-id)
+        when (= (mob-type mob) +mob-type-demon-sigil+)
+          do
+             (when (> (cur-hp mob) 0)
+               (return-from get-military-conquest-check-alive-sigils t))
+        )
+  nil)

@@ -62,8 +62,13 @@
                                                            "To win, destroy all angels and demons in the district. To lose, die.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (zerop (total-demons world))
-                                                                  (zerop (total-angels world)))
+                                                         (if (or (and (= (loyal-faction *player*) +faction-type-eater+)
+                                                                      (zerop (total-demons world))
+                                                                      (zerop (total-angels world)))
+                                                                 (and (/= (loyal-faction *player*) +faction-type-eater+)
+                                                                      (> (nth +faction-type-military+ (total-faction-list world)) 0)
+                                                                      (zerop (total-demons world))
+                                                                      (zerop (total-angels world))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
