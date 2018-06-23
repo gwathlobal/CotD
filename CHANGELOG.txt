@@ -2,6 +2,7 @@ CHANGELOG
 
 - Added a set of abandoned districts (which were left by the civilians) and two missions for them: a Demonic raid and Demonic conquest.
 - Added a new mission - Military conquest. The mission takes place in the abandoned districts. The military and the angels try to destroy demonic sigils, while the demons try to protect them.
+- Added a new mission - Military raid. The mission takes place in the abandoned districts. The military and the angels try to wipe out all demons from the district.
 
 --------------------
 April 21, 2018 v1.3.1

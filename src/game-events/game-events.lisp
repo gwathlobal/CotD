@@ -44,6 +44,9 @@
 (defconstant +game-event-military-conquest-win-for-angels+ 39)
 (defconstant +game-event-military-conquest-win-for-demons+ 40)
 (defconstant +game-event-military-conquest-win-for-military+ 41)
+(defconstant +game-event-military-raid-win-for-angels+ 42)
+(defconstant +game-event-military-raid-win-for-demons+ 43)
+(defconstant +game-event-military-raid-win-for-military+ 44)
 
 
 (defclass game-event ()

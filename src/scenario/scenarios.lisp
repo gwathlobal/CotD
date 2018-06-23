@@ -138,6 +138,17 @@
 (defconstant +sf-faction-military-conquest-ruined-eater+ 148)
 (defconstant +sf-faction-military-conquest-ruined-demon-malseraph+ 149)
 
+(defconstant +sf-faction-military-raid-ruined-player+ 160)
+(defconstant +sf-faction-military-raid-ruined-dead-player+ 161)
+(defconstant +sf-faction-military-raid-ruined-angel-chrome+ 162)
+(defconstant +sf-faction-military-raid-ruined-demon-crimson+ 163)
+(defconstant +sf-faction-military-raid-ruined-military-chaplain+ 164)
+(defconstant +sf-faction-military-raid-ruined-military-scout+ 165)
+(defconstant +sf-faction-military-raid-ruined-demon-shadow+ 166)
+(defconstant +sf-faction-military-raid-ruined-angel-trinity+ 167)
+(defconstant +sf-faction-military-raid-ruined-eater+ 168)
+(defconstant +sf-faction-military-raid-ruined-demon-malseraph+ 169)
+
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
 (defstruct (scenario-feature (:conc-name sf-))

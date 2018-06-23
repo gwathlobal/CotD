@@ -105,6 +105,19 @@
   
   game-event-list)
 
+(defun scenario-delayed-faction-setup-military-raid (faction-list game-event-list) 
+
+  ;; add delayed angels
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-angels+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 faction-list)
+    (push +game-event-demon-raid-delayed-arrival-angels+ game-event-list))
+  
+  game-event-list)
+
 ;;=====================================
 ;; PRESENT FACTION SCENARIO FUNCTIONS
 ;;=====================================
@@ -858,5 +871,78 @@
                        (remove-feature-from-world lvl-feature)))
         mob-func-list)
   
+  (push #'create-mobs-from-template mob-func-list)
+  mob-func-list)
+
+(defun scenario-present-faction-setup-military-raid-ruined (specific-faction-type faction-list mob-func-list)
+  
+  (setf mob-func-list (scenario-set-std-functions specific-faction-type faction-list mob-func-list))
+    
+  ;; populate the world with 1 eater of the dead
+  (setf mob-func-list (scenario-set-present-eater specific-faction-type faction-list mob-func-list))
+  
+  ;; populate the world with the 3 groups of military, where each group has 1 chaplain, 2 sargeants and 3 soldiers + an additional group of military if there is no player chaplain
+  (setf mob-func-list (scenario-set-present-military specific-faction-type faction-list mob-func-list))
+  
+  ;; populate the world with the outsider beasts, of which (humans / 15) will be fiends and 1 will be gargantaur
+  (setf mob-func-list (scenario-set-present-outsider-beasts specific-faction-type faction-list mob-func-list))
+    
+  ;; populate the world with the number of angels = humans / 11 + trinity mimics
+  (setf mob-func-list (scenario-set-present-angels specific-faction-type faction-list mob-func-list))
+  
+
+  ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
+  ;; make some of them shadow demons if there is dark in the city
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-demons+)
+                              (or (= (second a) +mission-faction-present+)
+                                  (= (second a) +mission-faction-attacker+)
+                                  (= (second a) +mission-faction-defender+)))
+                       t
+                       nil))
+                 faction-list)
+    (push #'(lambda (world mob-template-list)
+              (declare (ignore mob-template-list))
+              (multiple-value-bind (year month day hour min sec) (get-current-date-time (player-game-time world))
+                (declare (ignore year month day min sec))
+                (populate-world-with-mobs world (if (and (>= hour 7) (< hour 19))
+                                                  (list (cons +mob-type-archdemon+ 1)
+                                                        (cons +mob-type-demon+ 9)
+                                                        (cons +mob-type-imp+ (cond
+                                                                               ((< (truncate (total-humans world) 4) (+ *min-imps-number* 10)) *min-imps-number*)
+                                                                               ((> (truncate (total-humans world) 4) (+ *max-imps-number* 10)) *max-imps-number*)
+                                                                               (t (- (truncate (total-humans world) 4) 10)))
+                                                              ))
+                                                  (list (if (zerop (random 2)) (cons +mob-type-archdemon+ 1) (cons +mob-type-shadow-devil+ 1))
+                                                        (cons +mob-type-demon+ 4)
+                                                        (cons +mob-type-shadow-demon+ 5)
+                                                        (cons +mob-type-imp+ (cond
+                                                                               ((< (truncate (total-humans world) 4) 16) 3)
+                                                                               ((> (truncate (total-humans world) 4) 36) 13)
+                                                                               (t (truncate (- (/ (total-humans world) 4) 10) 2))))
+                                                        (cons +mob-type-shadow-imp+ (cond
+                                                                                      ((< (truncate (total-humans world) 4) (+ *min-imps-number* 10)) (truncate *min-imps-number* 2))
+                                                                                      ((> (truncate (total-humans world) 4) (+ *max-imps-number* 10)) (truncate *max-imps-number* 2))
+                                                                                      (t (truncate (- (/ (total-humans world) 4) 10) 2))))
+                                                        ))
+                                          #'find-unoccupied-place-inside)))
+          mob-func-list))
+
+  ;; populate world with malseraph puppets
+  (when (and (or (/= specific-faction-type +specific-faction-type-demon-malseraph+))
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-demons+)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-attacker+)
+                                       (= (second a) +mission-faction-defender+)))
+                            t
+                            nil))
+                      faction-list))
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            (populate-world-with-mobs world (list (cons +mob-type-malseraph-puppet+ 1))
+                                      #'find-unoccupied-place-inside))
+        mob-func-list))
+
   (push #'create-mobs-from-template mob-func-list)
   mob-func-list)
