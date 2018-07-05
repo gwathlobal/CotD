@@ -1,6 +1,15 @@
 (in-package :cotd)
 
-(defun create-template-city (max-x max-y max-z set-max-buildings-func set-reserved-buildings-func process-reserved-buildings-func)
+(defconstant +level-city-border+ 0)
+(defconstant +level-city-park+ 1)
+(defconstant +level-city-floor+ 2)
+(defconstant +level-city-floor-bright+ 3)
+
+(defun create-template-city (max-x max-y max-z set-max-buildings-func set-reserved-buildings-func process-reserved-buildings-func
+                             &optional (terrains (list +level-city-border+ +terrain-border-floor+
+                                                       +level-city-park+ +building-city-park-tiny+
+                                                       +level-city-floor+ +terrain-floor-dirt+
+                                                       +level-city-floor-bright+ +terrain-floor-dirt-bright+)))
   
   (logger (format nil "CREATE-TEMPLATE-CITY~%"))
 
@@ -12,7 +21,7 @@
   ;; grid will be used to make reservations for buildings
   ;; once all places on grid are reserved, put actual buildings to the template level in places that were reserved 
   (let* ((reserv-max-x (truncate max-x *level-grid-size*)) (reserv-max-y (truncate max-y *level-grid-size*)) (reserv-max-z max-z)
-         (template-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element +terrain-border-floor+))
+         (template-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element (getf terrains +level-city-border+)))
          (reserved-level (make-array (list reserv-max-x reserv-max-y reserv-max-z) :element-type 'fixnum :initial-element +building-city-reserved+))
          (feature-list)
          (mob-list nil)
@@ -125,17 +134,17 @@
                  )
             ))
     
-    ;; fill all free spaces left with +building-city-park-tiny+
+    ;; fill all free spaces left with +level-city-park+
     (loop for y from 0 below reserv-max-y do
       (loop for x from 0 below reserv-max-x 
             do
                ;;  check if you can place a tiny park
-               (when (level-city-can-place-build-on-grid +building-city-park-tiny+ x y 2 reserved-level)
+               (when (level-city-can-place-build-on-grid (getf terrains +level-city-park+) x y 2 reserved-level)
                  ;; if yes, add the building to the building list
-                 (setf build-list (append build-list (list (list +building-city-park-tiny+ x y 2))))
+                 (setf build-list (append build-list (list (list (getf terrains +level-city-park+) x y 2))))
                  
                  ;; reserve the tiles for the building
-                 (level-city-reserve-build-on-grid +building-city-park-tiny+ x y 2 reserved-level))
+                 (level-city-reserve-build-on-grid (getf terrains +level-city-park+) x y 2 reserved-level))
             ))
 
     (loop for y from 0 below max-y do
@@ -148,8 +157,8 @@
         (setf (aref template-level x y 0) +terrain-wall-earth+)
         (setf (aref template-level x y 1) +terrain-wall-earth+)
         (if (< (random 100) 20)
-            (setf (aref template-level x y 2) +terrain-floor-dirt-bright+)
-            (setf (aref template-level x y 2) +terrain-floor-dirt+))
+          (setf (aref template-level x y 2) (getf terrains +level-city-floor-bright+))
+            (setf (aref template-level x y 2) (getf terrains +level-city-floor+)))
         (loop for z from 3 below max-z do
           (setf (aref template-level x y z) +terrain-floor-air+))))
     
@@ -163,9 +172,6 @@
           for building-features = nil
           for building-items = nil
           do
-             ;(setf building-mobs nil)
-             ;(setf building-features nil)
-             ;(setf building-features nil)
              
              ;; find a random position within the grid on the template level so that the building does not violate the grid boundaries
              (destructuring-bind (adx . ady) (building-act-dim (get-building-type build-type-id))

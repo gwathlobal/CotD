@@ -28,6 +28,10 @@
                                                :glyph-idx 96 :glyph-color sdl:*cyan* :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-not-climable t :trait-blocks-sound t :trait-blocks-sound-floor t))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-border-creep+ :name "creep"
+                                               :glyph-idx 95 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound t :trait-blocks-sound-floor t :trait-not-climable t))
+
 
 ;;--------------------
 ;; Floors
@@ -92,6 +96,14 @@
                                                :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep+ :name "creep"
+                                               :glyph-idx 95 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-bright+ :name "creep"
+                                               :glyph-idx 95 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20))
+
 ;;--------------------
 ;; Walls
 ;;--------------------
@@ -116,6 +128,10 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-grave+ :name "grave"
                                                :glyph-idx 121 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20  :trait-can-jump-over t))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-gloomtwigs+ :name "gloomtwigs"
+                                               :glyph-idx 3 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3 :trait-can-jump-over t))
 
 ;;--------------------
 ;; Trees
@@ -160,6 +176,18 @@
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-sw+ :name "mature oak"
                                                :glyph-idx 107 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-vision t :trait-blocks-sound 15 :trait-blocks-sound-floor 15))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-twintube+ :name "young twintube"
+                                               :glyph-idx 57 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
+                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-sound-floor 20 :trait-opaque-floor t))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-tree-twintube-trunk+ :name "mature twintube"
+                                               :glyph-idx 16 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-move t :trait-blocks-vision t :trait-blocks-sound 10 :trait-blocks-sound-floor 20))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-twintube-branches+ :name "twintube branch"
+                                               :glyph-idx 3 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :trait-opaque-floor t))
 
 ;;--------------------
 ;; Furniture

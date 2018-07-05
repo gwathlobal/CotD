@@ -235,6 +235,118 @@
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-normal+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted district"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-normal)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-normal)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-land-arrival-border))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-river+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted district upon a river"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-river))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-port+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted seaport district"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (let ((r (random 4)))
+                                                         (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                              #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-port)))
+                                                                                                              #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-port)))
+                                                                                                              #'(lambda (reserved-level)
+                                                                                                                  (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                         #'(lambda (reserved-level)
+                                                                                                                                                             (place-land-arrival-border reserved-level)
+                                                                                                                                                             (let ((result))
+                                                                                                                                                               (cond
+                                                                                                                                                                 ;; north
+                                                                                                                                                                 ((= r 0) (setf result (place-reserved-buildings-ruined-port-n
+                                                                                                                                                                                        reserved-level)))
+                                                                                                                                                                 ;; south
+                                                                                                                                                                 ((= r 1) (setf result (place-reserved-buildings-ruined-port-s
+                                                                                                                                                                                        reserved-level)))
+                                                                                                                                                                 ;; east
+                                                                                                                                                                 ((= r 2) (setf result (place-reserved-buildings-ruined-port-e
+                                                                                                                                                                                        reserved-level)))
+                                                                                                                                                                 ;; west
+                                                                                                                                                                 ((= r 3) (setf result (place-reserved-buildings-ruined-port-w
+                                                                                                                                                                                        reserved-level)))) 
+                                                                                                                                                               (loop for x from 0 below (array-dimension reserved-level 0) do
+                                                                                                                                                                 (loop for y from 0 below (array-dimension reserved-level 1) do
+                                                                                                                                                                   (when (or (= (aref reserved-level x y 2) +building-city-sea+)
+                                                                                                                                                                             (= (aref reserved-level x y 2) +building-city-pier+)
+                                                                                                                                                                             (= (aref reserved-level x y 2) +building-city-land-border+))
+                                                                                                                                                                     (push (list (aref reserved-level x y 2) x y 2) result))))
+                                                                                                                                                               result))))
+                                                                                                              (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+)
+                                                                                                              )))
+                                                         )
+                                                                                                              
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-forest+
+                                             :type +scenario-feature-city-layout+
+                                             :name "The corrupted outskirts of the city"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-normal)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-normal)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-ruined-forest))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-island+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted island district"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-island))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+
 ;;======================
 ;; FACTIONS
 ;;======================

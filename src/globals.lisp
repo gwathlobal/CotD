@@ -550,6 +550,13 @@
 (defconstant +terrain-floor-sign-prison+ 49)
 (defconstant +terrain-floor-sign-bank+ 50)
 (defconstant +terrain-floor-sign-church-orthodox+ 51)
+(defconstant +terrain-border-creep+ 52)
+(defconstant +terrain-floor-creep+ 53)
+(defconstant +terrain-floor-creep-bright+ 54)
+(defconstant +terrain-tree-twintube+ 55)
+(defconstant +terrain-tree-twintube-trunk+ 56)
+(defconstant +terrain-floor-twintube-branches+ 57)
+(defconstant +terrain-wall-gloomtwigs+ 58)
 
 ;;--------------------
 ;; GOD Constants

@@ -28,6 +28,17 @@
 (defconstant +building-type-ruined-mansion+ 20)
 (defconstant +building-type-ruined-bank+ 21)
 
+(defconstant +building-type-corrupted-house+ 22)
+(defconstant +building-type-corrupted-townhall+ 23)
+(defconstant +building-type-corrupted-park+ 24)
+(defconstant +building-type-corrupted-prison+ 25)
+(defconstant +building-type-corrupted-warehouse+ 26)
+(defconstant +building-type-corrupted-library+ 27)
+(defconstant +building-type-corrupted-mansion+ 28)
+(defconstant +building-type-corrupted-bank+ 29)
+(defconstant +building-type-corrupted-graveyard+ 30)
+(defconstant +building-type-corrupted-lake+ 31)
+
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
 ;;--------------------------------------
@@ -99,6 +110,32 @@
 
 (defconstant +building-city-sigil-post+ 65)
 
+(defconstant +building-city-corrupted-house-1+ 66)
+(defconstant +building-city-corrupted-house-2+ 67)
+(defconstant +building-city-corrupted-house-3+ 68)
+(defconstant +building-city-corrupted-house-4+ 69)
+(defconstant +building-city-corrupted-townhall-1+ 70)
+(defconstant +building-city-corrupted-townhall-2+ 71)
+(defconstant +building-city-corrupted-townhall-3+ 72)
+(defconstant +building-city-corrupted-townhall-4+ 73)
+(defconstant +building-city-corrupted-park-1+ 74)
+(defconstant +building-city-corrupted-park-2+ 75)
+(defconstant +building-city-corrupted-park-3+ 76)
+(defconstant +building-city-corrupted-park-4+ 77)
+(defconstant +building-city-corrupted-prison-1+ 78)
+(defconstant +building-city-corrupted-warehouse-1+ 79)
+(defconstant +building-city-corrupted-library-1+ 80)
+(defconstant +building-city-corrupted-warehouse-port-1+ 81)
+(defconstant +building-city-corrupted-warehouse-port-2+ 82)
+(defconstant +building-city-corrupted-mansion-1+ 83)
+(defconstant +building-city-corrupted-mansion-2+ 84)
+(defconstant +building-city-corrupted-bank-1+ 85)
+(defconstant +building-city-corrupted-sigil-post+ 86)
+(defconstant +building-city-corrupted-park-tiny+ 87)
+(defconstant +building-city-corrupted-graveyard-1+ 88)
+(defconstant +building-city-corrupted-lake-1+ 89)
+(defconstant +building-city-corrupted-lake-2+ 90)
+
 (defparameter *level-grid-size* 5)
 
 (defvar *building-types* (make-hash-table))
@@ -160,6 +197,38 @@
                      (#\u +terrain-slope-stone-up+)
                      (#\d +terrain-slope-stone-down+)
                      (#\* +terrain-wall-bush+)
+                     (#\| +terrain-wall-lantern+)
+                     (#\G +terrain-wall-grave+))
+          when tt
+            do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
+
+(defun translate-build-to-corrupted-template (x y z build-template template-level)
+  (loop for y1 from 0 below (length build-template) do
+    (loop for c across (nth y1 build-template) 
+          and x1 from 0
+          for tt = (case c
+                     (#\. +terrain-floor-stone+)
+                     (#\# +terrain-wall-stone+)
+                     (#\T +terrain-tree-twintube+)
+                     (#\, (if (< (random 100) 20)
+                            +terrain-floor-creep-bright+
+                            +terrain-floor-creep+))
+                     (#\_ +terrain-water-liquid+)
+                     (#\` +terrain-floor-creep+)
+                     (#\- +terrain-wall-window+)
+                     (#\h +terrain-floor-chair+)
+                     (#\t +terrain-floor-table+)
+                     (#\b +terrain-floor-bed+)
+                     (#\c +terrain-floor-cabinet+)
+                     (#\C +terrain-floor-crate+)
+                     (#\B +terrain-floor-bookshelf+)
+                     (#\+ +terrain-door-closed+)
+                     (#\' +terrain-door-open+)
+                     (#\0 +terrain-wall-earth+)
+                     (#\Space +terrain-floor-air+)
+                     (#\u +terrain-slope-stone-up+)
+                     (#\d +terrain-slope-stone-down+)
+                     (#\* +terrain-wall-gloomtwigs+)
                      (#\| +terrain-wall-lantern+)
                      (#\G +terrain-wall-grave+))
           when tt
@@ -429,4 +498,184 @@
   (setf (aref template-level (+ x 3) (+ y 1) (+ z 3)) +terrain-floor-leaves+)
   (setf (aref template-level (+ x 3) (+ y 2) (+ z 3)) +terrain-floor-leaves+)
   ;;(setf (aref template-level (+ x 3) (+ y 3) (+ z 3)) +terrain-floor-grass+)
+  )
+
+(defun level-place-twintube-corrupted-1 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  
+  ;; z = 3
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-floor-twintube-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  
+  ;; z = 4
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-grass+)
+  )
+
+(defun level-place-twintube-corrupted-2 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  
+  ;; z = 3
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-floor-leaves+)
+  
+  ;; z = 4
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-grass+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-grass+)
+  )
+
+(defun level-place-twintube-corrupted-3 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  
+  ;; z = 3
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-floor-grass+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  
+  ;; z = 4
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-leaves+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  )
+
+(defun level-place-twintube-corrupted-4 (template-level x y z)
+  ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  
+  ;; z = 3
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  
+  ;; z = 4
+  ;;(setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  )
+
+(defun level-place-twintube-mutated-1 (template-level x y z)
+   ;; (0, 0) is the top left corner
+  ;; z = 2
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 0) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 0)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 1) (+ z 0)) +terrain-floor-creep+)
+  (setf (aref template-level (+ x 2) (+ y 2) (+ z 0)) +terrain-floor-creep+)
+  
+  ;; z = 3
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 1) (+ y 1) (+ z 1)) +terrain-floor-twintube-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 1)) +terrain-tree-twintube-trunk+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 1)) +terrain-tree-twintube-trunk+)
+  
+  ;; z = 4
+  (setf (aref template-level (+ x 0) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 0) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 1) (+ y 1) (+ z 2)) +terrain-floor-branches+)
+  (setf (aref template-level (+ x 1) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
+  (setf (aref template-level (+ x 2) (+ y 0) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 1) (+ z 2)) +terrain-floor-twintube-branches+)
+  ;;(setf (aref template-level (+ x 2) (+ y 2) (+ z 2)) +terrain-floor-twintube-branches+)
   )
