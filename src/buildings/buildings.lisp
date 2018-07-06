@@ -135,6 +135,7 @@
 (defconstant +building-city-corrupted-graveyard-1+ 88)
 (defconstant +building-city-corrupted-lake-1+ 89)
 (defconstant +building-city-corrupted-lake-2+ 90)
+(defconstant +building-city-army-post-corrupted+ 91)
 
 (defparameter *level-grid-size* 5)
 

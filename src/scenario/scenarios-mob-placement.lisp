@@ -946,3 +946,4 @@
 
   (push #'create-mobs-from-template mob-func-list)
   mob-func-list)
+

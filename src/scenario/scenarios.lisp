@@ -166,6 +166,17 @@
 (defconstant +sf-faction-demonic-conquest-corrupted-eater+ 198)
 (defconstant +sf-faction-demonic-conquest-corrupted-demon-malseraph+ 199)
 
+(defconstant +sf-faction-military-conquest-corrupted-player+ 210)
+(defconstant +sf-faction-military-conquest-corrupted-dead-player+ 211)
+(defconstant +sf-faction-military-conquest-corrupted-angel-chrome+ 212)
+(defconstant +sf-faction-military-conquest-corrupted-demon-crimson+ 213)
+(defconstant +sf-faction-military-conquest-corrupted-military-chaplain+ 214)
+(defconstant +sf-faction-military-conquest-corrupted-military-scout+ 215)
+(defconstant +sf-faction-military-conquest-corrupted-demon-shadow+ 216)
+(defconstant +sf-faction-military-conquest-corrupted-angel-trinity+ 217)
+(defconstant +sf-faction-military-conquest-corrupted-eater+ 218)
+(defconstant +sf-faction-military-conquest-corrupted-demon-malseraph+ 219)
+
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
 (defstruct (scenario-feature (:conc-name sf-))
@@ -1301,7 +1312,11 @@
           (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 
-(defun place-reserved-buildings-for-factions (faction-list reserved-level init-place-func)
+(defconstant +reserved-building-army-post+ 0)
+(defconstant +reserved-building-sigil-post+ 1)
+
+(defun place-reserved-buildings-for-factions (faction-list reserved-level init-place-func &optional (buildings (list +reserved-building-army-post+ +building-city-army-post+
+                                                                                                                     +reserved-building-sigil-post+ +building-city-sigil-post+)))
   (let ((building-list) (removed-build-coords ()) (added-builds ()))
     (setf building-list (funcall init-place-func reserved-level))
 
@@ -1314,10 +1329,10 @@
                       nil))
                 faction-list)
        (progn
-         (setf (aref reserved-level 4 4 2) +building-city-army-post+)
-         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) 4 2) +building-city-army-post+)
-         (setf (aref reserved-level 4 (- (array-dimension reserved-level 1) 5) 2) +building-city-army-post+)
-         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 5) 2) +building-city-army-post+)
+         (setf (aref reserved-level 4 4 2) (getf buildings +reserved-building-army-post+))
+         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) 4 2) (getf buildings +reserved-building-army-post+))
+         (setf (aref reserved-level 4 (- (array-dimension reserved-level 1) 5) 2) (getf buildings +reserved-building-army-post+))
+         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 5) 2) (getf buildings +reserved-building-army-post+))
          
          (setf removed-build-coords (list (list 4 4 2)
                                           (list 4 5 2)
@@ -1337,12 +1352,12 @@
                                           (list (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)))
          
          (loop for (x y z) in removed-build-coords do
-           (setf (aref reserved-level x y z) +building-city-army-post+))
+           (setf (aref reserved-level x y z) (getf buildings +reserved-building-army-post+)))
          
-         (setf added-builds (list (list +building-city-army-post+ 4 4 2)
-                                  (list +building-city-army-post+ (- (array-dimension reserved-level 0) 6) 4 2)
-                                  (list +building-city-army-post+ 4 (- (array-dimension reserved-level 1) 6) 2)
-                                  (list +building-city-army-post+ (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)
+         (setf added-builds (list (list (getf buildings +reserved-building-army-post+) 4 4 2)
+                                  (list (getf buildings +reserved-building-army-post+) (- (array-dimension reserved-level 0) 6) 4 2)
+                                  (list (getf buildings +reserved-building-army-post+) 4 (- (array-dimension reserved-level 1) 6) 2)
+                                  (list (getf buildings +reserved-building-army-post+) (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)
                                   ))))
       
       ;; if the demons are defender - place sigil posts in the district
@@ -1353,10 +1368,10 @@
                       nil))
                 faction-list)
        (progn
-         (setf (aref reserved-level 4 4 2) +building-city-sigil-post+)
-         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) 4 2) +building-city-sigil-post+)
-         (setf (aref reserved-level 4 (- (array-dimension reserved-level 1) 5) 2) +building-city-sigil-post+)
-         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 5) 2) +building-city-sigil-post+)
+         (setf (aref reserved-level 4 4 2) (getf buildings +reserved-building-sigil-post+))
+         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) 4 2) (getf buildings +reserved-building-sigil-post+))
+         (setf (aref reserved-level 4 (- (array-dimension reserved-level 1) 5) 2) (getf buildings +reserved-building-sigil-post+))
+         (setf (aref reserved-level (- (array-dimension reserved-level 0) 5) (- (array-dimension reserved-level 1) 5) 2) (getf buildings +reserved-building-sigil-post+))
          
          (setf removed-build-coords (list (list 4 4 2)
                                           (list 4 5 2)
@@ -1376,12 +1391,12 @@
                                           (list (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)))
          
          (loop for (x y z) in removed-build-coords do
-           (setf (aref reserved-level x y z) +building-city-sigil-post+))
+           (setf (aref reserved-level x y z) (getf buildings +reserved-building-sigil-post+)))
          
-         (setf added-builds (list (list +building-city-sigil-post+ 4 4 2)
-                                  (list +building-city-sigil-post+ (- (array-dimension reserved-level 0) 6) 4 2)
-                                  (list +building-city-sigil-post+ 4 (- (array-dimension reserved-level 1) 6) 2)
-                                  (list +building-city-sigil-post+ (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)
+         (setf added-builds (list (list (getf buildings +reserved-building-sigil-post+) 4 4 2)
+                                  (list (getf buildings +reserved-building-sigil-post+) (- (array-dimension reserved-level 0) 6) 4 2)
+                                  (list (getf buildings +reserved-building-sigil-post+) 4 (- (array-dimension reserved-level 1) 6) 2)
+                                  (list (getf buildings +reserved-building-sigil-post+) (- (array-dimension reserved-level 0) 6) (- (array-dimension reserved-level 1) 6) 2)
                                   )))))
     
     ;; remove the buildings from the designated places if there were any

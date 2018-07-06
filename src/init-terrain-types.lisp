@@ -127,11 +127,11 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-grave+ :name "grave"
                                                :glyph-idx 121 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20  :trait-can-jump-over t))
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-gloomtwigs+ :name "gloomtwigs"
                                                :glyph-idx 3 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3 :trait-can-jump-over t))
+                                               :trait-blocks-vision 60 :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
 ;;--------------------
 ;; Trees

@@ -244,7 +244,11 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-normal)))
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
-                                                                                                                                                                              #'place-land-arrival-border))
+                                                                                                                                                                              #'place-land-arrival-border
+                                                                                                                                                                              (list +reserved-building-army-post+
+                                                                                                                                                                                    +building-city-army-post-corrupted+
+                                                                                                                                                                                    +reserved-building-sigil-post+
+                                                                                                                                                                                    +building-city-corrupted-sigil-post+)))
                                                                                                             (list +level-city-border+ +terrain-border-creep+
                                                                                                                   +level-city-park+ +building-city-corrupted-park-tiny+
                                                                                                                   +level-city-floor+ +terrain-floor-creep+
@@ -261,7 +265,11 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-river)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-river)))
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
-                                                                                                                                                                              #'place-reserved-buildings-river))
+                                                                                                                                                                              #'place-reserved-buildings-river
+                                                                                                                                                                              (list +reserved-building-army-post+
+                                                                                                                                                                                    +building-city-army-post-corrupted+
+                                                                                                                                                                                    +reserved-building-sigil-post+
+                                                                                                                                                                                    +building-city-corrupted-sigil-post+)))
                                                                                                             (list +level-city-border+ +terrain-border-creep+
                                                                                                                   +level-city-park+ +building-city-corrupted-park-tiny+
                                                                                                                   +level-city-floor+ +terrain-floor-creep+
@@ -302,7 +310,11 @@
                                                                                                                                                                              (= (aref reserved-level x y 2) +building-city-pier+)
                                                                                                                                                                              (= (aref reserved-level x y 2) +building-city-land-border+))
                                                                                                                                                                      (push (list (aref reserved-level x y 2) x y 2) result))))
-                                                                                                                                                               result))))
+                                                                                                                                                               result))
+                                                                                                                                                         (list +reserved-building-army-post+
+                                                                                                                                                               +building-city-army-post-corrupted+
+                                                                                                                                                               +reserved-building-sigil-post+
+                                                                                                                                                               +building-city-corrupted-sigil-post+)))
                                                                                                               (list +level-city-border+ +terrain-border-creep+
                                                                                                                   +level-city-park+ +building-city-corrupted-park-tiny+
                                                                                                                   +level-city-floor+ +terrain-floor-creep+
@@ -321,7 +333,11 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-normal)))
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
-                                                                                                                                                                              #'place-reserved-buildings-ruined-forest))
+                                                                                                                                                                              #'place-reserved-buildings-ruined-forest
+                                                                                                                                                                              (list +reserved-building-army-post+
+                                                                                                                                                                                    +building-city-army-post-corrupted+
+                                                                                                                                                                                    +reserved-building-sigil-post+
+                                                                                                                                                                                    +building-city-corrupted-sigil-post+)))
                                                                                                             (list +level-city-border+ +terrain-border-creep+
                                                                                                                   +level-city-park+ +building-city-corrupted-park-tiny+
                                                                                                                   +level-city-floor+ +terrain-floor-creep+
@@ -338,7 +354,11 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-river)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-river)))
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
-                                                                                                                                                                              #'place-reserved-buildings-island))
+                                                                                                                                                                              #'place-reserved-buildings-island
+                                                                                                                                                                              (list +reserved-building-army-post+
+                                                                                                                                                                                    +building-city-army-post-corrupted+
+                                                                                                                                                                                    +reserved-building-sigil-post+
+                                                                                                                                                                                    +building-city-corrupted-sigil-post+)))
                                                                                                             (list +level-city-border+ +terrain-border-creep+
                                                                                                                   +level-city-park+ +building-city-corrupted-park-tiny+
                                                                                                                   +level-city-floor+ +terrain-floor-creep+
