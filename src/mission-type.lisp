@@ -42,6 +42,7 @@
 (defconstant +mission-scenario-military-raid-ruined+ 7)
 (defconstant +mission-scenario-demon-conquest-corrupted+ 8)
 (defconstant +mission-scenario-military-conquest-corrupted+ 9)
+(defconstant +mission-scenario-angelic-conquest-corrupted+ 10)
 
 (defclass mission-scenario ()
   ((id :initarg :id :accessor id :type fixnum)

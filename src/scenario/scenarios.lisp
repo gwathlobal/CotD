@@ -177,6 +177,17 @@
 (defconstant +sf-faction-military-conquest-corrupted-eater+ 218)
 (defconstant +sf-faction-military-conquest-corrupted-demon-malseraph+ 219)
 
+(defconstant +sf-faction-angelic-conquest-corrupted-player+ 230)
+(defconstant +sf-faction-angelic-conquest-corrupted-dead-player+ 231)
+(defconstant +sf-faction-angelic-conquest-corrupted-angel-chrome+ 232)
+(defconstant +sf-faction-angelic-conquest-corrupted-demon-crimson+ 233)
+(defconstant +sf-faction-angelic-conquest-corrupted-military-chaplain+ 234)
+(defconstant +sf-faction-angelic-conquest-corrupted-military-scout+ 235)
+(defconstant +sf-faction-angelic-conquest-corrupted-demon-shadow+ 236)
+(defconstant +sf-faction-angelic-conquest-corrupted-angel-trinity+ 237)
+(defconstant +sf-faction-angelic-conquest-corrupted-eater+ 238)
+(defconstant +sf-faction-angelic-conquest-corrupted-demon-malseraph+ 239)
+
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
 (defstruct (scenario-feature (:conc-name sf-))
