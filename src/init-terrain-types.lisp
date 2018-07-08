@@ -133,6 +133,11 @@
                                                :glyph-idx 3 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
                                                :trait-blocks-vision 60 :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-corrupted+ :name "flesh wall"
+                                               :glyph-idx 96 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color (sdl:color :r 100 :g 0 :b 100) 
+                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-sound 25 :trait-blocks-sound-floor 20 :trait-opaque-floor t
+                                               :trait-can-have-rune t))
+
 ;;--------------------
 ;; Trees
 ;;--------------------

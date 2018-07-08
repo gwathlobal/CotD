@@ -118,7 +118,7 @@
             (new-line on-screen))
     (if (and (not (eq *player* (find-mob-with-max-calls)))
              (not (zerop (stat-calls *player*))))
-      (format str "                  vs ~A~A~%" (format nil "~A with ~A summons" (prepend-article +article-a+ (get-qualified-name (get-qualified-name *player*))) (stat-calls *player*))
+      (format str "                  vs ~A~A~%" (format nil "~A with ~A summons" (prepend-article +article-a+ (get-qualified-name *player*)) (stat-calls *player*))
               (new-line on-screen)))
     
     (format str "      The Jumper: ~A~A~%" (if (zerop (stat-answers (find-mob-with-max-answers)))
@@ -127,7 +127,7 @@
             (new-line on-screen))
     (if (and (not (eq *player* (find-mob-with-max-answers)))
              (not (zerop (stat-answers *player*))))
-      (format str "                  vs ~A~A~%" (format nil "~A with ~A summons answers" (prepend-article +article-a+ (get-qualified-name (get-qualified-name *player*))) (stat-answers *player*))
+      (format str "                  vs ~A~A~%" (format nil "~A with ~A summons answers" (prepend-article +article-a+ (get-qualified-name *player*)) (stat-answers *player*))
               (new-line on-screen)))
     
     (format str "   The Berserker: ~A~A~%" (if (zerop (calculate-total-friendly-kills (find-mob-with-max-friendly-kills)))
@@ -164,7 +164,7 @@
     
     (format str "     The Scrooge: ~A~A~%" (if (zerop (calculate-total-value (find-mob-with-max-value)))
                                              (format nil "-")
-                                             (format nil "~A with ~A$ worth of items" (prepend-article +article-a+ (get-qualified-name (find-mob-with-max-value))) (calculate-total-value (find-mob-with-max-value))))
+                                             (format nil "~A with ~A$ worth of items" (prepend-article + article-a+ (get-qualified-name (find-mob-with-max-value))) (calculate-total-value (find-mob-with-max-value))))
             (new-line on-screen))
     (if (and (not (eq *player* (find-mob-with-max-value)))
              (not (zerop (calculate-total-value *player*))))

@@ -1214,6 +1214,103 @@
                                                                    (t
                                                                     (return-from ai-function))))
                                                                
+                                                               ))))
+
+(set-ai-package (make-instance 'ai-package :id +ai-package-escape-with-relic+
+                                           :priority 6
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-enemy nearest-ally hostile-mobs allied-mobs))
+                                                            (if (and (loop for item-id in (inv actor)
+                                                                           for item = (get-item-by-id item-id)
+                                                                           when (= (item-type item) +item-type-church-reliс+)
+                                                                             do (return t)))
+                                                              t
+                                                              nil)
+                                                            )
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
+
+                                                             (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob (~A, ~A, ~A) wants to return to the nearest map edge~%" (x actor) (y actor) (z actor)))
+                                                             (block ai-function
+                                                               ;; iterate through all the edges to get to the nearest one
+                                                               (when (null (path-dst actor))
+                                                                 (let ((rx 0) 
+                                                                       (ry 0)
+                                                                       (rz 0)
+                                                                       (edge-list (stable-sort (list (list 2 (y actor) 2)
+                                                                                                     (list (x actor) 2 2)
+                                                                                                     (list (- (array-dimension (terrain (level *world*)) 0) 2) (y actor) 2)
+                                                                                                     (list (x actor) (- (array-dimension (terrain (level *world*)) 1) 2) 2))
+                                                                                                 #'(lambda (a b)
+                                                                                                     (if (< (get-distance-3d (x actor) (y actor) (z actor) (first a) (second a) (third a))
+                                                                                                            (get-distance-3d (x actor) (y actor) (z actor) (first b) (second b) (third b)))
+                                                                                                       t
+                                                                                                       nil)))))
+                                                                   (declare (type fixnum rx ry rz))
+
+                                                                   (setf rx (first (first edge-list)) ry (second (first edge-list)) rz (third (first edge-list)))
+                                                                   
+                                                                   (loop with edge-num = 0
+                                                                         while (or (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
+                                                                                   (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (mob-effect-p actor +mob-effect-flying+)))
+                                                                                   (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
+                                                                                                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                                                          (map-size actor))
+                                                                                                                 (get-mob-move-mode actor))))
+                                                                         do
+                                                                            (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                                            rx ry rz
+                                                                                            (get-terrain-* (level *world*) rx ry rz)
+                                                                                            (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
+                                                                                                                                   (id (get-mob-* (level *world*) rx ry rz))
+                                                                                                                                   nil)
+                                                                                            (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
+                                                                                                                                                                              (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                                                                                              (map-size actor))
+                                                                                                                     (get-mob-move-mode actor))))
+                                                                            (setf rx (first (nth edge-num edge-list)) ry (second (nth edge-num edge-list)) rz (third (nth edge-num edge-list)))
+                                                                            (incf edge-num)
+                                                                            (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: NEW R (~A ~A ~A)~%" rx ry rz))
+                                                                            (when (>= edge-num (length edge-list))
+                                                                              (loop-finish))
+                                                                         finally (if (>= edge-num (length edge-list))
+                                                                                   (progn
+                                                                                     (setf (path-dst actor) nil)
+                                                                                     (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob cannot set the destination after exhausting all edges~%")))
+                                                                                   (progn
+                                                                                     (ai-set-path-dst actor rx ry rz)
+                                                                                     (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob's destination is set to (~A, ~A, ~A)~%"
+                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))))
+                                                                   
+                                                                   ))
+                                                               
+                                                               (let ((move-result nil))
+                                                                 ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
+                                                                 (when (null (path-dst actor))
+                                                                   (ai-mob-random-dir actor)
+                                                                   (return-from ai-function))
+                                                                     
+                                                                 ;; make a path to the destination target if there is no path plotted
+                                                                 (when (or (null (path actor))
+                                                                           (mob-ability-p actor +mob-abil-momentum+))
+                                                                   (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                                 
+                                                                 ;; make a step along the path to the path-dst
+                                                                 (setf move-result (ai-move-along-path actor))
+                                                                 (cond
+                                                                   ;; if the move failed - move in a random direction
+                                                                   ((null move-result)
+                                                                    (setf (path-dst actor) nil)
+                                                                    (ai-mob-random-dir actor)
+                                                                    (return-from ai-function)
+                                                                    )
+                                                                   ;; success
+                                                                   (t
+                                                                    (return-from ai-function))))
+                                                               
                                                              ))))
 
 (set-ai-package (make-instance 'ai-package :id +ai-package-patrol-district+

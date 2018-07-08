@@ -1182,3 +1182,82 @@
                                                     (list (list +feature-start-repel-demons+ 5 5 z)
                                                           (list +feature-start-military-point+ 5 5 z))
                                                     nil))))
+
+;;=====================
+;; Corrupted shrine
+;;=====================
+
+(set-building-type (make-building :id +building-city-corrupted-shrine-1+ :grid-dim '(3 . 3) :act-dim '(15 . 15) :type +building-type-corrupted-shrine+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,"
+                                                                            ",,,#########,,,"
+                                                                            ",,*,,,,,,,,,*,,"
+                                                                            ",#,,,#####,,,#,"
+                                                                            ",#,,*,,,,,*,,#,"
+                                                                            ",#,#,##,##,#,#,"
+                                                                            ",#,#,#,,,#,#,#,"
+                                                                            ",#,#,,,.,,,#,#,"
+                                                                            ",#,#,#,,,#,#,#,"
+                                                                            ",#,#,##,##,#,#,"
+                                                                            ",#,,*,,,,,*,,#,"
+                                                                            ",#,,,#####,,,#,"
+                                                                            ",,*,,,,,,,,,*,,"
+                                                                            ",,,#########,,,"
+                                                                            ",,,,,,,,,,,,,,,"))
+                                                  (build-template-z-3 (list "               "
+                                                                            "   .........   "
+                                                                            "  ###########  "
+                                                                            " ##  #####  ## "
+                                                                            " #           # "
+                                                                            " # # ## ## # # "
+                                                                            " # # #   # # # "
+                                                                            " # #       # # "
+                                                                            " # # #   # # # "
+                                                                            " # # ## ## # # "
+                                                                            " #           # "
+                                                                            " ##  #####  ## "
+                                                                            "  ###########  "
+                                                                            "   .........   "
+                                                                            "               "))
+                                                  (build-template-z-4 (list "               "
+                                                                            "               "
+                                                                            "  ...........  "
+                                                                            " ..#########.. "
+                                                                            " .##       ##. "
+                                                                            " .## ## ## ##. "
+                                                                            " .## #   # ##. "
+                                                                            " .##       ##. "
+                                                                            " .## #   # ##. "
+                                                                            " .## ## ## ##. "
+                                                                            " .##       ##. "
+                                                                            " ..#########.. "
+                                                                            "  ...........  "
+                                                                            "               "
+                                                                            "               "))
+                                                  (build-template-z-5 (list "               "
+                                                                            "               "
+                                                                            "               "
+                                                                            "   .........   "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "  ...........  "
+                                                                            "   .........   "
+                                                                            "               "
+                                                                            "               "
+                                                                            "               "))
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 3) build-template-z-5 template-level)
+                                              
+                                              )
+                                            (values nil
+                                                    (list (list +feature-start-place-church-relic+ 7 7 z)
+                                                          )
+                                                    nil))))

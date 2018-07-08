@@ -2976,3 +2976,13 @@
                (return-from get-military-conquest-check-alive-sigils t))
         )
   nil)
+
+(defun get-angel-steal-angel-with-relic (world)
+  (loop for mob-id in (mob-id-list (level world))
+        for mob = (get-mob-by-id mob-id)
+        when (and (mob-ability-p mob +mob-type-angel+)
+                  (get-inv-items-by-type (inv mob) +item-type-church-reliс+))
+          do
+             (return-from get-angel-steal-angel-with-relic mob)
+        )
+  nil)

@@ -166,6 +166,51 @@
                                                                            (list +faction-type-criminals+ +mission-faction-absent+)
                                                                            (list +faction-type-ghost+ +mission-faction-absent+))))
 
+(set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-steal-normal+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-steal-forest+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-steal-port+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-steal-island+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-steal-river+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
 ;;----------------------------------------
 ;; MISSION-SCENARIOS
 ;;----------------------------------------
@@ -584,6 +629,33 @@
                                                        :win-condition-list (list (list +faction-type-demons+ +game-event-military-conquest-win-for-demons+)
                                                                                  (list +faction-type-angels+ +game-event-military-conquest-win-for-angels+)
                                                                                  (list +faction-type-military+ +game-event-military-conquest-win-for-military+)
+                                                                                 (list +faction-type-eater+ +game-event-win-for-eater+)
+                                                                                 )
+                                                       :post-sf-list (list +mission-sf-ruined-district+)
+                                     ))
+
+(set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-angelic-steal-corrupted+
+                                                       :name "Celestial retrieval"
+                                                       :district-layout-list (list +city-layout-corrupted-steal-normal+ +city-layout-corrupted-steal-forest+ +city-layout-corrupted-steal-port+ +city-layout-corrupted-steal-island+
+                                                                                   +city-layout-corrupted-steal-river+)
+                                                       :faction-list (list (list +faction-type-demons+ +mission-faction-present+)
+                                                                           (list +faction-type-angels+ +mission-faction-attacker+)
+                                                                           )
+                                                       :scenario-faction-list (list (list +specific-faction-type-player+ +sf-faction-angelic-steal-player+)
+                                                                                    (list +specific-faction-type-dead-player+ +sf-faction-angelic-steal-dead-player+)
+                                                                                    (list +specific-faction-type-angel-chrome+ +sf-faction-angelic-steal-angel-chrome+)
+                                                                                    (list +specific-faction-type-angel-trinity+ +sf-faction-angelic-steal-angel-trinity+)
+                                                                                    (list +specific-faction-type-demon-crimson+ +sf-faction-angelic-steal-demon-crimson+)
+                                                                                    (list +specific-faction-type-demon-shadow+ +sf-faction-angelic-steal-demon-shadow+)
+                                                                                    (list +specific-faction-type-demon-malseraph+ +sf-faction-angelic-steal-demon-malseraph+)
+                                                                                    (list +specific-faction-type-eater+ +sf-faction-angelic-steal-eater+)
+                                                                                    )
+                                                       :objective-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
+                                                                             (list +faction-type-angels+ (list +ai-package-patrol-district+ +ai-package-search-relic+ +ai-package-pick-relic+ +ai-package-escape-with-relic+))
+                                                                             (list +faction-type-eater+ (list +ai-package-patrol-district+))
+                                                                             )
+                                                       :win-condition-list (list (list +faction-type-demons+ +game-event-angelic-steal-win-for-demons+)
+                                                                                 (list +faction-type-angels+ +game-event-angelic-steal-win-for-angels+)
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-ruined-district+)

@@ -5,6 +5,7 @@ CHANGELOG
 - Added a new mission - Military conquest. The mission takes place in the abandoned and corrupted districts. The military and the angels try to destroy demonic sigils, while the demons try to protect them.
 - Added a new mission - Military raid. The mission takes place in the abandoned districts. The military and the angels try to wipe out all demons from the district.
 - Added a new mission - Celestial purge. The mission takes place in the corrupted districts. The angels try to destroy demonic sigils, while the demons try to protect them.
+- Added a new mission - Celestial retrieval. The mission takes place in the corrupted districts. The angels try to recapture the stolen relic, while the demons want to stop and destroy them.
 - Demon conquest mission now also takes place in the abandoned and corrupted districts.
 - Demon raid mission now also takes place in the abandoned districts.
 

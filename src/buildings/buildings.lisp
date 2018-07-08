@@ -39,6 +39,8 @@
 (defconstant +building-type-corrupted-graveyard+ 30)
 (defconstant +building-type-corrupted-lake+ 31)
 
+(defconstant +building-type-corrupted-shrine+ 32)
+
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
 ;;--------------------------------------
@@ -137,6 +139,8 @@
 (defconstant +building-city-corrupted-lake-2+ 90)
 (defconstant +building-city-army-post-corrupted+ 91)
 
+(defconstant +building-city-corrupted-shrine-1+ 92)
+
 (defparameter *level-grid-size* 5)
 
 (defvar *building-types* (make-hash-table))
@@ -210,6 +214,40 @@
           for tt = (case c
                      (#\. +terrain-floor-stone+)
                      (#\# +terrain-wall-stone+)
+                     (#\T +terrain-tree-twintube+)
+                     (#\, (if (< (random 100) 20)
+                            +terrain-floor-creep-bright+
+                            +terrain-floor-creep+))
+                     (#\_ +terrain-water-liquid+)
+                     (#\` +terrain-floor-creep+)
+                     (#\- +terrain-wall-window+)
+                     (#\h +terrain-floor-chair+)
+                     (#\t +terrain-floor-table+)
+                     (#\b +terrain-floor-bed+)
+                     (#\c +terrain-floor-cabinet+)
+                     (#\C +terrain-floor-crate+)
+                     (#\B +terrain-floor-bookshelf+)
+                     (#\+ +terrain-door-closed+)
+                     (#\' +terrain-door-open+)
+                     (#\0 +terrain-wall-earth+)
+                     (#\Space +terrain-floor-air+)
+                     (#\u +terrain-slope-stone-up+)
+                     (#\d +terrain-slope-stone-down+)
+                     (#\* +terrain-wall-gloomtwigs+)
+                     (#\| +terrain-wall-lantern+)
+                     (#\G +terrain-wall-grave+))
+          when tt
+            do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
+
+(defun translate-build-to-corrupted-step-2-template (x y z build-template template-level)
+  (loop for y1 from 0 below (length build-template) do
+    (loop for c across (nth y1 build-template) 
+          and x1 from 0
+          for tt = (case c
+                     (#\. (if (< (random 100) 20)
+                            +terrain-floor-creep-bright+
+                            +terrain-floor-creep+))
+                     (#\# +terrain-wall-corrupted+)
                      (#\T +terrain-tree-twintube+)
                      (#\, (if (< (random 100) 20)
                             +terrain-floor-creep-bright+

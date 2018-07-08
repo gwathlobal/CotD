@@ -166,6 +166,7 @@
 (defconstant +ai-package-pick-relic+ 24)
 (defconstant +ai-package-return-relic-to-portal+ 25)
 (defconstant +ai-package-find-sigil+ 26)
+(defconstant +ai-package-escape-with-relic+ 27)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)
@@ -557,6 +558,7 @@
 (defconstant +terrain-tree-twintube-trunk+ 56)
 (defconstant +terrain-floor-twintube-branches+ 57)
 (defconstant +terrain-wall-gloomtwigs+ 58)
+(defconstant +terrain-wall-corrupted+ 59)
 
 ;;--------------------
 ;; GOD Constants
