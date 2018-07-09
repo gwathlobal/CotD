@@ -164,7 +164,7 @@
     
     (format str "     The Scrooge: ~A~A~%" (if (zerop (calculate-total-value (find-mob-with-max-value)))
                                              (format nil "-")
-                                             (format nil "~A with ~A$ worth of items" (prepend-article + article-a+ (get-qualified-name (find-mob-with-max-value))) (calculate-total-value (find-mob-with-max-value))))
+                                             (format nil "~A with ~A$ worth of items" (prepend-article +article-a+ (get-qualified-name (find-mob-with-max-value))) (calculate-total-value (find-mob-with-max-value))))
             (new-line on-screen))
     (if (and (not (eq *player* (find-mob-with-max-value)))
              (not (zerop (calculate-total-value *player*))))
