@@ -38,7 +38,6 @@
 (defconstant +building-type-corrupted-bank+ 29)
 (defconstant +building-type-corrupted-graveyard+ 30)
 (defconstant +building-type-corrupted-lake+ 31)
-
 (defconstant +building-type-corrupted-shrine+ 32)
 
 ;;--------------------------------------
@@ -138,7 +137,6 @@
 (defconstant +building-city-corrupted-lake-1+ 89)
 (defconstant +building-city-corrupted-lake-2+ 90)
 (defconstant +building-city-army-post-corrupted+ 91)
-
 (defconstant +building-city-corrupted-shrine-1+ 92)
 
 (defparameter *level-grid-size* 5)

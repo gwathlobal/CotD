@@ -19,7 +19,7 @@
       (when (< (cur-str win) 0)
         (setf (cur-str win) 0))
 
-      (format t "CUR-STR= ~A~%" (cur-str win))
+      ;;(format t "CUR-STR= ~A~%" (cur-str win))
       
       (write-colored-text (colored-txt-list (message-box-strings *full-message-box*)) rect :start-line (cur-str win))
       )

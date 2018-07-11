@@ -98,6 +98,7 @@
      (:file "game-events/init-game-events-demonic-steal" :depends-on ("game-events/game-events" "window-methods"))
      (:file "game-events/init-game-events-demonic-conquest" :depends-on ("game-events/game-events" "window-methods"))
      (:file "game-events/init-game-events-military-conquest" :depends-on ("game-events/game-events" "window-methods"))
+     (:file "game-events/init-game-events-military-raid" :depends-on ("game-events/game-events" "window-methods"))
      (:file "game-events/init-game-events-angelic-steal" :depends-on ("game-events/game-events" "window-methods"))
      (:file "init-animation-types" :depends-on ("animations" "window-methods"))
      (:file "init-ability-types" :depends-on ("base-methods" "window-methods"))

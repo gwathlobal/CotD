@@ -1,4 +1,4 @@
-- Custom scenarios
+- Flat game map
 - Scenario with attacking a battleship
 - Add Fenix-like eater that can change skins, with ability to upgrade skins (ranged->immovable sentry, melee,flyer->pack)
 - Add Twosoul character for satanists

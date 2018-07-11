@@ -4435,10 +4435,13 @@
                                                   (loop for mob in targets
                                                         when (> (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))) 0)
                                                           do
-                                                             (inflict-damage mob :min-dmg (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+)))
+                                                             (inflict-damage mob :actor actor
+                                                                                 :min-dmg (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+)))
                                                                                  :max-dmg (* 2 (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))))
-                                                                                 :dmg-type +weapon-dmg-radiation+ :no-dodge t
-                                                                                 :att-spd nil :weapon-aux () :acc 100)
+                                                                                 :dmg-type +weapon-dmg-radiation+ :no-dodge t :no-hit-message t
+                                                                                 :att-spd nil :weapon-aux () :acc 100
+                                                                                 :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                               (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (name mob))) cur-dmg)))
                                                              (rem-mob-effect mob +mob-effect-irradiated+))
                                                   
                                                   (decf (cur-fp actor) (cost ability-type)))
@@ -7221,7 +7224,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
-                                                               (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
+                                                               (or (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
+                                                                   (= (mission-scenario (level *world*)) +mission-scenario-demon-raid-ruined+))
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)
                                                                      when (item-ability-p item +item-abil-corpse+)
@@ -7235,7 +7239,8 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally nearest-enemy))
-                                                  (if (and (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
+                                                  (if (and (or (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
+                                                               (= (mission-scenario (level *world*)) +mission-scenario-demon-raid-ruined+))
                                                            (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
                                                            (can-invoke-ability actor actor +mob-abil-throw-corpse-into-portal+))
                                                     t
@@ -7337,7 +7342,9 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+)
+                                                      (if (and (or (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+)
+                                                                   (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-ruined+)
+                                                                   (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-corrupted+))
                                                                (mob-ability-p actor +mob-abil-create-demon-sigil+)
                                                                (loop with result = t
                                                                      for sigil-id in (demonic-sigils (level *world*))

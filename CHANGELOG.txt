@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+July 10, 2018 v1.3.2
+
 - Added a set of abandoned districts (which were left by the civilians).
 - Added a set of corrupted districts (which were captured by the demons).
 - Added a new mission - Military conquest. The mission takes place in the abandoned and corrupted districts. The military and the angels try to destroy demonic sigils, while the demons try to protect them.

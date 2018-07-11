@@ -643,7 +643,7 @@
       (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
       (setf *random-state* (make-random-state t))
 
-      (setf *window-width* (+ 380 (+ 30 (* *glyph-w* *max-x-view*))) 
+      (setf *window-width* (+ 460 (+ 30 (* *glyph-w* *max-x-view*))) 
             *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (* 3 (sdl:char-height sdl:*default-font*))))
 
       (when (<= *window-height* 384)

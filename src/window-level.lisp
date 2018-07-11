@@ -62,7 +62,8 @@
                                      (= (loyal-faction *player*) +faction-type-military+)))
                           (cond
                             ((or (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+)
-                                 (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-ruined+))
+                                 (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-ruined+)
+                                 (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-corrupted+))
                              (format nil "Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*
                                      (if (>= (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*)
                                        (format nil "~D turn~:P left" (- *demonic-conquest-win-sigils-turns* (get-demon-conquest-turns-left *world*)))
