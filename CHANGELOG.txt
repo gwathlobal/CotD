@@ -1,7 +1,7 @@
 CHANGELOG
 
 --------------------
-July 10, 2018 v1.3.2
+July 11, 2018 v1.3.2
 
 - Added a set of abandoned districts (which were left by the civilians).
 - Added a set of corrupted districts (which were captured by the demons).

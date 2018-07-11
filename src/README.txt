@@ -9,13 +9,16 @@ The year is 1915. The Great War thunders in the west, but the Hinterland is not 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.3.1
+LATEST CHANGES v1.3.2
 
-- A new mission was added - Demonic thievery. The demons opened portals in order to steal a holy relic from the church and return it to their dimension. The military and the angels want to stop and destroy them.
-- A new mission was added - Demonic conquest. The demons opened portals in order to conquer the district by placing and charging sigils in it. The military and the angels want to stop and destroy them.
-- Fixed the bug with player's choosing the resurrect ability that could freeze the game.
-- Fixed warehouses being mixed with barricades when military defenders are present in a seaport.
-- Strings in the message log are of different colors now depending on the type of the message (instead of white used everywhere previously).
+- Added a set of abandoned districts (which were left by the civilians).
+- Added a set of corrupted districts (which were captured by the demons).
+- Added a new mission - Military conquest. The mission takes place in the abandoned and corrupted districts. The military and the angels try to destroy demonic sigils, while the demons try to protect them.
+- Added a new mission - Military raid. The mission takes place in the abandoned districts. The military and the angels try to wipe out all demons from the district.
+- Added a new mission - Celestial purge. The mission takes place in the corrupted districts. The angels try to destroy demonic sigils, while the demons try to protect them.
+- Added a new mission - Celestial retrieval. The mission takes place in the corrupted districts. The angels try to recapture the stolen relic, while the demons want to stop and destroy them.
+- Demon conquest mission now also takes place in the abandoned and corrupted districts.
+- Demon raid mission now also takes place in the abandoned districts.
 
 --------------------
 FEATURES
