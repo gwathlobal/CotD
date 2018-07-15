@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Added a new terrain tile to the corrupted districts - dreadtubes. If you step on them, there is a 20% chance for them to fear you and all mobs around you.
+
 --------------------
 July 11, 2018 v1.3.2
 

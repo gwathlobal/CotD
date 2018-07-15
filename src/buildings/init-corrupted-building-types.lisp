@@ -1261,3 +1261,58 @@
                                                     (list (list +feature-start-place-church-relic+ 7 7 z)
                                                           )
                                                     nil))))
+
+;;=====================
+;; Borders
+;;=====================
+
+(set-building-type (make-building :id +building-city-corrupted-forest-border+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
+                                  :func #'(lambda (x y z template-level)
+                                            (if (zerop (random 5))
+                                              (progn
+                                                ;; place a large birch tree
+                                                (let ((r (random 4)))
+                                                  (cond
+                                                    ((= r 3) (level-place-twintube-corrupted-4 template-level (+ 1 x) (+ 1 y) z))
+                                                    ((= r 2) (level-place-twintube-corrupted-3 template-level (+ 1 x) (+ 1 y) z))
+                                                    ((= r 1) (level-place-twintube-corrupted-2 template-level (+ 1 x) (+ 1 y) z))
+                                                    (t (level-place-twintube-corrupted-1 template-level (+ 1 x) (+ 1 y) z)))
+                                                  )
+                                                (values nil nil)
+                                                )
+                                              (progn
+                                                ;; populate the area with trees, leaving the border untouched
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3 do
+                                                    (when (zerop (random 3))
+                                                      (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-twintube+))))
+                                                
+                                                ;; make sure that each tree has no more than two adjacent trees
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3
+                                                        with tree-num
+                                                        do
+                                                           (setf tree-num 0)
+                                                           (check-surroundings (+ x dx) (+ y dy) nil
+                                                                               #'(lambda (x y)
+                                                                                   (when (= (aref template-level x y z) +terrain-tree-twintube+)
+                                                                                     (incf tree-num))))
+                                                           (when (> tree-num 2)
+                                                             (setf (aref template-level (+ x dx) (+ y dy) z) +terrain-floor-creep+))))
+                                                
+                                                ;; place grass around trees
+                                                (loop for dx from 1 to 3 do
+                                                  (loop for dy from 1 to 3 do
+                                                    (when (= (aref template-level (+ x dx) (+ y dy) z) +terrain-tree-twintube+)
+                                                      (check-surroundings (+ x dx) (+ y dy) nil
+                                                                          #'(lambda (x y)
+                                                                              (if (or (= (aref template-level x y z) +terrain-border-floor+)
+                                                                                      (= (aref template-level x y z) +terrain-border-grass+)
+                                                                                      (= (aref template-level x y z) +terrain-border-creep+))
+                                                                                (setf (aref template-level x y z) +terrain-border-creep+)
+                                                                                (setf (aref template-level x y z) +terrain-floor-creep+)))))))
+                                                
+                                                (values nil
+                                                        (list (list +feature-delayed-arrival-point+ 2 2 z))
+                                                        nil))))
+                                  ))

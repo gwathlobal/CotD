@@ -559,6 +559,8 @@
 (defconstant +terrain-floor-twintube-branches+ 57)
 (defconstant +terrain-wall-gloomtwigs+ 58)
 (defconstant +terrain-wall-corrupted+ 59)
+(defconstant +terrain-floor-creep-dreadtubes+ 60)
+(defconstant +terrain-floor-creep-spores+ 61)
 
 ;;--------------------
 ;; GOD Constants

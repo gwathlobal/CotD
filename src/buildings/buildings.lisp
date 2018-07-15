@@ -138,6 +138,7 @@
 (defconstant +building-city-corrupted-lake-2+ 90)
 (defconstant +building-city-army-post-corrupted+ 91)
 (defconstant +building-city-corrupted-shrine-1+ 92)
+(defconstant +building-city-corrupted-forest-border+ 93)
 
 (defparameter *level-grid-size* 5)
 
@@ -213,9 +214,13 @@
                      (#\. +terrain-floor-stone+)
                      (#\# +terrain-wall-stone+)
                      (#\T +terrain-tree-twintube+)
-                     (#\, (if (< (random 100) 20)
-                            +terrain-floor-creep-bright+
-                            +terrain-floor-creep+))
+                     (#\, (let ((r (random 100)))
+                            (cond
+                              ((< r 5) +terrain-floor-creep-dreadtubes+)
+                              ((< r 10) +terrain-floor-creep-spores+)
+                              ((< r 20) +terrain-floor-creep+)
+                              (t +terrain-floor-creep-bright+)
+                              )))
                      (#\_ +terrain-water-liquid+)
                      (#\` +terrain-floor-creep+)
                      (#\- +terrain-wall-window+)

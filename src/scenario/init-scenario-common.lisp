@@ -333,7 +333,7 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-normal)))
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-normal)))
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
-                                                                                                                                                                              #'place-reserved-buildings-ruined-forest
+                                                                                                                                                                              #'place-reserved-buildings-corrupted-forest
                                                                                                                                                                               (list +reserved-building-army-post+
                                                                                                                                                                                     +building-city-army-post-corrupted+
                                                                                                                                                                                     +reserved-building-sigil-post+
@@ -667,9 +667,9 @@
                                                                  (let ((blood ())
                                                                        (max-blood (sqrt (* (array-dimension (terrain (level world)) 0)
                                                                                            (array-dimension (terrain (level world)) 1)))))
-                                                                   (loop with max-x = (1- (array-dimension (terrain (level world)) 0))
-                                                                         with max-y = (1- (array-dimension (terrain (level world)) 1))
-                                                                         with max-z = (1- (array-dimension (terrain (level world)) 2))
+                                                                   (loop with max-x = (- (array-dimension (terrain (level world)) 0) 2)
+                                                                         with max-y = (- (array-dimension (terrain (level world)) 1) 2)
+                                                                         with max-z = (- (array-dimension (terrain (level world)) 2) 2)
                                                                          with cur-blood = 0
                                                                          for x = (1+ (random max-x))
                                                                          for y = (1+ (random max-y))

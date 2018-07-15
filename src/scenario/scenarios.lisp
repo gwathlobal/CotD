@@ -1254,7 +1254,7 @@
           while (< (length demonic-runes) (length rune-list)) do
             (when (and (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-can-have-rune+)
                        (null (find (list x y z) demonic-runes :test #'(lambda (a b)
-                                                                        (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
+                                                                        (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 6)
                                                                           t
                                                                           nil)
                                                                         ))))
@@ -1326,6 +1326,37 @@
       (loop for y from 0 below (array-dimension reserved-level 1) do
         (when (or (= (aref reserved-level x y 2) +building-city-park-tiny+)
                   (= (aref reserved-level x y 2) +building-city-forest-border+))
+          (push (list (aref reserved-level x y 2) x y 2) result))))
+    result))
+
+(defun place-reserved-buildings-corrupted-forest (reserved-level)
+  (let ((result))
+    ;; place +building-city-park-tiny+ and +building-city-park-3+ along the borders
+    (loop for x from 0 below (array-dimension reserved-level 0)
+          do
+             (setf (aref reserved-level x 0 2) +building-city-corrupted-forest-border+)
+             (setf (aref reserved-level x (1- (array-dimension reserved-level 1)) 2) +building-city-corrupted-forest-border+)
+             (when (level-city-can-place-build-on-grid +building-city-corrupted-park-3+ x 1 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-corrupted-park-3+ x 1 2 reserved-level)
+               (push (list +building-city-corrupted-park-3+ x 1 2) result))
+             (when (level-city-can-place-build-on-grid +building-city-corrupted-park-3+ x (- (array-dimension reserved-level 1) 3) 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-corrupted-park-3+ x (- (array-dimension reserved-level 1) 3) 2 reserved-level)
+               (push (list +building-city-corrupted-park-3+ x (- (array-dimension reserved-level 1) 3) 2) result)))
+    (loop for y from 0 below (array-dimension reserved-level 1)
+          do
+             (setf (aref reserved-level 0 y 2) +building-city-forest-border+)
+             (setf (aref reserved-level (1- (array-dimension reserved-level 0)) y 2) +building-city-corrupted-forest-border+)
+             (when (level-city-can-place-build-on-grid +building-city-corrupted-park-3+ 1 y 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-corrupted-park-3+ 1 y 2 reserved-level)
+               (push (list +building-city-corrupted-park-3+ 1 y 2) result))
+             (when (level-city-can-place-build-on-grid +building-city-corrupted-park-3+ (- (array-dimension reserved-level 0) 3) y 2 reserved-level)
+               (level-city-reserve-build-on-grid +building-city-corrupted-park-3+ (- (array-dimension reserved-level 0) 3) y 2 reserved-level)
+               (push (list +building-city-corrupted-park-3+ (- (array-dimension reserved-level 0) 3) y 2) result)))
+    
+    (loop for x from 0 below (array-dimension reserved-level 0) do
+      (loop for y from 0 below (array-dimension reserved-level 1) do
+        (when (or (= (aref reserved-level x y 2) +building-city-corrupted-park-tiny+)
+                  (= (aref reserved-level x y 2) +building-city-corrupted-forest-border+))
           (push (list (aref reserved-level x y 2) x y 2) result))))
     result))
 

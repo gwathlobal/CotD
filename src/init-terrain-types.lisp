@@ -104,6 +104,49 @@
                                                :glyph-idx 95 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-dreadtubes+ :name "dreadtubes"
+                                               :glyph-idx 129 :glyph-color (sdl:color :r 105 :g 50 :b 255) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20
+                                               :on-step #'(lambda (mob x y z)
+                                                            (when (< (random 100) 20)
+                                                              (generate-sound mob (x mob) (y mob) (z mob) 100 #'(lambda (str)
+                                                                                                                  (format nil "You hear an eerie howl~A. " str)))
+                                                              (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                     (format nil "Dreadtubes give off an eerie howl under ~A. " (prepend-article +article-the+ (visible-name mob)))
+                                                                                     :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                              *shared-mind-msg-color*
+                                                                                              sdl:*white*))
+                                                              (let ((mob))
+                                                                (check-surroundings x y t #'(lambda (dx dy)
+                                                                                              (when (and (>= dx 0)
+                                                                                                         (>= dy 0)
+                                                                                                         (< dx (array-dimension (terrain (level *world*)) 0))
+                                                                                                         (< dy (array-dimension (terrain (level *world*)) 1))
+                                                                                                         (get-mob-* (level *world*) dx dy z))
+                                                                                                (setf mob (get-mob-* (level *world*) dx dy z))
+                                                                                                (if (> (random (+ (strength mob) 5)) (strength mob))
+                                                                                                  (progn
+                                                                                                    (set-mob-effect mob :effect-type-id +mob-effect-fear+ :actor-id (id mob) :cd 4)
+                                                                                                    (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                                                           (format nil "~A is feared. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
+                                                                                                                           :observed-mob mob
+                                                                                                                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                                                    *shared-mind-msg-color*
+                                                                                                                                    sdl:*white*)))
+                                                                                                  (progn
+                                                                                                    (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                                                           (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
+                                                                                                                           :observed-mob mob
+                                                                                                                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                                                    *shared-mind-msg-color*
+                                                                                                                                    sdl:*white*)))))
+                                                                                              )))
+                                                              ))))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-spores+ :name "sludgespores"
+                                               :glyph-idx 130 :glyph-color (sdl:color :r 155 :g 50 :b 0) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20))
+
 ;;--------------------
 ;; Walls
 ;;--------------------
