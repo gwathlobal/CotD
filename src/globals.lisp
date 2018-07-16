@@ -476,6 +476,7 @@
 (defconstant +feature-start-strong-repel-demons+ 26)
 (defconstant +feature-start-place-church-angels+ 27)
 (defconstant +feature-start-sigil-point+ 28)
+(defconstant +feature-corrupted-spores+ 29)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

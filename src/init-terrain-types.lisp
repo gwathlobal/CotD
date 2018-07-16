@@ -143,9 +143,28 @@
                                                                                               )))
                                                               ))))
 
-(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-spores+ :name "sludgespores"
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-spores+ :name "sludgeshrooms"
                                                :glyph-idx 130 :glyph-color (sdl:color :r 155 :g 50 :b 0) :back-color sdl:*black* 
-                                               :trait-opaque-floor t :trait-blocks-sound-floor 20))
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20
+                                               :on-step #'(lambda (mob x y z)
+                                                            (when (< (random 100) 20)
+                                                              (generate-sound mob (x mob) (y mob) (z mob) 100 #'(lambda (str)
+                                                                                                                  (format nil "You hear a hissing sound~A. " str)))
+                                                              (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                     (format nil "Sludgeshrooms release spores under ~A. " (prepend-article +article-the+ (visible-name mob)))
+                                                                                     :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                              *shared-mind-msg-color*
+                                                                                              sdl:*white*))
+                                                              (check-surroundings x y t #'(lambda (dx dy)
+                                                                                              (when (and (>= dx 0)
+                                                                                                         (>= dy 0)
+                                                                                                         (< dx (array-dimension (terrain (level *world*)) 0))
+                                                                                                         (< dy (array-dimension (terrain (level *world*)) 1))
+                                                                                                         )
+                                                                                                (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-corrupted-spores+ :x dx :y dy :z z
+                                                                                                                                                           :counter 2))
+                                                                                                )
+                                                                                              ))))))
 
 ;;--------------------
 ;; Walls

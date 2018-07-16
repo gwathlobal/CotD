@@ -168,7 +168,7 @@
 
                                                                      (inflict-damage target :min-dmg 1 :max-dmg (counter feature) :dmg-type +weapon-dmg-fire+
                                                                                             :att-spd nil :weapon-aux '(:is-fire) :acc 100 :add-blood nil :no-dodge t
-                                                                                            :actor nil
+                                                                                            :actor nil :no-hit-message t
                                                                                             :specific-hit-string-func #'(lambda (cur-dmg)
                                                                                                                           (format nil "~A takes ~A fire damage. " (capitalize-name (name target)) cur-dmg))
                                                                                             :specific-no-dmg-string-func #'(lambda ()
@@ -437,3 +437,43 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-demonic-portal+ :glyph-idx 126 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color nil :name "Demonic portal"
                                  ))
+
+(set-feature-type (make-instance 'feature-type :id +feature-corrupted-spores+ :glyph-idx 98 :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* :name "Spores"
+                                               :trait-blocks-vision 30 :trait-smoke +feature-corrupted-spores+ :trait-no-gravity t
+                                               :can-merge-func #'(lambda (level feature-new)
+                                                                   (let ((result nil))
+                                                                     (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                                                           for feature-old = (get-feature-by-id feature-old-id)
+                                                                           when (or (= (feature-type feature-new) (feature-type feature-old))
+                                                                                    )
+                                                                             do
+                                                                                (setf result t)
+                                                                                (loop-finish)
+                                                                           )
+                                                                     result))
+                                               :merge-func #'(lambda (level feature-new)
+                                                               (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                                                     for feature-old = (get-feature-by-id feature-old-id)
+                                                                     when (= (feature-type feature-new) (feature-type feature-old))
+                                                                       do
+                                                                          (remove-feature-from-level-list level feature-new)
+                                                                          (remove-feature-from-world feature-new)
+                                                                          (incf (counter feature-old))
+                                                                          (loop-finish)
+                                                                     )
+                                                               )
+                                               :on-tick-func #'(lambda (level feature)
+                                                                 (let ((target (get-mob-* level (x feature) (y feature) (z feature))))
+                                                                   (when target
+                                                                     (inflict-damage target :min-dmg 1 :max-dmg 2 :dmg-type +weapon-dmg-acid+
+                                                                                            :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t
+                                                                                            :actor nil :no-hit-message t
+                                                                                            :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                                          (format nil "~A takes ~A damage from spores. " (capitalize-name (name target)) cur-dmg))
+                                                                                            :specific-no-dmg-string-func #'(lambda ()
+                                                                                                                             (format nil "~A takes no damage from spores. " (capitalize-name (name target)))))
+
+                                                                     (when (check-dead target)
+                                                                       (when (eq target *player*)
+                                                                         (setf (killed-by *player*) "spores")))))
+                                                                 (feature-smoke-on-tick level feature))))
