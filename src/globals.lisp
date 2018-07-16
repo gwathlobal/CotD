@@ -562,6 +562,7 @@
 (defconstant +terrain-wall-corrupted+ 59)
 (defconstant +terrain-floor-creep-dreadtubes+ 60)
 (defconstant +terrain-floor-creep-spores+ 61)
+(defconstant +terrain-wall-razorthorns+ 62)
 
 ;;--------------------
 ;; GOD Constants

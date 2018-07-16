@@ -216,8 +216,9 @@
                      (#\T +terrain-tree-twintube+)
                      (#\, (let ((r (random 100)))
                             (cond
-                              ((< r 5) +terrain-floor-creep-dreadtubes+)
-                              ((< r 10) +terrain-floor-creep-spores+)
+                              ((< r 3) +terrain-floor-creep-dreadtubes+)
+                              ((< r 6) +terrain-floor-creep-spores+)
+                              ((< r 10) +terrain-wall-razorthorns+)
                               ((< r 20) +terrain-floor-creep+)
                               (t +terrain-floor-creep-bright+)
                               )))
@@ -247,14 +248,24 @@
     (loop for c across (nth y1 build-template) 
           and x1 from 0
           for tt = (case c
-                     (#\. (if (< (random 100) 20)
-                            +terrain-floor-creep-bright+
-                            +terrain-floor-creep+))
+                     (#\. (let ((r (random 100)))
+                            (cond
+                              ((< r 3) +terrain-floor-creep-dreadtubes+)
+                              ((< r 6) +terrain-floor-creep-spores+)
+                              ((< r 10) +terrain-wall-razorthorns+)
+                              ((< r 20) +terrain-floor-creep+)
+                              (t +terrain-floor-creep-bright+)
+                              )))
                      (#\# +terrain-wall-corrupted+)
                      (#\T +terrain-tree-twintube+)
-                     (#\, (if (< (random 100) 20)
-                            +terrain-floor-creep-bright+
-                            +terrain-floor-creep+))
+                     (#\, (let ((r (random 100)))
+                            (cond
+                              ((< r 3) +terrain-floor-creep-dreadtubes+)
+                              ((< r 6) +terrain-floor-creep-spores+)
+                              ((< r 10) +terrain-wall-razorthorns+)
+                              ((< r 20) +terrain-floor-creep+)
+                              (t +terrain-floor-creep-bright+)
+                              )))
                      (#\_ +terrain-water-liquid+)
                      (#\` +terrain-floor-creep+)
                      (#\- +terrain-wall-window+)

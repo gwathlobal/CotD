@@ -200,6 +200,23 @@
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-sound 25 :trait-blocks-sound-floor 20 :trait-opaque-floor t
                                                :trait-can-have-rune t))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-razorthorns+ :name "razorthorns"
+                                               :glyph-idx 3 :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* 
+                                               :trait-blocks-vision 60 :trait-opaque-floor t :trait-blocks-sound-floor 20
+                                               :on-step #'(lambda (mob x y z)
+                                                            (declare (ignore x y z))
+                                                            (inflict-damage mob :min-dmg 1 :max-dmg 1 :dmg-type +weapon-dmg-acid+
+                                                                                :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t
+                                                                                :actor nil :no-hit-message t
+                                                                                :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                              (format nil "~A takes ~A damage from razorthorns. " (capitalize-name (name mob)) cur-dmg))
+                                                                                :specific-no-dmg-string-func #'(lambda ()
+                                                                                                                 (format nil "~A takes no damage from razorthorns. " (capitalize-name (name mob)))))
+                                                            
+                                                            (when (check-dead mob)
+                                                              (when (eq mob *player*)
+                                                                (setf (killed-by *player*) "razorthorns"))))))
+
 ;;--------------------
 ;; Trees
 ;;--------------------
