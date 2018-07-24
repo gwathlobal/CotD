@@ -248,14 +248,9 @@
     (loop for c across (nth y1 build-template) 
           and x1 from 0
           for tt = (case c
-                     (#\. (let ((r (random 100)))
-                            (cond
-                              ((< r 3) +terrain-floor-creep-dreadtubes+)
-                              ((< r 6) +terrain-floor-creep-spores+)
-                              ((< r 10) +terrain-wall-razorthorns+)
-                              ((< r 20) +terrain-floor-creep+)
-                              (t +terrain-floor-creep-bright+)
-                              )))
+                     (#\. (if (< (random 100) 20)
+                            +terrain-floor-creep-bright+
+                            +terrain-floor-creep+))
                      (#\# +terrain-wall-corrupted+)
                      (#\T +terrain-tree-twintube+)
                      (#\, (let ((r (random 100)))

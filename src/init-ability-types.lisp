@@ -1911,7 +1911,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-no-breathe+ :name "Does no breathe" :descr "Your do not require oxygen to sustain your life." 
+                                 :id +mob-abil-no-breathe+ :name "Does not breathe" :descr "Your do not require oxygen to sustain your life." 
                                  :passive t :cost 0 :spd 0 
                                  :final nil :on-touch nil
                                  :on-invoke nil

@@ -814,6 +814,17 @@
             (declare (ignore mob-template-list))
             (loop for mob-id in (mob-id-list (level world))
                   for mob = (get-mob-by-id mob-id)
+                  when (and (mob-ability-p mob +mob-abil-demon+)
+                            (= (strength mob) 1))
+                    do
+                       (incf (cur-fp mob) 2)
+                       ))
+        mob-func-list)
+  
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            (loop for mob-id in (mob-id-list (level world))
+                  for mob = (get-mob-by-id mob-id)
                   when (mob-ability-p mob +mob-abil-angel+)
                     do
                        (incf (cur-fp mob) 2)
@@ -907,6 +918,17 @@
   mob-func-list)
 
 (defun scenario-present-faction-setup-military-raid-ruined (specific-faction-type faction-list mob-func-list)
+
+  (push #'(lambda (world mob-template-list)
+            (declare (ignore mob-template-list))
+            (loop for mob-id in (mob-id-list (level world))
+                  for mob = (get-mob-by-id mob-id)
+                  when (and (mob-ability-p mob +mob-abil-demon+)
+                            (= (strength mob) 1))
+                    do
+                       (incf (cur-fp mob) 2)
+                       ))
+        mob-func-list)
   
   (setf mob-func-list (scenario-set-std-functions specific-faction-type faction-list mob-func-list))
     

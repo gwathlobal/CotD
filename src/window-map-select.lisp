@@ -116,7 +116,7 @@
         (when (and mob
                    (check-mob-visible mob :observer *player*))
           (format str "~%~A~A~A"
-                  (capitalize-name (get-current-mob-name mob))
+                  (capitalize-name (visible-name mob))
                   (if (riding-mob-id mob)
                     (format nil ", riding ~A" (prepend-article +article-a+ (visible-name (get-mob-by-id (riding-mob-id mob)))))
                     "")

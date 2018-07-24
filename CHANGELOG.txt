@@ -3,6 +3,10 @@ CHANGELOG
 - Added a new terrain tile to the corrupted districts - dreadtubes. If you step on them, there is a 20% chance for them to fear you and all mobs around you.
 - Added a new terrain tile to the corrupted districts - sludgeshrooms. If you step on them, there is a 20% chance for them to release spores that will deal anyone inside them 1-2 acid damage.
 - Added a new terrain tile to the corrupted districts - razorthorns. If you step on them, they will deal 1 acid damage to you.
+- Fixed a typo in the "Does not breathe" ability.
+- You will see mob names when 'l'ooking at them.
+- The Military raid and Military conquest missions will no longer have angels from the very start, angels can only start delayed in these missions now.
+- Imps and Shadow imps will start with 2 power points during the Military raid and Military conquest missions.
 
 --------------------
 July 11, 2018 v1.3.2
