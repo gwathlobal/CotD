@@ -81,6 +81,87 @@
                                                              (ai-move-along-path actor)
                                                              )))
 
+(set-ai-package (make-instance 'ai-package :id +ai-package-swim-up+
+                                           :priority 8
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-ally nearest-enemy hostile-mobs allied-mobs))
+                                                            (let ((target-cell ()))
+                                                              (if (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
+                                                                       (not (mob-ability-p actor +mob-abil-no-breathe+))
+                                                                       (<= (cur-oxygen actor) 1)
+                                                                       (loop for z from (z actor) upto (array-dimension (terrain (level *world*)) 2)
+                                                                             when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+)
+                                                                                      (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+))
+                                                                               do
+                                                                                  (return nil)
+                                                                             when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+))
+                                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+))
+                                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-water+)))
+                                                                               do
+                                                                                  (setf target-cell (list (x actor) (y actor) (1- z)))
+                                                                                  (return t)
+                                                                             finally (return nil)
+                                                                             ))
+                                                                (if (and (= (x actor) (first target-cell))
+                                                                         (= (y actor) (second target-cell))
+                                                                         (= (z actor) (third target-cell)))
+                                                                  nil
+                                                                  (if (or (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) (first target-cell) (second target-cell) (third target-cell)
+                                                                                                   (if (riding-mob-id actor)
+                                                                                                     (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                     (map-size actor))
+                                                                                                   (get-mob-move-mode actor))
+                                                                          (and (> (map-size actor) 1)
+                                                                               (ai-find-move-around actor (first target-cell) (second target-cell))))
+                                                                    target-cell
+                                                                    nil))                                                                  
+                                                                nil)))
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs nearest-enemy))
+                                                             (logger (format nil "AI-PACKAGE-SWIM-UP: ~A [~A] wants to swim up to ~A.~%" (name actor) (id actor) check-result))
+                                                             
+                                                             (loop with x-terrain = (first check-result)
+                                                                   with y-terrain = (second check-result)
+                                                                   with z-terrain = (third check-result)
+                                                                   with move-failed-once = nil
+                                                                   with move-result = nil
+                                                                   while t do
+                                                                     ;; set path-dst to the target terrain if there is no path-dst or it is different from the item position
+                                                                     (when (or (null (path-dst actor))
+                                                                               (/= (first (path-dst actor)) x-terrain)
+                                                                               (/= (second (path-dst actor)) y-terrain)
+                                                                               (/= (third (path-dst actor)) z-terrain))
+                                                                       (ai-set-path-dst actor x-terrain y-terrain z-terrain))
+                                                                     
+                                                                     ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
+                                                                     (when (null (path-dst actor))
+                                                                       (ai-mob-random-dir actor)
+                                                                       (loop-finish))
+                                                                     
+                                                                     ;; make a path to the destination target if there is no path plotted
+                                                                     (when (or (null (path actor))
+                                                                               (mob-ability-p actor +mob-abil-momentum+))
+                                                                       (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                                     
+                                                                     ;; make a step along the path to the path-dst
+                                                                     (setf move-result (ai-move-along-path actor))
+                                                                     (cond
+                                                                       ;; if the move failed twice - move in a random direction
+                                                                       ((and move-failed-once
+                                                                             (null move-result))
+                                                                        (ai-mob-random-dir actor)
+                                                                        (loop-finish))
+                                                                       ;; if the move failed - reset path-dst and start anew
+                                                                       ((and (null move-failed-once)
+                                                                             (null move-result))
+                                                                        (setf (path-dst actor) nil)
+                                                                        (setf move-failed-once t)
+                                                                        )
+                                                                       ;; success
+                                                                       (t
+                                                                        (loop-finish))))
+                                                             )))
+
 (set-ai-package (make-instance 'ai-package :id +ai-package-horde+
                                            :priority 8
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)

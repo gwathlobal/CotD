@@ -22,7 +22,7 @@
                                        :strength 0
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t 
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t))
+                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-man+ 
                                        :name "man"
@@ -34,7 +34,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
-                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t))
+                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-woman+ 
                                        :name "woman"
@@ -46,7 +46,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
-                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t))
+                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t  :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-child+ 
                                        :name "child"
@@ -57,7 +57,7 @@
                                        :base-light-radius 3
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
-                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t))
+                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-clerk+ 
                                        :name "clerk"
@@ -69,7 +69,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 10 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
-                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t))
+                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-criminal+ 
                                        :name "criminal"
@@ -81,7 +81,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-clothing+ #'(lambda () (random 2))))
-                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t
+                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t :ai-swim-up t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-policeman+ 
@@ -94,7 +94,7 @@
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
-                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t
+                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t :ai-swim-up t
                              ))
 
 ;;--------------------
@@ -110,7 +110,7 @@
                                        :base-light-radius 6
                                        :abil-can-be-blessed t :abil-detect-evil t :abil-human t :abil-independent t :abil-soul t
                                        :abil-toggle-light t  :abil-prayer-bless t :abil-open-close-door t :abil-smite t :abil-slow t :abil-prayer-wrath t
-                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
+                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-swim-up t
                              ))
 
 ;;--------------------
@@ -129,7 +129,7 @@
                                        :abil-free-call t :abil-curse t :abil-toggle-light t :abil-open-close-door t :abil-reanimate-corpse t :abil-empower-undead t :abil-decipher-rune t
                                        :abil-demon-word-flesh t :abil-demon-word-plague t :abil-demon-word-power t :abil-demon-word-darkness t :abil-demon-word-invasion t :abil-demon-word-knockback t :abil-throw-corpse-into-portal t
                                        :abil-throw-relic-into-portal t :abil-create-demon-sigil t
-                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
+                                       :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-swim-up t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist-empowered+ 
@@ -158,7 +158,7 @@
                                        :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-independent t :abil-soul t
                                        :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t :abil-sprint t :abil-jump t :abil-make-disguise t :abil-remove-disguise t
                                        :init-items (list (list +item-type-smoke-bomb+ #'(lambda () 3)))
-                                       :ai-kleptomaniac t :ai-takes-valuable-items t :ai-cautious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-avoid-possession t
+                                       :ai-kleptomaniac t :ai-takes-valuable-items t :ai-cautious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-avoid-possession t :ai-swim-up t
                              ))
 
 ;;--------------------
@@ -175,7 +175,7 @@
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
-                                       :ai-avoid-melee t
+                                       :ai-avoid-melee t :ai-swim-up t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sergeant+ 
@@ -188,7 +188,7 @@
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
-                                       :ai-avoid-melee t
+                                       :ai-avoid-melee t :ai-swim-up t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
@@ -200,7 +200,7 @@
                                        :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-detect-good t :abil-detect-evil t
                                        :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t :abil-horseback-riding t :abil-dismount t :abil-independent t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
-                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-melee t
+                                       :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-melee t :ai-swim-up t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
@@ -213,7 +213,7 @@
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
-                                       :ai-avoid-melee t
+                                       :ai-avoid-melee t :ai-swim-up t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scout+ 
@@ -226,6 +226,7 @@
                                        :abil-horseback-riding t :abil-dismount t :abil-eagle-eye t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)) (list +item-type-signal-flare+ #'(lambda () 2)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-possession t :ai-avoid-melee t
+                                       :ai-swim-up t
                              ))
 
 ;;--------------------
@@ -662,7 +663,7 @@
                                        :strength 0
                                        :base-light-radius 0
                                        :abil-animal t :abil-momentum 2 :abil-horse-can-be-ridden t :abil-soul t
-                                       :ai-coward t :ai-use-ability t :ai-find-random-location t))
+                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sheep+ 
                                        :name "sheep"
@@ -672,7 +673,7 @@
                                        :strength 0
                                        :base-light-radius 0
                                        :abil-animal t :abil-soul t
-                                       :ai-coward t :ai-use-ability t :ai-find-random-location t))
+                                       :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-tree+ 
                                        :name "tree"

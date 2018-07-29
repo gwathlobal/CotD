@@ -167,6 +167,7 @@
 (defconstant +ai-package-return-relic-to-portal+ 25)
 (defconstant +ai-package-find-sigil+ 26)
 (defconstant +ai-package-escape-with-relic+ 27)
+(defconstant +ai-package-swim-up+ 28)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)

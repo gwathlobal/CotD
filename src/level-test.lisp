@@ -157,10 +157,10 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-malseraph-puppet+ :x 45 :y 19 :z 3))
+  (setf *player* (make-instance 'player :mob-type +mob-type-imp+ :x 36 :y 18 :z 1))
   (add-mob-to-level-list (level world) *player*)
   
-  (let (;(soldier (make-instance 'mob :mob-type +mob-type-angel+ :x 41 :y 19 :z 2))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-soldier+ :x 39 :y 20 :z 1))
         ;(demon (make-instance 'mob :mob-type +mob-type-demon+ :x 41 :y 18 :z 2))
         (angel (make-instance 'mob :mob-type +mob-type-angel+ :x 43 :y 16 :z 3))
         )
@@ -183,7 +183,7 @@
     ;(set-mob-effect demon +mob-effect-calling-for-help+ 100)
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-blessed+ :actor-id (id soldier))
-    ;(add-mob-to-level-list (level world) soldier)
+    (add-mob-to-level-list (level world) soldier)
     ;(add-mob-to-level-list (level world) demon)
     (add-mob-to-level-list (level world) angel)
     

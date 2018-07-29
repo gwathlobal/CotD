@@ -33,6 +33,7 @@
    ;;   :ai-search-corpses - mob will try to go to the nearest corpse
    ;;   :ai-trinity-mimic
    ;;   :ai-split-soul
+   ;;   :ai-swim-up
          
    (abilities :initform (make-hash-table) :accessor abilities)
    ;; The pattern of naming keys that may be used in make-instance is like <name of mob ability constant> minus the 'mob-' part
@@ -67,8 +68,9 @@
    ))
 
 (defmethod initialize-instance :after ((mob-type mob-type) &key armor
-                                                                ai-coward ai-horde ai-wants-bless ai-curious ai-takes-valuable-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-search-corpses ai-use-ability ai-use-item
-                                                                ai-reload-ranged-weapon ai-shoot-enemy ai-follow-leader ai-approach-target ai-attack-nearest-enemy ai-find-random-location ai-avoid-possession ai-avoid-melee
+                                                                ai-coward ai-horde ai-wants-bless ai-curious ai-takes-valuable-items ai-kleptomaniac ai-cautious ai-trinity-mimic ai-split-soul ai-search-corpses ai-use-ability
+                                                                ai-use-item ai-reload-ranged-weapon ai-shoot-enemy ai-follow-leader ai-approach-target ai-attack-nearest-enemy ai-find-random-location ai-avoid-possession
+                                                                ai-avoid-melee ai-swim-up
                                                                 abil-can-possess abil-possessable abil-purging-touch abil-blessing-touch abil-can-be-blessed abil-unholy 
                                                                 abil-heal-self abil-conceal-divine abil-reveal-divine abil-detect-good abil-detect-evil
                                                                 abil-human abil-demon abil-angel abil-see-all abil-lifesteal abil-call-for-help abil-answer-the-call
@@ -137,6 +139,8 @@
     (setf (gethash +ai-package-avoid-possession+ (ai-packages mob-type)) t))
   (when ai-avoid-melee
     (setf (gethash +ai-package-avoid-melee+ (ai-packages mob-type)) t))
+  (when ai-swim-up
+    (setf (gethash +ai-package-swim-up+ (ai-packages mob-type)) t))
   
   ;; set up abilities
   (when abil-can-possess
