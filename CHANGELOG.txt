@@ -7,6 +7,8 @@ CHANGELOG
 - You will see mob names when 'l'ooking at them.
 - The Military raid and Military conquest missions will no longer have angels from the very start, angels can only start delayed in these missions now.
 - Imps and Shadow imps will start with 2 power points during the Military raid and Military conquest missions.
+- Angels will no longer try to conceal divinity when there is an enemy next to them.
+- Added an option to replay the previous mission type with the same player faction.
 
 --------------------
 July 11, 2018 v1.3.2

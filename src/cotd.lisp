@@ -184,6 +184,8 @@
   
   (create-world *world* mission-id layout-id weather-id tod-id specific-faction-type faction-list)
 
+  (setf *previous-scenario* (list mission-id specific-faction-type))
+
   ;;(format t "FACTION-LIST ~A~%" faction-list)
   
   (setf (name *player*) "Player")
@@ -196,11 +198,10 @@
 
   )  
 
-(defun find-random-scenario-options (specific-faction-type)
+(defun find-random-scenario-options (specific-faction-type &key (mission-id nil))
   (let ((available-faction-list)
         (available-layout-list)
         (available-mission-list)
-        (mission-id)
         (layout-id)
         (faction-list))
 
@@ -250,8 +251,9 @@
                                                                  (loop-finish)
                                                             finally (return-from nil result))))
                                          collect (id mission-scenario)))
-    
-    (setf mission-id (nth (random (length available-mission-list)) available-mission-list))
+
+    (unless mission-id
+      (setf mission-id (nth (random (length available-mission-list)) available-mission-list)))
     
     (setf layout-id (nth (random (length (district-layout-list (get-mission-scenario-by-id mission-id)))) (district-layout-list (get-mission-scenario-by-id mission-id))))
     
@@ -298,7 +300,9 @@
                                                       faction-list))))
 
 (defun main-menu ()
-  (let ((join-heaven-item (cons "Join the Celestial Communion (as a Chrome angel)"
+  (let ((menu-items nil)
+        (menu-funcs nil)
+        (join-heaven-item (cons "Join the Celestial Communion (as a Chrome angel)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
@@ -554,26 +558,53 @@
                                                                   +weather-type-clear+
                                                                   +tod-type-night+
                                                                   +specific-faction-type-test+
-                                                                  nil))))))
+                                                                  nil)))))
+        (play-prev-scenario (cons "Replay the previous scenario"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
+                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                          (mission-id)
+                                          (layout-id)
+                                          (faction-list))
+
+                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options (second *previous-scenario*) :mission-id (first *previous-scenario*)))
+
+                                      (return-from main-menu (values mission-id
+                                                                     layout-id
+                                                                     (nth (random (length weather-types)) weather-types)
+                                                                     (nth (random (length tod-types)) tod-types)
+                                                                     (second *previous-scenario*)
+                                                                     faction-list)))))))
     (if *cotd-release*
       (progn
+        (setf menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
+                               (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-ghost-item)
+                               (car custom-scenario-item) (car highscores-item) (car help-item) (car exit-item)))
+        (setf menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
+                               (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-ghost-item)
+                               (cdr custom-scenario-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
+        (when *previous-scenario*
+          (push (car play-prev-scenario) menu-items)
+          (push (cdr play-prev-scenario) menu-funcs))
         (setf *current-window* (make-instance 'start-game-window 
-                                              :menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
-                                                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-ghost-item)
-                                                                (car custom-scenario-item) (car highscores-item) (car help-item) (car exit-item))
-                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
-                                                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-ghost-item)
-                                                                (cdr custom-scenario-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))))
+                                              :menu-items menu-items
+                                              :menu-funcs menu-funcs)))
       (progn
+        (setf menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
+                               (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-ghost-item)
+                               (car custom-scenario-item) (car all-see-item) (car test-level-item)
+                               (car highscores-item) (car help-item) (car exit-item)))
+        (setf menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
+                               (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-ghost-item)
+                               (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
+                               (cdr highscores-item) (cdr help-item) (cdr exit-item)))
+        (when *previous-scenario*
+          (push (car play-prev-scenario) menu-items)
+          (push (cdr play-prev-scenario) menu-funcs))
         (setf *current-window* (make-instance 'start-game-window 
-                                              :menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
-                                                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-ghost-item)
-                                                                (car custom-scenario-item) (car all-see-item) (car test-level-item)
-                                                                (car highscores-item) (car help-item) (car exit-item))
-                                              :menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
-                                                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-ghost-item)
-                                                                (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
-                                                                (cdr highscores-item) (cdr help-item) (cdr exit-item)))))))
+                                              :menu-items menu-items
+                                              :menu-funcs menu-funcs)))))
   
   (make-output *current-window*)
   (loop while t do
@@ -667,6 +698,7 @@
       )
 
     (setf *path-thread* nil)
+    (setf *previous-scenario* nil)
     
     (tagbody
        (setf *quit-func* #'(lambda () (go exit-tag)))

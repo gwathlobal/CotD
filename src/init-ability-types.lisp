@@ -70,10 +70,13 @@
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (declare (ignore ability-type nearest-ally))
                                                   ;; if the dst is more than 3 tiles away - stealth, if possible
                                                   (if (and (path actor)
                                                            (> (length (path actor)) 3)
+                                                           (or (not nearest-enemy)
+                                                               (and nearest-enemy
+                                                                    (> (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)))
                                                            (mob-ability-p actor +mob-abil-conceal-divine+)
                                                            (can-invoke-ability actor actor +mob-abil-conceal-divine+))
                                                     t

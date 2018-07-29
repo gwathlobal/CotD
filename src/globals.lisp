@@ -667,6 +667,8 @@
 
 (defconstant +connect-room-none+ -1)
 
+(defparameter *previous-scenario* nil)
+
 ;; Connect map indices for various movement types
 (defconstant +connect-map-move-walk+ 0)
 (defconstant +connect-map-move-climb+ 1)
