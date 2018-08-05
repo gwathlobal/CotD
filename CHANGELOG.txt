@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+August 5, 2018 v1.3.3
+
 - Added a new terrain tile to the corrupted districts - dreadtubes. If you step on them, there is a 20% chance for them to fear you and all mobs around you.
 - Added a new terrain tile to the corrupted districts - sludgeshrooms. If you step on them, there is a 20% chance for them to release spores that will deal anyone inside them 1-2 acid damage.
 - Added a new terrain tile to the corrupted districts - razorthorns. If you step on them, they will deal 1 acid damage to you.
