@@ -312,23 +312,24 @@
 
          (let ((rider-orig-x (x (get-mob-by-id (mounted-by-mob-id mob))))
                (rider-orig-y (y (get-mob-by-id (mounted-by-mob-id mob))))
-               (rider-orig-z (z (get-mob-by-id (mounted-by-mob-id mob)))))
+               (rider-orig-z (z (get-mob-by-id (mounted-by-mob-id mob))))
+               (rider (get-mob-by-id (mounted-by-mob-id mob))))
 
            ;; remove the rider from the prev location 
            (setf (aref (mobs (level *world*)) rider-orig-x rider-orig-y rider-orig-z) nil)
            
            (funcall place-func mob)
 
-           (setf (aref (mob-quadrant-map (level *world*)) (truncate (x (get-mob-by-id (mounted-by-mob-id mob))) 10) (truncate (y (get-mob-by-id (mounted-by-mob-id mob))) 10))
-                 (remove (id (get-mob-by-id (mounted-by-mob-id mob))) (aref (mob-quadrant-map (level *world*)) (truncate (x (get-mob-by-id (mounted-by-mob-id mob))) 10) (truncate (y (get-mob-by-id (mounted-by-mob-id mob))) 10))))
+           (setf (aref (mob-quadrant-map (level *world*)) (truncate (x rider) 10) (truncate (y rider) 10))
+                 (remove (id rider) (aref (mob-quadrant-map (level *world*)) (truncate (x rider) 10) (truncate (y rider) 10))))
            
            ;; place the rider
-           (setf (x (get-mob-by-id (mounted-by-mob-id mob))) x
-                 (y (get-mob-by-id (mounted-by-mob-id mob))) y
-                 (z (get-mob-by-id (mounted-by-mob-id mob))) z)
-           (setf (aref (mobs (level *world*)) (x mob) (y mob) (z mob)) (mounted-by-mob-id mob))
+           (setf (x rider) x
+                 (y rider) y
+                 (z rider) z)
+           (setf (aref (mobs (level *world*)) (x mob) (y mob) (z mob)) (id rider))
 
-           (push (id (get-mob-by-id (mounted-by-mob-id mob))) (aref (mob-quadrant-map (level *world*)) (truncate (x (get-mob-by-id (mounted-by-mob-id mob))) 10) (truncate (y (get-mob-by-id (mounted-by-mob-id mob))) 10)))
+           (push (id rider) (aref (mob-quadrant-map (level *world*)) (truncate (x rider) 10) (truncate (y rider) 10)))
            
            ;; set motion
            (if (and (= orig-x x) (= orig-y y) (= orig-z z))
@@ -337,19 +338,19 @@
            
            (if (and (= rider-orig-x x) (= rider-orig-y y) (= rider-orig-z z))
              (progn
-               (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-stand*)
+               (incf-mob-motion rider *mob-motion-stand*)
                
                ;; generate sound
                (when (not (mob-ability-p mob +mob-abil-float+))
-                 (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-stand* #'(lambda (str)
-                                                                                                     (format nil "You hear some scratching~A. " str)))))
+                 (generate-sound rider x y z *mob-sound-stand* #'(lambda (str)
+                                                                   (format nil "You hear some scratching~A. " str)))))
              (progn
-               (incf-mob-motion (get-mob-by-id (mounted-by-mob-id mob)) *mob-motion-move*)
+               (incf-mob-motion rider *mob-motion-move*)
                
                ;; generate sound
                (when (not (mob-ability-p mob +mob-abil-float+))
-                 (generate-sound (get-mob-by-id (mounted-by-mob-id mob)) x y z *mob-sound-move* #'(lambda (str)
-                                                                                                    (format nil "You hear rustling~A. " str))))
+                 (generate-sound rider x y z *mob-sound-move* #'(lambda (str)
+                                                                  (format nil "You hear rustling~A. " str))))
                ))
            
            

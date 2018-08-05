@@ -52,3 +52,11 @@ FLYING
 
 Avatars of Brilliance and wisps are able to fly directly up and down (as well as the usual horizontal movement). But beware that once the Avatar's transformation is over, you will fall and have to suffer full effects of gravity.
 Wisps, on the other hand, may fly indefinitely.
+
+
+DANGEROUS TERRAIN
+
+Some terrain tiles in the corrupted districts can produce special effects if a creature steps on them.
+Dreadtubes have a 20% chance to fear all mobs around them.
+Sludgeshrooms have a 20% chance to release spores that will deal 1-2 acid damage to anyone inside them.
+Razorthorns will deal 1 acid damage to the creature that stepped on them.
