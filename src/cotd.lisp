@@ -230,26 +230,27 @@
                   collect (id mission-district)))
     
     (setf available-mission-list (loop for mission-scenario across *mission-scenarios*
-                                       when (or (eq t (loop with result = nil
-                                                            for layout-id in available-layout-list
-                                                            when (find layout-id (district-layout-list mission-scenario)) do
-                                                              (setf result t)
-                                                              (loop-finish)
-                                                            finally (return-from nil result)))
-                                                (eq t (loop with result = nil
-                                                            for faction-type-id in available-faction-list
-                                                            when (find-if #'(lambda (a)
-                                                                              (if (and (or (= (second a) +mission-faction-attacker+)
-                                                                                           (= (second a) +mission-faction-defender+)
-                                                                                           (= (second a) +mission-faction-present+))
-                                                                                       (= (first a) faction-type-id))
-                                                                                t
-                                                                                nil))
-                                                                          (faction-list mission-scenario))
-                                                              do
-                                                                 (setf result t)
-                                                                 (loop-finish)
-                                                            finally (return-from nil result))))
+                                       when (and (enabled mission-scenario)
+                                                 (or (eq t (loop with result = nil
+                                                                 for layout-id in available-layout-list
+                                                                 when (find layout-id (district-layout-list mission-scenario)) do
+                                                                   (setf result t)
+                                                                   (loop-finish)
+                                                                 finally (return-from nil result)))
+                                                     (eq t (loop with result = nil
+                                                                 for faction-type-id in available-faction-list
+                                                                 when (find-if #'(lambda (a)
+                                                                                   (if (and (or (= (second a) +mission-faction-attacker+)
+                                                                                                (= (second a) +mission-faction-defender+)
+                                                                                                (= (second a) +mission-faction-present+))
+                                                                                            (= (first a) faction-type-id))
+                                                                                     t
+                                                                                     nil))
+                                                                               (faction-list mission-scenario))
+                                                                   do
+                                                                      (setf result t)
+                                                                      (loop-finish)
+                                                                 finally (return-from nil result)))))
                                          collect (id mission-scenario)))
 
     (unless mission-id

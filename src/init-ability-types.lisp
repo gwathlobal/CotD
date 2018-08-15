@@ -3674,7 +3674,6 @@
                                  :motion 60
                                  :start-map-select-func #'player-start-map-resurrect
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (declare (ignore ability-type))
                                                 (logger (format nil "MOB-RESURRECTION: ~A [~A] resurrects ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
                                                 ;; target here is the item to be reanimated
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*)
@@ -3727,6 +3726,7 @@
                                                     (incf (total-humans *world*)))
                                                   (when (eq actor *player*)
                                                     (incf (cur-score *player*) 10)))
+                                                (decf (cur-fp actor) (cost ability-type))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))

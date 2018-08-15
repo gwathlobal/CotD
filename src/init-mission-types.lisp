@@ -215,6 +215,16 @@
 ;; MISSION-SCENARIOS
 ;;----------------------------------------
 
+(set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-test+
+                                                       :name "test"
+                                                       :enabled nil
+                                                       :district-layout-list ()
+                                                       :faction-list ()
+                                                       :scenario-faction-list ()
+                                                       :objective-list ()
+                                                       :win-condition-list ()
+                                     ))
+
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-attack+
                                                        :name "Demonic attack"
                                                        :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+)

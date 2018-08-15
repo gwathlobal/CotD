@@ -79,7 +79,7 @@
 
 (defun readjust-after-mission-change (win)
   (let ((cur-layout-id (nth (cur-layout win) (layout-list win))))
-    (setf (layout-list win) (copy-list (district-layout-list (get-mission-scenario-by-id (cur-mission win)))))
+    (setf (layout-list win) (copy-list (district-layout-list (get-mission-scenario-by-id (nth (cur-mission win) (mission-list win))))))
     (if (position cur-layout-id (layout-list win))
       (progn
         (setf (cur-layout win) (position cur-layout-id (layout-list win))))
@@ -150,6 +150,7 @@
   (cond
     ((= step +custom-scenario-win-mission+) (return-from populate-custom-scenario-win-menu
                                               (loop for id in (mission-list win)
+                                                    when (enabled (get-mission-scenario-by-id id))
                                                     collect (name (get-mission-scenario-by-id id)))))
     ((= step +custom-scenario-win-layout+) (return-from populate-custom-scenario-win-menu
                                              (loop for sf-id in (layout-list win)

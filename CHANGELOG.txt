@@ -1,5 +1,8 @@
 CHANGELOG
 
+- Fixed Resurrection not spending Power points after usage.
+- Rearranged the Satanists' lair to reduce the chance of 'traffic jams'.
+
 --------------------
 August 5, 2018 v1.3.3
 
