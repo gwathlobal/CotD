@@ -2,6 +2,7 @@ CHANGELOG
 
 - Fixed Resurrection not spending Power points after usage.
 - Rearranged the Satanists' lair to reduce the chance of 'traffic jams'.
+- When angels conceal their divinity in abandoned and corrupted districts, they now look like soldiers.
 
 --------------------
 August 5, 2018 v1.3.3

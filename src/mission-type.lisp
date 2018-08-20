@@ -57,6 +57,7 @@
    (win-condition-list :initform () :initarg :win-condition-list :accessor win-condition-list) ;; of type ((<faction-id> <game-event-id>)...)
    (post-sf-list :initform () :initarg :post-sf-list :accessor post-sf-list)  ;; a list of scenario ids
    (win-value-func :initform nil :initarg :win-value-func :accessor win-value-func) ;; a lambda with no params
+   (angel-disguised-mob-type-id :initform nil :initarg :angel-disguised-mob-type-id :accessor angel-disguised-mob-type-id)
    ))
 
 (defparameter *mission-scenarios* (make-array (list 0) :adjustable t))

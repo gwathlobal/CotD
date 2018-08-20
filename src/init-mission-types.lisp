@@ -266,7 +266,8 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  (list +faction-type-criminals+ +game-event-win-for-thief+)
                                                                                  (list +faction-type-ghost+ +game-event-win-for-ghost+)
-                                                                           )
+                                                                                 )
+                                                       :angel-disguised-mob-type-id +mob-type-man+
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-raid+
@@ -317,6 +318,7 @@
                                                        :post-sf-list (list +mission-sf-demonic-raid+)
                                                        :win-value-func #'(lambda ()
                                                                            (setf *demonic-raid-win-value* 200))
+                                                       :angel-disguised-mob-type-id +mob-type-man+
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-steal+
@@ -362,6 +364,7 @@
                                                                                  (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-demonic-steal+)
+                                                       :angel-disguised-mob-type-id +mob-type-man+
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest+
@@ -408,6 +411,7 @@
                                                                                  (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-demonic-steal+)
+                                                       :angel-disguised-mob-type-id +mob-type-man+
                                                        ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-raid-ruined+
@@ -444,6 +448,7 @@
                                                                            +mission-sf-ruined-district+)
                                                        :win-value-func #'(lambda ()
                                                                            (setf *demonic-raid-win-value* 100))
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest-ruined+
@@ -479,6 +484,7 @@
                                                                                  )
                                                        :post-sf-list (list +mission-sf-demonic-steal+
                                                                            +mission-sf-ruined-district+)
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                                        ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-military-conquest-ruined+
@@ -510,6 +516,7 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-military-raid-ruined+
@@ -541,6 +548,7 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                                        ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest-corrupted+
@@ -576,6 +584,7 @@
                                                                                  )
                                                        :post-sf-list (list +mission-sf-demonic-steal+
                                                                            +mission-sf-ruined-district+)
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                                        ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-military-conquest-corrupted+
@@ -607,6 +616,7 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-angelic-conquest-corrupted+
@@ -639,6 +649,7 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-angelic-steal-corrupted+
@@ -666,4 +677,5 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))
