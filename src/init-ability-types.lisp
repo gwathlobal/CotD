@@ -108,12 +108,15 @@
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore ability-type nearest-enemy nearest-ally))
+                                                  (declare (ignore ability-type nearest-ally))
                                                   ;; if able to heal and need to reveal itself - do it
-                                                  ;; if the dst tile is less than 2 tiles away - unstealth, if possible
+                                                  ;; if the enemy is near and the dst tile is less than 2 tiles away - unstealth, if possible
                                                   (if (or (and (<= (length (path actor)) 1)
                                                                (mob-ability-p actor +mob-abil-reveal-divine+)
-                                                               (can-invoke-ability actor actor +mob-abil-reveal-divine+))
+                                                               (can-invoke-ability actor actor +mob-abil-reveal-divine+)
+                                                               nearest-enemy
+                                                               (< (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy))
+                                                                  2))
                                                           (and (< (/ (cur-hp actor) (max-hp actor)) 
                                                                   0.5)
                                                                (mob-ability-p actor +mob-abil-heal-self+)
@@ -258,8 +261,7 @@
                                                       (if (and (mob-ability-p actor +mob-abil-blessing-touch+)
                                                                (mob-ability-p target +mob-abil-can-be-blessed+)
                                                                (get-faction-relation (faction actor) (faction target))
-                                                               (not (mob-effect-p target +mob-effect-blessed+))
-                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
+                                                               (not (mob-effect-p target +mob-effect-blessed+)))
                                                         t
                                                         nil))))
 
@@ -2008,7 +2010,7 @@
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
-                                                  (declare (ignore ability-type nearest-ally nearest-enemy))
+                                                  (declare (ignore ability-type nearest-ally))
                                                   ;; if you can toggle lights and you happen to be nearby, and you do not radiate light yourself - switch it off
                                                   ;; if you can toggle lights and you happen to be nearby, and you do radiate light yourself - switch it on
                                                   (let ((light-source nil))
@@ -2024,7 +2026,11 @@
                                                                                                         (setf light-source (list dx dy (z actor)))))))
                                                     (if (and (mob-ability-p actor +mob-abil-toggle-light+)
                                                              (can-invoke-ability actor actor +mob-abil-toggle-light+)
-                                                             light-source)
+                                                             light-source
+                                                             (or (not nearest-enemy)
+                                                                 (and nearest-enemy
+                                                                      (>= (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy))
+                                                                          4))))
                                                       light-source
                                                       nil)))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)

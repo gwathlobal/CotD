@@ -32,7 +32,7 @@
         (format str "DEFEAT! ")
         (setf color sdl:*red*)))
     (when (player-died win)
-      (format str "YOU DIED, BUT "))
+      (format str "YOU DIED, AND "))
     (cond
       ((= (game-over-type win) +game-over-player-dead+) (setf str (format nil "YOU ARE DEAD")))
       ((= (game-over-type win) +game-over-demons-won+) (format str "THE PANDEMONIUM HIERARCHY WON"))

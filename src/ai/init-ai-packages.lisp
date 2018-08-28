@@ -250,13 +250,14 @@
                                                                        (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
                                                                      
                                                                      ;; if the target is close enough and the actor has divinity concealed - transform
-                                                                     (let ((check-result)
-                                                                           (ability (get-ability-type-by-id +mob-abil-reveal-divine+)))
-                                                                       (setf check-result (funcall (on-check-ai ability) ability actor nearest-enemy nearest-ally))
-                                                                       (when check-result
-                                                                         (logger (format nil "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] decides to invoke ability ~A~%" (name actor) (id actor) (name ability)))
-                                                                         (funcall (on-invoke-ai ability) ability actor nearest-enemy nearest-ally check-result)
-                                                                         (loop-finish)))
+                                                                     ;; angels no longer need to transform to bless
+                                                                     ;(let ((check-result)
+                                                                     ;      (ability (get-ability-type-by-id +mob-abil-reveal-divine+)))
+                                                                     ;  (setf check-result (funcall (on-check-ai ability) ability actor nearest-enemy nearest-ally))
+                                                                     ;  (when check-result
+                                                                     ;    (logger (format nil "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] decides to invoke ability ~A~%" (name actor) (id actor) (name ability)))
+                                                                     ;    (funcall (on-invoke-ai ability) ability actor nearest-enemy nearest-ally check-result)
+                                                                     ;    (loop-finish)))
                                                                      
                                                                      ;; make a step along the path to the path-dst
                                                                      (setf move-result (ai-move-along-path actor))
