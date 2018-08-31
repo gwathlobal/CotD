@@ -88,6 +88,8 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-big+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Big Gold Pile Placeholder"))
 
+(set-feature-type (make-instance 'feature-type :id +feature-start-demon-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Demon Point Starting Position" :trait-remove-on-dungeon-generation t))
+
 (set-feature-type (make-instance 'feature-type :id +feature-smoke-thin+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-thin+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)

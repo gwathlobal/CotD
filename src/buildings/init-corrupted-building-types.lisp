@@ -1014,7 +1014,7 @@
                                                                             " ddddddd "
                                                                             " d,,,,,d "
                                                                             " d,,,,,d "
-                                                                            " d,,,,,d "
+                                                                            " d,,`,,d "
                                                                             " d,,,,,d "
                                                                             " d,,,,,d "
                                                                             " ddddddd "
@@ -1259,7 +1259,20 @@
                                               )
                                             (values nil
                                                     (list (list +feature-start-place-church-relic+ 7 7 z)
-                                                          )
+                                                          (list +feature-start-demon-point+ 7 7 z)
+                                                          (list +feature-start-demon-point+ 7 5 z)
+                                                          (list +feature-start-demon-point+ 7 9 z)
+                                                          (list +feature-start-demon-point+ 5 7 z)
+                                                          (list +feature-start-demon-point+ 9 7 z)
+                                                          (list +feature-start-demon-point+ 4 4 z)
+                                                          (list +feature-start-demon-point+ 10 4 z)
+                                                          (list +feature-start-demon-point+ 4 10 z)
+                                                          (list +feature-start-demon-point+ 10 10 z)
+                                                          (list +feature-start-demon-point+ 9 7 z)
+                                                          (list +feature-start-demon-point+ 2 2 z)
+                                                          (list +feature-start-demon-point+ 12 2 z)
+                                                          (list +feature-start-demon-point+ 2 12 z)
+                                                          (list +feature-start-demon-point+ 12 12 z))
                                                     nil))))
 
 ;;=====================

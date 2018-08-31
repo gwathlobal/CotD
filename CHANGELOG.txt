@@ -4,6 +4,8 @@ CHANGELOG
 - Rearranged the Satanists' lair to reduce the chance of 'traffic jams'.
 - When angels conceal their divinity in abandoned and corrupted districts, they now look like soldiers.
 - Angels can now bless humans without revealing themselves. Also angels will not reveal themselves unless they are about to attack an enemy in melee.
+- Fixed the bug where demonic sigils could spawn on sludgeshrooms and die on their own.
+- For the Celestial retreival mission, some demons will start inside the corrupted shrine to protect the relic.
 
 --------------------
 August 5, 2018 v1.3.3

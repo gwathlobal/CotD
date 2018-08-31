@@ -1169,6 +1169,27 @@
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list (level world) mob)))
 
+(defun find-unoccupied-place-demon-point (world mob)
+  (loop with points-list = (loop for feature-id in (feature-id-list (level world))
+                                  for feature = (get-feature-by-id feature-id)
+                                  when (= (feature-type feature) +feature-start-demon-point+)
+                                    collect feature)
+        for point = (nth (random (length points-list)) points-list)
+        for x = (x point)
+        for y = (y point)
+        for z = 2
+        until (and (eq (check-move-on-level mob x y z) t)
+                   (not (get-mob-* (level world) x y z))
+                   (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
+                   (/= (get-level-connect-map-value (level world) x y z (if (riding-mob-id mob)
+                                                                          (map-size (get-mob-by-id (riding-mob-id mob)))
+                                                                          (map-size mob))
+                                                    (get-mob-move-mode mob))
+                       +connect-room-none+)
+                   )
+        finally (setf (x mob) x (y mob) y (z mob) z)
+                (add-mob-to-level-list (level world) mob)))
+
 (defun find-unoccupied-place-on-top (world mob)
   ;(setf (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
   

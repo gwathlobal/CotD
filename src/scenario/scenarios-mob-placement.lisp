@@ -1040,6 +1040,7 @@
   
   ;; populate the world with the number of demons = humans / 4, of which 1 will be an archdemon, 15 will be demons
   ;; make some of them shadow demons if there is dark in the city
+  ;; place demons and archdemons into the relic shrine
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-demons+)
                               (or (= (second a) +mission-faction-present+)
@@ -1055,15 +1056,20 @@
                 (populate-world-with-mobs world (if (and (>= hour 7) (< hour 19))
                                                   (list (cons +mob-type-archdemon+ 1)
                                                         (cons +mob-type-demon+ 9)
-                                                        (cons +mob-type-imp+ (cond
+                                                        )
+                                                  (list (if (zerop (random 2)) (cons +mob-type-archdemon+ 1) (cons +mob-type-shadow-devil+ 1))
+                                                        (cons +mob-type-demon+ 4)
+                                                        (cons +mob-type-shadow-demon+ 5)
+                                                        ))
+                                          #'find-unoccupied-place-demon-point)
+                
+                (populate-world-with-mobs world (if (and (>= hour 7) (< hour 19))
+                                                  (list (cons +mob-type-imp+ (cond
                                                                                ((< (truncate (total-humans world) 4) (+ *min-imps-number* 10)) *min-imps-number*)
                                                                                ((> (truncate (total-humans world) 4) (+ *max-imps-number* 10)) *max-imps-number*)
                                                                                (t (- (truncate (total-humans world) 4) 10)))
                                                               ))
-                                                  (list (if (zerop (random 2)) (cons +mob-type-archdemon+ 1) (cons +mob-type-shadow-devil+ 1))
-                                                        (cons +mob-type-demon+ 4)
-                                                        (cons +mob-type-shadow-demon+ 5)
-                                                        (cons +mob-type-imp+ (cond
+                                                  (list (cons +mob-type-imp+ (cond
                                                                                ((< (truncate (total-humans world) 4) 16) 3)
                                                                                ((> (truncate (total-humans world) 4) 36) 13)
                                                                                (t (truncate (- (/ (total-humans world) 4) 10) 2))))
