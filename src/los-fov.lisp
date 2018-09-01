@@ -281,7 +281,9 @@
              (push (list x y z light-radius) (nearby-light-sources *player*)))
         )
   
-    (loop for mob-id of-type fixnum in (if (mob-ability-p mob +mob-abil-shared-minds+)
+    (loop with nearest-evil = nil
+          with nearest-good = nil
+          for mob-id of-type fixnum in (if (mob-ability-p mob +mob-abil-shared-minds+)
                                          (mob-id-list (level *world*))
                                          (loop with result = ()
                                            for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
@@ -297,7 +299,26 @@
           for light-power of-type fixnum = (* *light-power-faloff* (abs (cur-light tmob)))
           for light-pwr of-type fixnum = (abs (cur-light tmob))
           for light-power-base of-type fixnum = (abs (cur-light tmob))
+          
           do
+             ;; find nearest evil mob
+             (when (and (not (check-dead tmob))
+                        (mob-ability-p tmob +mob-abil-demon+)
+                        (not (eq tmob mob)))
+               (unless nearest-evil (setf nearest-evil tmob))
+               (when (< (get-distance (x mob) (y mob) (x tmob) (y tmob))
+                        (get-distance (x mob) (y mob) (x nearest-evil) (y nearest-evil)))
+                 (setf nearest-evil tmob)))
+
+             ;; find nearest good mob
+             (when (and (not (check-dead tmob))
+                        (mob-ability-p tmob +mob-abil-angel+)
+                        (not (eq tmob mob)))
+               (unless nearest-good (setf nearest-good tmob))
+               (when (< (get-distance (x mob) (y mob) (x tmob) (y tmob))
+                        (get-distance (x mob) (y mob) (x nearest-good) (y nearest-good)))
+                 (setf nearest-good tmob)))
+             
              ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
              ;; except for trinity mimic - they share minds only with their own union
              (when (and (not (eq mob tmob))
@@ -406,6 +427,15 @@
              (when (and (not (eq mob tmob))
                         (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) *max-hearing-range*))
                (pushnew mob-id (hear-range-mobs mob)))
+          finally
+             (if (and nearest-evil
+                      (mob-ability-p mob +mob-abil-detect-evil+))
+               (setf (sense-evil-id mob) (id nearest-evil))
+               (setf (sense-evil-id mob) nil))
+             (if (and nearest-good
+                      (mob-ability-p mob +mob-abil-detect-good+))
+               (setf (sense-good-id mob) (id nearest-good))
+               (setf (sense-good-id mob) nil))
           )
     )
   (when (eq mob *player*)

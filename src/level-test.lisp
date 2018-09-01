@@ -161,7 +161,7 @@
   (add-mob-to-level-list (level world) *player*)
   
   (let ((soldier (make-instance 'mob :mob-type +mob-type-soldier+ :x 39 :y 20 :z 1))
-        ;(demon (make-instance 'mob :mob-type +mob-type-demon+ :x 41 :y 18 :z 2))
+        (demon (make-instance 'mob :mob-type +mob-type-demon+ :x 1 :y 1 :z 2))
         (angel (make-instance 'mob :mob-type +mob-type-angel+ :x 43 :y 16 :z 3))
         )
     (setf (cur-fp *player*) 15)
@@ -184,7 +184,7 @@
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-blessed+ :actor-id (id soldier))
     (add-mob-to-level-list (level world) soldier)
-    ;(add-mob-to-level-list (level world) demon)
+    (add-mob-to-level-list (level world) demon)
     (add-mob-to-level-list (level world) angel)
     
     ;(setf (mimic-id-list *player*) (list (id angel) (id soldier) (id demon)))

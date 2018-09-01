@@ -221,7 +221,7 @@
                                                        :district-layout-list ()
                                                        :faction-list ()
                                                        :scenario-faction-list ()
-                                                       :objective-list ()
+                                                       :objective-list (list (list +faction-type-angels+ (list +ai-package-patrol-district+)))
                                                        :win-condition-list ()
                                      ))
 

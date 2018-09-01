@@ -16,10 +16,10 @@
   (format t "TIME-ELAPSED AFTER: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
   
   ;; find the nearest enemy
-  (when (mob-ability-p *player* +mob-abil-detect-good+)
-    (sense-good))
-  (when (mob-ability-p *player* +mob-abil-detect-evil+)
-    (sense-evil))
+  ;;(when (mob-ability-p *player* +mob-abil-detect-good+)
+  ;;  (sense-good))
+  ;;(when (mob-ability-p *player* +mob-abil-detect-evil+)
+  ;;  (sense-evil))
   (when (mob-ability-p *player* +mob-abil-detect-unnatural+)
     (sense-unnatural))
   (when (and (or (= (loyal-faction *player*) +faction-type-demons+)

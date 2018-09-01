@@ -1,3 +1,4 @@
+- Make an option to disable some prompts like "disguise as human for angels"
 - Flat game map
 - Scenario with attacking a battleship
 - Add Fenix-like eater that can change skins, with ability to upgrade skins (ranged->immovable sentry, melee,flyer->pack)

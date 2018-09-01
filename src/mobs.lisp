@@ -701,6 +701,8 @@
    (hear-range-mobs :initform nil :accessor hear-range-mobs)
    (heard-sounds :initform nil :accessor heard-sounds)
    (visible-items :initform nil :accessor visible-items)
+   (sense-evil-id :initform nil :accessor sense-evil-id)
+   (sense-good-id :initform nil :accessor sense-good-id)
 
    ;; special vars for trinity mimics
    (mimic-id-list :initform () :accessor mimic-id-list)
@@ -1426,8 +1428,6 @@
    (view-y :initform 0 :accessor view-y)
    (view-z :initform 0 :accessor view-z)
    (dead-message-displayed :initform nil :accessor dead-message-displayed)
-   (sense-evil-id :initform nil :accessor sense-evil-id)
-   (sense-good-id :initform nil :accessor sense-good-id)
    (sense-unnatural-pos :initform nil :accessor sense-unnatural-pos)
    (sense-relic-pos :initform nil :accessor sense-relic-pos)
    (sense-sigil-pos :initform nil :accessor sense-sigil-pos)

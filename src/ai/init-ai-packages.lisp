@@ -1418,24 +1418,35 @@
                                                                        (rx 0) 
                                                                        (ry 0)
                                                                        (rz 0)
-                                                                       )
+                                                                       (evil-mob (if (sense-evil-id actor) (get-mob-by-id (sense-evil-id actor)) nil))
+                                                                       (good-mob (if (sense-good-id actor) (get-mob-by-id (sense-good-id actor)) nil)))
                                                                    (declare (type fixnum rx ry rz))
-                                                                   (loop for dx from 0 below (array-dimension (memory-map actor) 0) do
-                                                                     (loop for dy from 0 below (array-dimension (memory-map actor) 1) do
-                                                                       (unless nearest-sector
-                                                                         (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy))))
-                                                                       (cond
-                                                                         ((< (aref (memory-map actor) dx dy)
-                                                                             (third nearest-sector))
-                                                                          (progn
-                                                                            (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy)))))
-                                                                         ((and (= (aref (memory-map actor) dx dy)
-                                                                                  (third nearest-sector))
-                                                                               (< (get-distance (truncate (x actor) 10) (truncate (y actor) 10) dx dy)
-                                                                                  (get-distance (truncate (x actor) 10) (truncate (y actor) 10) (first nearest-sector) (second nearest-sector))))
-                                                                          (progn
-                                                                            (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy))))))
-                                                                       ))
+                                                                   (cond
+                                                                     ;; senses evil
+                                                                     (evil-mob
+                                                                      (setf nearest-sector (list (truncate (x evil-mob) 10) (truncate (y evil-mob) 10) (aref (memory-map actor) (truncate (x evil-mob) 10) (truncate (y evil-mob) 10)))))
+                                                                     ;; senses good
+                                                                     (good-mob
+                                                                      (setf nearest-sector (list (truncate (x good-mob) 10) (truncate (y good-mob) 10) (aref (memory-map actor) (truncate (x good-mob) 10) (truncate (y good-mob) 10)))))
+                                                                     ;; senses nothing
+                                                                     (t
+                                                                      (loop for dx from 0 below (array-dimension (memory-map actor) 0) do
+                                                                        (loop for dy from 0 below (array-dimension (memory-map actor) 1) do
+                                                                          (unless nearest-sector
+                                                                            (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy))))
+                                                                          (cond
+                                                                            ((< (aref (memory-map actor) dx dy)
+                                                                                (third nearest-sector))
+                                                                             (progn
+                                                                               (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy)))))
+                                                                            ((and (= (aref (memory-map actor) dx dy)
+                                                                                     (third nearest-sector))
+                                                                                  (< (get-distance (truncate (x actor) 10) (truncate (y actor) 10) dx dy)
+                                                                                     (get-distance (truncate (x actor) 10) (truncate (y actor) 10) (first nearest-sector) (second nearest-sector))))
+                                                                             (progn
+                                                                               (setf nearest-sector (list dx dy (aref (memory-map actor) dx dy))))))
+                                                                              ))))
+                                                                   
 
                                                                    (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: NEAREST-SECTOR ~A vs CUR-SECTOR ~A~%" nearest-sector (list (truncate (x actor) 10) (truncate (y actor) 10))))
                                                                    
