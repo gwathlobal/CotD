@@ -635,6 +635,47 @@
                                        ))
 
 ;;--------------------
+;; SKINCHANGER
+;;--------------------
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-melee+
+                                       :name "butcher"
+                                       :glyph-idx 51 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :faction +faction-type-eater+
+                                       :weapon (list "Claws" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100) nil) :base-dodge 15
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
+                                       :strength 2
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-skinchange-to-flyer t :abil-skinchange-to-ranged t
+                                       :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-ranged+
+                                       :name "Ravager"
+                                       :glyph-idx 51 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :faction +faction-type-eater+
+                                       :weapon (list "Acid spit" (list +weapon-dmg-acid+ 1 3 +normal-ap+ 100 (list :corrodes)) (list +weapon-dmg-acid+ 1 3 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes)))
+                                       :base-dodge 15
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
+                                       :strength 2
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-skinchange-to-melee t :abil-skinchange-to-flyer t
+                                       :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-shoot-enemy t :ai-avoid-melee t))
+
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-flyer+
+                                       :name "skinchanger"
+                                       :glyph-idx 51 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :faction +faction-type-eater+
+                                       :weapon (list "Spines" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 nil) nil) :base-dodge 15
+                                       :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
+                                       :strength 2
+                                       :base-light-radius 0 :base-stealth 10
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t
+                                       :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-flying t :abil-skinchange-to-melee t :abil-skinchange-to-ranged t
+                                       :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t))
+
+;;--------------------
 ;; GHOST
 ;;--------------------
 

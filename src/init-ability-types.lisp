@@ -7402,3 +7402,180 @@
                                                         (progn
                                                           nil))
                                                       )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-skinchange-to-melee+ :name "Skinchange to Butcher" :descr "Change your skin to become a Butcher. The Butcher is a ferocious melee warrior." 
+                                 :cd 15 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-SKINCHANGE-TO-MELEE: ~A [~A] uses skinchange to melee.~%" (name actor) (id actor)))
+
+                                                (let ((old-max-hp (max-hp actor)))
+                                                  (setf (mob-type actor) +mob-type-skinchanger-melee+)
+                                                  (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                (setf (face-mob-type-id actor) (mob-type actor))
+                                                (set-cur-weapons actor)
+                                                (adjust-abilities actor)
+                                                (adjust-dodge actor)
+                                                (adjust-armor actor)
+                                                (adjust-m-acc actor)
+                                                (adjust-r-acc actor)
+                                                (adjust-sight actor)
+                                                                                                
+                                                ;; set up current abilities cooldowns
+                                                (loop for ability-id being the hash-key in (abilities actor)
+                                                      when (null (gethash ability-id (abilities-cd actor)))
+                                                        do
+                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear a sound of flesh tearing~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A turns into a Butcher. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-skinchange-to-melee+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (or (and nearest-enemy
+                                                                    (= (z actor) (z nearest-enemy))
+                                                                    (< (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)))
+                                                           (null (riding-mob-id actor))
+                                                           (mob-ability-p actor +mob-abil-skinchange-to-melee+)
+                                                           (can-invoke-ability actor actor +mob-abil-skinchange-to-melee+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-skinchange-to-ranged+ :name "Skinchange to Ravager" :descr "Change your skin to become a Ravager. The Ravager is able to attack from afar." 
+                                 :cd 15 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-SKINCHANGE-TO-RANGED: ~A [~A] uses skinchange to ranged.~%" (name actor) (id actor)))
+
+                                                (let ((old-max-hp (max-hp actor)))
+                                                  (setf (mob-type actor) +mob-type-skinchanger-ranged+)
+                                                  (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                (setf (face-mob-type-id actor) (mob-type actor))
+                                                (set-cur-weapons actor)
+                                                (adjust-abilities actor)
+                                                (adjust-dodge actor)
+                                                (adjust-armor actor)
+                                                (adjust-m-acc actor)
+                                                (adjust-r-acc actor)
+                                                (adjust-sight actor)
+                                                                                                
+                                                ;; set up current abilities cooldowns
+                                                (loop for ability-id being the hash-key in (abilities actor)
+                                                      when (null (gethash ability-id (abilities-cd actor)))
+                                                        do
+                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear a sound of flesh tearing~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A turns into a Ravager. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-skinchange-to-ranged+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (or (and nearest-enemy
+                                                                    (/= (z actor) (z nearest-enemy)))
+                                                               (and nearest-enemy
+                                                                    (>= (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)
+                                                                    ))
+                                                           (null (riding-mob-id actor))
+                                                           (mob-ability-p actor +mob-abil-skinchange-to-ranged+)
+                                                           (can-invoke-ability actor actor +mob-abil-skinchange-to-ranged+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-skinchange-to-flyer+ :name "Skinchange to Corruptor" :descr "Change your skin to become a Corruptor. The Corruptors are able to fly." 
+                                 :cd 15 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-SKINCHANGE-TO-FLYER: ~A [~A] uses skinchange to flyer.~%" (name actor) (id actor)))
+
+                                                (let ((old-max-hp (max-hp actor)))
+                                                  (setf (mob-type actor) +mob-type-skinchanger-flyer+)
+                                                  (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                (setf (face-mob-type-id actor) (mob-type actor))
+                                                (set-cur-weapons actor)
+                                                (adjust-abilities actor)
+                                                (adjust-dodge actor)
+                                                (adjust-armor actor)
+                                                (adjust-m-acc actor)
+                                                (adjust-r-acc actor)
+                                                (adjust-sight actor)
+                                                                                                
+                                                ;; set up current abilities cooldowns
+                                                (loop for ability-id being the hash-key in (abilities actor)
+                                                      when (null (gethash ability-id (abilities-cd actor)))
+                                                        do
+                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear a sound of flesh tearing~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A turns into a Corruptor. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-skinchange-to-flyer+)
+                                                               )
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (null (riding-mob-id actor))
+                                                           (mob-ability-p actor +mob-abil-skinchange-to-flyer+)
+                                                           (can-invoke-ability actor actor +mob-abil-skinchange-to-flyer+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))

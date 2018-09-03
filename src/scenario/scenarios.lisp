@@ -53,6 +53,7 @@
 (defconstant +sf-faction-demonic-attack-eater+ 41)
 (defconstant +sf-faction-demonic-attack-demon-malseraph+ 42)
 (defconstant +sf-faction-demonic-attack-ghost+ 43)
+(defconstant +sf-faction-demonic-attack-skinchanger+ 44)
 
 (defconstant +sf-faction-demonic-raid-player+ 45)
 (defconstant +sf-faction-demonic-raid-dead-player+ 46)
@@ -68,6 +69,7 @@
 (defconstant +sf-faction-demonic-raid-eater+ 56)
 (defconstant +sf-faction-demonic-raid-demon-malseraph+ 57)
 (defconstant +sf-faction-demonic-raid-ghost+ 58)
+(defconstant +sf-faction-demonic-raid-skinchanger+ 59)
 
 (defconstant +sf-faction-demonic-steal-player+ 60)
 (defconstant +sf-faction-demonic-steal-dead-player+ 61)
@@ -83,6 +85,7 @@
 (defconstant +sf-faction-demonic-steal-eater+ 71)
 (defconstant +sf-faction-demonic-steal-demon-malseraph+ 72)
 (defconstant +sf-faction-demonic-steal-ghost+ 73)
+(defconstant +sf-faction-demonic-steal-skinchanger+ 74)
 
 (defconstant +sf-faction-demonic-conquest-player+ 75)
 (defconstant +sf-faction-demonic-conquest-dead-player+ 76)
@@ -98,6 +101,7 @@
 (defconstant +sf-faction-demonic-conquest-eater+ 86)
 (defconstant +sf-faction-demonic-conquest-demon-malseraph+ 87)
 (defconstant +sf-faction-demonic-conquest-ghost+ 88)
+(defconstant +sf-faction-demonic-conquest-skinchanger+ 89)
 
 (defconstant +city-layout-ruined-normal+ 90)
 (defconstant +city-layout-ruined-river+ 91)
@@ -115,6 +119,7 @@
 (defconstant +sf-faction-demonic-raid-ruined-angel-trinity+ 107)
 (defconstant +sf-faction-demonic-raid-ruined-eater+ 108)
 (defconstant +sf-faction-demonic-raid-ruined-demon-malseraph+ 110)
+(defconstant +sf-faction-demonic-raid-ruined-skinchanger+ 111)
 
 (defconstant +sf-faction-demonic-conquest-ruined-player+ 120)
 (defconstant +sf-faction-demonic-conquest-ruined-dead-player+ 121)
@@ -126,6 +131,7 @@
 (defconstant +sf-faction-demonic-conquest-ruined-angel-trinity+ 127)
 (defconstant +sf-faction-demonic-conquest-ruined-eater+ 128)
 (defconstant +sf-faction-demonic-conquest-ruined-demon-malseraph+ 129)
+(defconstant +sf-faction-demonic-conquest-ruined-skinchanger+ 130)
 
 (defconstant +sf-faction-military-conquest-ruined-player+ 140)
 (defconstant +sf-faction-military-conquest-ruined-dead-player+ 141)
@@ -137,6 +143,7 @@
 (defconstant +sf-faction-military-conquest-ruined-angel-trinity+ 147)
 (defconstant +sf-faction-military-conquest-ruined-eater+ 148)
 (defconstant +sf-faction-military-conquest-ruined-demon-malseraph+ 149)
+(defconstant +sf-faction-military-conquest-ruined-skinchanger+ 150)
 
 (defconstant +sf-faction-military-raid-ruined-player+ 160)
 (defconstant +sf-faction-military-raid-ruined-dead-player+ 161)
@@ -148,6 +155,7 @@
 (defconstant +sf-faction-military-raid-ruined-angel-trinity+ 167)
 (defconstant +sf-faction-military-raid-ruined-eater+ 168)
 (defconstant +sf-faction-military-raid-ruined-demon-malseraph+ 169)
+(defconstant +sf-faction-military-raid-ruined-skinchanger+ 170)
 
 (defconstant +city-layout-corrupted-normal+ 180)
 (defconstant +city-layout-corrupted-river+ 181)
@@ -165,6 +173,7 @@
 (defconstant +sf-faction-demonic-conquest-corrupted-angel-trinity+ 197)
 (defconstant +sf-faction-demonic-conquest-corrupted-eater+ 198)
 (defconstant +sf-faction-demonic-conquest-corrupted-demon-malseraph+ 199)
+(defconstant +sf-faction-demonic-conquest-corrupted-skinchanger+ 200)
 
 (defconstant +sf-faction-military-conquest-corrupted-player+ 210)
 (defconstant +sf-faction-military-conquest-corrupted-dead-player+ 211)
@@ -176,6 +185,7 @@
 (defconstant +sf-faction-military-conquest-corrupted-angel-trinity+ 217)
 (defconstant +sf-faction-military-conquest-corrupted-eater+ 218)
 (defconstant +sf-faction-military-conquest-corrupted-demon-malseraph+ 219)
+(defconstant +sf-faction-military-conquest-corrupted-skinchanger+ 220)
 
 (defconstant +sf-faction-angelic-conquest-corrupted-player+ 230)
 (defconstant +sf-faction-angelic-conquest-corrupted-dead-player+ 231)
@@ -187,6 +197,7 @@
 (defconstant +sf-faction-angelic-conquest-corrupted-angel-trinity+ 237)
 (defconstant +sf-faction-angelic-conquest-corrupted-eater+ 238)
 (defconstant +sf-faction-angelic-conquest-corrupted-demon-malseraph+ 239)
+(defconstant +sf-faction-angelic-conquest-corrupted-skinchanger+ 240)
 
 (defconstant +city-layout-corrupted-steal-normal+ 250)
 (defconstant +city-layout-corrupted-steal-river+ 251)
@@ -202,6 +213,7 @@
 (defconstant +sf-faction-angelic-steal-angel-trinity+ 270)
 (defconstant +sf-faction-angelic-steal-eater+ 271)
 (defconstant +sf-faction-angelic-steal-demon-malseraph+ 272)
+(defconstant +sf-faction-angelic-steal-skinchanger+ 273)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 

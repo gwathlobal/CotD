@@ -62,7 +62,7 @@
                                                                         (cons +faction-type-angels+ nil) (cons +faction-type-outsider-wisps+ nil) (cons +faction-type-animals+ nil) (cons +faction-type-civilians+ nil)
                                                                         (cons +faction-type-outsider-beasts+ nil) (cons +faction-type-military+ nil) (cons +faction-type-demons+ nil) (cons +faction-type-criminals+ nil)
                                                                         (cons +faction-type-ghost+ nil) (cons +faction-type-church+ nil) (cons +faction-type-satanists+ nil))
-                                               :specific-faction-list (list +specific-faction-type-eater+)))
+                                               :specific-faction-list (list +specific-faction-type-eater+ +specific-faction-type-skinchanger+)))
 
 (set-faction-type (make-instance 'faction-type :id +faction-type-ghost+
                                                :name "Ghost"

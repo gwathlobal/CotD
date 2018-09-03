@@ -269,3 +269,26 @@
                                                        (push +game-event-win-for-eater+ game-event-list)
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +sf-faction-angelic-conquest-corrupted-skinchanger+
+                                             :type +scenario-feature-player-faction+
+                                             :name "Eater of the dead"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break
+
+                                                       (setf mob-func-list (scenario-present-faction-setup-military-conquest-ruined +specific-faction-type-skinchanger+ faction-list mob-func-list))
+
+                                                       (setf game-event-list (scenario-delayed-faction-setup-military-conquest faction-list game-event-list))
+
+                                                       (push #'(lambda (world mob-template-list) (declare (ignore mob-template-list))
+                                                                 (setf *player* (make-instance 'player :mob-type +mob-type-skinchanger-melee+))
+                                                                 (find-unoccupied-place-water world *player*)
+                                                                 (setf (faction-name *player*) "Skinchanger"))
+                                                             mob-func-list)
+                                                       
+                                                       (push +game-event-lose-game-died+ game-event-list)
+                                                       (push +game-event-lose-game-possessed+ game-event-list)
+                                                       (push +game-event-win-for-eater+ game-event-list)
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))

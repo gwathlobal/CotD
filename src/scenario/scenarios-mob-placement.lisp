@@ -220,6 +220,7 @@
 
 (defun scenario-set-present-eater (specific-faction-type faction-list mob-func-list)
   (when (and (/= specific-faction-type +specific-faction-type-eater+)
+             (/= specific-faction-type +specific-faction-type-skinchanger+)
              (find-if #'(lambda (a)
                           (if (and (= (first a) +faction-type-eater+)
                                    (or (= (second a) +mission-faction-present+)
@@ -231,7 +232,9 @@
     (push #'(lambda (world mob-template-list)
               (declare (ignore mob-template-list))
               
-              (populate-world-with-mobs world (list (cons +mob-type-eater-of-the-dead+ 1))
+              (populate-world-with-mobs world (if (zerop (random 2))
+                                                (list (cons +mob-type-eater-of-the-dead+ 1))
+                                                (list (cons +mob-type-skinchanger-melee+ 1)))
                                         #'find-unoccupied-place-water))
           mob-func-list))
   mob-func-list)

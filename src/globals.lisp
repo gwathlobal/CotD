@@ -108,6 +108,9 @@
 (defconstant +mob-type-tree+ 51)
 (defconstant +mob-type-satanist-empowered+ 52)
 (defconstant +mob-type-demon-sigil+ 53)
+(defconstant +mob-type-skinchanger-melee+ 54)
+(defconstant +mob-type-skinchanger-ranged+ 55)
+(defconstant +mob-type-skinchanger-flyer+ 56)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-civilians+ 1)
@@ -138,6 +141,7 @@
 (defconstant +specific-faction-type-priest+ 9)
 (defconstant +specific-faction-type-eater+ 10)
 (defconstant +specific-faction-type-ghost+ 11)
+(defconstant +specific-faction-type-skinchanger+ 12)
 
 (defconstant +ai-package-coward+ 0)
 (defconstant +ai-package-horde+ 1)
@@ -333,6 +337,9 @@
 (defconstant +mob-abil-throw-corpse-into-portal+ 158)
 (defconstant +mob-abil-throw-relic-into-portal+ 159)
 (defconstant +mob-abil-create-demon-sigil+ 160)
+(defconstant +mob-abil-skinchange-to-melee+ 161)
+(defconstant +mob-abil-skinchange-to-ranged+ 162)
+(defconstant +mob-abil-skinchange-to-flyer+ 163)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
