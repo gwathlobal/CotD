@@ -160,8 +160,9 @@
 
 (defmethod apply-gravity ((mob mob))
   (let ((result 0))
-    (if (and (mob-effect-p mob +mob-effect-flying+)
-             (not (eq (cd (get-effect-by-id (mob-effect-p mob +mob-effect-flying+))) 0)))
+    (if (or (and (mob-effect-p mob +mob-effect-flying+)
+                 (not (eq (cd (get-effect-by-id (mob-effect-p mob +mob-effect-flying+))) 0)))
+            (mob-ability-p mob +mob-abil-flying+))
       (setf result (z mob))
       (loop for z from (z mob) downto 0 
             for check-result = (check-move-on-level mob (x mob) (y mob) z)

@@ -7412,34 +7412,44 @@
                                                 (declare (ignore target ability-type))
                                                 (logger (format nil "MOB-SKINCHANGE-TO-MELEE: ~A [~A] uses skinchange to melee.~%" (name actor) (id actor)))
 
-                                                (let ((old-max-hp (max-hp actor)))
+                                                (let ((old-max-hp (max-hp actor))
+                                                      (was-flyer (if (= (mob-type actor) +mob-type-skinchanger-flyer+)
+                                                                    t
+                                                                    nil)))
                                                   (setf (mob-type actor) +mob-type-skinchanger-melee+)
                                                   (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
-                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
-                                                (setf (face-mob-type-id actor) (mob-type actor))
-                                                (set-cur-weapons actor)
-                                                (adjust-abilities actor)
-                                                (adjust-dodge actor)
-                                                (adjust-armor actor)
-                                                (adjust-m-acc actor)
-                                                (adjust-r-acc actor)
-                                                (adjust-sight actor)
-                                                                                                
-                                                ;; set up current abilities cooldowns
-                                                (loop for ability-id being the hash-key in (abilities actor)
-                                                      when (null (gethash ability-id (abilities-cd actor)))
-                                                        do
-                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
-
-                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                           (format nil "You hear a sound of flesh tearing~A." str)))
-
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A turns into a Butcher. "
-                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                *shared-mind-msg-color*
-                                                                                sdl:*white*))
+                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
+                                                  (setf (face-mob-type-id actor) (mob-type actor))
+                                                  (set-cur-weapons actor)
+                                                  (adjust-abilities actor)
+                                                  (adjust-dodge actor)
+                                                  (adjust-armor actor)
+                                                  (adjust-m-acc actor)
+                                                  (adjust-r-acc actor)
+                                                  (adjust-sight actor)
+                                                  
+                                                  ;; set up current abilities cooldowns
+                                                  (loop for ability-id being the hash-key in (abilities actor)
+                                                        when (null (gethash ability-id (abilities-cd actor)))
+                                                          do
+                                                             (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                  
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear a sound of flesh tearing~A." str)))
+                                                  
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A turns into a Butcher. "
+                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                         :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))
+                                                  
+                                                  (when (and was-flyer
+                                                             (not (mob-effect-p actor +mob-effect-flying+))
+                                                             (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
+                                                             (apply-gravity actor))
+                                                    (set-mob-location actor (x actor) (y actor) (z actor)))
+                                                  )
                                                 
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
@@ -7471,34 +7481,43 @@
                                                 (declare (ignore target ability-type))
                                                 (logger (format nil "MOB-SKINCHANGE-TO-RANGED: ~A [~A] uses skinchange to ranged.~%" (name actor) (id actor)))
 
-                                                (let ((old-max-hp (max-hp actor)))
+                                                (let ((old-max-hp (max-hp actor))
+                                                      (was-flyer (if (= (mob-type actor) +mob-type-skinchanger-flyer+)
+                                                                    t
+                                                                    nil)))
                                                   (setf (mob-type actor) +mob-type-skinchanger-ranged+)
                                                   (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
-                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
-                                                (setf (face-mob-type-id actor) (mob-type actor))
-                                                (set-cur-weapons actor)
-                                                (adjust-abilities actor)
-                                                (adjust-dodge actor)
-                                                (adjust-armor actor)
-                                                (adjust-m-acc actor)
-                                                (adjust-r-acc actor)
-                                                (adjust-sight actor)
-                                                                                                
-                                                ;; set up current abilities cooldowns
-                                                (loop for ability-id being the hash-key in (abilities actor)
-                                                      when (null (gethash ability-id (abilities-cd actor)))
-                                                        do
-                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
-
-                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
-                                                                                                           (format nil "You hear a sound of flesh tearing~A." str)))
-
-                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                       (format nil "~A turns into a Ravager. "
-                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                *shared-mind-msg-color*
-                                                                                sdl:*white*))
+                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp))
+                                                  (setf (face-mob-type-id actor) (mob-type actor))
+                                                  (set-cur-weapons actor)
+                                                  (adjust-abilities actor)
+                                                  (adjust-dodge actor)
+                                                  (adjust-armor actor)
+                                                  (adjust-m-acc actor)
+                                                  (adjust-r-acc actor)
+                                                  (adjust-sight actor)
+                                                  
+                                                  ;; set up current abilities cooldowns
+                                                  (loop for ability-id being the hash-key in (abilities actor)
+                                                        when (null (gethash ability-id (abilities-cd actor)))
+                                                          do
+                                                             (setf (gethash ability-id (abilities-cd actor)) 0))
+                                                  
+                                                  (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear a sound of flesh tearing~A." str)))
+                                                  
+                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                         (format nil "~A turns into a Ravager. "
+                                                                                 (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                         :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                  *shared-mind-msg-color*
+                                                                                  sdl:*white*))
+                                                  (when (and was-flyer
+                                                             (not (mob-effect-p actor +mob-effect-flying+))
+                                                             (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
+                                                             (apply-gravity actor))
+                                                    (set-mob-location actor (x actor) (y actor) (z actor)))
+                                                )
                                                 
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)

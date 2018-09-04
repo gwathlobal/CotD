@@ -652,7 +652,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-ranged+
                                        :name "Ravager"
-                                       :glyph-idx 51 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :glyph-idx 51 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Acid spit" (list +weapon-dmg-acid+ 1 3 +normal-ap+ 100 (list :corrodes)) (list +weapon-dmg-acid+ 1 3 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes)))
                                        :base-dodge 15
@@ -665,7 +665,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-flyer+
                                        :name "skinchanger"
-                                       :glyph-idx 51 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :glyph-idx 51 :glyph-color (sdl:color :r 128 :g 0 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Spines" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 nil) nil) :base-dodge 15
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))

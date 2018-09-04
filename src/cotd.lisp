@@ -489,22 +489,24 @@
                                                                        +specific-faction-type-eater+
                                                                        faction-list))))))
         (join-skin-item (cons "Join as the Skinchanger"
-                                  #'(lambda (n) 
-                                      (declare (ignore n))
-                                      (let ((weather-types (remove +weather-type-snow+ (get-all-scenario-features-by-type +scenario-feature-weather+ nil)))
-                                            (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (mission-id)
-                                            (layout-id)
-                                            (faction-list))
+                              #'(lambda (n) 
+                                  (declare (ignore n))
+                                  (let ((weather-types (remove +weather-type-snow+ (get-all-scenario-features-by-type +scenario-feature-weather+ nil)))
+                                        (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
+                                        (mission-id)
+                                        (layout-id)
+                                        (faction-list))
+                                    
+                                    (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-skinchanger+))
 
-                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-skinchanger+))
-                                        
-                                        (return-from main-menu (values mission-id
-                                                                       layout-id
-                                                                       (nth (random (length weather-types)) weather-types)
-                                                                       (nth (random (length tod-types)) tod-types)
-                                                                       +specific-faction-type-skinchanger+
-                                                                       faction-list))))))
+                                    (format t "specific-faction-type = ~A~%" +specific-faction-type-skinchanger+)
+                                    
+                                    (return-from main-menu (values mission-id
+                                                                   layout-id
+                                                                   (nth (random (length weather-types)) weather-types)
+                                                                   (nth (random (length tod-types)) tod-types)
+                                                                   +specific-faction-type-skinchanger+
+                                                                   faction-list))))))
         (join-ghost-item (cons "Join as the Lost soul"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -614,7 +616,7 @@
                                (car custom-scenario-item) (car all-see-item) (car test-level-item)
                                (car highscores-item) (car help-item) (car exit-item)))
         (setf menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
-                               (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-puppet-item) (cdr join-ghost-item)
+                               (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-skin-item) (cdr join-ghost-item)
                                (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
                                (cdr highscores-item) (cdr help-item) (cdr exit-item)))
         (when *previous-scenario*
