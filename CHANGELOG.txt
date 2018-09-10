@@ -1,5 +1,6 @@
 CHANGELOG
 
+- Added a new primordial playable character - Skinchanger. The Skinchanger can shift between three archetypes: a melee warrior, a ranged shooter and a quick flyer. Some additional mutations can be received to improve on the strengths of each archetype.
 - Fixed Resurrection not spending Power points after usage.
 - Rearranged the Satanists' lair to reduce the chance of 'traffic jams'.
 - When angels conceal their divinity in abandoned and corrupted districts, they now look like soldiers.

@@ -111,6 +111,7 @@
 (defconstant +mob-type-skinchanger-melee+ 54)
 (defconstant +mob-type-skinchanger-ranged+ 55)
 (defconstant +mob-type-skinchanger-flyer+ 56)
+(defconstant +mob-type-skinchanger-turret+ 57)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-civilians+ 1)
@@ -340,6 +341,8 @@
 (defconstant +mob-abil-skinchange-to-melee+ 161)
 (defconstant +mob-abil-skinchange-to-ranged+ 162)
 (defconstant +mob-abil-skinchange-to-flyer+ 163)
+(defconstant +mob-abil-mutate-skin-ranged-to-turret+ 164)
+(defconstant +mob-abil-skinchange-to-turret+ 165)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

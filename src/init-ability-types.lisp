@@ -7598,3 +7598,102 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-skin-ranged-to-turret+ :name "Grow roots and spores" :descr "Evolve to give yourself an ability to skinchange into a Spore colony. The evolution process takes 20 turns. The Spore colony is an immobile creature with a strong ranged attack." 
+                                 :cost 5 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 20 :param1 (list +mob-abil-skinchange-to-turret+ "grows roots and spores"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-evolving+))
+                                                               (not (mob-ability-p actor +mob-abil-skinchange-to-turret+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-skin-ranged-to-turret+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-skin-ranged-to-turret+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-skinchange-to-turret+ :name "Skinchange to Spore colony" :descr "Change your skin to become a Spore colony. The Spore colony is immobile, but has a strong ranged attack." 
+                                 :cd 15 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target ability-type))
+                                                (logger (format nil "MOB-SKIN-TO-TURRET: ~A [~A] uses skinchange to spore colony.~%" (name actor) (id actor)))
+
+                                                (let ((old-max-hp (max-hp actor)))
+                                                  (setf (mob-type actor) +mob-type-skinchanger-turret+)
+                                                  (setf (max-hp actor) (max-hp (get-mob-type-by-id (mob-type actor))))
+                                                  (setf (cur-hp actor) (round (* (cur-hp actor) (max-hp actor)) old-max-hp)))
+                                                (setf (face-mob-type-id actor) (mob-type actor))
+                                                (set-cur-weapons actor)
+                                                (adjust-abilities actor)
+                                                (adjust-dodge actor)
+                                                (adjust-armor actor)
+                                                (adjust-m-acc actor)
+                                                (adjust-r-acc actor)
+                                                (adjust-sight actor)
+                                                                                                
+                                                ;; set up current abilities cooldowns
+                                                (loop for ability-id being the hash-key in (abilities actor)
+                                                      when (null (gethash ability-id (abilities-cd actor)))
+                                                        do
+                                                           (setf (gethash ability-id (abilities-cd actor)) 0))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                           (format nil "You hear a sound of flesh tearing~A." str)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A turns into a Spore colony. "
+                                                                               (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-skinchange-to-turret+)
+                                                               (not (= (mob-type actor) +mob-type-skinchanger-turret+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (or (and nearest-enemy
+                                                                    (> (strength nearest-enemy) 
+                                                                       (strength actor))
+                                                                    (or (/= (z actor) (z nearest-enemy))
+                                                                        (>= (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2))))
+                                                           (null (riding-mob-id actor))
+                                                           (mob-ability-p actor +mob-abil-skinchange-to-turret+)
+                                                           (can-invoke-ability actor actor +mob-abil-skinchange-to-turret+))
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
