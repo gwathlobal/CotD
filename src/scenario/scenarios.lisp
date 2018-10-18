@@ -219,6 +219,10 @@
 (defconstant +city-layout-ruined-lake+ 281)
 (defconstant +city-layout-corrupted-lake+ 282)
 (defconstant +city-layout-corrupted-steal-lake+ 283)
+(defconstant +city-layout-lake-river+ 284)
+(defconstant +city-layout-ruined-lake-river+ 285)
+(defconstant +city-layout-corrupted-lake-river+ 286)
+(defconstant +city-layout-corrupted-steal-lake-river+ 287)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -807,6 +811,56 @@
       
       (push (list +building-city-corrupted-central-lake+ x y 2) result)
       )
+    
+    result))
+
+(defun place-reserved-buildings-lake-river (reserved-level)
+  (let ((result))
+
+    (place-reserved-buildings-river reserved-level)
+
+    (let ((x (- (truncate (array-dimension reserved-level 0) 2) 2))
+          (y (- (truncate (array-dimension reserved-level 1) 2) 2)))
+
+      (loop for dx from 0 to 3 do
+        (loop for dy from 0 to 3 do
+          (setf (aref reserved-level (+ x dx) (+ y dy) 2) +building-city-central-lake+)
+              ))
+
+      (loop for x from 0 below (array-dimension reserved-level 0) do
+        (loop for y from 0 below (array-dimension reserved-level 1) do
+          (when (or (= (aref reserved-level x y 2) +building-city-river+)
+                    (= (aref reserved-level x y 2) +building-city-bridge+)
+                    (= (aref reserved-level x y 2) +building-city-land-border+))
+            (push (list (aref reserved-level x y 2) x y 2) result))))
+      
+      (push (list +building-city-central-lake+ x y 2) result)
+      )  
+    
+    result))
+
+(defun place-reserved-buildings-lake-river-corrupted (reserved-level)
+  (let ((result))
+
+    (place-reserved-buildings-river reserved-level)
+
+    (let ((x (- (truncate (array-dimension reserved-level 0) 2) 2))
+          (y (- (truncate (array-dimension reserved-level 1) 2) 2)))
+
+      (loop for dx from 0 to 3 do
+        (loop for dy from 0 to 3 do
+          (setf (aref reserved-level (+ x dx) (+ y dy) 2) +building-city-corrupted-central-lake+)
+              ))
+
+      (loop for x from 0 below (array-dimension reserved-level 0) do
+        (loop for y from 0 below (array-dimension reserved-level 1) do
+          (when (or (= (aref reserved-level x y 2) +building-city-river+)
+                    (= (aref reserved-level x y 2) +building-city-bridge+)
+                    (= (aref reserved-level x y 2) +building-city-land-border+))
+            (push (list (aref reserved-level x y 2) x y 2) result))))
+      
+      (push (list +building-city-corrupted-central-lake+ x y 2) result)
+      )  
     
     result))
 

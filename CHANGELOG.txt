@@ -8,6 +8,8 @@ CHANGELOG
 - Fixed the bug where demonic sigils could spawn on sludgeshrooms and die on their own.
 - For the Celestial retreival mission, some demons will start inside the corrupted shrine to protect the relic.
 - NPCs with Sense good and Sense evil will make use of these abilities to no wander randonly but to places where they feel that the enemy is.
+- Added a district with a lake to the map layouts.
+- Added a district with a lake and a river to the map layouts.
 
 --------------------
 August 5, 2018 v1.3.3
