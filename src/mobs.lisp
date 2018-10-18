@@ -93,7 +93,7 @@
                                                                 abil-mutate-spawn-scarabs abil-mutate-spawn-larva abil-spawn-larva abil-mutate-spore-colony abil-spore-colony abil-immobile abil-float abil-ghost-possess
                                                                 abil-invisibility abil-passwall abil-ghost-release abil-decipher-rune abil-demon-word-flesh abil-demon-word-knockback abil-demon-word-invasion abil-demon-word-darkness
                                                                 abil-demon-word-plague abil-demon-word-power abil-soul abil-detect-unnatural abil-throw-corpse-into-portal abil-throw-relic-into-portal abil-create-demon-sigil
-                                                                abil-skinchange-to-melee abil-skinchange-to-ranged abil-skinchange-to-flyer abil-mutate-skin-ranged-to-turret)
+                                                                abil-skinchange-to-melee abil-skinchange-to-ranged abil-skinchange-to-flyer abil-mutate-skin-ranged-to-turret abil-mutate-charge)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -465,7 +465,9 @@
   (when abil-skinchange-to-flyer
     (setf (gethash +mob-abil-skinchange-to-flyer+ (abilities mob-type)) t))
   (when abil-mutate-skin-ranged-to-turret
-    (setf (gethash +mob-abil-mutate-skin-ranged-to-turret+ (abilities mob-type)) t)))
+    (setf (gethash +mob-abil-mutate-skin-ranged-to-turret+ (abilities mob-type)) t))
+  (when abil-mutate-charge
+    (setf (gethash +mob-abil-mutate-charge+ (abilities mob-type)) t)))
 
 (defun get-mob-type-by-id (mob-type-id)
   (aref *mob-types* mob-type-id))

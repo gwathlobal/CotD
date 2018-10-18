@@ -142,6 +142,19 @@
                                                                                                                                                                                                                             
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
+(set-scenario-feature (make-scenario-feature :id +city-layout-lake+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A district upon a lake"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-lake)))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-ruined-normal+
                                              :type +scenario-feature-city-layout+
@@ -232,6 +245,19 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-river)))
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
                                                                                                                                                                               #'place-reserved-buildings-island)))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-ruined-lake+
+                                             :type +scenario-feature-city-layout+
+                                             :name "An abandoned district upon a lake"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-ruined-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-lake)))))
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
@@ -366,6 +392,27 @@
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-lake+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted district upon a lake"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-lake-corrupted
+                                                                                                                                                                              (list +reserved-building-army-post+
+                                                                                                                                                                                    +building-city-army-post-corrupted+
+                                                                                                                                                                                    +reserved-building-sigil-post+
+                                                                                                                                                                                    +building-city-corrupted-sigil-post+)))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
 (set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-steal-normal+
                                              :type +scenario-feature-city-layout+
                                              :name "A corrupted district"
@@ -486,6 +533,27 @@
                                                                                                             #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-steal-river)))
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
                                                                                                                                                                               #'place-reserved-buildings-island
+                                                                                                                                                                              (list +reserved-building-army-post+
+                                                                                                                                                                                    +building-city-army-post-corrupted+
+                                                                                                                                                                                    +reserved-building-sigil-post+
+                                                                                                                                                                                    +building-city-corrupted-sigil-post+)))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+))))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-steal-lake+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted district upon a lake"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-steal-river)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-steal-river)))
+                                                                                                            #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                                              #'place-reserved-buildings-lake-corrupted
                                                                                                                                                                               (list +reserved-building-army-post+
                                                                                                                                                                                     +building-city-army-post-corrupted+
                                                                                                                                                                                     +reserved-building-sigil-post+

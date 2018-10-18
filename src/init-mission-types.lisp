@@ -76,6 +76,18 @@
                                                                            (list +faction-type-ghost+ +mission-faction-present+)
                                                                            (list +faction-type-ghost+ +mission-faction-absent+))))
 
+(set-mission-district (make-instance 'mission-district :id +city-layout-lake+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-present+)
+                                                                           (list +faction-type-church+ +mission-faction-present+)
+                                                                           (list +faction-type-satanists+ +mission-faction-present+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-present+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-present+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
 (set-mission-district (make-instance 'mission-district :id +city-layout-ruined-normal+
                                                        :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
                                                                            (list +faction-type-church+ +mission-faction-absent+)
@@ -113,6 +125,15 @@
                                                                            (list +faction-type-ghost+ +mission-faction-absent+))))
 
 (set-mission-district (make-instance 'mission-district :id +city-layout-ruined-river+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
+(set-mission-district (make-instance 'mission-district :id +city-layout-ruined-lake+
                                                        :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
                                                                            (list +faction-type-church+ +mission-faction-absent+)
                                                                            (list +faction-type-satanists+ +mission-faction-absent+)
@@ -166,6 +187,15 @@
                                                                            (list +faction-type-criminals+ +mission-faction-absent+)
                                                                            (list +faction-type-ghost+ +mission-faction-absent+))))
 
+(set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-lake+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
 (set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-steal-normal+
                                                        :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
                                                                            (list +faction-type-church+ +mission-faction-absent+)
@@ -211,6 +241,15 @@
                                                                            (list +faction-type-criminals+ +mission-faction-absent+)
                                                                            (list +faction-type-ghost+ +mission-faction-absent+))))
 
+(set-mission-district (make-instance 'mission-district :id +city-layout-corrupted-steal-lake+
+                                                       :faction-list (list (list +faction-type-civilians+ +mission-faction-absent+)
+                                                                           (list +faction-type-church+ +mission-faction-absent+)
+                                                                           (list +faction-type-satanists+ +mission-faction-absent+)
+                                                                           (list +faction-type-eater+ +mission-faction-present+)
+                                                                           (list +faction-type-eater+ +mission-faction-absent+)
+                                                                           (list +faction-type-criminals+ +mission-faction-absent+)
+                                                                           (list +faction-type-ghost+ +mission-faction-absent+))))
+
 ;;----------------------------------------
 ;; MISSION-SCENARIOS
 ;;----------------------------------------
@@ -227,7 +266,7 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-attack+
                                                        :name "Demonic attack"
-                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+)
+                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+ +city-layout-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-military+ +mission-faction-delayed+)
@@ -273,7 +312,7 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-raid+
                                                        :name "Demonic raid"
-                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+)
+                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+ +city-layout-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-military+ +mission-faction-delayed+)
@@ -325,7 +364,7 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-steal+
                                                        :name "Demonic thievery"
-                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+)
+                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+ +city-layout-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-military+ +mission-faction-delayed+)
@@ -372,7 +411,7 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest+
                                                        :name "Demonic conquest"
-                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+)
+                                                       :district-layout-list (list +city-layout-normal+ +city-layout-forest+ +city-layout-port+ +city-layout-island+ +city-layout-river+ +city-layout-barricaded-city+ +city-layout-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-military+ +mission-faction-delayed+)
@@ -420,7 +459,8 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-raid-ruined+
                                                        :name "Demonic raid"
-                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+)
+                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+
+                                                                                   +city-layout-ruined-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-angels+ +mission-faction-defender+)
@@ -458,7 +498,8 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest-ruined+
                                                        :name "Demonic conquest"
-                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+)
+                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+
+                                                                                   +city-layout-ruined-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-military+ +mission-faction-delayed+)
@@ -495,7 +536,8 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-military-conquest-ruined+
                                                        :name "Military conquest"
-                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+)
+                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+
+                                                                                   +city-layout-ruined-lake+)
                                                        :faction-list (list (list +faction-type-military+ +mission-faction-attacker+)
                                                                            (list +faction-type-demons+ +mission-faction-defender+)
                                                                            (list +faction-type-angels+ +mission-faction-delayed+)
@@ -528,7 +570,8 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-military-raid-ruined+
                                                        :name "Military raid"
-                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+)
+                                                       :district-layout-list (list +city-layout-ruined-normal+ +city-layout-ruined-forest+ +city-layout-ruined-port+ +city-layout-ruined-island+ +city-layout-ruined-river+
+                                                                                   +city-layout-ruined-lake+)
                                                        :faction-list (list (list +faction-type-military+ +mission-faction-attacker+)
                                                                            (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-angels+ +mission-faction-delayed+)
@@ -561,7 +604,8 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-demon-conquest-corrupted+
                                                        :name "Demonic conquest"
-                                                       :district-layout-list (list +city-layout-corrupted-normal+ +city-layout-corrupted-forest+ +city-layout-corrupted-port+ +city-layout-corrupted-island+ +city-layout-corrupted-river+)
+                                                       :district-layout-list (list +city-layout-corrupted-normal+ +city-layout-corrupted-forest+ +city-layout-corrupted-port+ +city-layout-corrupted-island+ +city-layout-corrupted-river+
+                                                                                   +city-layout-corrupted-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-attacker+)
                                                                            (list +faction-type-military+ +mission-faction-defender+)
                                                                            (list +faction-type-military+ +mission-faction-delayed+)
@@ -598,7 +642,8 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-military-conquest-corrupted+
                                                        :name "Military conquest"
-                                                       :district-layout-list (list +city-layout-corrupted-normal+ +city-layout-corrupted-forest+ +city-layout-corrupted-port+ +city-layout-corrupted-island+ +city-layout-corrupted-river+)
+                                                       :district-layout-list (list +city-layout-corrupted-normal+ +city-layout-corrupted-forest+ +city-layout-corrupted-port+ +city-layout-corrupted-island+ +city-layout-corrupted-river+
+                                                                                   +city-layout-corrupted-lake+)
                                                        :faction-list (list (list +faction-type-military+ +mission-faction-attacker+)
                                                                            (list +faction-type-demons+ +mission-faction-defender+)
                                                                            (list +faction-type-angels+ +mission-faction-delayed+)
@@ -631,7 +676,8 @@
 
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-angelic-conquest-corrupted+
                                                        :name "Celestial purge"
-                                                       :district-layout-list (list +city-layout-corrupted-normal+ +city-layout-corrupted-forest+ +city-layout-corrupted-port+ +city-layout-corrupted-island+ +city-layout-corrupted-river+)
+                                                       :district-layout-list (list +city-layout-corrupted-normal+ +city-layout-corrupted-forest+ +city-layout-corrupted-port+ +city-layout-corrupted-island+ +city-layout-corrupted-river+
+                                                                                   +city-layout-corrupted-lake+)
                                                        :faction-list (list (list +faction-type-military+ +mission-faction-delayed+)
                                                                            (list +faction-type-military+ +mission-faction-absent+)
                                                                            (list +faction-type-demons+ +mission-faction-defender+)
@@ -666,7 +712,7 @@
 (set-mission-scenario (make-instance 'mission-scenario :id +mission-scenario-angelic-steal-corrupted+
                                                        :name "Celestial retrieval"
                                                        :district-layout-list (list +city-layout-corrupted-steal-normal+ +city-layout-corrupted-steal-forest+ +city-layout-corrupted-steal-port+ +city-layout-corrupted-steal-island+
-                                                                                   +city-layout-corrupted-steal-river+)
+                                                                                   +city-layout-corrupted-steal-river+ +city-layout-corrupted-steal-lake+)
                                                        :faction-list (list (list +faction-type-demons+ +mission-faction-present+)
                                                                            (list +faction-type-angels+ +mission-faction-attacker+)
                                                                            )

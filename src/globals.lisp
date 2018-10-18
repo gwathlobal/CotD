@@ -343,6 +343,7 @@
 (defconstant +mob-abil-skinchange-to-flyer+ 163)
 (defconstant +mob-abil-mutate-skin-ranged-to-turret+ 164)
 (defconstant +mob-abil-skinchange-to-turret+ 165)
+(defconstant +mob-abil-mutate-charge+ 166)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

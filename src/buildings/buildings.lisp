@@ -139,6 +139,8 @@
 (defconstant +building-city-army-post-corrupted+ 91)
 (defconstant +building-city-corrupted-shrine-1+ 92)
 (defconstant +building-city-corrupted-forest-border+ 93)
+(defconstant +building-city-central-lake+ 94)
+(defconstant +building-city-corrupted-central-lake+ 95)
 
 (defparameter *level-grid-size* 5)
 
