@@ -272,7 +272,7 @@
 
 (set-scenario-feature (make-scenario-feature :id +sf-faction-military-conquest-corrupted-skinchanger+
                                              :type +scenario-feature-player-faction+
-                                             :name "Eater of the dead"
+                                             :name "Skinchanger"
                                              :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore mission-id))
                                                        ;; it is important that the player setup function is the last to be pushed so that it is the first to be processed, otherwise everything will break

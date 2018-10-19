@@ -168,6 +168,75 @@
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
+(set-scenario-feature (make-scenario-feature :id +city-layout-port-river+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A seaport district with a river"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-port)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-port)))
+                                                                                                            #'(lambda (reserved-level)
+                                                                                                                (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                       #'(lambda (reserved-level)
+                                                                                                                                                           (place-land-arrival-border reserved-level)
+                                                                                                                                                           (let ((result) (r (random 11)) (n nil) (s nil) (w nil) (e nil))
+
+                                                                                                                                                             (cond
+                                                                                                                                                               ((= r 0) (setf w t e t))           ;; 0 - we
+                                                                                                                                                               ((= r 1) (setf n t s t))           ;; 1 - ns
+                                                                                                                                                               ((= r 2) (setf n t e t))           ;; 2 - ne
+                                                                                                                                                               ((= r 3) (setf n t w t))           ;; 3 - nw
+                                                                                                                                                               ((= r 4) (setf s t e t))           ;; 4 - se
+                                                                                                                                                               ((= r 5) (setf s t w t))           ;; 5 - sw
+                                                                                                                                                               ((= r 6) (setf n t w t e t))       ;; 6 - nwe
+                                                                                                                                                               ((= r 7) (setf s t w t e t))       ;; 7 - swe
+                                                                                                                                                               ((= r 8) (setf n t s t e t))       ;; 8 - nse
+                                                                                                                                                               ((= r 9) (setf n t s t w t))       ;; 9 - nsw
+                                                                                                                                                               ((= r 10) (setf n t s t w t e t))) ;; 10 - nswe
+                                                                                                                                                             
+                                                                                                                                                             (when n (place-city-river-n reserved-level))
+                                                                                                                                                             (when s (place-city-river-s reserved-level))
+                                                                                                                                                             (when w (place-city-river-w reserved-level))
+                                                                                                                                                             (when e (place-city-river-e reserved-level))
+                                                                                                                                                             (place-city-river-center reserved-level)
+
+                                                                                                                                                             (setf r (random 4))
+                                                                                                                                                             (cond
+                                                                                                                                                               ;; north
+                                                                                                                                                               ((= r 0)
+                                                                                                                                                                (place-city-river-n reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-port-n reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; south
+                                                                                                                                                               ((= r 1)
+                                                                                                                                                                (place-city-river-s reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-port-s reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; east
+                                                                                                                                                               ((= r 2)
+                                                                                                                                                                (place-city-river-e reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-port-e reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; west
+                                                                                                                                                               ((= r 3)
+                                                                                                                                                                (place-city-river-w reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-port-w reserved-level t))
+                                                                                                                                                                ))
+                                                                                                                                                             
+                                                                                                                                                             (loop for x from 0 below (array-dimension reserved-level 0) do
+                                                                                                                                                               (loop for y from 0 below (array-dimension reserved-level 1) do
+                                                                                                                                                                 (when (or (= (aref reserved-level x y 2) +building-city-sea+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-pier+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-river+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-bridge+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-land-border+))
+                                                                                                                                                                   (push (list (aref reserved-level x y 2) x y 2) result))))
+                                                                                                                                                             result))))
+                                                                                                            )))
+                                                       
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-ruined-normal+
                                              :type +scenario-feature-city-layout+
@@ -285,6 +354,75 @@
                                                                                                             #'(lambda (reserved-level) (place-reserved-buildings-for-factions faction-list reserved-level
                                                                                                                                                                               #'place-reserved-buildings-lake-river)))))
                                                        
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +city-layout-ruined-port-river+
+                                             :type +scenario-feature-city-layout+
+                                             :name "An abandoned seaport district with a river"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-ruined-port)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-ruined-port)))
+                                                                                                            #'(lambda (reserved-level)
+                                                                                                                (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                       #'(lambda (reserved-level)
+                                                                                                                                                           (place-land-arrival-border reserved-level)
+                                                                                                                                                           (let ((result) (r (random 11)) (n nil) (s nil) (w nil) (e nil))
+
+                                                                                                                                                             (cond
+                                                                                                                                                               ((= r 0) (setf w t e t))           ;; 0 - we
+                                                                                                                                                               ((= r 1) (setf n t s t))           ;; 1 - ns
+                                                                                                                                                               ((= r 2) (setf n t e t))           ;; 2 - ne
+                                                                                                                                                               ((= r 3) (setf n t w t))           ;; 3 - nw
+                                                                                                                                                               ((= r 4) (setf s t e t))           ;; 4 - se
+                                                                                                                                                               ((= r 5) (setf s t w t))           ;; 5 - sw
+                                                                                                                                                               ((= r 6) (setf n t w t e t))       ;; 6 - nwe
+                                                                                                                                                               ((= r 7) (setf s t w t e t))       ;; 7 - swe
+                                                                                                                                                               ((= r 8) (setf n t s t e t))       ;; 8 - nse
+                                                                                                                                                               ((= r 9) (setf n t s t w t))       ;; 9 - nsw
+                                                                                                                                                               ((= r 10) (setf n t s t w t e t))) ;; 10 - nswe
+                                                                                                                                                             
+                                                                                                                                                             (when n (place-city-river-n reserved-level))
+                                                                                                                                                             (when s (place-city-river-s reserved-level))
+                                                                                                                                                             (when w (place-city-river-w reserved-level))
+                                                                                                                                                             (when e (place-city-river-e reserved-level))
+                                                                                                                                                             (place-city-river-center reserved-level)
+
+                                                                                                                                                             (setf r (random 4))
+                                                                                                                                                             (cond
+                                                                                                                                                               ;; north
+                                                                                                                                                               ((= r 0)
+                                                                                                                                                                (place-city-river-n reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-n reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; south
+                                                                                                                                                               ((= r 1)
+                                                                                                                                                                (place-city-river-s reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-s reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; east
+                                                                                                                                                               ((= r 2)
+                                                                                                                                                                (place-city-river-e reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-e reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; west
+                                                                                                                                                               ((= r 3)
+                                                                                                                                                                (place-city-river-w reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-w reserved-level t))
+                                                                                                                                                                ))
+                                                                                                                                                             
+                                                                                                                                                             (loop for x from 0 below (array-dimension reserved-level 0) do
+                                                                                                                                                               (loop for y from 0 below (array-dimension reserved-level 1) do
+                                                                                                                                                                 (when (or (= (aref reserved-level x y 2) +building-city-sea+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-pier+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-river+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-bridge+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-land-border+))
+                                                                                                                                                                   (push (list (aref reserved-level x y 2) x y 2) result))))
+                                                                                                                                                             result))))
+                                                                                                            )))
+                                                                                                                                                                     
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 (set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-normal+
@@ -460,6 +598,83 @@
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-port-river+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted seaport district with a river"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-port)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-port)))
+                                                                                                            #'(lambda (reserved-level)
+                                                                                                                (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                       #'(lambda (reserved-level)
+                                                                                                                                                           (place-land-arrival-border reserved-level)
+                                                                                                                                                           (let ((result) (r (random 11)) (n nil) (s nil) (w nil) (e nil))
+
+                                                                                                                                                             (cond
+                                                                                                                                                               ((= r 0) (setf w t e t))           ;; 0 - we
+                                                                                                                                                               ((= r 1) (setf n t s t))           ;; 1 - ns
+                                                                                                                                                               ((= r 2) (setf n t e t))           ;; 2 - ne
+                                                                                                                                                               ((= r 3) (setf n t w t))           ;; 3 - nw
+                                                                                                                                                               ((= r 4) (setf s t e t))           ;; 4 - se
+                                                                                                                                                               ((= r 5) (setf s t w t))           ;; 5 - sw
+                                                                                                                                                               ((= r 6) (setf n t w t e t))       ;; 6 - nwe
+                                                                                                                                                               ((= r 7) (setf s t w t e t))       ;; 7 - swe
+                                                                                                                                                               ((= r 8) (setf n t s t e t))       ;; 8 - nse
+                                                                                                                                                               ((= r 9) (setf n t s t w t))       ;; 9 - nsw
+                                                                                                                                                               ((= r 10) (setf n t s t w t e t))) ;; 10 - nswe
+                                                                                                                                                             
+                                                                                                                                                             (when n (place-city-river-n reserved-level))
+                                                                                                                                                             (when s (place-city-river-s reserved-level))
+                                                                                                                                                             (when w (place-city-river-w reserved-level))
+                                                                                                                                                             (when e (place-city-river-e reserved-level))
+                                                                                                                                                             (place-city-river-center reserved-level)
+
+                                                                                                                                                             (setf r (random 4))
+                                                                                                                                                             (cond
+                                                                                                                                                               ;; north
+                                                                                                                                                               ((= r 0)
+                                                                                                                                                                (place-city-river-n reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-n reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; south
+                                                                                                                                                               ((= r 1)
+                                                                                                                                                                (place-city-river-s reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-s reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; east
+                                                                                                                                                               ((= r 2)
+                                                                                                                                                                (place-city-river-e reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-e reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; west
+                                                                                                                                                               ((= r 3)
+                                                                                                                                                                (place-city-river-w reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-w reserved-level t))
+                                                                                                                                                                ))
+                                                                                                                                                             
+                                                                                                                                                             (loop for x from 0 below (array-dimension reserved-level 0) do
+                                                                                                                                                               (loop for y from 0 below (array-dimension reserved-level 1) do
+                                                                                                                                                                 (when (or (= (aref reserved-level x y 2) +building-city-sea+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-pier+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-river+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-bridge+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-land-border+))
+                                                                                                                                                                   (push (list (aref reserved-level x y 2) x y 2) result))))
+                                                                                                                                                             result))
+                                                                                                                                                       (list +reserved-building-army-post+
+                                                                                                                                                             +building-city-army-post-corrupted+
+                                                                                                                                                             +reserved-building-sigil-post+
+                                                                                                                                                             +building-city-corrupted-sigil-post+)))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+)
+                                                                                                            )))
+                                                                                                                                                                   
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
 (set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-steal-normal+
                                              :type +scenario-feature-city-layout+
                                              :name "A corrupted district"
@@ -633,6 +848,82 @@
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
+(set-scenario-feature (make-scenario-feature :id +city-layout-corrupted-steal-port-river+
+                                             :type +scenario-feature-city-layout+
+                                             :name "A corrupted seaport district with a river"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore mission-id))
+                                                       (setf layout-func #'(lambda () (create-template-city *max-x-level* *max-y-level* *max-z-level*
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-max-buildings-corrupted-steal-port)))
+                                                                                                            #'(lambda () (set-building-types-for-factions faction-list (get-reserved-buildings-corrupted-steal-port)))
+                                                                                                            #'(lambda (reserved-level)
+                                                                                                                (place-reserved-buildings-for-factions faction-list reserved-level
+                                                                                                                                                       #'(lambda (reserved-level)
+                                                                                                                                                           (place-land-arrival-border reserved-level)
+                                                                                                                                                           (let ((result) (r (random 11)) (n nil) (s nil) (w nil) (e nil))
+
+                                                                                                                                                             (cond
+                                                                                                                                                               ((= r 0) (setf w t e t))           ;; 0 - we
+                                                                                                                                                               ((= r 1) (setf n t s t))           ;; 1 - ns
+                                                                                                                                                               ((= r 2) (setf n t e t))           ;; 2 - ne
+                                                                                                                                                               ((= r 3) (setf n t w t))           ;; 3 - nw
+                                                                                                                                                               ((= r 4) (setf s t e t))           ;; 4 - se
+                                                                                                                                                               ((= r 5) (setf s t w t))           ;; 5 - sw
+                                                                                                                                                               ((= r 6) (setf n t w t e t))       ;; 6 - nwe
+                                                                                                                                                               ((= r 7) (setf s t w t e t))       ;; 7 - swe
+                                                                                                                                                               ((= r 8) (setf n t s t e t))       ;; 8 - nse
+                                                                                                                                                               ((= r 9) (setf n t s t w t))       ;; 9 - nsw
+                                                                                                                                                               ((= r 10) (setf n t s t w t e t))) ;; 10 - nswe
+                                                                                                                                                             
+                                                                                                                                                             (when n (place-city-river-n reserved-level))
+                                                                                                                                                             (when s (place-city-river-s reserved-level))
+                                                                                                                                                             (when w (place-city-river-w reserved-level))
+                                                                                                                                                             (when e (place-city-river-e reserved-level))
+                                                                                                                                                             (place-city-river-center reserved-level)
+
+                                                                                                                                                             (setf r (random 4))
+                                                                                                                                                             (cond
+                                                                                                                                                               ;; north
+                                                                                                                                                               ((= r 0)
+                                                                                                                                                                (place-city-river-n reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-n reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; south
+                                                                                                                                                               ((= r 1)
+                                                                                                                                                                (place-city-river-s reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-s reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; east
+                                                                                                                                                               ((= r 2)
+                                                                                                                                                                (place-city-river-e reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-e reserved-level t))
+                                                                                                                                                                )
+                                                                                                                                                               ;; west
+                                                                                                                                                               ((= r 3)
+                                                                                                                                                                (place-city-river-w reserved-level)
+                                                                                                                                                                (setf result (place-reserved-buildings-ruined-port-w reserved-level t))
+                                                                                                                                                                ))
+                                                                                                                                                             
+                                                                                                                                                             (loop for x from 0 below (array-dimension reserved-level 0) do
+                                                                                                                                                               (loop for y from 0 below (array-dimension reserved-level 1) do
+                                                                                                                                                                 (when (or (= (aref reserved-level x y 2) +building-city-sea+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-pier+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-river+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-bridge+)
+                                                                                                                                                                           (= (aref reserved-level x y 2) +building-city-land-border+))
+                                                                                                                                                                   (push (list (aref reserved-level x y 2) x y 2) result))))
+                                                                                                                                                             result))
+                                                                                                                                                       (list +reserved-building-army-post+
+                                                                                                                                                             +building-city-army-post-corrupted+
+                                                                                                                                                             +reserved-building-sigil-post+
+                                                                                                                                                             +building-city-corrupted-sigil-post+)))
+                                                                                                            (list +level-city-border+ +terrain-border-creep+
+                                                                                                                  +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                                                                  +level-city-floor+ +terrain-floor-creep+
+                                                                                                                  +level-city-floor-bright+ +terrain-floor-creep-bright+)
+                                                                                                            )))
+                                                                                                                                                                     
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 
 ;;======================
 ;; FACTIONS

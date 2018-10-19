@@ -223,6 +223,10 @@
 (defconstant +city-layout-ruined-lake-river+ 285)
 (defconstant +city-layout-corrupted-lake-river+ 286)
 (defconstant +city-layout-corrupted-steal-lake-river+ 287)
+(defconstant +city-layout-port-river+ 288)
+(defconstant +city-layout-ruined-port-river+ 289)
+(defconstant +city-layout-corrupted-port-river+ 290)
+(defconstant +city-layout-corrupted-steal-port-river+ 291)
 
 (defparameter *scenario-features* (make-array (list 0) :adjustable t))
 
@@ -864,12 +868,18 @@
     
     result))
 
-(defun place-reserved-buildings-port-n (reserved-level)
+(defun place-reserved-buildings-port-n (reserved-level &optional (skip-second-pier nil))
   (let ((result))
-    (loop for x from 0 below (array-dimension reserved-level 0)
+    (loop with count-piers = 0
+          for x from 0 below (array-dimension reserved-level 0)
           for building-type-id = (if (and (zerop (mod (1+ x) 5))
                                           (/= x (1- (array-dimension reserved-level 0))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-warehouse-port-1+
@@ -890,12 +900,18 @@
     
     result))
 
-(defun place-reserved-buildings-port-s (reserved-level)
+(defun place-reserved-buildings-port-s (reserved-level &optional (skip-second-pier nil))
   (let ((result) (max-y (1- (array-dimension reserved-level 1))))
-    (loop for x from 0 below (array-dimension reserved-level 0)
+    (loop with count-piers = 0
+          for x from 0 below (array-dimension reserved-level 0)
           for building-type-id = (if (and (zerop (mod (1+ x) 5))
                                           (/= x (1- (array-dimension reserved-level 0))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-warehouse-port-1+
@@ -916,12 +932,18 @@
     
     result))
 
-(defun place-reserved-buildings-port-e (reserved-level)
+(defun place-reserved-buildings-port-e (reserved-level &optional (skip-second-pier nil))
   (let ((result) (max-x (1- (array-dimension reserved-level 0))))
-    (loop for y from 0 below (array-dimension reserved-level 1)
+    (loop with count-piers = 0
+          for y from 0 below (array-dimension reserved-level 1)
           for building-type-id = (if (and (zerop (mod (1+ y) 5))
                                           (/= y (1- (array-dimension reserved-level 1))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-warehouse-port-1+
@@ -942,12 +964,18 @@
     
     result))
 
-(defun place-reserved-buildings-port-w (reserved-level)
+(defun place-reserved-buildings-port-w (reserved-level &optional (skip-second-pier nil))
   (let ((result))
-    (loop for y from 0 below (array-dimension reserved-level 1)
+    (loop with count-piers = 0
+          for y from 0 below (array-dimension reserved-level 1)
           for building-type-id = (if (and (zerop (mod (1+ y) 5))
                                           (/= y (1- (array-dimension reserved-level 1))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-warehouse-port-1+
@@ -969,12 +997,18 @@
     
     result))
 
-(defun place-reserved-buildings-ruined-port-n (reserved-level)
+(defun place-reserved-buildings-ruined-port-n (reserved-level &optional (skip-second-pier nil))
   (let ((result))
-    (loop for x from 0 below (array-dimension reserved-level 0)
+    (loop with count-piers = 0
+          for x from 0 below (array-dimension reserved-level 0)
           for building-type-id = (if (and (zerop (mod (1+ x) 5))
                                           (/= x (1- (array-dimension reserved-level 0))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-ruined-warehouse-port-1+
@@ -995,12 +1029,18 @@
     
     result))
 
-(defun place-reserved-buildings-ruined-port-s (reserved-level)
+(defun place-reserved-buildings-ruined-port-s (reserved-level &optional (skip-second-pier nil))
   (let ((result) (max-y (1- (array-dimension reserved-level 1))))
-    (loop for x from 0 below (array-dimension reserved-level 0)
+    (loop with count-piers = 0
+          for x from 0 below (array-dimension reserved-level 0)
           for building-type-id = (if (and (zerop (mod (1+ x) 5))
                                           (/= x (1- (array-dimension reserved-level 0))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-ruined-warehouse-port-1+
@@ -1021,12 +1061,18 @@
     
     result))
 
-(defun place-reserved-buildings-ruined-port-e (reserved-level)
+(defun place-reserved-buildings-ruined-port-e (reserved-level &optional (skip-second-pier nil))
   (let ((result) (max-x (1- (array-dimension reserved-level 0))))
-    (loop for y from 0 below (array-dimension reserved-level 1)
+    (loop with count-piers = 0
+          for y from 0 below (array-dimension reserved-level 1)
           for building-type-id = (if (and (zerop (mod (1+ y) 5))
                                           (/= y (1- (array-dimension reserved-level 1))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-ruined-warehouse-port-1+
@@ -1047,12 +1093,18 @@
     
     result))
 
-(defun place-reserved-buildings-ruined-port-w (reserved-level)
+(defun place-reserved-buildings-ruined-port-w (reserved-level &optional (skip-second-pier nil))
   (let ((result))
-    (loop for y from 0 below (array-dimension reserved-level 1)
+    (loop with count-piers = 0
+          for y from 0 below (array-dimension reserved-level 1)
           for building-type-id = (if (and (zerop (mod (1+ y) 5))
                                           (/= y (1- (array-dimension reserved-level 1))))
-                                   +building-city-pier+
+                                   (progn
+                                     (incf count-piers)
+                                     (if (and skip-second-pier
+                                              (= count-piers 2))
+                                       +building-city-sea+
+                                       +building-city-pier+))
                                    +building-city-sea+)
           for random-warehouse-1 = (if (zerop (random 2))
                                      +building-city-ruined-warehouse-port-1+
