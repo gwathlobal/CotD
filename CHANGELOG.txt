@@ -11,6 +11,7 @@ CHANGELOG
 - Added a district with a lake to the map layouts.
 - Added a district with a lake and a river to the map layouts.
 - Added a seaport district with a river to the map layouts.
+- Added some performance optimizations.
 
 --------------------
 August 5, 2018 v1.3.3

@@ -2,9 +2,13 @@
 
 (defgeneric ai-function (mob))
 
+(defparameter *ms-inside-path* 0)
+(defparameter *ms-inside-path-start* 0)
+
 (defun check-move-for-ai (mob dx dy dz cx cy cz &key (final-dst nil))
   (declare (optimize (speed 3))
            (type fixnum dx dy dz cx cy cz))
+  
   (let ((sx 0) (sy 0) (move-result nil)
         (map-size (if (riding-mob-id mob)
                     (map-size (get-mob-by-id (riding-mob-id mob)))
@@ -157,6 +161,7 @@
         
             ))
 
+       
     t))
 
 (defun ai-find-move-around (mob tx ty)
@@ -359,6 +364,7 @@
                                                                                             (map-size actor))
                                    (get-mob-move-mode actor))
       (logger (format nil "AI-PLOT-PATH-TO-DST: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x actor) (y actor) (z actor) tx ty tz))
+      ;;(format t "~%TIME-ELAPSED AI ~A [~A] before AI-PLOT-PATH-TO-DST:: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (setf path (a-star (list (x actor) (y actor) (z actor)) (list tx ty tz) 
                          #'(lambda (dx dy dz cx cy cz) 
                              ;; checking for impassable objects
@@ -372,6 +378,7 @@
       
       (pop path)
       (logger (format nil "AI-PLOT-PATH-TO-DST: Set mob path - ~A~%" path))
+      ;;(format t "~%TIME-ELAPSED AI ~A [~A] after AI-PLOT-PATH-TO-DST:: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (setf (path actor) path)
       )))
 
@@ -422,6 +429,7 @@
                                  (not (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))))
                         nil)))
       
+      ;;(format t "~%TIME-ELAPSED AI ~A [~A] before AI-MOVE-AlONG-PATH: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (when (and move-result
                  (not (eq move-result t))
                  (eq (first move-result) :mobs)
@@ -437,7 +445,8 @@
         (let ((final-cell nil))
           (when (and (path-dst actor)
                      (>= (get-distance-3d (x actor) (y actor) (z actor) (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))
-                        2))
+                         2))
+            ;;(format t "~%TIME-ELAPSED AI ~A [~A] inside AI-MOVE-AlONG-PATH: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
             (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                         (when (eq (check-move-on-level actor dx dy (z actor)) t)
                                                           (unless final-cell
@@ -456,6 +465,7 @@
       (setf move-result (move-mob actor (x-y-into-dir step-x step-y) :dir-z step-z))
       
       (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A ~A), MOVE-RESULT ~A~%" (path-dst actor) (x actor) (y actor) (z actor) move-result))
+      ;;(format t "~%TIME-ELAPSED AI ~A [~A] after AI-MOVE-AlONG-PATH: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (if move-result
         (progn
           (when (and (path-dst actor)

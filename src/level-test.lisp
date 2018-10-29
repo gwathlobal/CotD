@@ -157,12 +157,12 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-skinchanger-melee+ :x 36 :y 18 :z 1))
+  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 36 :y 18 :z 1))
   (add-mob-to-level-list (level world) *player*)
   
   (let ((soldier (make-instance 'mob :mob-type +mob-type-soldier+ :x 39 :y 20 :z 1))
         (demon (make-instance 'mob :mob-type +mob-type-demon+ :x 1 :y 1 :z 2))
-        (angel (make-instance 'mob :mob-type +mob-type-angel+ :x 43 :y 16 :z 3))
+        (angel (make-instance 'mob :mob-type +mob-type-imp+ :x 43 :y 16 :z 3))
         )
     (setf (cur-fp *player*) 15)
     ;(setf (max-hp *player*) 50)

@@ -100,7 +100,12 @@
     (add-message str color)))
 
 (defun place-animation (x y z animation-type-id &key (params nil))
-  (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue *world*)))
+  (when (and (= z (z *player*))
+             (> x (- (x *player*) (truncate *max-x-view* 2)))
+             (< x (+ (x *player*) (truncate *max-x-view* 2)))
+             (> y (- (y *player*) (truncate *max-y-view* 2)))
+             (< y (+ (y *player*) (truncate *max-y-view* 2))))
+    (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue *world*))))
 
 (defun check-move-on-level (mob dx dy dz)
   (let ((sx) (sy)

@@ -14,6 +14,8 @@
   (update-visible-area (level *world*) (x player) (y player) (z player))
 
   (format t "TIME-ELAPSED AFTER: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  ;(format t "TIME-INSIDE PATH FUNCS: ~A~%" *ms-inside-path*)
+  ;(setf *ms-inside-path* 0)
   
   ;; find the nearest enemy
   ;;(when (mob-ability-p *player* +mob-abil-detect-good+)
@@ -183,5 +185,6 @@
   (loop until (made-turn player) do
     (setf (can-move-if-possessed player) nil)
     (get-input-player))
-  (setf *time-at-end-of-player-turn* (get-internal-real-time)))
+  (setf *time-at-end-of-player-turn* (get-internal-real-time))
+  )
 

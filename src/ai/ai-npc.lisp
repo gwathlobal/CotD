@@ -2,6 +2,10 @@
 
 (defmethod ai-function ((mob mob))
   ;(declare (optimize (speed 3)))
+  ;;(setf *ms-inside-path-start* (get-internal-real-time))
+
+  ;;(format t "~%TIME-ELAPSED AI ~A [~A] BEFORE : ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  
   (logger (format nil "~%AI-Function Computer ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
   
   ;; skip and invoke the master AI
@@ -132,6 +136,8 @@
     ;; find and apply the AI package
     (let ((ai-package-array (make-array (list (1+ +ai-priority-always+)) :initial-element ())))
 
+      ;;(format t "~%TIME-ELAPSED AI ~A [~A] before ai package sort: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+      
       ;; sort all AI packages according to priorities (and do not include 'never' packages)
       (loop for ai-package-id being the hash-key in (ai-packages mob)
             for ai-package = (get-ai-package-by-id ai-package-id)
@@ -154,6 +160,8 @@
                                                                             collect (format nil "~A " (id ai-package)))))))
       
 
+      ;;(format t "~%TIME-ELAPSED AI ~A [~A] after ai package sort: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+      
       ;; invoke all 'always' packages if possible
       (loop for ai-package in (aref ai-package-array +ai-priority-always+)
             for ai-check-func of-type function = (on-check-ai ai-package)
@@ -163,7 +171,10 @@
                       ai-invoke-func
                       (setf check-result (funcall ai-check-func mob nearest-enemy nearest-ally hostile-mobs allied-mobs)))
               do
-                 (funcall ai-invoke-func mob nearest-enemy nearest-ally hostile-mobs allied-mobs check-result))
+                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] after ai check func [~A]: ~A~%" (name mob) (id mob) (id ai-package) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+                 (funcall ai-invoke-func mob nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] after ai invoke func [~A]: ~A~%" (name mob) (id mob) (id ai-package) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+            )
 
       ;; for each priority check try to invoke a random ai-package in this priority
       (loop for priority from 9 downto 1
@@ -178,6 +189,7 @@
                                              when (and ai-check-func
                                                        (setf check-result (funcall ai-check-func mob nearest-enemy nearest-ally hostile-mobs allied-mobs)))
                                                collect (list ai-package check-result)))
+                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] after ai check funcs with priority ~A: ~A~%" (name mob) (id mob) priority (- (get-internal-real-time) *time-at-end-of-player-turn*))
 
                  (when ai-package-list
                    ;; if there are several of them choose one randomly
@@ -186,6 +198,7 @@
                          (check-result (second (nth r ai-package-list))))
                      (declare (type function ai-invoke-func))
                      (funcall ai-invoke-func mob nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                     ;;(format t "~%TIME-ELAPSED AI ~A [~A] after ai invoke func [~A]: ~A~%" (name mob) (id mob) (id (first (nth r ai-package-list))) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                      (return-from ai-function))))
 
       
@@ -193,4 +206,6 @@
     
     ;; if there are no hostile mobs move randomly
     ;; pester the AI until it makes some meaningful action
-    (ai-mob-random-dir mob)))
+    (ai-mob-random-dir mob))
+  ;;(format t "~%TIME-ELAPSED AI ~A [~A] AFTER : ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  )

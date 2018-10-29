@@ -76,26 +76,33 @@
                (when (get-message-this-turn) (add-message (format nil "~%")))
                (setf (heard-sounds mob) nil)
 
+               ;;(format t "~%TIME-ELAPSED MOB ~A [~A] after AI func finished: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                (update-visible-mobs mob)
+               ;;(format t "~%TIME-ELAPSED AI ~A [~A] after UPDATE-VISIBLE-MOBS: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                (when (eq mob *player*)
                  (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
                  (update-map-area)
                  )
-               
+               ;;(format t "~%TIME-ELAPSED AI ~A [~A] after players' UPDATE-VISIBLE-MOBS (if any): ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                
                ;; process animations for this turn if any
                (when (animation-queue *world*)
-                 
+                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] before animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                  (loop for animation in (animation-queue *world*)
                        do
                           (play-animation animation))
                  (sdl:update-display)
                  (sdl-cffi::sdl-delay 100)
                  (setf (animation-queue *world*) nil)
-                 (update-map-area))
+                 (update-map-area)
+                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] after all animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+				 )
                
                (when (<= (cur-ap mob) 0)
-                 (on-tick mob))
+                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] before ON-TICK: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+                 (on-tick mob)
+                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] after ON-TICK: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+				 )
 
                (unless *cotd-release*
                  ;; checking for inconsistences between *items* and item-quadrant-map 
