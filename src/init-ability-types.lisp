@@ -7735,3 +7735,422 @@
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
                                                    (declare (ignore nearest-enemy nearest-ally check-result))
                                                    (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-explosive-glands+ :name "Grow exploding glands" :descr "Evolve to give yourself an ability to explode corpses for 6-10 acid dmg. The evolution process takes 20 turns." 
+                                 :cost 3 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 20 :param1 (list +mob-abil-explosive-glands+ "grows exploding glands"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-evolving+))
+                                                               (not (mob-ability-p actor +mob-abil-explosive-glands+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-explosive-glands+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-explosive-glands+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-explosive-glands+ :name "Spit explosive parasite" :descr "You spit a parasite into a corpse. The parasite explodes the corpse to deal 6-10 acid dmg tp everybody nearby. The ability is only available in the Corruptor skin." 
+                                 :cost 0 :cd 7 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil :removes-disguise t
+                                 :motion 50
+                                 :start-map-select-func #'player-start-map-select-corpse
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-SPIT-EXPLOSIVE-PARASITE: ~A [~A] spits parasite at ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A spits an explosive parasite. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+
+                                                (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                       (format nil "~A explodes. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                (let ((targets nil)
+                                                      (max-range 1))
+                                                  (draw-fov (x target) (y target) (z target) max-range
+                                                            #'(lambda (dx dy dz prev-cell)
+                                                                (let ((exit-result t))
+                                                                  (block nil
+                                                                    (when (> (get-distance-3d (x target) (y target) (z target) dx dy dz) (1+ max-range))
+                                                                      (setf exit-result 'exit)
+                                                                      (return))
+                                                                    
+                                                                    (when (eq (check-LOS-propagate dx dy dz prev-cell :check-move t) nil)
+                                                                      (setf exit-result 'exit)
+                                                                      (return))
+                                                                    
+                                                                    (place-animation dx dy dz +anim-type-acid-dot+ :params ())
+                                                                    
+                                                                    (when (and (get-mob-* (level *world*) dx dy dz)) 
+                                                                      (pushnew (get-mob-* (level *world*) dx dy dz) targets))
+                                                                    )
+                                                                  exit-result)))
+                                                  
+                                                  (loop for target in targets
+                                                        for cur-dmg = 0
+                                                        do
+                                                           (incf cur-dmg (inflict-damage target :min-dmg 6 :max-dmg 10 :dmg-type +weapon-dmg-acid+
+                                                                                                :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
+                                                                                                :actor actor))
+                                                           (if (zerop cur-dmg)
+                                                             (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                                    (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                                    :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                             *shared-mind-msg-color*
+                                                                                             sdl:*white*))
+                                                             (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                                    (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)
+                                                                                    :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                             *shared-mind-msg-color*
+                                                                                             sdl:*white*)))
+                                                           (when (and (not (eq target actor))
+                                                                      (check-dead target))
+                                                             (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params ())
+                                                             
+                                                             (when (mob-effect-p target +mob-effect-possessed+)
+                                                               (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+                                                               (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
+                                                                     (y (get-mob-by-id (slave-mob-id target))) (y target)
+                                                                     (z (get-mob-by-id (slave-mob-id target))) (z target))
+                                                               (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))
+
+                                                  (remove-item-from-level-list (level *world*) target)
+                                                  (remove-item-from-world target)
+                                                  )
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-explosive-glands+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-enemy ability-type nearest-ally))
+                                                  (let ((corpse-item (funcall #'(lambda ()
+                                                                                  (let ((visible-items (copy-list (visible-items actor)))
+                                                                                        (best-item nil))
+                                                                                    ;; find all corpses
+                                                                                    (setf visible-items (remove-if #'(lambda (a)
+                                                                                                                       (if (item-ability-p a +item-abil-corpse+)
+                                                                                                                         nil
+                                                                                                                         t))
+                                                                                                                   visible-items
+                                                                                                                   :key #'get-item-by-id))
+                                                                                    ;; find corpse with maximum enemies (and not you) near it
+                                                                                    (loop for item-id in visible-items
+                                                                                          for item = (get-item-by-id item-id)
+                                                                                          for mob-count = 0
+                                                                                          for found-self = nil
+                                                                                          with best-count = 0
+                                                                                          do
+                                                                                             (check-surroundings (x item) (y item) t #'(lambda (dx dy)
+                                                                                                                                         (let ((mob (get-mob-* (level *world*) dx dy (z item))))
+                                                                                                                                           (when (and mob
+                                                                                                                                                    (find (id mob) (visible-mobs actor))
+                                                                                                                                                    (not (get-faction-relation (faction actor) (get-visible-faction mob :viewer actor))))
+                                                                                                                                             (incf mob-count))
+                                                                                                                                           (when (eq mob actor)
+                                                                                                                                             (setf found-self t)))))
+                                                                                             (when (and (> mob-count best-count)
+                                                                                                        (not found-self))
+                                                                                               (setf best-item item)
+                                                                                               (setf best-count mob-count)))
+                                                                                    best-item)))))
+                                                    (if (and (mob-ability-p actor +mob-abil-explosive-glands+)
+                                                             (can-invoke-ability actor actor +mob-abil-explosive-glands+)
+                                                             corpse-item)
+                                                      corpse-item
+                                                      nil))
+                                                  )
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((items (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                            (exit-result nil))
+                                                        (setf items (remove-if #'(lambda (a)
+                                                                                   (if (item-ability-p a +item-abil-corpse+)
+                                                                                     nil
+                                                                                     t))
+                                                                               items
+                                                                               :key #'get-item-by-id))
+                                                        
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 items
+                                                                 (<= (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 8)
+                                                                 (let ((tx 0) (ty 0) (tz 0)
+                                                                       (ex (view-x *player*)) (ey (view-y *player*)) (ez (view-z *player*)))
+                                                                   (declare (type fixnum tx ty tz ex ey ez))
+                                                                   (line-of-sight (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
+                                                                                  #'(lambda (dx dy dz prev-cell)
+                                                                                      (declare (type fixnum dx dy dz))
+                                                                                      (let ((exit-result t))
+                                                                                        (block nil
+                                                                                          (setf tx dx ty dy tz dz)
+                                                                                          
+                                                                                          (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
+                                                                                            (setf exit-result 'exit)
+                                                                                            (return))
+                                                                                          
+                                                                                          )
+                                                                                        exit-result)))
+                                                                   (if (and (= tx ex)
+                                                                            (= ty ey)
+                                                                            (= tz ez))
+                                                                     t
+                                                                     nil)))
+                                                          
+                                                          (progn
+                                                            (if (> (length items) 1)
+                                                              (progn
+                                                                (let ((item-line-list nil)
+                                                                      (item-prompt-list)
+                                                                      (item-list (copy-list items)))
+                                                                  
+                                                                  (setf item-line-list (loop for item-id in item-list
+                                                                                             for item = (get-item-by-id item-id)
+                                                                                             collect (format nil "~A"
+                                                                                                              (capitalize-name (prepend-article +article-a+ (visible-name item)))
+                                                                                                              )))
+                                                                   ;; populate the ability prompt list
+                                                                   (setf item-prompt-list (loop for item-id in item-list
+                                                                                                collect #'(lambda (cur-sel)
+                                                                                                            (declare (ignore cur-sel))
+                                                                                                            "[Enter] Explode  [Escape] Cancel")))
+                                                                   
+                                                                   ;; show selection window
+                                                                   (setf *current-window* (make-instance 'select-obj-window 
+                                                                                                         :return-to *current-window* 
+                                                                                                         :header-line "Choose a body to explode:"
+                                                                                                         :enter-func #'(lambda (cur-sel)
+                                                                                                                         (clear-message-list *small-message-box*)
+                                                                                                                         (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
+                                                                                                                         (setf *current-window* (return-to (return-to (return-to *current-window*))))
+                                                                                                                     ;(set-idle-calcing win)
+                                                                                                                         (make-output *current-window*)
+                                                                                                                     ;(show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                                                                                                                         (setf exit-result t))
+                                                                                                         :line-list item-line-list
+                                                                                                         :prompt-list item-prompt-list))
+                                                                   (make-output *current-window*)
+                                                                   (run-window *current-window*))
+                                                                 exit-result)
+                                                              (progn
+                                                                 (clear-message-list *small-message-box*)
+                                                                 (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
+                                                                 t))
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-mutate-poisoning-glands+ :name "Grow poisoning glands" :descr "Evolve to give yourself an ability to poison corpses. The evolution process takes 20 turns." 
+                                 :cost 3 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil
+                                 :motion 50
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
+                                                                                                             (format nil "You hear some burping~A. " str)))
+
+                                                (set-mob-effect actor :effect-type-id +mob-effect-evolving+ :actor-id (id actor) :cd 20 :param1 (list +mob-abil-poisoning-glands+ "grows poisoning glands"))
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A starts to evolve. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (not (mob-effect-p actor +mob-effect-evolving+))
+                                                               (not (mob-ability-p actor +mob-abil-poisoning-glands+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore ability-type nearest-ally))
+                                                  (if (and (not nearest-enemy)
+                                                           (mob-ability-p actor +mob-abil-mutate-poisoning-glands+)
+                                                           (can-invoke-ability actor actor +mob-abil-mutate-poisoning-glands+)
+                                                           )
+                                                    t
+                                                    nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally check-result))
+                                                   (mob-invoke-ability actor actor (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-poisoning-glands+ :name "Spit poisoning parasite" :descr "You spit a parasite into a corpse. The parasite poisons the corpse and make it emit gas that deals 3-6 acid dmg to that steps into it. The ability is only available in the Corruptor skin." 
+                                 :cost 0 :cd 3 :spd +normal-ap+ :passive nil
+                                 :final t :on-touch nil :removes-disguise t
+                                 :motion 50
+                                 :start-map-select-func #'player-start-map-select-corpse
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore ability-type))
+                                                (logger (format nil "MOB-SPIT-POISONING-PARASITE: ~A [~A] spits parasite at ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A spits a poisoning parasite. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+
+                                                (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                                                       (format nil "~A starts to emit gas. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                                                       :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                *shared-mind-msg-color*
+                                                                                sdl:*white*))
+                                                
+                                                (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-acid-gas+ :x (x target) :y (y target) :z (z target)
+                                                                                                                   :counter 10))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (mob-ability-p actor +mob-abil-poisoning-glands+)
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-enemy ability-type nearest-ally))
+                                                  (let ((corpse-item (funcall #'(lambda ()
+                                                                                  (let ((visible-items (copy-list (visible-items actor)))
+                                                                                        (best-item nil))
+                                                                                    ;; find all corpses
+                                                                                    (setf visible-items (remove-if #'(lambda (a)
+                                                                                                                       (if (item-ability-p a +item-abil-corpse+)
+                                                                                                                         nil
+                                                                                                                         t))
+                                                                                                                   visible-items
+                                                                                                                   :key #'get-item-by-id))
+                                                                                    ;; find corpse with an enemy (and not you) above it
+                                                                                    (loop for item-id in visible-items
+                                                                                          for item = (get-item-by-id item-id)
+                                                                                          for mob = (get-mob-* (level *world*) (x item) (y item) (z item))
+                                                                                          for found-self = nil
+                                                                                          do
+                                                                                             (when (and mob
+                                                                                                        (find (id mob) (visible-mobs actor))
+                                                                                                        (not (get-faction-relation (faction actor) (get-visible-faction mob :viewer actor)))
+                                                                                                        (not (eq mob actor)))
+                                                                                               (setf best-item item))
+                                                                                             )
+                                                                                    best-item)))))
+                                                    (if (and (mob-ability-p actor +mob-abil-poisoning-glands+)
+                                                             (can-invoke-ability actor actor +mob-abil-poisoning-glands+)
+                                                             corpse-item)
+                                                      corpse-item
+                                                      nil))
+                                                  )
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-enemy nearest-ally))
+                                                   (mob-invoke-ability actor check-result (id ability-type)))
+                                 :map-select-func #'(lambda (ability-type-id)
+                                                      (let ((items (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                            (exit-result nil))
+                                                        (setf items (remove-if #'(lambda (a)
+                                                                                   (if (item-ability-p a +item-abil-corpse+)
+                                                                                     nil
+                                                                                     t))
+                                                                               items
+                                                                               :key #'get-item-by-id))
+                                                        
+                                                        (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                                 items
+                                                                 (<= (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 8)
+                                                                 (let ((tx 0) (ty 0) (tz 0)
+                                                                       (ex (view-x *player*)) (ey (view-y *player*)) (ez (view-z *player*)))
+                                                                   (declare (type fixnum tx ty tz ex ey ez))
+                                                                   (line-of-sight (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
+                                                                                  #'(lambda (dx dy dz prev-cell)
+                                                                                      (declare (type fixnum dx dy dz))
+                                                                                      (let ((exit-result t))
+                                                                                        (block nil
+                                                                                          (setf tx dx ty dy tz dz)
+                                                                                          
+                                                                                          (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
+                                                                                            (setf exit-result 'exit)
+                                                                                            (return))
+                                                                                          
+                                                                                          )
+                                                                                        exit-result)))
+                                                                   (if (and (= tx ex)
+                                                                            (= ty ey)
+                                                                            (= tz ez))
+                                                                     t
+                                                                     nil)))
+                                                          
+                                                          (progn
+                                                            (if (> (length items) 1)
+                                                              (progn
+                                                                (let ((item-line-list nil)
+                                                                      (item-prompt-list)
+                                                                      (item-list (copy-list items)))
+                                                                  
+                                                                  (setf item-line-list (loop for item-id in item-list
+                                                                                             for item = (get-item-by-id item-id)
+                                                                                             collect (format nil "~A"
+                                                                                                              (capitalize-name (prepend-article +article-a+ (visible-name item)))
+                                                                                                              )))
+                                                                   ;; populate the ability prompt list
+                                                                   (setf item-prompt-list (loop for item-id in item-list
+                                                                                                collect #'(lambda (cur-sel)
+                                                                                                            (declare (ignore cur-sel))
+                                                                                                            "[Enter] Poison  [Escape] Cancel")))
+                                                                   
+                                                                   ;; show selection window
+                                                                   (setf *current-window* (make-instance 'select-obj-window 
+                                                                                                         :return-to *current-window* 
+                                                                                                         :header-line "Choose a body to poison:"
+                                                                                                         :enter-func #'(lambda (cur-sel)
+                                                                                                                         (clear-message-list *small-message-box*)
+                                                                                                                         (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
+                                                                                                                         (setf *current-window* (return-to (return-to (return-to *current-window*))))
+                                                                                                                     ;(set-idle-calcing win)
+                                                                                                                         (make-output *current-window*)
+                                                                                                                     ;(show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ 10 237) t)
+                                                                                                                         (setf exit-result t))
+                                                                                                         :line-list item-line-list
+                                                                                                         :prompt-list item-prompt-list))
+                                                                   (make-output *current-window*)
+                                                                   (run-window *current-window*))
+                                                                 exit-result)
+                                                              (progn
+                                                                 (clear-message-list *small-message-box*)
+                                                                 (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
+                                                                 t))
+                                                            t)
+                                                          (progn
+                                                            nil)))
+                                                      )))

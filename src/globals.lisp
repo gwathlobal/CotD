@@ -344,6 +344,10 @@
 (defconstant +mob-abil-mutate-skin-ranged-to-turret+ 164)
 (defconstant +mob-abil-skinchange-to-turret+ 165)
 (defconstant +mob-abil-mutate-charge+ 166)
+(defconstant +mob-abil-mutate-explosive-glands+ 167)
+(defconstant +mob-abil-explosive-glands+ 168)
+(defconstant +mob-abil-mutate-poisoning-glands+ 169)
+(defconstant +mob-abil-poisoning-glands+ 170)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -490,6 +494,7 @@
 (defconstant +feature-start-sigil-point+ 28)
 (defconstant +feature-corrupted-spores+ 29)
 (defconstant +feature-start-demon-point+ 30)
+(defconstant +feature-smoke-acid-gas+ 31)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

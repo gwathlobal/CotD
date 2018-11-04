@@ -1,5 +1,3 @@
-- Add explode corpse parasite to Skinchanger
-- Add poisoned corpse parasite to Skinchanger
 - Make an option to disable some prompts like "disguise as human for angels"
 - Flat game map
 - Scenario with attacking a battleship

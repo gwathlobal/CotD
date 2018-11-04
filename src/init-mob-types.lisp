@@ -648,7 +648,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-skinchange-to-flyer t :abil-skinchange-to-ranged t
-                                       :abil-mutate-skin-ranged-to-turret t :abil-mutate-charge t
+                                       :abil-mutate-charge t 
                                        :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-ranged+
@@ -675,7 +675,7 @@
                                        :base-light-radius 0 :base-stealth 10
                                        :abil-detect-good t :abil-detect-evil t :abil-no-breathe t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-flying t :abil-skinchange-to-melee t :abil-skinchange-to-ranged t
-                                       :abil-mutate-skin-ranged-to-turret t
+                                       :abil-mutate-explosive-glands t :abil-mutate-poisoning-glands t
                                        :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-turret+

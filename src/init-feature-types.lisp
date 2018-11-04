@@ -479,3 +479,43 @@
                                                                        (when (eq target *player*)
                                                                          (setf (killed-by *player*) "spores")))))
                                                                  (feature-smoke-on-tick level feature))))
+
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-acid-gas+ :glyph-idx 98 :glyph-color (sdl:color :r 0 :g 200 :b 0) :back-color sdl:*black* :name "Poisoned gas"
+                                               :trait-blocks-vision 60 :trait-smoke +feature-smoke-acid-gas+ :trait-no-gravity t
+                                               :can-merge-func #'(lambda (level feature-new)
+                                                                   (let ((result nil))
+                                                                     (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                                                           for feature-old = (get-feature-by-id feature-old-id)
+                                                                           when (or (= (feature-type feature-new) (feature-type feature-old))
+                                                                                    )
+                                                                             do
+                                                                                (setf result t)
+                                                                                (loop-finish)
+                                                                           )
+                                                                     result))
+                                               :merge-func #'(lambda (level feature-new)
+                                                               (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                                                     for feature-old = (get-feature-by-id feature-old-id)
+                                                                     when (= (feature-type feature-new) (feature-type feature-old))
+                                                                       do
+                                                                          (remove-feature-from-level-list level feature-new)
+                                                                          (remove-feature-from-world feature-new)
+                                                                          (incf (counter feature-old))
+                                                                          (loop-finish)
+                                                                     )
+                                                               )
+                                               :on-tick-func #'(lambda (level feature)
+                                                                 (let ((target (get-mob-* level (x feature) (y feature) (z feature))))
+                                                                   (when target
+                                                                     (inflict-damage target :min-dmg 3 :max-dmg 6 :dmg-type +weapon-dmg-acid+
+                                                                                            :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t
+                                                                                            :actor nil :no-hit-message t
+                                                                                            :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                                          (format nil "~A takes ~A damage from poisoned gas. " (capitalize-name (name target)) cur-dmg))
+                                                                                            :specific-no-dmg-string-func #'(lambda ()
+                                                                                                                             (format nil "~A takes no damage from poisoned gas. " (capitalize-name (name target)))))
+
+                                                                     (when (check-dead target)
+                                                                       (when (eq target *player*)
+                                                                         (setf (killed-by *player*) "poisoned gas")))))
+                                                                 (feature-smoke-on-tick level feature))))

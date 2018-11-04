@@ -157,12 +157,12 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 36 :y 18 :z 1))
+  (setf *player* (make-instance 'player :mob-type +mob-type-skinchanger-flyer+ :x 47 :y 18 :z 1))
   (add-mob-to-level-list (level world) *player*)
   
   (let ((soldier (make-instance 'mob :mob-type +mob-type-soldier+ :x 39 :y 20 :z 1))
         (demon (make-instance 'mob :mob-type +mob-type-demon+ :x 1 :y 1 :z 2))
-        (angel (make-instance 'mob :mob-type +mob-type-imp+ :x 43 :y 16 :z 3))
+        (angel (make-instance 'mob :mob-type +mob-type-skinchanger-flyer+ :x 43 :y 16 :z 3))
         )
     (setf (cur-fp *player*) 15)
     ;(setf (max-hp *player*) 50)
@@ -176,6 +176,9 @@
     ;(mob-set-mutation *player* +mob-abil-clawed-tentacle+)
     ;(mob-set-mutation *player* +mob-abil-piercing-needles+)
     ;(mob-remove-ability *player* +mob-abil-possessable+)
+    (mob-set-mutation angel +mob-abil-poisoning-glands+)
+    (mob-remove-ability angel +mob-abil-skinchange-to-melee+)
+    (mob-remove-ability angel +mob-abil-skinchange-to-ranged+)
 
     ;(setf (aref (terrain (level world)) (x *player*) (y *player*) (z *player*)) +terrain-water-ice+)
     ;(set-mob-effect *player* +mob-effect-divine-shield+ 100)
@@ -208,6 +211,7 @@
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-scroll-demonic-rune-barrier+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-scroll-demonic-rune-away+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x *player*) 1) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
+    (add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-full+ :x (+ (x angel) 1) :y (+ (y angel) 0) :z (+ (z angel) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-body-part-half+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-clothing+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
     ;(add-item-to-level-list (level world) (make-instance 'item :item-type +item-type-disguise+ :x (+ (x *player*) 0) :y (+ (y *player*) 0) :z (+ (z *player*) 0) :qty 1))
