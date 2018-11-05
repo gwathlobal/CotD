@@ -37,7 +37,8 @@ OUTSIDER BEASTS
 
 PRIMORDIALS
  - In the taiga bogs and forests of the East live strange creatures that had walked the Earth before any ape could be called sapient. Now they slumber, waiting for the time when the cycle of humankind is complete and they are able to reign the land once more. The natives fear, worship and offer sacrifices to them. But when the outsiders from beyond Earth arrived in the City, the primordials rose once more to drive the invaders out of what they consider their own domain.
- - You start as an Eater of the dead, a tentacled monster, weakened by the millennia of inactivity.
+ - You can start as an Eater of the dead, a tentacled monster, weakened by the millennia of inactivity.
+ - You can start as a Skinchanger, who can shift between different forms depending on the situation.
  - You are able to feast on the corpses of the fallen to gain HP and power and mutate yourself gaining various abilities.
  - You equally hate everybody in the City and are hated by everyone. 
  - Your goal is to destroy all angels and demons.

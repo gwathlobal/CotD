@@ -796,7 +796,10 @@
   (setf (cur-fp mob) 0)
   (setf (cur-ap mob) (max-ap mob))
 
-  (when (= (mob-type mob) +mob-type-eater-of-the-dead+)
+  (when (or (= (mob-type mob) +mob-type-eater-of-the-dead+)
+            (= (mob-type mob) +mob-type-skinchanger-melee+)
+            (= (mob-type mob) +mob-type-skinchanger-ranged+)
+            (= (mob-type mob) +mob-type-skinchanger-flyer+))
     (setf (cur-fp mob) 2))
   
   (setf (face-mob-type-id mob) (mob-type mob))

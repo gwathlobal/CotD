@@ -7679,7 +7679,8 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-skinchange-to-turret+)
-                                                               (not (= (mob-type actor) +mob-type-skinchanger-turret+)))
+                                                               (not (= (mob-type actor) +mob-type-skinchanger-turret+))
+                                                               (= (mob-type actor) +mob-type-skinchanger-ranged+))
                                                         t
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
