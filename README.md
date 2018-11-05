@@ -5,18 +5,22 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-August 5, 2018 v1.3.3
+November 5, 2018 v1.3.4
 
-- Added a new terrain tile to the corrupted districts - dreadtubes. If you step on them, there is a 20% chance for them to fear you and all mobs around you.
-- Added a new terrain tile to the corrupted districts - sludgeshrooms. If you step on them, there is a 20% chance for them to release spores that will deal anyone inside them 1-2 acid damage.
-- Added a new terrain tile to the corrupted districts - razorthorns. If you step on them, they will deal 1 acid damage to you.
-- Fixed a typo in the "Does not breathe" ability.
-- You will see mob names when 'l'ooking at them.
-- The Military raid and Military conquest missions will no longer have angels from the very start, angels can only start delayed in these missions now.
-- Imps and Shadow imps will start with 2 power points during the Military raid and Military conquest missions.
-- Angels will no longer try to conceal divinity when there is an enemy next to them.
-- Humans will try to swim up if they feel a lack of oxygen.
-- Added an option to replay the previous mission type with the same player faction.
+- Added a new primordial playable character - Skinchanger. The Skinchanger can shift between three archetypes: a melee warrior, a ranged shooter and a quick flyer. Some additional mutations can be received to improve on the strengths of each archetype.
+- Fixed Resurrection not spending Power points after usage.
+- Rearranged the Satanists' lair to reduce the chance of 'traffic jams'.
+- When angels conceal their divinity in abandoned and corrupted districts, they now look like soldiers.
+- Angels can now bless humans without revealing themselves. Also, angels will not reveal themselves unless they are about to attack an enemy in melee.
+- Fixed the bug where demonic sigils could spawn on sludgeshrooms and die on their own.
+- For the Celestial retrieval mission, some demons will start inside the corrupted shrine to protect the relic.
+- NPCs with Sense good and Sense evil will make use of these abilities to no wander randomly but to places where they feel that the enemy is.
+- Added a district with a lake to the map layouts.
+- Added a district with a lake and a river to the map layouts.
+- Added a seaport district with a river to the map layouts.
+- Added some performance optimizations.
+- Chrome angels are now armed with holy fists and can no longer sever body parts.
+
 
 
 CURRENT CHANGELOG

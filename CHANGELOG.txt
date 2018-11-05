@@ -1,13 +1,16 @@
 CHANGELOG
 
+--------------------
+November 5, 2018 v1.3.4
+
 - Added a new primordial playable character - Skinchanger. The Skinchanger can shift between three archetypes: a melee warrior, a ranged shooter and a quick flyer. Some additional mutations can be received to improve on the strengths of each archetype.
 - Fixed Resurrection not spending Power points after usage.
 - Rearranged the Satanists' lair to reduce the chance of 'traffic jams'.
 - When angels conceal their divinity in abandoned and corrupted districts, they now look like soldiers.
-- Angels can now bless humans without revealing themselves. Also angels will not reveal themselves unless they are about to attack an enemy in melee.
+- Angels can now bless humans without revealing themselves. Also, angels will not reveal themselves unless they are about to attack an enemy in melee.
 - Fixed the bug where demonic sigils could spawn on sludgeshrooms and die on their own.
-- For the Celestial retreival mission, some demons will start inside the corrupted shrine to protect the relic.
-- NPCs with Sense good and Sense evil will make use of these abilities to no wander randonly but to places where they feel that the enemy is.
+- For the Celestial retrieval mission, some demons will start inside the corrupted shrine to protect the relic.
+- NPCs with Sense good and Sense evil will make use of these abilities to no wander randomly but to places where they feel that the enemy is.
 - Added a district with a lake to the map layouts.
 - Added a district with a lake and a river to the map layouts.
 - Added a seaport district with a river to the map layouts.
