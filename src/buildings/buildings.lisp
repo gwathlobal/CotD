@@ -221,6 +221,7 @@
                               ((< r 3) +terrain-floor-creep-dreadtubes+)
                               ((< r 6) +terrain-floor-creep-spores+)
                               ((< r 10) +terrain-wall-razorthorns+)
+                              ((< r 13) +terrain-floor-creep-glowshroom+)
                               ((< r 20) +terrain-floor-creep+)
                               (t +terrain-floor-creep-bright+)
                               )))

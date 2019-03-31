@@ -470,3 +470,7 @@
                                                                         (mob-invoke-ability mob (list x y z) +mob-abil-toggle-light+)
                                                                         t)
                                                                       nil))))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-glowshroom+ :name "glowshroom"
+                                               :glyph-idx 130 :glyph-color sdl:*yellow* :back-color sdl:*black*
+                                               :trait-blocks-move nil :trait-opaque-floor t :trait-light-source 4 :trait-blocks-sound-floor 20))
