@@ -1,4 +1,3 @@
-- Glowshroom that emits light for corrupted layouts
 - Craters for buildings
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)
 - A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police

@@ -25,10 +25,11 @@
       )
     )
     
-  (sdl:draw-string-solid-* (format nil "[Up/Down] Scroll text  [Esc] Exit")
+  (sdl:draw-string-solid-* (format nil "[Shift+Up/Down] Scroll page  [Up/Down] Scroll text  [Esc] Exit")
                            10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
   
   (sdl:update-display))
+
 
 (defmethod run-window ((win message-window))
   (tagbody
@@ -46,6 +47,10 @@
                            (decf (cur-str win)))
                           ((and (sdl:key= key :sdl-key-down) (= mod 0))
                            (incf (cur-str win)))
+			  ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+			   (decf (cur-str win) 30))
+			  ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+			   (incf (cur-str win) 30))
                           ;; escape - quit
 			  ((sdl:key= key :sdl-key-escape) 
                            (setf *current-window* (return-to win)) (go exit-func))
