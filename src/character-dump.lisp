@@ -206,7 +206,8 @@
                                                                                                                                 0)
                                                                                                                   :count-only t)
                   (declare (ignore max-lines))
-                  (format file "~A~A~%" final-txt (new-line)))))))
+                  (format file "~A~A~%" final-txt (new-line))
+                  )))))
         
         
         ))))

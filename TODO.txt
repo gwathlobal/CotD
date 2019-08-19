@@ -1,4 +1,4 @@
-- Craters for buildings
+- Irradiated terrain that gives radiation on step
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)
 - A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police
 - Chain Lightning attack

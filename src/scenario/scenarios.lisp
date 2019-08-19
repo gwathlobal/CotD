@@ -329,6 +329,7 @@
     (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 4)
     (setf (gethash +building-type-graveyard+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-crater+ max-building-types) 4)
     max-building-types))
 
 (defun get-max-buildings-ruined-river ()
@@ -345,6 +346,7 @@
     (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
     (setf (gethash +building-type-graveyard+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-crater+ max-building-types) 4)
     max-building-types))
 
 (defun get-max-buildings-ruined-port ()
@@ -360,6 +362,7 @@
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
+    (setf (gethash +building-type-ruined-crater+ max-building-types) 4)
     max-building-types))
 
 (defun get-max-buildings-corrupted-normal ()
