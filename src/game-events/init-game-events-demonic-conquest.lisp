@@ -21,9 +21,7 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic conquest prevented.")
-                                                                               ))
+                                                           (let* ((final-str "Demonic conquest prevented.")
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
                                                                                                            (loop for mimic-id in (mimic-id-list *player*)
@@ -150,9 +148,7 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic conquest prevented.")
-                                                                               ))
+                                                           (let* ((final-str "Demonic conquest prevented.")
                                                                   (score (calculate-player-score (+ 1450 (* 7 (total-humans world)))))
                                                                   (highscores-place)
                                                                   (player-faction (if (= (loyal-faction *player*) +faction-type-military+)
@@ -210,9 +206,7 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic conquest prevented.")
-                                                                               ))
+                                                           (let* ((final-str "Demonic conquest prevented.")
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
                                                                                                            (loop for mimic-id in (mimic-id-list *player*)

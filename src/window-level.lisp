@@ -270,6 +270,7 @@
 (defun update-screen (win)
   
   ;; filling the background with black rectangle
+    
   (fill-background-tiles)
    
   (update-map-area :post-func #'(lambda (x y x1 y1)

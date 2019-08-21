@@ -155,7 +155,7 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str "District successfully defended by demons.")
+                                                           (let* ((final-str "District successfully conquered back.")
                                                                   (score (calculate-player-score (+ 1450 (* 7 (total-humans world)))))
                                                                   (highscores-place)
                                                                   (player-faction (if (= (loyal-faction *player*) +faction-type-military+)

@@ -40,6 +40,8 @@
 (defconstant +building-type-corrupted-lake+ 31)
 (defconstant +building-type-corrupted-shrine+ 32)
 
+(defconstant +building-type-ruined-crater+ 33)
+
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
 ;;--------------------------------------
@@ -141,6 +143,9 @@
 (defconstant +building-city-corrupted-forest-border+ 93)
 (defconstant +building-city-central-lake+ 94)
 (defconstant +building-city-corrupted-central-lake+ 95)
+
+(defconstant +building-city-ruined-crater-1+ 96)
+(defconstant +building-city-ruined-crater-2+ 97)
 
 (defparameter *level-grid-size* 5)
 

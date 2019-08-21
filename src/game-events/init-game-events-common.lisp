@@ -74,7 +74,7 @@
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ((zerop (total-demons world)) "Enemies of Primordials eliminated.")
                                                                                ))
                                                                   (score (calculate-player-score 1430))
                                                                   (highscores-place (add-highscore-record (make-highscore-record (name *player*)
