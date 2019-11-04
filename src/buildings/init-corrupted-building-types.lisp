@@ -1403,3 +1403,140 @@
                                                         (list (list +feature-delayed-arrival-point+ 2 2 z))
                                                         nil))))
                                   ))
+
+;;=====================
+;; Craters
+;;=====================
+
+(set-building-type (make-building :id +building-city-corrupted-crater-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-corrupted-crater+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,,,"
+                                                                            ",,dddddd,,"
+                                                                            ",dd    dd,"
+                                                                            ",d      d,"
+                                                                            ",d      d,"
+                                                                            ",d      d,"
+                                                                            ",d      d,"
+                                                                            ",dd    dd,"
+                                                                            ",,dddddd,,"
+                                                                            ",,,,,,,,,,"))
+                                                  
+                                                  (build-template-z-1 (list "0000000000"
+                                                                            "00uuuuuu00"
+                                                                            "0uudddduu0"
+                                                                            "0udd  ddu0"
+                                                                            "0ud    du0"
+                                                                            "0ud    du0"
+                                                                            "0udd  ddu0"
+                                                                            "0uudddduu0"
+                                                                            "00uuuuuu00"
+                                                                            "0000000000"))
+
+                                                  (build-template-z-0 (list "0000000000"
+                                                                            "0000000000"
+                                                                            "000uuuu000"
+                                                                            "00uu,,uu00"
+                                                                            "00u,,,,u00"
+                                                                            "00u,,,,u00"
+                                                                            "00uu,,uu00"
+                                                                            "000uuuu000"
+                                                                            "0000000000"
+                                                                            "0000000000"))
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (- z 1) build-template-z-1 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (- z 2) build-template-z-0 template-level)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-corrupted-crater-2+ :grid-dim '(2 . 2) :act-dim '(8 . 8) :type +building-type-corrupted-crater+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-2 (list ",,,,,,,,"
+                                                                            ",,dddd,,"
+                                                                            ",dd  dd,"
+                                                                            ",d    d,"
+                                                                            ",d    d,"
+                                                                            ",dd  dd,"
+                                                                            ",,dddd,,"
+                                                                            ",,,,,,,,"))
+
+                                                  (build-template-z-1 (list "00000000"
+                                                                            "00uuuu00"
+                                                                            "0uu,,uu0"
+                                                                            "0u,,,,u0"
+                                                                            "0u,,,,u0"
+                                                                            "0uu,,uu0"
+                                                                            "00uuuu00"
+                                                                            "00000000"))
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (- z 1) build-template-z-1 template-level)
+                                              
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-corrupted-crater-large+ :grid-dim '(3 . 3) :act-dim '(15 . 15) :type +building-type-corrupted-crater-large+
+                                  :func #'(lambda (x y z template-level)
+                                            (let ((build-template-z-3 (list "               "
+                                                                            "   ddddddddd   "
+                                                                            "  dd,,,,,,,dd  "
+                                                                            " dd,,ddddd,,dd "
+                                                                            " d,,dd   dd,,d "
+                                                                            " d,dd     dd,d "
+                                                                            " d,d       d,d "
+                                                                            " d,d       d,d "
+                                                                            " d,d       d,d "
+                                                                            " d,dd     dd,d "
+                                                                            " d,,dd   dd,,d "
+                                                                            " dd,,ddddd,,dd "
+                                                                            "  dd,,,,,,,dd  "
+                                                                            "   ddddddddd   "
+                                                                            "               "))
+                                                  
+                                                  (build-template-z-2 (list ",,,,,,,,,,,,,,,"
+                                                                            ",,,uuuuuuuuu,,,"
+                                                                            ",,uu0000000uu,,"
+                                                                            ",uu00uuuuu00uu,"
+                                                                            ",u00uuddduu00u,"
+                                                                            ",u0uudd dduu0u,"
+                                                                            ",u0udd   ddu0u,"
+                                                                            ",u0ud     du0u,"
+                                                                            ",u0udd   ddu0u,"
+                                                                            ",u0uudd dduu0u,"
+                                                                            ",u00uuddduu00u,"
+                                                                            ",uu00uuuuu00uu,"
+                                                                            ",,uu0000000uu,,"
+                                                                            ",,,uuuuuuuuu,,,"
+                                                                            ",,,,,,,,,,,,,,,"))
+                                                  
+                                                  (build-template-z-1 (list "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000uuu000000"
+                                                                            "00000uu,uu00000"
+                                                                            "0000uu,,,uu0000"
+                                                                            "0000u,,,,,u0000"
+                                                                            "0000uu,,,uu0000"
+                                                                            "00000uu,uu00000"
+                                                                            "000000uuu000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"))
+
+                                                  )
+                                              ;; we assume that z = 2
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (+ z 0) build-template-z-2 template-level)
+                                              (translate-build-to-corrupted-step-2-template x y (- z 1) build-template-z-1 template-level)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))

@@ -382,6 +382,8 @@
     (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
     (setf (gethash +building-type-corrupted-lake+ max-building-types) 4)
     (setf (gethash +building-type-corrupted-graveyard+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-corrupted-river ()
@@ -398,6 +400,8 @@
     (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
     (setf (gethash +building-type-corrupted-lake+ max-building-types) 0)
     (setf (gethash +building-type-corrupted-graveyard+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-corrupted-port ()
@@ -413,6 +417,8 @@
     (setf (gethash +building-type-stables+ max-building-types) 0)
     (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
     (setf (gethash +building-type-corrupted-lake+ max-building-types) 0)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-corrupted-steal-normal ()
@@ -430,6 +436,8 @@
     (setf (gethash +building-type-corrupted-lake+ max-building-types) 4)
     (setf (gethash +building-type-corrupted-graveyard+ max-building-types) 1)
     (setf (gethash +building-type-corrupted-shrine+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-corrupted-steal-river ()
@@ -447,6 +455,8 @@
     (setf (gethash +building-type-corrupted-lake+ max-building-types) 0)
     (setf (gethash +building-type-corrupted-graveyard+ max-building-types) 1)
     (setf (gethash +building-type-corrupted-shrine+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-corrupted-steal-port ()
@@ -463,6 +473,8 @@
     (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
     (setf (gethash +building-type-corrupted-lake+ max-building-types) 0)
     (setf (gethash +building-type-corrupted-shrine+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
     max-building-types))
 
 
