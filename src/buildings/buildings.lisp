@@ -41,6 +41,7 @@
 (defconstant +building-type-corrupted-shrine+ 32)
 
 (defconstant +building-type-ruined-crater+ 33)
+(defconstant +building-type-ruined-crater-large+ 34)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -146,6 +147,8 @@
 
 (defconstant +building-city-ruined-crater-1+ 96)
 (defconstant +building-city-ruined-crater-2+ 97)
+
+(defconstant +building-city-ruined-crater-large+ 98)
 
 (defparameter *level-grid-size* 5)
 
