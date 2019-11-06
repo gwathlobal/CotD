@@ -38,6 +38,7 @@
 (defconstant +mission-sf-demonic-raid+ 25)
 (defconstant +mission-sf-demonic-steal+ 26)
 (defconstant +mission-sf-ruined-district+ 27)
+(defconstant +mission-sf-irradiated-district+ 28)
 
 (defconstant +sf-faction-demonic-attack-player+ 30)
 (defconstant +sf-faction-demonic-attack-dead-player+ 31)

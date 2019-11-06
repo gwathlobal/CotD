@@ -582,6 +582,7 @@
 (defconstant +terrain-floor-creep-spores+ 61)
 (defconstant +terrain-wall-razorthorns+ 62)
 (defconstant +terrain-floor-creep-glowshroom+ 63)
+(defconstant +terrain-floor-creep-irradiated+ 64)
 
 ;;--------------------
 ;; GOD Constants

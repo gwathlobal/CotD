@@ -157,7 +157,12 @@
 
 (defun test-level-place-mobs (world mob-template-list)
   (declare (ignore mob-template-list))
-  (setf *player* (make-instance 'player :mob-type +mob-type-skinchanger-flyer+ :x 47 :y 18 :z 1))
+
+  (set-terrain-* (level world) 47 19 1 +terrain-floor-creep-irradiated+)
+  (set-terrain-* (level world) 48 19 1 +terrain-floor-creep+)
+  (set-terrain-* (level world) 49 19 1 +terrain-floor-creep-bright+)
+  
+  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 47 :y 18 :z 1))
   (add-mob-to-level-list (level world) *player*)
   
   (let ((soldier (make-instance 'mob :mob-type +mob-type-soldier+ :x 39 :y 20 :z 1))

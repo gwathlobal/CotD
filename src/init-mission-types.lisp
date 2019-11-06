@@ -718,7 +718,8 @@
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
                                                        :post-sf-list (list +mission-sf-demonic-steal+
-                                                                           +mission-sf-ruined-district+)
+                                                                           +mission-sf-ruined-district+
+                                                                           +mission-sf-irradiated-district+)
                                                        :angel-disguised-mob-type-id +mob-type-soldier+
                                                        ))
 
@@ -752,7 +753,7 @@
                                                                                  (list +faction-type-military+ +game-event-military-conquest-win-for-military+)
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
-                                                       :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :post-sf-list (list +mission-sf-ruined-district+ +mission-sf-irradiated-district+)
                                                        :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))
 
@@ -787,7 +788,7 @@
                                                                                  (list +faction-type-military+ +game-event-military-conquest-win-for-military+)
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
-                                                       :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :post-sf-list (list +mission-sf-ruined-district+ +mission-sf-irradiated-district+)
                                                        :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))
 
@@ -817,6 +818,6 @@
                                                                                  (list +faction-type-angels+ +game-event-angelic-steal-win-for-angels+)
                                                                                  (list +faction-type-eater+ +game-event-win-for-eater+)
                                                                                  )
-                                                       :post-sf-list (list +mission-sf-ruined-district+)
+                                                       :post-sf-list (list +mission-sf-ruined-district+ +mission-sf-irradiated-district+)
                                                        :angel-disguised-mob-type-id +mob-type-soldier+
                                      ))

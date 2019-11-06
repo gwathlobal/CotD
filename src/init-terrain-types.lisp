@@ -164,7 +164,24 @@
                                                                                                 (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-corrupted-spores+ :x dx :y dy :z z
                                                                                                                                                            :counter 2))
                                                                                                 )
-                                                                                              ))))))
+                                                                                            ))))))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-irradiated+ :name "glowing creep"
+                                               :glyph-idx 95 :glyph-color (sdl:color :r 200 :g 50 :b 100) :back-color sdl:*black* 
+                                               :trait-opaque-floor t :trait-blocks-sound-floor 20
+                                               :on-step #'(lambda (mob x y z)
+                                                            (declare (ignore x y z))
+                                                            (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                   (format nil "Sinister glow irradiates ~A. " (prepend-article +article-the+ (visible-name mob)))
+                                                                                   :color (if (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                            *shared-mind-msg-color*
+                                                                                            sdl:*white*))
+                                                            (if (mob-effect-p mob +mob-effect-irradiated+)
+                                                              (progn
+                                                                (let ((effect (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))))
+                                                                  (incf (param1 effect) (+ 2 (random 3)))))
+                                                              (progn
+                                                                (set-mob-effect mob :effect-type-id +mob-effect-irradiated+ :actor-id nil :cd t :param1 (+ 2 (random 3))))))))
 
 ;;--------------------
 ;; Walls

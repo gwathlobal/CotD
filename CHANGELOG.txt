@@ -3,6 +3,7 @@ CHANGELOG
 - Added a new terrain tile to the corrupted districts - glowshrooms. Glowshrooms emit faint light and illuminate everything around them.
 - Message log can be now quickly skimmed using Shift+Up/Down.
 - Added craters from artillery fire to abandoned and corrupted districts. 
+- Added a new terrain tile to the corrupted districts - glowing creep. If somebody steps on this tile, it will give irradiation to this character.
 
 --------------------
 November 5, 2018 v1.3.4

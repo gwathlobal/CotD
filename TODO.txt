@@ -1,7 +1,6 @@
 - Alarak-style gameplay where you gain resource when allies get killed and you can sacrifice your allies
 - Unstable pocket dimensions - complete the goal before the time expires
 - Collasping pocket dimensions - complete the goal while the map becomes smaller and smaller
-- Irradiated terrain that gives radiation on step
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)
 - A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police
 - Chain Lightning attack

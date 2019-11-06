@@ -1121,3 +1121,35 @@
                                                              post-processing-func-list)
                                                                                                               
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
+
+(set-scenario-feature (make-scenario-feature :id +mission-sf-irradiated-district+
+                                             :type +scenario-feature-mission+
+                                             :name "Irradiated district (SF)"
+                                             :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
+                                                       (declare (ignore faction-list mission-id))
+                                                       ;; place irradiated spots
+                                                       (push #'(lambda (world)
+                                                                 (logger (format nil "POST-PROCESSING FUNC: Irradiated district, placing irradiated spots~%"))
+                                                                 (loop with max-x = (- (array-dimension (terrain (level world)) 0) 2)
+                                                                       with max-y = (- (array-dimension (terrain (level world)) 1) 2)
+                                                                       with max-z = (- (array-dimension (terrain (level world)) 2) 2)
+                                                                       with cur-spot = 0
+                                                                       with max-spots = (+ 3 (random 10))
+                                                                       with func = (defun func (tx ty tz)
+                                                                                     (set-terrain-* (level world) tx ty tz +terrain-floor-creep-irradiated+)
+                                                                                     (check-surroundings tx ty nil #'(lambda (dx dy)
+                                                                                                                     (when (= (get-terrain-* (level world) dx dy tz) +terrain-floor-creep+)
+                                                                                                                       (when (zerop (random 4))
+                                                                                                                         (funcall #'func dx dy tz))))))
+                                                                       for x = (1+ (random max-x))
+                                                                       for y = (1+ (random max-y))
+                                                                       for z = (1+ (random max-z))
+                                                                       while (< cur-spot max-spots) do
+                                                                         (when (= (get-terrain-* (level world) x y z) +terrain-floor-creep+)
+                                                                           (funcall func x y z)
+                                                                           (incf cur-spot)))
+                                                                 (set-terrain-* (level world) 47 47 2 +terrain-floor-creep-irradiated+)
+                                                                 ) 
+                                                             post-processing-func-list)
+                                                                                                              
+                                                       (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
