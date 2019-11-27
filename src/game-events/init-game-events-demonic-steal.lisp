@@ -88,7 +88,7 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str "Relic sucessfully captured.")
+                                                           (let* ((final-str "Relic captured by demons.")
                                                                   (score (calculate-player-score 1300))
                                                                   (highscores-place)
                                                                   (player-faction (if (or (= (loyal-faction *player*) +faction-type-demons+)

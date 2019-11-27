@@ -1,3 +1,6 @@
+- A style of gameplay where you gain abilities depending on your surroundings
+- Angels get conducts they should not break or they will get penalized
+- Malseraph's puppets get additional task from Malseraph
 - Alarak-style gameplay where you gain resource when allies get killed and you can sacrifice your allies
 - Unstable pocket dimensions - complete the goal before the time expires
 - Collasping pocket dimensions - complete the goal while the map becomes smaller and smaller
