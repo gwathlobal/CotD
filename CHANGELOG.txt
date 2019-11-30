@@ -4,6 +4,7 @@ CHANGELOG
 - Message log can be now quickly skimmed using Shift+Up/Down.
 - Added craters from artillery fire to abandoned and corrupted districts. 
 - Added a new terrain tile to the corrupted districts - glowing creep. If somebody steps on this tile, it will give irradiation to this character.
+- Abilities to mount a horse, fiend or Gargantaur will now show up only when the corresponding mount is next to you to avoid confusion.
 
 --------------------
 November 5, 2018 v1.3.4

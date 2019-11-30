@@ -1197,10 +1197,19 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-horseback-riding+)
-                                                               (not (riding-mob-id actor)))
-                                                        t
-                                                        nil))
+                                                      (let ((mount nil))
+                                                        (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                        (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                          (when (and mob
+                                                                                                                     (get-faction-relation (faction actor) (faction mob))
+                                                                                                                     (mob-ability-p mob +mob-abil-horse-can-be-ridden+)
+                                                                                                                     (not (mounted-by-mob-id mob)))
+                                                                                                            (setf mount mob)))))
+                                                        (if (and mount
+                                                                 (mob-ability-p actor +mob-abil-horseback-riding+)
+                                                                 (not (riding-mob-id actor)))
+                                                          t
+                                                          nil)))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
@@ -1369,10 +1378,18 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-dominate-fiend+)
-                                                               (not (riding-mob-id actor)))
-                                                        t
-                                                        nil))
+                                                      (let ((mount nil))
+                                                        (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                        (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                          (when (and mob
+                                                                                                                     (mob-ability-p mob +mob-abil-fiend-can-be-ridden+)
+                                                                                                                     (not (mounted-by-mob-id mob)))
+                                                                                                            (setf mount mob)))))
+                                                        (if (and mount
+                                                                 (mob-ability-p actor +mob-abil-dominate-fiend+)
+                                                                 (not (riding-mob-id actor)))
+                                                          t
+                                                          nil)))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
@@ -1670,10 +1687,18 @@
                                                   ))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-dominate-gargantaur+)
-                                                               (not (riding-mob-id actor)))
-                                                        t
-                                                        nil))
+                                                      (let ((mount nil))
+                                                        (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                        (let ((mob (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                          (when (and mob
+                                                                                                                     (= (mob-type mob) +mob-type-gargantaur+)
+                                                                                                                     (null (mounted-by-mob-id mob)))
+                                                                                                            (setf mount mob)))))
+                                                        (if (and mount
+                                                                 (mob-ability-p actor +mob-abil-dominate-gargantaur+)
+                                                                 (not (riding-mob-id actor)))
+                                                          t
+                                                          nil)))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore nearest-enemy nearest-ally))
                                                   (let ((mount nil))
