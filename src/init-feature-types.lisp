@@ -288,16 +288,16 @@
                                                                               (if (zerop cur-dmg)
                                                                                 (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                                       :color (if (and (find (id target) (shared-visible-mobs *player*))
-                                                                                                               (not (find (id target) (proper-visible-mobs *player*))))
-                                                                                                                *shared-mind-msg-color*
-                                                                                                                sdl:*white*))
+                                                                                                       :color sdl:*white*
+                                                                                                       :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                                                     :singlemind)))
                                                                                 (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)
-                                                                                                       :color (if (and (find (id target) (shared-visible-mobs *player*))
-                                                                                                                       (not (find (id target) (proper-visible-mobs *player*))))
-                                                                                                                *shared-mind-msg-color*
-                                                                                                                sdl:*white*)))
+                                                                                                       :color sdl:*white*
+                                                                                                       :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                                                     :singlemind))))
                                                                               (when (check-dead target)
                                                                                 (make-dead target :splatter t :msg t :msg-newline nil :killer (get-mob-by-id (param1 feature)) :corpse t :aux-params (list :is-fire))
                                                                                 
@@ -376,16 +376,16 @@
                                                                               (if (zerop cur-dmg)
                                                                                 (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                                       :color (if (and (find (id target) (shared-visible-mobs *player*))
-                                                                                                                       (not (find (id target) (proper-visible-mobs *player*))))
-                                                                                                                *shared-mind-msg-color*
-                                                                                                                sdl:*white*))
+                                                                                                       :color sdl:*white*
+                                                                                                       :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                                                     :singlemind)))
                                                                                 (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                                        (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)
-                                                                                                       :color (if (and (find (id target) (shared-visible-mobs *player*))
-                                                                                                                       (not (find (id target) (proper-visible-mobs *player*))))
-                                                                                                                *shared-mind-msg-color*
-                                                                                                                sdl:*white*)))
+                                                                                                       :color sdl:*white*
+                                                                                                       :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
+                                                                                                                              (not (find (id target) (proper-visible-mobs *player*))))
+                                                                                                                     :singlemind))))
                                                                               (when (check-dead target)
                                                                                 (make-dead target :splatter t :msg t :msg-newline nil :killer (get-mob-by-id (param1 feature)) :corpse t :aux-params (list :is-fire))
                                                                                 

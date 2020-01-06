@@ -113,9 +113,9 @@
                                                                                                                   (format nil "You hear an eerie howl~A. " str)))
                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                      (format nil "Dreadtubes give off an eerie howl under ~A. " (prepend-article +article-the+ (visible-name mob)))
-                                                                                     :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                              *shared-mind-msg-color*
-                                                                                              sdl:*white*))
+                                                                                     :color sdl:*white*
+                                                                                     :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                   :singlemind)))
                                                               (let ((mob))
                                                                 (check-surroundings x y t #'(lambda (dx dy)
                                                                                               (when (and (>= dx 0)
@@ -130,16 +130,16 @@
                                                                                                     (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                                                            (format nil "~A is feared. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
                                                                                                                            :observed-mob mob
-                                                                                                                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                                                                    *shared-mind-msg-color*
-                                                                                                                                    sdl:*white*)))
+                                                                                                                           :color sdl:*white*
+                                                                                                                           :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                                                         :singlemind))))
                                                                                                   (progn
                                                                                                     (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                                                            (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
                                                                                                                            :observed-mob mob
-                                                                                                                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                                                                    *shared-mind-msg-color*
-                                                                                                                                    sdl:*white*)))))
+                                                                                                                           :color sdl:*white*
+                                                                                                                           :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                                                         :singlemind))))))
                                                                                               )))
                                                               ))))
 
@@ -152,9 +152,9 @@
                                                                                                                   (format nil "You hear a hissing sound~A. " str)))
                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                      (format nil "Sludgeshrooms release spores under ~A. " (prepend-article +article-the+ (visible-name mob)))
-                                                                                     :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                              *shared-mind-msg-color*
-                                                                                              sdl:*white*))
+                                                                                     :color sdl:*white*
+                                                                                     :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                   :singlemind)))
                                                               (check-surroundings x y t #'(lambda (dx dy)
                                                                                               (when (and (>= dx 0)
                                                                                                          (>= dy 0)
@@ -173,9 +173,9 @@
                                                             (declare (ignore x y z))
                                                             (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                    (format nil "Sinister glow irradiates ~A. " (prepend-article +article-the+ (visible-name mob)))
-                                                                                   :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                            *shared-mind-msg-color*
-                                                                                            sdl:*white*))
+                                                                                   :color sdl:*white*
+                                                                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                 :singlemind)))
                                                             (if (mob-effect-p mob +mob-effect-irradiated+)
                                                               (progn
                                                                 (let ((effect (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))))

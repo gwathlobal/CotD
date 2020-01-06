@@ -122,6 +122,9 @@
                                     ((= sound-z 1) " above")
                                     ((= sound-z -1) " below")
                                     (t ""))))
-            (print-visible-message (x target) (y target) (z target) (level *world*) (funcall sound-str-func dir-str))
+            (print-visible-message (x target) (y target) (z target) (level *world*) (funcall sound-str-func dir-str)
+                                   :color sdl:*white*
+                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                 :singlemind)))
             )))))
   (logger (format nil "LEAVING PROPAGATE~%")))

@@ -86,6 +86,7 @@
      (:file "window-inventory" :depends-on ("window-methods"))
      (:file "window-input-str" :depends-on ("window-methods"))
      (:file "window-highscores" :depends-on ("window-methods"))
+     (:file "window-settings" :depends-on ("window-methods"))
      (:file "window-journal" :depends-on ("window-methods"))
      (:module "ai" :depends-on ("base-methods" "window-methods")
       :components ((:file "ai-common")

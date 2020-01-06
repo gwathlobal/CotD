@@ -544,6 +544,12 @@
                                         (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (run-window *current-window*)
                                           (when (and mission-id layout-id weather-id tod-id specific-faction-type faction-list)
                                             (return-from main-menu (values mission-id layout-id weather-id tod-id specific-faction-type faction-list)))))))
+        (settings-item (cons "Settings"
+                             #'(lambda (n)
+                                 (declare (ignore n))
+                                 (setf *current-window* (make-instance 'settings-window))
+                                 (make-output *current-window*)
+                                 (run-window *current-window*))))
         (highscores-item (cons "High scores"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -607,31 +613,30 @@
       (progn
         (setf menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-skin-item) (car join-ghost-item)
-                               (car custom-scenario-item) (car highscores-item) (car help-item) (car exit-item)))
+                               (car custom-scenario-item) (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
         (setf menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-skin-item) (cdr join-ghost-item)
-                               (cdr custom-scenario-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
-        (when *previous-scenario*
-          (push (car play-prev-scenario) menu-items)
-          (push (cdr play-prev-scenario) menu-funcs))
-        (setf *current-window* (make-instance 'start-game-window 
-                                              :menu-items menu-items
-                                              :menu-funcs menu-funcs)))
+                               (cdr custom-scenario-item) (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
+        
+        )
       (progn
         (setf menu-items (list (car join-heaven-item) (car join-trinity-item) (car join-legion-item) (car join-shadow-item) (car join-puppet-item) (car join-chaplain-item) (car join-scout-item)
                                (car join-thief-item) (car join-satanist-item) (car join-church-item) (car join-eater-item) (car join-skin-item) (car join-ghost-item)
                                (car custom-scenario-item) (car all-see-item) (car test-level-item)
-                               (car highscores-item) (car help-item) (car exit-item)))
+                               (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
         (setf menu-funcs (list (cdr join-heaven-item) (cdr join-trinity-item) (cdr join-legion-item) (cdr join-shadow-item) (cdr join-puppet-item) (cdr join-chaplain-item) (cdr join-scout-item)
                                (cdr join-thief-item) (cdr join-satanist-item) (cdr join-church-item) (cdr join-eater-item) (cdr join-skin-item) (cdr join-ghost-item)
                                (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
-                               (cdr highscores-item) (cdr help-item) (cdr exit-item)))
-        (when *previous-scenario*
-          (push (car play-prev-scenario) menu-items)
-          (push (cdr play-prev-scenario) menu-funcs))
-        (setf *current-window* (make-instance 'start-game-window 
-                                              :menu-items menu-items
-                                              :menu-funcs menu-funcs)))))
+                               (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
+        
+        ))
+    (when *previous-scenario*
+      (push (car play-prev-scenario) menu-items)
+      (push (cdr play-prev-scenario) menu-funcs))
+    (setf *current-window* (make-instance 'start-game-window 
+                                          :menu-items menu-items
+                                          :menu-funcs menu-funcs)))
+  
   
   (make-output *current-window*)
   (loop while t do

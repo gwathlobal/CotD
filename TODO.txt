@@ -8,7 +8,6 @@
 - A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police
 - Chain Lightning attack
 - Beam & Sweep arrack
-- Make an option to disable some prompts like "disguise as human for angels"
 - Flat game map
 - Scenario with attacking a battleship
 - Add Twosoul character for satanists

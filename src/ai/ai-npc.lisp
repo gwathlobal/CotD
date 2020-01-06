@@ -53,9 +53,9 @@
     (logger (format nil "AI-FUNCTION: ~A [~A] is irradiated, loses turn.~%" (name mob) (id mob)))
     (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                            (format nil "~A is sick. " (capitalize-name (prepend-article +article-the+ (name mob))))
-                           :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                    *shared-mind-msg-color*
-                                    sdl:*white*))
+                           :color sdl:*white*
+                           :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                         :singlemind)))
     (move-mob mob 5)
     (setf (path mob) nil)
     (return-from ai-function nil))
@@ -78,9 +78,9 @@
                      (get-faction-relation (faction mob) (faction *player*))))
         (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                (format nil "~A revolts against ~A. " (capitalize-name (prepend-article +article-the+ (name (get-mob-by-id (slave-mob-id mob))))) (prepend-article +article-the+ (name mob)))
-                               :color (if (if-cur-mob-seen-through-shared-vision *player*)
-                                        *shared-mind-msg-color*
-                                        sdl:*white*)))
+                               :color sdl:*white*
+                               :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                             :singlemind))))
       (setf (path mob) nil)
       (ai-mob-random-dir mob)
       (return-from ai-function nil)
