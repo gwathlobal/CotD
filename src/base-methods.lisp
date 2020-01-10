@@ -93,7 +93,8 @@
 (defun print-visible-message (x y z level str &key (observed-mob nil) (color sdl:*white*) (tags ()))
   (when (member :singlemind tags)
     (setf color *shared-mind-msg-color*))
-  (when (options-ignore-singlemind-messages *options*)
+  (when (and (options-ignore-singlemind-messages *options*)
+             (member :singlemind tags))
     (return-from print-visible-message nil))
   (when (or (and (null observed-mob)
                  (get-single-memo-visibility (get-memo-* level x y z)))
@@ -2378,7 +2379,7 @@
                            (format nil "~A bends space around itself and disappeares in thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                            :color sdl:*white*
                            :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
-                                         :singlemind))))
+                                         :singlemind)))
     
     (set-mob-location actor dx dy dz)
     
@@ -2388,7 +2389,7 @@
                            (format nil "~A appears out of thin air. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                            :color sdl:*white*
                            :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
-                                         :singlemind))))
+                                         :singlemind)))
     ))
 
 (defun invoke-teleport-self (actor min-distance z)

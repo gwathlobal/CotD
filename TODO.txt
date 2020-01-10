@@ -10,7 +10,7 @@
 - Beam & Sweep arrack
 - Flat game map
 - Scenario with attacking a battleship
-- Add Twosoul character for satanists
+- Add Twosoul character for satanists, where players acts as a demon living inside a satanist and acts independetely
 - Add Flamethrower operator to the miliatry
 - Add courtyard houses like Thief2RL
 - Add the Revolutionaries faction
