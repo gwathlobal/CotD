@@ -179,7 +179,8 @@
                                                             (if (mob-effect-p mob +mob-effect-irradiated+)
                                                               (progn
                                                                 (let ((effect (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))))
-                                                                  (incf (param1 effect) (+ 2 (random 3)))))
+                                                                  (when (<= (param1 effect) 5)
+                                                                    (incf (param1 effect) (+ 2 (random 2))))))
                                                               (progn
                                                                 (set-mob-effect mob :effect-type-id +mob-effect-irradiated+ :actor-id nil :cd t :param1 (+ 2 (random 3))))))))
 

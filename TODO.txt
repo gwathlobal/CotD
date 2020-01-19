@@ -1,5 +1,3 @@
-- Glowing creep should not irradiate too much
-- Trinity mimics should be able to merge only if there is another trinity mimic nearby
 - A style of gameplay where you gain abilities depending on your surroundings
 - Angels get conducts (do not kill allies) they should not break or they will get penalized
 - Malseraph's puppets get additional task from Malseraph

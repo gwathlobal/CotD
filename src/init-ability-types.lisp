@@ -3049,23 +3049,53 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-merge+)
-                                                               (not (mob-effect-p actor +mob-effect-possessed+))
-                                                               (not (mob-effect-p actor +mob-effect-divine-concealed+)))
-                                                        t
-                                                        nil))
+                                                      (let ((ally nil)
+                                                            (check-func #'(lambda (mob)
+                                                                            (if (and mob
+                                                                                     (find (id mob) (mimic-id-list actor))
+                                                                                     (not (mob-effect-p mob +mob-effect-possessed+))
+                                                                                     (not (riding-mob-id mob))
+                                                                                     (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-opaque-floor+))
+                                                                              mob
+                                                                              nil))))
+                                                        (setf ally (block nil
+                                                                     (check-surroundings (x actor) (y actor) nil
+                                                                                         #'(lambda (dx dy)
+                                                                                             (let* ((mob (get-mob-* (level *world*) dx dy (z actor)))
+                                                                                                    (res (funcall check-func mob)))
+                                                                                               (when res (return res)))))
+                                                                     
+                                                                     (when (< (1+ (z actor)) (array-dimension (terrain (level *world*)) 2))
+                                                                       (check-surroundings (x actor) (y actor) nil
+                                                                                           #'(lambda (dx dy)
+                                                                                               (let* ((mob (get-mob-* (level *world*) dx dy (1+ (z actor))))
+                                                                                                      (res (funcall check-func mob)))
+                                                                                                 (when res (return res))))))
+                                                                     (when (>= (1- (z actor)) 0)
+                                                                       (check-surroundings (x actor) (y actor) nil
+                                                                                           #'(lambda (dx dy)
+                                                                                               (let* ((mob (get-mob-* (level *world*) dx dy (1- (z actor))))
+                                                                                                      (res (funcall check-func mob)))
+                                                                                                 (when res (return res))))))))
+                                                        
+                                                        (if (and ally
+                                                                 (mob-ability-p actor +mob-abil-merge+)
+                                                                 (not (mob-effect-p actor +mob-effect-possessed+))
+                                                                 (not (mob-effect-p actor +mob-effect-divine-concealed+)))
+                                                          t
+                                                          nil)))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type))
                                                   (if (and (mob-ability-p actor +mob-abil-merge+)
-                                                             (can-invoke-ability actor actor +mob-abil-merge+)
-                                                             (not nearest-enemy)
-                                                             nearest-ally
-                                                             (find (id nearest-ally) (mimic-id-list actor))
-                                                             (not (mob-effect-p nearest-ally +mob-effect-possessed+))
-                                                             (not (riding-mob-id nearest-ally))
-                                                             (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-ally) (y nearest-ally) (z nearest-ally)) +terrain-trait-opaque-floor+)
-                                                             (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
-                                                                2))
+                                                           (can-invoke-ability actor actor +mob-abil-merge+)
+                                                           (not nearest-enemy)
+                                                           nearest-ally
+                                                           (find (id nearest-ally) (mimic-id-list actor))
+                                                           (not (mob-effect-p nearest-ally +mob-effect-possessed+))
+                                                           (not (riding-mob-id nearest-ally))
+                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-ally) (y nearest-ally) (z nearest-ally)) +terrain-trait-opaque-floor+)
+                                                           (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
+                                                              2))
                                                       t
                                                       nil))
                                  :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
