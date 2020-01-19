@@ -2302,7 +2302,7 @@
 (defun calculate-player-score (bonus)
   (let ((score (+ (cur-score *player*) bonus (- (if (> (real-game-time *world*) 200)
                                                   (- (real-game-time *world*) 200)
-                                                  0))
+                                                  (* 2 (- (real-game-time *world*) 200))))
                   (if (= (mob-type *player*) +mob-type-thief+)
                     (calculate-total-value *player*)
                     0)

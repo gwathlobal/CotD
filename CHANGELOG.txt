@@ -6,7 +6,7 @@ CHANGELOG
 - Added a new terrain tile to the corrupted districts - glowing creep. If somebody steps on this tile, it will give irradiation to this character.
 - Abilities to mount a horse, fiend or Gargantaur will now show up only when the corresponding mount is next to you to avoid confusion.
 - Made an option to hide messages that are visible through Angel's 'Singlemind' ability.
-
+- Restructured the main menu - moved all quick scenario options into a submenu
 
 --------------------
 November 5, 2018 v1.3.4

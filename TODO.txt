@@ -1,9 +1,11 @@
+- Glowing creep should not irradiate too much
+- Trinity mimics should be able to merge only if there is another trinity mimic nearby
 - A style of gameplay where you gain abilities depending on your surroundings
-- Angels get conducts they should not break or they will get penalized
+- Angels get conducts (do not kill allies) they should not break or they will get penalized
 - Malseraph's puppets get additional task from Malseraph
 - Alarak-style gameplay where you gain resource when allies get killed and you can sacrifice your allies
 - Unstable pocket dimensions - complete the goal before the time expires
-- Collasping pocket dimensions - complete the goal while the map becomes smaller and smaller
+- Collapsing pocket dimensions - complete the goal while the map becomes smaller and smaller
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)
 - A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police
 - Chain Lightning attack

@@ -1,0 +1,6 @@
+THE CHURCH
+ - Priests have an array of divine abilities. They are able to grant divine shield to allies, scorch and reveal the true form of all enemies in sight, slow and smite enemies. The divine shield provides a one-time protection from any harm.
+ - Whenever a priest gives humans a divine shield, they will start to follow the preacher.
+ - Smiting damage increases with the number of humans the priest sees.
+ - Priests can also give fire-based melee attacks to themselves and their followers by praying for wrath.
+ - Priests start in the church.

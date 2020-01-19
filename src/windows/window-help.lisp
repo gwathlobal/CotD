@@ -15,21 +15,21 @@
   ((cur-page :initform +win-help-page-menu+ :accessor cur-page)
    (cur-str :initform 0 :accessor cur-str)
    (cur-sel :initform 0 :accessor cur-sel)
-   (menu-items :initform (list "Overview" "Concepts: Combat" "Concepts: Environment" "Concepts: Gods" "Keybindings" "Credits") :accessor menu-items)
-   (help-txt :initform (help-window-populate-txt) :accessor help-txt)
+   (menu-items :initform (list "Overview"
+                               "Concepts: Combat"
+                               "Concepts: Environment"
+                               "Concepts: Gods"
+                               "Keybindings"
+                               "Credits")
+               :accessor menu-items)
+   (help-txt :initform (populate-txt-from-filelist (list "help/overview.txt"
+                                                         "help/concept_combat.txt"
+                                                         "help/concept_environment.txt"
+                                                         "help/concept_gods.txt"
+                                                         "help/keybindings.txt"
+                                                         "help/credits.txt"))
+             :accessor help-txt)
    ))
-
-(defun help-window-populate-txt ()
-  (let ((file-list (list "help/overview.txt" "help/concept_combat.txt" "help/concept_environment.txt" "help/concept_gods.txt" "help/keybindings.txt" "help/credits.txt"))
-        (get-txt-func #'(lambda (filename)
-                          (with-open-file (file (merge-pathnames filename *current-dir*) :direction :input :if-does-not-exist nil)
-                            (when file 
-                              (loop for line = (read-line file nil)
-                                    with str = (create-string "")
-                                    while line do (format str "~A~%" line)
-                                    finally (return str)))))))
-    (append (list nil) (map 'list get-txt-func file-list)))
-  )
 
 (defun show-help-text (win txt-n)
   (let ((str (nth txt-n (help-txt win)))

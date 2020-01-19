@@ -1,19 +1,17 @@
 (in-package :cotd)
 
-(defclass start-game-window (window)
+(defclass main-menu-window (window)
   ((cur-sel :initform 0 :accessor cur-sel)
    (menu-items :initform () :initarg :menu-items :accessor menu-items)
    (menu-funcs :initform () :initarg :menu-funcs :accessor menu-funcs)))
 
-(defmethod make-output ((win start-game-window))
+(defmethod make-output ((win main-menu-window))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
     (sdl:fill-surface sdl:*black* :template a-rect))
 
   (sdl:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
 
   (sdl:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 30 (sdl:char-height sdl:*default-font*)) :justify :right :color sdl:*white*)
-    
-  
   
   ;; drawing selection list
   (let ((cur-str) (color-list nil))
@@ -32,7 +30,7 @@
   
   (sdl:update-display))
 
-(defmethod run-window ((win start-game-window))
+(defmethod run-window ((win main-menu-window))
      (sdl:with-events ()
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
