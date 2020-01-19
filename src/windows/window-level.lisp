@@ -483,13 +483,14 @@
                                 (abil-descr-list nil)
                                 (abil-prompt-list nil)
                                 (abil-color-list nil)
-                                (mob-abilities (get-mob-all-abilities *player*)))
-                            
+                                (mob-abilities nil))
+
                             ;; filter ability list to leave only non passive and applicable
-                            (setf mob-abilities (loop for ability-type-id in mob-abilities
+                            (setf mob-abilities (loop for ability-type-id in (get-mob-all-abilities *player*)
                                                       when (and (not (abil-passive-p ability-type-id))
                                                                 (abil-applicable-p (get-ability-type-by-id ability-type-id) *player* *player*))
                                                         collect ability-type-id))
+                            
                             (if mob-abilities
                               (progn
                                 ;; populate the ability name list 

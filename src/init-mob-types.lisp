@@ -241,7 +241,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
                                        :strength 2
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
-                                       :abil-heal-self 1 :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
+                                       :abil-heal-self 1 :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t :abil-purge-rune t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-avatar-of-brilliance t :abil-split-soul t :abil-resurrection t
                                        :ai-wants-bless t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
@@ -256,6 +256,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-heal-self 2 :abil-detect-evil t :abil-blindness t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t
                                        :abil-toggle-light t :abil-open-close-door t :abil-ignite-the-fire t :abil-split-soul t :abil-resurrection t :abil-remove-disguise t
+                                       :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -269,6 +270,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-righteous-fury t :abil-pain-link t :abil-resurrection t
+                                       :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -282,6 +284,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-silence t :abil-confuse t :abil-resurrection t
+                                       :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -295,6 +298,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-soul-reinforcement t :abil-resurrection t
+                                       :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -309,6 +313,7 @@
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-righteous-fury t :abil-pain-link t 
                                        :abil-soul-reinforcement t :abil-resurrection t
+                                       :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -322,6 +327,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-righteous-fury t :abil-pain-link t :abil-silence t :abil-confuse t :abil-resurrection t
+                                       :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-gazer-mender+
@@ -334,7 +340,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-soul-reinforcement t :abil-silence t :abil-confuse t
-                                       :abil-resurrection t
+                                       :abil-resurrection t :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-gazer-mender+
@@ -347,7 +353,7 @@
                                        :abil-purging-touch t :abil-blessing-touch t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-soul t
                                        :abil-conceal-divine t :abil-reveal-divine t :abil-detect-evil t :abil-dismount t :abil-dominate-gargantaur t :abil-gargantaurs-mind-burn t :abil-toggle-light t
                                        :abil-open-close-door t :abil-ignite-the-fire t :abil-trinity-mimic t :abil-merge t :abil-unmerge t :abil-heal-other 1 :abil-righteous-fury t :abil-pain-link t
-                                       :abil-soul-reinforcement t :abil-silence t :abil-confuse t :abil-resurrection t
+                                       :abil-soul-reinforcement t :abil-silence t :abil-confuse t :abil-resurrection t :abil-purge-rune t
                                        :ai-wants-bless t :ai-curious t :ai-trinity-mimic t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel-image+
