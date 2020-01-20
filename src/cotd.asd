@@ -63,7 +63,7 @@
                    (:file "init-scenario-angelic-steal-corrupted" :depends-on ("scenarios" "scenarios-mob-placement"))))
      (:file "highscores")
      (:file "dungeon-creation" :depends-on ("level-test" "level-city" "scenario"))
-     (:file "campaign-map")
+     (:file "world-map")
      (:file "init-faction-types" :depends-on ("base-methods"))
      (:file "init-mob-types" :depends-on ("base-methods"))
      (:file "init-feature-types" :depends-on ("base-methods"))

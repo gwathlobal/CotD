@@ -6,10 +6,9 @@
 - Unstable pocket dimensions - complete the goal before the time expires
 - Collapsing pocket dimensions - complete the goal while the map becomes smaller and smaller
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)
-- A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police
+- A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police (or put a certain )
 - Chain Lightning attack
 - Beam & Sweep arrack
-- Flat game map
 - Scenario with attacking a battleship
 - Add Twosoul character for satanists, where players acts as a demon living inside a satanist and acts independetely
 - Add Flamethrower operator to the miliatry

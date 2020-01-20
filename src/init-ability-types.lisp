@@ -3149,6 +3149,9 @@
                                                 (setf (merged-id-list actor) (append (merged-id-list actor) (list (id target)) (merged-id-list target)))
                                                 (setf (merged-id-list target) nil)
 
+                                                (incf (cur-fp actor) (cur-fp target))
+                                                (setf (cur-fp target) 0)
+                                                                                                
                                                 (set-mob-effect actor :effect-type-id +mob-effect-merged+ :actor-id (id actor) :param1 (mob-type actor))
 
                                                 (when (zerop (random 20))
@@ -3278,10 +3281,13 @@
                                                         for mimic = (get-mob-by-id mimic-id)
                                                         for random-tile = (random (length tile-list))
                                                         for (x y z) = (nth random-tile tile-list)
+                                                        with fp-per-mimic = (floor (cur-fp actor) (1+ (length (merged-id-list actor))))
                                                         do
                                                            (setf (is-merged mimic) nil)
                                                            (setf tile-list (remove (nth random-tile tile-list)
                                                                                    tile-list))
+                                                           (incf (cur-fp mimic) fp-per-mimic)
+                                                           (decf (cur-fp actor) fp-per-mimic)
                                                            (setf (x mimic) x (y mimic) y (z mimic) z)
                                                            (rem-mob-effect mimic +mob-effect-merged+)
                                                            (add-mob-to-level-list (level *world*) mimic))
