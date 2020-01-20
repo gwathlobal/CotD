@@ -5,7 +5,7 @@
    (menu-items :initform () :initarg :menu-items :accessor menu-items)
    (menu-funcs :initform () :initarg :menu-funcs :accessor menu-funcs)
    (menu-descrs :initform () :initarg :menu-descrs :accessor menu-descrs)
-   (max-menu-length :initform (truncate (- (/ *window-height* 2) 40) (sdl:char-height sdl:*default-font*)) :initarg :max-menu-length :accessor max-menu-length)
+   (max-menu-length :initform (truncate (- (/ *window-height* 2) 60) (sdl:char-height sdl:*default-font*)) :initarg :max-menu-length :accessor max-menu-length)
    ))
 
 (defmethod make-output ((win new-game-window))
@@ -13,6 +13,9 @@
     (sdl:fill-surface sdl:*black* :template a-rect))
 
   (sdl:draw-string-solid-* "NEW GAME" (truncate *window-width* 2) 0 :justify :center :color sdl:*white*)
+
+  (sdl:draw-string-solid-* (format nil "Choose your faction & character:")
+                           10 (+ 10 (sdl:char-height sdl:*default-font*)))
   
   ;; drawing selection list
   (let ((cur-str (cur-sel win)) (color-list nil))
@@ -26,13 +29,13 @@
       (if (= i cur-str) 
         (setf color-list (append color-list (list sdl:*yellow*)))
         (setf color-list (append color-list (list sdl:*white*)))))
-    (draw-selection-list (menu-items win) cur-str (max-menu-length win) 20 (+ 10 (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
+    (draw-selection-list (menu-items win) cur-str (max-menu-length win) 20 (+ 30 (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
 
   ;; drawing selection description
   (let ((descr (nth (cur-sel win) (menu-descrs win))))
     (sdl:with-rectangle (rect (sdl:rectangle :x 20 :y (+ (truncate *window-height* 2) 0)
                                              :w (- *window-width* 40)
-                                             :h (- (truncate *window-height* 2) 20 30 (sdl:char-height sdl:*default-font*))))
+                                             :h (- (truncate *window-height* 2) 20 0 (sdl:char-height sdl:*default-font*))))
       (write-text descr rect :start-line 0)))
 
   (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
