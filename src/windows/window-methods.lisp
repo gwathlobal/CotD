@@ -453,3 +453,125 @@
                      )
     (:video-expose-event () (make-output *current-window*))
     (:idle () (return-from pause-for-poll))))
+
+(defun draw-world-map (world-map scr-x scr-y)
+  (loop with max-disp-w = 5
+        with max-disp-h = 5
+        for y from 0 below *max-y-world-map* do
+    (loop for x from 0 below *max-y-world-map*
+          for x1 = (+ scr-x (* x *glyph-w* max-disp-w))
+          for y1 = (+ scr-y (* y *glyph-h* max-disp-h))
+          for river-feat = (find :river (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+          for sea-feat = (find :sea (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+          for barricade-feat = (find :barricade (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+          for displayed-cells = (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*))
+          do
+             ;; display sea & island sector 
+             (when (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
+                       (= (wtype (aref (cells world-map) x y)) +world-sector-normal-sea+))
+               (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*))))
+
+             ;; display barricades
+             (when barricade-feat
+               (when (find :n (second barricade-feat))
+                 (setf (aref displayed-cells 0 0) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 1 0) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 2 0) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 3 0) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 4 0) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*)))
+               (when (find :s (second barricade-feat))
+                 (setf (aref displayed-cells 0 4) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 1 4) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 2 4) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 3 4) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 4 4) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*)))
+               (when (find :w (second barricade-feat))
+                 (setf (aref displayed-cells 0 0) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 0 1) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 0 2) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 0 3) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 0 4) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*)))
+               (when (find :e (second barricade-feat))
+                 (setf (aref displayed-cells 4 0) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 4 1) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 4 2) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 4 3) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))
+                 (setf (aref displayed-cells 4 4) (list +glyph-id-hash+ (sdl:color :r 139 :g 69 :b 19) sdl:*black*))))
+             
+             ;; display rivers
+             (when river-feat
+               (when (find :n (second river-feat))
+                 (setf (aref displayed-cells 2 0) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 2 1) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*)))
+               (when (find :s (second river-feat))
+                 (setf (aref displayed-cells 2 3) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 2 4) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*)))
+               (when (find :w (second river-feat))
+                 (setf (aref displayed-cells 0 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 1 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*)))
+               (when (find :e (second river-feat))
+                 (setf (aref displayed-cells 3 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 4 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*))))
+
+             ;; display seas for ports
+             (when sea-feat
+               (when (find :n (second sea-feat))
+                 (setf (aref displayed-cells 0 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 1 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 2 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 3 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 4 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
+               (when (find :s (second sea-feat))
+                 (setf (aref displayed-cells 0 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 1 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 2 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 3 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 4 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
+               (when (find :w (second sea-feat))
+                 (setf (aref displayed-cells 0 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 0 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 0 2) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 0 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 0 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
+               (when (find :e (second sea-feat))
+                 (setf (aref displayed-cells 4 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 4 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 4 2) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 4 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+                 (setf (aref displayed-cells 4 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))))
+
+             ;; display lake
+             (when (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+)
+               (setf (aref displayed-cells 1 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+               (setf (aref displayed-cells 1 2) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+               (setf (aref displayed-cells 1 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+               (setf (aref displayed-cells 2 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+               (setf (aref displayed-cells 2 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+               (setf (aref displayed-cells 3 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+               (setf (aref displayed-cells 3 2) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
+               (setf (aref displayed-cells 3 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
+
+             ;; display controlled status
+             (cond
+               ((= (controlled-by (aref (cells world-map) x y)) +world-sector-controlled-by-demons+)
+                (progn
+                  (setf (aref displayed-cells 1 1) (list +glyph-id-large-d+ sdl:*red* sdl:*black*))))
+               ((= (controlled-by (aref (cells world-map) x y)) +world-sector-controlled-by-military+)
+                (progn
+                  (setf (aref displayed-cells 1 1) (list +glyph-id-large-m+ sdl:*green* sdl:*black*))))
+               ((= (controlled-by (aref (cells world-map) x y)) +world-sector-controlled-by-angels+)
+                (progn
+                  (setf (aref displayed-cells 1 1) (list +glyph-id-large-a+ sdl:*cyan* sdl:*black*))))
+               )
+             
+             (setf (aref displayed-cells 2 2) (list (glyph-idx (get-world-sector-type-by-id (wtype (aref (cells world-map) x y))))
+                                                    (glyph-color (get-world-sector-type-by-id (wtype (aref (cells world-map) x y))))
+                                                    sdl:*black*))
+             
+             (loop for dy from 0 below max-disp-h do
+               (loop for dx from 0 below max-disp-w do
+                     (draw-glyph (+ x1 (* dx *glyph-w*)) (+ y1 (* dy *glyph-h*)) (first (aref displayed-cells dx dy))
+                         :front-color (second (aref displayed-cells dx dy)) 
+                         :back-color (third (aref displayed-cells dx dy)))))
+          ))
+  )

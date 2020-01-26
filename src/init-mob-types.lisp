@@ -248,7 +248,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archangel+
                                        :name "Avatar of Brilliance"
-                                       :glyph-idx 33 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 36 :max-fp 32
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 36 :max-fp 32
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 6 9 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 3 50))
@@ -304,7 +304,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-mender+
                                        :name "amalgamated angel"
-                                       :glyph-idx 33 :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -319,7 +319,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-gazer+
                                        :name "amalgamated angel"
-                                       :glyph-idx 33 :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -332,7 +332,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-gazer-mender+
                                        :name "amalgamated angel"
-                                       :glyph-idx 33 :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -345,7 +345,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-gazer-mender+
                                        :name "amalgamated angel"
-                                       :glyph-idx 33 :glyph-color (sdl:color :r 0 :g 128 :b 128) :back-color sdl:*black* :max-hp 14 :max-fp 36
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 0 :g 128 :b 128) :back-color sdl:*black* :max-hp 14 :max-fp 36
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -400,7 +400,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archdemon+
                                        :name "archdemon"
-                                       :glyph-idx 36 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 40 :max-fp 16
+                                       :glyph-idx +glyph-id-large-d+ :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 40 :max-fp 16
                                        :faction +faction-type-demons+
                                        :weapon (list "Chains of Shattering" (list +weapon-dmg-vorpal+ 5 10 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -443,7 +443,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-devil+
                                        :name "shadow devil"
-                                       :glyph-idx 36 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 32 :max-fp 16
+                                       :glyph-idx +glyph-id-large-d+ :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 32 :max-fp 16
                                        :faction +faction-type-demons+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 5 8 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))

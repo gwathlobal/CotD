@@ -1,3 +1,5 @@
+- Malseraph's puppet: make irradiation strength depend on Malseraph's favor
+- Malseraph's puppet: make 2 phase ability with 1 phase irradiating everybody around and 2 phase blowing up everybody around
 - Acid rain in corrupted districts
 - A style of gameplay where you gain abilities depending on your surroundings
 - Angels get conducts (do not kill allies) they should not break or they will get penalized

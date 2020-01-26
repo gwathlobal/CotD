@@ -194,7 +194,7 @@
                                                :trait-can-have-rune t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-barricade+ :name "barricade"
-                                               :glyph-idx 3 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 10  :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-earth+ :name "earth"
@@ -202,7 +202,7 @@
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t :trait-blocks-sound 40 :trait-blocks-sound-floor 40))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-bush+ :name "bush"
-                                               :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color sdl:*green* :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-grave+ :name "grave"
@@ -210,7 +210,7 @@
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-gloomtwigs+ :name "gloomtwigs"
-                                               :glyph-idx 3 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
                                                :trait-blocks-vision 60 :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-corrupted+ :name "flesh wall"
@@ -219,7 +219,7 @@
                                                :trait-can-have-rune t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-razorthorns+ :name "razorthorns"
-                                               :glyph-idx 3 :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* 
                                                :trait-blocks-vision 60 :trait-opaque-floor t :trait-blocks-sound-floor 20
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))

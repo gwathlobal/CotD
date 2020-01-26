@@ -388,6 +388,8 @@
    (fov-cv :initform (bt:make-condition-variable) :accessor fov-cv)
 
    (animation-queue :initform () :accessor animation-queue)
+
+   (world-map :initform nil :accessor world-map)
    ))
 
 ;;----------------------

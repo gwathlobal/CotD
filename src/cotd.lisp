@@ -308,276 +308,18 @@
                                                       layout-id
                                                       faction-list))))
 
-(defun new-game-menu-items ()
-  (let ((menu-items nil)
-        (menu-funcs nil)
-        (menu-descrs nil)
-        (join-heaven-item (list "Join the Celestial Communion (as a Chrome angel)"
-                                #'(lambda (n) 
-                                    (declare (ignore n))
-                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (mission-id)
-                                          (layout-id)
-                                          (faction-list))
-
-                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-angel-chrome+))
-
-                                      (values mission-id
-                                              layout-id
-                                              (nth (random (length weather-types)) weather-types)
-                                              (nth (random (length tod-types)) tod-types)
-                                              +specific-faction-type-angel-chrome+
-                                              faction-list)))
-                                (get-txt-from-file "data/descriptions/communion_chrome.txt")))
-        (join-trinity-item (list "Join the Celestial Communion (as a Trinity mimic)"
-                                #'(lambda (n) 
-                                    (declare (ignore n))
-                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (mission-id)
-                                          (layout-id)
-                                          (faction-list))
-
-                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-angel-trinity+))
-                                      
-                                      (values mission-id
-                                              layout-id
-                                              (nth (random (length weather-types)) weather-types)
-                                              (nth (random (length tod-types)) tod-types)
-                                              +specific-faction-type-angel-trinity+
-                                              faction-list)))
-                                (get-txt-from-file "data/descriptions/communion_trinity.txt")))
-        (join-legion-item (list "Join the Pandemonium Hierarchy (as a Crimson imp)"
-                                #'(lambda (n) 
-                                    (declare (ignore n))
-                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (mission-id)
-                                          (layout-id)
-                                          (faction-list))
-
-                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-demon-crimson+))
-                                      
-                                      (values mission-id
-                                              layout-id
-                                              (nth (random (length weather-types)) weather-types)
-                                              (nth (random (length tod-types)) tod-types)
-                                              +specific-faction-type-demon-crimson+
-                                              faction-list)))
-                                (get-txt-from-file "data/descriptions/pandemonium_crimsonimp.txt")))
-        (join-shadow-item (list "Join the Pandemonium Hierarchy (as a Shadow imp)"
-                                #'(lambda (n) 
-                                    (declare (ignore n))
-                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (mission-id)
-                                          (layout-id)
-                                          (faction-list))
-
-                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-demon-shadow+))
-                                      
-                                      (values mission-id
-                                              layout-id
-                                              (nth (random (length weather-types)) weather-types)
-                                              +tod-type-evening+
-                                              +specific-faction-type-demon-shadow+
-                                              faction-list)))
-                                (get-txt-from-file "data/descriptions/pandemonium_shadowimp.txt")))
-        (join-puppet-item (list "Join the Pandemonium Hierarchy (as Malseraph's puppet)"
-                                #'(lambda (n) 
-                                    (declare (ignore n))
-                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (mission-id)
-                                          (layout-id)
-                                          (faction-list))
-
-                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-demon-malseraph+))
-                                      
-                                      (values mission-id
-                                              layout-id
-                                              (nth (random (length weather-types)) weather-types)
-                                              (nth (random (length tod-types)) tod-types)
-                                              +specific-faction-type-demon-malseraph+
-                                              faction-list)))
-                                (get-txt-from-file "data/descriptions/pandemonium_puppet.txt")))
-        (join-chaplain-item (list "Join the Military (as a Chaplain)"
-                                  #'(lambda (n) 
-                                      (declare (ignore n))
-                                      (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                            (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (mission-id)
-                                            (layout-id)
-                                            (faction-list))
-
-                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-military-chaplain+))
-                                        
-                                        (values mission-id
-                                                layout-id
-                                                (nth (random (length weather-types)) weather-types)
-                                                (nth (random (length tod-types)) tod-types)
-                                                +specific-faction-type-military-chaplain+
-                                                faction-list)))
-                                  (get-txt-from-file "data/descriptions/military_chaplain.txt")))
-        (join-scout-item (list "Join the Military (as a Scout)"
-                               #'(lambda (n) 
-                                   (declare (ignore n))
-                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                         (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                         (mission-id)
-                                         (layout-id)
-                                         (faction-list))
-
-                                     (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-military-scout+))
-                                     
-                                     (values mission-id
-                                             layout-id
-                                             (nth (random (length weather-types)) weather-types)
-                                             (nth (random (length tod-types)) tod-types)
-                                             +specific-faction-type-military-scout+
-                                             faction-list)))
-                               (get-txt-from-file "data/descriptions/military_scout.txt")))
-        (join-thief-item (list "Join as the Thief"
-                               #'(lambda (n) 
-                                   (declare (ignore n))
-                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                         (mission-id)
-                                         (layout-id)
-                                         (faction-list))
-
-                                     (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-thief+))
-                                     
-                                     (values mission-id
-                                             layout-id
-                                             (nth (random (length weather-types)) weather-types)
-                                             +tod-type-evening+
-                                             +specific-faction-type-thief+
-                                             faction-list)))
-                               (get-txt-from-file "data/descriptions/criminals.txt")))
-        (join-satanist-item (list "Join the Satanists"
-                                  #'(lambda (n) 
-                                      (declare (ignore n))
-                                      (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                            (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (mission-id)
-                                            (layout-id)
-                                            (faction-list))
-
-                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-satanist+))
-                                        
-                                        (values mission-id
-                                                layout-id
-                                                (nth (random (length weather-types)) weather-types)
-                                                (nth (random (length tod-types)) tod-types)
-                                                +specific-faction-type-satanist+
-                                                faction-list)))
-                                  (get-txt-from-file "data/descriptions/satanists.txt")))
-        (join-church-item (list "Join the Church"
-                                #'(lambda (n) 
-                                    (declare (ignore n))
-                                    (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                          (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                          (mission-id)
-                                          (layout-id)
-                                          (faction-list))
-                                      
-                                      (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-priest+))
-                                      
-                                      (values mission-id
-                                              layout-id
-                                              (nth (random (length weather-types)) weather-types)
-                                              (nth (random (length tod-types)) tod-types)
-                                              +specific-faction-type-priest+
-                                              faction-list)))
-                                (get-txt-from-file "data/descriptions/church.txt")))
-        (join-eater-item (list "Join as the Eater of the dead"
-                               #'(lambda (n) 
-                                   (declare (ignore n))
-                                   (let ((weather-types (remove +weather-type-snow+ (get-all-scenario-features-by-type +scenario-feature-weather+ nil)))
-                                         (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                         (mission-id)
-                                         (layout-id)
-                                         (faction-list))
-                                     
-                                     (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-eater+))
-                                     
-                                     (values mission-id
-                                             layout-id
-                                             (nth (random (length weather-types)) weather-types)
-                                             (nth (random (length tod-types)) tod-types)
-                                             +specific-faction-type-eater+
-                                             faction-list)))
-                               (get-txt-from-file "data/descriptions/primordials_eater.txt")))
-        (join-skin-item (list "Join as the Skinchanger"
-                              #'(lambda (n) 
-                                  (declare (ignore n))
-                                  (let ((weather-types (remove +weather-type-snow+ (get-all-scenario-features-by-type +scenario-feature-weather+ nil)))
-                                        (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                        (mission-id)
-                                        (layout-id)
-                                        (faction-list))
-                                    
-                                    (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-skinchanger+))
-
-                                    (format t "specific-faction-type = ~A~%" +specific-faction-type-skinchanger+)
-                                    
-                                    (values mission-id
-                                            layout-id
-                                            (nth (random (length weather-types)) weather-types)
-                                            (nth (random (length tod-types)) tod-types)
-                                            +specific-faction-type-skinchanger+
-                                            faction-list)))
-                              (get-txt-from-file "data/descriptions/primordials_skinchanger.txt")))
-        (join-ghost-item (list "Join as the Lost soul"
-                               #'(lambda (n) 
-                                   (declare (ignore n))
-                                   (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                         (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                         (mission-id)
-                                         (layout-id)
-                                         (faction-list))
-
-                                     (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-ghost+))
-                                     
-                                     (values mission-id
-                                             layout-id
-                                             (nth (random (length weather-types)) weather-types)
-                                             (nth (random (length tod-types)) tod-types)
-                                             +specific-faction-type-ghost+
-                                             faction-list)))
-                               (get-txt-from-file "data/descriptions/lostsoul.txt")))
-        )
-
-    (setf menu-items (list (first join-heaven-item) (first join-trinity-item) (first join-legion-item) (first join-shadow-item) (first join-puppet-item)
-                           (first join-chaplain-item) (first join-scout-item) (first join-thief-item) (first join-satanist-item) (first join-church-item)
-                           (first join-eater-item) (first join-skin-item) (first join-ghost-item)))
-    (setf menu-funcs (list (second join-heaven-item) (second join-trinity-item) (second join-legion-item) (second join-shadow-item) (second join-puppet-item)
-                           (second join-chaplain-item) (second join-scout-item) (second join-thief-item) (second join-satanist-item) (second join-church-item)
-                           (second join-eater-item) (second join-skin-item) (second join-ghost-item)))
-    (setf menu-descrs (list (third join-heaven-item) (third join-trinity-item) (third join-legion-item) (third join-shadow-item) (third join-puppet-item)
-                            (third join-chaplain-item) (third join-scout-item) (third join-thief-item) (third join-satanist-item) (third join-church-item)
-                            (third join-eater-item) (third join-skin-item) (third join-ghost-item)))
-
-    (values menu-items menu-funcs menu-descrs)))
-
 (defun main-menu ()
   (let ((menu-items nil)
         (menu-funcs nil)
         (new-game-item (cons "New game"
                              #'(lambda (n) 
                                  (declare (ignore n))
-                                 (multiple-value-bind (new-game-items new-game-funcs new-game-descrs) (new-game-menu-items)
-                                   (setf *current-window* (make-instance 'new-game-window
-                                                                         :menu-items new-game-items
-                                                                         :menu-funcs new-game-funcs
-                                                                         :menu-descrs new-game-descrs
-                                                                         ))
-                                   (make-output *current-window*)
-                                   (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (run-window *current-window*)
-                                     (format t "~A ~A ~A ~A ~A ~A~%" mission-id layout-id weather-id tod-id specific-faction-type faction-list)
-                                     (when (and mission-id layout-id weather-id tod-id specific-faction-type faction-list)
-                                       (return-from main-menu (values mission-id layout-id weather-id tod-id specific-faction-type faction-list))))
-                                   ))))
+                                 (setf *current-window* (make-instance 'new-game-window))
+                                 (make-output *current-window*)
+                                 (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (run-window *current-window*)
+                                   (format t "~A ~A ~A ~A ~A ~A~%" mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+                                   (when (and mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+                                     (return-from main-menu (values mission-id layout-id weather-id tod-id specific-faction-type faction-list)))))))
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
                                         (declare (ignore n))
@@ -655,7 +397,23 @@
                                                                        (nth (random (length weather-types)) weather-types)
                                                                        (nth (random (length tod-types)) tod-types)
                                                                        (second *previous-scenario*)
-                                                                       faction-list)))))))
+                                                                       faction-list))))))
+        (test-campaign-item (cons "Test campaign"
+                                  #'(lambda (n)
+                                      (declare (ignore n))
+                                      (let ((test-world-map (make-instance 'world-map)))
+                                        (generate-test-world-map test-world-map)
+                                        
+                                        ;;(loop for y from 0 below *max-y-world-map* do
+                                        ;;  (loop for x from 0 below *max-x-world-map*
+                                        ;;        do
+                                        ;;           
+                                        ;;           (format t "(~A ~A), ~A~%" x y (feats (aref (cells test-world-map) x y)))
+                                        ;;        ))
+                                        (setf *current-window* (make-instance 'new-campaign-window
+                                                                              :world-map test-world-map))
+                                        (make-output *current-window*)
+                                        (run-window *current-window*))))))
     (if *cotd-release*
       (progn
         (setf menu-items (list (car new-game-item) 
@@ -665,10 +423,10 @@
         )
       (progn
         (setf menu-items (list (car new-game-item)
-                               (car custom-scenario-item) (car all-see-item) (car test-level-item)
+                               (car custom-scenario-item) (car all-see-item) (car test-level-item) (car test-campaign-item)
                                (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
         (setf menu-funcs (list (cdr new-game-item)
-                               (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item)
+                               (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item) (cdr test-campaign-item)
                                (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
         
         ))
@@ -681,8 +439,8 @@
   
   
   (make-output *current-window*)
-  (loop while t do
-    (run-window *current-window*)))
+  (run-window *current-window*)
+  )
   
 (defun cotd-main () 
   (in-package :cotd)
