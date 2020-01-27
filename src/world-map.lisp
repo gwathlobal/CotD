@@ -27,7 +27,8 @@
 (defclass world-sector-type ()
   ((wtype :initform nil :initarg :wtype :accessor wtype) ;; ids from feature-layout
    (glyph-idx :initform 0 :initarg :glyph-idx :accessor glyph-idx :type fixnum)
-   (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)) 
+   (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
+   (name :initform "" :initarg :name :accessor name :type string)) 
   )
 
 (defparameter *world-sector-types* (make-hash-table))
@@ -94,7 +95,12 @@
                                                      (= (wtype (aref (cells world-map) sx sy)) +world-sector-normal-port+)
                                                      (= (wtype (aref (cells world-map) sx sy)) +world-sector-normal-residential+)
                                                      (= (controlled-by (aref (cells world-map) sx sy)) +world-sector-controlled-by-military+))
-                                                 (= (controlled-by (aref (cells world-map) tx ty)) +world-sector-controlled-by-demons+))
+                                                 (or (= (controlled-by (aref (cells world-map) tx ty)) +world-sector-controlled-by-demons+)
+                                                     (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-forest+)
+                                                     (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-island+)
+                                                     (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-lake+)
+                                                     (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-port+)
+                                                     (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-residential+)))
                                           t
                                           nil))
           do
@@ -186,3 +192,27 @@
    ;; ((:river (:n :s :w :e)) (:sea (:n :s :w :e)) (:barricade (:n :s :w :e)))
    (controlled-by :initform +world-sector-controlled-by-none+ :initarg :controlled-by :accessor controlled-by)
    ))
+
+(defmethod descr ((sector world-sector))
+  (let ((feats-str (create-string))
+        (feats-str-comma nil)
+        (controlled-str (create-string)))
+    (when (find :river (feats sector) :key #'(lambda (a) (first a)))
+      (format feats-str "~%~%River")
+      (setf feats-str-comma t))
+    (when (find :barricade (feats sector) :key #'(lambda (a) (first a)))
+      (format feats-str "~ABarricade" (if feats-str-comma ", " "~%~%"))
+      (setf feats-str-comma t))
+    (when feats-str-comma
+      (format feats-str "."))
+    (cond
+      ((= (controlled-by sector) +world-sector-controlled-by-angels+) (progn
+                                                                        (format controlled-str "~%~%Controlled by angels.")))
+      ((= (controlled-by sector) +world-sector-controlled-by-demons+) (progn
+                                                                        (format controlled-str "~%~%Controlled by demons.")))
+      ((= (controlled-by sector) +world-sector-controlled-by-military+) (progn
+                                                                          (format controlled-str "~%~%Controlled by the military."))))
+  (format nil "~A.~A~A"
+          (name (get-world-sector-type-by-id (wtype sector)))
+          feats-str
+          controlled-str)))

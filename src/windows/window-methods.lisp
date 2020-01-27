@@ -80,28 +80,52 @@
            (when (get-single-memo-player single-memo)
              (highlight-map-tile x1 y1)))))))
 
+(defun highlight-left-top-corner (x1 y1 &key (color sdl:*yellow*))
+  (sdl:draw-pixel-* (+ x1 1) y1 :color color)
+  (sdl:draw-pixel-* (+ x1 2) y1 :color color)
+  (sdl:draw-pixel-* x1 (+ y1 1) :color color)
+  (sdl:draw-pixel-* x1 (+ y1 2) :color color))
+
+(defun highlight-left-bottom-corner (x1 y1 &key (color sdl:*yellow*))
+  (sdl:draw-pixel-* (+ x1 1) y1 :color color)
+  (sdl:draw-pixel-* (+ x1 2) y1 :color color)
+  (sdl:draw-pixel-* x1 (- y1 1) :color color)
+  (sdl:draw-pixel-* x1 (- y1 2) :color color))
+
+(defun highlight-right-top-corner (x1 y1 &key (color sdl:*yellow*))
+  (sdl:draw-pixel-* (- x1 1) y1 :color color)
+  (sdl:draw-pixel-* (- x1 2) y1 :color color)
+  (sdl:draw-pixel-* x1 (+ y1 1) :color color)
+  (sdl:draw-pixel-* x1 (+ y1 2) :color color))
+
+(defun highlight-right-bottom-corner (x1 y1 &key (color sdl:*yellow*))
+  (sdl:draw-pixel-* (- x1 1) y1 :color color)
+  (sdl:draw-pixel-* (- x1 2) y1 :color color)
+  (sdl:draw-pixel-* x1 (- y1 1) :color color)
+  (sdl:draw-pixel-* x1 (- y1 2) :color color))
+
 (defun highlight-map-tile (x1 y1)
   (let ((color (sdl:color :r 85 :g 107 :b 47)))
     ;; draw the rectangle
-    (sdl:draw-pixel-* (+ x1 1) y1 :color color)
-    (sdl:draw-pixel-* (+ x1 2) y1 :color color)
-    (sdl:draw-pixel-* x1 (+ y1 1) :color color)
-    (sdl:draw-pixel-* x1 (+ y1 2) :color color)
+    (highlight-left-top-corner x1 y1 :color color)
 
-    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 1) y1 :color color)
-    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 2) y1 :color color)
-    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (+ y1 1) :color color)
-    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (+ y1 2) :color color)
+    (highlight-left-bottom-corner x1 (+ y1 (1- *glyph-h*)) :color color)
 
-    (sdl:draw-pixel-* (+ x1 1) (+ y1 (1- *glyph-h*)) :color color)
-    (sdl:draw-pixel-* (+ x1 2) (+ y1 (1- *glyph-h*)) :color color)
-    (sdl:draw-pixel-* x1 (- (+ y1 (1- *glyph-h*)) 1) :color color)
-    (sdl:draw-pixel-* x1 (- (+ y1 (1- *glyph-h*)) 2) :color color)
+    (highlight-right-top-corner (+ x1 (1- *glyph-w*)) y1 :color color)
 
-    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 1) (+ y1 (1- *glyph-h*)) :color color)
-    (sdl:draw-pixel-* (- (+ x1 (1- *glyph-w*)) 2) (+ y1 (1- *glyph-h*)) :color color)
-    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (- (+ y1 (1- *glyph-h*)) 1) :color color)
-    (sdl:draw-pixel-* (+ x1 (1- *glyph-w*)) (- (+ y1 (1- *glyph-h*)) 2) :color color)
+    (highlight-right-bottom-corner (+ x1 (1- *glyph-w*)) (+ y1 (1- *glyph-h*)) :color color)
+    ))
+
+(defun highlight-world-map-tile (x1 y1)
+  (let ((color sdl:*yellow*))
+    ;; draw the rectangle
+    (highlight-left-top-corner x1 y1 :color color)
+
+    (highlight-left-bottom-corner x1 (+ y1 (* *glyph-h* 5) -1) :color color)
+
+    (highlight-right-top-corner (+ x1 (* *glyph-w* 5) -1) y1 :color color)
+
+    (highlight-right-bottom-corner (+ x1 (* *glyph-w* 5) -1) (+ y1 (* *glyph-h* 5) -1) :color color)
     ))
 
 (defun check-tile-on-map (map-x map-y map-z sx sy max-x-view max-y-view view-z)
