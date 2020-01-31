@@ -1,3 +1,4 @@
+- Campaign for Lost Soul: library and lair in different sectors, player can move between sectors by going to the edge of the local map
 - Malseraph's puppet: make irradiation strength depend on Malseraph's favor
 - Malseraph's puppet: make 2 phase ability with 1 phase irradiating everybody around and 2 phase blowing up everybody around
 - Acid rain in corrupted districts

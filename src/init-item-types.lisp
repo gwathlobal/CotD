@@ -734,7 +734,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-book-of-rituals+
                                          :name "Book of Rituals" :plural-name "Books of Rituals"
-                                         :glyph-idx 125 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx +glyph-id-book+ :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
                                          :descr "A black leather book. It seems to be whispering something to you. In the languages you do not understand. Only the ghost can use it on the sacrificial circle, the place of its creation."
                                          :flavor-quote (format nil "\"He quickly went into a stall, drew a circle round him with his finger, uttered some prayers and formulas for exorcism, and then began to read the prayers for the dead in a loud voice and with the fixed resolution not to look up from the book nor take notice of anything.\"~%Nikolai Gogol. The Viy.")
                                          :on-use #'(lambda (actor target item)
@@ -817,6 +817,6 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-church-reliс+
                                          :name "relic" :plural-name "relics"
-                                         :glyph-idx 127 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx +glyph-id-christ-cross+ :glyph-color sdl:*cyan* :back-color sdl:*black* :max-stack-num 1 :value 50
                                          :descr "A holy relic. Demons seek it to capture and place under the wards in their world."
                                          :flavor-quote (format nil "\"Our sacred ideals persist not because of their utility but because of our faith in them. We will even refuse to defend any sacred ideals in which we no longer beleove, unlike the ancient priests who, in the twilight of paganism, defended the idols which they had long ceased to consider as gods. Not a single of our sacred ideals is threatened by free inquiry, but this is precisely because they are strong in reality.\"~%Fyodor Dostoevsky. A Writer's Diary.")))

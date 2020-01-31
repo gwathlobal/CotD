@@ -1,6 +1,136 @@
 (in-package :cotd)
 
 ;;----------------------------------------
+;; MISSION-TYPES
+;;----------------------------------------
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-demonic-attack+
+                                               :name "Demonic attack"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (let ((near-demons nil))
+                                                                        (check-surroundings x y nil #'(lambda (dx dy)
+                                                                                                        (when (and (>= dx 0) (>= dy 0)
+                                                                                                                   (< dx (array-dimension (cells world-map) 0))
+                                                                                                                   (< dy (array-dimension (cells world-map) 1))
+                                                                                                                   (or (= (controlled-by (aref (cells world-map) dx dy)) +world-sector-controlled-by-demons+)
+                                                                                                                       (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-forest+)
+                                                                                                                       (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-port+)
+                                                                                                                       (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-island+)
+                                                                                                                       (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-residential+)
+                                                                                                                       (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-lake+)))
+                                                                                                          (setf near-demons t))))
+                                                                        (if (and near-demons
+                                                                                 (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+)))
+                                                                        t
+                                                                        nil)))))
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-demonic-raid+
+                                               :name "Demonic raid"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+))
+                                                                        t
+                                                                        nil))))
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-demonic-conquest+
+                                               :name "Demonic conquest"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-forest+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-port+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-island+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+))
+                                                                        t
+                                                                        nil))))
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-demonic-thievery+
+                                               :name "Demonic thievery"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (if (and (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+                                                                               (find +item-type-church-reliс+ (items (aref (cells world-map) x y))))
+                                                                        t
+                                                                        nil))))
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-military-conquest+
+                                               :name "Military conquest"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (let ((near-military nil))
+                                                                        (check-surroundings x y nil #'(lambda (dx dy)
+                                                                                                        (when (and (>= dx 0) (>= dy 0)
+                                                                                                                   (< dx (array-dimension (cells world-map) 0))
+                                                                                                                   (< dy (array-dimension (cells world-map) 1))
+                                                                                                                   (= (controlled-by (aref (cells world-map) dx dy)) +world-sector-controlled-by-military+))
+                                                                                                          (setf near-military t))))
+                                                                        (if (and near-military
+                                                                                 (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-port+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-island+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-residential+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-lake+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-forest+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-port+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-island+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+)))
+                                                                        t
+                                                                        nil)))))
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-military-raid+
+                                               :name "Military raid"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (let ((near-military nil))
+                                                                        (check-surroundings x y nil #'(lambda (dx dy)
+                                                                                                        (when (and (>= dx 0) (>= dy 0)
+                                                                                                                   (< dx (array-dimension (cells world-map) 0))
+                                                                                                                   (< dy (array-dimension (cells world-map) 1))
+                                                                                                                   (= (controlled-by (aref (cells world-map) dx dy)) +world-sector-controlled-by-military+))
+                                                                                                          (setf near-military t))))
+                                                                        (if (and near-military
+                                                                                 (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-port+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-island+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-residential+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-lake+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-forest+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-port+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-island+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
+                                                                                     (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+)))
+                                                                        t
+                                                                        nil)))))
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-celestial-purge+
+                                               :name "Celestial purge"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-port+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-island+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-residential+)
+                                                                              (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-lake+))
+                                                                        t
+                                                                        nil))))
+
+(set-mission-type (make-instance 'mission-type :id +mission-type-celestial-retrieval+
+                                               :name "Celestial retrieval"
+                                               :is-available-func #'(lambda (world-map x y)
+                                                                      (if (and (not (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a))))
+                                                                               (find +item-type-church-reliс+ (items (aref (cells world-map) x y))))
+                                                                        t
+                                                                        nil))))
+
+;;----------------------------------------
 ;; MISSION-DISTRICTS
 ;;----------------------------------------
 

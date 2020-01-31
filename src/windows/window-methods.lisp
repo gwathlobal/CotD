@@ -485,14 +485,18 @@
     (loop for x from 0 below *max-y-world-map*
           for x1 = (+ scr-x (* x *glyph-w* max-disp-w))
           for y1 = (+ scr-y (* y *glyph-h* max-disp-h))
-          for river-feat = (find :river (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
-          for sea-feat = (find :sea (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
-          for barricade-feat = (find :barricade (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+          for sector = (aref (cells world-map) x y)
+          for river-feat = (find :river (feats sector) :key #'(lambda (a) (first a)))
+          for sea-feat = (find :sea (feats sector) :key #'(lambda (a) (first a)))
+          for barricade-feat = (find :barricade (feats sector) :key #'(lambda (a) (first a)))
+          for satanists-feat = (find :satanists (feats sector) :key #'(lambda (a) (first a)))
+          for church-feat = (find :church (feats sector) :key #'(lambda (a) (first a)))
+          for library-feat = (find :library (feats sector) :key #'(lambda (a) (first a)))
           for displayed-cells = (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*))
           do
              ;; display sea & island sector 
-             (when (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
-                       (= (wtype (aref (cells world-map) x y)) +world-sector-normal-sea+))
+             (when (or (= (wtype sector) +world-sector-normal-island+)
+                       (= (wtype sector) +world-sector-normal-sea+))
                (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*))))
 
              ;; display barricades
@@ -587,10 +591,36 @@
                 (progn
                   (setf (aref displayed-cells 1 1) (list +glyph-id-large-a+ sdl:*cyan* sdl:*black*))))
                )
+
+             ;; display satanists, church, library, etc
+             (cond
+               ((loop for n in (list satanists-feat church-feat library-feat)
+                      count n into sum
+                      finally (return (if (> sum 1) t nil)))
+                (progn
+                  (setf (aref displayed-cells 1 3) (list +glyph-id-three-dots+ sdl:*white* sdl:*black*))))
+               (satanists-feat (progn
+                                 (setf (aref displayed-cells 1 3) (list +glyph-id-sacrificial-circle+ sdl:*magenta* sdl:*black*))))
+               (church-feat (progn
+                              (setf (aref displayed-cells 1 3) (list +glyph-id-church+ sdl:*white* sdl:*black*))))
+               (library-feat (progn
+                              (setf (aref displayed-cells 1 3) (list +glyph-id-book+ sdl:*white* sdl:*black*)))))
              
-             (setf (aref displayed-cells 2 2) (list (glyph-idx (get-world-sector-type-by-id (wtype (aref (cells world-map) x y))))
-                                                    (glyph-color (get-world-sector-type-by-id (wtype (aref (cells world-map) x y))))
+             (setf (aref displayed-cells 2 2) (list (glyph-idx (get-world-sector-type-by-id (wtype sector)))
+                                                    (glyph-color (get-world-sector-type-by-id (wtype sector)))
                                                     sdl:*black*))
+
+             ;; display items
+             (cond
+               ((> (length (items sector)) 1) (progn
+                                                (setf (aref displayed-cells 3 3) (list +glyph-id-three-dots+ sdl:*white* sdl:*black*))))
+               ((= (length (items sector)) 1) (progn
+                                                (let ((item-type (get-item-type-by-id (first (items sector)))))
+                                                  (setf (aref displayed-cells 3 3) (list (glyph-idx item-type) (glyph-color item-type) sdl:*black*))))))
+             
+             ;; display available mission
+             (when (/= (mission-type-id sector) +mission-type-none+)
+               (setf (aref displayed-cells 3 1) (list +glyph-id-crossed-swords+ sdl:*yellow* sdl:*black*)))
              
              (loop for dy from 0 below max-disp-h do
                (loop for dx from 0 below max-disp-w do
