@@ -4,6 +4,7 @@
 - Acid rain in corrupted districts
 - A style of gameplay where you gain abilities depending on your surroundings
 - Angels get conducts (do not kill allies) they should not break or they will get penalized
+- Angels get wrath management - when they attack or kill, they accomodate wrath. When wrath reaches a threshold, they get a sin (penalty). To reduce wrath, special abilities should be given. Wrath also enables special powerful abilities which produce even more wrath.
 - Malseraph's puppets get additional task from Malseraph
 - Alarak-style gameplay where you gain resource when allies get killed and you can sacrifice your allies
 - Unstable pocket dimensions - complete the goal before the time expires

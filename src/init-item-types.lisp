@@ -29,7 +29,7 @@
                                          :name "medkit" :plural-name "medkits"
                                          :descr "A medkit that can heal 3-5 HP. Usable by humans only. Unusable underwater."
                                          :flavor-quote (format nil "\"There was a large wound in his stomach. The King washed it as best he could, and bandaged it with his handkerchief and with a towel the hermit had. But the blood would not stop flowing, and the King again and again removed the bandage soaked with warm blood, and washed and rebandaged the wound. When at last the blood ceased flowing, the man revived and asked for something to drink.\"~%Leo Tolstoy. Three Questions.")
-                                         :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 10 :value 10
+                                         :glyph-idx +glyph-id-exclamation-mark+ :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item target))
                                                      (let ((heal-pwr (+ 3 (random 3))))

@@ -1,5 +1,30 @@
 (in-package :cotd)
 
+(defconstant +mission-type-none+ -1)
+(defconstant +mission-type-demonic-attack+ 0)
+(defconstant +mission-type-demonic-raid+ 1)
+(defconstant +mission-type-demonic-conquest+ 2)
+(defconstant +mission-type-demonic-thievery+ 3)
+(defconstant +mission-type-military-raid+ 4)
+(defconstant +mission-type-military-conquest+ 5)
+(defconstant +mission-type-celestial-purge+ 6)
+(defconstant +mission-type-celestial-retrieval+ 7)
+
+(defclass mission-type ()
+  ((id :initform +mission-type-none+ :initarg :id :accessor id)
+   (name :initform "Mission type name" :initarg :name :accessor name)
+   (is-available-func :initform #'(lambda (world-map x y) (declare (ignore world-map x y)) t) :initarg :is-available-func :accessor is-available-func)
+   (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector and returns a list of faction-ids
+   ))
+
+(defparameter *mission-types* (make-hash-table))
+
+(defun set-mission-type (mission-type)
+  (setf (gethash (id mission-type) *mission-types*) mission-type))
+
+(defun get-mission-type-by-id (mission-type-id)
+  (gethash mission-type-id *mission-types*))
+
 ;;========================================
 ;; MISSION-DISTRICTS
 ;;========================================

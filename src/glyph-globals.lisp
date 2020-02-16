@@ -1,5 +1,6 @@
 (in-package :cotd)
 
+(defconstant +glyph-id-exclamation-mark+ 1)
 (defconstant +glyph-id-hash+ 3)
 (defconstant +glyph-id-large-a+ 33)
 (defconstant +glyph-id-large-d+ 36)

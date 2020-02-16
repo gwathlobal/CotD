@@ -422,7 +422,45 @@
 
 (defun show-date-time-short (date-time)
   (multiple-value-bind (year month day hour min sec) (get-current-date-time date-time)
-    (format nil "~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d:~2,'0d" year (1+ month) (1+ day) hour min sec)))
+    (format nil "~2,'0d ~A ~4,'0d ~2,'0d:~2,'0d:~2,'0d" (1+ day)
+            (cond
+              ((= month 0) "Jan")
+              ((= month 1) "Feb")
+              ((= month 2) "Mar")
+              ((= month 3) "Apr")
+              ((= month 4) "May")
+              ((= month 5) "Jun")
+              ((= month 6) "Jul")
+              ((= month 7) "Aug")
+              ((= month 8) "Sep")
+              ((= month 9) "Oct")
+              ((= month 10) "Nov")
+              ((= month 11) "Dec")
+              )
+            year
+            hour min sec)))
+
+(defun show-date-time-YMD (date-time)
+  (multiple-value-bind (year month day hour min sec) (get-current-date-time date-time)
+    (declare (ignore hour min sec))
+    
+    (format nil "~2,'0d ~A ~4,'0d"
+            (1+ day)
+            (cond
+              ((= month 0) "Jan")
+              ((= month 1) "Feb")
+              ((= month 2) "Mar")
+              ((= month 3) "Apr")
+              ((= month 4) "May")
+              ((= month 5) "Jun")
+              ((= month 6) "Jul")
+              ((= month 7) "Aug")
+              ((= month 8) "Sep")
+              ((= month 9) "Oct")
+              ((= month 10) "Nov")
+              ((= month 11) "Dec")
+              )
+            year)))
 
 (defun return-weather-type-str (world)
   (let ((str (create-string)))

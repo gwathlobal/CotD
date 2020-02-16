@@ -222,8 +222,8 @@
     (create-connect-map-aux (level world))
 
     ;; set up win condition values
-    (when (win-value-func (get-mission-scenario-by-id (mission-scenario (level world))))
-      (funcall (win-value-func (get-mission-scenario-by-id (mission-scenario (level world))))))
+    ;(when (win-value-func (get-mission-scenario-by-id (mission-scenario (level world))))
+    ;  (funcall (win-value-func (get-mission-scenario-by-id (mission-scenario (level world))))))
     
     world))
 

@@ -5,6 +5,7 @@
 
 (defclass new-campaign-window (window)
   ((world-map :initarg :world-map :accessor world-map)
+   (world-time :initarg :world-time :accessor world-time)
    (cur-sector :initform (cons 0 0) :initarg :cur-sector :accessor cur-sector)
    (cur-mode :initform +new-campaign-window-mission-mode+ :initarg :cur-mode :accessor cur-mode)
    (cur-sel :initform 0 :accessor cur-sel)
@@ -14,17 +15,17 @@
   (setf (avail-missions win) (loop with result = ()
                                    for x from 0 below *max-x-world-map* do
                                      (loop for y from 0 below *max-y-world-map*
-                                           for mission-type-id = (mission-type-id (aref (cells (world-map win)) x y))
-                                           do
-                                              (when (/= mission-type-id +mission-type-none+)
-                                                (push (list mission-type-id x y) result)))
+                                           for mission = (mission (aref (cells (world-map win)) x y))
+                                           when mission
+                                             do
+                                                (push mission result))
                                    finally (return result)))
   (when (= (cur-mode win) +new-campaign-window-mission-mode+)
     (campaign-win-move-select-to-mission win)))
 
 (defmethod campaign-win-move-select-to-mission ((win new-campaign-window))
-  (setf (cur-sector win) (cons (second (nth (cur-sel win) (avail-missions win)))
-                               (third (nth (cur-sel win) (avail-missions win))))))
+  (setf (cur-sector win) (cons (x (nth (cur-sel win) (avail-missions win)))
+                               (y (nth (cur-sel win) (avail-missions win))))))
 
 (defmethod make-output ((win new-campaign-window))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
@@ -36,7 +37,8 @@
   (let* ((x1 20) (y1 20) (map-w (* *glyph-w* 5 *max-x-world-map*)) (map-h (* *glyph-h* 5 *max-y-world-map*))
          (x2 (+ x1 map-w 20)) (y2 (+ y1 20))
          (str1 "Select mission in a sector:")
-         (str2 "Select available mission:"))
+         (str2 "Select available mission:")
+         (str3 (format nil "~A" (show-date-time-YMD (world-time win)))))
     (if (= (cur-mode win) +new-campaign-window-map-mode+)
       (sdl:draw-string-solid-* str1 (+ x1 (truncate map-w 2)) y1 :justify :center :color sdl:*white*)
       (sdl:draw-string-solid-* str2 (+ x2 (truncate (- *window-width* x2 20) 2)) y1 :justify :center :color sdl:*white*))
@@ -44,6 +46,8 @@
     (draw-world-map (world-map win) x1 y2)
 
     (highlight-world-map-tile (+ x1 (* (car (cur-sector win)) (* *glyph-w* 5))) (+ y2 (* (cdr (cur-sector win)) (* *glyph-h* 5))))
+
+    (sdl:draw-string-solid-* str3 (+ x1 (truncate map-w 2)) (+ y1 map-h 30) :justify :center :color sdl:*white*)
     
     (if (= (cur-mode win) +new-campaign-window-map-mode+)
       (sdl:with-rectangle (rect (sdl:rectangle :x x2 :y y2 :w (- *window-width* x2 20) :h map-h))
@@ -52,20 +56,22 @@
       (progn
         (let ((cur-str) (color-list nil)
               (mission-names-list ())
-              (str-per-page (truncate (truncate (- *window-height* y2 40) 2) (sdl:char-height sdl:*default-font*)))
-              )
+              (str-per-page 10))
           (setf cur-str (cur-sel win))
           (dotimes (i (length (avail-missions win)))
-            (push (name (get-mission-type-by-id (first (nth i (avail-missions win))))) mission-names-list)
+            (push (name (nth i (avail-missions win))) mission-names-list)
             (if (= i cur-str) 
               (setf color-list (append color-list (list sdl:*yellow*)))
               (setf color-list (append color-list (list sdl:*white*)))))
           (setf mission-names-list (reverse mission-names-list))
-          (draw-selection-list mission-names-list cur-str str-per-page x2 y2 :color-list color-list))
+          (draw-selection-list mission-names-list cur-str str-per-page x2 y2 :color-list color-list)
         
-        (sdl:with-rectangle (rect (sdl:rectangle :x x2 :y (+ 10 (truncate (- *window-height* y2 40) 2)) :w (- *window-width* x2 20) :h (truncate (- *window-height* y2 40) 2)))
+        (sdl:with-rectangle (rect (sdl:rectangle :x x2
+                                                 :y (+ y2 10 (* (sdl:char-height sdl:*default-font*) str-per-page))
+                                                 :w (- *window-width* x2 20)
+                                                 :h (- *window-height* 40 (+ 10 10 (* (sdl:char-height sdl:*default-font*) str-per-page)))))
           (write-text (descr (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))
-                      rect)))
+                      rect))))
       )
     )
 

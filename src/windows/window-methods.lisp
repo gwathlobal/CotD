@@ -486,12 +486,12 @@
           for x1 = (+ scr-x (* x *glyph-w* max-disp-w))
           for y1 = (+ scr-y (* y *glyph-h* max-disp-h))
           for sector = (aref (cells world-map) x y)
-          for river-feat = (find :river (feats sector) :key #'(lambda (a) (first a)))
-          for sea-feat = (find :sea (feats sector) :key #'(lambda (a) (first a)))
-          for barricade-feat = (find :barricade (feats sector) :key #'(lambda (a) (first a)))
-          for satanists-feat = (find :satanists (feats sector) :key #'(lambda (a) (first a)))
-          for church-feat = (find :church (feats sector) :key #'(lambda (a) (first a)))
-          for library-feat = (find :library (feats sector) :key #'(lambda (a) (first a)))
+          for river-feat = (find +lm-feat-river+ (feats sector) :key #'(lambda (a) (first a)))
+          for sea-feat = (find +lm-feat-sea+ (feats sector) :key #'(lambda (a) (first a)))
+          for barricade-feat = (find +lm-feat-barricade+ (feats sector) :key #'(lambda (a) (first a)))
+          for satanists-feat = (find +lm-feat-lair+ (feats sector) :key #'(lambda (a) (first a)))
+          for church-feat = (find +lm-feat-church+ (feats sector) :key #'(lambda (a) (first a)))
+          for library-feat = (find +lm-feat-library+ (feats sector) :key #'(lambda (a) (first a)))
           for displayed-cells = (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*))
           do
              ;; display sea & island sector 
@@ -581,15 +581,12 @@
 
              ;; display controlled status
              (cond
-               ((= (controlled-by (aref (cells world-map) x y)) +world-sector-controlled-by-demons+)
+               ((= (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-demons+)
                 (progn
                   (setf (aref displayed-cells 1 1) (list +glyph-id-large-d+ sdl:*red* sdl:*black*))))
-               ((= (controlled-by (aref (cells world-map) x y)) +world-sector-controlled-by-military+)
+               ((= (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-military+)
                 (progn
                   (setf (aref displayed-cells 1 1) (list +glyph-id-large-m+ sdl:*green* sdl:*black*))))
-               ((= (controlled-by (aref (cells world-map) x y)) +world-sector-controlled-by-angels+)
-                (progn
-                  (setf (aref displayed-cells 1 1) (list +glyph-id-large-a+ sdl:*cyan* sdl:*black*))))
                )
 
              ;; display satanists, church, library, etc
@@ -614,12 +611,15 @@
              (cond
                ((> (length (items sector)) 1) (progn
                                                 (setf (aref displayed-cells 3 3) (list +glyph-id-three-dots+ sdl:*white* sdl:*black*))))
-               ((= (length (items sector)) 1) (progn
-                                                (let ((item-type (get-item-type-by-id (first (items sector)))))
-                                                  (setf (aref displayed-cells 3 3) (list (glyph-idx item-type) (glyph-color item-type) sdl:*black*))))))
+               ((= (length (items sector)) 1) (cond
+                                                ((= (first (items sector)) +lm-item-holy-relic+)
+                                                 (setf (aref displayed-cells 3 3) (list +glyph-id-christ-cross+ sdl:*cyan* sdl:*black*)))
+                                                ((= (first (items sector)) +lm-item-book-of-rituals+)
+                                                 (setf (aref displayed-cells 3 3) (list +glyph-id-book+ sdl:*magenta* sdl:*black*)))
+                                                (t (setf (aref displayed-cells 3 3) (list +glyph-id-exclamation-mark+ sdl:*yellow* sdl:*black*))))))
              
              ;; display available mission
-             (when (/= (mission-type-id sector) +mission-type-none+)
+             (when (mission sector)
                (setf (aref displayed-cells 3 1) (list +glyph-id-crossed-swords+ sdl:*yellow* sdl:*black*)))
              
              (loop for dy from 0 below max-disp-h do

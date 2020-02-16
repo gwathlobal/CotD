@@ -1,0 +1,222 @@
+(in-package :cotd)
+
+;; the level generation function takes the following parameters:
+;;   sector-level-gen-func - main funcation to generate a level from template (for example, city level)
+;;      takes:   (template-level set-max-buildings-func set-reserved-buildings-func)
+;;      returns: (real-terrain mob-template-list item-template-list feature-template-list)
+;;   item-process-func-list - list of functions that generate items on the level
+;;      takes:   (item-template-list)
+;;      returns: (list of items)
+;;   feature-process-func-list - list of functions that generate features on the level
+;;      takes:   (feature-template-list)
+;;      returns: (list of features)
+;;   mob-process-func-list - list of functions that generate mobs on the level
+;;      takes:   (mob-template-list)
+;;      returns: (list of mobs)
+;;   level-template-pre-process-func-list - list of functions that modify the template level before the sector-level-gen-func
+;;      takes:   (template-level)
+;;      returns: (template-level (list of buildings))
+;;   terrain-level-post-process-func-list - list of functions that modify the real terrain on the level after the sector-level-gen-func
+;;      takes:   (real-terrain)
+;;      returns: (real-terrain)
+;;
+
+(defun generate-level-from-sector (sector-level-gen-func &key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*)
+                                                              (item-process-func-list ())
+                                                              (feature-process-func-list ())
+                                                              (mob-process-func-list ())
+                                                              (level-template-pre-process-func-list ())
+                                                              (terrain-level-post-process-func-list ())
+                                                              
+                                                              (weather-list ())
+                                                              (tod-id +tod-type-day+)
+                                                              (layout-id)
+                                                              (mission-id))
+
+  ;; create a template level
+  (let* ((level (create-level :max-x max-x :max-y max-y :max-z max-z))
+         (terrain-level nil)
+         (feature-template-result nil)
+         (mob-template-result nil)
+         (item-template-result nil)
+         (game-event-list nil))
+    (let* ((template-max-x (truncate max-x *level-grid-size*)) (template-max-y (truncate max-y *level-grid-size*)) (template-max-z max-z)
+           (template-level (make-array (list template-max-x template-max-y template-max-z) :element-type 'fixnum :initial-element +building-city-reserved+))
+           (building-list nil)
+           (final-level nil))
+    
+      ;; all grid cells along the borders are reserved, while everything inside is free for claiming
+      (loop for y from 1 below (1- template-max-y) do
+        (loop for x from 1 below (1- template-max-x) do
+          (loop for z from 0 below template-max-z do
+            (setf (aref template-level x y z) +building-city-free+))))
+      
+      ;; use level template pre-process functions to place reserved buildings from sector features, factions, etc
+      (loop for level-template-pre-process-func in level-template-pre-process-func-list do
+        (setf building-list (append building-list (funcall level-template-pre-process-func template-level))))
+      
+      ;; produce terrain level from template using the supplied function
+      (multiple-value-setq (terrain-level mob-template-result item-template-result feature-template-result) (funcall sector-level-gen-func :template-level template-level
+                                                                                                                                           :build-list building-list
+                                                                                                                                           :max-x max-x :max-y max-y :max-z max-z))
+
+      ;; post process actual level (demonic portals, blood spatter, irradiated spots, etc)
+      (loop for terrain-post-process-func in terrain-level-post-process-func-list do
+        (setf terrain-level (funcall terrain-post-process-func terrain-level)))
+
+      (setf (terrain level) terrain-level)
+      )
+
+    (setf (mob-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
+                                                     (ceiling (array-dimension (terrain level) 1) 10))
+                                               :initial-element ()))
+    (setf (item-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
+                                                      (ceiling (array-dimension (terrain level) 1) 10))
+                                                :initial-element ()))
+    (setf (light-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
+                                                       (ceiling (array-dimension (terrain level) 1) 10))
+                                                 :initial-element ()))
+
+    (setf (level-layout level) layout-id)
+    (setf (mission-scenario level) mission-id)
+
+
+    ;; generate connectivity maps
+    (let* ((out *standard-output*)
+           (size-1-thread (bt:make-thread #'(lambda ()
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-walk level 1)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER WALK 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-climb level 1)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER CLIMB 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-fly level 1)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER FLY 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+                                              )
+                                        :name "Connectivity map (size 1) thread"))
+           (size-3-thread (bt:make-thread #'(lambda ()
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-walk level 3)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER WALK 3: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+                                              
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-climb level 3)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (logger (format nil "TIME-ELAPSED AFTER CLIMB 3: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                )
+
+                                              ;;(let ((start-time (get-internal-real-time)))
+                                              ;;  (create-connect-map-fly (level world) 3)
+                                              ;;  (incf *cur-progress-bar*)
+                                              ;;  (funcall *update-screen-closure* nil)
+                                              ;;  (format out "TIME-ELAPSED AFTER FLY 3: ~A~%" (- (get-internal-real-time) start-time))
+                                              ;;  )
+                                              )
+                                         :name "Connectivity map (size 3) thread"))
+           )
+      (bt:join-thread size-1-thread)
+      (logger (format nil "SIZE 1 CREATION FINISHED~%"))
+      (bt:join-thread size-3-thread)
+      (logger (format nil "SIZE 3 CREATION FINISHED~%"))
+      )
+    
+    ;; creating light map
+    (funcall (sf-func (get-scenario-feature-by-id tod-id)) level)
+
+    ;; setting up time, a bit of hardcode here
+    ;; TODO: make time be set outside of here
+;    (let ((year 1915)
+;          (month 7)
+;          (day 12)
+;          (hour 12)
+;          (min (random 45))
+;          (sec (random 60)))
+;      (when (find +weather-type-snow+ weather-list)
+;        (setf month 1))
+;      (when (= tod-id +tod-type-night+)
+;        (setf hour 0))
+;      (when (= tod-id +tod-type-morning+)
+;        (setf hour 7))
+;      (when (= tod-id +tod-type-evening+)
+;        (setf hour 19))
+;      (setf (player-game-time world) (set-current-date-time year month day hour min sec)))
+    (push +game-event-adjust-outdoor-light+ game-event-list)
+    
+    ;; populate the world with special mobs (military in outposts, demons around portals, etc) depending on present factions
+
+    ;; populate world with standard mobs (from actual level template)
+    ;(loop for mob-func in mob-func-list do
+    ;  (funcall mob-func world mob-template-result))
+    
+    ;; populate world with items
+    ;(create-items-from-template level item-template-result)
+    
+    ;; populate world with features
+    ;(create-features-from-template level feature-template-result)
+
+    ;; set the game events
+    ;(setf (game-events world) game-event-list)
+
+    ;; setting up demonic portals so that mobs could access them directly without iterating through the whole list of features
+    ;(loop for feature-id in (feature-id-list (level world))
+    ;      for feature = (get-feature-by-id feature-id)
+    ;      when (= (feature-type feature) +feature-demonic-portal+)
+    ;        do
+    ;           (push feature-id (demonic-portals (level world))))
+    
+    ;; add win conditions
+    
+   ) 
+  )
+
+(defun reserve-build-on-grid (template-building-id gx gy gz reserved-level)
+  (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
+    (loop for y1 from 0 below dy do
+      (loop for x1 from 0 below dx do
+        (setf (aref reserved-level (+ gx x1) (+ gy y1) gz) template-building-id)))
+    ))
+
+(defun can-place-build-on-grid (template-building-id gx gy gz reserved-level)
+  (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
+    ;; if the staring point of the building + its dimensions) is more than level dimensions - fail
+    (when (or (> (+ gx dx) (array-dimension reserved-level 0))
+              (> (+ gy dy) (array-dimension reserved-level 1)))
+      (return-from can-place-build-on-grid nil))
+    
+    ;; if any of the grid tiles that the building is going to occupy are already reserved - fail
+    (loop for y1 from 0 below dy do
+      (loop for x1 from 0 below dx do
+        (when (/= (aref reserved-level (+ gx x1) (+ gy y1) gz) +building-city-free+)
+          (return-from can-place-build-on-grid nil))
+            ))
+    ;; all checks done - success
+    t
+    ))
+
+(defun prepare-gen-build-id-list (max-building-types &optional increased-build-type-id)
+  ;; a hack to make houses appear 3 times more frequently
+  (append (loop repeat 3
+                collect (prepare-spec-build-id-list increased-build-type-id))
+          (loop for gen-build-type-id being the hash-key in max-building-types
+                collect (prepare-spec-build-id-list gen-build-type-id))))
+
+(defun prepare-spec-build-id-list (gen-build-type-id)
+  (loop for spec-build-type being the hash-value in *building-types*
+        when (= (building-type spec-build-type) gen-build-type-id)
+          collect (building-id spec-build-type)))

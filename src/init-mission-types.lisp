@@ -12,7 +12,7 @@
                                                                                                         (when (and (>= dx 0) (>= dy 0)
                                                                                                                    (< dx (array-dimension (cells world-map) 0))
                                                                                                                    (< dy (array-dimension (cells world-map) 1))
-                                                                                                                   (or (= (controlled-by (aref (cells world-map) dx dy)) +world-sector-controlled-by-demons+)
+                                                                                                                   (or (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-demons+)
                                                                                                                        (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-forest+)
                                                                                                                        (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-port+)
                                                                                                                        (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-island+)
@@ -26,7 +26,18 @@
                                                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
                                                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+)))
                                                                         t
-                                                                        nil)))))
+                                                                          nil)))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-delayed+)
+                                                                                                (list +faction-type-angels+ +mission-faction-absent+)
+                                                                                                )))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-military+)
+                                                                          (push (list +faction-type-military+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                                                        faction-list))
+                                 ))
 
 (set-mission-type (make-instance 'mission-type :id +mission-type-demonic-raid+
                                                :name "Demonic raid"
@@ -37,7 +48,17 @@
                                                                               (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
                                                                               (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+))
                                                                         t
-                                                                        nil))))
+                                                                        nil))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-delayed+)
+                                                                                                (list +faction-type-angels+ +mission-faction-absent+)
+                                                                                                )))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-military+)
+                                                                          (push (list +faction-type-military+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                                                        faction-list))))
 
 (set-mission-type (make-instance 'mission-type :id +mission-type-demonic-conquest+
                                                :name "Demonic conquest"
@@ -53,7 +74,17 @@
                                                                               (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
                                                                               (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+))
                                                                         t
-                                                                        nil))))
+                                                                        nil))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-delayed+)
+                                                                                                (list +faction-type-angels+ +mission-faction-absent+)
+                                                                                                )))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-military+)
+                                                                          (push (list +faction-type-military+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                                                        faction-list))))
 
 (set-mission-type (make-instance 'mission-type :id +mission-type-demonic-thievery+
                                                :name "Demonic thievery"
@@ -61,7 +92,17 @@
                                                                       (if (and (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
                                                                                (find +item-type-church-reliс+ (items (aref (cells world-map) x y))))
                                                                         t
-                                                                        nil))))
+                                                                        nil))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-delayed+)
+                                                                                                (list +faction-type-angels+ +mission-faction-absent+)
+                                                                                                )))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-military+)
+                                                                          (push (list +faction-type-military+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                                                        faction-list))))
 
 (set-mission-type (make-instance 'mission-type :id +mission-type-military-conquest+
                                                :name "Military conquest"
@@ -71,7 +112,7 @@
                                                                                                         (when (and (>= dx 0) (>= dy 0)
                                                                                                                    (< dx (array-dimension (cells world-map) 0))
                                                                                                                    (< dy (array-dimension (cells world-map) 1))
-                                                                                                                   (= (controlled-by (aref (cells world-map) dx dy)) +world-sector-controlled-by-military+))
+                                                                                                                   (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-military+))
                                                                                                           (setf near-military t))))
                                                                         (if (and near-military
                                                                                  (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
@@ -85,7 +126,18 @@
                                                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
                                                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+)))
                                                                         t
-                                                                        nil)))))
+                                                                          nil)))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-military+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-delayed+)
+                                                                                                (list +faction-type-angels+ +mission-faction-absent+)
+                                                                                                )))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
+                                                                          (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                                                          )
+                                                                        faction-list))))
 
 (set-mission-type (make-instance 'mission-type :id +mission-type-military-raid+
                                                :name "Military raid"
@@ -95,7 +147,7 @@
                                                                                                         (when (and (>= dx 0) (>= dy 0)
                                                                                                                    (< dx (array-dimension (cells world-map) 0))
                                                                                                                    (< dy (array-dimension (cells world-map) 1))
-                                                                                                                   (= (controlled-by (aref (cells world-map) dx dy)) +world-sector-controlled-by-military+))
+                                                                                                                   (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-military+))
                                                                                                           (setf near-military t))))
                                                                         (if (and near-military
                                                                                  (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
@@ -109,7 +161,18 @@
                                                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
                                                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+)))
                                                                         t
-                                                                        nil)))))
+                                                                          nil)))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-military+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-present+)
+                                                                                                (list +faction-type-angels+ +mission-faction-delayed+)
+                                                                                                (list +faction-type-angels+ +mission-faction-absent+)
+                                                                                                )))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
+                                                                          (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                                                          )
+                                                                        faction-list))))
 
 (set-mission-type (make-instance 'mission-type :id +mission-type-celestial-purge+
                                                :name "Celestial purge"
@@ -120,7 +183,18 @@
                                                                               (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-residential+)
                                                                               (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-lake+))
                                                                         t
-                                                                        nil))))
+                                                                        nil))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-angels+ +mission-faction-present+))))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
+                                                                          (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                                                          )
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-military+)
+                                                                          (push (list +faction-type-military+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-military+ +mission-faction-delayed+) faction-list)
+                                                                          )
+                                                                        faction-list))))
 
 (set-mission-type (make-instance 'mission-type :id +mission-type-celestial-retrieval+
                                                :name "Celestial retrieval"
@@ -128,7 +202,18 @@
                                                                       (if (and (not (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a))))
                                                                                (find +item-type-church-reliс+ (items (aref (cells world-map) x y))))
                                                                         t
-                                                                        nil))))
+                                                                        nil))
+                                               :faction-list-func #'(lambda (world-sector)
+                                                                      (let ((faction-list (list (list +faction-type-angels+ +mission-faction-present+))))
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
+                                                                          (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                                                          )
+                                                                        (if (= (controlled-by world-sector) +lm-controlled-by-military+)
+                                                                          (push (list +faction-type-military+ +mission-faction-present+) faction-list)
+                                                                          (push (list +faction-type-military+ +mission-faction-delayed+) faction-list)
+                                                                          )
+                                                                        faction-list))))
 
 ;;----------------------------------------
 ;; MISSION-DISTRICTS

@@ -402,16 +402,13 @@
                                   #'(lambda (n)
                                       (declare (ignore n))
                                       (let ((test-world-map (make-instance 'world-map)))
-                                        (generate-test-world-map test-world-map)
+                                        (setf *world* (make-instance 'world))
+                                        (setf (real-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
+                                        (generate-test-world-map test-world-map (real-game-time *world*))
                                         
-                                        ;;(loop for y from 0 below *max-y-world-map* do
-                                        ;;  (loop for x from 0 below *max-x-world-map*
-                                        ;;        do
-                                        ;;           
-                                        ;;           (format t "(~A ~A), ~A~%" x y (feats (aref (cells test-world-map) x y)))
-                                        ;;        ))
                                         (setf *current-window* (make-instance 'new-campaign-window
-                                                                              :world-map test-world-map))
+                                                                              :world-map test-world-map
+                                                                              :world-time (real-game-time *world*)))
                                         (make-output *current-window*)
                                         (run-window *current-window*))))))
     (if *cotd-release*
