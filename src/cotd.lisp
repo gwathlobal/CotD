@@ -319,6 +319,7 @@
                                  (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (run-window *current-window*)
                                    (format t "~A ~A ~A ~A ~A ~A~%" mission-id layout-id weather-id tod-id specific-faction-type faction-list)
                                    (when (and mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+                                     (setf *current-window* (return-to *current-window*))
                                      (return-from main-menu (values mission-id layout-id weather-id tod-id specific-faction-type faction-list)))))))
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
@@ -332,6 +333,7 @@
                                         (make-output *current-window*)
                                         (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (run-window *current-window*)
                                           (when (and mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+                                            (setf *current-window* (return-to *current-window*))
                                             (return-from main-menu (values mission-id layout-id weather-id tod-id specific-faction-type faction-list)))))))
         (settings-item (cons "Settings"
                              #'(lambda (n)
@@ -401,7 +403,8 @@
         (test-campaign-item (cons "Test campaign"
                                   #'(lambda (n)
                                       (declare (ignore n))
-                                      (let ((test-world-map (make-instance 'world-map)))
+                                      (let ((test-world-map (make-instance 'world-map))
+                                            (selected-mission nil))
                                         (setf *world* (make-instance 'world))
                                         (setf (real-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
                                         (generate-test-world-map test-world-map (real-game-time *world*))
@@ -410,7 +413,9 @@
                                                                               :world-map test-world-map
                                                                               :world-time (real-game-time *world*)))
                                         (make-output *current-window*)
-                                        (run-window *current-window*))))))
+                                        (setf selected-mission (run-window *current-window*))
+                                        (when selected-mission
+                                          (setf *current-window* (return-to *current-window*))))))))
     (if *cotd-release*
       (progn
         (setf menu-items (list (car new-game-item) 

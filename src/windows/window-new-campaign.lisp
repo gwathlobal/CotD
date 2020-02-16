@@ -74,9 +74,11 @@
                       rect))))
       )
     )
-
-  (sdl:draw-string-solid-* (format nil "[Arrows/Numpad] Move selection  [Tab] Change mode  [Esc] Exit")
-                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+  (let ((run-mission-str (if (mission (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))
+                           "[Enter] Start mission  "
+                           "")))
+    (sdl:draw-string-solid-* (format nil "~A[Arrows/Numpad] Move selection  [Tab] Change mode  [Esc] Exit" run-mission-str)
+                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*))))
   
   (sdl:update-display))
 
@@ -150,6 +152,10 @@
                             (campaign-win-move-select-to-mission win))))
                        ;; enter - select
                        ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                        (cond
+                          ((= (cur-mode win) +new-campaign-window-mission-mode+) (return-from run-window (nth (cur-sel win) (avail-missions win))))
+                          ((= (cur-mode win) +new-campaign-window-map-mode+) (when (mission (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))
+                                                                               (return-from run-window (mission (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))))))
                         ;;(when (and (menu-funcs win) (nth (cur-sel win) (menu-funcs win)))
                         ;;  (return-from run-window (funcall (nth (cur-sel win) (menu-funcs win)) (cur-sel win))))
                         ))
