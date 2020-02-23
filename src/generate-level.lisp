@@ -22,29 +22,35 @@
 ;;
 
 (defun generate-level-from-sector (sector-level-gen-func &key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*)
-                                                              (item-process-func-list ())
-                                                              (feature-process-func-list ())
-                                                              (mob-process-func-list ())
+                                                              (overall-post-process-func-list ())
                                                               (level-template-pre-process-func-list ())
                                                               (terrain-level-post-process-func-list ())
                                                               
-                                                              (weather-list ())
-                                                              (tod-id +tod-type-day+)
-                                                              (layout-id)
-                                                              (mission-id))
+                                                              (player-placement-lvl-mod-id +lm-placement-player+)
+                                                              (world-sector nil)
+                                                              (mission nil)
+                                                              (world nil)
+                                                              )
 
+  (unless world-sector (error ":WORLD-SECTOR is an obligatory parameter!"))
+  (unless mission (error ":MISSION is an obligatory parameter!"))
+  (unless world (error ":WORLD is an obligatory parameter!"))
+  
   ;; create a template level
   (let* ((level (create-level :max-x max-x :max-y max-y :max-z max-z))
          (terrain-level nil)
          (feature-template-result nil)
          (mob-template-result nil)
-         (item-template-result nil)
-         (game-event-list nil))
+         (item-template-result nil))
     (let* ((template-max-x (truncate max-x *level-grid-size*)) (template-max-y (truncate max-y *level-grid-size*)) (template-max-z max-z)
            (template-level (make-array (list template-max-x template-max-y template-max-z) :element-type 'fixnum :initial-element +building-city-reserved+))
-           (building-list nil)
-           (final-level nil))
-    
+           (building-list nil))
+
+      (setf *max-progress-bar* 10)
+      (setf *cur-progress-bar* 0)
+
+      (funcall *update-screen-closure* "Generating map")
+      
       ;; all grid cells along the borders are reserved, while everything inside is free for claiming
       (loop for y from 1 below (1- template-max-y) do
         (loop for x from 1 below (1- template-max-x) do
@@ -53,20 +59,33 @@
       
       ;; use level template pre-process functions to place reserved buildings from sector features, factions, etc
       (loop for level-template-pre-process-func in level-template-pre-process-func-list do
-        (setf building-list (append building-list (funcall level-template-pre-process-func template-level))))
+        (setf building-list (append building-list (funcall level-template-pre-process-func template-level world-sector mission world))))
+
+      ;; adjusting the progress bar : 1
+      (incf *cur-progress-bar*)
+      (funcall *update-screen-closure* nil)
       
       ;; produce terrain level from template using the supplied function
-      (multiple-value-setq (terrain-level mob-template-result item-template-result feature-template-result) (funcall sector-level-gen-func :template-level template-level
-                                                                                                                                           :build-list building-list
-                                                                                                                                           :max-x max-x :max-y max-y :max-z max-z))
-
-      ;; post process actual level (demonic portals, blood spatter, irradiated spots, etc)
-      (loop for terrain-post-process-func in terrain-level-post-process-func-list do
-        (setf terrain-level (funcall terrain-post-process-func terrain-level)))
+      (multiple-value-setq (terrain-level mob-template-result item-template-result feature-template-result) (funcall sector-level-gen-func template-level
+                                                                                                                                           building-list
+                                                                                                                                           max-x max-y max-z))
 
       (setf (terrain level) terrain-level)
+      (setf (level world) level)
+
+      ;; adjusting the progress bar : 2
+      (incf *cur-progress-bar*)
+      (funcall *update-screen-closure* nil)
+      
+      ;; post process actual level (demonic portals, blood spatter, irradiated spots, etc)
+      (loop for terrain-post-process-func in terrain-level-post-process-func-list do
+        (setf terrain-level (funcall terrain-post-process-func level world-sector mission world)))      
       )
 
+    ;; adjusting the progress bar : 3
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* nil)
+    
     (setf (mob-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
                                                      (ceiling (array-dimension (terrain level) 1) 10))
                                                :initial-element ()))
@@ -77,10 +96,16 @@
                                                        (ceiling (array-dimension (terrain level) 1) 10))
                                                  :initial-element ()))
 
-    (setf (level-layout level) layout-id)
-    (setf (mission-scenario level) mission-id)
+    (setf (mission level) mission)
+    (setf (world-sector level) world-sector)
 
 
+    ;; check map for connectivity : 4
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* "Creating connectivity maps")
+
+    (setf *time-at-end-of-player-turn* (get-internal-real-time))
+    
     ;; generate connectivity maps
     (let* ((out *standard-output*)
            (size-1-thread (bt:make-thread #'(lambda ()
@@ -135,52 +160,49 @@
       (bt:join-thread size-3-thread)
       (logger (format nil "SIZE 3 CREATION FINISHED~%"))
       )
-    
-    ;; creating light map
-    (funcall (sf-func (get-scenario-feature-by-id tod-id)) level)
 
-    ;; setting up time, a bit of hardcode here
-    ;; TODO: make time be set outside of here
-;    (let ((year 1915)
-;          (month 7)
-;          (day 12)
-;          (hour 12)
-;          (min (random 45))
-;          (sec (random 60)))
-;      (when (find +weather-type-snow+ weather-list)
-;        (setf month 1))
-;      (when (= tod-id +tod-type-night+)
-;        (setf hour 0))
-;      (when (= tod-id +tod-type-morning+)
-;        (setf hour 7))
-;      (when (= tod-id +tod-type-evening+)
-;        (setf hour 19))
-;      (setf (player-game-time world) (set-current-date-time year month day hour min sec)))
-    (push +game-event-adjust-outdoor-light+ game-event-list)
+    ;; adjusting the progress bar : 10
+    (incf *cur-progress-bar*)
+    (funcall *update-screen-closure* "Finalizing")
     
-    ;; populate the world with special mobs (military in outposts, demons around portals, etc) depending on present factions
+    (push +game-event-adjust-outdoor-light+ (game-events level))
+
+    ;; add the player to the level
+    (loop for overall-post-process-func in (funcall (overall-post-process-func-list (get-level-modifier-by-id player-placement-lvl-mod-id)))
+          do
+             (funcall overall-post-process-func level world-sector mission world))
 
     ;; populate world with standard mobs (from actual level template)
-    ;(loop for mob-func in mob-func-list do
-    ;  (funcall mob-func world mob-template-result))
-    
-    ;; populate world with items
-    ;(create-items-from-template level item-template-result)
-    
-    ;; populate world with features
-    ;(create-features-from-template level feature-template-result)
+    (loop for (mob-type-id x y z) in mob-template-result
+          when (null (get-mob-* level x y z))
+            do
+               (add-mob-to-level-list level (make-instance 'mob :mob-type mob-type-id :x x :y y :z z)))
 
-    ;; set the game events
-    ;(setf (game-events world) game-event-list)
+    ;; populate world with items
+    (loop for (item-type-id x y z qty) in item-template-result 
+        do
+           (add-item-to-level-list level (make-instance 'item :item-type item-type-id :x x :y y :z z :qty qty)))
+        
+    ;; populate world with features
+    (loop for (feature-type-id x y z) in feature-template-result 
+        do
+           (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
+    
+    ;; populate the world with special mobs (military in outposts, demons around portals, etc) depending on present factions
+    (loop for overall-post-process-func in overall-post-process-func-list
+          do
+             (funcall overall-post-process-func level world-sector mission world))
 
     ;; setting up demonic portals so that mobs could access them directly without iterating through the whole list of features
-    ;(loop for feature-id in (feature-id-list (level world))
-    ;      for feature = (get-feature-by-id feature-id)
-    ;      when (= (feature-type feature) +feature-demonic-portal+)
-    ;        do
-    ;           (push feature-id (demonic-portals (level world))))
+    (loop for feature-id in (feature-id-list (level world))
+          for feature = (get-feature-by-id feature-id)
+          when (= (feature-type feature) +feature-demonic-portal+)
+            do
+               (push feature-id (demonic-portals level)))
     
     ;; add win conditions
+
+    
     
    ) 
   )

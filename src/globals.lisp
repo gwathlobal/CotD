@@ -496,6 +496,13 @@
 (defconstant +feature-corrupted-spores+ 29)
 (defconstant +feature-start-demon-point+ 30)
 (defconstant +feature-smoke-acid-gas+ 31)
+(defconstant +feature-delayed-military-arrival-point+ 32)
+(defconstant +feature-delayed-angels-arrival-point+ 33)
+(defconstant +feature-demons-arrival-point+ 34)
+(defconstant +feature-start-place-church-priest+ 35)
+(defconstant +feature-start-place-civilian-man+ 36)
+(defconstant +feature-start-place-civilian-woman+ 37)
+(defconstant +feature-start-place-civilian-child+ 38)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

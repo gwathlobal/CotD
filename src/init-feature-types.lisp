@@ -84,6 +84,12 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-delayed-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Arrival Point"))
 
+(set-feature-type (make-instance 'feature-type :id +feature-delayed-military-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Military Arrival Point" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-delayed-angels-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Angels Arrival Point" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-demons-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Demons Arrival Point" :trait-remove-on-dungeon-generation t))
+
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-small+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Small Gold Pile Placeholder"))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-big+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Big Gold Pile Placeholder"))
@@ -209,6 +215,14 @@
 (set-feature-type (make-instance 'feature-type :id +feature-start-sigil-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Sigil Starting Position" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-place-church-angels+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Angel Defender Starting Position" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-church-priest+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Priest Starting Position" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-civilian-man+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Man Starting Position" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-civilian-woman+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Woman Starting Position" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-civilian-child+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Child Starting Position" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-smoke-flare+ :glyph-idx 98 :glyph-color sdl:*magenta* :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-flare+ :trait-no-gravity t

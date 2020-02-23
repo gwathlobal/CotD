@@ -485,10 +485,7 @@
 
 (defun get-reserved-buildings-normal ()
   (let ((reserved-building-types (make-hash-table)))
-    (setf (gethash +building-type-church+ reserved-building-types) 1)
-    (setf (gethash +building-type-satanists+ reserved-building-types) 1)
     (setf (gethash +building-type-warehouse+ reserved-building-types) 1)
-    (setf (gethash +building-type-library+ reserved-building-types) 1)
     (setf (gethash +building-type-prison+ reserved-building-types) 1)
     (setf (gethash +building-type-stables+ reserved-building-types) 0)
     (setf (gethash +building-type-bank+ reserved-building-types) 1)

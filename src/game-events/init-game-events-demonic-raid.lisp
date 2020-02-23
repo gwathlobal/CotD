@@ -48,13 +48,13 @@
                                                                                                                                  (if (mimic-id-list *player*)
                                                                                                                                    (faction-name *player*)
                                                                                                                                    (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                 (real-game-time world)
+                                                                                                                                 (player-game-time world)
                                                                                                                                  final-str
                                                                                                                                  (level-layout (level world)))
                                                                                                           *highscores*))
                                                            
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
 
                                                              (if player-faction
@@ -107,13 +107,13 @@
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (real-game-time world)
+                                                                                                                                (player-game-time world)
                                                                                                                                 final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (if player-faction
@@ -166,13 +166,13 @@
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (real-game-time world)
+                                                                                                                                (player-game-time world)
                                                                                                                                 final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (if player-faction
@@ -235,13 +235,13 @@
                                                                                                                                  (if (mimic-id-list *player*)
                                                                                                                                    (faction-name *player*)
                                                                                                                                    (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                 (real-game-time world)
+                                                                                                                                 (player-game-time world)
                                                                                                                                  final-str
                                                                                                                                  (level-layout (level world)))
                                                                                                           *highscores*))
                                                            
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
 
                                                              (if player-faction
@@ -295,13 +295,13 @@
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (real-game-time world)
+                                                                                                                                (player-game-time world)
                                                                                                                                 final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (if player-faction
@@ -330,7 +330,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-delayed-arrival-military+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 60) (turn-finished world))
+                                                         (if (and (= (player-game-time world) 60) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
@@ -370,7 +370,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-delayed-arrival-angels+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (real-game-time world) 40) (turn-finished world))
+                                                         (if (and (= (player-game-time world) 40) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)

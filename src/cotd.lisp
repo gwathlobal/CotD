@@ -6,24 +6,24 @@
         do
            ;;(format t "GAME-LOOP: Start loop~%")
            (setf turn-finished t)
-           (logger (format nil "REAL-GAME-TURN: ~A~%~%" (real-game-time *world*)))
+           (logger (format nil "REAL-GAME-TURN: ~A~%~%" (player-game-time *world*)))
 
            ;; check for the player's win conditions first
            (when (and *player*
-                      (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                      (find (loyal-faction *player*) (win-condition-list (get-mission-type-by-id (mission-type-id (mission (level *world*)))))
                             :key #'(lambda (a)
                                      (first a)))
-                      (funcall (on-check (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+                      (funcall (on-check (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-type-by-id (mission-type-id (mission (level *world*)))))
                                                                              :key #'(lambda (a)
                                                                                       (first a))))))
                                *world*))
-             (funcall (on-trigger (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+             (funcall (on-trigger (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-type-by-id (mission-type-id (mission (level *world*)))))
                                                                              :key #'(lambda (a)
                                                                                       (first a))))))
                       *world*))
            
            ;; check all available game events
-           (loop for game-event-id of-type fixnum in (game-events *world*)
+           (loop for game-event-id of-type fixnum in (game-events (level *world*))
                  for game-event of-type game-event = (get-game-event-by-id game-event-id)
                  when (and (not (disabled game-event))
                            (funcall (on-check game-event) *world*))
@@ -140,9 +140,9 @@
                (bt:destroy-thread *path-thread*)))
            
            (when turn-finished
-             (incf (real-game-time *world*))
+             (incf (player-game-time *world*))
              (when (check-dead *player*)
-               (incf (player-game-time *world*) +normal-ap+))
+               (incf (world-game-time *world*) +normal-ap+))
              (setf (turn-finished *world*) t)
              (set-message-this-turn nil)
              (loop for mob of-type mob across *mobs* do
@@ -168,7 +168,7 @@
              ))
   )
   
-(defun init-game (mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+(defun init-game (mission world-sector)
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
@@ -188,20 +188,85 @@
                                     (make-output *current-window*)
 				    ))
 
-  (setf *world* (make-instance 'world))
-  
-  (create-world *world* mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+  (let ((sector-level-gen-func (sector-level-gen-func (get-world-sector-type-by-id (wtype world-sector))))
+        (level-template-pre-process-func-list ())
+        (overall-post-process-func-list ())
+        (terrain-post-process-func-list ()))
+    
+    ;; add all funcs from world sector
+    (let ((world-sector-type (get-world-sector-type-by-id (wtype world-sector))))
+      (when (template-level-gen-func world-sector-type)
+        (setf level-template-pre-process-func-list (append level-template-pre-process-func-list
+                                                           (list (template-level-gen-func world-sector-type)))))
+      (when (overall-post-process-func-list world-sector-type)
+        (setf overall-post-process-func-list (append overall-post-process-func-list
+                                                     (funcall (overall-post-process-func-list world-sector-type)))))
+      (when (terrain-post-process-func-list world-sector-type)
+        (setf terrain-post-process-func-list (append terrain-post-process-func-list
+                                                     (funcall (terrain-post-process-func-list world-sector-type)))))
+      )
+    
+    ;; add all funcs from level-modifiers
+    ;; sort them by level-modifier priority, to ensure that all template-level reservations are made in the right order
+    (loop with lm-controlled-by = (list (get-level-modifier-by-id (controlled-by world-sector)))
+          with lm-feats = (loop for (lm-feat-id) in (feats world-sector)
+                                collect (get-level-modifier-by-id lm-feat-id))
+          with lm-item = (loop for lm-item-id in (items world-sector)
+                               collect (get-level-modifier-by-id lm-item-id))
+          with sorted-lvl-mod-list = (stable-sort (append lm-controlled-by lm-feats lm-item)
+                                                  #'(lambda (a b)
+                                                      (if (< (priority a) (priority b))
+                                                        t
+                                                        nil)))
+          for lvl-mod in sorted-lvl-mod-list
+          do
+             (when (template-level-gen-func lvl-mod)
+               (setf level-template-pre-process-func-list (append level-template-pre-process-func-list
+                                                                  (list (template-level-gen-func lvl-mod)))))
+             (when (overall-post-process-func-list lvl-mod)
+               (setf overall-post-process-func-list (append overall-post-process-func-list
+                                                            (funcall (overall-post-process-func-list lvl-mod)))))
+             (when (terrain-post-process-func-list lvl-mod)
+               (setf terrain-post-process-func-list (append terrain-post-process-func-list
+                                                            (funcall (terrain-post-process-func-list lvl-mod))))))
+    
+    ;; add all funcs from mission
+    (let ((mission-type (get-mission-type-by-id (mission-type-id mission))))
+      (when (template-level-gen-func mission-type)
+        (setf level-template-pre-process-func-list (append level-template-pre-process-func-list
+                                                           (list (template-level-gen-func mission-type)))))
+      (when (overall-post-process-func-list mission-type)
+        (setf overall-post-process-func-list (append overall-post-process-func-list
+                                                     (funcall (overall-post-process-func-list mission-type)))))
+      (when (terrain-post-process-func-list mission-type)
+        (setf terrain-post-process-func-list (append terrain-post-process-func-list
+                                                     (funcall (terrain-post-process-func-list mission-type)))))
+      )
 
-  (setf *previous-scenario* (list mission-id specific-faction-type))
+    (setf (player-specific-faction-id mission) +lm-placement-player+)
+    
+    (generate-level-from-sector sector-level-gen-func
+                                :level-template-pre-process-func-list level-template-pre-process-func-list
+                                :overall-post-process-func-list overall-post-process-func-list
+                                :terrain-level-post-process-func-list terrain-post-process-func-list
+                                :player-placement-lvl-mod-id +lm-placement-player+
+                                :world-sector world-sector
+                                :mission mission
+                                :world *world*)
+    )
+  
+  ;;(create-world *world* mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+
+  ;;(setf *previous-scenario* (list mission-id specific-faction-type))
 
   ;;(format t "FACTION-LIST ~A~%" faction-list)
   
   (setf (name *player*) "Player")
 
   (add-message (format nil "Welcome to City of the Damned.~%This is a "))
-  (add-message (format nil "~(~A~)" (name (get-mission-scenario-by-id mission-id))) sdl:*yellow*)
+  (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow*)
   (add-message (format nil " in "))
-  (add-message (format nil "~(~A~)" (sf-name (get-scenario-feature-by-id (level-layout (level *world*))))) sdl:*yellow*)
+  (add-message (format nil "~(~A~)" (name (get-world-sector-type-by-id (wtype world-sector)))) sdl:*yellow*)
   (add-message (format nil "!~%~%To view help, press '?'.~%To view your current objective, press 'j'.~%"))
 
   )  
@@ -404,18 +469,23 @@
                                   #'(lambda (n)
                                       (declare (ignore n))
                                       (let ((test-world-map (make-instance 'world-map))
-                                            (selected-mission nil))
+                                            (mission nil)
+                                            (world-sector nil))
                                         (setf *world* (make-instance 'world))
-                                        (setf (real-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                        (generate-test-world-map test-world-map (real-game-time *world*))
+                                        (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
+                                        (generate-test-world-map test-world-map (world-game-time *world*))
+                                        (setf (world-map *world*) test-world-map)
                                         
                                         (setf *current-window* (make-instance 'new-campaign-window
                                                                               :world-map test-world-map
-                                                                              :world-time (real-game-time *world*)))
+                                                                              :world-time (world-game-time *world*)))
                                         (make-output *current-window*)
-                                        (setf selected-mission (run-window *current-window*))
-                                        (when selected-mission
-                                          (setf *current-window* (return-to *current-window*))))))))
+                                        (multiple-value-setq (mission world-sector) (run-window *current-window*))
+                                        (when (and mission world-sector)
+                                          (setf *current-window* (return-to *current-window*))
+
+                                          (return-from main-menu (values world-sector mission))
+                                          ))))))
     (if *cotd-release*
       (progn
         (setf menu-items (list (car new-game-item) 
@@ -539,7 +609,7 @@
      start-tag
        (when (and *path-thread* (bt:thread-alive-p *path-thread*))
          (bt:destroy-thread *path-thread*))
-       (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (main-menu)
+       (multiple-value-bind (world-sector mission) (main-menu)
          (setf *current-window* (make-instance 'loading-window 
                                                :update-func #'(lambda (win)
                                                                 (when (/= *max-progress-bar* 0) 
@@ -551,7 +621,7 @@
                                                                                               (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
                                                                                               :color sdl:*white*))
                                                                   ))))
-         (init-game mission-id layout-id weather-id tod-id specific-faction-type faction-list))
+         (init-game mission world-sector))
 
        ;; initialize thread, that will calculate random-movement paths while the system waits for player input
        (let ((out *standard-output*))

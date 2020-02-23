@@ -5,7 +5,7 @@
 (defconstant +level-city-floor+ 2)
 (defconstant +level-city-floor-bright+ 3)
 
-(defun create-template-city (max-x max-y max-z set-max-buildings-func set-reserved-buildings-func process-reserved-buildings-func
+(defun create-template-city (template-level building-list max-x max-y max-z set-max-buildings-func set-reserved-buildings-func
                              &optional (terrains (list +level-city-border+ +terrain-border-floor+
                                                        +level-city-park+ +building-city-park-tiny+
                                                        +level-city-floor+ +terrain-floor-dirt+
@@ -20,13 +20,12 @@
   ;; and an enlarged grid with scale 1 to 10 cells of template level
   ;; grid will be used to make reservations for buildings
   ;; once all places on grid are reserved, put actual buildings to the template level in places that were reserved 
-  (let* ((reserv-max-x (truncate max-x *level-grid-size*)) (reserv-max-y (truncate max-y *level-grid-size*)) (reserv-max-z max-z)
-         (template-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element (getf terrains +level-city-border+)))
-         (reserved-level (make-array (list reserv-max-x reserv-max-y reserv-max-z) :element-type 'fixnum :initial-element +building-city-reserved+))
+  (let* ((reserv-max-x (truncate max-x *level-grid-size*)) (reserv-max-y (truncate max-y *level-grid-size*)) ;(reserv-max-z max-z)
+         (terrain-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element (getf terrains +level-city-border+)))
          (feature-list)
          (mob-list nil)
          (item-list)
-         (build-list nil)
+         (build-list building-list)
          (max-building-types (make-hash-table))
          (reserved-building-types (make-hash-table))
          )
@@ -39,15 +38,7 @@
     (when set-reserved-buildings-func
       (setf reserved-building-types (funcall set-reserved-buildings-func)))
 
-    ;; all grid cells along the borders are reserved, while everything inside is free for claiming
-    (loop for y from 1 below (1- reserv-max-y) do
-      (loop for x from 1 below (1- reserv-max-x) do
-        (loop for z from 0 below reserv-max-z do
-          (setf (aref reserved-level x y z) +building-city-free+))))
-
-    ;; apply building reservations specify to this city type
-    (when process-reserved-buildings-func
-      (setf build-list (append build-list (funcall process-reserved-buildings-func reserved-level))))
+    (print-reserved-level template-level)
 
     ;; make reservations from reserved buildings on the grid level
     (loop for gen-building-type-id being the hash-key in reserved-building-types do
@@ -71,12 +62,12 @@
                ;; try to pick an unoccupied place
                (loop for cell-pick = (nth (random (length avail-cells-list)) avail-cells-list)
                      
-                     until (level-city-can-place-build-on-grid build-picked (first cell-pick) (second cell-pick) 2 reserved-level)
+                     until (level-city-can-place-build-on-grid build-picked (first cell-pick) (second cell-pick) 2 template-level)
                      do
                         (setf avail-cells-list (remove cell-pick avail-cells-list))
                         (when (null avail-cells-list)
                           (logger (format nil "~%CREATE-TEMPLATE-CITY: Could not place reserved building ~A~%" build-picked))
-                          (print-reserved-level reserved-level)
+                          (print-reserved-level template-level)
                           (return-from create-template-city (values nil nil nil nil)))
                      finally (setf x (first cell-pick) y (second cell-pick)))
 
@@ -86,7 +77,7 @@
                  (setf build-list (append build-list (list (list build-picked x y 2))))
                  
                  ;; reserve the tiles for the building
-                 (level-city-reserve-build-on-grid build-picked x y 2 reserved-level)
+                 (level-city-reserve-build-on-grid build-picked x y 2 template-level)
 
                  ;; decrease the maximum available number of buildings of this type
                  (when (and (gethash (building-type (get-building-type build-picked)) max-building-types)
@@ -110,7 +101,7 @@
                      until (or (and (gethash (building-type (get-building-type build-picked)) max-building-types)
                                     (or (eq (gethash (building-type (get-building-type build-picked)) max-building-types) t)
                                         (> (gethash (building-type (get-building-type build-picked)) max-building-types) 0))
-                                    (level-city-can-place-build-on-grid build-picked x y 2 reserved-level))
+                                    (level-city-can-place-build-on-grid build-picked x y 2 template-level))
                                )
                      do
                         (unless build-cur-list
@@ -125,7 +116,7 @@
                  (setf build-list (append build-list (list (list build-picked x y 2))))
                  
                  ;; reserve the tiles for the building
-                 (level-city-reserve-build-on-grid build-picked x y 2 reserved-level)
+                 (level-city-reserve-build-on-grid build-picked x y 2 template-level)
 
                  ;; decrease the maximum available number of buildings of this type
                  (when (and (gethash (building-type (get-building-type build-picked)) max-building-types)
@@ -139,30 +130,30 @@
       (loop for x from 0 below reserv-max-x 
             do
                ;;  check if you can place a tiny park
-               (when (level-city-can-place-build-on-grid (getf terrains +level-city-park+) x y 2 reserved-level)
+               (when (level-city-can-place-build-on-grid (getf terrains +level-city-park+) x y 2 template-level)
                  ;; if yes, add the building to the building list
                  (setf build-list (append build-list (list (list (getf terrains +level-city-park+) x y 2))))
                  
                  ;; reserve the tiles for the building
-                 (level-city-reserve-build-on-grid (getf terrains +level-city-park+) x y 2 reserved-level))
+                 (level-city-reserve-build-on-grid (getf terrains +level-city-park+) x y 2 template-level))
             ))
 
     (loop for y from 0 below max-y do
       (loop for x from 0 below max-x do
         (loop for z from 3 below max-z do
-          (setf (aref template-level x y z) +terrain-border-air+))))
+          (setf (aref terrain-level x y z) +terrain-border-air+))))
     
     (loop for y from 1 below (1- max-y) do
       (loop for x from 1 below (1- max-x) do
-        (setf (aref template-level x y 0) +terrain-wall-earth+)
-        (setf (aref template-level x y 1) +terrain-wall-earth+)
+        (setf (aref terrain-level x y 0) +terrain-wall-earth+)
+        (setf (aref terrain-level x y 1) +terrain-wall-earth+)
         (if (< (random 100) 20)
-          (setf (aref template-level x y 2) (getf terrains +level-city-floor-bright+))
-            (setf (aref template-level x y 2) (getf terrains +level-city-floor+)))
+          (setf (aref terrain-level x y 2) (getf terrains +level-city-floor-bright+))
+            (setf (aref terrain-level x y 2) (getf terrains +level-city-floor+)))
         (loop for z from 3 below max-z do
-          (setf (aref template-level x y z) +terrain-floor-air+))))
+          (setf (aref terrain-level x y z) +terrain-floor-air+))))
     
-    (print-reserved-level reserved-level)
+    (print-reserved-level template-level)
     
     ;; take buildings from the building list and actually place them on the template level
     (loop for (build-type-id gx gy gz) in build-list 
@@ -183,7 +174,7 @@
              (when (building-func (get-building-type build-type-id))
                (multiple-value-setq (building-mobs building-features building-items) (funcall (building-func (get-building-type build-type-id))
                                                                                               (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) gz
-                                                                                              template-level)))
+                                                                                              terrain-level)))
 
              ;(logger (format nil "CREATE-TEMPLATE-CITY: Building type ~A, mob list ~A~%" build-type-id building-mobs))
              ;; add mobs to the mob-list
@@ -209,31 +200,31 @@
     (loop for x from 0 below max-x do
       (loop for z from 0 below max-z
             for y-0 = 0
-            for y-max = (1- (array-dimension template-level 1))
+            for y-max = (1- (array-dimension terrain-level 1))
             do
         (cond
-          ((= (aref template-level x y-0 z) +terrain-floor-air+) (setf (aref template-level x y-0 z) +terrain-border-air+))
-          ((= (aref template-level x y-0 z) +terrain-water-liquid+) (setf (aref template-level x y-0 z) +terrain-border-water+))
-          ((= (aref template-level x y-0 z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x y-0 z) +terrain-border-water+)))
+          ((= (aref terrain-level x y-0 z) +terrain-floor-air+) (setf (aref terrain-level x y-0 z) +terrain-border-air+))
+          ((= (aref terrain-level x y-0 z) +terrain-water-liquid+) (setf (aref terrain-level x y-0 z) +terrain-border-water+))
+          ((= (aref terrain-level x y-0 z) +terrain-water-liquid-nofreeze+) (setf (aref terrain-level x y-0 z) +terrain-border-water+)))
         (cond
-          ((= (aref template-level x y-max z) +terrain-floor-air+) (setf (aref template-level x y-max z) +terrain-border-air+))
-          ((= (aref template-level x y-max z) +terrain-water-liquid+) (setf (aref template-level x y-max z) +terrain-border-water+))
-          ((= (aref template-level x y-max z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x y-max z) +terrain-border-water+)))))
+          ((= (aref terrain-level x y-max z) +terrain-floor-air+) (setf (aref terrain-level x y-max z) +terrain-border-air+))
+          ((= (aref terrain-level x y-max z) +terrain-water-liquid+) (setf (aref terrain-level x y-max z) +terrain-border-water+))
+          ((= (aref terrain-level x y-max z) +terrain-water-liquid-nofreeze+) (setf (aref terrain-level x y-max z) +terrain-border-water+)))))
     (loop for y from 0 below max-y do
       (loop for z from 0 below max-z
             for x-0 = 0
-            for x-max = (1- (array-dimension template-level 0))
+            for x-max = (1- (array-dimension terrain-level 0))
             do
         (cond
-          ((= (aref template-level x-0 y z) +terrain-floor-air+) (setf (aref template-level x-0 y z) +terrain-border-air+))
-          ((= (aref template-level x-0 y z) +terrain-water-liquid+) (setf (aref template-level x-0 y z) +terrain-border-water+))
-          ((= (aref template-level x-0 y z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x-0 y z) +terrain-border-water+)))
+          ((= (aref terrain-level x-0 y z) +terrain-floor-air+) (setf (aref terrain-level x-0 y z) +terrain-border-air+))
+          ((= (aref terrain-level x-0 y z) +terrain-water-liquid+) (setf (aref terrain-level x-0 y z) +terrain-border-water+))
+          ((= (aref terrain-level x-0 y z) +terrain-water-liquid-nofreeze+) (setf (aref terrain-level x-0 y z) +terrain-border-water+)))
         (cond
-          ((= (aref template-level x-max y z) +terrain-floor-air+) (setf (aref template-level x-max y z) +terrain-border-air+))
-          ((= (aref template-level x-max y z) +terrain-water-liquid+) (setf (aref template-level x-max y z) +terrain-border-water+))
-          ((= (aref template-level x-max y z) +terrain-water-liquid-nofreeze+) (setf (aref template-level x-max y z) +terrain-border-water+)))))
+          ((= (aref terrain-level x-max y z) +terrain-floor-air+) (setf (aref terrain-level x-max y z) +terrain-border-air+))
+          ((= (aref terrain-level x-max y z) +terrain-water-liquid+) (setf (aref terrain-level x-max y z) +terrain-border-water+))
+          ((= (aref terrain-level x-max y z) +terrain-water-liquid-nofreeze+) (setf (aref terrain-level x-max y z) +terrain-border-water+)))))
     
-    (values template-level feature-list mob-list item-list)
+    (values terrain-level mob-list item-list feature-list)
     ))
 
 (defun print-reserved-level (reserved-level)

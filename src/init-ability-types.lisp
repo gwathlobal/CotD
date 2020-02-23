@@ -1208,7 +1208,7 @@
                                                   (setf path-line (nreverse path-line))
                                                   (pop path-line)
                                                   
-                                                  (setf game-time (player-game-time *world*))
+                                                  (setf game-time (world-game-time *world*))
                                                   (setf cur-ap (cur-ap actor))
                                                   
                                                   (loop for (nx . ny) in path-line
@@ -1232,7 +1232,7 @@
                                                              (loop-finish))
                                                         )
                                                   (setf (cur-ap actor) cur-ap)
-                                                  (setf (player-game-time *world*) game-time)
+                                                  (setf (world-game-time *world*) game-time)
                                                   ))
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))

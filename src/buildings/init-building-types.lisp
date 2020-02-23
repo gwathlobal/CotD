@@ -939,14 +939,15 @@
 
                                             (setf (aref template-level (+ x 8) (+ y 16) z) +terrain-floor-sign-church-catholic+)
                                             
-                                            (values (list (list +mob-type-priest+ 8 4 z)
-                                                          (list +mob-type-priest+ 3 4 z)
-                                                          (list +mob-type-priest+ 12 4 z)
-                                                          (list +mob-type-man+ 6 7 z)
-                                                          (list +mob-type-woman+ 10 7 z)
-                                                          (list +mob-type-man+ 10 11 z)
-                                                          (list +mob-type-woman+ 6 11 z))
+                                            (values nil
                                                     (list (list +feature-start-church-player+ 8 2 z)
+                                                          (list +feature-start-place-church-priest+ 8 4 z)
+                                                          (list +feature-start-place-church-priest+ 3 4 z)
+                                                          (list +feature-start-place-church-priest+ 12 4 z)
+                                                          (list +feature-start-place-civilian-man+ 6 7 z)
+                                                          (list +feature-start-place-civilian-man+ 10 11 z)
+                                                          (list +feature-start-place-civilian-woman+ 10 7 z)
+                                                          (list +feature-start-place-civilian-woman+ 6 11 z)
                                                           (list +feature-start-place-church-relic+ 8 2 z)
                                                           (list +feature-start-strong-repel-demons+ 8 9 z)
                                                           (list +feature-start-strong-repel-demons+ 8 9 z)
@@ -1074,14 +1075,15 @@
 
                                             (setf (aref template-level (+ x 8) (+ y 16) z) +terrain-floor-sign-church-orthodox+)
                                             
-                                            (values (list (list +mob-type-priest+ 8 4 z)
-                                                          (list +mob-type-priest+ 5 4 z)
-                                                          (list +mob-type-priest+ 11 4 z)
-                                                          (list +mob-type-man+ 6 7 z)
-                                                          (list +mob-type-woman+ 10 7 z)
-                                                          (list +mob-type-man+ 10 11 z)
-                                                          (list +mob-type-woman+ 6 11 z))
+                                            (values nil
                                                     (list (list +feature-start-church-player+ 8 6 z)
+                                                          (list +feature-start-place-church-priest+ 8 4 z)
+                                                          (list +feature-start-place-church-priest+ 5 4 z)
+                                                          (list +feature-start-place-church-priest+ 11 4 z)
+                                                          (list +feature-start-place-civilian-man+ 6 7 z)
+                                                          (list +feature-start-place-civilian-woman+ 10 7 z)
+                                                          (list +feature-start-place-civilian-man+ 10 11 z)
+                                                          (list +feature-start-place-civilian-woman+ 6 11 z)
                                                           (list +feature-start-place-church-relic+ 8 2 z)
                                                           (list +feature-start-strong-repel-demons+ 8 9 z)
                                                           (list +feature-start-place-church-angels+ 8 5 z)
@@ -1539,14 +1541,14 @@
 
 (set-building-type (make-building :id +building-city-barricade-sw+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
-                                            (loop for dx from 0 to 2 do
+                                            (loop for dx from 1 to 3 do
+                                              (setf (aref template-level (+ x dx) (+ y 0) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x dx) (+ y 1) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x dx) (+ y 2) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x dx) (+ y 3) z) +terrain-wall-barricade+))
-                                            (loop for dy from 2 to 4 do
-                                              (setf (aref template-level (+ x 1) (+ y dy) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 2) z) +terrain-wall-barricade+))
+                                            (loop for dy from 1 to 3 do
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))
+                                              (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x 4) (+ y dy) z) +terrain-wall-barricade+))
                                             
                                             (values nil nil nil)
                                             )))
@@ -1567,11 +1569,11 @@
 
 (set-building-type (make-building :id +building-city-barricade-ne+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
-                                            (loop for dx from 2 to 4 do
+                                            (loop for dx from 0 to 2 do
                                               (setf (aref template-level (+ x dx) (+ y 1) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x dx) (+ y 2) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x dx) (+ y 3) z) +terrain-wall-barricade+))
-                                            (loop for dy from 0 to 2 do
+                                            (loop for dy from 2 to 4 do
                                               (setf (aref template-level (+ x 1) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))

@@ -770,7 +770,7 @@
                           (swank::handle-requests connection t)))))
 
 (defun show-time-label (idle-calcing x y &optional (update nil))
-  (sdl:draw-string-solid-* (format nil "~A [T: ~A]"  (show-date-time-short (player-game-time *world*)) (real-game-time *world*))
+  (sdl:draw-string-solid-* (format nil "~A [T: ~A]"  (show-date-time-short (world-game-time *world*)) (player-game-time *world*))
                            x y :color (cond ((eql idle-calcing :done) sdl:*white*)
                                             ((eql idle-calcing :in-progress) sdl:*yellow*)
                                             ((eql idle-calcing :npc-turn) sdl:*red*)))

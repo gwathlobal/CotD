@@ -152,12 +152,9 @@
                             (campaign-win-move-select-to-mission win))))
                        ;; enter - select
                        ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-                        (cond
-                          ((= (cur-mode win) +new-campaign-window-mission-mode+) (return-from run-window (nth (cur-sel win) (avail-missions win))))
-                          ((= (cur-mode win) +new-campaign-window-map-mode+) (when (mission (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))
-                                                                               (return-from run-window (mission (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))))))
-                        ;;(when (and (menu-funcs win) (nth (cur-sel win) (menu-funcs win)))
-                        ;;  (return-from run-window (funcall (nth (cur-sel win) (menu-funcs win)) (cur-sel win))))
+                        (when (mission (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))
+                          (return-from run-window (values (mission (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))
+                                                          (aref (cells (world-map win)) (car (cur-sector win)) (cdr (cur-sector win))))))
                         ))
                      (make-output *current-window*))
     (:video-expose-event () (make-output *current-window*))))

@@ -309,6 +309,7 @@
 (defun level-city-can-place-build-on-grid (template-building-id gx gy gz reserved-level)
   (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
     ;; if the staring point of the building + its dimensions) is more than level dimensions - fail
+
     (when (or (> (+ gx dx) (array-dimension reserved-level 0))
               (> (+ gy dy) (array-dimension reserved-level 1)))
       (return-from level-city-can-place-build-on-grid nil))

@@ -799,7 +799,7 @@
   (decf (cur-ap mob) (truncate (* speed (cur-speed mob)) 100))
   (setf (made-turn mob) t)
   (when (eq mob *player*)
-    (incf (player-game-time *world*) (truncate (* speed +normal-ap+) (max-ap mob)))))
+    (incf (world-game-time *world*) (truncate (* speed +normal-ap+) (max-ap mob)))))
 
 (defun stumble-upon-mob (actor target)
   (logger (format nil "STUMBLE-UPON-MOB: ~A [~A] stumbled upon ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
@@ -2300,9 +2300,9 @@
     ))
 
 (defun calculate-player-score (bonus)
-  (let ((score (+ (cur-score *player*) bonus (- (if (> (real-game-time *world*) 200)
-                                                  (- (real-game-time *world*) 200)
-                                                  (* 2 (- (real-game-time *world*) 200))))
+  (let ((score (+ (cur-score *player*) bonus (- (if (> (player-game-time *world*) 200)
+                                                  (- (player-game-time *world*) 200)
+                                                  (* 2 (- (player-game-time *world*) 200))))
                   (if (= (mob-type *player*) +mob-type-thief+)
                     (calculate-total-value *player*)
                     0)

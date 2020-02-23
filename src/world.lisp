@@ -25,12 +25,21 @@
    (level-layout :initform 0 :initarg :level-layout :accessor level-layout)
    (mission-scenario :initform nil :initarg :mission-scenario :accessor mission-scenario)
    (delayed-arrival-points :initform () :initarg :delayed-arrival-points :accessor delayed-arrival-points) ;; is of type ((x y z) (...) ...)
+   (delayed-demons-arrival-points :initform () :initarg :delayed-demons-arrival-points :accessor delayed-demons-arrival-points) ;; is of type ((x y z) (...) ...)
+   (delayed-angels-arrival-points :initform () :initarg :delayed-angels-arrival-points :accessor delayed-angels-arrival-points) ;; is of type ((x y z) (...) ...)
+   (delayed-military-arrival-points :initform () :initarg :delayed-military-arrival-points :accessor delayed-military-arrival-points) ;; is of type ((x y z) (...) ...)
+
+   (game-events :initform () :accessor game-events)
+   
    (demonic-portals :initform () :initarg :demonic-portals :accessor demonic-portals)
    (relic-id :initform () :initarg :relic-id :accessor relic-id)
    (demonic-sigils :initform () :initarg :demonic-sigils :accessor demonic-sigils)
    (mob-quadrant-map :initform nil :initarg :mob-quadrant-map :accessor mob-quadrant-map)
    (item-quadrant-map :initform nil :initarg :item-quadrant-map :accessor item-quadrant-map)
    (light-quadrant-map :initform nil :initarg :light-quadrant-map :accessor light-quadrant-map)
+
+   (world-sector :initform nil :accessor world-sector)
+   (mission :initform nil :accessor mission)
    ))
    
 (defun add-mob-to-level-list (level mob)
@@ -359,8 +368,8 @@
 ;;----------------------
 
 (defclass world ()
-  ((player-game-time :initform 0 :accessor player-game-time)
-   (real-game-time :initform 0 :accessor real-game-time)
+  ((world-game-time :initform 0 :accessor world-game-time)
+   (player-game-time :initform 0 :accessor player-game-time)
    (turn-finished :initform nil :accessor turn-finished)
    
    (level :initform nil :accessor level :type level)

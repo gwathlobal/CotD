@@ -30,7 +30,7 @@
   (update-visible-mobs mob)
   (update-visible-items mob)
 
-  (setf (aref (memory-map mob) (truncate (x mob) 10) (truncate (y mob) 10)) (real-game-time *world*))
+  (setf (aref (memory-map mob) (truncate (x mob) 10) (truncate (y mob) 10)) (player-game-time *world*))
 
   ;; if the mob is blind - move in random direction
   (when (mob-effect-p mob +mob-effect-blind+)

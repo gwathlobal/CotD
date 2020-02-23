@@ -35,12 +35,12 @@
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (real-game-time world)
+                                                                                                                                (player-game-time world)
                                                                                                                                 final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (format nil "~%"))
@@ -82,13 +82,13 @@
                                                                                                                                  (if (mimic-id-list *player*)
                                                                                                                                    (faction-name *player*)
                                                                                                                                    (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                 (real-game-time world)
+                                                                                                                                 (player-game-time world)
                                                                                                                                  final-str
                                                                                                                                  (level-layout (level world)))
                                                                                                          *highscores*)))
                                                            
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (format nil "~%"))
@@ -121,12 +121,12 @@
                                                                   (highscores-place (add-highscore-record (make-highscore-record (name *player*)
                                                                                                                                  score
                                                                                                                                  (faction-name *player*)
-                                                                                                                                 (real-game-time world)
+                                                                                                                                 (player-game-time world)
                                                                                                                                  final-str
                                                                                                                                  (level-layout (level world)))
                                                                                                           *highscores*)))
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (format nil "~%"))
@@ -163,12 +163,12 @@
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (real-game-time world)
+                                                                                                                                (player-game-time world)
                                                                                                                                 final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (create-string "~%"))
@@ -218,12 +218,12 @@
                                                                                                                                 (if (mimic-id-list *player*)
                                                                                                                                   (faction-name *player*)
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (real-game-time world)
+                                                                                                                                (player-game-time world)
                                                                                                                                 final-str
                                                                                                                                 (level-layout (level world)))
                                                                                                          *highscores*)))
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (real-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (add-message (create-string "~%"))
@@ -360,5 +360,120 @@
                                                              (t
                                                               (progn
                                                                 (setf (outdoor-light (level world))
-                                                                      (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 12 60 10)) (player-game-time world))))))))))
+                                                                      (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 12 60 10)) (world-game-time world))))))))))
                                                              ))))
+
+
+;;===========================
+;; ARRIVAL EVENTS
+;;===========================
+
+(set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-military+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (player-game-time world) 220) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "~%GAME-EVENT: The military has arrived!~%"))
+
+                                                           ;; find a suitable arrival point to accomodate 4 groups of military
+                                                           (let ((arrival-points (copy-list (delayed-military-arrival-points (level world)))))
+                                                             (loop with max-troops = 4
+                                                                   while (not (zerop max-troops))
+                                                                   for n = (random (length arrival-points))
+                                                                   for arrival-point = (nth n arrival-points)
+                                                                   do
+                                                                      (let ((free-cells 0) (m-picked 0))
+                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                            #'(lambda (dx dy)
+                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
+                                                                                                  (incf free-cells))))
+                                                                        (when (>= free-cells (1- (length *game-events-military-list*)))
+                                                                          
+                                                                          (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                              #'(lambda (dx dy)
+                                                                                                  (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                             (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
+                                                                                                             (<= m-picked (1- (length *game-events-military-list*))))
+                                                                                                    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type (nth m-picked *game-events-military-list*)
+                                                                                                                                                             :x dx :y dy :z (third arrival-point)))
+                                                                                                    (incf m-picked))))
+                                                                          (decf max-troops)
+                                                                          ))
+                                                                   ))
+                                                           )
+                               ))
+
+
+(set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-angels+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (player-game-time world) 220) (turn-finished world))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (logger (format nil "~%GAME-EVENT: The angels have arrived!~%"))
+
+                                                           (let ((arrival-points (copy-list (delayed-angels-arrival-points (level world)))))
+                                                             ;; find a suitable arrival point to accomodate trinity mimics
+                                                             (loop with positioned = nil
+                                                                   with trinity-mimic-list = (list +mob-type-star-singer+ +mob-type-star-gazer+ +mob-type-star-mender+)
+                                                                   while (null positioned)
+                                                                   for n = (random (length arrival-points))
+                                                                   for arrival-point = (nth n arrival-points)
+                                                                   do
+                                                                      (let ((free-cells ()))
+                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                            #'(lambda (dx dy)
+                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
+                                                                                                  (push (list dx dy (third arrival-point)) free-cells))))
+                                                                        (when (>= (length free-cells) (length trinity-mimic-list))
+                                                                          (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+ :x (first (nth 0 free-cells)) :y (second (nth 0 free-cells)) :z (third (nth 0 free-cells))))
+                                                                                (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+ :x (first (nth 1 free-cells)) :y (second (nth 1 free-cells)) :z (third (nth 1 free-cells))))
+                                                                                (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+ :x (first (nth 2 free-cells)) :y (second (nth 2 free-cells)) :z (third (nth 2 free-cells)))))
+                                                                            
+                                                                            (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                                                                            (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                                                                            (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                                                                            (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                                                                            
+                                                                            (add-mob-to-level-list (level world) mob1)
+                                                                            (add-mob-to-level-list (level world) mob2)
+                                                                            (add-mob-to-level-list (level world) mob3))
+                                                                          
+                                                                          (setf positioned t)
+                                                                          ))
+                                                                   )
+                                                             (loop with positioned = nil
+                                                                   with max-angels = 5
+                                                                   while (null positioned)
+                                                                   for n = (random (length arrival-points))
+                                                                   for arrival-point = (nth n arrival-points)
+                                                                   do
+                                                                      (let ((free-cells 0) (m-picked 0))
+                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                            #'(lambda (dx dy)
+                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
+                                                                                                  (incf free-cells))))
+                                                                        (when (>= free-cells max-angels)
+                                                                          
+                                                                          (check-surroundings (first arrival-point) (second arrival-point) t
+                                                                                              #'(lambda (dx dy)
+                                                                                                  (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
+                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
+                                                                                                             (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
+                                                                                                             (<= m-picked max-angels))
+                                                                                                    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-angel+
+                                                                                                                                                             :x dx :y dy :z (third arrival-point)))
+                                                                                                    (incf m-picked))))
+                                                                          (setf positioned t)
+                                                                          ))
+                                                                   ))
+                                                           )
+                               ))
