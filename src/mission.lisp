@@ -143,6 +143,7 @@
                                   when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
                                             (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
                                     do
+                                       
                                        (setf result nil)
                                        (loop-finish)
                                   finally (return result)))))

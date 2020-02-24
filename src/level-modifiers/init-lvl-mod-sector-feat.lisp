@@ -217,6 +217,9 @@
                                                           ;; add priests if they are available
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector world))
+
+                                                                    (format t "OVERALL-POST-PROCESS-FUNC: Add priests~%~%")
+                                                                    
                                                                     (loop with church-present = nil
                                                                           for (faction-type faction-presence) in (faction-list mission)
                                                                           when (and (= faction-type +faction-type-church+)
@@ -228,20 +231,20 @@
 
                                                                              ;; find all church start points and place priests there
                                                                              (loop for feature-id in (feature-id-list level)
-                                                                                      for lvl-feature = (get-feature-by-id feature-id)
-                                                                                      for x = (x lvl-feature)
-                                                                                      for y = (y lvl-feature)
-                                                                                      for z = (z lvl-feature)
-                                                                                      when (= feature-id +feature-start-place-church-priest+)
-                                                                                        do
-                                                                                           (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-priest+
-                                                                                                                                            :x x :y y :z z)))
+                                                                                   for lvl-feature = (get-feature-by-id feature-id)
+                                                                                   for x = (x lvl-feature)
+                                                                                   for y = (y lvl-feature)
+                                                                                   for z = (z lvl-feature)
+                                                                                   when (= (feature-type lvl-feature) +feature-start-place-church-priest+)
+                                                                                     do
+                                                                                        (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-priest+
+                                                                                                                                         :x x :y y :z z)))
                                                                           )
                                                                     )
                                                                 func-list)
                                                           
                                                           
-                                                          (reverse func-list)))
+                                                          func-list))
                     )
 
 (set-level-modifier :id +lm-feat-lair+ :type +level-mod-sector-feat+
@@ -300,5 +303,5 @@
                                                                         (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z))
                                                                             )))
                                                                 func-list)
-                                                          (reverse func-list)))
+                                                          func-list))
                     )

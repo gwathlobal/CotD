@@ -97,15 +97,15 @@
                                                                                       for x = (x lvl-feature)
                                                                                       for y = (y lvl-feature)
                                                                                       for z = (z lvl-feature)
-                                                                                      when (= feature-id +feature-start-place-civilian-man+)
+                                                                                      when (= (feature-type lvl-feature) +feature-start-place-civilian-man+)
                                                                                         do
                                                                                            (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-man+
                                                                                                                                             :x x :y y :z z))
-                                                                                      when (= feature-id +feature-start-place-civilian-woman+)
+                                                                                      when (= (feature-type lvl-feature) +feature-start-place-civilian-woman+)
                                                                                         do
                                                                                            (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-woman+
                                                                                                                                             :x x :y y :z z))
-                                                                                      when (= feature-id +feature-start-place-civilian-child+)
+                                                                                      when (= (feature-type lvl-feature) +feature-start-place-civilian-child+)
                                                                                         do
                                                                                            (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-child+
                                                                                                                                             :x x :y y :z z)))

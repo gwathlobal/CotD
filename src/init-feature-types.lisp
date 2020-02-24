@@ -216,7 +216,7 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-place-church-angels+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Angel Defender Starting Position" :trait-remove-on-dungeon-generation t))
 
-(set-feature-type (make-instance 'feature-type :id +feature-start-place-church-priest+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Priest Starting Position" :trait-remove-on-dungeon-generation t))
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-church-priest+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Priest Starting Position" :trait-remove-on-dungeon-generation t :trait-no-gravity t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-place-civilian-man+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Man Starting Position" :trait-remove-on-dungeon-generation t))
 

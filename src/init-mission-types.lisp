@@ -40,7 +40,9 @@
                                                         ;; update visibility for all added mobs
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector mission world))
-                                                                                                                                    
+
+                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Update visibility~%~%")
+                                                                  
                                                                   (loop for mob-id in (mob-id-list level)
                                                                         for mob = (get-mob-by-id mob-id)
                                                                         do
@@ -50,7 +52,9 @@
                                                         ;; remove all starting features
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector mission world))
-                                                                                                                                    
+
+                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Remove dungeon generation features~%~%")
+                                                                  
                                                                   (loop for feature-id in (feature-id-list level)
                                                                         for lvl-feature = (get-feature-by-id feature-id)
                                                                         when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
@@ -67,7 +71,7 @@
                                                                         for x = (x lvl-feature)
                                                                         for y = (y lvl-feature)
                                                                         for z = (z lvl-feature)
-                                                                        when (= feature-id +feature-delayed-military-arrival-point+)
+                                                                        when (= (feature-type lvl-feature) +feature-delayed-military-arrival-point+)
                                                                           do
                                                                              (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
@@ -183,7 +187,7 @@
                                                                                      for x = (x lvl-feature)
                                                                                      for y = (y lvl-feature)
                                                                                      for z = (z lvl-feature)
-                                                                                     when (and (= feature-id +feature-delayed-military-arrival-point+)
+                                                                                     when (and (= (feature-type lvl-feature) +feature-delayed-military-arrival-point+)
                                                                                                (not (get-mob-* level x y z)))
                                                                                        do
                                                                                           (setf (x chaplain) x (y chaplain) y (z chaplain) z)
@@ -220,7 +224,9 @@
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector world))
 
-                                                                  (when (and (= (player-specific-faction-id mission) +specific-faction-type-angel-chrome+)
+                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Place trinity mimics~%~%")
+                                                                  
+                                                                  (when (and (/= (player-specific-faction-id mission) +specific-faction-type-angel-trinity+)
                                                                              (find-if #'(lambda (a)
                                                                                      (if (and (= (first a) +faction-type-angels+)
                                                                                               (or (= (second a) +mission-faction-delayed+)
@@ -238,7 +244,7 @@
                                                                           for x = (x lvl-feature)
                                                                           for y = (y lvl-feature)
                                                                           for z = (z lvl-feature)
-                                                                          when (= feature-id +feature-delayed-angels-arrival-point+)
+                                                                          when (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
                                                                             do
                                                                                (setf is-free t)
                                                                                (check-surroundings x y t #'(lambda (dx dy)
@@ -267,15 +273,14 @@
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector world))
 
-                                                                  (when (and (or (= (player-specific-faction-id mission) +specific-faction-type-angel-chrome+)
-                                                                                 (= (player-specific-faction-id mission) +specific-faction-type-angel-trinity+))
-                                                                             (find-if #'(lambda (a)
+                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Place chrome angels~%~%")
+                                                                  (when (find-if #'(lambda (a)
                                                                                      (if (and (= (first a) +faction-type-angels+)
                                                                                               (or (= (second a) +mission-faction-delayed+)
                                                                                                   (= (second a) +mission-faction-present+)))
                                                                                        t
                                                                                        nil))
-                                                                                      (faction-list mission)))
+                                                                                      (faction-list mission))
 
                                                                     (loop repeat *min-angels-number*
                                                                           do
@@ -285,7 +290,7 @@
                                                                                    for x = (x lvl-feature)
                                                                                    for y = (y lvl-feature)
                                                                                    for z = (z lvl-feature)
-                                                                                   when (and (= feature-id +feature-delayed-angels-arrival-point+)
+                                                                                   when (and (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
                                                                                              (not (get-mob-* level x y z)))
                                                                                      do
                                                                                         (setf (x angel) x (y angel) y (z angel) z)
@@ -299,6 +304,7 @@
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector))
 
+                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Place demons~%~%")
                                                                   (when (find-if #'(lambda (a)
                                                                                      (if (and (= (first a) +faction-type-demons+)
                                                                                               (= (second a) +mission-faction-present+))
@@ -322,10 +328,10 @@
                                                                   )
                                                               func-list)
                                                         
-                                                        ;; ??? create mobs from mob templates 
+                                                        
                                                                   
                                                                   
-                                                        (reverse func-list)))
+                                                        func-list))
                   :scenario-faction-list (list (list +specific-faction-type-player+ +lm-placement-player+)
                                                (list +specific-faction-type-dead-player+ +lm-placement-dead-player+)
                                                (list +specific-faction-type-angel-chrome+ +lm-placement-angel-chrome+)

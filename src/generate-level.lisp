@@ -185,8 +185,9 @@
         
     ;; populate world with features
     (loop for (feature-type-id x y z) in feature-template-result 
-        do
-           (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
+          do
+             ;;(when (= feature-type-id +feature-start-place-church-priest+) (format t "~%FOUND +feature-start-place-church-priest+ AT (~A ~A ~A)~%~%" x y z))
+             (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
     
     ;; populate the world with special mobs (military in outposts, demons around portals, etc) depending on present factions
     (loop for overall-post-process-func in overall-post-process-func-list
