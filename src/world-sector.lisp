@@ -133,68 +133,62 @@
 
 (defun terrain-post-process-add-arrival-points (level world-sector world-map arrival-point-feature-type-id test-func)
   ;; test-func takes (x y)
-  
-  ;; find the nearest sector controlled by military
-  (loop with nearest-sector = nil
-        for x from 0 below (array-dimension (cells world-map) 0) do
-          (loop for y from 0 below (array-dimension (cells world-map) 1) do
-            (when (and (not (and (= x (x world-sector)) (= y (y world-sector))))
-                       (funcall test-func x y))
-              (unless nearest-sector
-                (setf nearest-sector (aref (cells world-map) x y)))
-              (when (< (get-distance x y (x world-sector) (y world-sector))
-                       (get-distance (x nearest-sector) (y nearest-sector) (x world-sector) (y world-sector)))
-                (setf nearest-sector (aref (cells world-map) x y)))))
-        finally
-           (when nearest-sector
-             ;; find the side from which the military can arrive
-             ;; and place the delayed arrival points at this side
-             (when (> (- (x world-sector) (x nearest-sector)) 0)
-               ;; west
-               (loop with x = 2
-                     with z = 2
-                     for y from 0 below (array-dimension (terrain level) 1)
-                     for (div rem) = (multiple-value-list (truncate y 10))
-                     when (and (= rem 0)
-                               (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                               (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                       do
-                          (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))
-             (when (< (- (x world-sector) (x nearest-sector)) 0)
-               ;; east
-               (loop with x = (- (array-dimension (terrain level) 1) 3)
-                     with z = 2
-                     for y from 0 below (array-dimension (terrain level) 1)
-                     for (div rem) = (multiple-value-list (truncate x 10))
-                     when (and (= rem 0)
-                               (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                               (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                       do
-                          (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))
-             (when (> (- (y world-sector) (y nearest-sector)) 0)
-               ;; north
-               (loop with y = 2
-                     with z = 2
-                     for x from 0 below (array-dimension (terrain level) 0)
-                     for (div rem) = (multiple-value-list (truncate x 10))
-                     when (and (= rem 0)
-                               (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                               (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                       do
-                          (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
-               )
-             (when (< (- (y world-sector) (y nearest-sector)) 0)
-               ;; south
-               (loop with y = (- (array-dimension (terrain level) 1) 3)
-                     with z = 2
-                     for x from 0 below (array-dimension (terrain level) 0)
-                     for (div rem) = (multiple-value-list (truncate x 10))
-                     when (and (= rem 0)
-                               (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                               (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                       do
-                          (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
-               )
-             )
-        )
+
+  ;; find sectors to the east, west, north, south that satisfy the test
+  ;; if found place arrival points to that side of the level
+  (let ((max-world-x (array-dimension (cells world-map) 0))
+        (max-world-y (array-dimension (cells world-map) 1)))
+    ;; find west
+    (loop for x from 0 below (x world-sector) do
+      (loop for y from 0 below max-world-y do
+        (when (funcall test-func x y)
+          (loop with x = 2
+                with z = 2
+                for y from 0 below (array-dimension (terrain level) 1)
+                for (div rem) = (multiple-value-list (truncate y 10))
+                when (and (= rem 0)
+                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                  do
+                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    ;; find east
+    (loop for x from (1+ (x world-sector)) below max-world-x do
+      (loop for y from 0 below max-world-y do
+        (when (funcall test-func x y)
+          (loop with x = (- (array-dimension (terrain level) 1) 3)
+                with z = 2
+                for y from 0 below (array-dimension (terrain level) 1)
+                for (div rem) = (multiple-value-list (truncate x 10))
+                when (and (= rem 0)
+                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                  do
+                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    ;; find north
+    (loop for x from 0 below max-world-x do
+      (loop for y from 0 below (y world-sector) do
+        (when (funcall test-func x y)
+          (loop with y = 2
+                with z = 2
+                for x from 0 below (array-dimension (terrain level) 0)
+                for (div rem) = (multiple-value-list (truncate x 10))
+                when (and (= rem 0)
+                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                  do
+                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    ;; find south
+    (loop for x from 0 below max-world-x do
+      (loop for y from (1+ (y world-sector)) below max-world-y do
+        (when (funcall test-func x y)
+          (loop with y = (- (array-dimension (terrain level) 1) 3)
+                with z = 2
+                for x from 0 below (array-dimension (terrain level) 0)
+                for (div rem) = (multiple-value-list (truncate x 10))
+                when (and (= rem 0)
+                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                  do
+                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    )
   )

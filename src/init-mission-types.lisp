@@ -220,6 +220,45 @@
                                                               func-list)
 
                                                         ;; add angels to borders if angels are delayed and the player is angels
+                                                        ;; set up chrome angels
+                                                        (push #'(lambda (level world-sector mission world)
+                                                                  (declare (ignore world-sector world))
+
+                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Place chrome angels~%~%")
+                                                                  (when (find-if #'(lambda (a)
+                                                                                     (if (and (= (first a) +faction-type-angels+)
+                                                                                              (or (= (second a) +mission-faction-delayed+)
+                                                                                                  (= (second a) +mission-faction-present+)))
+                                                                                       t
+                                                                                       nil))
+                                                                                      (faction-list mission))
+
+                                                                    (loop repeat *min-angels-number* do
+                                                                      (loop with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                                                                                         (= (feature-type a) +feature-delayed-angels-arrival-point+))
+                                                                                                                     (feature-id-list level)
+                                                                                                                     :key #'(lambda (b)
+                                                                                                                              (get-feature-by-id b)))
+                                                                            while (> (length arrival-point-list) 0) 
+                                                                            for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
+                                                                            for lvl-feature = (get-feature-by-id random-arrival-point-id)
+                                                                            for x = (x lvl-feature)
+                                                                            for y = (y lvl-feature)
+                                                                            for z = (z lvl-feature)
+                                                                            when (and (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
+                                                                                             (not (get-mob-* level x y z)))
+                                                                              do
+                                                                                 (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+
+                                                                                 (populate-level-with-mobs level (list (cons +mob-type-angel+ 1))
+                                                                                                           #'(lambda (level mob)
+                                                                                                               (find-unoccupied-place-around level mob x y z)))
+                                                                                 
+                                                                                 (loop-finish)))
+                                                                    )
+                                                                  )
+                                                              func-list)
+
                                                         ;; set up trinity mimics
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector world))
@@ -234,72 +273,48 @@
                                                                                        t
                                                                                        nil))
                                                                                       (faction-list mission)))
-                                                                    
+
                                                                     (loop with is-free = t
                                                                           with mob1 = (make-instance 'mob :mob-type +mob-type-star-singer+)
                                                                           with mob2 = (make-instance 'mob :mob-type +mob-type-star-gazer+)
                                                                           with mob3 = (make-instance 'mob :mob-type +mob-type-star-mender+)
-                                                                          for feature-id in (feature-id-list level)
-                                                                          for lvl-feature = (get-feature-by-id feature-id)
+                                                                          with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                                                                                       (= (feature-type a) +feature-delayed-angels-arrival-point+))
+                                                                                                                   (feature-id-list level)
+                                                                                                                   :key #'(lambda (b)
+                                                                                                                            (get-feature-by-id b)))
+                                                                          while (> (length arrival-point-list) 0) 
+                                                                          for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
+                                                                          for lvl-feature = (get-feature-by-id random-arrival-point-id)
                                                                           for x = (x lvl-feature)
                                                                           for y = (y lvl-feature)
                                                                           for z = (z lvl-feature)
-                                                                          when (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
-                                                                            do
-                                                                               (setf is-free t)
-                                                                               (check-surroundings x y t #'(lambda (dx dy)
-                                                                                                             (when (and (eq (check-move-on-level mob1 dx dy z) t)
-                                                                                                                        (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+))
-                                                                                                               (setf is-free nil))))
-                                                                               (when is-free
-                                                                                 (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
-                                                                                 (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
-                                                                                 (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
-                                                                                 (setf (name mob2) (name mob1) (name mob3) (name mob1))
-
-                                                                                 (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
-                                                                                 (add-mob-to-level-list level mob1)
-                                                                                 (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
-                                                                                 (add-mob-to-level-list level mob2)
-                                                                                 (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
-                                                                                 (add-mob-to-level-list level mob3)
-
-                                                                                 (loop-finish)))
+                                                                          do
+                                                                             (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+                                                                             (setf is-free t)
+                                                                             (check-surroundings x y t #'(lambda (dx dy)
+                                                                                                           (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
+                                                                                                                     (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+)))
+                                                                                                             (setf is-free nil))))
+                                                                             (when is-free
+                                                                               
+                                                                               (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                                                                               (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                                                                               (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                                                                               (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                                                                               
+                                                                               (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
+                                                                               (add-mob-to-level-list level mob1)
+                                                                               (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
+                                                                               (add-mob-to-level-list level mob2)
+                                                                               (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
+                                                                               (add-mob-to-level-list level mob3)
+                                                                               
+                                                                               (loop-finish)))
                                                                     )
                                                                   )
                                                               func-list)
                                                         
-                                                        ;; set up chrome angels
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector world))
-
-                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Place chrome angels~%~%")
-                                                                  (when (find-if #'(lambda (a)
-                                                                                     (if (and (= (first a) +faction-type-angels+)
-                                                                                              (or (= (second a) +mission-faction-delayed+)
-                                                                                                  (= (second a) +mission-faction-present+)))
-                                                                                       t
-                                                                                       nil))
-                                                                                      (faction-list mission))
-
-                                                                    (loop repeat *min-angels-number*
-                                                                          do
-                                                                             (loop with angel = (make-instance 'mob :mob-type +mob-type-angel+)
-                                                                                   for feature-id in (feature-id-list level)
-                                                                                   for lvl-feature = (get-feature-by-id feature-id)
-                                                                                   for x = (x lvl-feature)
-                                                                                   for y = (y lvl-feature)
-                                                                                   for z = (z lvl-feature)
-                                                                                   when (and (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
-                                                                                             (not (get-mob-* level x y z)))
-                                                                                     do
-                                                                                        (setf (x angel) x (y angel) y (z angel) z)
-                                                                                        (add-mob-to-level-list level angel)
-                                                                                        (loop-finish)))
-                                                                    )
-                                                                  )
-                                                              func-list)
-
                                                         ;; place demons
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector))
