@@ -131,64 +131,48 @@
 (defun remove-item-from-sector (world-sector item-type-id)
   (setf (items world-sector) (remove item-type-id (items world-sector))))
 
-(defun terrain-post-process-add-arrival-points (level world-sector world-map arrival-point-feature-type-id test-func)
+(defun world-find-sides-for-world-sector (world-sector world-map
+                                          test-north-func test-south-func test-west-func test-east-func
+                                          call-north-func call-south-func call-west-func call-east-func)
   ;; test-func takes (x y)
 
   ;; find sectors to the east, west, north, south that satisfy the test
-  ;; if found place arrival points to that side of the level
+  ;; if found place do something to that side of the level
   (let ((max-world-x (array-dimension (cells world-map) 0))
         (max-world-y (array-dimension (cells world-map) 1)))
     ;; find west
-    (loop for x from 0 below (x world-sector) do
-      (loop for y from 0 below max-world-y do
-        (when (funcall test-func x y)
-          (loop with x = 2
-                with z = 2
-                for y from 0 below (array-dimension (terrain level) 1)
-                for (div rem) = (multiple-value-list (truncate y 10))
-                when (and (= rem 0)
-                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                  do
-                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    (loop named loop
+          for x from 0 below (x world-sector) do
+            (loop for y from 0 below max-world-y do
+              (when (funcall test-west-func x y)
+                (funcall call-west-func)
+                (return-from loop nil)
+          )))
     ;; find east
-    (loop for x from (1+ (x world-sector)) below max-world-x do
-      (loop for y from 0 below max-world-y do
-        (when (funcall test-func x y)
-          (loop with x = (- (array-dimension (terrain level) 1) 3)
-                with z = 2
-                for y from 0 below (array-dimension (terrain level) 1)
-                for (div rem) = (multiple-value-list (truncate x 10))
-                when (and (= rem 0)
-                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                  do
-                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    (loop named loop
+          for x from (1+ (x world-sector)) below max-world-x do
+            (loop for y from 0 below max-world-y do
+              (when (funcall test-east-func x y)
+                (funcall call-east-func)
+                (return-from loop nil)
+          )))
     ;; find north
-    (loop for x from 0 below max-world-x do
-      (loop for y from 0 below (y world-sector) do
-        (when (funcall test-func x y)
-          (loop with y = 2
-                with z = 2
-                for x from 0 below (array-dimension (terrain level) 0)
-                for (div rem) = (multiple-value-list (truncate x 10))
-                when (and (= rem 0)
-                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                  do
-                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    (loop named loop
+          for x from 0 below max-world-x do
+            (loop for y from 0 below (y world-sector) do
+              (when (funcall test-north-func x y)
+                (funcall call-north-func)
+                (return-from loop nil)
+          )))
     ;; find south
-    (loop for x from 0 below max-world-x do
-      (loop for y from (1+ (y world-sector)) below max-world-y do
-        (when (funcall test-func x y)
-          (loop with y = (- (array-dimension (terrain level) 1) 3)
-                with z = 2
-                for x from 0 below (array-dimension (terrain level) 0)
-                for (div rem) = (multiple-value-list (truncate x 10))
-                when (and (= rem 0)
-                          (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                          (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
-                  do
-                     (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z))))))
+    (loop named loop
+          for x from 0 below max-world-x do
+            (loop for y from (1+ (y world-sector)) below max-world-y do
+              (when (funcall test-south-func x y)
+                (funcall call-south-func)
+                (return-from loop nil)
+          )))
     )
   )
+
+
