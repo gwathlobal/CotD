@@ -98,3 +98,38 @@
                                                                     )
                                                                 func-list)
                                                           func-list)))
+
+(set-level-modifier :id +lm-placement-military-chaplain+ :type +level-mod-player-placement+
+                    :name "Military (as Chaplain)"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    
+                                                                    (place-military-on-level level world-sector mission world
+                                                                                             (list (list (list +mob-type-chaplain+ 1 t)
+                                                                                                         (list +mob-type-sergeant+ 1 nil)
+                                                                                                         (list +mob-type-scout+ 1 nil)
+                                                                                                         (list +mob-type-soldier+ 3 nil)
+                                                                                                         (list +mob-type-gunner+ 1 nil)))
+                                                                                             t)
+                                                                    (setf (faction-name *player*) "Military Chaplain")
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
+
+(set-level-modifier :id +lm-placement-military-scout+ :type +level-mod-player-placement+
+                    :name "Military (as Scout)"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    
+                                                                    (place-military-on-level level world-sector mission world
+                                                                                             (list (list (list +mob-type-scout+ 1 t)))
+                                                                                             nil)
+                                                                    (setf (faction-name *player*) "Military Chaplain")
+
+                                                                    )
+                                                                func-list)
+                                                          func-list)))

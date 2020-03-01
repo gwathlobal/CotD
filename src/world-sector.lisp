@@ -138,6 +138,9 @@
 (defmethod angel-disguised-mob-type-id ((world-sector world-sector))
   (angel-disguised-mob-type-id (get-world-sector-type-by-id (wtype world-sector))))
 
+(defmethod name ((world-sector world-sector))
+  (name (get-world-sector-type-by-id (wtype world-sector))))
+
 (defun world-find-sides-for-world-sector (world-sector world-map
                                           test-north-func test-south-func test-west-func test-east-func
                                           call-north-func call-south-func call-west-func call-east-func)

@@ -151,55 +151,26 @@
                                                                   )
                                                               func-list)
                                                         
-                                                        ;; add delayed military if military is delayed and the player is not military
+                                                        ;; add military
                                                         (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector world))
-
-                                                                  (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
-                                                                             (/= (player-lvl-mod-placement-id mission) +lm-placement-military-scout+)
-                                                                             (find-if #'(lambda (a)
-                                                                                     (if (and (= (first a) +faction-type-military+)
-                                                                                              (= (second a) +mission-faction-delayed+))
-                                                                                       t
-                                                                                       nil))
-                                                                                 (faction-list mission)))
-                                                                    (push +game-event-delayed-arrival-military+ (game-events level)))
-                                                                  )
-                                                              func-list)
-
-                                                        ;; add military to borders if military is delayed and the player is military
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector world))
-
-                                                                  (when (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
-                                                                                 (= (player-lvl-mod-placement-id mission) +lm-placement-military-scout+))
-                                                                             (find-if #'(lambda (a)
-                                                                                     (if (and (= (first a) +faction-type-military+)
-                                                                                              (= (second a) +mission-faction-delayed+))
-                                                                                       t
-                                                                                       nil))
-                                                                                 (faction-list mission)))
-                                                                    (loop repeat 3
-                                                                          do
-                                                                             (let ((chaplain (make-instance 'mob :mob-type +mob-type-chaplain+)))
-                                                                               (loop for feature-id in (feature-id-list level)
-                                                                                     for lvl-feature = (get-feature-by-id feature-id)
-                                                                                     for x = (x lvl-feature)
-                                                                                     for y = (y lvl-feature)
-                                                                                     for z = (z lvl-feature)
-                                                                                     when (and (= (feature-type lvl-feature) +feature-delayed-military-arrival-point+)
-                                                                                               (not (get-mob-* level x y z)))
-                                                                                       do
-                                                                                          (setf (x chaplain) x (y chaplain) y (z chaplain) z)
-                                                                                          (add-mob-to-level-list level chaplain)
-                                                                                          (loop-finish))
-                                                                               
-                                                                               (populate-level-with-mobs level (list (list +mob-type-sergeant+ 1 nil)
-                                                                                                                     (list +mob-type-scout+ 1 nil)
-                                                                                                                     (list +mob-type-soldier+ 3 nil)
-                                                                                                                     (list +mob-type-gunner+ 1 nil))
-                                                                                                         #'(lambda (level mob)
-                                                                                                             (find-unoccupied-place-around level mob (x chaplain) (y chaplain) (z chaplain)))))))
+                                                                  
+                                                                  (let ((military-list (list (list (list +mob-type-chaplain+ 1 nil)
+                                                                                                   (list +mob-type-sergeant+ 1 nil)
+                                                                                                   (list +mob-type-scout+ 1 nil)
+                                                                                                   (list +mob-type-soldier+ 3 nil)
+                                                                                                   (list +mob-type-gunner+ 1 nil))
+                                                                                             (list (list +mob-type-chaplain+ 1 nil)
+                                                                                                   (list +mob-type-sergeant+ 1 nil)
+                                                                                                   (list +mob-type-scout+ 1 nil)
+                                                                                                   (list +mob-type-soldier+ 3 nil)
+                                                                                                   (list +mob-type-gunner+ 1 nil))
+                                                                                             (list (list +mob-type-chaplain+ 1 nil)
+                                                                                                   (list +mob-type-sergeant+ 1 nil)
+                                                                                                   (list +mob-type-scout+ 1 nil)
+                                                                                                   (list +mob-type-soldier+ 3 nil)
+                                                                                                   (list +mob-type-gunner+ 1 nil)))))
+                                                                    
+                                                                    (place-military-on-level level world-sector mission world military-list t))
                                                                   )
                                                               func-list)
                                                                                                                 
@@ -211,7 +182,7 @@
                                                                     (when (/= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
                                                                         (push (list +mob-type-star-singer+ 1 nil) angel-list))
                                                                       
-                                                                      (place-angels-on-level level world-sector mission world angel-list)))
+                                                                    (place-angels-on-level level world-sector mission world angel-list)))
                                                               func-list)
                                                         
                                                         ;; place demons

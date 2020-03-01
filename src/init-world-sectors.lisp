@@ -43,14 +43,16 @@
                                                                                                          for side being the hash-keys in sides-hash do
                                                                                                            (format t "   ~A : (~A)~%" side (gethash side sides-hash))
                                                                                                          finally (format t "~%"))))
-                                                                              (side-party-list (if (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
-                                                                                                 (list (list :demons +feature-demons-arrival-point+)
-                                                                                                       (list :military +feature-delayed-military-arrival-point+)
-                                                                                                       (list :angels +feature-delayed-angels-arrival-point+))
-                                                                                                 (list (list :demons +feature-demons-arrival-point+)
-                                                                                                       (list :military +feature-delayed-military-arrival-point+)
-                                                                                                       (list :angels +feature-start-place-angels+)
-                                                                                                       (list :angels +feature-delayed-angels-arrival-point+)))))
+                                                                              (side-party-list (list (list :demons +feature-demons-arrival-point+)
+                                                                                                     (list :military +feature-delayed-military-arrival-point+)
+                                                                                                     (list :angels +feature-delayed-angels-arrival-point+))))
+
+                                                                         (unless (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                                                           (push (list :angels +feature-start-place-angels+) side-party-list))
+
+                                                                         (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
+                                                                           (push (list :military +feature-start-military-point+) side-party-list))
+                                                                         
                                                                          ;; find all sides from which demons can arrive
                                                                          (world-find-sides-for-world-sector world-sector (world-map world)
                                                                                                             demon-test-func
