@@ -53,7 +53,7 @@
                                                                                                           *highscores*))
                                                            
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
                                                                                           final-str (return-scenario-stats nil))
 
                                                              (if player-faction
@@ -119,7 +119,7 @@
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (if player-faction
@@ -177,7 +177,7 @@
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (if player-faction
@@ -245,7 +245,7 @@
                                                                                                           *highscores*))
                                                            
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
                                                                                           final-str (return-scenario-stats nil))
 
                                                              (if player-faction
@@ -306,7 +306,7 @@
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
+                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
                                                                                           final-str (return-scenario-stats nil))
                                                              
                                                              (if player-faction

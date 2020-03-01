@@ -11,13 +11,15 @@
    (sector-level-gen-func :initform nil :initarg :sector-level-gen-func :accessor sector-level-gen-func)
    (template-level-gen-func :initform nil :initarg :template-level-gen-func :accessor template-level-gen-func)
    (terrain-post-process-func-list :initform nil :initarg :terrain-post-process-func-list :accessor terrain-post-process-func-list)
-   (overall-post-process-func-list :initform nil :initarg :overall-post-process-func-list :accessor overall-post-process-func-list)) 
+   (overall-post-process-func-list :initform nil :initarg :overall-post-process-func-list :accessor overall-post-process-func-list)
+   (angel-disguised-mob-type-id :initform +mob-type-man+ :initarg :angel-disguised-mob-type-id :accessor angel-disguised-mob-type-id)
+   ) 
   )
 
 (defparameter *world-sector-types* (make-hash-table))
 
 (defun set-world-sector-type (&key wtype glyph-idx glyph-color name faction-list-func sector-level-gen-func template-level-gen-func terrain-post-process-func-list
-                                   overall-post-process-func-list)
+                                   overall-post-process-func-list angel-disguised-mob-type-id)
   (unless wtype (error ":WTYPE is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   (unless glyph-idx (error ":GLYPH-IDX is an obligatory parameter!"))
@@ -28,7 +30,9 @@
                                                                                :sector-level-gen-func sector-level-gen-func
                                                                                :template-level-gen-func template-level-gen-func
                                                                                :terrain-post-process-func-list terrain-post-process-func-list
-                                                                               :overall-post-process-func-list overall-post-process-func-list)))
+                                                                               :overall-post-process-func-list overall-post-process-func-list
+                                                                               :angel-disguised-mob-type-id angel-disguised-mob-type-id
+                                                                               )))
 
 (defun get-world-sector-type-by-id (world-sector-type-id)
   (gethash world-sector-type-id *world-sector-types*))
@@ -43,7 +47,7 @@
    ;; (<level modifier id of type +level-mod-sector-item+> ...)
    (controlled-by :initform +lm-controlled-by-none+ :initarg :controlled-by :accessor controlled-by)
    ;; <level modifier id of type +level-mod-controlled-by+>
-   (mission :initform nil :initarg :mission :accessor mission) 
+   (mission :initform nil :initarg :mission :accessor mission)
    ))
 
 (defmethod descr ((sector world-sector))
@@ -130,6 +134,9 @@
 
 (defun remove-item-from-sector (world-sector item-type-id)
   (setf (items world-sector) (remove item-type-id (items world-sector))))
+
+(defmethod angel-disguised-mob-type-id ((world-sector world-sector))
+  (angel-disguised-mob-type-id (get-world-sector-type-by-id (wtype world-sector))))
 
 (defun world-find-sides-for-world-sector (world-sector world-map
                                           test-north-func test-south-func test-west-func test-east-func

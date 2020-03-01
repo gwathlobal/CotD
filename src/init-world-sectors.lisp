@@ -16,6 +16,7 @@
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
                                                     (list +faction-type-ghost+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-man+
                        :sector-level-gen-func #'(lambda (template-level building-list max-x max-y max-z)
                                                   (create-template-city template-level building-list max-x max-y max-z
                                                                         #'get-max-buildings-normal #'get-reserved-buildings-normal))
@@ -300,7 +301,8 @@
                                                                                                                                             :x x :y y :z z)))
                                                                              ))
                                                                    func-list)
-                                                             func-list)))
+                                                             func-list))
+                       )
 
 (set-world-sector-type :wtype +world-sector-normal-port+
                        :glyph-idx 48
@@ -313,7 +315,8 @@
                                                     (list +faction-type-criminals+ +mission-faction-present+)
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+))))
+                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-man+)
 
 (set-world-sector-type :wtype +world-sector-normal-forest+
                        :glyph-idx 38
@@ -326,7 +329,8 @@
                                                     (list +faction-type-criminals+ +mission-faction-present+)
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+))))
+                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-man+)
 
 (set-world-sector-type :wtype +world-sector-normal-lake+
                        :glyph-idx 44
@@ -339,7 +343,8 @@
                                                     (list +faction-type-criminals+ +mission-faction-present+)
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+))))
+                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-man+)
 
 (set-world-sector-type :wtype +world-sector-normal-sea+
                        :glyph-idx 51
@@ -357,7 +362,8 @@
                                                     (list +faction-type-criminals+ +mission-faction-present+)
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+))))
+                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-man+)
 
 ;;============
 ;; ABANDONED
@@ -369,7 +375,8 @@
                         :name "An abandoned district"
                         :faction-list-func #'(lambda ()
                                                (list (list +faction-type-eater+ +mission-faction-present+)
-                                                     (list +faction-type-eater+ +mission-faction-absent+))))
+                                                     (list +faction-type-eater+ +mission-faction-absent+)))
+                        :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-abandoned-port+
                        :glyph-idx 48
@@ -377,7 +384,8 @@
                        :name "An abandoned seaport district"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-abandoned-forest+
                        :glyph-idx 38
@@ -385,7 +393,8 @@
                        :name "The abandoned outskirts of the city"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-abandoned-lake+
                        :glyph-idx 44
@@ -393,7 +402,8 @@
                        :name "An abandoned district upon a lake"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-abandoned-island+
                        :glyph-idx 41
@@ -401,7 +411,8 @@
                        :name "An abandoned island district"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 ;;============
 ;; CORRUPTED
@@ -413,7 +424,8 @@
                        :name "A corrupted district"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-corrupted-port+
                        :glyph-idx 48
@@ -421,7 +433,8 @@
                        :name "A corrupted seaport district"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-corrupted-forest+
                        :glyph-idx 38
@@ -429,7 +442,8 @@
                        :name "The corrupted outskirts of the city"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-corrupted-lake+
                        :glyph-idx 44
@@ -437,7 +451,8 @@
                        :name "A corrupted district upon a lake"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                                   (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)
 
 (set-world-sector-type :wtype +world-sector-corrupted-island+
                        :glyph-idx 41
@@ -445,4 +460,5 @@
                        :name "A corrupted island district"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+))))
+                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+)

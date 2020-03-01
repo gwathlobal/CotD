@@ -192,7 +192,7 @@
         (level-template-pre-process-func-list ())
         (overall-post-process-func-list ())
         (terrain-post-process-func-list ()))
-    
+
     ;; add all funcs from world sector
     (let ((world-sector-type (get-world-sector-type-by-id (wtype world-sector))))
       (when (template-level-gen-func world-sector-type)
@@ -229,11 +229,6 @@
              (when (terrain-post-process-func-list lvl-mod)
                (setf terrain-post-process-func-list (append terrain-post-process-func-list
                                                             (funcall (terrain-post-process-func-list lvl-mod))))))   
-
-    ;; place player function
-    (when (overall-post-process-func-list (get-level-modifier-by-id (player-lvl-mod-placement-id mission)))
-        (setf overall-post-process-func-list (append overall-post-process-func-list
-                                                     (funcall (overall-post-process-func-list (get-level-modifier-by-id (player-lvl-mod-placement-id mission)))))))
 
     ;; add all level modifiers from the mission
     (loop for lvl-mod-id in (level-modifier-list mission)
@@ -500,7 +495,7 @@
                                         (multiple-value-setq (mission world-sector) (run-window *current-window*))
                                         (when (and mission world-sector)
 
-                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+)
+                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-demon-malseraph+)
                                           
                                           (setf *current-window* (return-to *current-window*))
 
