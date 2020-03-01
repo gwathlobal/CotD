@@ -8,8 +8,8 @@
                     :name "Morning"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
-                                                          (push #'(lambda (level world-sector mission world-map world)
-                                                                    (declare (ignore world-sector mission world-map))
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission))
 
                                                                     (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
                                                                       (setf hour 7)
@@ -27,8 +27,8 @@
                     :name "Afternoon"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
-                                                          (push #'(lambda (level world-sector mission world-map world)
-                                                                    (declare (ignore world-sector mission world-map))
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission))
 
                                                                     (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
                                                                       (setf hour 12)
@@ -38,6 +38,7 @@
                                                                       (setf (world-game-time world) (set-current-date-time year month day hour min sec)))
 
                                                                     (set-up-outdoor-light level 100)
+                                                                    
                                                                     )
                                                                 func-list)
                                                           (reverse func-list))))
@@ -46,8 +47,8 @@
                     :name "Evening"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
-                                                          (push #'(lambda (level world-sector mission world-map world)
-                                                                    (declare (ignore world-sector mission world-map))
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission))
 
                                                                     (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
                                                                       (setf hour 19)
@@ -65,8 +66,8 @@
                     :name "Midnight"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
-                                                          (push #'(lambda (level world-sector mission world-map world)
-                                                                    (declare (ignore world-sector mission world-map))
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission))
 
                                                                     (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
                                                                       (setf hour 0)

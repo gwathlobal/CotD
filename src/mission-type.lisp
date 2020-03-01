@@ -46,6 +46,13 @@
 (defun get-mission-type-by-id (mission-type-id)
   (gethash mission-type-id *mission-types*))
 
+
+(defun get-ai-based-on-faction (faction-id mission-type-id)
+  (if (find faction-id (ai-package-list (get-mission-type-by-id mission-type-id)) :key #'(lambda (a) (first a)))
+    (progn
+      (second (find faction-id (ai-package-list (get-mission-type-by-id mission-type-id)) :key #'(lambda (a) (first a)))))
+    nil))
+
 ;;========================================
 ;; MISSION-DISTRICTS
 ;;========================================

@@ -790,6 +790,7 @@
    ))
 
 (defmethod initialize-instance :after ((mob mob) &key)
+
   (setf (id mob) (find-free-id *mobs*))
   (setf (aref *mobs* (id mob)) mob)
 

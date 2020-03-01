@@ -364,6 +364,16 @@
   (setf (aref (light-sources level) (1- (length (light-sources level)))) light-source)
   (push light-source (aref (light-quadrant-map level) (truncate (first light-source) 10) (truncate (second light-source) 10))))
 
+(defun return-weather-type-str (level)
+  (let ((str (create-string)))
+    (format str "~A" (cond
+                       ((find +game-event-snow-falls+ (game-events level)) "Snow")
+                       ((find +game-event-rain-falls+ (game-events level)) "Rain")
+                       (t "Clear")))
+    (when (find +game-event-unnatural-darkness+ (game-events level))
+      (format str ", Darkness"))
+    str))
+
 ;;----------------------
 ;; WORLD
 ;;----------------------
@@ -471,13 +481,3 @@
               ((= month 11) "Dec")
               )
             year)))
-
-(defun return-weather-type-str (world)
-  (let ((str (create-string)))
-    (format str "~A" (cond
-                       ((find +game-event-snow-falls+ (game-events world)) "Snow")
-                       ((find +game-event-rain-falls+ (game-events world)) "Rain")
-                       (t "Clear")))
-    (when (find +game-event-unnatural-darkness+ (game-events world))
-      (format str ", Darkness"))
-    str))

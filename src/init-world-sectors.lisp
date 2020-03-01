@@ -25,23 +25,31 @@
                                                              (push #'(lambda (level world-sector mission world)
                                                                        (declare (ignore mission))
                                                                        (let* ((sides-hash (make-hash-table))
-                                                                             (demon-test-func #'(lambda (x y)
-                                                                                                  (if (or (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-demons+)
-                                                                                                          (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-forest+)
-                                                                                                          (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-port+)
-                                                                                                          (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-residential+)
-                                                                                                          (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-lake+))
-                                                                                                    t
-                                                                                                    nil)))
-                                                                             (military-test-func #'(lambda (x y)
-                                                                                                     (if (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-military+)
-                                                                                                       t
-                                                                                                       nil)))
-                                                                             (hash-print-func #'(lambda ()
-                                                                                                  (loop initially (format t "~%SIDES-HASH: ")
-                                                                                                        for side being the hash-keys in sides-hash do
-                                                                                                          (format t "   ~A : (~A)~%" side (gethash side sides-hash))
-                                                                                                        finally (format t "~%")))))
+                                                                              (demon-test-func #'(lambda (x y)
+                                                                                                   (if (or (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-demons+)
+                                                                                                           (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-forest+)
+                                                                                                           (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-port+)
+                                                                                                           (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-residential+)
+                                                                                                           (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-lake+))
+                                                                                                     t
+                                                                                                     nil)))
+                                                                              (military-test-func #'(lambda (x y)
+                                                                                                      (if (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-military+)
+                                                                                                        t
+                                                                                                        nil)))
+                                                                              (hash-print-func #'(lambda ()
+                                                                                                   (loop initially (format t "~%SIDES-HASH: ")
+                                                                                                         for side being the hash-keys in sides-hash do
+                                                                                                           (format t "   ~A : (~A)~%" side (gethash side sides-hash))
+                                                                                                         finally (format t "~%"))))
+                                                                              (side-party-list (if (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                                                                                 (list (list :demons +feature-demons-arrival-point+)
+                                                                                                       (list :military +feature-delayed-military-arrival-point+)
+                                                                                                       (list :angels +feature-delayed-angels-arrival-point+))
+                                                                                                 (list (list :demons +feature-demons-arrival-point+)
+                                                                                                       (list :military +feature-delayed-military-arrival-point+)
+                                                                                                       (list :angels +feature-start-place-angels+)
+                                                                                                       (list :angels +feature-delayed-angels-arrival-point+)))))
                                                                          ;; find all sides from which demons can arrive
                                                                          (world-find-sides-for-world-sector world-sector (world-map world)
                                                                                                             demon-test-func
@@ -188,17 +196,14 @@
                                                                                  (funcall hash-print-func)
                                                                                )
 
-                                                                         (format t "FINALLY")
                                                                          ;; once we fixed everything - we can place arrival points
-                                                                         (loop with party-list = (list (list :demons +feature-demons-arrival-point+)
-                                                                                                       (list :military +feature-delayed-military-arrival-point+)
-                                                                                                       (list :angels +feature-delayed-angels-arrival-point+))
+                                                                         (loop with party-list = side-party-list
                                                                                for (party arrival-point-feature-type-id) in party-list
                                                                                ;; north
                                                                                when (find party (gethash :n sides-hash)) do
                                                                                  (loop with y = 2
                                                                                        with z = 2
-                                                                                       for x from 0 below (array-dimension (terrain level) 0) by (+ 7 (random 4))
+                                                                                       for x from 0 below (array-dimension (terrain level) 0) by (+ 5 (random 3))
                                                                                        when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
                                                                                                  (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
                                                                                          do
@@ -208,7 +213,7 @@
                                                                                when (find party (gethash :s sides-hash)) do
                                                                                  (loop with y = (- (array-dimension (terrain level) 1) 3)
                                                                                        with z = 2
-                                                                                       for x from 0 below (array-dimension (terrain level) 0) by (+ 7 (random 4))
+                                                                                       for x from 0 below (array-dimension (terrain level) 0) by (+ 5 (random 3))
                                                                                        when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
                                                                                                  (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
                                                                                          do
@@ -217,7 +222,7 @@
                                                                                when (find party (gethash :w sides-hash)) do
                                                                                  (loop with x = 2
                                                                                        with z = 2
-                                                                                       for y from 0 below (array-dimension (terrain level) 1) by (+ 7 (random 4))
+                                                                                       for y from 0 below (array-dimension (terrain level) 1) by (+ 5 (random 3))
                                                                                        when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
                                                                                                  (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
                                                                                          do
@@ -226,7 +231,7 @@
                                                                                when (find party (gethash :e sides-hash)) do
                                                                                  (loop with x = (- (array-dimension (terrain level) 1) 3)
                                                                                        with z = 2
-                                                                                       for y from 0 below (array-dimension (terrain level) 1) by (+ 7 (random 4))
+                                                                                       for y from 0 below (array-dimension (terrain level) 1) by (+ 5 (random 3))
                                                                                        when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
                                                                                                  (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
                                                                                          do
@@ -264,6 +269,8 @@
                                                              ;; place civilians if they are available
                                                              (push #'(lambda (level world-sector mission world)
                                                                        (declare (ignore world-sector world))
+
+                                                                       (format t "OVERALL-POST-PROCESS-FUNC: Place civilians~%~%")
                                                                        (loop with civilians-present = nil
                                                                              for (faction-type faction-presence) in (faction-list mission)
                                                                              when (and (= faction-type +faction-type-civilians+)
@@ -293,7 +300,7 @@
                                                                                                                                             :x x :y y :z z)))
                                                                              ))
                                                                    func-list)
-                                                             (reverse func-list))))
+                                                             func-list)))
 
 (set-world-sector-type :wtype +world-sector-normal-port+
                        :glyph-idx 48

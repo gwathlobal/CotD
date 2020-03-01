@@ -88,6 +88,8 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-delayed-angels-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Angels Arrival Point" :trait-remove-on-dungeon-generation t))
 
+(set-feature-type (make-instance 'feature-type :id +feature-delayed-angels-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Angels Arrival Point" :trait-remove-on-dungeon-generation t))
+
 (set-feature-type (make-instance 'feature-type :id +feature-demons-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Demons Arrival Point" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-small+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Small Gold Pile Placeholder"))
@@ -214,7 +216,7 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-sigil-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Sigil Starting Position" :trait-remove-on-dungeon-generation t))
 
-(set-feature-type (make-instance 'feature-type :id +feature-start-place-church-angels+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Angel Defender Starting Position" :trait-remove-on-dungeon-generation t))
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-angels+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Angel Starting Position" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-place-church-priest+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Priest Starting Position" :trait-remove-on-dungeon-generation t :trait-no-gravity t))
 

@@ -15,7 +15,17 @@
                                                         t
                                                         nil)
                                                       nil))
-                                                  ))
+                                                  )
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+
+                                                                    (pushnew +game-event-rain-falls+ (game-events level))
+                                                                    
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
 
 (set-level-modifier :id +lm-weather-snow+ :type +level-mod-weather+
                     :name "Snow"

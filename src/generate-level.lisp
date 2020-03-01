@@ -1,4 +1,4 @@
-(in-package :cotd)
+player-placement-lvl-mod-id(in-package :cotd)
 
 ;; the level generation function takes the following parameters:
 ;;   sector-level-gen-func - main funcation to generate a level from template (for example, city level)
@@ -168,25 +168,29 @@
     (push +game-event-adjust-outdoor-light+ (game-events level))
 
     ;; add the player to the level
-    (loop for overall-post-process-func in (funcall (overall-post-process-func-list (get-level-modifier-by-id player-placement-lvl-mod-id)))
-          do
-             (funcall overall-post-process-func level world-sector mission world))
+    ;(loop for overall-post-process-func in (funcall (overall-post-process-func-list (get-level-modifier-by-id player-placement-lvl-mod-id)))
+    ;      do
+    ;         (funcall overall-post-process-func level world-sector mission world))
 
     ;; populate world with standard mobs (from actual level template)
+    (format t "GENERATE-LEVEL: Placing standard mobs~%")
     (loop for (mob-type-id x y z) in mob-template-result
           when (null (get-mob-* level x y z))
             do
                (add-mob-to-level-list level (make-instance 'mob :mob-type mob-type-id :x x :y y :z z)))
 
+    (format t "~%Name of ID 0 (later) - ~A~%" (get-mob-by-id 0))
+
     ;; populate world with items
+    (format t "GENERATE-LEVEL: Placing standard items~%")
     (loop for (item-type-id x y z qty) in item-template-result 
         do
            (add-item-to-level-list level (make-instance 'item :item-type item-type-id :x x :y y :z z :qty qty)))
         
     ;; populate world with features
+    (format t "GENERATE-LEVEL: Placing standard features~%")
     (loop for (feature-type-id x y z) in feature-template-result 
           do
-             ;;(when (= feature-type-id +feature-start-place-church-priest+) (format t "~%FOUND +feature-start-place-church-priest+ AT (~A ~A ~A)~%~%" x y z))
              (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
     
     ;; populate the world with special mobs (military in outposts, demons around portals, etc) depending on present factions

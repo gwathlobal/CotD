@@ -6,18 +6,188 @@
    (y :initarg :y :accessor y)
    (faction-list :initform () :initarg :faction-list :accessor faction-list) ;; list of faction-type-id
    (level-modifier-list :initform () :initarg :level-modifier-list :accessor level-modifier-list) ;; list of level-modifier-id
-   (player-specific-faction-id :initarg :player-specific-faction-id :accessor player-specific-faction-id)
+   (player-lvl-mod-placement-id :initarg :player-lvl-mod-placement-id :accessor player-lvl-mod-placement-id) ;; serves as a specific faction designation and the id of this faction placement function
    ))
 
 (defmethod name ((mission mission))
   (name (get-mission-type-by-id (mission-type-id mission))))
 
 
+;;=======================
+;; Placement funcs
+;;=======================
+
+(defun place-demons-on-level (level world-sector mission world demon-list)
+  (declare (ignore world world-sector))
+  
+  (format t "OVERALL-POST-PROCESS-FUNC: Place demons function~%")
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-demons+)
+                              (= (second a) +mission-faction-present+))
+                       t
+                       nil))
+                 (faction-list mission))
+    
+    ;; if the player is an angel & angels are delayed, place demons inside (as if they were the first to arrive)
+    (if (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
+                 (= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+))
+             (find-if #'(lambda (a)
+                          (if (and (= (first a) +faction-type-angels+)
+                                   (= (second a) +mission-faction-delayed+))
+                            t
+                            nil))
+                      (faction-list mission)))
+      (progn
+        (format t "PLACE-DEMONS-ON-LEVEL: Place inside~%")
+        (populate-level-with-mobs level demon-list #'find-unoccupied-place-inside))
+      (progn
+        (format t "PLACE-DEMONS-ON-LEVEL: Place at the borders~%")
+        (loop for (demon-type demon-number is-player) in demon-list do
+          (loop repeat demon-number do
+            (loop with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                               (= (feature-type a) +feature-demons-arrival-point+))
+                                                           (feature-id-list level)
+                                                           :key #'(lambda (b)
+                                                                    (get-feature-by-id b)))
+                  while (> (length arrival-point-list) 0) 
+                  for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
+                  for lvl-feature = (get-feature-by-id random-arrival-point-id)
+                  for x = (x lvl-feature)
+                  for y = (y lvl-feature)
+                  for z = (z lvl-feature)
+                  do
+                     (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+                     (if is-player
+                       (progn
+                         (setf *player* (make-instance 'player :mob-type demon-type))
+                         (find-unoccupied-place-around level *player* x y z))
+                       (find-unoccupied-place-around level (make-instance 'mob :mob-type demon-type) x y z))
+                     
+                     (loop-finish)))))))
+  )
+
+(defun place-angels-on-level (level world-sector mission world angel-list)
+  (declare (ignore world-sector world))
+  
+  (format t "PLACE-ANGELS-ON-LEVEL: Place angels function~%")
+  (flet ((placement-func (arrival-feature-type-id)
+           (loop for (angel-type angel-number is-player) in angel-list do
+             (loop repeat angel-number do
+               (if (or (= angel-type +mob-type-star-singer+)
+                       (= angel-type +mob-type-star-gazer+)
+                       (= angel-type +mob-type-star-mender+))
+                 (progn
+                   (format t "PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%")
+                   (loop with is-free = t
+                         with mob1 = (if is-player (make-instance 'player :mob-type +mob-type-star-singer+) (make-instance 'mob :mob-type +mob-type-star-singer+))
+                         with mob2 = (if is-player (make-instance 'player :mob-type +mob-type-star-gazer+) (make-instance 'mob :mob-type +mob-type-star-gazer+))
+                         with mob3 = (if is-player (make-instance 'player :mob-type +mob-type-star-mender+) (make-instance 'mob :mob-type +mob-type-star-mender+))
+                         with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                                      (= (feature-type a) arrival-feature-type-id))
+                                                                  (feature-id-list level)
+                                                                  :key #'(lambda (b)
+                                                                           (get-feature-by-id b)))
+                         while (> (length arrival-point-list) 0) 
+                         for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
+                         for lvl-feature = (get-feature-by-id random-arrival-point-id)
+                         for x = (x lvl-feature)
+                         for y = (y lvl-feature)
+                         for z = (z lvl-feature)
+                         do
+                            (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+                            (setf is-free t)
+                            (check-surroundings x y t #'(lambda (dx dy)
+                                                          (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
+                                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+)))
+                                                            (setf is-free nil))))
+                            (when is-free
+                              
+                              (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                              (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                              (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                              (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                              
+                              (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
+                              (add-mob-to-level-list level mob1)
+                              (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
+                              (add-mob-to-level-list level mob2)
+                              (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
+                              (add-mob-to-level-list level mob3)
+                              
+                              (when is-player
+                                (setf *player* mob1))
+                              
+                              (loop-finish))))
+                 (progn
+                   (format t "PLACE-ANGELS-ON-LEVEL: Place chrome angels~%")
+                   
+                   (loop with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                                      (= (feature-type a) arrival-feature-type-id))
+                                                                  (feature-id-list level)
+                                                                  :key #'(lambda (b)
+                                                                           (get-feature-by-id b)))
+                         while (> (length arrival-point-list) 0) 
+                         for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
+                         for lvl-feature = (get-feature-by-id random-arrival-point-id)
+                         for x = (x lvl-feature)
+                         for y = (y lvl-feature)
+                         for z = (z lvl-feature)
+                         do
+                            (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+                            
+                            (if is-player
+                              (progn
+                                (setf *player* (make-instance 'player :mob-type angel-type))
+                                (find-unoccupied-place-around level *player* x y z))
+                              (find-unoccupied-place-around level (make-instance 'mob :mob-type angel-type) x y z))
+                            
+                            (loop-finish))))
+                   ))))
+    
+    (when (find-if #'(lambda (a)
+                       (if (and (= (first a) +faction-type-angels+)
+                                (= (second a) +mission-faction-present+))
+                         t
+                         nil))
+                   (faction-list mission))
+      (format t "PLACE-ANGELS-ON-LEVEL: Place present angels~%")
+      (placement-func +feature-start-place-angels+))
+
+    (when (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
+                   (= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+))
+               (find-if #'(lambda (a)
+                            (if (and (= (first a) +faction-type-angels+)
+                                     (= (second a) +mission-faction-delayed+))
+                              t
+                              nil))
+                        (faction-list mission)))
+      (format t "PLACE-ANGELS-ON-LEVEL: Place delayed angels~%")
+      (placement-func +feature-delayed-angels-arrival-point+))
+
+    (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+)
+               (/= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
+               (find-if #'(lambda (a)
+                            (if (and (= (first a) +faction-type-angels+)
+                                     (= (second a) +mission-faction-delayed+))
+                              t
+                              nil))
+                        (faction-list mission)))
+      (format t "PLACE-ANGELS-ON-LEVEL: Add game event for delayed angels~%")
+      (push +game-event-delayed-arrival-angels+ (game-events level))))
+  )
+
+;;=======================
+;; Auxiliary funcs
+;;=======================
+
 (defun populate-level-with-mobs (level mob-template-list placement-func)
-  (loop for (mob-template-id . num) in mob-template-list do
-    (loop repeat num
-          do
-             (funcall placement-func level (make-instance 'mob :mob-type mob-template-id)))))
+  (loop for (mob-template-id num is-player) in mob-template-list do
+    (loop repeat num do
+      (if is-player
+        (progn
+          (setf *player* (make-instance 'player :mob-type mob-template-id))
+          (funcall placement-func level *player*))
+        (funcall placement-func level (make-instance 'mob :mob-type mob-template-id))))))
 
 (defun find-unoccupied-place-on-top (level mob)
   (loop with max-x = (array-dimension (terrain level) 0)
@@ -245,4 +415,5 @@
                 (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
                 (add-mob-to-level-list level mob3)
         ))
+
 

@@ -7432,8 +7432,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
-                                                               (or (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
-                                                                   (= (mission-scenario (level *world*)) +mission-scenario-demon-raid-ruined+))
+                                                               (= (mission-type-id (mission (level *world*))) +mission-type-demonic-raid+)
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)
                                                                      when (item-ability-p item +item-abil-corpse+)
@@ -7447,8 +7446,7 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally nearest-enemy))
-                                                  (if (and (or (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
-                                                               (= (mission-scenario (level *world*)) +mission-scenario-demon-raid-ruined+))
+                                                  (if (and (= (mission-type-id (mission (level *world*))) +mission-type-demonic-raid+)
                                                            (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
                                                            (can-invoke-ability actor actor +mob-abil-throw-corpse-into-portal+))
                                                     t
@@ -7458,7 +7456,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-throw-relic-into-portal+ :name "Throw relic into portal" :descr "Throw the relic you have into a demonic portal. You must be standing on top of the demonic portal and have the relic in your inventory to do that. Usable only during the demonic thievery scenario." 
+                                 :id +mob-abil-throw-relic-into-portal+ :name "Throw relic into portal" :descr "Throw the relic you have into a demonic portal. You must be standing on top of the demonic portal and have the relic in your inventory to do that. Usable only during the demonic thievery mission." 
                                  :spd (truncate +normal-ap+ 1.5) :passive nil
                                  :final t :on-touch nil
                                  :motion 90
@@ -7502,7 +7500,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
-                                                               (= (mission-scenario (level *world*)) +mission-scenario-demon-steal+)
+                                                               (= (mission-type-id (mission (level *world*))) +mission-type-demonic-thievery+)
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)
                                                                      when (= (item-type item) +item-type-church-reliс+)
@@ -7516,7 +7514,7 @@
                                                         nil))
                                  :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
                                                   (declare (ignore ability-type nearest-ally nearest-enemy))
-                                                  (if (and (= (mission-scenario (level *world*)) +mission-scenario-demon-steal+)
+                                                  (if (and (= (mission-type-id (mission (level *world*))) +mission-type-demonic-thievery+)
                                                            (mob-ability-p actor +mob-abil-throw-relic-into-portal+)
                                                            (can-invoke-ability actor actor +mob-abil-throw-relic-into-portal+))
                                                     t
@@ -7526,7 +7524,7 @@
                                                    (mob-invoke-ability actor actor (id ability-type)))))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-create-demon-sigil+ :name "Summon demonic sigil" :descr (format nil "Summon a demonic sigil next to you. You can not summon sigils closer than ~A tiles to each other. Usable only during the demonic conquest scenario." *demonic-conquest-win-sigils-dist*)
+                                 :id +mob-abil-create-demon-sigil+ :name "Summon demonic sigil" :descr (format nil "Summon a demonic sigil next to you. You can not summon sigils closer than ~A tiles to each other. Usable only during the demonic conquest mission." *demonic-conquest-win-sigils-dist*)
                                  :spd (truncate +normal-ap+ 1.5) :passive nil
                                  :cd 50 :final t :on-touch nil
                                  :motion 100
@@ -7550,9 +7548,7 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (or (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest+)
-                                                                   (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-ruined+)
-                                                                   (= (mission-scenario (level *world*)) +mission-scenario-demon-conquest-corrupted+))
+                                                      (if (and (= (mission-type-id (mission (level *world*))) +mission-type-demonic-conquest+)
                                                                (mob-ability-p actor +mob-abil-create-demon-sigil+)
                                                                (loop with result = t
                                                                      for sigil-id in (demonic-sigils (level *world*))
