@@ -498,4 +498,11 @@
                 (add-mob-to-level-list level mob3)
         ))
 
-
+(defun find-player-start-position (level mob feature-type-id)
+  (loop for feature-id in (feature-id-list level)
+        for feature = (get-feature-by-id feature-id)
+        when (= (feature-type feature) feature-type-id)
+          do
+             (setf (x mob) (x feature) (y mob) (y feature) (z mob) (z feature))
+             (add-mob-to-level-list level mob)
+             (loop-finish)))

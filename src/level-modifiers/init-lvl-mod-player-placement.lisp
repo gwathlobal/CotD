@@ -133,3 +133,99 @@
                                                                     )
                                                                 func-list)
                                                           func-list)))
+
+(set-level-modifier :id +lm-placement-priest+ :type +level-mod-player-placement+
+                    :name "Church"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+                                                                    
+                                                                    (setf *player* (make-instance 'player :mob-type +mob-type-priest+))
+                                                                    (find-player-start-position level *player* +feature-start-church-player+)
+                                                                    (setf (faction-name *player*) "Church")
+
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
+
+(set-level-modifier :id +lm-placement-satanist+ :type +level-mod-player-placement+
+                    :name "Satanists"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+                                                                    
+                                                                    (setf *player* (make-instance 'player :mob-type +mob-type-satanist+))
+                                                                    (find-player-start-position level *player* +feature-start-satanist-player+)
+                                                                    (setf (faction-name *player*) "Satanists")
+
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
+
+(set-level-modifier :id +lm-placement-eater+ :type +level-mod-player-placement+
+                    :name "Eater of the dead"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+                                                                    
+                                                                    (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+))
+                                                                    (find-unoccupied-place-water level *player*)
+                                                                    (setf (faction-name *player*) "Eater of the dead")
+
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
+
+(set-level-modifier :id +lm-placement-skinchanger+ :type +level-mod-player-placement+
+                    :name "Skinchanger"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+                                                                    
+                                                                    (setf *player* (make-instance 'player :mob-type +mob-type-skinchanger-melee+))
+                                                                    (find-unoccupied-place-water level *player*)
+                                                                    (setf (faction-name *player*) "Skinchanger")
+
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
+
+(set-level-modifier :id +lm-placement-thief+ :type +level-mod-player-placement+
+                    :name "Thief"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+                                                                    
+                                                                    (setf *player* (make-instance 'player :mob-type +mob-type-thief+))
+                                                                    (find-unoccupied-place-on-top level *player*)
+                                                                    (setf (faction-name *player*) "Thief")
+
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
+
+(set-level-modifier :id +lm-placement-ghost+ :type +level-mod-player-placement+
+                    :name "Lost soul"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+                                                                    
+                                                                    (setf *player* (make-instance 'player :mob-type +mob-type-ghost+))
+                                                                    (find-unoccupied-place-inside level *player*)
+                                                                    (setf (faction-name *player*) "Lost soul")
+
+                                                                    )
+                                                                func-list)
+                                                          func-list)))

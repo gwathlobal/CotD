@@ -1407,15 +1407,6 @@
         finally (setf (x mob) x (y mob) y (z mob) nz)
                 (add-mob-to-level-list (level world) mob)))
 
-(defun find-player-start-position (world mob feature-type-id)
-  (loop for feature-id in (feature-id-list (level world))
-        for feature = (get-feature-by-id feature-id)
-        when (= (feature-type feature) feature-type-id)
-          do
-             (setf (x mob) (x feature) (y mob) (y feature) (z mob) (z feature))
-             (add-mob-to-level-list (level world) mob)
-             (loop-finish)))
-
 (defun find-unoccupied-place-water (world mob)
   (let ((water-cells nil)
         (r-cell))

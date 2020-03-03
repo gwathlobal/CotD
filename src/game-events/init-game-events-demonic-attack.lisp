@@ -49,7 +49,7 @@
                                                                                                                                    (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                  (player-game-time world)
                                                                                                                                  final-str
-                                                                                                                                 (level-layout (level world)))
+                                                                                                                                 (name (world-sector (level world))))
                                                                                                           *highscores*))
                                                            
                                                              (write-highscores-to-file *highscores*)
@@ -115,7 +115,7 @@
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (player-game-time world)
                                                                                                                                 final-str
-                                                                                                                                (level-layout (level world)))
+                                                                                                                                (name (world-sector (level world))))
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
@@ -173,7 +173,7 @@
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (player-game-time world)
                                                                                                                                 final-str
-                                                                                                                                (level-layout (level world)))
+                                                                                                                                (name (world-sector (level world))))
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)
@@ -241,7 +241,7 @@
                                                                                                                                    (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                  (player-game-time world)
                                                                                                                                  final-str
-                                                                                                                                 (level-layout (level world)))
+                                                                                                                                 (name (world-sector (level world))))
                                                                                                           *highscores*))
                                                            
                                                              (write-highscores-to-file *highscores*)
@@ -302,7 +302,7 @@
                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
                                                                                                                                 (player-game-time world)
                                                                                                                                 final-str
-                                                                                                                                (level-layout (level world)))
+                                                                                                                                (name (world-sector (level world))))
                                                                                                           *highscores*))
                                                              
                                                              (write-highscores-to-file *highscores*)

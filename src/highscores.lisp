@@ -69,5 +69,5 @@
             (third record)
             "None")
           (format nil "~D turn~:P" (fourth record))
-          (sf-name (get-scenario-feature-by-id (sixth record)))
+          (sixth record)
           (fifth record)))

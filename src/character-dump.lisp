@@ -183,7 +183,7 @@
       (with-open-file (file (merge-pathnames file-name dir-path) :direction :output :if-exists :supersede)
         (format file "~A - ~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d:~2,'0d~A~%" (get-qualified-name *player*) year month date hour minute second (new-line))
         (format file "~A~%" (new-line))
-        (format file "Mission: ~A~A~%" (name (get-mission-scenario-by-id (mission-scenario (level *world*)))) (new-line))
+        (format file "Mission: ~A~A~%" (name (mission (level *world*))) (new-line))
         (format file "Game time: ~D turn~:P~A~%" game-time (new-line))
         (format file "Game score: ~A~A~%" score (new-line))
         (format file "Layout: ~A~A~%" layout-str (new-line))
