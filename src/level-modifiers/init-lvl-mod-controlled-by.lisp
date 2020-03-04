@@ -6,13 +6,14 @@
 
 (set-level-modifier :id +lm-controlled-by-none+ :type +level-mod-controlled-by+
                     :name "Is not controlled by anyone"
-                    :priority 30)
+                    :priority 25)
 
 (set-level-modifier :id +lm-controlled-by-demons+ :type +level-mod-controlled-by+
                     :name "Controlled by demons"
                     :faction-list-func #'(lambda (world-sector)
                                            (declare (ignore world-sector))
                                            (list (list +faction-type-demons+ +mission-faction-present+)))
+                    :priority 25
                     )
 
 (set-level-modifier :id +lm-controlled-by-military+ :type +level-mod-controlled-by+
@@ -20,6 +21,40 @@
                     :faction-list-func #'(lambda (world-sector)
                                            (declare (ignore world-sector))
                                            (list (list +faction-type-military+ +mission-faction-present+)))
+                    :priority 25
+                    :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                 (declare (ignore world-sector mission world))
+
+                                                 (format t "TEMPLATE LEVEL FUNC: LM CONTROLLED BY MILITARY~%")
+
+                                                 (let ((build-list ())
+                                                       (x-w 4)
+                                                       (y-n 4)
+                                                       (x-e (- (array-dimension template-level 0) 5))
+                                                       (y-s (- (array-dimension template-level 1) 5)))
+                                                   ;; place nw post
+                                                   (when (level-city-can-place-build-on-grid +building-city-army-post+ x-w y-n 2 template-level)
+                                                     (setf build-list (append build-list (list (list +building-city-army-post+ x-w y-n 2))))
+                                                     (level-city-reserve-build-on-grid +building-city-army-post+ x-w y-n 2 template-level))
+                                                     
+                                                   ;; place ne post
+                                                   (when (level-city-can-place-build-on-grid +building-city-army-post+ x-e y-n 2 template-level)
+                                                     (setf build-list (append build-list (list (list +building-city-army-post+ x-e y-n 2))))
+                                                     (level-city-reserve-build-on-grid +building-city-army-post+ x-e y-n 2 template-level))
+                                                   
+                                                   ;; place sw post
+                                                   (when (level-city-can-place-build-on-grid +building-city-army-post+ x-w y-s 2 template-level)
+                                                     (setf build-list (append build-list (list (list +building-city-army-post+ x-w y-s 2))))
+                                                     (level-city-reserve-build-on-grid +building-city-army-post+ x-w y-s 2 template-level))
+                                                     
+                                                   ;; place se post
+                                                   (when (level-city-can-place-build-on-grid +building-city-army-post+ x-e y-s 2 template-level)
+                                                     (setf build-list (append build-list (list (list +building-city-army-post+ x-e y-s 2))))
+                                                     (level-city-reserve-build-on-grid +building-city-army-post+ x-e y-s 2 template-level))
+
+                                                   build-list)
+                                                 
+                                                 )
                     )
 
 

@@ -225,6 +225,11 @@
                                              #'(lambda (level mob)
                                                  (find-unoccupied-place-around level mob (x leader) (y leader) (z leader)))))))
              )))
+
+    ;; if the player is present as a chaplain then we need only three squads
+    (when (and (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
+               (> (length military-list) 1))
+      (setf military-list (remove (first military-list) military-list)))
     
     (when (find-if #'(lambda (a)
                        (if (and (= (first a) +faction-type-military+)

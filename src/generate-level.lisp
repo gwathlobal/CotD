@@ -1,4 +1,4 @@
-player-placement-lvl-mod-id(in-package :cotd)
+(in-package :cotd)
 
 ;; the level generation function takes the following parameters:
 ;;   sector-level-gen-func - main funcation to generate a level from template (for example, city level)

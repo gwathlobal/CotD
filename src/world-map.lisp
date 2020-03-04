@@ -41,7 +41,8 @@
                                                                   :controlled-by +lm-controlled-by-demons+))
   (setf (aref (cells world-map) 2 3) (make-instance 'world-sector :wtype +world-sector-normal-residential+ :x 2 :y 3
                                                                   :feats (list (list +lm-feat-river+ nil) (list +lm-feat-lair+) (list +lm-feat-church+))
-                                                                  :items (list +lm-item-holy-relic+)))
+                                                                  :items (list +lm-item-holy-relic+)
+                                                                  :controlled-by +lm-controlled-by-military+))
   (setf (aref (cells world-map) 3 3) (make-instance 'world-sector :wtype +world-sector-corrupted-residential+ :x 3 :y 3
                                                                   :controlled-by +lm-controlled-by-demons+))
   (setf (aref (cells world-map) 4 3) (make-instance 'world-sector :wtype +world-sector-normal-forest+ :x 4 :y 3))
