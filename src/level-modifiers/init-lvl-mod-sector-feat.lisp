@@ -109,13 +109,13 @@
 
                                                    (when (and (find :n barricade-params)
                                                               (find :e barricade-params))
-                                                     (when (= (aref template-level x1 y2 2) +building-city-free+)
-                                                       (setf (aref template-level x1 y2 2) +building-city-barricade-sw+)))
+                                                     (when (= (aref template-level x2 y1 2) +building-city-free+)
+                                                       (setf (aref template-level x2 y1 2) +building-city-barricade-sw+)))
 
                                                    (when (and (find :s barricade-params)
                                                               (find :w barricade-params))
-                                                     (when (= (aref template-level x2 y1 2) +building-city-free+)
-                                                       (setf (aref template-level x2 y1 2) +building-city-barricade-ne+)))
+                                                     (when (= (aref template-level x1 y2 2) +building-city-free+)
+                                                       (setf (aref template-level x1 y2 2) +building-city-barricade-ne+)))
 
                                                    (when (and (find :s barricade-params)
                                                               (find :e barricade-params))
@@ -181,7 +181,24 @@
                                                    build-list)))
 
 (set-level-modifier :id +lm-feat-library+ :type +level-mod-sector-feat+
-                    :name "Library")
+                    :name "Library"
+                    :priority 30
+                    :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                 (declare (ignore world-sector mission world))
+
+                                                 (format t "TEMPLATE LEVEL FUNC: LM FEAT LIBRARY~%")
+                                                 
+                                                 (loop with library-types = (prepare-spec-build-id-list +building-type-library+)
+                                                       with build-list = () 
+                                                       for x = (random (array-dimension template-level 0))
+                                                       for y = (random (array-dimension template-level 1))
+                                                       for selected-library-type = (nth (random (length library-types)) library-types)
+                                                       until (level-city-can-place-build-on-grid selected-library-type x y 2 template-level)
+                                                       finally
+                                                          (setf build-list (list (list selected-library-type x y 2)))
+                                                          (level-city-reserve-build-on-grid selected-library-type x y 2 template-level)
+                                                          (return build-list))
+                                                 ))
 
 (set-level-modifier :id +lm-feat-church+ :type +level-mod-sector-feat+
                     :name "Church"

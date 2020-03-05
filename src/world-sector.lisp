@@ -185,4 +185,240 @@
     )
   )
 
+(defun add-arrival-points-on-level (level world-sector mission world)
+  (declare (ignore mission))
+
+  (format t "ADD-ARRIVAL-POINTS-ON-LEVEL: Start~%")
+  
+  (let* ((sides-hash (make-hash-table))
+         (demon-test-func #'(lambda (x y)
+                              (if (or (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-demons+)
+                                      (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-forest+)
+                                      (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-port+)
+                                      (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-residential+)
+                                      (= (wtype (aref (cells (world-map world)) x y)) +world-sector-corrupted-lake+))
+                                t
+                                nil)))
+         (military-test-func #'(lambda (x y)
+                                 (if (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-military+)
+                                   t
+                                   nil)))
+         (hash-print-func #'(lambda ()
+                              (loop initially (format t "~%SIDES-HASH: ")
+                                    for side being the hash-keys in sides-hash do
+                                      (format t "   ~A : (~A)~%" side (gethash side sides-hash))
+                                    finally (format t "~%"))))
+         (side-party-list (list (list :demons +feature-demons-arrival-point+)
+                                (list :military +feature-delayed-military-arrival-point+)
+                                (list :angels +feature-delayed-angels-arrival-point+))))
+    
+    (unless (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+      (push (list :angels +feature-start-place-angels+) side-party-list))
+    
+    (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
+      (push (list :military +feature-start-military-point+) side-party-list))
+    
+    ;; find all sides from which demons can arrive
+    (world-find-sides-for-world-sector world-sector (world-map world)
+                                       demon-test-func
+                                       demon-test-func
+                                       demon-test-func
+                                       demon-test-func
+                                       #'(lambda ()
+                                           (if (gethash :n sides-hash)
+                                             (push :demons (gethash :n sides-hash))
+                                             (setf (gethash :n sides-hash) (list :demons))))
+                                       #'(lambda ()
+                                           (if (gethash :s sides-hash)
+                                             (push :demons (gethash :s sides-hash))
+                                             (setf (gethash :s sides-hash) (list :demons))))
+                                       #'(lambda ()
+                                           (if (gethash :w sides-hash)
+                                             (push :demons (gethash :w sides-hash))
+                                             (setf (gethash :w sides-hash) (list :demons))))
+                                       #'(lambda ()
+                                           (if (gethash :e sides-hash)
+                                             (push :demons (gethash :e sides-hash))
+                                             (setf (gethash :e sides-hash) (list :demons)))))
+    
+    ;; find all sides from which military can arrive
+    (world-find-sides-for-world-sector world-sector (world-map world)
+                                       military-test-func
+                                       military-test-func
+                                       military-test-func
+                                       military-test-func
+                                       #'(lambda ()
+                                           (if (gethash :n sides-hash)
+                                             (push :military (gethash :n sides-hash))
+                                             (setf (gethash :n sides-hash) (list :military))))
+                                       #'(lambda ()
+                                           (if (gethash :s sides-hash)
+                                             (push :military (gethash :s sides-hash))
+                                             (setf (gethash :s sides-hash) (list :military))))
+                                       #'(lambda ()
+                                           (if (gethash :w sides-hash)
+                                             (push :military (gethash :w sides-hash))
+                                             (setf (gethash :w sides-hash) (list :military))))
+                                       #'(lambda ()
+                                           (if (gethash :e sides-hash)
+                                             (push :military (gethash :e sides-hash))
+                                             (setf (gethash :e sides-hash) (list :military)))))
+    
+    ;; fill the all sides with angels
+    (if (gethash :n sides-hash)
+      (push :angels (gethash :n sides-hash))
+      (setf (gethash :n sides-hash) (list :angels)))
+    (if (gethash :s sides-hash)
+      (push :angels (gethash :s sides-hash))
+      (setf (gethash :s sides-hash) (list :angels)))
+    (if (gethash :w sides-hash)
+      (push :angels (gethash :w sides-hash))
+      (setf (gethash :w sides-hash) (list :angels)))
+    (if (gethash :e sides-hash)
+      (push :angels (gethash :e sides-hash))
+      (setf (gethash :e sides-hash) (list :angels)))
+    
+    ;; PRINT
+    (funcall hash-print-func)
+    
+    ;; if all sides have only one party, we are good to go, otherwise we need rearrangements
+    (loop with demons-num = 0
+          with military-num = 0
+          with angels-num = 0
+          with has-overlapped = nil
+          with count-nums-func = #'(lambda ()
+                                     (loop initially (setf demons-num 0
+                                                           military-num 0
+                                                           angels-num 0
+                                                           has-overlapped nil)
+                                           for side being the hash-keys in sides-hash
+                                           when (find :demons (gethash side sides-hash))
+                                             do
+                                                (incf demons-num)
+                                           when (find :military (gethash side sides-hash))
+                                             do
+                                                (incf military-num)
+                                           when (find :angels (gethash side sides-hash))
+                                             do
+                                                (incf angels-num)
+                                           when (> (length (gethash side sides-hash)) 1)
+                                             do
+                                                (setf has-overlapped t)
+                                           finally (format t
+                                                           "Counts:~%   Demons: ~A~%   Angels: ~A~%   Military:~A~%   Overlapped: ~A~%"
+                                                           demons-num angels-num military-num has-overlapped)))
+          with reduce-nums-func = #'(lambda ()
+                                      (format t "Reduce angels:~%")
+                                      ;; reduce angels
+                                      (loop with prev-angels-num = 0
+                                            while (/= angels-num prev-angels-num) do
+                                              (setf prev-angels-num angels-num)
+                                              (loop for side being the hash-keys in sides-hash
+                                                    when (and (> (length (gethash side sides-hash)) 1)
+                                                              (> angels-num 1)
+                                                              (find :angels (gethash side sides-hash)))
+                                                      do
+                                                         (setf (gethash side sides-hash)
+                                                               (remove :angels (gethash side sides-hash)))
+                                                         
+                                                         (funcall count-nums-func)
+                                                         (loop-finish)))
+                                      (funcall hash-print-func)
+                                      (format t "Reduce military:~%")
+                                      ;; reduce military
+                                      (loop with prev-military-num = 0
+                                            while (/= military-num prev-military-num) do
+                                              (setf prev-military-num military-num)
+                                        (loop for side being the hash-keys in sides-hash
+                                              when (and (> (length (gethash side sides-hash)) 1)
+                                                        (> military-num 1)
+                                                        (find :military (gethash side sides-hash)))
+                                                do
+                                                   (setf (gethash side sides-hash)
+                                                         (remove :military (gethash side sides-hash)))
+                                                   
+                                                   (funcall count-nums-func)
+                                                   (loop-finish)))
+                                      (funcall hash-print-func)
+                                      (format t "Reduce demons:~%")
+                                      ;; reduce demons
+                                      (loop with prev-demons-num = 0
+                                            while (/= demons-num prev-demons-num) do
+                                              (setf prev-demons-num demons-num)
+                                        (loop for side being the hash-keys in sides-hash
+                                              when (and (> (length (gethash side sides-hash)) 1)
+                                                        (> demons-num 1)
+                                                        (find :demons (gethash side sides-hash)))
+                                                do
+                                                   (setf (gethash side sides-hash)
+                                                         (remove :demons (gethash side sides-hash)))
+                                                   
+                                                   (funcall count-nums-func)
+                                                   (loop-finish)))
+                                      (funcall hash-print-func)
+                                      
+                                      )
+            initially (funcall count-nums-func)
+          while has-overlapped do
+            ;; reduce all parties to a minimum
+            (funcall reduce-nums-func)
+            (format t "After reduce:~%")
+            (funcall hash-print-func)
+            (unless has-overlapped (loop-finish))
+            ;; if it still does not help, add a random party to a free side
+            (loop with party-list = (list :angels :military :demons)
+                  with selected-pick = (nth (random (length party-list)) party-list)
+                  for side being the hash-keys in sides-hash
+                  when (= (length (gethash side sides-hash)) 0)
+                    do
+                       (setf (gethash side sides-hash) (list selected-pick))
+                       (loop-finish))
+            ;; on the next iteration we reduce again and see if it helped
+            (format t "After addition:~%")
+            (funcall hash-print-func)
+          )
+    
+    ;; once we fixed everything - we can place arrival points
+    (loop with party-list = side-party-list
+          for (party arrival-point-feature-type-id) in party-list
+          ;; north
+          when (find party (gethash :n sides-hash)) do
+            (loop with y = 2
+                  with z = 2
+                  for x from 0 below (array-dimension (terrain level) 0) by (+ 5 (random 3))
+                  when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                    do
+                       (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
+            
+            ;; south
+          when (find party (gethash :s sides-hash)) do
+            (loop with y = (- (array-dimension (terrain level) 1) 3)
+                  with z = 2
+                  for x from 0 below (array-dimension (terrain level) 0) by (+ 5 (random 3))
+                  when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                    do
+                       (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
+            ;; west
+          when (find party (gethash :w sides-hash)) do
+            (loop with x = 2
+                  with z = 2
+                  for y from 0 below (array-dimension (terrain level) 1) by (+ 5 (random 3))
+                  when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                    do
+                       (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
+            ;; east
+          when (find party (gethash :e sides-hash)) do
+            (loop with x = (- (array-dimension (terrain level) 1) 3)
+                  with z = 2
+                  for y from 0 below (array-dimension (terrain level) 1) by (+ 5 (random 3))
+                  when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                    do
+                       (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
+          )
+    )
+  )
 

@@ -1209,8 +1209,8 @@
                                                           (list +mob-type-woman+ 10 6 z)
                                                           (list +mob-type-woman+ 13 8 z)
                                                           (list +mob-type-woman+ 16 8 z))
-                                                    nil
-                                                    (list (list +item-type-book-of-rituals+ 15 6 (- z 1) 1))))))
+                                                    (list (list +feature-start-place-book-of-rituals+ 15 6 (- z 1) 1))
+                                                    nil))))
 
 ;;=====================
 ;; Satanists' lair
@@ -1540,14 +1540,14 @@
 
 (set-building-type (make-building :id +building-city-barricade-sw+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
-                                            (loop for dx from 1 to 3 do
-                                              (setf (aref template-level (+ x dx) (+ y 0) z) +terrain-wall-barricade+)
+                                            (loop for dx from 0 to 2 do
                                               (setf (aref template-level (+ x dx) (+ y 1) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x dx) (+ y 2) z) +terrain-wall-barricade+))
-                                            (loop for dy from 1 to 3 do
+                                              (setf (aref template-level (+ x dx) (+ y 2) z) +terrain-wall-barricade+)
+                                              (setf (aref template-level (+ x dx) (+ y 3) z) +terrain-wall-barricade+))
+                                            (loop for dy from 2 to 4 do
+                                              (setf (aref template-level (+ x 1) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 4) (+ y dy) z) +terrain-wall-barricade+))
+                                              (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))
                                             
                                             (values nil nil nil)
                                             )))
@@ -1568,11 +1568,11 @@
 
 (set-building-type (make-building :id +building-city-barricade-ne+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level)
-                                            (loop for dx from 0 to 2 do
+                                            (loop for dx from 2 to 4 do
                                               (setf (aref template-level (+ x dx) (+ y 1) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x dx) (+ y 2) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x dx) (+ y 3) z) +terrain-wall-barricade+))
-                                            (loop for dy from 2 to 4 do
+                                            (loop for dy from 0 to 2 do
                                               (setf (aref template-level (+ x 1) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 2) (+ y dy) z) +terrain-wall-barricade+)
                                               (setf (aref template-level (+ x 3) (+ y dy) z) +terrain-wall-barricade+))
