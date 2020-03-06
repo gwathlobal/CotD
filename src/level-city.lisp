@@ -5,7 +5,7 @@
 (defconstant +level-city-floor+ 2)
 (defconstant +level-city-floor-bright+ 3)
 
-(defun create-template-city (template-level building-list max-x max-y max-z set-max-buildings-func set-reserved-buildings-func
+(defun create-template-city (template-level max-x max-y max-z set-max-buildings-func set-reserved-buildings-func
                              &optional (terrains (list +level-city-border+ +terrain-border-floor+
                                                        +level-city-park+ +building-city-park-tiny+
                                                        +level-city-floor+ +terrain-floor-dirt+
@@ -13,19 +13,16 @@
   
   (logger (format nil "CREATE-TEMPLATE-CITY~%"))
 
-  ;(setf max-x *max-x-level*)
-  ;(setf max-y *max-y-level*)
-  ;(setf max-z 10)
   ;; make a template level
   ;; and an enlarged grid with scale 1 to 10 cells of template level
   ;; grid will be used to make reservations for buildings
   ;; once all places on grid are reserved, put actual buildings to the template level in places that were reserved 
-  (let* ((reserv-max-x (truncate max-x *level-grid-size*)) (reserv-max-y (truncate max-y *level-grid-size*)) ;(reserv-max-z max-z)
+  (let* ((reserv-max-x (array-dimension template-level 0)) (reserv-max-y (array-dimension template-level 1)) ;(reserv-max-z max-z)
          (terrain-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element (getf terrains +level-city-border+)))
-         (feature-list)
-         (mob-list nil)
-         (item-list)
-         (build-list building-list)
+         (feature-list ())
+         (mob-list ())
+         (item-list ())
+         (build-list ())
          (max-building-types (make-hash-table))
          (reserved-building-types (make-hash-table))
          )
@@ -73,12 +70,9 @@
 
                ;; if an unoccupied place is found, place the building
                (when build-picked
-                 ;; add the building to the building list
-                 (setf build-list (append build-list (list (list build-picked x y 2))))
-                 
-                 ;; reserve the tiles for the building
+                 ;; add the building to the building list and reserve the tiles for the bilding
                  (level-city-reserve-build-on-grid build-picked x y 2 template-level)
-
+                 
                  ;; decrease the maximum available number of buildings of this type
                  (when (and (gethash (building-type (get-building-type build-picked)) max-building-types)
                             (not (eq (gethash (building-type (get-building-type build-picked)) max-building-types) t)))
@@ -112,12 +106,9 @@
                
                ;;  check if there was a building picked
                (when build-picked
-                 ;; if yes, add the building to the building list
-                 (setf build-list (append build-list (list (list build-picked x y 2))))
-                 
-                 ;; reserve the tiles for the building
+                 ;; if yes, add the building to the building list and reserve the tiles for the building
                  (level-city-reserve-build-on-grid build-picked x y 2 template-level)
-
+                 
                  ;; decrease the maximum available number of buildings of this type
                  (when (and (gethash (building-type (get-building-type build-picked)) max-building-types)
                             (not (eq (gethash (building-type (get-building-type build-picked)) max-building-types) t)))
@@ -131,11 +122,9 @@
             do
                ;;  check if you can place a tiny park
                (when (level-city-can-place-build-on-grid (getf terrains +level-city-park+) x y 2 template-level)
-                 ;; if yes, add the building to the building list
-                 (setf build-list (append build-list (list (list (getf terrains +level-city-park+) x y 2))))
-                 
-                 ;; reserve the tiles for the building
-                 (level-city-reserve-build-on-grid (getf terrains +level-city-park+) x y 2 template-level))
+                 ;; if yes, add the building to the building list & reserve the tiles for the building
+                 (level-city-reserve-build-on-grid (getf terrains +level-city-park+) x y 2 template-level)
+                 )
             ))
 
     (loop for y from 0 below max-y do
@@ -154,6 +143,16 @@
           (setf (aref terrain-level x y z) +terrain-floor-air+))))
     
     (print-reserved-level template-level)
+
+     ;; create a building list from template-level
+    (loop for x from 0 below reserv-max-x do
+      (loop for y from 0 below reserv-max-y
+            for building = (aref template-level x y 2)
+            when (and (not (eq building t))
+                      (not (eq building nil))
+                      (not (find building build-list)))
+              do
+                 (push building build-list)))
     
     ;; take buildings from the building list and actually place them on the template level
     (loop for (build-type-id gx gy gz) in build-list 
@@ -163,7 +162,6 @@
           for building-features = nil
           for building-items = nil
           do
-             
              ;; find a random position within the grid on the template level so that the building does not violate the grid boundaries
              (destructuring-bind (adx . ady) (building-act-dim (get-building-type build-type-id))
                (destructuring-bind (gdx . gdy) (building-grid-dim (get-building-type build-type-id))
@@ -231,7 +229,11 @@
   (logger (format nil "RESERVED-LEVEL:~%"))
   (loop for y from 0 below (array-dimension reserved-level 1) do
     (loop for x from 0 below (array-dimension reserved-level 0) do
-      (logger (format nil "~2@A " (aref reserved-level x y 2))))
+      (logger (format nil "~2@A " (cond
+                                    ((null (aref reserved-level x y 2)) "F")
+                                    ((eq (aref reserved-level x y 2) t) "R")
+                                    (t (first (aref reserved-level x y 2)))
+                                    ))))
     (logger (format nil "~%"))))
 
 (defun pick-building-randomly (build-cur-list)

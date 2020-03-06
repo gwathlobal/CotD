@@ -19,34 +19,28 @@
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM CONTROLLED BY DEMONS~%")
 
-                                                 (let ((build-list ())
-                                                       (building-id +building-city-sigil-post+)
+                                                 (let ((building-id +building-city-sigil-post+)
                                                        (x-w 4)
                                                        (y-n 4)
                                                        (x-e (- (array-dimension template-level 0) 5))
                                                        (y-s (- (array-dimension template-level 1) 5)))
                                                    ;; place nw post
                                                    (when (level-city-can-place-build-on-grid building-id x-w y-n 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-w y-n 2))))
                                                      (level-city-reserve-build-on-grid building-id x-w y-n 2 template-level))
                                                      
                                                    ;; place ne post
                                                    (when (level-city-can-place-build-on-grid building-id x-e y-n 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-e y-n 2))))
                                                      (level-city-reserve-build-on-grid building-id x-e y-n 2 template-level))
                                                    
                                                    ;; place sw post
                                                    (when (level-city-can-place-build-on-grid building-id x-w y-s 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-w y-s 2))))
                                                      (level-city-reserve-build-on-grid building-id x-w y-s 2 template-level))
                                                      
                                                    ;; place se post
                                                    (when (level-city-can-place-build-on-grid building-id x-e y-s 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-e y-s 2))))
                                                      (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level))
 
-                                                   build-list)
-                                                 
+                                                   )
                                                  )
                     )
 
@@ -61,34 +55,28 @@
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM CONTROLLED BY MILITARY~%")
 
-                                                 (let ((build-list ())
-                                                       (building-id +building-city-army-post+)
+                                                 (let ((building-id +building-city-army-post+)
                                                        (x-w 4)
                                                        (y-n 4)
                                                        (x-e (- (array-dimension template-level 0) 5))
                                                        (y-s (- (array-dimension template-level 1) 5)))
                                                    ;; place nw post
                                                    (when (level-city-can-place-build-on-grid building-id x-w y-n 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-w y-n 2))))
                                                      (level-city-reserve-build-on-grid building-id x-w y-n 2 template-level))
                                                      
                                                    ;; place ne post
                                                    (when (level-city-can-place-build-on-grid building-id x-e y-n 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-e y-n 2))))
                                                      (level-city-reserve-build-on-grid building-id x-e y-n 2 template-level))
                                                    
                                                    ;; place sw post
                                                    (when (level-city-can-place-build-on-grid building-id x-w y-s 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-w y-s 2))))
                                                      (level-city-reserve-build-on-grid building-id x-w y-s 2 template-level))
                                                      
                                                    ;; place se post
                                                    (when (level-city-can-place-build-on-grid building-id x-e y-s 2 template-level)
-                                                     (setf build-list (append build-list (list (list building-id x-e y-s 2))))
                                                      (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level))
 
-                                                   build-list)
-                                                 
+                                                   )
                                                  )
                     )
 

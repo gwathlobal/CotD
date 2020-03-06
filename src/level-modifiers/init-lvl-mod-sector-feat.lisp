@@ -13,8 +13,7 @@
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM FEAT RIVER~%")
                                                  
-                                                 (let ((build-list)
-                                                       (river-params (second (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))))
+                                                 (let ((river-params (second (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))))
                                                    (when (find :n river-params)
                                                      (loop with max-y = (1- (truncate (array-dimension template-level 1) 2))
                                                            with min-y = 0
@@ -24,10 +23,21 @@
                                                                                            (/= y (1- max-y)))
                                                                                     +building-city-bridge+
                                                                                     +building-city-river+)
+                                                           for building-at-point-1 = (aref template-level center-x y 2)
+                                                           for building-at-point-2 = (aref template-level (1- center-x) y 2)
                                                            do
-                                                              (setf (aref template-level center-x y 2) building-type-id)
-                                                              (setf (aref template-level (1- center-x) y 2) building-type-id)))
-                                                   
+                                                              (when (or (eq building-at-point-1 nil)
+                                                                        (eq building-at-point-1 t)
+                                                                        (and (listp building-at-point-1)
+                                                                             (/= (first building-at-point-1) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id center-x y 2 template-level))
+                                                              (when (or (eq building-at-point-2 nil)
+                                                                        (eq building-at-point-2 t)
+                                                                        (and (listp building-at-point-2)
+                                                                             (/= (first building-at-point-2) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id (1- center-x) y 2 template-level))
+                                                              ))
+
                                                    (when (find :s river-params)
                                                      (loop with max-y = (array-dimension template-level 1)
                                                            with min-y = (1- (truncate (array-dimension template-level 1) 2))
@@ -37,10 +47,21 @@
                                                                                            (/= y (1- max-y)))
                                                                                     +building-city-bridge+
                                                                                     +building-city-river+)
+                                                           for building-at-point-1 = (aref template-level center-x y 2)
+                                                           for building-at-point-2 = (aref template-level (1- center-x) y 2)
                                                            do
-                                                              (setf (aref template-level center-x y 2) building-type-id)
-                                                              (setf (aref template-level (1- center-x) y 2) building-type-id)))
-                                                   
+                                                              (when (or (eq building-at-point-1 nil)
+                                                                        (eq building-at-point-1 t)
+                                                                        (and (listp building-at-point-1)
+                                                                             (/= (first building-at-point-1) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id center-x y 2 template-level))
+                                                              (when (or (eq building-at-point-2 nil)
+                                                                        (eq building-at-point-2 t)
+                                                                        (and (listp building-at-point-2)
+                                                                             (/= (first building-at-point-2) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id (1- center-x) y 2 template-level))
+                                                           ))
+
                                                    (when (find :e river-params)
                                                      (loop with max-x = (array-dimension template-level 0)
                                                            with min-x = (1- (truncate (array-dimension template-level 0) 2))
@@ -50,9 +71,20 @@
                                                                                            (/= x (1- max-x)))
                                                                                     +building-city-bridge+
                                                                                     +building-city-river+)
+                                                           for building-at-point-1 = (aref template-level x (1- center-y) 2)
+                                                           for building-at-point-2 = (aref template-level x center-y 2)
                                                            do
-                                                              (setf (aref template-level x (1- center-y) 2) building-type-id)
-                                                              (setf (aref template-level x center-y 2) building-type-id)))
+                                                              (when (or (eq building-at-point-1 nil)
+                                                                        (eq building-at-point-1 t)
+                                                                        (and (listp building-at-point-1)
+                                                                             (/= (first building-at-point-1) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id x (1- center-y) 2 template-level))
+                                                              (when (or (eq building-at-point-1 nil)
+                                                                        (eq building-at-point-1 t)
+                                                                        (and (listp building-at-point-1)
+                                                                             (/= (first building-at-point-1) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id x center-y 2 template-level))
+                                                           ))
 
                                                    (when (find :w river-params)
                                                      (loop with max-x = (1- (truncate (array-dimension template-level 0) 2))
@@ -63,25 +95,39 @@
                                                                                            (/= x (1- max-x)))
                                                                                     +building-city-bridge+
                                                                                     +building-city-river+)
+                                                           for building-at-point-1 = (aref template-level x (1- center-y) 2)
+                                                           for building-at-point-2 = (aref template-level x center-y 2)
                                                            do
-                                                              (setf (aref template-level x (1- center-y) 2) building-type-id)
-                                                              (setf (aref template-level x center-y 2) building-type-id)))
-                                                   
+                                                              (when (or (eq building-at-point-1 nil)
+                                                                        (eq building-at-point-1 t)
+                                                                        (and (listp building-at-point-1)
+                                                                             (/= (first building-at-point-1) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id x (1- center-y) 2 template-level))
+                                                              (when (or (eq building-at-point-1 nil)
+                                                                        (eq building-at-point-1 t)
+                                                                        (and (listp building-at-point-1)
+                                                                             (/= (first building-at-point-1) +building-city-central-lake+)))
+                                                                (level-city-reserve-build-on-grid building-type-id x center-y 2 template-level))
+                                                              
+                                                           ))
+
                                                    (let ((x (1- (truncate (array-dimension template-level 0) 2)))
                                                          (y (1- (truncate (array-dimension template-level 1) 2))))
-    
-                                                     (setf (aref template-level (+ x 0) (+ y 0) 2) +building-city-river+)
-                                                     (setf (aref template-level (+ x 1) (+ y 0) 2) +building-city-river+)
-                                                     (setf (aref template-level (+ x 0) (+ y 1) 2) +building-city-river+)
-                                                     (setf (aref template-level (+ x 1) (+ y 1) 2) +building-city-river+))
+
+                                                     (loop for off-x from 0 to 1 do
+                                                       (loop for off-y from 0 to 1
+                                                             for building-at-point = (aref template-level (+ x off-x) (+ y off-y) 2)
+                                                             do
+                                                                (when (or (eq building-at-point nil)
+                                                                          (eq building-at-point t)
+                                                                          (and (listp building-at-point)
+                                                                               (/= (first building-at-point) +building-city-central-lake+)))
+                                                                  (level-city-reserve-build-on-grid +building-city-river+ (+ x off-x) (+ y off-y) 2 template-level))
+                                                             ))
+                                                     )
+
                                                    
-                                                   (loop for x from 0 below (array-dimension template-level 0) do
-                                                     (loop for y from 0 below (array-dimension template-level 1) do
-                                                       (when (or (= (aref template-level x y 2) +building-city-river+)
-                                                                 (= (aref template-level x y 2) +building-city-bridge+)
-                                                                 (= (aref template-level x y 2) +building-city-land-border+))
-                                                         (push (list (aref template-level x y 2) x y 2) build-list))))
-                                                   build-list)))
+                                                   )))
 
 (set-level-modifier :id +lm-feat-sea+ :type +level-mod-sector-feat+
                     :name "Sea")
@@ -94,91 +140,91 @@
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM FEAT BARRICADE~%")
                                                  
-                                                 (let ((build-list)
-                                                       (x1 1)
+                                                 (let ((x1 1)
                                                        (x2 (- (array-dimension template-level 0) 2))
                                                        (y1 1)
                                                        (y2 (- (array-dimension template-level 1) 2))
                                                        (barricade-params (second (find +lm-feat-barricade+ (feats world-sector) :key #'(lambda (a) (first a))))))
 
+                                                   ;; set up barricade lines & entrances
+                                                   (when (find :n barricade-params)
+                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                           for x from x1 below (- center-x 2)
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y1 2 template-level))
+                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                           for x from (+ center-x 2) to x2
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y1 2 template-level))
+                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                           for off-x from -2 below 2
+                                                           when (eq (aref template-level (+ center-x off-x) y1 2) nil)
+                                                             do
+                                                                (setf (aref template-level (+ center-x off-x) y1 2) t)))
+
+                                                   (when (find :s barricade-params)
+                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                           for x from x1 below (- center-x 2)
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y2 2 template-level))
+                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                           for x from (+ center-x 2) to x2
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y2 2 template-level))
+                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                           for off-x from -2 below 2
+                                                           when (eq (aref template-level (+ center-x off-x) y2 2) nil)
+                                                             do
+                                                                (setf (aref template-level (+ center-x off-x) y2 2) t)))
+
+                                                   (when (find :w barricade-params)
+                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                           for y from y1 below (- center-y 2)
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x1 y 2 template-level))
+                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                           for y from (+ center-y 2) to y2
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x1 y 2 template-level))
+                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                           for off-y from -2 below 2
+                                                           when (eq (aref template-level x1 (+ center-y off-y) 2) nil)
+                                                             do
+                                                                (setf (aref template-level x1 (+ center-y off-y) 2) t)))
+
+                                                   (when (find :e barricade-params)
+                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                           for y from y1 below (- center-y 2)
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x2 y 2 template-level))
+                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                            for y from (+ center-y 2) to y2
+                                                           do
+                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x2 y 2 template-level))
+                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                           for off-y from -2 below 2
+                                                           when (eq (aref template-level x2 (+ center-y off-y) 2) nil)
+                                                             do
+                                                                (setf (aref template-level x2 (+ center-y off-y) 2) t)))
+
                                                    ;; set up barricade corners
                                                    (when (and (find :n barricade-params)
                                                               (find :w barricade-params))
-                                                     (when (= (aref template-level x1 y1 2) +building-city-free+)
-                                                       (setf (aref template-level x1 y1 2) +building-city-barricade-se+)))
+                                                     (level-city-reserve-build-on-grid +building-city-barricade-se+ x1 y1 2 template-level))
 
                                                    (when (and (find :n barricade-params)
                                                               (find :e barricade-params))
-                                                     (when (= (aref template-level x2 y1 2) +building-city-free+)
-                                                       (setf (aref template-level x2 y1 2) +building-city-barricade-sw+)))
+                                                     (level-city-reserve-build-on-grid +building-city-barricade-sw+ x2 y1 2 template-level))
 
                                                    (when (and (find :s barricade-params)
                                                               (find :w barricade-params))
-                                                     (when (= (aref template-level x1 y2 2) +building-city-free+)
-                                                       (setf (aref template-level x1 y2 2) +building-city-barricade-ne+)))
+                                                     (level-city-reserve-build-on-grid +building-city-barricade-ne+ x1 y2 2 template-level))
 
                                                    (when (and (find :s barricade-params)
                                                               (find :e barricade-params))
-                                                     (when (= (aref template-level x2 y2 2) +building-city-free+)
-                                                       (setf (aref template-level x2 y2 2) +building-city-barricade-nw+)))
-
-                                                   ;; set up barricade lines & entrances
-                                                   (when (find :n barricade-params)
-                                                     (loop for x from x1 to x2
-                                                           when (= (aref template-level x y1 2) +building-city-free+)
-                                                           do
-                                                              (setf (aref template-level x y1 2) +building-city-barricade-we+))
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for off-x from -2 below 2
-                                                           when (= (aref template-level (+ center-x off-x) y1 2) +building-city-barricade-we+)
-                                                             do
-                                                                (setf (aref template-level (+ center-x off-x) y1 2) +building-city-reserved+)))
-
-                                                   (when (find :s barricade-params)
-                                                     (loop for x from x1 to x2
-                                                           when (= (aref template-level x y2 2) +building-city-free+)
-                                                           do
-                                                              (setf (aref template-level x y2 2) +building-city-barricade-we+))
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for off-x from -2 below 2
-                                                           when (= (aref template-level (+ center-x off-x) y2 2) +building-city-barricade-we+)
-                                                             do
-                                                                (setf (aref template-level (+ center-x off-x) y2 2) +building-city-reserved+)))
-
-                                                   (when (find :w barricade-params)
-                                                     (loop for y from y1 to y2
-                                                           when (= (aref template-level x1 y 2) +building-city-free+)
-                                                           do
-                                                              (setf (aref template-level x1 y 2) +building-city-barricade-ns+))
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                           for off-y from -2 below 2
-                                                           when (= (aref template-level x1 (+ center-y off-y) 2) +building-city-barricade-ns+)
-                                                             do
-                                                                (setf (aref template-level x1 (+ center-y off-y) 2) +building-city-reserved+)))
-
-                                                   (when (find :e barricade-params)
-                                                     (loop for y from y1 to y2
-                                                           when (= (aref template-level x2 y 2) +building-city-free+)
-                                                           do
-                                                              (setf (aref template-level x2 y 2) +building-city-barricade-ns+))
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                           for off-y from -2 below 2
-                                                           when (= (aref template-level x2 (+ center-y off-y) 2) +building-city-barricade-ns+)
-                                                             do
-                                                                (setf (aref template-level x2 (+ center-y off-y) 2) +building-city-reserved+)))
+                                                     (level-city-reserve-build-on-grid +building-city-barricade-nw+ x2 y2 2 template-level))
                                                    
-                                                   ;; set up buildings
-                                                   (loop for x from 0 below (array-dimension template-level 0) do
-                                                     (loop for y from 0 below (array-dimension template-level 1) do
-                                                       (when (or (= (aref template-level x y 2) +building-city-barricade-ns+)
-                                                                 (= (aref template-level x y 2) +building-city-barricade-we+)
-                                                                 (= (aref template-level x y 2) +building-city-barricade-ne+)
-                                                                 (= (aref template-level x y 2) +building-city-barricade-se+)
-                                                                 (= (aref template-level x y 2) +building-city-barricade-sw+)
-                                                                 (= (aref template-level x y 2) +building-city-barricade-nw+)
-                                                                 (= (aref template-level x y 2) +building-city-land-border+))
-                                                         (push (list (aref template-level x y 2) x y 2) build-list))))
-                                                   build-list)))
+                                                   )))
 
 (set-level-modifier :id +lm-feat-library+ :type +level-mod-sector-feat+
                     :name "Library"
@@ -189,15 +235,12 @@
                                                  (format t "TEMPLATE LEVEL FUNC: LM FEAT LIBRARY~%")
                                                  
                                                  (loop with library-types = (prepare-spec-build-id-list +building-type-library+)
-                                                       with build-list = () 
                                                        for x = (random (array-dimension template-level 0))
                                                        for y = (random (array-dimension template-level 1))
                                                        for selected-library-type = (nth (random (length library-types)) library-types)
                                                        until (level-city-can-place-build-on-grid selected-library-type x y 2 template-level)
                                                        finally
-                                                          (setf build-list (list (list selected-library-type x y 2)))
-                                                          (level-city-reserve-build-on-grid selected-library-type x y 2 template-level)
-                                                          (return build-list))
+                                                          (level-city-reserve-build-on-grid selected-library-type x y 2 template-level))
                                                  ))
 
 (set-level-modifier :id +lm-feat-church+ :type +level-mod-sector-feat+
@@ -219,15 +262,12 @@
                                                  (format t "TEMPLATE LEVEL FUNC: LM FEAT CHURCH~%")
                                                  
                                                  (loop with church-types = (prepare-spec-build-id-list +building-type-church+)
-                                                       with build-list = () 
                                                        for x = (random (array-dimension template-level 0))
                                                        for y = (random (array-dimension template-level 1))
                                                        for selected-church-type = (nth (random (length church-types)) church-types)
                                                        until (level-city-can-place-build-on-grid selected-church-type x y 2 template-level)
                                                        finally
-                                                          (setf build-list (list (list selected-church-type x y 2)))
-                                                          (level-city-reserve-build-on-grid selected-church-type x y 2 template-level)
-                                                          (return build-list))
+                                                          (level-city-reserve-build-on-grid selected-church-type x y 2 template-level))
                                                  )
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -276,15 +316,12 @@
                                                  (format t "TEMPLATE LEVEL FUNC: LM FEAT SATANISTS LAIR~%")
                                                  
                                                  (loop with lair-types = (prepare-spec-build-id-list +building-type-satanists+)
-                                                       with build-list = () 
                                                        for x = (random (array-dimension template-level 0))
                                                        for y = (random (array-dimension template-level 1))
                                                        for selected-lair-type = (nth (random (length lair-types)) lair-types)
                                                        until (level-city-can-place-build-on-grid selected-lair-type x y 2 template-level)
                                                        finally
-                                                          (setf build-list (list (list selected-lair-type x y 2)))
-                                                          (level-city-reserve-build-on-grid selected-lair-type x y 2 template-level)
-                                                          (return build-list))
+                                                          (level-city-reserve-build-on-grid selected-lair-type x y 2 template-level))
                                                  )
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))

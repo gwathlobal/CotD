@@ -17,8 +17,8 @@
                                                     (list +faction-type-ghost+ +mission-faction-present+)
                                                     (list +faction-type-ghost+ +mission-faction-absent+)))
                        :angel-disguised-mob-type-id +mob-type-man+
-                       :sector-level-gen-func #'(lambda (template-level building-list max-x max-y max-z)
-                                                  (create-template-city template-level building-list max-x max-y max-z
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-normal #'get-reserved-buildings-normal))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
@@ -110,7 +110,41 @@
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
                                                     (list +faction-type-ghost+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-man+)
+                       :angel-disguised-mob-type-id +mob-type-man+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-normal #'get-reserved-buildings-normal))
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world world-sector))
+
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
+
+                                                    ;; place +building-city-park-tiny+ and +building-city-park-3+ along the borders
+                                                    (loop with y1 = 0
+                                                          with y2 = (array-dimension template-level 1)
+                                                          for x from 0 below (array-dimension template-level 0)
+                                                          do
+                                                             (level-city-reserve-build-on-grid +building-city-forest-border+ x y1 2 template-level)
+                                                             (level-city-reserve-build-on-grid +building-city-forest-border+ x (- y2 1) 2 template-level)
+                                                             
+                                                             (when (level-city-can-place-build-on-grid +building-city-park-3+ x (+ y1 1) 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-park-3+ x (+ y1 1) 2 template-level))
+                                                             (when (level-city-can-place-build-on-grid +building-city-park-3+ x (- y2 3) 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-park-3+ x (- y2 3) 2 template-level)))
+                                                    
+                                                    (loop with x1 = 0
+                                                          with x2 = (array-dimension template-level 0)
+                                                          for y from 0 below (array-dimension template-level 1)
+                                                          do
+                                                             (level-city-reserve-build-on-grid +building-city-forest-border+ x1 y 2 template-level)
+                                                             (level-city-reserve-build-on-grid +building-city-forest-border+ (- x2 1) y 2 template-level)
+                                                             
+                                                             (when (level-city-can-place-build-on-grid +building-city-park-3+ (+ x1 1) y 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-park-3+ (+ x1 1) y 2 template-level))
+                                                             (when (level-city-can-place-build-on-grid +building-city-park-3+ (- x2 3) y 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-park-3+ (- x2 3) y 2 template-level)))
+                                                    
+                                                    ))
 
 (set-world-sector-type :wtype +world-sector-normal-lake+
                        :glyph-idx 44
@@ -125,24 +159,20 @@
                                                     (list +faction-type-ghost+ +mission-faction-present+)
                                                     (list +faction-type-ghost+ +mission-faction-absent+)))
                        :angel-disguised-mob-type-id +mob-type-man+
-                       :sector-level-gen-func #'(lambda (template-level building-list max-x max-y max-z)
-                                                  (create-template-city template-level building-list max-x max-y max-z
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-normal #'get-reserved-buildings-normal))
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
 
-                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR RIVER~%")
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
 
-                                                    (let ((build-list)
-                                                          (x (- (truncate (array-dimension template-level 0) 2) 2))
+                                                    (let ((x (- (truncate (array-dimension template-level 0) 2) 2))
                                                           (y (- (truncate (array-dimension template-level 1) 2) 2)))
+
+                                                      (level-city-reserve-build-on-grid +building-city-central-lake+ x y 2 template-level)
                                                       
-                                                      (loop for dx from 0 to 3 do
-                                                        (loop for dy from 0 to 3 do
-                                                          (setf (aref template-level (+ x dx) (+ y dy) 2) +building-city-central-lake+)))
-                                                      
-                                                      (push (list +building-city-central-lake+ x y 2) build-list)
-                                                      build-list))
+                                                      ))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military

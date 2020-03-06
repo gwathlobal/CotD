@@ -43,8 +43,12 @@
          (mob-template-result nil)
          (item-template-result nil))
     (let* ((template-max-x (truncate max-x *level-grid-size*)) (template-max-y (truncate max-y *level-grid-size*)) (template-max-z max-z)
-           (template-level (make-array (list template-max-x template-max-y template-max-z) :element-type 'fixnum :initial-element +building-city-reserved+))
-           (building-list nil))
+           (template-level (make-array (list template-max-x template-max-y template-max-z) :initial-element t))
+           ;; the values in template-level are as follows:
+           ;;   t - reserved
+           ;;   nil - free
+           ;;   list of (+building-type-<id>+ x y z)
+           )
 
       (setf *max-progress-bar* 10)
       (setf *cur-progress-bar* 0)
@@ -55,20 +59,20 @@
       (loop for y from 1 below (1- template-max-y) do
         (loop for x from 1 below (1- template-max-x) do
           (loop for z from 0 below template-max-z do
-            (setf (aref template-level x y z) +building-city-free+))))
+            (setf (aref template-level x y z) nil))))
       
       ;; use level template pre-process functions to place reserved buildings from sector features, factions, etc
       (loop for level-template-pre-process-func in level-template-pre-process-func-list do
-        (setf building-list (append building-list (funcall level-template-pre-process-func template-level world-sector mission world))))
+        (funcall level-template-pre-process-func template-level world-sector mission world))
 
       ;; adjusting the progress bar : 1
       (incf *cur-progress-bar*)
       (funcall *update-screen-closure* nil)
       
       ;; produce terrain level from template using the supplied function
-      (multiple-value-setq (terrain-level mob-template-result item-template-result feature-template-result) (funcall sector-level-gen-func template-level
-                                                                                                                                           building-list
-                                                                                                                                           max-x max-y max-z))
+      (multiple-value-setq (terrain-level mob-template-result item-template-result feature-template-result) (funcall sector-level-gen-func
+                                                                                                                     template-level
+                                                                                                                     max-x max-y max-z))
 
       (setf (terrain level) terrain-level)
       (setf (level world) level)
@@ -212,24 +216,25 @@
    ) 
   )
 
-(defun reserve-build-on-grid (template-building-id gx gy gz reserved-level)
+(defun reserve-build-on-grid (template-building-id gx gy gz template-level)
   (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
-    (loop for y1 from 0 below dy do
-      (loop for x1 from 0 below dx do
-        (setf (aref reserved-level (+ gx x1) (+ gy y1) gz) template-building-id)))
-    ))
+    (let ((building (list template-building-id gx gy gz)))
+      (loop for y1 from 0 below dy do
+        (loop for x1 from 0 below dx do
+          (setf (aref template-level (+ gx x1) (+ gy y1) gz) building)))
+      building)))
 
-(defun can-place-build-on-grid (template-building-id gx gy gz reserved-level)
+(defun can-place-build-on-grid (template-building-id gx gy gz template-level)
   (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
     ;; if the staring point of the building + its dimensions) is more than level dimensions - fail
-    (when (or (> (+ gx dx) (array-dimension reserved-level 0))
-              (> (+ gy dy) (array-dimension reserved-level 1)))
+    (when (or (> (+ gx dx) (array-dimension template-level 0))
+              (> (+ gy dy) (array-dimension template-level 1)))
       (return-from can-place-build-on-grid nil))
     
     ;; if any of the grid tiles that the building is going to occupy are already reserved - fail
     (loop for y1 from 0 below dy do
       (loop for x1 from 0 below dx do
-        (when (/= (aref reserved-level (+ gx x1) (+ gy y1) gz) +building-city-free+)
+        (unless (eq (aref template-level (+ gx x1) (+ gy y1) gz) nil)
           (return-from can-place-build-on-grid nil))
             ))
     ;; all checks done - success

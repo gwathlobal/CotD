@@ -1496,7 +1496,7 @@
                                                                                 (setf (aref template-level x y z) +terrain-floor-grass+)))))))
                                                 
                                                 (values nil
-                                                        (list (list +feature-delayed-arrival-point+ 2 2 z))
+                                                        nil
                                                         nil))))
                                   ))
 

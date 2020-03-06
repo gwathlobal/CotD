@@ -299,12 +299,29 @@
           when tt
             do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
 
-(defun level-city-reserve-build-on-grid (template-building-id gx gy gz reserved-level)
+(defun level-city-reserve-build-on-grid (template-building-id gx gy gz reserved-level &key (force-remove t))
   (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
-    (loop for y1 from 0 below dy do
-      (loop for x1 from 0 below dx do
-        (setf (aref reserved-level (+ gx x1) (+ gy y1) gz) template-building-id)))
-    ))
+    (let ((building (list template-building-id gx gy gz)))
+      (loop for y1 from 0 below dy do
+        (loop for x1 from 0 below dx
+              for building-to-remove = (aref reserved-level (+ gx x1) (+ gy y1) gz)
+              do
+                 (when (and force-remove
+                            (listp building-to-remove)
+                            building-to-remove)
+                   (level-city-remove-build-from-grid building-to-remove reserved-level))
+                 (setf (aref reserved-level (+ gx x1) (+ gy y1) gz) building)))
+      building)))
+
+(defun level-city-remove-build-from-grid (building reserved-level)
+  (let ((template-building-id (first building))
+        (gx (second building))
+        (gy (third building))
+        (gz (fourth building)))
+    (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
+      (loop for y1 from 0 below dy do
+        (loop for x1 from 0 below dx do
+          (setf (aref reserved-level (+ gx x1) (+ gy y1) gz) nil))))))
 
 (defun level-city-can-place-build-on-grid (template-building-id gx gy gz reserved-level)
   (destructuring-bind (dx . dy) (building-grid-dim (get-building-type template-building-id))
@@ -317,7 +334,7 @@
     ;; if any of the grid tiles that the building is going to occupy are already reserved - fail
     (loop for y1 from 0 below dy do
       (loop for x1 from 0 below dx do
-        (when (/= (aref reserved-level (+ gx x1) (+ gy y1) gz) +building-city-free+)
+        (when (not (eq (aref reserved-level (+ gx x1) (+ gy y1) gz) nil))
           (return-from level-city-can-place-build-on-grid nil))
             ))
     ;; all checks done - success
