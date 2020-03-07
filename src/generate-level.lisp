@@ -80,30 +80,41 @@
       ;; adjusting the progress bar : 2
       (incf *cur-progress-bar*)
       (funcall *update-screen-closure* nil)
+
+      (setf (mob-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
+                                                       (ceiling (array-dimension (terrain level) 1) 10))
+                                                 :initial-element ()))
+      (setf (item-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
+                                                        (ceiling (array-dimension (terrain level) 1) 10))
+                                                  :initial-element ()))
+      (setf (light-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
+                                                         (ceiling (array-dimension (terrain level) 1) 10))
+                                                   :initial-element ()))
+
+      (setf (mission level) mission)
+      (setf (world-sector level) world-sector)
+
+      ;; populate world with items
+      (format t "GENERATE-LEVEL: Placing standard items~%")
+      (loop for (item-type-id x y z qty) in item-template-result 
+            do
+               (add-item-to-level-list level (make-instance 'item :item-type item-type-id :x x :y y :z z :qty qty)))
+      
+      ;; populate world with features
+      (format t "GENERATE-LEVEL: Placing standard features~%")
+      (loop for (feature-type-id x y z) in feature-template-result 
+            do
+               (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
+
+      ;; adjusting the progress bar : 3
+      (incf *cur-progress-bar*)
+      (funcall *update-screen-closure* nil)
       
       ;; post process actual level (demonic portals, blood spatter, irradiated spots, etc)
       (loop for terrain-post-process-func in terrain-level-post-process-func-list do
         (setf terrain-level (funcall terrain-post-process-func level world-sector mission world)))      
       )
-
-    ;; adjusting the progress bar : 3
-    (incf *cur-progress-bar*)
-    (funcall *update-screen-closure* nil)
     
-    (setf (mob-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
-                                                     (ceiling (array-dimension (terrain level) 1) 10))
-                                               :initial-element ()))
-    (setf (item-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
-                                                      (ceiling (array-dimension (terrain level) 1) 10))
-                                                :initial-element ()))
-    (setf (light-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
-                                                       (ceiling (array-dimension (terrain level) 1) 10))
-                                                 :initial-element ()))
-
-    (setf (mission level) mission)
-    (setf (world-sector level) world-sector)
-
-
     ;; check map for connectivity : 4
     (incf *cur-progress-bar*)
     (funcall *update-screen-closure* "Creating connectivity maps")
@@ -170,18 +181,6 @@
     (funcall *update-screen-closure* "Finalizing")
     
     (push +game-event-adjust-outdoor-light+ (game-events level))
-
-    ;; populate world with items
-    (format t "GENERATE-LEVEL: Placing standard items~%")
-    (loop for (item-type-id x y z qty) in item-template-result 
-        do
-           (add-item-to-level-list level (make-instance 'item :item-type item-type-id :x x :y y :z z :qty qty)))
-        
-    ;; populate world with features
-    (format t "GENERATE-LEVEL: Placing standard features~%")
-    (loop for (feature-type-id x y z) in feature-template-result 
-          do
-             (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
 
     ;; add the player to the level
     (loop for overall-post-process-func in (funcall (overall-post-process-func-list (get-level-modifier-by-id player-placement-lvl-mod-id)))

@@ -504,6 +504,10 @@
 (defconstant +feature-start-place-civilian-woman+ 37)
 (defconstant +feature-start-place-civilian-child+ 38)
 (defconstant +feature-start-place-book-of-rituals+ 39)
+(defconstant +feature-arrival-point-north+ 40)
+(defconstant +feature-arrival-point-south+ 41)
+(defconstant +feature-arrival-point-west+ 42)
+(defconstant +feature-arrival-point-east+ 43)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants

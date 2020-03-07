@@ -130,7 +130,8 @@
                                                    )))
 
 (set-level-modifier :id +lm-feat-sea+ :type +level-mod-sector-feat+
-                    :name "Sea")
+                    :name "Sea"
+                    :priority 0)
 
 (set-level-modifier :id +lm-feat-barricade+ :type +level-mod-sector-feat+
                     :name "Barricade"

@@ -303,10 +303,7 @@
     (setf (gethash +building-type-park+ max-building-types) t)
     (setf (gethash +building-type-mansion+ max-building-types) t)
     
-    (setf (gethash +building-type-church+ max-building-types) 1)
-    (setf (gethash +building-type-satanists+ max-building-types) 1)
     (setf (gethash +building-type-warehouse+ max-building-types) 0)
-    (setf (gethash +building-type-library+ max-building-types) 1)
     (setf (gethash +building-type-prison+ max-building-types) 1)
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-bank+ max-building-types) 1)
@@ -505,15 +502,6 @@
 
 (defun get-reserved-buildings-port ()
   (let ((reserved-building-types (make-hash-table)))
-    (setf (gethash +building-type-church+ reserved-building-types) 1)
-    (setf (gethash +building-type-satanists+ reserved-building-types) 1)
-    (setf (gethash +building-type-warehouse+ reserved-building-types) 0)
-    (setf (gethash +building-type-library+ reserved-building-types) 1)
-    (setf (gethash +building-type-prison+ reserved-building-types) 1)
-    (setf (gethash +building-type-stables+ reserved-building-types) 0)
-    (setf (gethash +building-type-bank+ reserved-building-types) 1)
-    (setf (gethash +building-type-lake+ reserved-building-types) 0)
-    (setf (gethash +building-type-graveyard+ reserved-building-types) 0)
     reserved-building-types))
 
 (defun get-reserved-buildings-ruined-normal ()

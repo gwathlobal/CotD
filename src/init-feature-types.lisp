@@ -84,6 +84,14 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-delayed-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Arrival Point"))
 
+(set-feature-type (make-instance 'feature-type :id +feature-arrival-point-north+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "North Delayed Arrival Point" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-arrival-point-south+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "South Delayed Arrival Point" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-arrival-point-east+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "East Delayed Arrival Point" :trait-remove-on-dungeon-generation t))
+
+(set-feature-type (make-instance 'feature-type :id +feature-arrival-point-west+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "West Delayed Arrival Point" :trait-remove-on-dungeon-generation t))
+
 (set-feature-type (make-instance 'feature-type :id +feature-delayed-military-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Military Arrival Point" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-delayed-angels-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Angels Arrival Point" :trait-remove-on-dungeon-generation t))

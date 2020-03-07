@@ -156,6 +156,11 @@
 (defconstant +building-city-corrupted-crater-2+ 100)
 (defconstant +building-city-corrupted-crater-large+ 101)
 
+(defconstant +building-city-pier-north+ 102)
+(defconstant +building-city-pier-south+ 103)
+(defconstant +building-city-pier-west+ 104)
+(defconstant +building-city-pier-east+ 105)
+
 (defparameter *level-grid-size* 5)
 
 (defvar *building-types* (make-hash-table))

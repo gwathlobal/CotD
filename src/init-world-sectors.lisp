@@ -96,7 +96,35 @@
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
                                                     (list +faction-type-ghost+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-man+)
+                       :angel-disguised-mob-type-id +mob-type-man+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-port #'get-reserved-buildings-port))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world mission))
+
+                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR SEAPORT~%")
+
+                                                     (let ((seaport-params (second (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))))
+
+                                                       (cond
+                                                         ;; north
+                                                         ((find :n seaport-params) (place-seaport-north template-level))
+                                                         ;; south
+                                                         ((find :s seaport-params) (place-seaport-south template-level))
+                                                         ;; east
+                                                         ((find :e seaport-params) (place-seaport-east template-level))
+                                                         ;; west
+                                                         ((find :w seaport-params) (place-seaport-west template-level)))
+                                                       )
+                                                     )
+                       )
 
 (set-world-sector-type :wtype +world-sector-normal-forest+
                        :glyph-idx 38
@@ -114,6 +142,12 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-normal #'get-reserved-buildings-normal))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
 
@@ -198,7 +232,88 @@
                                                     (list +faction-type-criminals+ +mission-faction-absent+)
                                                     (list +faction-type-ghost+ +mission-faction-present+)
                                                     (list +faction-type-ghost+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-man+)
+                       :angel-disguised-mob-type-id +mob-type-man+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-port #'get-reserved-buildings-port))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world mission world-sector))
+
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR ISLAND~%")
+
+                                                    (let ((max-x (array-dimension template-level 0))
+                                                          (max-y (array-dimension template-level 1)))
+                                                      ;; place water along the borders
+                                                      (loop for x from 0 below max-x
+                                                            do
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ x 0 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ x 1 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ x 2 2 template-level)
+
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ x (- max-y 1) 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ x (- max-y 2) 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ x (- max-y 3) 2 template-level))
+                                                      
+                                                      (loop for y from 0 below max-y
+                                                            do
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ 0 y 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ 1 y 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ 2 y 2 template-level)
+
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ (- max-x 1) y 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ (- max-x 2) y 2 template-level)
+                                                               (level-city-reserve-build-on-grid +building-city-sea+ (- max-x 3) y 2 template-level))
+                                                    
+                                                      ;; place four piers - north, south, east, west
+                                                      (let ((min) (max) (r))
+                                                        ;; north
+                                                        (setf min 3 max (- (truncate max-x 2) 1))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-north+ r 1 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-north+ r 2 2 template-level)
+                                                        (setf min (+ (truncate max-x 2) 1) max (- max-x 3))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-north+ r 1 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-north+ r 2 2 template-level)
+                                                        
+                                                        ;; south
+                                                        (setf min 3 max (- (truncate max-x 2) 1))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 2) 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 3) 2 template-level)
+                                                        (setf min (+ (truncate max-x 2) 1) max (- max-x 3))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 2) 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 3) 2 template-level)
+                                                        
+                                                        ;; west
+                                                        (setf min 3 max (- (truncate max-y 2) 1))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-west+ 1 r 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-west+ 2 r 2 template-level)
+                                                        (setf min (+ (truncate max-y 2) 1) max (- max-y 3))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-west+ 1 r 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-west+ 2 r 2 template-level)
+                                                        
+                                                        ;; east
+                                                        (setf min 3 max (- (truncate max-y 2) 1))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 2) r 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 3) r 2 template-level)
+                                                        (setf min (+ (truncate max-y 2) 1) max (- max-y 3))
+                                                        (setf r (+ (random (- max min)) min))
+                                                        (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 2) r 2 template-level)
+                                                        (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 3) r 2 template-level))
+                                                      )
+                                                    )
+                       )
 
 ;;============
 ;; ABANDONED

@@ -19,7 +19,7 @@
   (setf (aref (cells world-map) 0 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 0 :y 1))
   (setf (aref (cells world-map) 1 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 1 :y 1))
   (setf (aref (cells world-map) 2 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 2 :y 1
-                                                                  :feats (list (list +lm-feat-river+ nil))))
+                                                                  :feats (list (list +lm-feat-river+ (list :n)))))
   (setf (aref (cells world-map) 3 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 3 :y 1))
   (setf (aref (cells world-map) 4 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 4 :y 1))
 
@@ -61,7 +61,7 @@
   
   ;;(generate-missions-on-world-map world-map world-time)
 
-  (setf (mission (aref (cells world-map) 4 2)) (generate-mission-on-world-map world-map 4 2 +mission-type-demonic-attack+ world-time))
+  (setf (mission (aref (cells world-map) 2 3)) (generate-mission-on-world-map world-map 2 3 +mission-type-demonic-attack+ world-time))
   
   world-map)
 
@@ -136,7 +136,7 @@
                  (progn
                    (push (list +lm-feat-sea+ (list :s)) (feats (aref (cells world-map) x y)))
                    (setf sea-feat (find +lm-feat-sea+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
-
+             
              ;; add barricade features
              (when (and (>= (1- x) 0)
                         (funcall can-barricade-func x y (1- x) y))
