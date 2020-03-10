@@ -61,7 +61,7 @@
   
   ;;(generate-missions-on-world-map world-map world-time)
 
-  (setf (mission (aref (cells world-map) 2 3)) (generate-mission-on-world-map world-map 2 3 +mission-type-demonic-attack+ world-time))
+  (setf (mission (aref (cells world-map) 1 2)) (generate-mission-on-world-map world-map 1 2 +mission-type-demonic-attack+ world-time))
   
   world-map)
 

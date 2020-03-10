@@ -231,11 +231,25 @@
                     :name "Library"
                     :priority 30
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
-                                                 (declare (ignore world-sector mission world))
+                                                 (declare (ignore mission world))
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM FEAT LIBRARY~%")
+
                                                  
-                                                 (loop with library-types = (prepare-spec-build-id-list +building-type-library+)
+                                                 
+                                                 (loop with library-types = (prepare-spec-build-id-list (cond
+                                                                                                          ((or (= (wtype world-sector) +world-sector-normal-residential+)
+                                                                                                               (= (wtype world-sector) +world-sector-normal-island+)
+                                                                                                               (= (wtype world-sector) +world-sector-normal-port+)
+                                                                                                               (= (wtype world-sector) +world-sector-normal-lake+)
+                                                                                                               (= (wtype world-sector) +world-sector-normal-forest+))
+                                                                                                           +building-type-library+)
+                                                                                                          ((or (= (wtype world-sector) +world-sector-abandoned-residential+)
+                                                                                                               (= (wtype world-sector) +world-sector-abandoned-island+)
+                                                                                                               (= (wtype world-sector) +world-sector-abandoned-port+)
+                                                                                                               (= (wtype world-sector) +world-sector-abandoned-lake+)
+                                                                                                               (= (wtype world-sector) +world-sector-abandoned-forest+))
+                                                                                                           +building-type-ruined-library+)))
                                                        for x = (random (array-dimension template-level 0))
                                                        for y = (random (array-dimension template-level 1))
                                                        for selected-library-type = (nth (random (length library-types)) library-types)

@@ -1205,11 +1205,12 @@
 
                                             (setf (aref template-level (+ x 2) (+ y 6) z) +terrain-floor-sign-library+)
                                             
-                                            (values (list (list +mob-type-man+ 3 2 z)
-                                                          (list +mob-type-woman+ 10 6 z)
-                                                          (list +mob-type-woman+ 13 8 z)
-                                                          (list +mob-type-woman+ 16 8 z))
-                                                    (list (list +feature-start-place-book-of-rituals+ 15 6 (- z 1) 1))
+                                            (values nil
+                                                    (list (list +feature-start-place-book-of-rituals+ 15 6 (- z 1) 1)
+                                                          (list +feature-start-place-civilian-man+ 3 2 z)
+                                                          (list +feature-start-place-civilian-woman+ 10 6 z)
+                                                          (list +feature-start-place-civilian-woman+ 13 8 z)
+                                                          (list +feature-start-place-civilian-woman+ 16 8 z))
                                                     nil))))
 
 ;;=====================

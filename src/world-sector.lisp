@@ -442,7 +442,7 @@
     )
   )
 
-(defun place-seaport-north (template-level)
+(defun place-seaport-north (template-level warehouse-building-id-1 warehouse-building-id-2)
   (loop with max-x = (array-dimension template-level 0)
         for x from 0 below max-x
         for building-type-id = (if (and (zerop (mod x 5))
@@ -454,11 +454,11 @@
                                    +building-city-pier-north+
                                    +building-city-sea+)
         for random-warehouse-1 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         for random-warehouse-2 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         do
            (level-city-reserve-build-on-grid +building-city-sea+ x 0 2 template-level)
            (level-city-reserve-build-on-grid building-type-id x 1 2 template-level)
@@ -469,7 +469,7 @@
            (when (level-city-can-place-build-on-grid random-warehouse-2 x 5 2 template-level)
              (level-city-reserve-build-on-grid random-warehouse-2 x 5 2 template-level))))
 
-(defun place-seaport-south (template-level)
+(defun place-seaport-south (template-level warehouse-building-id-1 warehouse-building-id-2)
   (loop with max-x = (array-dimension template-level 0)
         with max-y = (array-dimension template-level 1)
         for x from 0 below max-x
@@ -482,11 +482,11 @@
                                    +building-city-pier-south+
                                    +building-city-sea+)
         for random-warehouse-1 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         for random-warehouse-2 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         do
            (level-city-reserve-build-on-grid +building-city-sea+ x (- max-y 1) 2 template-level)
            (level-city-reserve-build-on-grid building-type-id x (- max-y 2) 2 template-level)
@@ -497,7 +497,7 @@
            (when (level-city-can-place-build-on-grid random-warehouse-2 x (- max-y 7) 2 template-level)
              (level-city-reserve-build-on-grid random-warehouse-2 x (- max-y 7) 2 template-level))))
 
-(defun place-seaport-east (template-level)
+(defun place-seaport-east (template-level warehouse-building-id-1 warehouse-building-id-2)
   (loop with max-x = (array-dimension template-level 0)
         with max-y = (array-dimension template-level 1)
         for y from 0 below max-y
@@ -510,11 +510,11 @@
                                  +building-city-pier-east+
                                  +building-city-sea+)
         for random-warehouse-1 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         for random-warehouse-2 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         do
            (level-city-reserve-build-on-grid +building-city-sea+ (- max-x 1) y 2 template-level)
            (level-city-reserve-build-on-grid building-type-id (- max-y 2) y 2 template-level)
@@ -525,7 +525,7 @@
            (when (level-city-can-place-build-on-grid random-warehouse-2 (- max-x 7) y 2 template-level)
              (level-city-reserve-build-on-grid random-warehouse-2 (- max-x 7) y 2 template-level))))
 
-(defun place-seaport-west (template-level)
+(defun place-seaport-west (template-level warehouse-building-id-1 warehouse-building-id-2)
   (loop with max-y = (array-dimension template-level 1)
         for y from 0 below max-y
         for building-type-id = (if (and (zerop (mod y 5))
@@ -537,11 +537,11 @@
                                  +building-city-pier-west+
                                  +building-city-sea+)
         for random-warehouse-1 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         for random-warehouse-2 = (if (zerop (random 2))
-                                   +building-city-warehouse-port-1+
-                                   +building-city-warehouse-port-2+)
+                                   warehouse-building-id-1
+                                   warehouse-building-id-2)
         do
            (level-city-reserve-build-on-grid +building-city-sea+ 0 y 2 template-level)
            (level-city-reserve-build-on-grid building-type-id 1 y 2 template-level)
@@ -551,3 +551,217 @@
              (level-city-reserve-build-on-grid random-warehouse-1 3 y 2 template-level))
            (when (level-city-can-place-build-on-grid random-warehouse-2 5 y 2 template-level)
              (level-city-reserve-build-on-grid random-warehouse-2 5 y 2 template-level))))
+
+(defun place-coins-on-level (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+
+  (format t "OVERALL-POST-PROCESS-FUNC: Place coins~%~%")
+  (let ((total-gold-items (loop for feature-id in (feature-id-list level)
+                                for lvl-feature = (get-feature-by-id feature-id)
+                                when (= (feature-type lvl-feature) +feature-start-gold-small+)
+                                  count lvl-feature)))
+    
+    (loop for feature-id in (feature-id-list level)
+          for lvl-feature = (get-feature-by-id feature-id)
+          when (= (feature-type lvl-feature) +feature-start-gold-small+)
+            do
+               (add-item-to-level-list level (make-instance 'item :item-type +item-type-coin+ :x (x lvl-feature) :y (y lvl-feature) :z (z lvl-feature)
+                                                                  :qty (+ (round 1250 total-gold-items) (random 51))))
+               (remove-feature-from-level-list level lvl-feature)
+          )
+    ))
+
+(defun place-civilians-on-level (level world-sector mission world)
+  (declare (ignore world-sector world))
+  
+  (format t "OVERALL-POST-PROCESS-FUNC: Place civilians~%~%")
+  (loop with civilians-present = nil
+        for (faction-type faction-presence) in (faction-list mission)
+        when (and (= faction-type +faction-type-civilians+)
+                  (= faction-presence +mission-faction-present+))
+          do
+             (setf civilians-present t)
+        finally
+           (unless civilians-present (return))
+           
+           ;; find all civilian start points and place civilians there
+           (loop for feature-id in (feature-id-list level)
+                 for lvl-feature = (get-feature-by-id feature-id)
+                 for x = (x lvl-feature)
+                 for y = (y lvl-feature)
+                 for z = (z lvl-feature)
+                 when (= (feature-type lvl-feature) +feature-start-place-civilian-man+)
+                   do
+                      (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-man+
+                                                                       :x x :y y :z z))
+                 when (= (feature-type lvl-feature) +feature-start-place-civilian-woman+)
+                   do
+                      (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-woman+
+                                                                       :x x :y y :z z))
+                 when (= (feature-type lvl-feature) +feature-start-place-civilian-child+)
+                   do
+                      (add-mob-to-level-list level (make-instance 'mob :mob-type +mob-type-child+
+                                                                       :x x :y y :z z)))
+        ))
+
+(defun place-lake-on-template-level (template-level world-sector mission world)
+  (declare (ignore mission world world-sector))
+  
+  (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
+  
+  (let ((x (- (truncate (array-dimension template-level 0) 2) 2))
+        (y (- (truncate (array-dimension template-level 1) 2) 2)))
+    
+    (level-city-reserve-build-on-grid +building-city-central-lake+ x y 2 template-level)
+    
+    ))
+
+(defun place-island-on-template-level (template-level world-sector mission world)
+  (declare (ignore mission world mission world-sector))
+  
+  (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR ISLAND~%")
+  
+  (let ((max-x (array-dimension template-level 0))
+        (max-y (array-dimension template-level 1)))
+    ;; place water along the borders
+    (loop for x from 0 below max-x
+          do
+             (level-city-reserve-build-on-grid +building-city-sea+ x 0 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ x 1 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ x 2 2 template-level)
+             
+             (level-city-reserve-build-on-grid +building-city-sea+ x (- max-y 1) 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ x (- max-y 2) 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ x (- max-y 3) 2 template-level))
+    
+    (loop for y from 0 below max-y
+          do
+             (level-city-reserve-build-on-grid +building-city-sea+ 0 y 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ 1 y 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ 2 y 2 template-level)
+             
+             (level-city-reserve-build-on-grid +building-city-sea+ (- max-x 1) y 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ (- max-x 2) y 2 template-level)
+             (level-city-reserve-build-on-grid +building-city-sea+ (- max-x 3) y 2 template-level))
+    
+    ;; place four piers - north, south, east, west
+    (let ((min) (max) (r))
+      ;; north
+      (setf min 3 max (- (truncate max-x 2) 1))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-north+ r 1 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-north+ r 2 2 template-level)
+      (setf min (+ (truncate max-x 2) 1) max (- max-x 3))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-north+ r 1 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-north+ r 2 2 template-level)
+      
+      ;; south
+      (setf min 3 max (- (truncate max-x 2) 1))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 2) 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 3) 2 template-level)
+      (setf min (+ (truncate max-x 2) 1) max (- max-x 3))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 2) 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-south+ r (- max-y 3) 2 template-level)
+      
+      ;; west
+      (setf min 3 max (- (truncate max-y 2) 1))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-west+ 1 r 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-west+ 2 r 2 template-level)
+      (setf min (+ (truncate max-y 2) 1) max (- max-y 3))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-west+ 1 r 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-west+ 2 r 2 template-level)
+      
+      ;; east
+      (setf min 3 max (- (truncate max-y 2) 1))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 2) r 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 3) r 2 template-level)
+      (setf min (+ (truncate max-y 2) 1) max (- max-y 3))
+      (setf r (+ (random (- max min)) min))
+      (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 2) r 2 template-level)
+      (level-city-reserve-build-on-grid +building-city-pier-east+ (- max-x 3) r 2 template-level))
+    )
+  )
+
+(defun get-max-buildings-normal ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-house+ max-building-types) t)
+    (setf (gethash +building-type-townhall+ max-building-types) t)
+    (setf (gethash +building-type-park+ max-building-types) t)
+    (setf (gethash +building-type-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-warehouse+ max-building-types) 1)
+    (setf (gethash +building-type-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-bank+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 4)
+    (setf (gethash +building-type-graveyard+ max-building-types) 1)
+    max-building-types))
+
+(defun get-max-buildings-port ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-house+ max-building-types) t)
+    (setf (gethash +building-type-townhall+ max-building-types) t)
+    (setf (gethash +building-type-park+ max-building-types) t)
+    (setf (gethash +building-type-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-warehouse+ max-building-types) 0)
+    (setf (gethash +building-type-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-bank+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 0)
+    max-building-types))
+
+(defun get-reserved-buildings-normal ()
+  (let ((reserved-building-types (make-hash-table)))
+    reserved-building-types))
+
+(defun get-reserved-buildings-port ()
+  (let ((reserved-building-types (make-hash-table)))
+    reserved-building-types))
+
+(defun get-max-buildings-ruined-normal ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-house+ max-building-types) t)
+    (setf (gethash +building-type-ruined-townhall+ max-building-types) t)
+    (setf (gethash +building-type-ruined-park+ max-building-types) t)
+    (setf (gethash +building-type-ruined-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-ruined-warehouse+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 4)
+    (setf (gethash +building-type-graveyard+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-crater+ max-building-types) 4)
+    (setf (gethash +building-type-ruined-crater-large+ max-building-types) 1)
+    max-building-types))
+
+(defun get-max-buildings-ruined-port ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-ruined-house+ max-building-types) t)
+    (setf (gethash +building-type-ruined-townhall+ max-building-types) t)
+    (setf (gethash +building-type-ruined-park+ max-building-types) t)
+    (setf (gethash +building-type-ruined-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-ruined-warehouse+ max-building-types) 0)
+    (setf (gethash +building-type-ruined-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 1)
+    (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 0)
+    (setf (gethash +building-type-ruined-crater+ max-building-types) 4)
+    (setf (gethash +building-type-ruined-crater-large+ max-building-types) 1)
+    max-building-types))
+
+(defun get-reserved-buildings-ruined-normal ()
+  (let ((reserved-building-types (make-hash-table)))
+    reserved-building-types))
+
+(defun get-reserved-buildings-ruined-port ()
+  (let ((reserved-building-types (make-hash-table)))
+    reserved-building-types))
