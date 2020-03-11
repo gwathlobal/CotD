@@ -688,6 +688,35 @@
     )
   )
 
+(defun place-outskirts-on-template-level (template-level building-park-id)
+    
+  ;; place building-park-id along the borders
+  (loop with y1 = 0
+        with y2 = (array-dimension template-level 1)
+        for x from 0 below (array-dimension template-level 0)
+        do
+           (level-city-reserve-build-on-grid +building-city-forest-border+ x y1 2 template-level)
+           (level-city-reserve-build-on-grid +building-city-forest-border+ x (- y2 1) 2 template-level)
+           
+           (when (level-city-can-place-build-on-grid building-park-id x (+ y1 1) 2 template-level)
+             (level-city-reserve-build-on-grid building-park-id x (+ y1 1) 2 template-level))
+           (when (level-city-can-place-build-on-grid building-park-id x (- y2 3) 2 template-level)
+             (level-city-reserve-build-on-grid building-park-id x (- y2 3) 2 template-level)))
+  
+  (loop with x1 = 0
+        with x2 = (array-dimension template-level 0)
+        for y from 0 below (array-dimension template-level 1)
+        do
+           (level-city-reserve-build-on-grid +building-city-forest-border+ x1 y 2 template-level)
+           (level-city-reserve-build-on-grid +building-city-forest-border+ (- x2 1) y 2 template-level)
+           
+           (when (level-city-can-place-build-on-grid building-park-id (+ x1 1) y 2 template-level)
+             (level-city-reserve-build-on-grid building-park-id (+ x1 1) y 2 template-level))
+           (when (level-city-can-place-build-on-grid building-park-id (- x2 3) y 2 template-level)
+             (level-city-reserve-build-on-grid building-park-id (- x2 3) y 2 template-level)))
+  
+  )
+
 (defun get-max-buildings-normal ()
   (let ((max-building-types (make-hash-table)))
     (setf (gethash +building-type-house+ max-building-types) t)

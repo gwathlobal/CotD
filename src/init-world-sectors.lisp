@@ -305,14 +305,10 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
 
-                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
 
-                                                    (let ((x (- (truncate (array-dimension template-level 0) 2) 2))
-                                                          (y (- (truncate (array-dimension template-level 1) 2) 2)))
-
-                                                      (level-city-reserve-build-on-grid +building-city-central-lake+ x y 2 template-level)
-                                                      
-                                                      ))
+                                                    (place-outskirts-on-template-level template-level +building-city-ruined-park-3+)
+                                                    )
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; place coins to always enable thief's victory
