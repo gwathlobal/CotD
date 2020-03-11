@@ -150,7 +150,11 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-normal #'get-reserved-buildings-normal))
-                       :template-level-gen-func #'place-lake-on-template-level
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world world-sector))
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
+
+                                                    (place-lake-on-template-level template-level +building-city-central-lake+))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -328,7 +332,11 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-ruined-normal #'get-reserved-buildings-ruined-normal))
-                       :template-level-gen-func #'place-lake-on-template-level
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world world-sector))
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
+
+                                                    (place-lake-on-template-level template-level +building-city-central-lake+))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -380,7 +388,24 @@
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
                                                     (list +faction-type-eater+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-soldier+)
+                       :angel-disguised-mob-type-id +mob-type-soldier+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
+                                                                        (list +level-city-border+ +terrain-border-creep+
+                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-floor+ +terrain-floor-creep+
+                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :overall-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             
+                                                             func-list)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-port+
                        :glyph-idx 48
@@ -389,7 +414,46 @@
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
                                                     (list +faction-type-eater+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-soldier+)
+                       :angel-disguised-mob-type-id +mob-type-soldier+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-corrupted-port #'get-reserved-buildings-corrupted-port
+                                                                        (list +level-city-border+ +terrain-border-creep+
+                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-floor+ +terrain-floor-creep+
+                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world mission))
+
+                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR SEAPORT~%")
+
+                                                     (let ((seaport-params (second (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))))
+
+                                                       (cond
+                                                        ;; north
+                                                        ((find :n seaport-params)
+                                                         (place-seaport-north template-level +building-city-corrupted-warehouse-port-1+ +building-city-corrupted-warehouse-port-2+))
+                                                        ;; south
+                                                        ((find :s seaport-params)
+                                                         (place-seaport-south template-level +building-city-corrupted-warehouse-port-1+ +building-city-corrupted-warehouse-port-2+))
+                                                        ;; east
+                                                        ((find :e seaport-params)
+                                                         (place-seaport-east template-level +building-city-corrupted-warehouse-port-1+ +building-city-corrupted-warehouse-port-2+))
+                                                        ;; west
+                                                        ((find :w seaport-params)
+                                                         (place-seaport-west template-level +building-city-corrupted-warehouse-port-1+ +building-city-corrupted-warehouse-port-2+)))
+                                                       )
+                                                     )
+                       :overall-post-process-func-list #'(lambda ()
+                                                            (let ((func-list ()))
+                                                                                                                          
+                                                              func-list)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-forest+
                        :glyph-idx 38
@@ -398,7 +462,31 @@
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
                                                     (list +faction-type-eater+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-soldier+)
+                       :angel-disguised-mob-type-id +mob-type-soldier+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
+                                                                        (list +level-city-border+ +terrain-border-creep+
+                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-floor+ +terrain-floor-creep+
+                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world world-sector))
+
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
+
+                                                    (place-outskirts-on-template-level template-level +building-city-corrupted-park-3+)
+                                                    )
+                       :overall-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                                                                                          
+                                                             func-list)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-lake+
                        :glyph-idx 44
@@ -407,7 +495,29 @@
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
                                                     (list +faction-type-eater+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-soldier+)
+                       :angel-disguised-mob-type-id +mob-type-soldier+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
+                                                                        (list +level-city-border+ +terrain-border-creep+
+                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-floor+ +terrain-floor-creep+
+                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (declare (ignore mission world world-sector))
+                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
+
+                                                    (place-lake-on-template-level template-level +building-city-corrupted-central-lake+))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :overall-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                                                                                          
+                                                             func-list)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-island+
                        :glyph-idx 41
@@ -416,4 +526,22 @@
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ +mission-faction-present+)
                                                     (list +faction-type-eater+ +mission-faction-absent+)))
-                       :angel-disguised-mob-type-id +mob-type-soldier+)
+                       :angel-disguised-mob-type-id +mob-type-soldier+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-corrupted-port #'get-reserved-buildings-corrupted-port
+                                                                        (list +level-city-border+ +terrain-border-creep+
+                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-floor+ +terrain-floor-creep+
+                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :template-level-gen-func #'place-island-on-template-level
+                       :overall-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             
+                                                             func-list)))

@@ -1,4 +1,5 @@
-- Add beasts to abandoned district
+- Add glowing tiles to corrupted district
+- Add beasts to abandoned and corrupted district
 - Make the system show normal-looking highscores after the upgrade
 - Level modifier when there are numerous primordial creatures on level
 - Campaign for Lost Soul: library and lair in different sectors, player can move between sectors by going to the edge of the local map

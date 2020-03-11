@@ -234,9 +234,7 @@
                                                  (declare (ignore mission world))
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM FEAT LIBRARY~%")
-
-                                                 
-                                                 
+                                                                                                  
                                                  (loop with library-types = (prepare-spec-build-id-list (cond
                                                                                                           ((or (= (wtype world-sector) +world-sector-normal-residential+)
                                                                                                                (= (wtype world-sector) +world-sector-normal-island+)

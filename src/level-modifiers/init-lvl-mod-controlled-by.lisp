@@ -15,11 +15,23 @@
                                            (list (list +faction-type-demons+ +mission-faction-present+)))
                     :priority 25
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
-                                                 (declare (ignore world-sector mission world))
+                                                 (declare (ignore mission world))
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM CONTROLLED BY DEMONS~%")
 
-                                                 (let ((building-id +building-city-sigil-post+)
+                                                 (let ((building-id (cond
+                                                                      ((or (= (wtype world-sector) +world-sector-corrupted-residential+)
+                                                                           (= (wtype world-sector) +world-sector-corrupted-island+)
+                                                                           (= (wtype world-sector) +world-sector-corrupted-port+)
+                                                                           (= (wtype world-sector) +world-sector-corrupted-lake+)
+                                                                           (= (wtype world-sector) +world-sector-corrupted-forest+))
+                                                                       +building-city-corrupted-sigil-post+)
+                                                                      ((or (= (wtype world-sector) +world-sector-abandoned-residential+)
+                                                                           (= (wtype world-sector) +world-sector-abandoned-island+)
+                                                                           (= (wtype world-sector) +world-sector-abandoned-port+)
+                                                                           (= (wtype world-sector) +world-sector-abandoned-lake+)
+                                                                           (= (wtype world-sector) +world-sector-abandoned-forest+))
+                                                                       +building-city-sigil-post+)))
                                                        (x-w 4)
                                                        (y-n 4)
                                                        (x-e (- (array-dimension template-level 0) 5))
@@ -42,6 +54,26 @@
 
                                                    )
                                                  )
+                     :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+                                                          ;; add demonic sigils
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector world mission))
+
+                                                                    (format t "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%~%")
+
+                                                                    (loop with sigil = nil
+                                                                          for feature-id in (feature-id-list level)
+                                                                          for lvl-feature = (get-feature-by-id feature-id)
+                                                                          when (= (feature-type lvl-feature) +feature-start-sigil-point+)
+                                                                            do
+                                                                               (setf sigil (make-instance 'mob :mob-type +mob-type-demon-sigil+))
+                                                                               (setf (x sigil) (x lvl-feature) (y sigil) (y lvl-feature) (z sigil) (z lvl-feature))
+                                                                               (add-mob-to-level-list level sigil)
+                                                                               (set-mob-effect sigil :effect-type-id +mob-effect-demonic-sigil+ :actor-id (id sigil) :cd t))
+                                                                    )
+                                                                func-list)
+                                                          func-list))
                     )
 
 (set-level-modifier :id +lm-controlled-by-military+ :type +level-mod-controlled-by+

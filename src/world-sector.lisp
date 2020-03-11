@@ -604,15 +604,12 @@
                                                                        :x x :y y :z z)))
         ))
 
-(defun place-lake-on-template-level (template-level world-sector mission world)
-  (declare (ignore mission world world-sector))
-  
-  (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
-  
+(defun place-lake-on-template-level (template-level building-lake-id)
+    
   (let ((x (- (truncate (array-dimension template-level 0) 2) 2))
         (y (- (truncate (array-dimension template-level 1) 2) 2)))
     
-    (level-city-reserve-build-on-grid +building-city-central-lake+ x y 2 template-level)
+    (level-city-reserve-build-on-grid building-lake-id x y 2 template-level)
     
     ))
 
@@ -792,5 +789,46 @@
     reserved-building-types))
 
 (defun get-reserved-buildings-ruined-port ()
+  (let ((reserved-building-types (make-hash-table)))
+    reserved-building-types))
+
+(defun get-max-buildings-corrupted-normal ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-corrupted-house+ max-building-types) t)
+    (setf (gethash +building-type-corrupted-townhall+ max-building-types) t)
+    (setf (gethash +building-type-corrupted-park+ max-building-types) t)
+    (setf (gethash +building-type-corrupted-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-corrupted-warehouse+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 0)
+    (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-lake+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-graveyard+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
+    max-building-types))
+
+(defun get-max-buildings-corrupted-port ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-corrupted-house+ max-building-types) t)
+    (setf (gethash +building-type-corrupted-townhall+ max-building-types) t)
+    (setf (gethash +building-type-corrupted-park+ max-building-types) t)
+    (setf (gethash +building-type-corrupted-mansion+ max-building-types) t)
+    
+    (setf (gethash +building-type-corrupted-warehouse+ max-building-types) 0)
+    (setf (gethash +building-type-corrupted-prison+ max-building-types) 1)
+    (setf (gethash +building-type-stables+ max-building-types) 0)
+    (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
+    (setf (gethash +building-type-corrupted-lake+ max-building-types) 0)
+    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
+    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
+    max-building-types))
+
+(defun get-reserved-buildings-corrupted-normal ()
+  (let ((reserved-building-types (make-hash-table)))
+    reserved-building-types))
+
+(defun get-reserved-buildings-corrupted-port ()
   (let ((reserved-building-types (make-hash-table)))
     reserved-building-types))
