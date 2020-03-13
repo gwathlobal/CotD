@@ -604,6 +604,15 @@
                                                                        :x x :y y :z z)))
         ))
 
+(defun place-outsider-beasts-on-level (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  (populate-world-with-mobs level (list (cons +mob-type-gargantaur+ 1)
+                                        (cons +mob-type-wisp+ 9))
+                            #'find-unoccupied-place-inside)
+  (populate-world-with-mobs level (list (cons +mob-type-fiend+ 9))
+                            #'find-unoccupied-place-inside)
+  )
+
 (defun place-lake-on-template-level (template-level building-lake-id)
     
   (let ((x (- (truncate (array-dimension template-level 0) 2) 2))

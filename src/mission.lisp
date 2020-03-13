@@ -403,6 +403,11 @@
                                        
                                        (setf result nil)
                                        (loop-finish)
+                                  when (and (get-feature-type-trait feature +feature-trait-remove-on-dungeon-generation+)
+                                            (< (get-distance x y (x feature) (y feature)) 2))
+                                    do
+                                       (setf result nil)
+                                       (loop-finish)
                                   finally (return result)))))
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list level mob)))

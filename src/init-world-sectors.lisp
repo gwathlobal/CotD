@@ -239,6 +239,10 @@
                                                              ;; place coins to always enable thief's victory
                                                              (push #'place-coins-on-level
                                                                    func-list)
+
+                                                              ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                   func-list)
                                                              
                                                               func-list)))
 
@@ -286,7 +290,11 @@
                                                              ;; place coins to always enable thief's victory
                                                              (push #'place-coins-on-level
                                                                    func-list)
-                                                             
+
+                                                              ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
+                                                              
                                                               func-list)))
 
 (set-world-sector-type :wtype +world-sector-abandoned-forest+
@@ -318,6 +326,10 @@
                                                              ;; place coins to always enable thief's victory
                                                              (push #'place-coins-on-level
                                                                    func-list)
+
+                                                             ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
                                                              
                                                              func-list)))
 
@@ -348,6 +360,10 @@
                                                              ;; place coins to always enable thief's victory
                                                              (push #'place-coins-on-level
                                                                    func-list)
+
+                                                             ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
                                                              
                                                              func-list)))
 
@@ -374,6 +390,10 @@
                                                              ;; place coins to always enable thief's victory
                                                              (push #'place-coins-on-level
                                                                    func-list)
+
+                                                             ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
                                                              
                                                              func-list)))
 
@@ -404,6 +424,10 @@
                                                              func-list))
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
+
+                                                             ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
                                                              
                                                              func-list)))
 
@@ -452,7 +476,11 @@
                                                      )
                        :overall-post-process-func-list #'(lambda ()
                                                             (let ((func-list ()))
-                                                                                                                          
+
+                                                              ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
+                                                              
                                                               func-list)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-forest+
@@ -485,7 +513,11 @@
                                                     )
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
-                                                                                                                          
+
+                                                             ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
+                                                             
                                                              func-list)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-lake+
@@ -516,7 +548,11 @@
                                                              func-list))
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
-                                                                                                                          
+
+                                                             ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
+                                                             
                                                              func-list)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-island+
@@ -543,5 +579,9 @@
                        :template-level-gen-func #'place-island-on-template-level
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
+
+                                                             ;; place outsider beasts
+                                                              (push #'place-outsider-beasts-on-level
+                                                                    func-list)
                                                              
                                                              func-list)))
