@@ -243,7 +243,11 @@
                                                               ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                    func-list)
-                                                             
+
+                                                              ;; place blood
+                                                             (push #'place-blood-on-level
+                                                                   func-list)
+                                                              
                                                               func-list)))
 
 (set-world-sector-type :wtype +world-sector-abandoned-port+
@@ -294,6 +298,10 @@
                                                               ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
+
+                                                              ;; place blood
+                                                             (push #'place-blood-on-level
+                                                                   func-list)
                                                               
                                                               func-list)))
 
@@ -330,6 +338,10 @@
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
+
+                                                             ;; place blood
+                                                             (push #'place-blood-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -364,6 +376,14 @@
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
+
+                                                             ;; place blood
+                                                             (push #'place-blood-on-level
+                                                                   func-list)
+
+                                                             ;; place blood
+                                                             (push #'place-blood-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -392,8 +412,12 @@
                                                                    func-list)
 
                                                              ;; place outsider beasts
-                                                              (push #'place-outsider-beasts-on-level
-                                                                    func-list)
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+
+                                                             ;; place blood
+                                                             (push #'place-blood-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -426,7 +450,11 @@
                                                            (let ((func-list ()))
 
                                                              ;; place outsider beasts
-                                                              (push #'place-outsider-beasts-on-level
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+
+                                                             ;; place irradiated spots
+                                                             (push #'place-irradation-on-level
                                                                     func-list)
                                                              
                                                              func-list)))
@@ -480,6 +508,10 @@
                                                               ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
+
+                                                              ;; place irradiated spots
+                                                              (push #'place-irradation-on-level
+                                                                   func-list)
                                                               
                                                               func-list)))
 
@@ -517,6 +549,10 @@
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
+
+                                                             ;; place irradiated spots
+                                                             (push #'place-irradation-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -552,6 +588,10 @@
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
+
+                                                             ;; place irradiated spots
+                                                             (push #'place-irradation-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -583,5 +623,9 @@
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
+
+                                                             ;; place irradiated spots
+                                                             (push #'place-irradation-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))

@@ -606,11 +606,70 @@
 
 (defun place-outsider-beasts-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
+
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place outsider beasts~%"))
+  
   (populate-world-with-mobs level (list (cons +mob-type-gargantaur+ 1)
                                         (cons +mob-type-wisp+ 9))
                             #'find-unoccupied-place-inside)
   (populate-world-with-mobs level (list (cons +mob-type-fiend+ 9))
                             #'find-unoccupied-place-inside)
+  )
+
+(defun place-blood-on-level (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place blood spatters~%"))
+  (let ((blood ())
+        (max-blood (sqrt (* (array-dimension (terrain level) 0)
+                            (array-dimension (terrain level) 1)))))
+    (loop with max-x = (- (array-dimension (terrain level) 0) 2)
+          with max-y = (- (array-dimension (terrain level) 1) 2)
+          with max-z = (- (array-dimension (terrain level) 2) 2)
+          with cur-blood = 0
+          for x = (1+ (random max-x))
+          for y = (1+ (random max-y))
+          for z = (1+ (random max-z))
+          while (< cur-blood max-blood) do
+            (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                       (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
+                       (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-water+)))
+              (if (zerop (random 2))
+                (push (list x y z +feature-blood-stain+) blood)
+                (push (list x y z +feature-blood-old+) blood))
+              (incf cur-blood)
+              (check-surroundings x y nil #'(lambda (dx dy)
+                                              (when (and (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+)
+                                                         (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-water+)))
+                                                (when (zerop (random 4))
+                                                  (push (list dx dy z +feature-blood-old+) blood))))))
+          )
+    (loop for (x y z feature-type-id) in blood do
+      ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id feature-type-id)) x y z)
+      (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))))
+
+(defun place-irradation-on-level (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place irradiated spots~%"))
+  (loop with max-x = (- (array-dimension (terrain level) 0) 2)
+        with max-y = (- (array-dimension (terrain level) 1) 2)
+        with max-z = (- (array-dimension (terrain level) 2) 2)
+        with cur-spot = 0
+        with max-spots = (+ 3 (random 10))
+        with func = (defun func (tx ty tz)
+                      (set-terrain-* level tx ty tz +terrain-floor-creep-irradiated+)
+                      (check-surroundings tx ty nil #'(lambda (dx dy)
+                                                        (when (= (get-terrain-* level dx dy tz) +terrain-floor-creep+)
+                                                          (when (zerop (random 4))
+                                                            (funcall #'func dx dy tz))))))
+        for x = (1+ (random max-x))
+        for y = (1+ (random max-y))
+        for z = (1+ (random max-z))
+        while (< cur-spot max-spots) do
+          (when (= (get-terrain-* level x y z) +terrain-floor-creep+)
+            (funcall func x y z)
+            (incf cur-spot)))
   )
 
 (defun place-lake-on-template-level (template-level building-lake-id)
