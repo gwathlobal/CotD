@@ -753,15 +753,15 @@
     )
   )
 
-(defun place-outskirts-on-template-level (template-level building-park-id)
+(defun place-outskirts-on-template-level (template-level building-border-id building-park-id)
     
   ;; place building-park-id along the borders
   (loop with y1 = 0
         with y2 = (array-dimension template-level 1)
         for x from 0 below (array-dimension template-level 0)
         do
-           (level-city-reserve-build-on-grid +building-city-forest-border+ x y1 2 template-level)
-           (level-city-reserve-build-on-grid +building-city-forest-border+ x (- y2 1) 2 template-level)
+           (level-city-reserve-build-on-grid building-border-id x y1 2 template-level)
+           (level-city-reserve-build-on-grid building-border-id x (- y2 1) 2 template-level)
            
            (when (level-city-can-place-build-on-grid building-park-id x (+ y1 1) 2 template-level)
              (level-city-reserve-build-on-grid building-park-id x (+ y1 1) 2 template-level))
@@ -772,8 +772,8 @@
         with x2 = (array-dimension template-level 0)
         for y from 0 below (array-dimension template-level 1)
         do
-           (level-city-reserve-build-on-grid +building-city-forest-border+ x1 y 2 template-level)
-           (level-city-reserve-build-on-grid +building-city-forest-border+ (- x2 1) y 2 template-level)
+           (level-city-reserve-build-on-grid building-border-id x1 y 2 template-level)
+           (level-city-reserve-build-on-grid building-border-id (- x2 1) y 2 template-level)
            
            (when (level-city-can-place-build-on-grid building-park-id (+ x1 1) y 2 template-level)
              (level-city-reserve-build-on-grid building-park-id (+ x1 1) y 2 template-level))
@@ -832,8 +832,8 @@
     (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 4)
     (setf (gethash +building-type-graveyard+ max-building-types) 1)
-    (setf (gethash +building-type-ruined-crater+ max-building-types) 4)
-    (setf (gethash +building-type-ruined-crater-large+ max-building-types) 1)
+    (setf (gethash +building-type-crater+ max-building-types) 4)
+    (setf (gethash +building-type-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-ruined-port ()
@@ -848,8 +848,8 @@
     (setf (gethash +building-type-stables+ max-building-types) 1)
     (setf (gethash +building-type-ruined-bank+ max-building-types) 1)
     (setf (gethash +building-type-lake+ max-building-types) 0)
-    (setf (gethash +building-type-ruined-crater+ max-building-types) 4)
-    (setf (gethash +building-type-ruined-crater-large+ max-building-types) 1)
+    (setf (gethash +building-type-crater+ max-building-types) 4)
+    (setf (gethash +building-type-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-reserved-buildings-ruined-normal ()
@@ -871,10 +871,10 @@
     (setf (gethash +building-type-corrupted-prison+ max-building-types) 1)
     (setf (gethash +building-type-stables+ max-building-types) 0)
     (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
-    (setf (gethash +building-type-corrupted-lake+ max-building-types) 4)
+    (setf (gethash +building-type-lake+ max-building-types) 4)
     (setf (gethash +building-type-corrupted-graveyard+ max-building-types) 1)
-    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
-    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
+    (setf (gethash +building-type-crater+ max-building-types) 4)
+    (setf (gethash +building-type-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-max-buildings-corrupted-port ()
@@ -888,9 +888,9 @@
     (setf (gethash +building-type-corrupted-prison+ max-building-types) 1)
     (setf (gethash +building-type-stables+ max-building-types) 0)
     (setf (gethash +building-type-corrupted-bank+ max-building-types) 1)
-    (setf (gethash +building-type-corrupted-lake+ max-building-types) 0)
-    (setf (gethash +building-type-corrupted-crater+ max-building-types) 4)
-    (setf (gethash +building-type-corrupted-crater-large+ max-building-types) 1)
+    (setf (gethash +building-type-lake+ max-building-types) 0)
+    (setf (gethash +building-type-crater+ max-building-types) 4)
+    (setf (gethash +building-type-crater-large+ max-building-types) 1)
     max-building-types))
 
 (defun get-reserved-buildings-corrupted-normal ()

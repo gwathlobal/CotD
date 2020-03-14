@@ -121,7 +121,7 @@
 
                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
 
-                                                    (place-outskirts-on-template-level template-level +building-city-park-3+)
+                                                    (place-outskirts-on-template-level template-level +building-city-normal-forest-border+ +building-city-park-3+)
                                                     )
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
@@ -327,7 +327,7 @@
 
                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
 
-                                                    (place-outskirts-on-template-level template-level +building-city-ruined-park-3+)
+                                                    (place-outskirts-on-template-level template-level +building-city-normal-forest-border+ +building-city-ruined-park-3+)
                                                     )
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
@@ -436,10 +436,25 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
-                                                                        (list +level-city-border+ +terrain-border-creep+
-                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
-                                                                              +level-city-floor+ +terrain-floor-creep+
-                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                                                                        (list +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-terrain-border+ #'(lambda ()
+                                                                                                              +terrain-border-creep+)
+                                                                               +level-city-terrain-dirt+ #'(lambda ()
+                                                                                                            (let ((r (random 100)))
+                                                                                                              (cond
+                                                                                                                ((< r 3) +terrain-floor-creep-dreadtubes+)
+                                                                                                                ((< r 6) +terrain-floor-creep-spores+)
+                                                                                                                ((< r 10) +terrain-wall-razorthorns+)
+                                                                                                                ((< r 13) +terrain-floor-creep-glowshroom+)
+                                                                                                                ((< r 20) +terrain-floor-creep+)
+                                                                                                                (t +terrain-floor-creep-bright+)
+                                                                                                                )))
+                                                                              +level-city-terrain-grass+ #'(lambda ()
+                                                                                                             +terrain-floor-creep+)
+                                                                              +level-city-terrain-tree+ #'(lambda ()
+                                                                                                            +terrain-tree-twintube+)
+                                                                              +level-city-terrain-bush+ #'(lambda ()
+                                                                                                            +terrain-wall-gloomtwigs+))))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -470,10 +485,25 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-corrupted-port #'get-reserved-buildings-corrupted-port
-                                                                        (list +level-city-border+ +terrain-border-creep+
-                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
-                                                                              +level-city-floor+ +terrain-floor-creep+
-                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                                                                        (list +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-terrain-border+ #'(lambda ()
+                                                                                                              +terrain-border-creep+)
+                                                                              +level-city-terrain-dirt+ #'(lambda ()
+                                                                                                            (let ((r (random 100)))
+                                                                                                              (cond
+                                                                                                                ((< r 3) +terrain-floor-creep-dreadtubes+)
+                                                                                                                ((< r 6) +terrain-floor-creep-spores+)
+                                                                                                                ((< r 10) +terrain-wall-razorthorns+)
+                                                                                                                ((< r 13) +terrain-floor-creep-glowshroom+)
+                                                                                                                ((< r 20) +terrain-floor-creep+)
+                                                                                                                (t +terrain-floor-creep-bright+)
+                                                                                                                )))
+                                                                              +level-city-terrain-grass+ #'(lambda ()
+                                                                                                             +terrain-floor-creep+)
+                                                                              +level-city-terrain-tree+ #'(lambda ()
+                                                                                                            +terrain-tree-twintube+)
+                                                                              +level-city-terrain-bush+ #'(lambda ()
+                                                                                                            +terrain-wall-gloomtwigs+))))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -526,10 +556,25 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
-                                                                        (list +level-city-border+ +terrain-border-creep+
-                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
-                                                                              +level-city-floor+ +terrain-floor-creep+
-                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                                                                        (list +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-terrain-border+ #'(lambda ()
+                                                                                                              +terrain-border-creep+)
+                                                                              +level-city-terrain-dirt+ #'(lambda ()
+                                                                                                            (let ((r (random 100)))
+                                                                                                              (cond
+                                                                                                                ((< r 3) +terrain-floor-creep-dreadtubes+)
+                                                                                                                ((< r 6) +terrain-floor-creep-spores+)
+                                                                                                                ((< r 10) +terrain-wall-razorthorns+)
+                                                                                                                ((< r 13) +terrain-floor-creep-glowshroom+)
+                                                                                                                ((< r 20) +terrain-floor-creep+)
+                                                                                                                (t +terrain-floor-creep-bright+)
+                                                                                                                )))
+                                                                              +level-city-terrain-grass+ #'(lambda ()
+                                                                                                             +terrain-floor-creep+)
+                                                                              +level-city-terrain-tree+ #'(lambda ()
+                                                                                                            +terrain-tree-twintube+)
+                                                                              +level-city-terrain-bush+ #'(lambda ()
+                                                                                                            +terrain-wall-gloomtwigs+))))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -541,7 +586,7 @@
 
                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
 
-                                                    (place-outskirts-on-template-level template-level +building-city-corrupted-park-3+)
+                                                    (place-outskirts-on-template-level template-level +building-city-corrupted-forest-border+ +building-city-corrupted-park-3+)
                                                     )
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
@@ -567,15 +612,30 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
-                                                                        (list +level-city-border+ +terrain-border-creep+
-                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
-                                                                              +level-city-floor+ +terrain-floor-creep+
-                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                                                                        (list +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-terrain-border+ #'(lambda ()
+                                                                                                              +terrain-border-creep+)
+                                                                              +level-city-terrain-dirt+ #'(lambda ()
+                                                                                                            (let ((r (random 100)))
+                                                                                                              (cond
+                                                                                                                ((< r 3) +terrain-floor-creep-dreadtubes+)
+                                                                                                                ((< r 6) +terrain-floor-creep-spores+)
+                                                                                                                ((< r 10) +terrain-wall-razorthorns+)
+                                                                                                                ((< r 13) +terrain-floor-creep-glowshroom+)
+                                                                                                                ((< r 20) +terrain-floor-creep+)
+                                                                                                                (t +terrain-floor-creep-bright+)
+                                                                                                                )))
+                                                                              +level-city-terrain-grass+ #'(lambda ()
+                                                                                                             +terrain-floor-creep+)
+                                                                              +level-city-terrain-tree+ #'(lambda ()
+                                                                                                            +terrain-tree-twintube+)
+                                                                              +level-city-terrain-bush+ #'(lambda ()
+                                                                                                            +terrain-wall-gloomtwigs+))))
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
 
-                                                    (place-lake-on-template-level template-level +building-city-corrupted-central-lake+))
+                                                    (place-lake-on-template-level template-level +building-city-central-lake+))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -606,10 +666,25 @@
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
                                                                         #'get-max-buildings-corrupted-port #'get-reserved-buildings-corrupted-port
-                                                                        (list +level-city-border+ +terrain-border-creep+
-                                                                              +level-city-park+ +building-city-corrupted-park-tiny+
-                                                                              +level-city-floor+ +terrain-floor-creep+
-                                                                              +level-city-floor-bright+ +terrain-floor-creep-bright+)))
+                                                                        (list +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-terrain-border+ #'(lambda ()
+                                                                                                              +terrain-border-creep+)
+                                                                              +level-city-terrain-dirt+ #'(lambda ()
+                                                                                                            (let ((r (random 100)))
+                                                                                                              (cond
+                                                                                                                ((< r 3) +terrain-floor-creep-dreadtubes+)
+                                                                                                                ((< r 6) +terrain-floor-creep-spores+)
+                                                                                                                ((< r 10) +terrain-wall-razorthorns+)
+                                                                                                                ((< r 13) +terrain-floor-creep-glowshroom+)
+                                                                                                                ((< r 20) +terrain-floor-creep+)
+                                                                                                                (t +terrain-floor-creep-bright+)
+                                                                                                                )))
+                                                                              +level-city-terrain-grass+ #'(lambda ()
+                                                                                                             +terrain-floor-creep+)
+                                                                              +level-city-terrain-tree+ #'(lambda ()
+                                                                                                            +terrain-tree-twintube+)
+                                                                              +level-city-terrain-bush+ #'(lambda ()
+                                                                                                            +terrain-wall-gloomtwigs+))))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military

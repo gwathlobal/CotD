@@ -1,3 +1,4 @@
+
 (in-package :cotd)
 
 ;;=====================
@@ -5,7 +6,8 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-house-1+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-ruined-house+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
+                                            
                                             (let ((build-template-z-2 (list ",,,,,,,,,"
                                                                             ",,.#####,"
                                                                             ",....u##,"
@@ -36,9 +38,9 @@
                                                                             "    .... "
                                                                             "         ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -46,7 +48,7 @@
                                                     ))))
 
 (set-building-type (make-building :id +building-city-ruined-house-2+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-ruined-house+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,"
                                                                             ",#######,"
                                                                             ",#c...t#,"
@@ -77,16 +79,16 @@
                                                                             " ....... "
                                                                             "         ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-house-3+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-ruined-house+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,"
                                                                             ",#######,"
                                                                             ",##u#ht-,"
@@ -117,16 +119,16 @@
                                                                             "    .... "
                                                                             "         ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-house-4+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-ruined-house+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,"
                                                                             ",###..,,,"
                                                                             ",#c....,,"
@@ -157,9 +159,9 @@
                                                                             " ....... "
                                                                             "         ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -170,7 +172,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-townhall-1+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-ruined-townhall+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,"
                                                                             ",####......####,"
                                                                             ",#```......```#,"
@@ -207,16 +209,16 @@
                                                                             " ..........     "
                                                                             "                ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-townhall-2+ :grid-dim '(4 . 3) :act-dim '(16 . 11) :type +building-type-ruined-townhall+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,"
                                                                             ",###-##--##-###,"
                                                                             ",#ht.#|..|#.u##,"
@@ -253,16 +255,16 @@
                                                                             "                "
                                                                             "                ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-townhall-3+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-ruined-townhall+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,"
                                                                             ",#########,"
                                                                             ",##..#```#,"
@@ -314,16 +316,16 @@
                                                                             "           "
                                                                             "           ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-townhall-4+ :grid-dim '(3 . 4) :act-dim '(11 . 16) :type +building-type-ruined-townhall+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,"
                                                                             ",,,,,,..##,"
                                                                             ",,```...h#,"
@@ -375,9 +377,9 @@
                                                                             "     ..... "
                                                                             "           ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -388,7 +390,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-park-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-ruined-park+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template (list ",,```,,```"
                                                                         "```T````T`"
                                                                         "`T```T````"
@@ -400,7 +402,7 @@
                                                                         ",,`T``T`,,"
                                                                         ",,``````,,")))
                                               
-                                              (translate-build-to-template x y z build-template template-level)
+                                              (translate-build-to-template x y z build-template template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -408,7 +410,7 @@
 
 
 (set-building-type (make-building :id +building-city-ruined-park-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-ruined-park+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template (list ",,```,```,"
                                                                         "```T```T`,"
                                                                         "`T```T````"
@@ -420,14 +422,15 @@
                                                                         ",`T`T`,`T`"
                                                                         ",`````,```")))
                                               
-                                              (translate-build-to-template x y z build-template template-level)
+                                              (translate-build-to-template x y z build-template template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-park-3+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-ruined-park+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (declare (ignore terrains))
                                             ;; populate the area with trees, leaving the border untouched
                                             (loop for dx from 1 to 8 do
                                               (loop for dy from 1 to 8 do
@@ -474,7 +477,8 @@
                                             )))
 
 (set-building-type (make-building :id +building-city-ruined-park-4+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-ruined-park+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (declare (ignore terrains))
                                             ;; populate the area with trees, leaving the border untouched
                                             (loop for dx from 1 to 8 do
                                               (loop for dy from 1 to 8 do
@@ -520,7 +524,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-prison-1+ :grid-dim '(4 . 4) :act-dim '(17 . 17) :type +building-type-ruined-prison+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,"
                                                                             ",,.#####.#######,"
                                                                             ",......-.#...+.#,"
@@ -575,9 +579,9 @@
                                                                             "    ............ "
                                                                             "                 ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
 
                                             (setf (aref template-level (+ x 7) (+ y 0) z) +terrain-floor-sign-prison+)
@@ -591,7 +595,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-warehouse-1+ :grid-dim '(4 . 4) :act-dim '(20 . 20) :type +building-type-ruined-warehouse+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,,"
                                                                             ",##-#####..#####-##,"
                                                                             ",#|..............|#,"
@@ -634,8 +638,8 @@
                                                                             " .................. "
                                                                             "                    ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -646,7 +650,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-library-1+ :grid-dim '(4 . 3) :act-dim '(20 . 13) :type +building-type-ruined-library+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-1 (list "00000000000000000000"
                                                                             "00000000000000000000"
                                                                             "00000000000000000000"
@@ -690,9 +694,9 @@
                                                                             "                    "
                                                                         )))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level)
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level terrains)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
                                               )
 
                                             (setf (aref template-level (+ x 2) (+ y 6) z) +terrain-floor-sign-library+)
@@ -706,7 +710,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-warehouse-port-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,"
                                                                             ",########,"
                                                                             ",#|CCCCC#,"
@@ -729,15 +733,15 @@
                                                                             " ........ "
                                                                             "          ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-warehouse-port-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,"
                                                                             ",##+##+##,"
                                                                             ",#C....|#,"
@@ -760,8 +764,8 @@
                                                                             " ........ "
                                                                             "          ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -772,7 +776,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-mansion-1+ :grid-dim '(4 . 3) :act-dim '(19 . 14) :type +building-type-ruined-mansion+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,"
                                                                             ",,,,,,,,,,,,,,,,,,,"
                                                                             ",,###-#-###-#-.,,,,"
@@ -818,16 +822,16 @@
                                                                             "                   "
                                                                             "                   ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
                                                     nil))))
 
 (set-building-type (make-building :id +building-city-ruined-mansion-2+ :grid-dim '(4 . 3) :act-dim '(19 . 14) :type +building-type-ruined-mansion+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-2 (list ",,,,,,,,,,,,,,,,,,,"
                                                                             ",,,,,,,,,,,,,,,,,,,"
                                                                             ",,##+##**********,,"
@@ -873,9 +877,9 @@
                                                                             "                   "
                                                                             "                   ")))
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -887,7 +891,7 @@
 ;;=====================
 
 (set-building-type (make-building :id +building-city-ruined-bank-1+ :grid-dim '(4 . 3) :act-dim '(19 . 14) :type +building-type-ruined-bank+
-                                  :func #'(lambda (x y z template-level)
+                                  :func #'(lambda (x y z template-level terrains)
                                             (let ((build-template-z-1 (list "000000000000000"
                                                                             "000000000000000"
                                                                             "00###########00"
@@ -934,222 +938,13 @@
                                                                             "               "))
                                                   )
                                               ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z -1) build-template-z-1 template-level)
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
+                                              (translate-build-to-template x y (+ z -1) build-template-z-1 template-level terrains)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
                                               )
                                             
                                             (setf (aref template-level (+ x 6) (+ y 12) z) +terrain-floor-sign-bank+)
 
-                                            (values nil
-                                                    nil
-                                                    nil))))
-
-;;=====================
-;; Sigil posts
-;;=====================
-
-(set-building-type (make-building :id +building-city-sigil-post+ :grid-dim '(2 . 2) :act-dim '(9 . 9) :type +building-type-none+
-                                  :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,,"
-                                                                            ",uuuuuuu,"
-                                                                            ",u00000u,"
-                                                                            ",u00000u,"
-                                                                            ",u00000u,"
-                                                                            ",u00000u,"
-                                                                            ",u00000u,"
-                                                                            ",uuuuuuu,"
-                                                                            ",,,,,,,,,"
-                                                                            ))
-                                                  (build-template-z-3 (list "         "
-                                                                            " ddddddd "
-                                                                            " d,,,,,d "
-                                                                            " d,,,,,d "
-                                                                            " d,,,,,d "
-                                                                            " d,,,,,d "
-                                                                            " d,,,,,d "
-                                                                            " ddddddd "
-                                                                            "         "
-                                                                            ))
-                                                  )
-                                              ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              )
-                                            (values nil
-                                                    (list (list +feature-start-sigil-point+ 4 4 (+ z 1)))
-                                                    nil))))
-
-;;=====================
-;; Army posts
-;;=====================
-
-(set-building-type (make-building :id +building-city-army-post-corrupted+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-none+
-                                  :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,,,"
-                                                                            ",,,,,,,,,,"
-                                                                            ",,##,,##,,"
-                                                                            ",,#,,,,#,,"
-                                                                            ",,,,,|,,,,"
-                                                                            ",,,,,,,,,,"
-                                                                            ",,#,,,,#,,"
-                                                                            ",,##,,##,,"
-                                                                            ",,,,,,,,,,"
-                                                                            ",,,,,,,,,,"))
-                                                  )
-                                              ;; we assume that z = 2
-                                              (translate-build-to-corrupted-template x y (+ z 0) build-template-z-2 template-level)
-                                              (setf (aref template-level (+ x 2) (+ y 2) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 3) (+ y 2) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 2) (+ y 3) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 6) (+ y 2) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 7) (+ y 2) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 7) (+ y 3) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 2) (+ y 6) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 2) (+ y 7) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 3) (+ y 7) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 6) (+ y 7) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 7) (+ y 7) z) +terrain-wall-barricade+)
-                                              (setf (aref template-level (+ x 7) (+ y 6) z) +terrain-wall-barricade+)
-                                              )
-                                            (values nil
-                                                    (list (list +feature-start-repel-demons+ 5 5 z)
-                                                          (list +feature-start-military-point+ 5 5 z))
-                                                    nil))))
-
-;;=====================
-;; Craters
-;;=====================
-
-(set-building-type (make-building :id +building-city-ruined-crater-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-ruined-crater+
-                                  :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,,,"
-                                                                            ",,dddddd,,"
-                                                                            ",dd    dd,"
-                                                                            ",d      d,"
-                                                                            ",d      d,"
-                                                                            ",d      d,"
-                                                                            ",d      d,"
-                                                                            ",dd    dd,"
-                                                                            ",,dddddd,,"
-                                                                            ",,,,,,,,,,"))
-                                                  
-                                                  (build-template-z-1 (list "0000000000"
-                                                                            "00uuuuuu00"
-                                                                            "0uudddduu0"
-                                                                            "0udd  ddu0"
-                                                                            "0ud    du0"
-                                                                            "0ud    du0"
-                                                                            "0udd  ddu0"
-                                                                            "0uudddduu0"
-                                                                            "00uuuuuu00"
-                                                                            "0000000000"))
-
-                                                  (build-template-z-0 (list "0000000000"
-                                                                            "0000000000"
-                                                                            "000uuuu000"
-                                                                            "00uu,,uu00"
-                                                                            "00u,,,,u00"
-                                                                            "00u,,,,u00"
-                                                                            "00uu,,uu00"
-                                                                            "000uuuu000"
-                                                                            "0000000000"
-                                                                            "0000000000"))
-                                                  )
-                                              ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level)
-                                              (translate-build-to-template x y (- z 2) build-template-z-0 template-level)
-                                              )
-                                            (values nil
-                                                    nil
-                                                    nil))))
-
-(set-building-type (make-building :id +building-city-ruined-crater-2+ :grid-dim '(2 . 2) :act-dim '(8 . 8) :type +building-type-ruined-crater+
-                                  :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-2 (list ",,,,,,,,"
-                                                                            ",,dddd,,"
-                                                                            ",dd  dd,"
-                                                                            ",d    d,"
-                                                                            ",d    d,"
-                                                                            ",dd  dd,"
-                                                                            ",,dddd,,"
-                                                                            ",,,,,,,,"))
-
-                                                  (build-template-z-1 (list "00000000"
-                                                                            "00uuuu00"
-                                                                            "0uu,,uu0"
-                                                                            "0u,,,,u0"
-                                                                            "0u,,,,u0"
-                                                                            "0uu,,uu0"
-                                                                            "00uuuu00"
-                                                                            "00000000"))
-                                                  )
-                                              ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level)
-                                              
-                                              )
-                                            (values nil
-                                                    nil
-                                                    nil))))
-
-(set-building-type (make-building :id +building-city-ruined-crater-large+ :grid-dim '(3 . 3) :act-dim '(15 . 15) :type +building-type-ruined-crater-large+
-                                  :func #'(lambda (x y z template-level)
-                                            (let ((build-template-z-3 (list "               "
-                                                                            "   ddddddddd   "
-                                                                            "  dd,,,,,,,dd  "
-                                                                            " dd,,ddddd,,dd "
-                                                                            " d,,dd   dd,,d "
-                                                                            " d,dd     dd,d "
-                                                                            " d,d       d,d "
-                                                                            " d,d       d,d "
-                                                                            " d,d       d,d "
-                                                                            " d,dd     dd,d "
-                                                                            " d,,dd   dd,,d "
-                                                                            " dd,,ddddd,,dd "
-                                                                            "  dd,,,,,,,dd  "
-                                                                            "   ddddddddd   "
-                                                                            "               "))
-                                                  
-                                                  (build-template-z-2 (list ",,,,,,,,,,,,,,,"
-                                                                            ",,,uuuuuuuuu,,,"
-                                                                            ",,uu0000000uu,,"
-                                                                            ",uu00uuuuu00uu,"
-                                                                            ",u00uuddduu00u,"
-                                                                            ",u0uudd dduu0u,"
-                                                                            ",u0udd   ddu0u,"
-                                                                            ",u0ud     du0u,"
-                                                                            ",u0udd   ddu0u,"
-                                                                            ",u0uudd dduu0u,"
-                                                                            ",u00uuddduu00u,"
-                                                                            ",uu00uuuuu00uu,"
-                                                                            ",,uu0000000uu,,"
-                                                                            ",,,uuuuuuuuu,,,"
-                                                                            ",,,,,,,,,,,,,,,"))
-                                                  
-                                                  (build-template-z-1 (list "000000000000000"
-                                                                            "000000000000000"
-                                                                            "000000000000000"
-                                                                            "000000000000000"
-                                                                            "000000uuu000000"
-                                                                            "00000uu,uu00000"
-                                                                            "0000uu,,,uu0000"
-                                                                            "0000u,,,,,u0000"
-                                                                            "0000uu,,,uu0000"
-                                                                            "00000uu,uu00000"
-                                                                            "000000uuu000000"
-                                                                            "000000000000000"
-                                                                            "000000000000000"
-                                                                            "000000000000000"
-                                                                            "000000000000000"))
-
-                                                  )
-                                              ;; we assume that z = 2
-                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level)
-                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level)
-                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level)
-                                              )
                                             (values nil
                                                     nil
                                                     nil))))

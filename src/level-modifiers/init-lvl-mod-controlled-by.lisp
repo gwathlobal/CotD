@@ -19,19 +19,7 @@
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM CONTROLLED BY DEMONS~%")
 
-                                                 (let ((building-id (cond
-                                                                      ((or (= (wtype world-sector) +world-sector-corrupted-residential+)
-                                                                           (= (wtype world-sector) +world-sector-corrupted-island+)
-                                                                           (= (wtype world-sector) +world-sector-corrupted-port+)
-                                                                           (= (wtype world-sector) +world-sector-corrupted-lake+)
-                                                                           (= (wtype world-sector) +world-sector-corrupted-forest+))
-                                                                       +building-city-corrupted-sigil-post+)
-                                                                      ((or (= (wtype world-sector) +world-sector-abandoned-residential+)
-                                                                           (= (wtype world-sector) +world-sector-abandoned-island+)
-                                                                           (= (wtype world-sector) +world-sector-abandoned-port+)
-                                                                           (= (wtype world-sector) +world-sector-abandoned-lake+)
-                                                                           (= (wtype world-sector) +world-sector-abandoned-forest+))
-                                                                       +building-city-sigil-post+)))
+                                                 (let ((building-id +building-city-sigil-post+)
                                                        (x-w 4)
                                                        (y-n 4)
                                                        (x-e (- (array-dimension template-level 0) 5))

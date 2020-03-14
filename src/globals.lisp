@@ -513,6 +513,13 @@
 ;; TERRAIN-TEMPLATE Constants
 ;;-------------------- 
 
+(defconstant +level-city-park+ 0)
+(defconstant +level-city-terrain-border+ 1)
+(defconstant +level-city-terrain-dirt+ 2)
+(defconstant +level-city-terrain-grass+ 3)
+(defconstant +level-city-terrain-tree+ 4)
+(defconstant +level-city-terrain-bush+ 5)
+
 (defconstant +terrain-trait-blocks-move+ 0)
 (defconstant +terrain-trait-blocks-vision+ 1)
 (defconstant +terrain-trait-blocks-projectiles+ 2)

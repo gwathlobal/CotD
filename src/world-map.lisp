@@ -24,7 +24,7 @@
   (setf (aref (cells world-map) 4 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 4 :y 1))
 
   (setf (aref (cells world-map) 0 2) (make-instance 'world-sector :wtype +world-sector-abandoned-forest+ :x 0 :y 2))
-  (setf (aref (cells world-map) 1 2) (make-instance 'world-sector :wtype +world-sector-abandoned-residential+ :x 1 :y 2
+  (setf (aref (cells world-map) 1 2) (make-instance 'world-sector :wtype +world-sector-corrupted-residential+ :x 1 :y 2
                                                                   :feats (list (list +lm-feat-church+))
                                                                   :items (list +lm-item-holy-relic+)))
   (setf (aref (cells world-map) 2 2) (make-instance 'world-sector :wtype +world-sector-corrupted-residential+ :x 2 :y 2
@@ -61,7 +61,7 @@
   
   ;;(generate-missions-on-world-map world-map world-time)
 
-  (setf (mission (aref (cells world-map) 1 2)) (generate-mission-on-world-map world-map 1 2 +mission-type-demonic-attack+ world-time))
+  (setf (mission (aref (cells world-map) 0 3)) (generate-mission-on-world-map world-map 0 3 +mission-type-demonic-attack+ world-time))
   
   world-map)
 

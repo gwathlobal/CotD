@@ -1,15 +1,20 @@
+
 (in-package :cotd)
 
-(defconstant +level-city-border+ 0)
-(defconstant +level-city-park+ 1)
-(defconstant +level-city-floor+ 2)
-(defconstant +level-city-floor-bright+ 3)
-
 (defun create-template-city (template-level max-x max-y max-z set-max-buildings-func set-reserved-buildings-func
-                             &optional (terrains (list +level-city-border+ +terrain-border-floor+
-                                                       +level-city-park+ +building-city-park-tiny+
-                                                       +level-city-floor+ +terrain-floor-dirt+
-                                                       +level-city-floor-bright+ +terrain-floor-dirt-bright+)))
+                             &optional (terrains (list +level-city-park+ +building-city-park-tiny+
+                                                       +level-city-terrain-border+ #'(lambda ()
+                                                                                       +terrain-border-floor+)
+                                                       +level-city-terrain-dirt+ #'(lambda ()
+                                                                                      (if (< (random 100) 20)
+                                                                                        +terrain-floor-dirt-bright+
+                                                                                        +terrain-floor-dirt+))
+                                                       +level-city-terrain-grass+ #'(lambda ()
+                                                                                     +terrain-floor-grass+)
+                                                       +level-city-terrain-tree+ #'(lambda ()
+                                                                                     +terrain-tree-birch+)
+                                                       +level-city-terrain-bush+ #'(lambda ()
+                                                                                     +terrain-wall-bush+))))
   
   (logger (format nil "CREATE-TEMPLATE-CITY~%"))
 
@@ -18,7 +23,7 @@
   ;; grid will be used to make reservations for buildings
   ;; once all places on grid are reserved, put actual buildings to the template level in places that were reserved 
   (let* ((reserv-max-x (array-dimension template-level 0)) (reserv-max-y (array-dimension template-level 1)) ;(reserv-max-z max-z)
-         (terrain-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element (getf terrains +level-city-border+)))
+         (terrain-level (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element (funcall (getf terrains +level-city-terrain-border+))))
          (feature-list ())
          (mob-list ())
          (item-list ())
@@ -131,14 +136,17 @@
       (loop for x from 0 below max-x do
         (loop for z from 3 below max-z do
           (setf (aref terrain-level x y z) +terrain-border-air+))))
+
+    (loop for y from 0 below max-y do
+      (loop for x from 0 below max-x do
+        (loop for z from 0 below 2 do
+          (setf (aref terrain-level x y z)  +terrain-wall-earth+))))
     
     (loop for y from 1 below (1- max-y) do
       (loop for x from 1 below (1- max-x) do
-        (setf (aref terrain-level x y 0) +terrain-wall-earth+)
-        (setf (aref terrain-level x y 1) +terrain-wall-earth+)
-        (if (< (random 100) 20)
-          (setf (aref terrain-level x y 2) (getf terrains +level-city-floor-bright+))
-            (setf (aref terrain-level x y 2) (getf terrains +level-city-floor+)))
+       
+        (setf (aref terrain-level x y 2) (funcall (getf terrains +level-city-terrain-dirt+)))
+        
         (loop for z from 3 below max-z do
           (setf (aref terrain-level x y z) +terrain-floor-air+))))
     
@@ -172,7 +180,8 @@
              (when (building-func (get-building-type build-type-id))
                (multiple-value-setq (building-mobs building-features building-items) (funcall (building-func (get-building-type build-type-id))
                                                                                               (+ (* gx *level-grid-size*) px) (+ (* gy *level-grid-size*) py) gz
-                                                                                              terrain-level)))
+                                                                                              terrain-level
+                                                                                              terrains)))
 
              ;(logger (format nil "CREATE-TEMPLATE-CITY: Building type ~A, mob list ~A~%" build-type-id building-mobs))
              ;; add mobs to the mob-list
