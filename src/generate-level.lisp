@@ -37,7 +37,7 @@
   (unless world (error ":WORLD is an obligatory parameter!"))
   
   ;; create a template level
-  (let* ((level (create-level :max-x max-x :max-y max-y :max-z max-z))
+  (let* ((level nil)
          (terrain-level nil)
          (feature-template-result nil)
          (mob-template-result nil)
@@ -74,6 +74,9 @@
                                                                                                                      template-level
                                                                                                                      max-x max-y max-z))
 
+      ;; create level with dimenision based on terrain-level dimensions
+      (setf level (create-level :max-x (array-dimension terrain-level 0) :max-y (array-dimension terrain-level 1) :max-z (array-dimension terrain-level 2)))
+      
       (setf (terrain level) terrain-level)
       (setf (level world) level)
 

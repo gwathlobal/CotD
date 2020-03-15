@@ -1,6 +1,23 @@
 (in-package :cotd)
 
 ;;============
+;; TEST
+;;============
+
+(set-world-sector-type :wtype +world-sector-test+
+                       :glyph-idx +glyph-id-large-t+
+                       :glyph-color sdl:*white*
+                       :name "A test district"
+                       :faction-list-func #'(lambda ()
+                                              ())
+                       :angel-disguised-mob-type-id +mob-type-man+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (declare (ignore template-level))
+                                                  (create-template-test-city max-x max-y max-z))
+                       )
+                       
+
+;;============
 ;; NORMAL
 ;;============
 

@@ -21,7 +21,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t 
-                                       :abil-toggle-light t :abil-open-close-door t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-man+ 
@@ -32,7 +32,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
-                                       :abil-toggle-light t :abil-open-close-door t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
@@ -44,7 +44,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
-                                       :abil-toggle-light t :abil-open-close-door t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t  :ai-swim-up t))
 
@@ -56,7 +56,7 @@
                                        :strength 0
                                        :base-light-radius 3
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
-                                       :abil-toggle-light t :abil-open-close-door t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-clerk+ 
@@ -67,7 +67,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
-                                       :abil-toggle-light t :abil-open-close-door t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 10 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
@@ -79,7 +79,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
-                                       :abil-toggle-light t :abil-open-close-door t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t :ai-swim-up t
                              ))
@@ -92,7 +92,7 @@
                                        :strength 0
                                        :base-light-radius 4
                                        :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
-                                       :abil-toggle-light t :abil-open-close-door t
+                                       :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t :ai-swim-up t
                              ))

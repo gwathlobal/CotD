@@ -79,24 +79,20 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-demons+
                                            :descr-func #'(lambda ()
-                                                           "To win, destroy all angels in the district. To lose, have all demons killed.")
+                                                           "To win, destroy or possess all civilians in the district. To lose, have all demons killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-demons+)
                                                                       (> (total-demons world) 0)
-                                                                      (zerop (total-angels world)))
+                                                                      (zerop (total-civilians (level world))))
                                                                  (and (/= (loyal-faction *player*) +faction-type-demons+)
                                                                       (> (total-demons world) 0)
-                                                                      (zerop (nth +faction-type-military+ (total-faction-list world)))
-                                                                      (zerop (nth +faction-type-church+ (total-faction-list world)))
-                                                                      (zerop (total-angels world))))
+                                                                      (zerop (total-civilians (level world)))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
-                                                           (let* ((final-str (cond
-                                                                               ((zerop (total-angels world)) "Enemies eliminated.")
-                                                                               ))
+                                                           (let* ((final-str "Civilians eliminated.")
                                                                   (score (calculate-player-score 1450))
                                                                   (highscores-place)
                                                                   (player-faction (if (or (= (loyal-faction *player*) +faction-type-demons+)

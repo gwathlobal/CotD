@@ -1,7 +1,6 @@
 (in-package :cotd)
 
-(defun create-template-test-city (max-x max-y max-z entrance)
-  (declare (ignore entrance))
+(defun create-template-test-city (max-x max-y max-z)
   
   (logger (format nil "CREATE-TEMPLATE-TEST-CITY~%"))
 
@@ -155,9 +154,8 @@
     (values template-level feature-list nil nil)
     ))
 
-(defun test-level-place-mobs (world mob-template-list)
-  (declare (ignore mob-template-list))
-
+(defun test-level-place-mobs (world)
+  
   (set-terrain-* (level world) 47 19 1 +terrain-floor-creep-irradiated+)
   (set-terrain-* (level world) 48 19 1 +terrain-floor-creep+)
   (set-terrain-* (level world) 49 19 1 +terrain-floor-creep-bright+)

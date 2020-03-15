@@ -349,6 +349,7 @@
 (defconstant +mob-abil-mutate-poisoning-glands+ 169)
 (defconstant +mob-abil-poisoning-glands+ 170)
 (defconstant +mob-abil-purge-rune+ 171)
+(defconstant +mob-abil-civilian+ 172)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

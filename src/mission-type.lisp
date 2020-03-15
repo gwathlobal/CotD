@@ -1,19 +1,20 @@
 (in-package :cotd)
 
 (defconstant +mission-type-none+ -1)
-(defconstant +mission-type-demonic-attack+ 0)
-(defconstant +mission-type-demonic-raid+ 1)
-(defconstant +mission-type-demonic-conquest+ 2)
-(defconstant +mission-type-demonic-thievery+ 3)
-(defconstant +mission-type-military-raid+ 4)
-(defconstant +mission-type-military-conquest+ 5)
-(defconstant +mission-type-celestial-purge+ 6)
-(defconstant +mission-type-celestial-retrieval+ 7)
+(defconstant +mission-type-test+ 0)
+(defconstant +mission-type-demonic-attack+ 1)
+(defconstant +mission-type-demonic-raid+ 2)
+(defconstant +mission-type-demonic-conquest+ 3)
+(defconstant +mission-type-demonic-thievery+ 4)
+(defconstant +mission-type-military-raid+ 5)
+(defconstant +mission-type-military-conquest+ 6)
+(defconstant +mission-type-celestial-purge+ 7)
+(defconstant +mission-type-celestial-retrieval+ 8)
 
 (defclass mission-type ()
   ((id :initform +mission-type-none+ :initarg :id :accessor id)
    (name :initform "Mission type name" :initarg :name :accessor name)
-   (is-available-func :initform #'(lambda (world-map x y) (declare (ignore world-map x y)) t) :initarg :is-available-func :accessor is-available-func)
+   (is-available-func :initform #'(lambda (world-map x y) (declare (ignore world-map x y)) nil) :initarg :is-available-func :accessor is-available-func)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector and returns a list of faction-ids
 
    (template-level-gen-func :initform nil :initarg :template-level-gen-func :accessor template-level-gen-func)
@@ -52,6 +53,28 @@
     (progn
       (second (find faction-id (ai-package-list (get-mission-type-by-id mission-type-id)) :key #'(lambda (a) (first a)))))
     nil))
+
+(defun setup-win-conditions (mission level)
+  (loop for (faction-id game-event-id) in (win-condition-list (get-mission-type-by-id (mission-type-id mission)))
+        when (find-if #'(lambda (a)
+                          (if (and (= (first a) faction-id)
+                                   (or (= (second a) +mission-faction-present+)
+                                       (= (second a) +mission-faction-delayed+)))
+                            t
+                            nil))
+                      (faction-list mission))
+          do
+             (pushnew game-event-id (game-events level))))
+
+(defun update-visibility-after-creation (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  
+  (format t "OVERALL-POST-PROCESS-FUNC: Update visibility~%~%")
+  
+  (loop for mob-id in (mob-id-list level)
+        for mob = (get-mob-by-id mob-id)
+        do
+           (update-visible-mobs mob)))
 
 ;;========================================
 ;; MISSION-DISTRICTS

@@ -26,18 +26,39 @@
            (incf y1 (sdl:get-font-height))))
 
 (defun show-char-properties (x y idle-calcing)
-  (let* ((str)
+  (let* ((str (create-string))
          (str-lines))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w (- *window-width* x 10) :h (* *glyph-h* *max-y-view*)))
       (sdl:fill-surface sdl:*black* :template a-rect)
-      (setf str (format nil "~A - ~A~%~%HP: ~A/~A~%~A~A~A~A~A~A~A~%~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
-                        (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*))))
-                        (cur-hp *player*) (max-hp *player*) 
-                        (if (zerop (max-fp *player*)) "" (format nil "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
-                        (if (or (mob-ability-p *player* +mob-abil-military-follow-me+)
-                                (mob-ability-p *player* +mob-abil-prayer-bless+))
-                          (format nil "Followers: ~A~%" (count-follower-list *player*))
-                          "")
+
+      ;; name
+      (format str "~A - ~A~%~%" (name *player*) (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
+
+      ;; player stats
+      (format str "HP: ~A/~A~%"
+              (cur-hp *player*) (max-hp *player*))
+      (unless (zerop (max-fp *player*))
+        (format str "Power: ~A/~A~%" (cur-fp *player*) (max-fp *player*)))
+      (when (/= (cur-oxygen *player*) *max-oxygen-level*)
+        (format str "Oxygen: ~A/~A~%" (cur-oxygen *player*) *max-oxygen-level*))
+
+      ;; god
+      (when (worshiped-god *player*)
+        (format str "~A: ~A~%" (name (get-god-by-id (get-worshiped-god-type (worshiped-god *player*)))) (return-piety-str (get-worshiped-god-type (worshiped-god *player*))
+                                                                                                                          (get-worshiped-god-piety (worshiped-god *player*)))))
+
+      ;; followers
+      (when (or (mob-ability-p *player* +mob-abil-military-follow-me+)
+                (mob-ability-p *player* +mob-abil-prayer-bless+))
+        (format str "Followers: ~A~%" (count-follower-list *player*)))
+
+      ;; win condition
+      (when (and (or (= (loyal-faction *player*) +faction-type-demons+))
+                 (= (mission-type-id (mission (level *world*))) +mission-type-demonic-attack+))
+        (format str "~%Civilians left: ~A~%" (total-civilians (level *world*))))
+      
+      (setf str (format nil "~A~A~A~A~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
+                        str
                         (if (and (= (mob-type *player*) +mob-type-thief+)
                                  (not (mob-ability-p *player* +mob-abil-ghost-possess+)))
                           (format nil "Value left: ~A$~%" (if (> (- *thief-win-value* (get-overall-value (inv *player*))) 0)
@@ -69,13 +90,8 @@
                              (format nil "Demonic sigils: ~A/~A~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*))
                             (t ""))
                           "")
-                        (if (/= (cur-oxygen *player*) *max-oxygen-level*)
-                          (format nil "Oxygen: ~A/~A~%" (cur-oxygen *player*) *max-oxygen-level*)
-                          "")
-                        (if (worshiped-god *player*)
-                          (format nil "~A: ~A~%" (name (get-god-by-id (get-worshiped-god-type (worshiped-god *player*)))) (return-piety-str (get-worshiped-god-type (worshiped-god *player*))
-                                                                                                                                            (get-worshiped-god-piety (worshiped-god *player*))))
-                          "")
+                        
+                        
                         (get-weapon-descr-line *player*)
                         (total-humans *world*)
                         (total-blessed *world*)

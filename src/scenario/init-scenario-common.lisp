@@ -37,7 +37,7 @@
                                              :name "Test"
                                              :func #'(lambda (layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list faction-list mission-id)
                                                        (declare (ignore faction-list mission-id))
-                                                       (setf layout-func #'(lambda () (create-template-test-city *max-x-level* *max-y-level* *max-z-level* nil)))
+                                                       (setf layout-func #'(lambda () (create-template-test-city *max-x-level* *max-y-level* *max-z-level*)))
                                                        
                                                        (values layout-func template-processing-func-list post-processing-func-list mob-func-list game-event-list))))
 

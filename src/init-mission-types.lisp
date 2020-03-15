@@ -4,6 +4,26 @@
 ;; MISSION-TYPES
 ;;----------------------------------------
 
+(set-mission-type :id +mission-type-test+
+                  :name "Test"
+                  :faction-list-func #'(lambda (world-sector)
+                                         (declare (ignore world-sector))
+                                         (let ((faction-list (list (list +faction-type-none+ +mission-faction-present+)
+                                                                   )))
+                                           
+                                           faction-list))
+                  :scenario-faction-list (list (list +specific-faction-type-test+ +lm-placement-test+))
+                  :overall-post-process-func-list #'(lambda ()
+                                                      (let ((func-list ()))
+
+                                                        ;; update visibility for all added mobs
+                                                        (push #'update-visibility-after-creation
+                                                              func-list)
+                                                        
+                                                        func-list))
+
+                  )
+
 (set-mission-type :id +mission-type-demonic-attack+
                   :name "Demonic attack"
                   :is-available-func #'(lambda (world-map x y)
@@ -36,16 +56,24 @@
                                            faction-list))
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
-                                                        ;; update visibility for all added mobs
+
+                                                        ;; add all other win conditions
+                                                        (push #'(lambda (level world-sector mission world)
+                                                                  (declare (ignore world-sector world))
+
+                                                                  (when (/= (player-lvl-mod-placement-id mission) +specific-faction-type-player+)
+                                                                    (setup-win-conditions mission level)))
+                                                              func-list)
+                                                        
+                                                        ;; add lose condition on death
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector mission world))
 
-                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Update visibility~%~%")
-                                                                  
-                                                                  (loop for mob-id in (mob-id-list level)
-                                                                        for mob = (get-mob-by-id mob-id)
-                                                                        do
-                                                                           (update-visible-mobs mob)))
+                                                                  (push +game-event-lose-game-died+ (game-events level)))
+                                                              func-list)
+                                                        
+                                                        ;; update visibility for all added mobs
+                                                        (push #'update-visibility-after-creation
                                                               func-list)
                                                         
                                                         ;; remove all starting features

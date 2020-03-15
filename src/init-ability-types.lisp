@@ -389,6 +389,13 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-civilian+ :name "Civilian" :descr "You are a civilian, mainly the suffering side of any conflict." 
+                                 :passive t :cost 0 :spd 0
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-unholy+ :name "Unholy" :descr "You burn (dmg: 1-2) when touching a blessed creature." 
                                  :passive t :cost 0 :spd +normal-ap+
                                  :final t :on-touch t

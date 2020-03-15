@@ -229,3 +229,17 @@
                                                                     )
                                                                 func-list)
                                                           func-list)))
+
+(set-level-modifier :id +lm-placement-test+ :type +level-mod-player-placement+
+                    :name "Test"
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission level))
+
+                                                                    (test-level-place-mobs world)
+                                                                    
+                                                                    )
+                                                                func-list)
+                                                          func-list)))

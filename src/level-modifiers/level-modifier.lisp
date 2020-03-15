@@ -53,6 +53,7 @@
 (defconstant +lm-placement-skinchanger+ 29)
 (defconstant +lm-placement-thief+ 30)
 (defconstant +lm-placement-ghost+ 31)
+(defconstant +lm-placement-test+ 32)
 
 (defparameter *level-modifiers* (make-array (list 0) :adjustable t))
 

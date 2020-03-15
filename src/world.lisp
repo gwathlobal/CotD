@@ -40,6 +40,9 @@
 
    (world-sector :initform nil :accessor world-sector)
    (mission :initform nil :accessor mission)
+   
+   (total-civilians :initform 0 :accessor total-civilians)
+   (initial-civilians :initform 0 :accessor initial-civilians)
    ))
    
 (defun add-mob-to-level-list (level mob)

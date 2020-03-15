@@ -313,7 +313,7 @@
                                                          (adjust-speed actor)
                                                          )
                                              :on-remove #'(lambda (effect actor)
-                                                            (declare (ignore effect))
+                                                            (rem-mob-effect-simple actor (effect-type effect))
                                                             (adjust-speed actor)
                                                             )))
 

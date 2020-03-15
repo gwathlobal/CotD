@@ -1,3 +1,4 @@
+
 (in-package :cotd)
 
 (defparameter *max-x-world-map* 5)
@@ -6,6 +7,16 @@
 (defclass world-map ()
   ((cells :initform nil :accessor cells :type simple-array) ;; array of world-sector
    ))
+
+(defun generate-empty-world-map (world-map world-time)
+  (declare (ignore world-time))
+  (setf (cells world-map) (make-array (list *max-x-world-map* *max-y-world-map*) :element-type '(or world-sector null) :initial-element nil))
+
+  (loop for x from 0 below *max-x-world-map* do
+    (loop for y from 0 below *max-y-world-map* do
+      (setf (aref (cells world-map) x y) (make-instance 'world-sector :wtype +world-sector-normal-sea+ :x x :y y))))
+
+  world-map)
 
 (defun generate-test-world-map (world-map world-time)
   (setf (cells world-map) (make-array (list *max-x-world-map* *max-y-world-map*) :element-type '(or world-sector null) :initial-element nil))
@@ -25,7 +36,7 @@
 
   (setf (aref (cells world-map) 0 2) (make-instance 'world-sector :wtype +world-sector-abandoned-forest+ :x 0 :y 2))
   (setf (aref (cells world-map) 1 2) (make-instance 'world-sector :wtype +world-sector-corrupted-residential+ :x 1 :y 2
-                                                                  :feats (list (list +lm-feat-church+))
+                                                                  :feats (list (list +lm-feat-library+))
                                                                   :items (list +lm-item-holy-relic+)))
   (setf (aref (cells world-map) 2 2) (make-instance 'world-sector :wtype +world-sector-corrupted-residential+ :x 2 :y 2
                                                                   :feats (list (list +lm-feat-river+ nil))
@@ -61,7 +72,7 @@
   
   ;;(generate-missions-on-world-map world-map world-time)
 
-  (setf (mission (aref (cells world-map) 0 3)) (generate-mission-on-world-map world-map 0 3 +mission-type-demonic-attack+ world-time))
+  (setf (mission (aref (cells world-map) 2 3)) (generate-mission-on-world-map world-map 2 3 +mission-type-demonic-attack+ world-time))
   
   world-map)
 

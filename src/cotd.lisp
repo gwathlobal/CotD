@@ -454,12 +454,23 @@
         (test-level-item (cons "Test level"
                                #'(lambda (n) 
                                    (declare (ignore n))
-                                   (return-from main-menu (values 0
-                                                                  +city-layout-test+
-                                                                  +weather-type-clear+
-                                                                  +tod-type-night+
-                                                                  +specific-faction-type-test+
-                                                                  nil)))))
+                                   (let ((test-world-map (make-instance 'world-map))
+                                         (mission (make-instance 'mission :mission-type-id +mission-type-test+
+                                                                          :x 0 :y 0))
+                                         (world-sector (make-instance 'world-sector :wtype +world-sector-test+ :x 0 :y 0)))
+                                     (setf *world* (make-instance 'world))
+                                     (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
+                                     (generate-empty-world-map test-world-map (world-game-time *world*))
+                                     (setf (world-map *world*) test-world-map)
+                                     
+                                     (setf (aref (cells test-world-map) 0 0) world-sector)
+                                     (setf (mission (aref (cells test-world-map) 0 0)) mission)
+                                     (setf (player-lvl-mod-placement-id mission) +lm-placement-test+)
+                                        
+                                     (return-from main-menu (values world-sector mission))
+                                     )
+                                   
+                                   )))
         (play-prev-scenario (cons "Replay the previous scenario"
                                   #'(lambda (n) 
                                       (declare (ignore n))
@@ -495,7 +506,7 @@
                                         (multiple-value-setq (mission world-sector) (run-window *current-window*))
                                         (when (and mission world-sector)
 
-                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-player+)
+                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-demon-malseraph+)
                                           
                                           (setf *current-window* (return-to *current-window*))
 
