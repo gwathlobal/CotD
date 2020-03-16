@@ -53,8 +53,9 @@
         (format str "Followers: ~A~%" (count-follower-list *player*)))
 
       ;; win condition
-      (when (and (or (= (loyal-faction *player*) +faction-type-demons+))
-                 (= (mission-type-id (mission (level *world*))) +mission-type-demonic-attack+))
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+))
+                     (= (mission-type-id (mission (level *world*))) +mission-type-demonic-attack+))
+                (= (mission-type-id (mission (level *world*))) +mission-type-test+))
         (format str "~%Civilians left: ~A~%" (total-civilians (level *world*))))
       
       (setf str (format nil "~A~A~A~A~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"

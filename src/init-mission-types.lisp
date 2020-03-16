@@ -103,7 +103,7 @@
                                                                              (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
                                                                                (push (list x y z) (delayed-military-arrival-points level)))
-                                                                        when (= feature-id +feature-delayed-angels-arrival-point+)
+                                                                        when (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
                                                                           do
                                                                              (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))

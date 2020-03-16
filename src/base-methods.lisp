@@ -952,7 +952,7 @@
     (incf (nth (loyal-faction target) (total-faction-list *world*)))
 
     (when (mob-ability-p target +mob-abil-civilian+)
-      (decf (total-civilians (level *world*))))
+      (incf (total-civilians (level *world*))))
     
     ;; give all items to the slave
     (loop for item-id in (inv actor)
@@ -1657,8 +1657,6 @@
                  (= (strength mob) 0))
         (incf (cur-score *player*) 5)))
 
-    (when (mob-ability-p mob +mob-abil-civilian+)
-      (decf (total-civilians (level *world*))))
     (when (mob-ability-p mob +mob-abil-human+)
       (decf (total-humans *world*)))
     (when (mob-ability-p mob +mob-abil-demon+)
@@ -1671,6 +1669,10 @@
 
     (when (mob-ability-p mob +mob-abil-civilian+)
       (decf (total-civilians (level *world*))))
+    ;; increase total civilian count of the slave mob otherwise it will be decreased twice - once during possession and once during death
+    (when (and (master-mob-id mob)
+               (total-civilians (level *world*)))
+      (incf (total-civilians (level *world*))))
     
     (decf (nth (loyal-faction mob) (total-faction-list *world*)))
     ;; increase total faction count of the slave mob otherwise it will be decreased twice - once during possession and once during death
