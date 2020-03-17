@@ -155,6 +155,8 @@
     ))
 
 (defun test-level-place-mobs (world)
+
+  (push +game-event-lose-game-died+ (game-events (level world)))
   
   (set-terrain-* (level world) 47 19 1 +terrain-floor-creep-irradiated+)
   (set-terrain-* (level world) 48 19 1 +terrain-floor-creep+)

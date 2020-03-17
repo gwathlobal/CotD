@@ -16,9 +16,9 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
 
-      (when (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*)))) :key #'(lambda (a)
+      (when (find (loyal-faction *player*) (win-condition-list (get-mission-type-by-id (mission-type-id (mission (level *world*))))) :key #'(lambda (a)
                                                                                                                                          (first a)))
-        (add-colored-str txt-struct (format nil "~A~%~%~%" (funcall (descr-func (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-scenario-by-id (mission-scenario (level *world*))))
+        (add-colored-str txt-struct (format nil "~A~%~%~%" (funcall (descr-func (get-game-event-by-id (second (find (loyal-faction *player*) (win-condition-list (get-mission-type-by-id (mission-type-id (mission (level *world*)))))
                                                                                                                     :key #'(lambda (a)
                                                                                                                              (first a)))))))))
         )

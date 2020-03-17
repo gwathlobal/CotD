@@ -69,7 +69,8 @@
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector mission world))
 
-                                                                  (push +game-event-lose-game-died+ (game-events level)))
+                                                                  ;; make the game continue even after the game dies
+                                                                  (push +game-event-player-died+ (game-events level)))
                                                               func-list)
                                                         
                                                         ;; update visibility for all added mobs
