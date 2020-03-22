@@ -866,7 +866,6 @@
     (incf (initial-humans *world*)))
   
   (when (mob-ability-p mob +mob-abil-civilian+)
-    (incf (total-civilians (level *world*)))
     (incf (initial-civilians (level *world*))))
 
   (when (mob-ability-p mob +mob-abil-demon+)

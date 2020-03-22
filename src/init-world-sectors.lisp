@@ -264,6 +264,10 @@
                                                               ;; place blood
                                                              (push #'place-blood-on-level
                                                                    func-list)
+
+                                                              ;; add demonic runes
+                                                              (push #'place-demonic-runes-on-level
+                                                                    func-list)
                                                               
                                                               func-list)))
 
@@ -319,6 +323,10 @@
                                                               ;; place blood
                                                              (push #'place-blood-on-level
                                                                    func-list)
+
+                                                              ;; add demonic runes
+                                                              (push #'place-demonic-runes-on-level
+                                                                    func-list)
                                                               
                                                               func-list)))
 
@@ -358,6 +366,10 @@
 
                                                              ;; place blood
                                                              (push #'place-blood-on-level
+                                                                   func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
                                                                    func-list)
                                                              
                                                              func-list)))
@@ -401,6 +413,10 @@
                                                              ;; place blood
                                                              (push #'place-blood-on-level
                                                                    func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -434,6 +450,10 @@
 
                                                              ;; place blood
                                                              (push #'place-blood-on-level
+                                                                   func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
                                                                    func-list)
                                                              
                                                              func-list)))
@@ -487,7 +507,11 @@
 
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
-                                                                    func-list)
+                                                                   func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -558,7 +582,11 @@
 
                                                               ;; place irradiated spots
                                                               (push #'place-irradation-on-level
-                                                                   func-list)
+                                                                    func-list)
+
+                                                              ;; add demonic runes
+                                                              (push #'place-demonic-runes-on-level
+                                                                    func-list)
                                                               
                                                               func-list)))
 
@@ -615,6 +643,10 @@
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
                                                                    func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -669,6 +701,10 @@
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
                                                                    func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
+                                                                   func-list)
                                                              
                                                              func-list)))
 
@@ -718,6 +754,10 @@
 
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
+                                                                   func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
                                                                    func-list)
                                                              
                                                              func-list)))

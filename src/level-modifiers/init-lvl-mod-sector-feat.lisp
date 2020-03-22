@@ -345,36 +345,7 @@
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
                                                           ;; add demonic runes
-                                                          (push #'(lambda (level world-sector mission world)
-                                                                    (declare (ignore world-sector mission world))
-                                                                    (let ((demonic-runes ())
-                                                                          (rune-list (list +feature-demonic-rune-flesh+ +feature-demonic-rune-flesh+
-                                                                                           +feature-demonic-rune-invite+ +feature-demonic-rune-invite+
-                                                                                           +feature-demonic-rune-away+ +feature-demonic-rune-away+
-                                                                                           +feature-demonic-rune-transform+ +feature-demonic-rune-transform+
-                                                                                           +feature-demonic-rune-barrier+ +feature-demonic-rune-barrier+
-                                                                                           +feature-demonic-rune-all+ +feature-demonic-rune-all+
-                                                                                           +feature-demonic-rune-decay+ +feature-demonic-rune-decay+)))
-                                                                      (loop with max-x = (array-dimension (terrain level) 0)
-                                                                            with max-y = (array-dimension (terrain level) 1)
-                                                                            with max-z = (array-dimension (terrain level) 2)
-                                                                            with cur-rune = 0
-                                                                            for x = (random max-x)
-                                                                            for y = (random max-y)
-                                                                            for z = (random max-z)
-                                                                            while (< (length demonic-runes) (length rune-list)) do
-                                                                              (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-can-have-rune+)
-                                                                                         (null (find (list x y z) demonic-runes :test #'(lambda (a b)
-                                                                                                                                          (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 6)
-                                                                                                                                            t
-                                                                                                                                            nil)
-                                                                                                                                          ))))
-                                                                                (push (list x y z (nth cur-rune rune-list)) demonic-runes)
-                                                                                (incf cur-rune)))
-                                                                      (loop for (x y z feature-type-id) in demonic-runes do
-                                                                        ;;(format t "PLACE RUNE ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id feature-type-id)) x y z)
-                                                                        (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z))
-                                                                            )))
+                                                          (push #'place-demonic-runes-on-level
                                                                 func-list)
                                                           func-list))
                     )

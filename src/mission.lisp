@@ -20,7 +20,7 @@
 (defun place-demons-on-level (level world-sector mission world demon-list)
   (declare (ignore world world-sector))
   
-  (format t "OVERALL-POST-PROCESS-FUNC: Place demons function~%")
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place demons function~%"))
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-demons+)
                               (= (second a) +mission-faction-present+))
@@ -47,10 +47,10 @@
                                 nil))
                           (faction-list mission))))
       (progn
-        (format t "PLACE-DEMONS-ON-LEVEL: Place inside~%")
+        (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place inside~%"))
         (populate-level-with-mobs level demon-list #'find-unoccupied-place-inside))
       (progn
-        (format t "PLACE-DEMONS-ON-LEVEL: Place at the borders~%")
+        (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place at the borders~%"))
         (loop for (demon-type demon-number is-player) in demon-list do
           (loop repeat demon-number do
             (loop with arrival-point-list = (remove-if-not #'(lambda (a)
@@ -78,7 +78,7 @@
 (defun place-angels-on-level (level world-sector mission world angel-list)
   (declare (ignore world-sector world))
   
-  (format t "PLACE-ANGELS-ON-LEVEL: Place angels function~%")
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place angels function~%"))
   (flet ((placement-func (arrival-feature-type-id)
            (loop for (angel-type angel-number is-player) in angel-list do
              (loop repeat angel-number do
@@ -86,7 +86,7 @@
                        (= angel-type +mob-type-star-gazer+)
                        (= angel-type +mob-type-star-mender+))
                  (progn
-                   (format t "PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%")
+                   (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%"))
                    (loop with is-free = t
                          with mob1 = (if is-player (make-instance 'player :mob-type +mob-type-star-singer+) (make-instance 'mob :mob-type +mob-type-star-singer+))
                          with mob2 = (if is-player (make-instance 'player :mob-type +mob-type-star-gazer+) (make-instance 'mob :mob-type +mob-type-star-gazer+))
@@ -128,7 +128,7 @@
                               
                               (loop-finish))))
                  (progn
-                   (format t "PLACE-ANGELS-ON-LEVEL: Place chrome angels~%")
+                   (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place chrome angels~%"))
                    
                    (loop with arrival-point-list = (remove-if-not #'(lambda (a)
                                                                       (= (feature-type a) arrival-feature-type-id))
@@ -159,7 +159,7 @@
                          t
                          nil))
                    (faction-list mission))
-      (format t "PLACE-ANGELS-ON-LEVEL: Place present angels~%")
+      (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place present angels~%"))
       (placement-func +feature-start-place-angels+))
 
     (when (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
@@ -170,7 +170,7 @@
                               t
                               nil))
                         (faction-list mission)))
-      (format t "PLACE-ANGELS-ON-LEVEL: Place delayed angels~%")
+      (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place delayed angels~%"))
       (placement-func +feature-delayed-angels-arrival-point+))
 
     (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+)
@@ -181,14 +181,14 @@
                               t
                               nil))
                         (faction-list mission)))
-      (format t "PLACE-ANGELS-ON-LEVEL: Add game event for delayed angels~%")
+      (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add game event for delayed angels~%"))
       (push +game-event-delayed-arrival-angels+ (game-events level))))
   )
 
 (defun place-military-on-level (level world-sector mission world military-list remove-arrival-points)
   (declare (ignore world-sector world))
   
-  (format t "PLACE-MILITARY-ON-LEVEL: Place military function~%")
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place military function~%"))
   (flet ((placement-func (arrival-feature-type-id)
            (loop for squad-list in military-list do
              (destructuring-bind (mob-type-id mob-num is-player) (first squad-list)
@@ -237,7 +237,7 @@
                          t
                          nil))
                    (faction-list mission))
-      (format t "PLACE-MILITARY-ON-LEVEL: Place present military~%")
+      (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Place present military~%"))
       (placement-func +feature-start-military-point+))
 
     (when (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
@@ -248,7 +248,7 @@
                               t
                               nil))
                         (faction-list mission)))
-      (format t "PLACE-MILITARY-ON-LEVEL: Place delayed military~%")
+      (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Place delayed military~%"))
       (placement-func +feature-delayed-military-arrival-point+))
 
     (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
@@ -259,9 +259,40 @@
                               t
                               nil))
                         (faction-list mission)))
-      (format t "PLACE-MILITARY-ON-LEVEL: Add game event for delayed military~%")
+      (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Add game event for delayed military~%"))
       (push +game-event-delayed-arrival-military+ (game-events level))))
   )
+
+(defun place-demonic-runes-on-level (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place demonic runes~%"))
+  (let ((demonic-runes ())
+        (rune-list (list +feature-demonic-rune-flesh+ +feature-demonic-rune-flesh+
+                         +feature-demonic-rune-invite+ +feature-demonic-rune-invite+
+                         +feature-demonic-rune-away+ +feature-demonic-rune-away+
+                         +feature-demonic-rune-transform+ +feature-demonic-rune-transform+
+                         +feature-demonic-rune-barrier+ +feature-demonic-rune-barrier+
+                         +feature-demonic-rune-all+ +feature-demonic-rune-all+
+                         +feature-demonic-rune-decay+ +feature-demonic-rune-decay+)))
+    (loop with max-x = (array-dimension (terrain level) 0)
+          with max-y = (array-dimension (terrain level) 1)
+          with max-z = (array-dimension (terrain level) 2)
+          with cur-rune = 0
+          for x = (random max-x)
+          for y = (random max-y)
+          for z = (random max-z)
+          while (< (length demonic-runes) (length rune-list)) do
+            (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-can-have-rune+)
+                       (null (find (list x y z) demonic-runes :test #'(lambda (a b)
+                                                                        (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 6)
+                                                                          t
+                                                                          nil)
+                                                                        ))))
+              (push (list x y z (nth cur-rune rune-list)) demonic-runes)
+              (incf cur-rune)))
+    (loop for (x y z feature-type-id) in demonic-runes do
+      ;;(format t "PLACE RUNE ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id feature-type-id)) x y z)
+      (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))))
 
 ;;=======================
 ;; Auxiliary funcs

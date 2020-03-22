@@ -920,7 +920,7 @@
   (decf (nth (loyal-faction target) (total-faction-list *world*)))
 
   (when (mob-ability-p target +mob-abil-civilian+)
-    (decf (total-civilians (level *world*))))
+    (incf (lost-civilians (level *world*))))
   
   ;; give all items to the master
   (loop for item-id in (inv target)
@@ -952,7 +952,7 @@
     (incf (nth (loyal-faction target) (total-faction-list *world*)))
 
     (when (mob-ability-p target +mob-abil-civilian+)
-      (incf (total-civilians (level *world*))))
+      (decf (lost-civilians (level *world*))))
     
     ;; give all items to the slave
     (loop for item-id in (inv actor)
@@ -1668,11 +1668,11 @@
       (decf (total-angels *world*)))
 
     (when (mob-ability-p mob +mob-abil-civilian+)
-      (decf (total-civilians (level *world*))))
+      (incf (lost-civilians (level *world*))))
     ;; increase total civilian count of the slave mob otherwise it will be decreased twice - once during possession and once during death
     (when (and (master-mob-id mob)
-               (total-civilians (level *world*)))
-      (incf (total-civilians (level *world*))))
+               (mob-ability-p mob +mob-abil-civilian+))
+      (decf (lost-civilians (level *world*))))
     
     (decf (nth (loyal-faction mob) (total-faction-list *world*)))
     ;; increase total faction count of the slave mob otherwise it will be decreased twice - once during possession and once during death

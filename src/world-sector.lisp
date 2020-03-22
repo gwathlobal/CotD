@@ -555,7 +555,7 @@
 (defun place-coins-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
 
-  (format t "OVERALL-POST-PROCESS-FUNC: Place coins~%~%")
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place coins~%"))
   (let ((total-gold-items (loop for feature-id in (feature-id-list level)
                                 for lvl-feature = (get-feature-by-id feature-id)
                                 when (= (feature-type lvl-feature) +feature-start-gold-small+)
@@ -574,7 +574,7 @@
 (defun place-civilians-on-level (level world-sector mission world)
   (declare (ignore world-sector world))
   
-  (format t "OVERALL-POST-PROCESS-FUNC: Place civilians~%~%")
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place civilians~%"))
   (loop with civilians-present = nil
         for (faction-type faction-presence) in (faction-list mission)
         when (and (= faction-type +faction-type-civilians+)
