@@ -350,6 +350,7 @@
 (defconstant +mob-abil-poisoning-glands+ 170)
 (defconstant +mob-abil-purge-rune+ 171)
 (defconstant +mob-abil-civilian+ 172)
+(defconstant +mob-abil-deep-breath+ 173)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -408,6 +409,7 @@
 (defconstant +mob-effect-soul-sickness+ 54)
 (defconstant +mob-effect-demonic-power+ 55)
 (defconstant +mob-effect-demonic-sigil+ 56)
+(defconstant +mob-effect-deep-breath+ 57)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)

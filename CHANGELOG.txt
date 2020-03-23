@@ -10,6 +10,8 @@ CHANGELOG
      merge trinity mimics 
      decipher runes
   will now show up only when the corresponding target is next to you to avoid confusion.
+- Malseraph's Puppet irradiation strength will now depend on his favor with Malseraph.
+- Malseraph's Puppet get an ability to draw breath and exhale irradiation around them on the next turn.
 - Made an option to hide messages that are visible through Angel's 'Singlemind' ability.
 - Restructured the main menu: moved all quick scenario options into a submenu.
 - Fixed the bug when merged angels did not merge their power values.

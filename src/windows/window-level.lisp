@@ -56,7 +56,7 @@
       (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+))
                      (= (mission-type-id (mission (level *world*))) +mission-type-demonic-attack+))
                 (= (mission-type-id (mission (level *world*))) +mission-type-test+))
-        (format str "~%Civilians left: ~A~%" (- (truncate (* (initial-civilians (level *world*)) 0.8)) (lost-civilians (level *world*)))))
+        (format str "~%Civilians left: ~A~%" (- (truncate (* (initial-civilians (level *world*)) 0.6)) (lost-civilians (level *world*)))))
       
       (setf str (format nil "~A~A~A~A~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         str

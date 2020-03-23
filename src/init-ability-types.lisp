@@ -4548,10 +4548,49 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
-                                 :id +mob-abil-irradiate+ :name "Irradiate" :descr "Channel hellish powers to affect the target character with sickly invisible rays. Exposure to them causes irradiation of the target. The power of the irradiation increases with the number of times the target is affected by the rays. Heavy irradiation may sometimes make the target unable to act." 
-                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :id +mob-abil-deep-breath+ :name "Deep breath" :descr "Make a deep breath. On the next turn,  Malseraph transforms your exhale into sickly rays irradiating everybody around you. The power of the irradiation increases with the number of times the target is affected by the rays. Heavy irradiation may sometimes make the target unable to act. The amount of irradiation depends on your favor with Malseraph."
+                                 :cost 2 :spd +normal-ap+ :passive nil
                                  :final t :on-touch nil :removes-disguise t
                                  :motion 40
+                                 :on-invoke #'(lambda (ability-type actor target)
+                                                (declare (ignore target))
+                                                (logger (format nil "MOB-DEEP-BREATH: ~A [~A] uses deep breath.~%" (name actor) (id actor)))
+
+                                                (generate-sound actor (x actor) (y actor) (z actor) 40 #'(lambda (str)
+                                                                                                           (format nil "You hear someone breathing~A. " str)))
+                                                (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                       (format nil "~A takes a deep breath. "
+                                                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                       :color sdl:*white*
+                                                                       :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     :singlemind)))
+                                                (set-mob-effect actor :effect-type-id +mob-effect-deep-breath+ :actor-id (id actor) :cd 2)
+                                                
+                                                (decf (cur-fp actor) (cost ability-type))
+                                                )
+                                 :on-check-applic #'(lambda (ability-type actor target)
+                                                      (declare (ignore ability-type target))
+                                                      (if (and (mob-ability-p actor +mob-abil-deep-breath+)
+                                                               (not (mob-effect-p actor +mob-effect-deep-breath+)))
+                                                        t
+                                                        nil))
+                                 :on-check-ai #'(lambda (ability-type actor nearest-enemy nearest-ally)
+                                                  (declare (ignore nearest-ally))
+                                                  (if (and (can-invoke-ability actor nearest-enemy (id ability-type))
+                                                           nearest-enemy
+                                                           (< (get-distance (x actor) (y actor) (x nearest-enemy) (y nearest-enemy)) 2)
+                                                           (not (get-faction-relation (faction actor) (get-visible-faction nearest-enemy :viewer actor))))
+                                                      t
+                                                      nil))
+                                 :on-invoke-ai #'(lambda (ability-type actor nearest-enemy nearest-ally check-result)
+                                                   (declare (ignore nearest-ally check-result))
+                                                   (mob-invoke-ability actor nearest-enemy (id ability-type)))))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-irradiate+ :name "Irradiate" :descr "Channel hellish powers to affect the target character with sickly invisible rays. Exposure to them causes irradiation of the target. The power of the irradiation increases with the number of times the target is affected by the rays. Heavy irradiation may sometimes make the target unable to act. The amount of irradiation depends on your favor with Malseraph." 
+                                 :cost 1 :spd (truncate +normal-ap+ 2) :passive nil
+                                 :final t :on-touch nil :removes-disguise t
+                                 :motion 20
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (logger (format nil "MOB-IRRADIATE: ~A [~A] uses irradiate on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
@@ -4563,14 +4602,20 @@
                                                                                    (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                    (prepend-article +article-the+ (visible-name target)))
                                                                        :color sdl:*white*
-                                                                           :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                         :singlemind)))
-                                                (if (mob-effect-p target +mob-effect-irradiated+)
-                                                  (progn
-                                                    (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
-                                                      (incf (param1 effect) (+ 2 (random 3)))))
-                                                  (progn
-                                                    (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
+                                                                       :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     :singlemind)))
+                                                (let* ((malseraph (get-god-by-id (get-worshiped-god-type (worshiped-god actor))))
+                                                       (irradiate-bonus (funcall (piety-level-func malseraph) malseraph (get-worshiped-god-piety (worshiped-god actor))))
+                                                       (irradiate-value (if (zerop irradiate-bonus)
+                                                                          -1
+                                                                          (random irradiate-bonus))))
+                                                  (if (mob-effect-p target +mob-effect-irradiated+)
+                                                    (progn
+                                                      (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
+                                                        (incf (param1 effect) (+ 2 irradiate-value))))
+                                                    (progn
+                                                      (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 irradiate-value)))))
+                                                
                                                 (decf (cur-fp actor) (cost ability-type))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)

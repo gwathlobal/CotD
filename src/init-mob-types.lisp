@@ -467,7 +467,7 @@
                                        :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-remove-disguise t :abil-irradiate t :abil-fission t :abil-throw-corpse-into-portal t :abil-throw-relic-into-portal t
-                                       :abil-create-demon-sigil t
+                                       :abil-create-demon-sigil t :abil-deep-breath t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon-sigil+

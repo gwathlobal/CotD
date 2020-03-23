@@ -649,6 +649,41 @@
                                                           (when (<= (param1 effect) 0)
                                                             (rem-mob-effect actor (effect-type effect))))))
 
+(set-effect-type (make-instance 'effect-type :id +mob-effect-deep-breath+ :name "Deep breath"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             (sdl:color :r 100 :g 100 :b 100))
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore effect))
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 50 #'(lambda (str)
+                                                                                                                       (format nil "You hear someone exhaling~A. " str)))
+
+                                                            (check-surroundings (x actor) (y actor) nil
+                                                                                #'(lambda (dx dy)
+                                                                                    (let ((target (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                      (when target
+                                                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
+                                                                                                               (format nil "~A irradiates ~A. "
+                                                                                                                       (capitalize-name (prepend-article +article-the+ (visible-name actor)))
+                                                                                                                       (prepend-article +article-the+ (visible-name target)))
+                                                                                                               :color sdl:*white*
+                                                                                                               :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                                             :singlemind)))
+                                                                                        (let* ((malseraph (get-god-by-id (get-worshiped-god-type (worshiped-god actor))))
+                                                                                               (irradiate-bonus (funcall (piety-level-func malseraph) malseraph (get-worshiped-god-piety (worshiped-god actor))))
+                                                                                               (irradiate-value (if (zerop irradiate-bonus)
+                                                                                                                  -1
+                                                                                                                  (random irradiate-bonus))))
+                                                                                          (if (mob-effect-p target +mob-effect-irradiated+)
+                                                                                            (progn
+                                                                                              (let ((effect (get-effect-by-id (mob-effect-p target +mob-effect-irradiated+))))
+                                                                                                (incf (param1 effect) (+ 2 irradiate-value))))
+                                                                                            (progn
+                                                                                              (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 irradiate-value)))))
+                                                                                        ))
+                                                                                    ))
+                                                            )))
+
 (set-effect-type (make-instance 'effect-type :id +mob-effect-polymorph-sheep+ :name "Polymorhped"
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
