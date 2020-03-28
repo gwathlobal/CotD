@@ -6,7 +6,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-angels+
                                            :descr-func #'(lambda ()
-                                                           "To win, destroy all demons in the district. To lose, have all angels killed or have 60% of civilians in the district destroyed or possessed.")
+                                                           (let ((win-figure (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-attack))))
+                                                             (format nil "To win, destroy all demons in the district. To lose, have all angels killed or have ~A% of civilians in the district destroyed or possessed." win-figure)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
@@ -79,17 +80,20 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-demons+
                                            :descr-func #'(lambda ()
-                                                           "To win, destroy or possess 60% of civilians in the district. To lose, have all demons killed.")
+                                                           (let ((win-figure (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-attack))))
+                                                             (format nil "To win, destroy or possess ~A% of civilians in the district. To lose, have all demons killed." win-figure)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (or (and (= (loyal-faction *player*) +faction-type-demons+)
-                                                                      (> (total-demons world) 0)
-                                                                      (<= (- (truncate (* (initial-civilians (level *world*)) 0.6)) (lost-civilians (level *world*))) 0))
-                                                                 (and (/= (loyal-faction *player*) +faction-type-demons+)
-                                                                      (> (total-demons world) 0)
-                                                                      (<= (- (truncate (* (initial-civilians (level *world*)) 0.6)) (lost-civilians (level *world*))) 0)))
-                                                           t
-                                                           nil))
+                                                         (let* ((win-condition (get-win-condition-by-id :win-cond-demonic-attack))
+                                                                (civilians-left (funcall (win-condition/win-func win-condition) world win-condition)))
+                                                           (if (or (and (= (loyal-faction *player*) +faction-type-demons+)
+                                                                        (> (total-demons world) 0)
+                                                                        (<= civilians-left 0))
+                                                                   (and (/= (loyal-faction *player*) +faction-type-demons+)
+                                                                        (> (total-demons world) 0)
+                                                                        (<= civilians-left 0)))
+                                                             t
+                                                             nil)))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str "Civilians eliminated.")
@@ -140,7 +144,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-military+
                                            :descr-func #'(lambda ()
-                                                           "To win, destroy all demons in the district. To lose, have all military killed or have 60% of civilians in the district destroyed or possessed.")
+                                                           (let ((win-figure (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-attack))))
+                                                             (format nil "To win, destroy all demons in the district. To lose, have all military killed or have ~A% of civilians in the district destroyed or possessed." win-figure)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (> (total-humans world) 0)

@@ -506,7 +506,7 @@
                                         (multiple-value-setq (mission world-sector) (run-window *current-window*))
                                         (when (and mission world-sector)
 
-                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-demon-malseraph+)
+                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
                                           
                                           (setf *current-window* (return-to *current-window*))
 
