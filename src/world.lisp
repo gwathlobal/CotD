@@ -30,7 +30,7 @@
    (delayed-military-arrival-points :initform () :initarg :delayed-military-arrival-points :accessor delayed-military-arrival-points) ;; is of type ((x y z) (...) ...)
 
    (game-events :initform () :accessor game-events)
-   
+
    (demonic-portals :initform () :initarg :demonic-portals :accessor demonic-portals)
    (relic-id :initform () :initarg :relic-id :accessor relic-id)
    (demonic-sigils :initform () :initarg :demonic-sigils :accessor demonic-sigils)

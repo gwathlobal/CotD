@@ -284,6 +284,18 @@
         finally (sdl:draw-string-solid-* str x y :color sdl:*red*))
   )
 
+(defun show-delayed-arrival ()
+  (let* ((str (format nil "Turns before arrival: ~A/~A" (player-game-time *world*) 220))
+         (w (* (sdl:char-width sdl:*default-font*) (length str)))
+         (h (sdl:char-height sdl:*default-font*))
+         (x (- (truncate (* *max-x-view* *glyph-w*) 2) (truncate w 2)))
+         (y (- (truncate (* *max-y-view* *glyph-h*) 2) (truncate h 2))))
+    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
+      (sdl:fill-surface sdl:*black* :template a-rect)
+
+      (sdl:draw-string-solid-* str x y :color sdl:*white*))
+  ))
+
 (defun update-screen (win)
   
   ;; filling the background with black rectangle
@@ -308,6 +320,9 @@
   (show-message-box 10 (- *window-height* *msg-box-window-height* 20) (- *window-width* 260 10))
   (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height*)
   (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
+
+  (when (player-outside-level *player*)
+    (show-delayed-arrival))
     
   (sdl:update-display)
   

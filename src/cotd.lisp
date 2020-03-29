@@ -34,18 +34,22 @@
            (setf (turn-finished *world*) nil)
 
            (when (or (check-dead *player*)
-                     (master-mob-id *player*))
-             (when (master-mob-id *player*)
-               (setf (x *player*) (x (get-mob-by-id (master-mob-id *player*))) (y *player*) (y (get-mob-by-id (master-mob-id *player*))) (z *player*) (z (get-mob-by-id (master-mob-id *player*)))))
-             (update-visible-mobs *player*)
-             (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+                     (master-mob-id *player*)
+                     (player-outside-level *player*))
+             (unless (player-outside-level *player*)
+               (when (master-mob-id *player*)
+                 (setf (x *player*) (x (get-mob-by-id (master-mob-id *player*))) (y *player*) (y (get-mob-by-id (master-mob-id *player*))) (z *player*) (z (get-mob-by-id (master-mob-id *player*)))))
+               (update-visible-mobs *player*)
+               (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*)))
              
              (make-output *current-window*)
              (pause-for-poll))
            
            ;; iterate through all the mobs
            ;; those who are not dead and have cur-ap > 0 can make a move
-           (loop for mob of-type mob across *mobs* do
+           (loop for mob-id in (mob-id-list (level *world*))
+                 for mob = (get-mob-by-id mob-id)
+                 do
              (when (and (not (check-dead mob))
                         (> (cur-ap mob) 0)
                         (not (is-merged mob)))
@@ -145,7 +149,9 @@
                (incf (world-game-time *world*) +normal-ap+))
              (setf (turn-finished *world*) t)
              (set-message-this-turn nil)
-             (loop for mob of-type mob across *mobs* do
+             (loop  for mob-id in (mob-id-list (level *world*))
+                    for mob = (get-mob-by-id mob-id)
+                    do
                (when (and (not (check-dead mob))
                           (not (is-merged mob)))
                  ;; increase cur-ap by max-ap
@@ -280,6 +286,9 @@
   (add-message (format nil " in "))
   (add-message (format nil "~(~A~)" (name (get-world-sector-type-by-id (wtype world-sector)))) sdl:*yellow*)
   (add-message (format nil "!~%~%To view help, press '?'.~%To view your current objective, press 'j'.~%"))
+
+  (when (player-outside-level *player*)
+    (add-message (format nil "~%Your arrival here is delayed, please wait!")))
 
   )  
 

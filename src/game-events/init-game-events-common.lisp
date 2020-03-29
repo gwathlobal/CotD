@@ -377,33 +377,77 @@
                                                            (logger (format nil "~%GAME-EVENT: The military has arrived!~%"))
 
                                                            ;; find a suitable arrival point to accomodate 4 groups of military
-                                                           (let ((arrival-points (copy-list (delayed-military-arrival-points (level world)))))
-                                                             (loop with max-troops = 4
-                                                                   while (not (zerop max-troops))
-                                                                   for n = (random (length arrival-points))
-                                                                   for arrival-point = (nth n arrival-points)
-                                                                   do
-                                                                      (let ((free-cells 0) (m-picked 0))
-                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
-                                                                                            #'(lambda (dx dy)
-                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
-                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
-                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
-                                                                                                  (incf free-cells))))
-                                                                        (when (>= free-cells (1- (length *game-events-military-list*)))
-                                                                          
-                                                                          (check-surroundings (first arrival-point) (second arrival-point) t
-                                                                                              #'(lambda (dx dy)
-                                                                                                  (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
-                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
-                                                                                                             (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
-                                                                                                             (<= m-picked (1- (length *game-events-military-list*))))
-                                                                                                    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type (nth m-picked *game-events-military-list*)
-                                                                                                                                                             :x dx :y dy :z (third arrival-point)))
-                                                                                                    (incf m-picked))))
-                                                                          (decf max-troops)
-                                                                          ))
-                                                                   ))
+                                                           (let ((arrival-point-list (copy-list (delayed-military-arrival-points (level world))))
+                                                                 (military-list (list (list (list +mob-type-chaplain+ 1 nil)
+                                                                                            (list +mob-type-sergeant+ 1 nil)
+                                                                                            (list +mob-type-scout+ 1 nil)
+                                                                                            (list +mob-type-soldier+ 3 nil)
+                                                                                            (list +mob-type-gunner+ 1 nil))
+                                                                                      (list (list +mob-type-chaplain+ 1 nil)
+                                                                                            (list +mob-type-sergeant+ 1 nil)
+                                                                                            (list +mob-type-scout+ 1 nil)
+                                                                                            (list +mob-type-soldier+ 3 nil)
+                                                                                            (list +mob-type-gunner+ 1 nil))
+                                                                                      (list (list +mob-type-chaplain+ 1 nil)
+                                                                                            (list +mob-type-sergeant+ 1 nil)
+                                                                                            (list +mob-type-scout+ 1 nil)
+                                                                                            (list +mob-type-soldier+ 3 nil)
+                                                                                            (list +mob-type-gunner+ 1 nil))
+                                                                                      (list (list +mob-type-chaplain+ 1 nil)
+                                                                                            (list +mob-type-sergeant+ 1 nil)
+                                                                                            (list +mob-type-scout+ 1 nil)
+                                                                                            (list +mob-type-soldier+ 3 nil)
+                                                                                            (list +mob-type-gunner+ 1 nil)))))
+
+                                                             (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-military-chaplain+)
+                                                               (setf military-list (remove (first military-list) military-list))
+                                                               (push (list (list +mob-type-chaplain+ 1 t)
+                                                                           (list +mob-type-sergeant+ 1 nil)
+                                                                           (list +mob-type-scout+ 1 nil)
+                                                                           (list +mob-type-soldier+ 3 nil)
+                                                                           (list +mob-type-gunner+ 1 nil))
+                                                                     military-list))
+
+                                                             (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-military-scout+)
+                                                               (push (list (list +mob-type-scout+ 1 t))
+                                                                     military-list))
+
+                                                             (loop for squad-list in military-list do
+                                                               (destructuring-bind (mob-type-id mob-num is-player) (first squad-list)
+                                                                 (declare (ignore mob-num))
+                                                                 (let ((leader (if is-player
+                                                                                 (progn
+                                                                                   (setf (player-outside-level *player*) nil)
+                                                                                   *player*)
+                                                                                 (make-instance 'mob :mob-type mob-type-id))))
+                                                                   (loop while (> (length arrival-point-list) 0) 
+                                                                         for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
+                                                                         for x = (first random-arrival-point)
+                                                                         for y = (second random-arrival-point)
+                                                                         for z = (third random-arrival-point)
+                                                                         do
+                                                                            (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+                                                                            
+                                                                            (find-unoccupied-place-around (level world) leader x y z)
+                                                                            
+                                                                            (loop-finish))
+                                                                   
+                                                                   (setf squad-list (remove (first squad-list) squad-list))
+                                                                   
+                                                                   (when squad-list
+                                                                     (populate-level-with-mobs (level world) squad-list
+                                                                                               #'(lambda (level mob)
+                                                                                                   (find-unoccupied-place-around level mob (x leader) (y leader) (z leader)))))))
+                                                                   )
+                                                             (loop for mob-id in (mob-id-list (level world))
+                                                                   for horse = (get-mob-by-id mob-id)
+                                                                   for rider = (if (mounted-by-mob-id horse)
+                                                                                 (get-mob-by-id (mounted-by-mob-id horse))
+                                                                                 nil)
+                                                                   when rider
+                                                                     do
+                                                                        (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+                                                             )
                                                            )
                                ))
 

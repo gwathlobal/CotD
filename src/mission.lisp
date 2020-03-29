@@ -28,51 +28,29 @@
                        nil))
                  (faction-list mission))
     
-    ;; if the player is an angel & angels are delayed or the player is military & military is delayed
-    ;; place demons inside (as if they were the first to arrive)
-    (if (or (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
-                     (= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+))
-                 (find-if #'(lambda (a)
-                              (if (and (= (first a) +faction-type-angels+)
-                                       (= (second a) +mission-faction-delayed+))
-                                t
-                                nil))
-                          (faction-list mission)))
-            (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
-                     (= (player-lvl-mod-placement-id mission) +lm-placement-military-scout+))
-                 (find-if #'(lambda (a)
-                              (if (and (= (first a) +faction-type-military+)
-                                       (= (second a) +mission-faction-delayed+))
-                                t
-                                nil))
-                          (faction-list mission))))
-      (progn
-        (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place inside~%"))
-        (populate-level-with-mobs level demon-list #'find-unoccupied-place-inside))
-      (progn
-        (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place at the borders~%"))
-        (loop for (demon-type demon-number is-player) in demon-list do
-          (loop repeat demon-number do
-            (loop with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                               (= (feature-type a) +feature-demons-arrival-point+))
-                                                           (feature-id-list level)
-                                                           :key #'(lambda (b)
-                                                                    (get-feature-by-id b)))
-                  while (> (length arrival-point-list) 0) 
-                  for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
-                  for lvl-feature = (get-feature-by-id random-arrival-point-id)
-                  for x = (x lvl-feature)
-                  for y = (y lvl-feature)
-                  for z = (z lvl-feature)
-                  do
-                     (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
-                     (if is-player
-                       (progn
-                         (setf *player* (make-instance 'player :mob-type demon-type))
-                         (find-unoccupied-place-around level *player* x y z))
-                       (find-unoccupied-place-around level (make-instance 'mob :mob-type demon-type) x y z))
-                     
-                     (loop-finish)))))))
+    (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place at the borders~%"))
+    (loop for (demon-type demon-number is-player) in demon-list do
+      (loop repeat demon-number do
+        (loop with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                           (= (feature-type a) +feature-demons-arrival-point+))
+                                                       (feature-id-list level)
+                                                       :key #'(lambda (b)
+                                                                (get-feature-by-id b)))
+              while (> (length arrival-point-list) 0) 
+              for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
+              for lvl-feature = (get-feature-by-id random-arrival-point-id)
+              for x = (x lvl-feature)
+              for y = (y lvl-feature)
+              for z = (z lvl-feature)
+              do
+                 (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+                 (if is-player
+                   (progn
+                     (setf *player* (make-instance 'player :mob-type demon-type))
+                     (find-unoccupied-place-around level *player* x y z))
+                   (find-unoccupied-place-around level (make-instance 'mob :mob-type demon-type) x y z))
+                 
+                 (loop-finish)))))
   )
 
 (defun place-angels-on-level (level world-sector mission world angel-list)
@@ -189,79 +167,80 @@
   (declare (ignore world-sector world))
   
   (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place military function~%"))
-  (flet ((placement-func (arrival-feature-type-id)
-           (loop for squad-list in military-list do
-             (destructuring-bind (mob-type-id mob-num is-player) (first squad-list)
-               (declare (ignore mob-num))
-               (let ((leader (if is-player (make-instance 'player :mob-type mob-type-id) (make-instance 'mob :mob-type mob-type-id))))
-                 (loop with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                                      (= (feature-type a) arrival-feature-type-id))
-                                                                  (feature-id-list level)
-                                                                  :key #'(lambda (b)
-                                                                           (get-feature-by-id b)))
-                         while (> (length arrival-point-list) 0) 
-                         for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
-                         for lvl-feature = (get-feature-by-id random-arrival-point-id)
-                         for x = (x lvl-feature)
-                         for y = (y lvl-feature)
-                         for z = (z lvl-feature)
-                         do
-                            (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
 
-                            (find-unoccupied-place-around level leader x y z)
-                            
-                            (when is-player
-                              (setf *player* leader))
-                            (when remove-arrival-points
-                              (remove-feature-from-level-list level lvl-feature)
-                              (remove-feature-from-world lvl-feature))
-                            
-                            (loop-finish))
-                 
-                 (setf squad-list (remove (first squad-list) squad-list))
-
-                 (when squad-list
-                   (populate-level-with-mobs level squad-list
-                                             #'(lambda (level mob)
-                                                 (find-unoccupied-place-around level mob (x leader) (y leader) (z leader)))))))
-             )))
-
-    ;; if the player is present as a chaplain then we need only three squads
-    (when (and (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
-               (> (length military-list) 1))
-      (setf military-list (remove (first military-list) military-list)))
+  ;; if the player is present as a chaplain then we need only three squads
+  (when (and (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
+             (> (length military-list) 1))
+    (setf military-list (remove (first military-list) military-list)))
+  
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-military+)
+                              (= (second a) +mission-faction-present+))
+                       t
+                       nil))
+                 (faction-list mission))
+    (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Place present military~%"))
     
-    (when (find-if #'(lambda (a)
-                       (if (and (= (first a) +faction-type-military+)
-                                (= (second a) +mission-faction-present+))
-                         t
-                         nil))
-                   (faction-list mission))
-      (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Place present military~%"))
-      (placement-func +feature-start-military-point+))
-
-    (when (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
-                   (= (player-lvl-mod-placement-id mission) +lm-placement-military-scout+))
-               (find-if #'(lambda (a)
-                            (if (and (= (first a) +faction-type-military+)
-                                     (= (second a) +mission-faction-delayed+))
-                              t
-                              nil))
-                        (faction-list mission)))
-      (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Place delayed military~%"))
-      (placement-func +feature-delayed-military-arrival-point+))
-
-    (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
-               (/= (player-lvl-mod-placement-id mission) +lm-placement-military-scout+)
-               (find-if #'(lambda (a)
-                            (if (and (= (first a) +faction-type-military+)
-                                     (= (second a) +mission-faction-delayed+))
-                              t
-                              nil))
-                        (faction-list mission)))
-      (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Add game event for delayed military~%"))
-      (push +game-event-delayed-arrival-military+ (game-events level))))
+    (loop for squad-list in military-list do
+      (destructuring-bind (mob-type-id mob-num is-player) (first squad-list)
+        (declare (ignore mob-num))
+        (let ((leader (if is-player (make-instance 'player :mob-type mob-type-id) (make-instance 'mob :mob-type mob-type-id))))
+          (loop with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                             (= (feature-type a) +feature-start-military-point+))
+                                                         (feature-id-list level)
+                                                         :key #'(lambda (b)
+                                                                  (get-feature-by-id b)))
+                while (> (length arrival-point-list) 0) 
+                for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
+                for lvl-feature = (get-feature-by-id random-arrival-point-id)
+                for x = (x lvl-feature)
+                for y = (y lvl-feature)
+                for z = (z lvl-feature)
+                do
+                   (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+                   
+                   (find-unoccupied-place-around level leader x y z)
+                   
+                   (when is-player
+                     (setf *player* leader))
+                   (when remove-arrival-points
+                     (remove-feature-from-level-list level lvl-feature)
+                     (remove-feature-from-world lvl-feature))
+                   
+                   (loop-finish))
+          
+          (setf squad-list (remove (first squad-list) squad-list))
+          
+          (when squad-list
+            (populate-level-with-mobs level squad-list
+                                      #'(lambda (level mob)
+                                          (find-unoccupied-place-around level mob (x leader) (y leader) (z leader)))))))
+          )
+    )
+  
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-military+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 (faction-list mission))
+    (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Add game event for delayed military~%"))
+    
+    (pushnew +game-event-delayed-arrival-military+ (game-events level))
+    
+    ;; add a player to game but do not add him to the level
+    (when (or (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
+              (= (player-lvl-mod-placement-id mission) +lm-placement-military-scout+))
+      (loop for squad-list in military-list do
+        (destructuring-bind (mob-type-id mob-num is-player) (first squad-list)
+          (declare (ignore mob-num))
+          (when is-player
+            (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Add delayed player to the game~%"))
+            (setf *player* (make-instance 'player :mob-type mob-type-id))
+            (setf (player-outside-level *player*) t)))))
+    )
   )
+  
 
 (defun place-demonic-runes-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
