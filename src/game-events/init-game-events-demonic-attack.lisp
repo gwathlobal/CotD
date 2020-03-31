@@ -334,46 +334,6 @@
 ;; ARRIVAL EVENTS
 ;;===========================
 
-(set-game-event (make-instance 'game-event :id +game-event-demon-attack-delayed-arrival-military+ :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (if (and (= (player-game-time world) 220) (turn-finished world))
-                                                           t
-                                                           nil))
-                                           :on-trigger #'(lambda (world)
-                                                           (logger (format nil "~%GAME-EVENT: The military has arrived!~%"))
-
-                                                           ;; find a suitable arrival point to accomodate 4 groups of military
-                                                           (let ((arrival-points (copy-list (delayed-arrival-points (level world)))))
-                                                             (loop with max-troops = 4
-                                                                   while (not (zerop max-troops))
-                                                                   for n = (random (length arrival-points))
-                                                                   for arrival-point = (nth n arrival-points)
-                                                                   do
-                                                                      (let ((free-cells 0) (m-picked 0))
-                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
-                                                                                            #'(lambda (dx dy)
-                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
-                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
-                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
-                                                                                                  (incf free-cells))))
-                                                                        (when (>= free-cells (1- (length *game-events-military-list*)))
-                                                                          
-                                                                          (check-surroundings (first arrival-point) (second arrival-point) t
-                                                                                              #'(lambda (dx dy)
-                                                                                                  (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
-                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
-                                                                                                             (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
-                                                                                                             (<= m-picked (1- (length *game-events-military-list*))))
-                                                                                                    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type (nth m-picked *game-events-military-list*)
-                                                                                                                                                             :x dx :y dy :z (third arrival-point)))
-                                                                                                    (incf m-picked))))
-                                                                          (decf max-troops)
-                                                                          ))
-                                                                   ))
-                                                           )
-                               ))
-
-
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-delayed-arrival-angels+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (player-game-time world) 220) (turn-finished world))

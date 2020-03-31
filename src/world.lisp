@@ -43,6 +43,10 @@
    
    (lost-civilians :initform 0 :accessor lost-civilians)
    (initial-civilians :initform 0 :accessor initial-civilians)
+
+   (turns-for-delayed-angels :initform 220 :accessor turns-for-delayed-angels)
+   (turns-for-delayed-demons :initform 220 :accessor turns-for-delayed-demons)
+   (turns-for-delayed-military :initform 220 :accessor turns-for-delayed-military)
    ))
    
 (defun add-mob-to-level-list (level mob)

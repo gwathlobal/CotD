@@ -57,20 +57,28 @@
   (declare (ignore world-sector world))
   
   (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place angels function~%"))
-  (flet ((placement-func (arrival-feature-type-id)
-           (loop for (angel-type angel-number is-player) in angel-list do
-             (loop repeat angel-number do
-               (if (or (= angel-type +mob-type-star-singer+)
-                       (= angel-type +mob-type-star-gazer+)
-                       (= angel-type +mob-type-star-mender+))
-                 (progn
-                   (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%"))
-                   (loop with is-free = t
-                         with mob1 = (if is-player (make-instance 'player :mob-type +mob-type-star-singer+) (make-instance 'mob :mob-type +mob-type-star-singer+))
-                         with mob2 = (if is-player (make-instance 'player :mob-type +mob-type-star-gazer+) (make-instance 'mob :mob-type +mob-type-star-gazer+))
-                         with mob3 = (if is-player (make-instance 'player :mob-type +mob-type-star-mender+) (make-instance 'mob :mob-type +mob-type-star-mender+))
-                         with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                                      (= (feature-type a) arrival-feature-type-id))
+  
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-angels+)
+                              (= (second a) +mission-faction-present+))
+                       t
+                       nil))
+                 (faction-list mission))
+    (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place present angels~%"))
+    
+    (loop for (angel-type angel-number is-player) in angel-list do
+      (loop repeat angel-number do
+        (if (or (= angel-type +mob-type-star-singer+)
+                (= angel-type +mob-type-star-gazer+)
+                (= angel-type +mob-type-star-mender+))
+          (progn
+            (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%"))
+            (loop with is-free = t
+                  with mob1 = (if is-player (make-instance 'player :mob-type +mob-type-star-singer+) (make-instance 'mob :mob-type +mob-type-star-singer+))
+                  with mob2 = (if is-player (make-instance 'player :mob-type +mob-type-star-gazer+) (make-instance 'mob :mob-type +mob-type-star-gazer+))
+                  with mob3 = (if is-player (make-instance 'player :mob-type +mob-type-star-mender+) (make-instance 'mob :mob-type +mob-type-star-mender+))
+                  with arrival-point-list = (remove-if-not #'(lambda (a)
+                                                                      (= (feature-type a) +feature-start-place-angels+))
                                                                   (feature-id-list level)
                                                                   :key #'(lambda (b)
                                                                            (get-feature-by-id b)))
@@ -109,7 +117,7 @@
                    (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place chrome angels~%"))
                    
                    (loop with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                                      (= (feature-type a) arrival-feature-type-id))
+                                                                      (= (feature-type a) +feature-start-place-angels+))
                                                                   (feature-id-list level)
                                                                   :key #'(lambda (b)
                                                                            (get-feature-by-id b)))
@@ -129,39 +137,42 @@
                               (find-unoccupied-place-around level (make-instance 'mob :mob-type angel-type) x y z))
                             
                             (loop-finish))))
-                   ))))
-    
+                   )))
+
     (when (find-if #'(lambda (a)
-                       (if (and (= (first a) +faction-type-angels+)
-                                (= (second a) +mission-faction-present+))
-                         t
-                         nil))
-                   (faction-list mission))
-      (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place present angels~%"))
-      (placement-func +feature-start-place-angels+))
-
-    (when (and (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
-                   (= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+))
-               (find-if #'(lambda (a)
-                            (if (and (= (first a) +faction-type-angels+)
-                                     (= (second a) +mission-faction-delayed+))
-                              t
-                              nil))
-                        (faction-list mission)))
-      (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place delayed angels~%"))
-      (placement-func +feature-delayed-angels-arrival-point+))
-
-    (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+)
-               (/= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
-               (find-if #'(lambda (a)
-                            (if (and (= (first a) +faction-type-angels+)
-                                     (= (second a) +mission-faction-delayed+))
-                              t
-                              nil))
-                        (faction-list mission)))
+                     (if (and (= (first a) +faction-type-angels+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 (faction-list mission))
       (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add game event for delayed angels~%"))
-      (push +game-event-delayed-arrival-angels+ (game-events level))))
+      
+      (pushnew +game-event-delayed-arrival-angels+ (game-events level))
+      
+      ;; add a player to game but do not add him to the level
+      (when (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
+                (= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+))
+        (loop for (mob-type-id mob-num is-player) in angel-list do
+          (when is-player
+            (if (or (= mob-type-id +mob-type-star-singer+)
+                    (= mob-type-id +mob-type-star-gazer+)
+                    (= mob-type-id +mob-type-star-mender+))
+              (progn
+                (let ((mob1 (make-instance 'player :mob-type +mob-type-star-singer+))
+                      (mob2 (make-instance 'player :mob-type +mob-type-star-gazer+))
+                      (mob3 (make-instance 'player :mob-type +mob-type-star-mender+)))
+                  (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                  (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                  (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                  (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                  (setf *player* mob1)))
+              (progn
+                (setf *player* (make-instance 'player :mob-type mob-type-id))))
+            (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add delayed player to the game~%"))
+            (setf (player-outside-level *player*) t))))
+      )
   )
+  
 
 (defun place-military-on-level (level world-sector mission world military-list remove-arrival-points)
   (declare (ignore world-sector world))

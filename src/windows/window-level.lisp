@@ -285,7 +285,12 @@
   )
 
 (defun show-delayed-arrival ()
-  (let* ((str (format nil "Turns before arrival: ~A/~A" (player-game-time *world*) 220))
+  (let* ((turns-before-arrival (cond
+                                 ((= (loyal-faction *player*) +faction-type-demons+) (turns-for-delayed-demons (level *world*)))
+                                 ((= (loyal-faction *player*) +faction-type-angels+) (turns-for-delayed-angels (level *world*)))
+                                 ((= (loyal-faction *player*) +faction-type-military+) (turns-for-delayed-military (level *world*)))
+                                 (t 220)))
+         (str (format nil "Turns before arrival: ~A/~A" (player-game-time *world*) turns-before-arrival))
          (w (* (sdl:char-width sdl:*default-font*) (length str)))
          (h (sdl:char-height sdl:*default-font*))
          (x (- (truncate (* *max-x-view* *glyph-w*) 2) (truncate w 2)))

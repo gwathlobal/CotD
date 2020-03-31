@@ -15,7 +15,7 @@
 (defconstant +game-event-win-for-ghost+ 10)
 (defconstant +game-event-unnatural-darkness+ 11)
 (defconstant +game-event-constant-reanimation+ 12)
-(defconstant +game-event-demon-attack-delayed-arrival-military+ 13)
+
 (defconstant +game-event-demon-attack-delayed-arrival-angels+ 14)
 (defconstant +game-event-player-died+ 15)
 (defconstant +game-event-demon-attack-win-for-church+ 16)

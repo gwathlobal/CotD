@@ -370,7 +370,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-military+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (player-game-time world) 220) (turn-finished world))
+                                                         (if (and (= (player-game-time world) (turns-for-delayed-military (level world))) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
@@ -454,70 +454,90 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-angels+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (player-game-time world) 220) (turn-finished world))
+                                                         (if (and (= (player-game-time world) (turns-for-delayed-angels (level world))) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            (logger (format nil "~%GAME-EVENT: The angels have arrived!~%"))
 
-                                                           (let ((arrival-points (copy-list (delayed-angels-arrival-points (level world)))))
-                                                             ;; find a suitable arrival point to accomodate trinity mimics
-                                                             (loop with positioned = nil
-                                                                   with trinity-mimic-list = (list +mob-type-star-singer+ +mob-type-star-gazer+ +mob-type-star-mender+)
-                                                                   while (null positioned)
-                                                                   for n = (random (length arrival-points))
-                                                                   for arrival-point = (nth n arrival-points)
-                                                                   do
-                                                                      (let ((free-cells ()))
-                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
-                                                                                            #'(lambda (dx dy)
-                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
-                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
-                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
-                                                                                                  (push (list dx dy (third arrival-point)) free-cells))))
-                                                                        (when (>= (length free-cells) (length trinity-mimic-list))
-                                                                          (let ((mob1 (make-instance 'mob :mob-type +mob-type-star-singer+ :x (first (nth 0 free-cells)) :y (second (nth 0 free-cells)) :z (third (nth 0 free-cells))))
-                                                                                (mob2 (make-instance 'mob :mob-type +mob-type-star-gazer+ :x (first (nth 1 free-cells)) :y (second (nth 1 free-cells)) :z (third (nth 1 free-cells))))
-                                                                                (mob3 (make-instance 'mob :mob-type +mob-type-star-mender+ :x (first (nth 2 free-cells)) :y (second (nth 2 free-cells)) :z (third (nth 2 free-cells)))))
-                                                                            
-                                                                            (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
-                                                                            (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
-                                                                            (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
-                                                                            (setf (name mob2) (name mob1) (name mob3) (name mob1))
-                                                                            
-                                                                            (add-mob-to-level-list (level world) mob1)
-                                                                            (add-mob-to-level-list (level world) mob2)
-                                                                            (add-mob-to-level-list (level world) mob3))
-                                                                          
-                                                                          (setf positioned t)
-                                                                          ))
-                                                                   )
-                                                             (loop with positioned = nil
-                                                                   with max-angels = 5
-                                                                   while (null positioned)
-                                                                   for n = (random (length arrival-points))
-                                                                   for arrival-point = (nth n arrival-points)
-                                                                   do
-                                                                      (let ((free-cells 0) (m-picked 0))
-                                                                        (check-surroundings (first arrival-point) (second arrival-point) t
-                                                                                            #'(lambda (dx dy)
-                                                                                                (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
-                                                                                                           (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
-                                                                                                           (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+))
-                                                                                                  (incf free-cells))))
-                                                                        (when (>= free-cells max-angels)
-                                                                          
-                                                                          (check-surroundings (first arrival-point) (second arrival-point) t
-                                                                                              #'(lambda (dx dy)
-                                                                                                  (when (and (not (get-mob-* (level world) dx dy (third arrival-point)))
-                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-blocks-move+))
-                                                                                                             (get-terrain-type-trait (get-terrain-* (level world) dx dy (third arrival-point)) +terrain-trait-opaque-floor+)
-                                                                                                             (<= m-picked max-angels))
-                                                                                                    (add-mob-to-level-list (level world) (make-instance 'mob :mob-type +mob-type-angel+
-                                                                                                                                                             :x dx :y dy :z (third arrival-point)))
-                                                                                                    (incf m-picked))))
-                                                                          (setf positioned t)
-                                                                          ))
-                                                                   ))
+                                                           ;; find suitale arrival points to accomodate chrome angels & trinity mimics
+                                                           (let ((arrival-point-list (copy-list (delayed-angels-arrival-points (level world))))
+                                                                 (angels-list (list (list +mob-type-angel+ *min-angels-number* nil))))
+
+                                                             (if (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-angel-trinity+)
+                                                               (push (list +mob-type-star-singer+ 1 t) angels-list)
+                                                               (push (list +mob-type-star-singer+ 1 nil)
+                                                                     angels-list))
+
+                                                             (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-angel-chrome+)
+                                                               (push (list +mob-type-angel+ 1 t)
+                                                                     angels-list))
+
+                                                             (loop for (angel-type angel-number is-player) in angels-list do
+                                                               (loop repeat angel-number do
+                                                                 (if (or (= angel-type +mob-type-star-singer+)
+                                                                         (= angel-type +mob-type-star-gazer+)
+                                                                         (= angel-type +mob-type-star-mender+))
+                                                                   (progn
+                                                                     (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%"))
+                                                                     (loop with is-free = t
+                                                                           with mob1 = (if is-player
+                                                                                         (progn
+                                                                                           (setf (player-outside-level *player*) nil)
+                                                                                           *player*)
+                                                                                         (make-instance 'mob :mob-type +mob-type-star-singer+))
+                                                                           with mob2 = (if is-player
+                                                                                         (get-mob-by-id (second (mimic-id-list *player*)))
+                                                                                         (make-instance 'mob :mob-type +mob-type-star-gazer+))
+                                                                           with mob3 = (if is-player
+                                                                                         (get-mob-by-id(third (mimic-id-list *player*)))
+                                                                                         (make-instance 'mob :mob-type +mob-type-star-mender+))
+                                                                           for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
+                                                                           for x = (first random-arrival-point)
+                                                                           for y = (second random-arrival-point)
+                                                                           for z = (third random-arrival-point)
+                                                                           do
+                                                                              (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+                                                                              (setf is-free t)
+                                                                              (check-surroundings x y t #'(lambda (dx dy)
+                                                                                                            (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
+                                                                                                                      (not (get-terrain-type-trait (get-terrain-* (level world) dx dy z) +terrain-trait-opaque-floor+)))
+                                                                                                              (setf is-free nil))))
+                                                                              (when is-free
+                                                                                
+                                                                                (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                                                                                (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                                                                                (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                                                                                (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                                                                                
+                                                                                (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
+                                                                                (add-mob-to-level-list (level world) mob1)
+                                                                                (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
+                                                                                (add-mob-to-level-list (level world) mob2)
+                                                                                (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
+                                                                                (add-mob-to-level-list (level world) mob3)
+                                                                                
+                                                                                (loop-finish))))
+                                                                   (progn
+                                                                     (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place chrome angels~%"))
+                                                                     
+                                                                     (loop with angel = (if is-player
+                                                                                          (progn
+                                                                                            (setf (player-outside-level *player*) nil)
+                                                                                            *player*)
+                                                                                          (make-instance 'mob :mob-type angel-type))
+                                                                           while (> (length arrival-point-list) 0) 
+                                                                           for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
+                                                                           for x = (first random-arrival-point)
+                                                                           for y = (second random-arrival-point)
+                                                                           for z = (third random-arrival-point)
+                                                                           do
+                                                                              (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+                                                                              
+                                                                              (find-unoccupied-place-around (level world) angel x y z)
+                                                                              
+                                                                              (loop-finish))))
+                                                                     ))
+                                                             )
                                                            )
                                ))
