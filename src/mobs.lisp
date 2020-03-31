@@ -824,8 +824,7 @@
   (when (mob-ability-p mob +mob-abil-starts-with-horse+)
     (let ((horse (make-instance 'mob :mob-type +mob-type-horse+ :x (x mob) :y (y mob) :z (z mob))))
       (setf (mounted-by-mob-id horse) (id mob))
-      (setf (riding-mob-id mob) (id horse))
-      (add-mob-to-level-list (level *world*) horse)))
+      (setf (riding-mob-id mob) (id horse))))
 
   (loop for (item-type-id qty-func) in (init-items (get-mob-type-by-id (mob-type mob)))
         for qty = (funcall qty-func)

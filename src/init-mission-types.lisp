@@ -81,13 +81,41 @@
                                                         (push #'(lambda (level world-sector mission world)
                                                                   (declare (ignore world-sector mission world))
 
-                                                                  (format t "OVERALL-POST-PROCESS-FUNC: Remove dungeon generation features~%~%")
+                                                                  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Remove dungeon generation features~%"))
                                                                   
                                                                   (loop for feature-id in (feature-id-list level)
                                                                         for lvl-feature = (get-feature-by-id feature-id)
                                                                         when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
                                                                           do
                                                                              (remove-feature-from-level-list level lvl-feature)))
+                                                              func-list)
+
+                                                        ;; set up turns for delayed arrival for all parties
+                                                        (push #'(lambda (level world-sector mission world)
+                                                                  (declare (ignore mission))
+
+                                                                  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Set up turns for delayed arrival~%"))
+                                                                  
+                                                                  ;; set up delayed arrival for angels
+                                                                  (setf (turns-for-delayed-angels level) 150)
+
+                                                                  ;; set up delayed arrival for military depending on the distance from the nearest military-controlled sector
+                                                                  (let ((first t)
+                                                                        (nearest-military-sector nil))
+                                                                    (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                                                      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                                                        (when (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-military+)
+                                                                          (when first
+                                                                            (setf nearest-military-sector (aref (cells (world-map world)) x y))
+                                                                            (setf first nil))
+                                                                          (when (< (get-distance x y (x world-sector) (y world-sector))
+                                                                                   (get-distance (x nearest-military-sector) (y nearest-military-sector) (x world-sector) (y world-sector)))
+                                                                            (setf nearest-military-sector (aref (cells (world-map world)) x y))))))
+
+                                                                    (if nearest-military-sector
+                                                                      (setf (turns-for-delayed-military level) (+ 120 (* (truncate (get-distance (x nearest-military-sector) (y nearest-military-sector) (x world-sector) (y world-sector))) 20)))
+                                                                      (setf (turns-for-delayed-military level) 220)))
+                                                                  )
                                                               func-list)
                                                                   
                                                         ;; create delayed points from respective features

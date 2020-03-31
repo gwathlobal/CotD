@@ -51,6 +51,20 @@
    
 (defun add-mob-to-level-list (level mob)
   (pushnew (id mob) (mob-id-list level))
+
+  (when (riding-mob-id mob)
+    (let ((sx) (sy)
+          (mount (get-mob-by-id (riding-mob-id mob))))
+      (pushnew (id mount) (mob-id-list level))
+
+      (setf sx (- (x mount) (truncate (1- (map-size mount)) 2)))
+      (setf sy (- (y mount) (truncate (1- (map-size mount)) 2)))
+    
+      (loop for nx from sx below (+ sx (map-size mount)) do
+        (loop for ny from sy below (+ sy (map-size mount)) do
+          (setf (aref (mobs level) nx ny (z mount)) (id mount))))
+      
+      (pushnew (id mount) (aref (mob-quadrant-map level) (truncate (x mount) 10) (truncate (y mount) 10)))))
   
   (let ((sx) (sy))
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
@@ -60,7 +74,7 @@
       (loop for ny from sy below (+ sy (map-size mob)) do
         (setf (aref (mobs level) nx ny (z mob)) (id mob)))))
 
-  (push (id mob) (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10)))
+  (pushnew (id mob) (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10)))
   
   (let ((final-z (z mob)))
     (when (setf final-z (apply-gravity mob))
