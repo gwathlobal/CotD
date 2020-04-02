@@ -11,14 +11,14 @@
                                                              sdl:*blue*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore actor))
-                                                         (incf (total-blessed *world*))
+                                                         (incf (total-blessed (level *world*)))
                                                          (incf (stat-blesses (get-mob-by-id (actor-id effect))))
                                                          (when (eq *player* (get-mob-by-id (actor-id effect)))
                                                            (incf (cur-score *player*) 5))
                                                          )
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect actor))
-                                                            (decf (total-blessed *world*))
+                                                            (decf (total-blessed (level *world*)))
                                                             )))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-reveal-true-form+ :name "Revealed"
@@ -1180,7 +1180,7 @@
                                                          (adjust-m-acc actor)
                                                          (adjust-r-acc actor)
                                                          (adjust-sight actor)
-                                                         (incf (total-demons *world*))
+                                                         (incf (total-demons (level *world*)))
                                                          
                                                          ;; set up current abilities cooldowns
                                                          (loop for ability-id being the hash-key in (abilities actor)
@@ -1216,7 +1216,7 @@
                                                             (adjust-m-acc actor)
                                                             (adjust-r-acc actor)
                                                             (adjust-sight actor)
-                                                            (decf (total-demons *world*))
+                                                            (decf (total-demons (level *world*)))
                                                             
                                                             ;; set up current abilities cooldowns
                                                             (loop for ability-id being the hash-key in (abilities actor)

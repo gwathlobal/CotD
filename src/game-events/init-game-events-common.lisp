@@ -63,18 +63,18 @@
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-eater+)
-                                                                      (zerop (total-demons world))
-                                                                      (zerop (total-angels world)))
+                                                                      (zerop (total-demons (level world)))
+                                                                      (zerop (total-angels (level world))))
                                                                  (and (/= (loyal-faction *player*) +faction-type-eater+)
-                                                                      (> (nth +faction-type-military+ (total-faction-list world)) 0)
-                                                                      (zerop (total-demons world))
-                                                                      (zerop (total-angels world))))
+                                                                      (> (nth +faction-type-military+ (total-faction-list (level world))) 0)
+                                                                      (zerop (total-demons (level world)))
+                                                                      (zerop (total-angels (level world)))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Enemies of Primordials eliminated.")
+                                                                               ((zerop (total-demons (level world))) "Enemies of Primordials eliminated.")
                                                                                ))
                                                                   (score (calculate-player-score 1430))
                                                                   (highscores-place (add-highscore-record (make-highscore-record (name *player*)

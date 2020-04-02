@@ -862,26 +862,6 @@
   (when (= (mob-type mob) +mob-type-malseraph-puppet+)
     (set-mob-worshiped-god mob :god-id +god-entity-malseraph+ :init-piety 150 :param1 0 :param2 0))
   
-  (when (mob-ability-p mob +mob-abil-human+)
-    (incf (total-humans *world*))
-    (incf (initial-humans *world*)))
-  
-  (when (mob-ability-p mob +mob-abil-civilian+)
-    (incf (initial-civilians (level *world*))))
-
-  (when (mob-ability-p mob +mob-abil-demon+)
-    (incf (total-demons *world*))
-    (incf (initial-demons *world*)))
-  (when (mob-ability-p mob +mob-abil-undead+)
-    (incf (total-undead *world*))
-    (incf (initial-undead *world*)))
-  (when (and (mob-ability-p mob +mob-abil-angel+)
-             (not (mob-ability-p mob +mob-abil-animal+)))
-    (incf (total-angels *world*))
-    (incf (initial-angels *world*)))
-
-  (incf (nth (loyal-faction mob) (total-faction-list *world*)))
-
   )
 
 (defun get-mob-by-id (mob-id)

@@ -394,9 +394,9 @@
     (push #'(lambda (world mob-template-list)
               (declare (ignore mob-template-list))
 
-              (populate-world-with-mobs world (list (cons +mob-type-angel+ (if (> (+ (total-angels world) (truncate (total-humans world) 11)) *min-angels-number*)
-                                                                             (- (truncate (total-humans world) 11) 1)
-                                                                             (- *min-angels-number* (total-angels world)))))
+              (populate-world-with-mobs world (list (cons +mob-type-angel+ (if (> (+ (total-angels (level world)) (truncate (total-humans (level world)) 11)) *min-angels-number*)
+                                                                             (- (truncate (total-humans (level world)) 11) 1)
+                                                                             (- *min-angels-number* (total-angels (level world))))))
                                         #'find-unoccupied-place-outside)
               
               )
@@ -634,9 +634,9 @@
                                                 when (= (feature-type lvl-feature) +feature-start-place-church-angels+) 
                                                   collect (list (x lvl-feature) (y lvl-feature) (z lvl-feature)))
                     with positioned = nil
-                    with max-angels = (if (> (+ (total-angels world) (truncate (total-humans world) 11)) *min-angels-number*)
-                                        (- (truncate (total-humans world) 11) 1)
-                                        (- *min-angels-number* (total-angels world)))
+                    with max-angels = (if (> (+ (total-angels (level world)) (truncate (total-humans (level world)) 11)) *min-angels-number*)
+                                        (- (truncate (total-humans (level world)) 11) 1)
+                                        (- *min-angels-number* (total-angels (level world))))
                     while (null positioned)
                     for n = (random (length arrival-points))
                     for arrival-point = (nth n arrival-points)

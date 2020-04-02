@@ -131,7 +131,7 @@
                                                  (not (mob-ability-p merged-mob +mob-abil-animal+))))
                                     do
                                        (incf result))
-                       ;;finally (when (/= (total-angels *world*) result)
+                       ;;finally (when (/= (total-angels (level *world*)) result)
                        ;;          (error (format nil "FAILED!!! TOTAL ANGELS = ~A, ACTUAL ANGELS ALIVE = ~A" (total-angels *world*) result)))
                        )
                      
@@ -465,17 +465,18 @@
                                    (declare (ignore n))
                                    (let ((test-world-map (make-instance 'world-map))
                                          (mission (make-instance 'mission :mission-type-id +mission-type-test+
-                                                                          :x 0 :y 0))
+                                                                          :x 0 :y 0
+                                                                          :level-modifier-list (list +lm-tod-night+)))
                                          (world-sector (make-instance 'world-sector :wtype +world-sector-test+ :x 0 :y 0)))
                                      (setf *world* (make-instance 'world))
                                      (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
                                      (generate-empty-world-map test-world-map (world-game-time *world*))
                                      (setf (world-map *world*) test-world-map)
-                                     
+
                                      (setf (aref (cells test-world-map) 0 0) world-sector)
                                      (setf (mission (aref (cells test-world-map) 0 0)) mission)
                                      (setf (player-lvl-mod-placement-id mission) +lm-placement-test+)
-                                        
+                                     
                                      (return-from main-menu (values world-sector mission))
                                      )
                                    
@@ -515,7 +516,7 @@
                                         (multiple-value-setq (mission world-sector) (run-window *current-window*))
                                         (when (and mission world-sector)
 
-                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-military-scout+)
+                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+)
                                           
                                           (setf *current-window* (return-to *current-window*))
 

@@ -44,19 +44,75 @@
    (lost-civilians :initform 0 :accessor lost-civilians)
    (initial-civilians :initform 0 :accessor initial-civilians)
 
+   (initial-humans :initform 0 :accessor initial-humans)
+   (initial-demons :initform 0 :accessor initial-demons)
+   (initial-angels :initform 0 :accessor initial-angels)
+   (initial-undead :initform 0 :accessor initial-undead)
+   
+   (total-humans :initform 0 :accessor total-humans)
+   (total-demons :initform 0 :accessor total-demons)
+   (total-angels :initform 0 :accessor total-angels)
+   (total-blessed :initform 0 :accessor total-blessed)
+   (total-undead :initform 0 :accessor total-undead)
+   (total-faction-list :initform (loop for faction across *faction-types* collect 0) :accessor total-faction-list)
+
    (turns-for-delayed-angels :initform 220 :accessor turns-for-delayed-angels)
    (turns-for-delayed-demons :initform 220 :accessor turns-for-delayed-demons)
    (turns-for-delayed-military :initform 220 :accessor turns-for-delayed-military)
    ))
    
 (defun add-mob-to-level-list (level mob)
-  (pushnew (id mob) (mob-id-list level))
 
+  (when (not (find (id mob) (mob-id-list level)))
+    (push (id mob) (mob-id-list level))
+
+    (when (mob-ability-p mob +mob-abil-human+)
+      (incf (total-humans (level *world*)))
+      (incf (initial-humans (level *world*))))
+    
+    (when (mob-ability-p mob +mob-abil-civilian+)
+      (incf (initial-civilians (level *world*))))
+    
+    (when (mob-ability-p mob +mob-abil-demon+)
+      (incf (total-demons (level *world*)))
+      (incf (initial-demons (level *world*))))
+    (when (mob-ability-p mob +mob-abil-undead+)
+      (incf (total-undead (level *world*)))
+      (incf (initial-undead (level *world*))))
+    (when (and (mob-ability-p mob +mob-abil-angel+)
+               (not (mob-ability-p mob +mob-abil-animal+)))
+      (incf (total-angels (level *world*)))
+      (incf (initial-angels (level *world*))))
+    
+    (incf (nth (loyal-faction mob) (total-faction-list (level *world*)))))
+  
   (when (riding-mob-id mob)
     (let ((sx) (sy)
           (mount (get-mob-by-id (riding-mob-id mob))))
-      (pushnew (id mount) (mob-id-list level))
 
+      (when (not (find (id mount) (mob-id-list level)))
+        (when (mob-ability-p mount +mob-abil-human+)
+          (incf (total-humans (level *world*)))
+          (incf (initial-humans (level *world*))))
+        
+        (when (mob-ability-p mount +mob-abil-civilian+)
+          (incf (initial-civilians (level *world*))))
+        
+        (when (mob-ability-p mount +mob-abil-demon+)
+          (incf (total-demons (level *world*)))
+          (incf (initial-demons (level *world*))))
+        (when (mob-ability-p mount +mob-abil-undead+)
+          (incf (total-undead (level *world*)))
+          (incf (initial-undead (level *world*))))
+        (when (and (mob-ability-p mount +mob-abil-angel+)
+                   (not (mob-ability-p mount +mob-abil-animal+)))
+          (incf (total-angels (level *world*)))
+          (incf (initial-angels (level *world*))))
+        
+        (incf (nth (loyal-faction mob) (total-faction-list (level *world*))))
+        
+        (push (id mount) (mob-id-list level)))
+      
       (setf sx (- (x mount) (truncate (1- (map-size mount)) 2)))
       (setf sy (- (y mount) (truncate (1- (map-size mount)) 2)))
     
@@ -64,7 +120,9 @@
         (loop for ny from sy below (+ sy (map-size mount)) do
           (setf (aref (mobs level) nx ny (z mount)) (id mount))))
       
-      (pushnew (id mount) (aref (mob-quadrant-map level) (truncate (x mount) 10) (truncate (y mount) 10)))))
+      (pushnew (id mount) (aref (mob-quadrant-map level) (truncate (x mount) 10) (truncate (y mount) 10)))
+
+      ))
   
   (let ((sx) (sy))
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
@@ -75,7 +133,7 @@
         (setf (aref (mobs level) nx ny (z mob)) (id mob)))))
 
   (pushnew (id mob) (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10)))
-  
+
   (let ((final-z (z mob)))
     (when (setf final-z (apply-gravity mob))
       (set-mob-location mob (x mob) (y mob) final-z :apply-gravity t)))
@@ -83,7 +141,32 @@
   )
 
 (defun remove-mob-from-level-list (level mob)
-  (setf (mob-id-list level) (remove (id mob) (mob-id-list level)))
+
+  (when (find (id mob) (mob-id-list level))
+
+    (when (mob-ability-p mob +mob-abil-human+)
+      (decf (total-humans (level *world*))))
+    (when (mob-ability-p mob +mob-abil-demon+)
+      (decf (total-demons (level *world*))))
+    (when (mob-ability-p mob +mob-abil-undead+)
+      (decf (total-undead (level *world*))))
+    (when (and (mob-ability-p mob +mob-abil-angel+)
+               (not (mob-ability-p mob +mob-abil-animal+)))
+      (decf (total-angels (level *world*))))
+    
+    (when (mob-ability-p mob +mob-abil-civilian+)
+      (incf (lost-civilians (level *world*))))
+    ;; increase total civilian count of the slave mob otherwise it will be decreased twice - once during possession and once during death
+    (when (and (master-mob-id mob)
+               (mob-ability-p mob +mob-abil-civilian+))
+      (decf (lost-civilians (level *world*))))
+    
+    (decf (nth (loyal-faction mob) (total-faction-list (level *world*))))
+    ;; increase total faction count of the slave mob otherwise it will be decreased twice - once during possession and once during death
+    (when (master-mob-id mob)
+      (incf (nth (loyal-faction mob) (total-faction-list (level *world*)))))
+    
+    (setf (mob-id-list level) (remove (id mob) (mob-id-list level))))
   
   (let ((sx) (sy))
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
@@ -406,18 +489,6 @@
    
    (level :initform nil :accessor level :type level)
    
-   (initial-humans :initform 0 :accessor initial-humans)
-   (initial-demons :initform 0 :accessor initial-demons)
-   (initial-angels :initform 0 :accessor initial-angels)
-   (initial-undead :initform 0 :accessor initial-undead)
-   
-   (total-humans :initform 0 :accessor total-humans)
-   (total-demons :initform 0 :accessor total-demons)
-   (total-angels :initform 0 :accessor total-angels)
-   (total-blessed :initform 0 :accessor total-blessed)
-   (total-undead :initform 0 :accessor total-undead)
-   (total-faction-list :initform (loop for faction across *faction-types* collect 0) :accessor total-faction-list)
-
    (game-events :initform () :accessor game-events)
 
    (cur-mob-path :initform 0 :accessor cur-mob-path)

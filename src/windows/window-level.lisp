@@ -98,11 +98,11 @@
                         
                         
                         (get-weapon-descr-line *player*)
-                        (total-humans *world*)
-                        (total-blessed *world*)
-                        (total-angels *world*)
-                        (total-demons *world*)
-                        (total-undead *world*)
+                        (total-humans (level *world*))
+                        (total-blessed (level *world*))
+                        (total-angels (level *world*))
+                        (total-demons (level *world*))
+                        (total-undead (level *world*))
                         (sense-good-evil-str)
                         (if (mimic-id-list *player*)
                           (loop for mimic-id in (mimic-id-list *player*)

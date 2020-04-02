@@ -11,18 +11,18 @@
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
-                                                                      (> (total-angels world) 0)
-                                                                      (zerop (total-demons world)))
+                                                                      (> (total-angels (level world)) 0)
+                                                                      (zerop (total-demons (level world))))
                                                                  (and (/= (loyal-faction *player*) +faction-type-angels+)
-                                                                      (zerop (nth +faction-type-satanists+ (total-faction-list world)))
-                                                                      (> (total-angels world) 0)
-                                                                      (zerop (total-demons world))))
+                                                                      (zerop (nth +faction-type-satanists+ (total-faction-list (level world))))
+                                                                      (> (total-angels (level world)) 0)
+                                                                      (zerop (total-demons (level world)))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
+                                                                               ((zerop (total-demons (level world))) "Demonic raid broken.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
@@ -84,7 +84,7 @@
                                                                    *demonic-raid-win-value*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (> (total-demons world) 0)
+                                                         (if (and (> (total-demons (level world)) 0)
                                                                   (>= (get-demon-raid-overall-points world) *demonic-raid-win-value*))
                                                            t
                                                            nil))
@@ -142,16 +142,16 @@
                                                                    *demonic-raid-win-value*))
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (> (total-humans world) 0)
-                                                                  (zerop (total-demons world)))
+                                                         (if (and (> (total-humans (level world)) 0)
+                                                                  (zerop (total-demons (level world))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
+                                                                               ((zerop (total-demons (level world))) "Demonic raid broken.")
                                                                                ))
-                                                                  (score (calculate-player-score (+ 1450 (* 7 (total-humans world)))))
+                                                                  (score (calculate-player-score (+ 1450 (* 7 (total-humans (level world))))))
                                                                   (highscores-place)
                                                                   (player-faction (if (= (loyal-faction *player*) +faction-type-military+)
                                                                                     t
@@ -202,14 +202,14 @@
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-church+)
-                                                                  (> (nth +faction-type-church+ (total-faction-list world)) 0)
-                                                                  (zerop (total-demons world)))
+                                                                  (> (nth +faction-type-church+ (total-faction-list (level world))) 0)
+                                                                  (zerop (total-demons (level world))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Demonic raid broken.")
+                                                                               ((zerop (total-demons (level world))) "Demonic raid broken.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
@@ -272,7 +272,7 @@
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)
-                                                                  (> (nth +faction-type-satanists+ (total-faction-list world)) 0)
+                                                                  (> (nth +faction-type-satanists+ (total-faction-list (level world))) 0)
                                                                   (>= (get-demon-raid-overall-points world) *demonic-raid-win-value*))
                                                            t
                                                            nil))

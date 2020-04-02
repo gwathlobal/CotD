@@ -917,7 +917,7 @@
   (set-mob-effect target :effect-type-id +mob-effect-possessed+ :actor-id (id target))
   (setf (face-mob-type-id actor) (mob-type target))
   (incf (stat-possess actor))
-  (decf (nth (loyal-faction target) (total-faction-list *world*)))
+  (decf (nth (loyal-faction target) (total-faction-list (level *world*))))
 
   (when (mob-ability-p target +mob-abil-civilian+)
     (incf (lost-civilians (level *world*))))
@@ -949,7 +949,7 @@
     (rem-mob-effect actor +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-reveal-true-form+)
-    (incf (nth (loyal-faction target) (total-faction-list *world*)))
+    (incf (nth (loyal-faction target) (total-faction-list (level *world*))))
 
     (when (mob-ability-p target +mob-abil-civilian+)
       (decf (lost-civilians (level *world*))))
@@ -1657,28 +1657,6 @@
                  (= (strength mob) 0))
         (incf (cur-score *player*) 5)))
 
-    (when (mob-ability-p mob +mob-abil-human+)
-      (decf (total-humans *world*)))
-    (when (mob-ability-p mob +mob-abil-demon+)
-      (decf (total-demons *world*)))
-    (when (mob-ability-p mob +mob-abil-undead+)
-      (decf (total-undead *world*)))
-    (when (and (mob-ability-p mob +mob-abil-angel+)
-               (not (mob-ability-p mob +mob-abil-animal+)))
-      (decf (total-angels *world*)))
-
-    (when (mob-ability-p mob +mob-abil-civilian+)
-      (incf (lost-civilians (level *world*))))
-    ;; increase total civilian count of the slave mob otherwise it will be decreased twice - once during possession and once during death
-    (when (and (master-mob-id mob)
-               (mob-ability-p mob +mob-abil-civilian+))
-      (decf (lost-civilians (level *world*))))
-    
-    (decf (nth (loyal-faction mob) (total-faction-list *world*)))
-    ;; increase total faction count of the slave mob otherwise it will be decreased twice - once during possession and once during death
-    (when (master-mob-id mob)
-      (incf (nth (loyal-faction mob) (total-faction-list *world*))))
-    
     ;; set stat-gold before dropping inventory
     (setf (stat-gold mob) (get-overall-value (inv mob)))
 

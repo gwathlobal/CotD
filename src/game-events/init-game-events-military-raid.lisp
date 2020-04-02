@@ -10,18 +10,18 @@
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-angels+)
-                                                                      (> (total-angels world) 0)
-                                                                      (zerop (total-demons world)))
+                                                                      (> (total-angels (level world)) 0)
+                                                                      (zerop (total-demons (level world))))
                                                                  (and (/= (loyal-faction *player*) +faction-type-angels+)
-                                                                      (zerop (nth +faction-type-satanists+ (total-faction-list world)))
-                                                                      (> (total-angels world) 0)
-                                                                      (zerop (total-demons world))))
+                                                                      (zerop (nth +faction-type-satanists+ (total-faction-list (level world))))
+                                                                      (> (total-angels (level world)) 0)
+                                                                      (zerop (total-demons (level world)))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ((zerop (total-demons (level world))) "Enemies eliminated.")
                                                                                ))
                                                                   (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                            0
@@ -83,20 +83,20 @@
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-demons+)
-                                                                      (> (total-demons world) 0)
-                                                                      (zerop (nth +faction-type-military+ (total-faction-list world)))
-                                                                      (zerop (total-angels world)))
+                                                                      (> (total-demons (level world)) 0)
+                                                                      (zerop (nth +faction-type-military+ (total-faction-list (level world))))
+                                                                      (zerop (total-angels (level world))))
                                                                  (and (/= (loyal-faction *player*) +faction-type-demons+)
-                                                                      (> (total-demons world) 0)
-                                                                      (zerop (nth +faction-type-military+ (total-faction-list world)))
-                                                                      (zerop (nth +faction-type-church+ (total-faction-list world)))
-                                                                      (zerop (total-angels world))))
+                                                                      (> (total-demons (level world)) 0)
+                                                                      (zerop (nth +faction-type-military+ (total-faction-list (level world))))
+                                                                      (zerop (nth +faction-type-church+ (total-faction-list (level world))))
+                                                                      (zerop (total-angels (level world)))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-angels world)) "Enemies eliminated.")
+                                                                               ((zerop (total-angels (level world))) "Enemies eliminated.")
                                                                                ))
                                                                   (score (calculate-player-score 1450))
                                                                   (highscores-place)
@@ -148,16 +148,16 @@
                                                            "To win, destroy all demons in the district. To lose, have all military killed.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (> (total-humans world) 0)
-                                                                  (zerop (total-demons world)))
+                                                         (if (and (> (total-humans (level world)) 0)
+                                                                  (zerop (total-demons (level world))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; write highscores
                                                            (let* ((final-str (cond
-                                                                               ((zerop (total-demons world)) "Enemies eliminated.")
+                                                                               ((zerop (total-demons (level world))) "Enemies eliminated.")
                                                                                ))
-                                                                  (score (calculate-player-score (+ 1500 (* 10 (total-humans world)))))
+                                                                  (score (calculate-player-score (+ 1500 (* 10 (total-humans (level world))))))
                                                                   (highscores-place)
                                                                   (player-faction (if (= (loyal-faction *player*) +faction-type-military+)
                                                                                     t

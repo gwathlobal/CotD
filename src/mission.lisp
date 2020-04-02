@@ -537,3 +537,23 @@
              (setf (x mob) (x feature) (y mob) (y feature) (z mob) (z feature))
              (add-mob-to-level-list level mob)
              (loop-finish)))
+
+(defun set-up-outdoor-light (level light-power)
+  (setf (outdoor-light level) light-power)
+
+  ;; propagate light from above to determine which parts of the map are outdoor and which are "inside"
+  ;; also set up all stationary light sources
+  (loop for x from 0 below (array-dimension (light-map level) 0) do
+    (loop for y from 0 below (array-dimension (light-map level) 1)
+          for light-pwr = 100
+          do
+             (loop for z from (1- (array-dimension (light-map level) 2)) downto 0
+                   do
+                      (setf (aref (light-map level) x y z) light-pwr)
+                      (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                        (setf light-pwr 0))
+                      (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-light-source+)
+                        (add-light-source level (make-light-source x y z (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-light-source+))))
+                   )))
+
+  )
