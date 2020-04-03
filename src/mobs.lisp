@@ -791,6 +791,8 @@
 
    (inv :initform () :accessor inv)
 
+   (initial-added :initform nil :accessor initial-added)
+
    ))
 
 (defmethod initialize-instance :after ((mob mob) &key)

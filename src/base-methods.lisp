@@ -919,8 +919,8 @@
   (incf (stat-possess actor))
   (decf (nth (loyal-faction target) (total-faction-list (level *world*))))
 
-  (when (mob-ability-p target +mob-abil-civilian+)
-    (incf (lost-civilians (level *world*))))
+  ;(when (mob-ability-p target +mob-abil-civilian+)
+  ;  (incf (lost-civilians (level *world*))))
   
   ;; give all items to the master
   (loop for item-id in (inv target)

@@ -61,68 +61,46 @@
    (turns-for-delayed-military :initform 220 :accessor turns-for-delayed-military)
    ))
    
-(defun add-mob-to-level-list (level mob)
+(defun add-mob-to-level-list (level mob &optional (apply-gravity t))
+
+  (when (riding-mob-id mob)
+    (add-mob-to-level-list level (get-mob-by-id (riding-mob-id mob)) nil))
+  
+  (unless (initial-added mob)
+    (setf (initial-added mob) t)
+
+    (when (mob-ability-p mob +mob-abil-human+)
+      (incf (initial-humans (level *world*))))
+
+    (when (mob-ability-p mob +mob-abil-civilian+)
+      (incf (initial-civilians (level *world*))))
+
+    (when (mob-ability-p mob +mob-abil-demon+)
+      (incf (initial-demons (level *world*))))
+
+    (when (mob-ability-p mob +mob-abil-undead+)
+      (incf (initial-undead (level *world*))))
+
+    (when (and (mob-ability-p mob +mob-abil-angel+)
+               (not (mob-ability-p mob +mob-abil-animal+)))
+      (incf (initial-angels (level *world*))))
+    )
 
   (when (not (find (id mob) (mob-id-list level)))
     (push (id mob) (mob-id-list level))
 
     (when (mob-ability-p mob +mob-abil-human+)
-      (incf (total-humans (level *world*)))
-      (incf (initial-humans (level *world*))))
-    
-    (when (mob-ability-p mob +mob-abil-civilian+)
-      (incf (initial-civilians (level *world*))))
+      (incf (total-humans (level *world*))))
     
     (when (mob-ability-p mob +mob-abil-demon+)
-      (incf (total-demons (level *world*)))
-      (incf (initial-demons (level *world*))))
+      (incf (total-demons (level *world*))))
     (when (mob-ability-p mob +mob-abil-undead+)
-      (incf (total-undead (level *world*)))
-      (incf (initial-undead (level *world*))))
+      (incf (total-undead (level *world*))))
     (when (and (mob-ability-p mob +mob-abil-angel+)
                (not (mob-ability-p mob +mob-abil-animal+)))
-      (incf (total-angels (level *world*)))
-      (incf (initial-angels (level *world*))))
+      (incf (total-angels (level *world*))))
     
     (incf (nth (loyal-faction mob) (total-faction-list (level *world*)))))
-  
-  (when (riding-mob-id mob)
-    (let ((sx) (sy)
-          (mount (get-mob-by-id (riding-mob-id mob))))
-
-      (when (not (find (id mount) (mob-id-list level)))
-        (when (mob-ability-p mount +mob-abil-human+)
-          (incf (total-humans (level *world*)))
-          (incf (initial-humans (level *world*))))
-        
-        (when (mob-ability-p mount +mob-abil-civilian+)
-          (incf (initial-civilians (level *world*))))
-        
-        (when (mob-ability-p mount +mob-abil-demon+)
-          (incf (total-demons (level *world*)))
-          (incf (initial-demons (level *world*))))
-        (when (mob-ability-p mount +mob-abil-undead+)
-          (incf (total-undead (level *world*)))
-          (incf (initial-undead (level *world*))))
-        (when (and (mob-ability-p mount +mob-abil-angel+)
-                   (not (mob-ability-p mount +mob-abil-animal+)))
-          (incf (total-angels (level *world*)))
-          (incf (initial-angels (level *world*))))
-        
-        (incf (nth (loyal-faction mob) (total-faction-list (level *world*))))
-        
-        (push (id mount) (mob-id-list level)))
-      
-      (setf sx (- (x mount) (truncate (1- (map-size mount)) 2)))
-      (setf sy (- (y mount) (truncate (1- (map-size mount)) 2)))
-    
-      (loop for nx from sx below (+ sx (map-size mount)) do
-        (loop for ny from sy below (+ sy (map-size mount)) do
-          (setf (aref (mobs level) nx ny (z mount)) (id mount))))
-      
-      (pushnew (id mount) (aref (mob-quadrant-map level) (truncate (x mount) 10) (truncate (y mount) 10)))
-
-      ))
   
   (let ((sx) (sy))
     (setf sx (- (x mob) (truncate (1- (map-size mob)) 2)))
@@ -134,9 +112,10 @@
 
   (pushnew (id mob) (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10)))
 
-  (let ((final-z (z mob)))
-    (when (setf final-z (apply-gravity mob))
-      (set-mob-location mob (x mob) (y mob) final-z :apply-gravity t)))
+  (when apply-gravity
+    (let ((final-z (z mob)))
+      (when (setf final-z (apply-gravity mob))
+        (set-mob-location mob (x mob) (y mob) final-z :apply-gravity t))))
 
   )
 
@@ -157,14 +136,14 @@
     (when (mob-ability-p mob +mob-abil-civilian+)
       (incf (lost-civilians (level *world*))))
     ;; increase total civilian count of the slave mob otherwise it will be decreased twice - once during possession and once during death
-    (when (and (master-mob-id mob)
-               (mob-ability-p mob +mob-abil-civilian+))
-      (decf (lost-civilians (level *world*))))
+    ;(when (and (master-mob-id mob)
+    ;           (mob-ability-p mob +mob-abil-civilian+))
+    ;  (decf (lost-civilians (level *world*))))
     
     (decf (nth (loyal-faction mob) (total-faction-list (level *world*))))
     ;; increase total faction count of the slave mob otherwise it will be decreased twice - once during possession and once during death
-    (when (master-mob-id mob)
-      (incf (nth (loyal-faction mob) (total-faction-list (level *world*)))))
+    ;(when (master-mob-id mob)
+    ;  (incf (nth (loyal-faction mob) (total-faction-list (level *world*)))))
     
     (setf (mob-id-list level) (remove (id mob) (mob-id-list level))))
   
