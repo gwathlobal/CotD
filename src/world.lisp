@@ -87,8 +87,10 @@
     )
 
   (when (not (find (id mob) (mob-id-list level)))
-    (push (id mob) (mob-id-list level))
-
+    (if (eq mob *player*)
+      (push (id mob) (mob-id-list level))
+      (push (id mob) (cdr (nthcdr 0 (mob-id-list level)))))
+    
     (when (mob-ability-p mob +mob-abil-human+)
       (incf (total-humans (level *world*))))
     
