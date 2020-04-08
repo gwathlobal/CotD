@@ -165,9 +165,9 @@
   (setf *player* (make-instance 'player :mob-type +mob-type-malseraph-puppet+ :x 47 :y 18 :z 1))
   (add-mob-to-level-list (level world) *player*)
   
-  (let ((soldier (make-instance 'mob :mob-type +mob-type-fiend+ :x 49 :y 20 :z 1))
+  (let ((soldier (make-instance 'mob :mob-type +mob-type-satanist+ :x 49 :y 20 :z 1))
         (demon (make-instance 'mob :mob-type +mob-type-demon+ :x 45 :y 15 :z 1))
-        (angel (make-instance 'mob :mob-type +mob-type-fiend+ :x 46 :y 16 :z 1))
+        (angel (make-instance 'mob :mob-type +mob-type-man+ :x 46 :y 16 :z 1))
         )
     (setf (cur-fp *player*) 15)
     ;(setf (max-hp *player*) 50)

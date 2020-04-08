@@ -19,6 +19,10 @@
                                                         ;; update visibility for all added mobs
                                                         (push #'update-visibility-after-creation
                                                               func-list)
+
+                                                        ;; place player
+                                                        (push #'place-player-on-level
+                                                              func-list)
                                                         
                                                         func-list))
 
