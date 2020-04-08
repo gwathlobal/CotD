@@ -57,20 +57,8 @@
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
-                                                        ;; add all other win conditions
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector world))
-
-                                                                  (when (/= (player-lvl-mod-placement-id mission) +specific-faction-type-player+)
-                                                                    (setup-win-conditions mission level)))
-                                                              func-list)
-                                                        
-                                                        ;; add lose condition on death
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector mission world))
-
-                                                                  ;; make the game continue even after the game dies
-                                                                  (push +game-event-player-died+ (game-events level)))
+                                                        ;; add lose condition on death & all other win conditions
+                                                        (push #'add-lose-and-win-coditions-to-level
                                                               func-list)
                                                         
                                                         ;; update visibility for all added mobs
@@ -78,193 +66,60 @@
                                                               func-list)
                                                         
                                                         ;; remove all starting features
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector mission world))
-
-                                                                  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Remove dungeon generation features~%"))
-                                                                  
-                                                                  (loop for feature-id in (feature-id-list level)
-                                                                        for lvl-feature = (get-feature-by-id feature-id)
-                                                                        when (get-feature-type-trait lvl-feature +feature-trait-remove-on-dungeon-generation+)
-                                                                          do
-                                                                             (remove-feature-from-level-list level lvl-feature)))
+                                                        (push #'remove-dungeon-gen-functions
                                                               func-list)
 
                                                         ;; set up turns for delayed arrival for all parties
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore mission))
-
-                                                                  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Set up turns for delayed arrival~%"))
-                                                                  
-                                                                  ;; set up delayed arrival for angels
-                                                                  (setf (turns-for-delayed-angels level) 150)
-
-                                                                  ;; set up delayed arrival for military depending on the distance from the nearest military-controlled sector
-                                                                  (let ((first t)
-                                                                        (nearest-military-sector nil))
-                                                                    (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
-                                                                      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
-                                                                        (when (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-military+)
-                                                                          (when first
-                                                                            (setf nearest-military-sector (aref (cells (world-map world)) x y))
-                                                                            (setf first nil))
-                                                                          (when (< (get-distance x y (x world-sector) (y world-sector))
-                                                                                   (get-distance (x nearest-military-sector) (y nearest-military-sector) (x world-sector) (y world-sector)))
-                                                                            (setf nearest-military-sector (aref (cells (world-map world)) x y))))))
-
-                                                                    (if nearest-military-sector
-                                                                      (setf (turns-for-delayed-military level) (+ 120 (* (truncate (get-distance (x nearest-military-sector) (y nearest-military-sector) (x world-sector) (y world-sector))) 20)))
-                                                                      (setf (turns-for-delayed-military level) 220)))
-                                                                  )
+                                                        (push #'setup-turns-for-delayed-arrival
                                                               func-list)
                                                                   
                                                         ;; create delayed points from respective features
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector mission world))
-
-                                                                  (loop for feature-id in (feature-id-list level)
-                                                                        for lvl-feature = (get-feature-by-id feature-id)
-                                                                        for x = (x lvl-feature)
-                                                                        for y = (y lvl-feature)
-                                                                        for z = (z lvl-feature)
-                                                                        when (= (feature-type lvl-feature) +feature-delayed-military-arrival-point+)
-                                                                          do
-                                                                             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
-                                                                                        (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
-                                                                               (push (list x y z) (delayed-military-arrival-points level)))
-                                                                        when (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
-                                                                          do
-                                                                             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
-                                                                                        (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
-                                                                               (push (list x y z) (delayed-angels-arrival-points level)))))
+                                                        (push #'place-delayed-arrival-points-on-level
                                                               func-list)    
 
                                                         ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector mission world))
-
-                                                                  (loop for mob-id in (mob-id-list level)
-                                                                        for horse = (get-mob-by-id mob-id)
-                                                                        for rider = (if (mounted-by-mob-id horse)
-                                                                                      (get-mob-by-id (mounted-by-mob-id horse))
-                                                                                      nil)
-                                                                        when rider
-                                                                          do
-                                                                             (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+                                                        ;;(push #'(lambda (level world-sector mission world)
+                                                        ;;          (declare (ignore world-sector mission world))
+                                                        ;;
+                                                        ;;          (loop for mob-id in (mob-id-list level)
+                                                        ;;                for horse = (get-mob-by-id mob-id)
+                                                        ;;                for rider = (if (mounted-by-mob-id horse)
+                                                        ;;                              (get-mob-by-id (mounted-by-mob-id horse))
+                                                        ;;                              nil)
+                                                        ;;                when rider
+                                                        ;;                  do
+                                                        ;;                     (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
                                                                   ;; remove the glitch from (0, 0, 0)
                                                                   ;;(setf (aref (mobs (level world)) 0 0 0) nil)
-                                                                  )
-                                                              func-list)
+                                                        ;;          )
+                                                        ;;      func-list)
                                                         
                                                         ;; place 1 thief
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector world))
-
-                                                                  (when (and (/= (player-lvl-mod-placement-id mission) +specific-faction-type-thief+)
-                                                                             (find-if #'(lambda (a)
-                                                                                          (if (and (= (first a) +faction-type-criminals+)
-                                                                                                   (= (second a) +mission-faction-present+))
-                                                                                            t
-                                                                                            nil))
-                                                                                      (faction-list mission)))
-                                                                    (populate-level-with-mobs level (list (list +mob-type-thief+ 1 nil))
-                                                                                              #'find-unoccupied-place-on-top))
-                                                                  )
+                                                        (push #'place-ai-thief-on-level
                                                               func-list)
                                                                   
                                                         ;; place 1 eater of the dead
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector world))
-
-                                                                  (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-eater+)
-                                                                             (/= (player-lvl-mod-placement-id mission) +lm-placement-skinchanger+)
-                                                                             (find-if #'(lambda (a)
-                                                                                          (if (and (= (first a) +faction-type-eater+)
-                                                                                                   (= (second a) +mission-faction-present+))
-                                                                                            t
-                                                                                            nil))
-                                                                                      (faction-list mission)))
-                                                                    (populate-level-with-mobs level (if (zerop (random 2))
-                                                                                                      (list (list +mob-type-eater-of-the-dead+ 1 nil))
-                                                                                                      (list (list +mob-type-skinchanger-melee+ 1 nil)))
-                                                                                              #'find-unoccupied-place-water))
-                                                                  )
+                                                        (push #'place-ai-primordial-on-level
                                                               func-list)
                                                         
                                                         ;; place 1 ghost
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (declare (ignore world-sector world))
-
-                                                                  (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-ghost+)
-                                                                             (find-if #'(lambda (a)
-                                                                                          (if (and (= (first a) +faction-type-ghost+)
-                                                                                                   (= (second a) +mission-faction-present+))
-                                                                                            t
-                                                                                            nil))
-                                                                                      (faction-list mission)))
-                                                                    (populate-level-with-mobs level (list (list +mob-type-ghost+ 1 nil))
-                                                                                              #'find-unoccupied-place-inside))
-                                                                  )
+                                                        (push #'place-ai-ghost-on-level
                                                               func-list)
                                                         
                                                         ;; add military
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  
-                                                                  (let ((military-list (list (list (list +mob-type-chaplain+ 1 nil)
-                                                                                                   (list +mob-type-sergeant+ 1 nil)
-                                                                                                   (list +mob-type-scout+ 1 nil)
-                                                                                                   (list +mob-type-soldier+ 3 nil)
-                                                                                                   (list +mob-type-gunner+ 1 nil))
-                                                                                             (list (list +mob-type-chaplain+ 1 nil)
-                                                                                                   (list +mob-type-sergeant+ 1 nil)
-                                                                                                   (list +mob-type-scout+ 1 nil)
-                                                                                                   (list +mob-type-soldier+ 3 nil)
-                                                                                                   (list +mob-type-gunner+ 1 nil))
-                                                                                             (list (list +mob-type-chaplain+ 1 nil)
-                                                                                                   (list +mob-type-sergeant+ 1 nil)
-                                                                                                   (list +mob-type-scout+ 1 nil)
-                                                                                                   (list +mob-type-soldier+ 3 nil)
-                                                                                                   (list +mob-type-gunner+ 1 nil))
-                                                                                             (list (list +mob-type-chaplain+ 1 nil)
-                                                                                                   (list +mob-type-sergeant+ 1 nil)
-                                                                                                   (list +mob-type-scout+ 1 nil)
-                                                                                                   (list +mob-type-soldier+ 3 nil)
-                                                                                                   (list +mob-type-gunner+ 1 nil)))))
-                                                                    
-                                                                    (place-military-on-level level world-sector mission world military-list t))
-                                                                  )
+                                                        (push #'place-ai-military-on-level
                                                               func-list)
                                                                                                                 
                                                         ;; place angels
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  
-                                                                  (let ((angel-list (list (list +mob-type-angel+ *min-angels-number* nil))))
-                                                                    
-                                                                    (when (/= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
-                                                                        (push (list +mob-type-star-singer+ 1 nil) angel-list))
-                                                                      
-                                                                    (place-angels-on-level level world-sector mission world angel-list)))
+                                                        (push #'place-ai-angels-on-level
                                                               func-list)
                                                         
                                                         ;; place demons
-                                                        (push #'(lambda (level world-sector mission world)
-                                                                  (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
-                                                                    (declare (ignore year month day min sec))
-                                                                    (let ((demon-list (if (and (>= hour 7) (< hour 19))
-                                                                                        (list (list +mob-type-archdemon+ 1 nil)
-                                                                                              (list +mob-type-demon+ 15 nil)
-                                                                                              (list +mob-type-imp+ *min-imps-number* nil))
-                                                                                        (list (if (zerop (random 2))
-                                                                                                (list +mob-type-archdemon+ 1 nil)
-                                                                                                (list +mob-type-shadow-devil+ 1 nil))
-                                                                                              (list +mob-type-demon+ 7 nil)
-                                                                                              (list +mob-type-shadow-demon+ 8 nil)
-                                                                                              (list +mob-type-imp+ (truncate *min-imps-number* 2) nil)
-                                                                                              (list +mob-type-shadow-imp+ (truncate *min-imps-number* 2) nil)))))
-                                                                      (when (/= (player-lvl-mod-placement-id mission) +lm-placement-demon-malseraph+)
-                                                                        (push (list +mob-type-malseraph-puppet+ 1 nil) demon-list))
-                                                                      
-                                                                      (place-demons-on-level level world-sector mission world demon-list))))
+                                                        (push #'place-ai-demons-on-level
+                                                              func-list)
+
+                                                        ;; place player
+                                                        (push #'place-player-on-level
                                                               func-list)
 
                                                         func-list))
@@ -323,7 +178,168 @@
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ +mission-faction-present+) faction-list)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
-                                           faction-list)))
+                                           faction-list))
+                  :overall-post-process-func-list #'(lambda ()
+                                                      (let ((func-list ()))
+
+                                                        ;; add lose condition on death & all other win conditions
+                                                        (push #'add-lose-and-win-coditions-to-level
+                                                              func-list)
+                                                        
+                                                        ;; update visibility for all added mobs
+                                                        (push #'update-visibility-after-creation
+                                                              func-list)
+                                                        
+                                                        ;; remove all starting features
+                                                        (push #'remove-dungeon-gen-functions
+                                                              func-list)
+
+                                                        ;; set up turns for delayed arrival for all parties
+                                                        (push #'setup-turns-for-delayed-arrival
+                                                              func-list)
+                                                                  
+                                                        ;; create delayed points from respective features
+                                                        (push #'place-delayed-arrival-points-on-level
+                                                              func-list)    
+
+                                                        ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
+                                                        ;;(push #'(lambda (level world-sector mission world)
+                                                        ;;          (declare (ignore world-sector mission world))
+                                                        ;;
+                                                        ;;          (loop for mob-id in (mob-id-list level)
+                                                        ;;                for horse = (get-mob-by-id mob-id)
+                                                        ;;                for rider = (if (mounted-by-mob-id horse)
+                                                        ;;                              (get-mob-by-id (mounted-by-mob-id horse))
+                                                        ;;                              nil)
+                                                        ;;                when rider
+                                                        ;;                  do
+                                                        ;;                     (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
+                                                                  ;; remove the glitch from (0, 0, 0)
+                                                                  ;;(setf (aref (mobs (level world)) 0 0 0) nil)
+                                                        ;;          )
+                                                        ;;      func-list)
+                                                        
+                                                        ;; place 1 thief
+                                                        (push #'place-ai-thief-on-level
+                                                              func-list)
+                                                                  
+                                                        ;; place 1 eater of the dead
+                                                        (push #'place-ai-primordial-on-level
+                                                              func-list)
+                                                        
+                                                        ;; place 1 ghost
+                                                        (push #'place-ai-ghost-on-level
+                                                              func-list)
+                                                        
+                                                        ;; add military
+                                                        (push #'place-ai-military-on-level
+                                                              func-list)
+                                                                                                                
+                                                        ;; place angels
+                                                        (push #'place-ai-angels-on-level
+                                                              func-list)
+                                                        
+                                                        ;; place demons
+                                                        (push #'place-ai-demons-on-level
+                                                              func-list)
+
+                                                        ;; place player
+                                                        (push #'place-player-on-level
+                                                              func-list)
+                                                        
+                                                        ;; place demonic portals
+                                                        (push #'(lambda (level world-sector mission world)
+                                                                  (declare (ignore world-sector mission world))
+                                                                  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Placing demonic portals~%"))
+
+                                                                  ;; remove standard demon arrival points
+                                                                  (loop for feature-id in (feature-id-list level)
+                                                                        for lvl-feature = (get-feature-by-id feature-id)
+                                                                        when (= (feature-type lvl-feature) +feature-demons-arrival-point+) do
+                                                                          (remove-feature-from-level-list level lvl-feature))
+
+                                                                  ;; add portals
+                                                                  (let ((portals ())
+                                                                       (max-portals 6))
+                                                                   (loop with max-x = (- (array-dimension (terrain level) 0) 60)
+                                                                         with max-y = (- (array-dimension (terrain level) 1) 60)
+                                                                         with cur-portal = 0
+                                                                         for free-place = t
+                                                                         for x = (+ (random max-x) 30)
+                                                                         for y = (+ (random max-y) 30)
+                                                                         while (< (length portals) max-portals) do
+                                                                           (check-surroundings x y t #'(lambda (dx dy)
+                                                                                                         (when (or (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-blocks-move+)
+                                                                                                                   (not (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-opaque-floor+))
+                                                                                                                   (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-water+))
+                                                                                                           (setf free-place nil))))
+                                                                           (when (and free-place
+                                                                                      (not (find (list x y 2) portals :test #'(lambda (a b)
+                                                                                                                                (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
+                                                                                                                                  t
+                                                                                                                                  nil)
+                                                                                                                                )))
+                                                                                      (loop for feature-id in (feature-id-list level)
+                                                                                            for feature = (get-feature-by-id feature-id)
+                                                                                            with result = t
+                                                                                            when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                                                                                      (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                                                                                              do
+                                                                                                 (setf result nil)
+                                                                                                 (loop-finish)
+                                                                                            when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                                                                                      (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
+                                                                                              do
+                                                                                                 (setf result nil)
+                                                                                                 (loop-finish)
+                                                                                            finally (return result)))
+                                                                             (push (list x y 2) portals)
+                                                                             (incf cur-portal)))
+                                                                   (loop for (x y z) in portals do
+                                                                     ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id +feature-demonic-portal+)) x y z)
+                                                                     (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-demonic-portal+ :x x :y y :z z))
+                                                                     (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-demons-arrival-point+ :x x :y y :z z))))
+                                                                  )
+                                                              func-list)
+
+                                                        func-list))
+                  :scenario-faction-list (list (list +specific-faction-type-player+ +lm-placement-player+)
+                                               (list +specific-faction-type-dead-player+ +lm-placement-dead-player+)
+                                               (list +specific-faction-type-angel-chrome+ +lm-placement-angel-chrome+)
+                                               (list +specific-faction-type-angel-trinity+ +lm-placement-angel-trinity+)
+                                               (list +specific-faction-type-demon-crimson+ +lm-placement-demon-crimson+)
+                                               (list +specific-faction-type-demon-shadow+ +lm-placement-demon-shadow+)
+                                               (list +specific-faction-type-demon-malseraph+ +lm-placement-demon-malseraph+)
+                                               (list +specific-faction-type-military-chaplain+ +lm-placement-military-chaplain+)
+                                               (list +specific-faction-type-military-scout+ +lm-placement-military-scout+)
+                                               (list +specific-faction-type-priest+ +lm-placement-priest+)
+                                               (list +specific-faction-type-satanist+ +lm-placement-satanist+)
+                                               (list +specific-faction-type-eater+ +lm-placement-eater+)
+                                               (list +specific-faction-type-skinchanger+ +lm-placement-skinchanger+)
+                                               (list +specific-faction-type-thief+ +lm-placement-thief+)
+                                               (list +specific-faction-type-ghost+ +lm-placement-ghost+)
+                                               )
+                  :ai-package-list (list (list +faction-type-demons+ (list +ai-package-search-corpses+ +ai-package-pick-corpses+ +ai-package-return-corpses-to-portal+
+                                                                           +ai-package-patrol-district+))
+                                         (list +faction-type-angels+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-military+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-church+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-satanists+ (list +ai-package-search-corpses+ +ai-package-pick-corpses+ +ai-package-return-corpses-to-portal+
+                                                                              +ai-package-patrol-district+))
+                                         (list +faction-type-eater+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-criminals+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-ghost+ (list +ai-package-patrol-district+))
+                                         )
+                  :win-condition-list (list (list +faction-type-demons+ +game-event-demon-raid-win-for-demons+)
+                                            (list +faction-type-angels+ +game-event-demon-raid-win-for-angels+)
+                                            (list +faction-type-military+ +game-event-demon-raid-win-for-military+)
+                                            (list +faction-type-church+ +game-event-demon-raid-win-for-church+)
+                                            (list +faction-type-satanists+ +game-event-demon-raid-win-for-satanists+)
+                                            (list +faction-type-eater+ +game-event-win-for-eater+)
+                                            (list +faction-type-criminals+ +game-event-win-for-thief+)
+                                            (list +faction-type-ghost+ +game-event-win-for-ghost+)
+                                            )
+                  )
 
 (set-mission-type :id +mission-type-demonic-conquest+
                   :name "Demonic conquest"

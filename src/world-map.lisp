@@ -18,7 +18,7 @@
 
   world-map)
 
-(defun generate-test-world-map (world-map world-time)
+(defun generate-test-world-map (world-map)
   (setf (cells world-map) (make-array (list *max-x-world-map* *max-y-world-map*) :element-type '(or world-sector null) :initial-element nil))
 
   (setf (aref (cells world-map) 0 0) (make-instance 'world-sector :wtype +world-sector-normal-sea+ :x 0 :y 0))
@@ -72,7 +72,7 @@
   
   ;;(generate-missions-on-world-map world-map world-time)
 
-  (setf (mission (aref (cells world-map) 4 2)) (generate-mission-on-world-map world-map 4 2 +mission-type-demonic-attack+ world-time))
+  
   
   world-map)
 

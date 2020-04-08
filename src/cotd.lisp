@@ -267,7 +267,6 @@
                                 :level-template-pre-process-func-list level-template-pre-process-func-list
                                 :overall-post-process-func-list overall-post-process-func-list
                                 :terrain-level-post-process-func-list terrain-post-process-func-list
-                                :player-placement-lvl-mod-id (player-lvl-mod-placement-id mission)
                                 :world-sector world-sector
                                 :mission mission
                                 :world *world*)
@@ -506,8 +505,10 @@
                                             (world-sector nil))
                                         (setf *world* (make-instance 'world))
                                         (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                        (generate-test-world-map test-world-map (world-game-time *world*))
+                                        (generate-test-world-map test-world-map)
                                         (setf (world-map *world*) test-world-map)
+
+                                        (setf (mission (aref (cells test-world-map) 4 2)) (generate-mission-on-world-map test-world-map 4 2 +mission-type-demonic-raid+ (world-game-time *world*)))
                                         
                                         (setf *current-window* (make-instance 'new-campaign-window
                                                                               :world-map test-world-map
@@ -516,7 +517,7 @@
                                         (multiple-value-setq (mission world-sector) (run-window *current-window*))
                                         (when (and mission world-sector)
 
-                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+)
+                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-demon-malseraph+)
                                           
                                           (setf *current-window* (return-to *current-window*))
 

@@ -1108,8 +1108,8 @@
                                            :priority 6
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore nearest-ally hostile-mobs allied-mobs))
-                                                            (if (and (or (= (mission-scenario (level *world*)) +mission-scenario-demon-raid+)
-                                                                         (= (mission-scenario (level *world*)) +mission-scenario-demon-raid-ruined+))
+                                                            (if (and (or (= (mission-type-id (mission (level *world*))) +mission-type-demonic-raid+)
+                                                                         )
                                                                      (not nearest-enemy)
                                                                      (loop for item-id in (inv actor)
                                                                            for item = (get-item-by-id item-id)

@@ -7,6 +7,14 @@
 (defconstant +custom-scenario-win-factions+ 4)
 (defconstant +custom-scenario-win-specific-faction+ 5)
 
+(deftype custom-scenario-window-tab-type () '(member
+                                              :custom-scenario-tab-mission
+                                              :custom-scenario-tab-sectors
+                                              :custom-scenario-tab-feats
+                                              :custom-scenario-tab-lvl-mods
+                                              :custom-scenario-tab-factions
+                                              :custom-scenario-tab-specific-factions))
+
 (defconstant +custom-scenario-win-faction-attacker+ 0)
 (defconstant +custom-scenario-win-faction-defender+ 1)
 (defconstant +custom-scenario-win-faction-delayed-defender+ 2)
@@ -16,7 +24,7 @@
   ((cur-step :initform +custom-scenario-win-mission+ :accessor cur-step)
    (cur-sel :initform 0 :accessor cur-sel)
    (menu-items :initform () :accessor menu-items)
-   (mission-list :initarg :mission-list :accessor mission-list)
+   (mission-list :initform () :initarg :mission-list :accessor mission-list)
    (layout-list :accessor layout-list)
    (weather-list :initarg :weather-list :accessor weather-list)
    (tod-list :initarg :tod-list :accessor tod-list)
@@ -32,8 +40,15 @@
    ))
 
 (defmethod initialize-instance :after ((win custom-scenario-window) &key)
-  (setf (cur-mission win) (random (length (mission-list win))))
-  (setf (layout-list win) (copy-list (district-layout-list (get-mission-scenario-by-id (nth (cur-mission win) (mission-list win))))))
+  ;; find all available missions
+  ;(setf (mission-list win) (loop for id being the hash-keys in *mission-types*
+  ;                               when (enabled (get-mission-type-by-id id))
+  ;                                 collect id))
+  ;(setf (cur-mission win) (random (length (mission-list win))))
+
+  ;; find all available layouts depending on the selected mission
+  (setf (layout-list win)
+        (copy-list (district-layout-list (get-mission-scenario-by-id (nth (cur-mission win) (mission-list win))))))
   (setf (cur-layout win) (random (length (layout-list win))))
   (setf (cur-weather win) (random (length (weather-list win))))
   (setf (cur-tod win) (random (length (tod-list win))))

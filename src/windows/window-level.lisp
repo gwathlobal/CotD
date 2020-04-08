@@ -52,34 +52,43 @@
                 (mob-ability-p *player* +mob-abil-prayer-bless+))
         (format str "Followers: ~A~%" (count-follower-list *player*)))
 
-      ;; win condition
+      ;; win condition for demonic attack
       (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
                          (= (loyal-faction *player*) +faction-type-angels+)
-                         (= (loyal-faction *player*) +faction-type-military+))
+                         (= (loyal-faction *player*) +faction-type-military+)
+                         (= (loyal-faction *player*) +faction-type-church+)
+                         (= (loyal-faction *player*) +faction-type-satanists+))
                      (= (mission-type-id (mission (level *world*))) +mission-type-demonic-attack+))
                 (= (mission-type-id (mission (level *world*))) +mission-type-test+))
         (let ((win-condition (get-win-condition-by-id :win-cond-demonic-attack)))
           (format str "~%Civilians left: ~A~%" (funcall (win-condition/win-func win-condition) *world* win-condition)))
         )
+
+       ;; win condition for demonic raid
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                         (= (loyal-faction *player*) +faction-type-angels+)
+                         (= (loyal-faction *player*) +faction-type-military+)
+                         (= (loyal-faction *player*) +faction-type-church+)
+                         (= (loyal-faction *player*) +faction-type-satanists+))
+                     (= (mission-type-id (mission (level *world*))) +mission-type-demonic-raid+))
+                (= (mission-type-id (mission (level *world*))) +mission-type-test+))
+        (let ((win-formula (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-raid))))
+          (format str "~%Flesh left: ~A pts~%" (if (> (- win-formula (get-demon-raid-overall-points *world*)) 0)
+                                                 (- win-formula (get-demon-raid-overall-points *world*))
+                                                 0)))
+        )
+
+      ;; win condition for thief
+      (when (and (= (mob-type *player*) +mob-type-thief+)
+                 (not (mob-ability-p *player* +mob-abil-ghost-possess+)))
+        (let ((win-formula (win-condition/win-formula (get-win-condition-by-id :win-cond-thief))))
+          (format str "Value left: ~A$~%" (if (> (- win-formula (get-overall-value (inv *player*))) 0)
+                                          (- win-formula (get-overall-value (inv *player*)))
+                                          0)))
+        )
       
-      (setf str (format nil "~A~A~A~A~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
+      (setf str (format nil "~A~A~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         str
-                        (if (and (= (mob-type *player*) +mob-type-thief+)
-                                 (not (mob-ability-p *player* +mob-abil-ghost-possess+)))
-                          (format nil "Value left: ~A$~%" (if (> (- *thief-win-value* (get-overall-value (inv *player*))) 0)
-                                                            (- *thief-win-value* (get-overall-value (inv *player*)))
-                                                            0))
-                          "")
-                        (if (and (or (= (loyal-faction *player*) +faction-type-demons+)
-                                     (= (loyal-faction *player*) +faction-type-angels+)
-                                     (= (loyal-faction *player*) +faction-type-church+)
-                                     (= (loyal-faction *player*) +faction-type-satanists+)
-                                     (= (loyal-faction *player*) +faction-type-military+))
-                                 (= (mission-type-id (mission (level *world*))) +mission-type-demonic-raid+))
-                          (format nil "Flesh left: ~A pts~%" (if (> (- *demonic-raid-win-value* (get-demon-raid-overall-points *world*)) 0)
-                                                            (- *demonic-raid-win-value* (get-demon-raid-overall-points *world*))
-                                                            0))
-                          "")
                         (if (and (or (= (loyal-faction *player*) +faction-type-demons+)
                                      (= (loyal-faction *player*) +faction-type-angels+)
                                      (= (loyal-faction *player*) +faction-type-church+)

@@ -26,7 +26,6 @@
                                                               (level-template-pre-process-func-list ())
                                                               (terrain-level-post-process-func-list ())
                                                               
-                                                              (player-placement-lvl-mod-id +lm-placement-player+)
                                                               (world-sector nil)
                                                               (mission nil)
                                                               (world nil)
@@ -185,11 +184,6 @@
     
     (push +game-event-adjust-outdoor-light+ (game-events level))
 
-    ;; add the player to the level
-    (loop for overall-post-process-func in (funcall (overall-post-process-func-list (get-level-modifier-by-id player-placement-lvl-mod-id)))
-          do
-             (funcall overall-post-process-func level world-sector mission world))
-
     ;; populate world with standard mobs (from actual level template)
     (format t "GENERATE-LEVEL: Placing standard mobs~%")
     (loop for (mob-type-id x y z) in mob-template-result
@@ -197,8 +191,6 @@
             do
                (add-mob-to-level-list level (make-instance 'mob :mob-type mob-type-id :x x :y y :z z)))
 
-    (format t "~%Name of ID 0 (later) - ~A~%" (get-mob-by-id 0))  
-    
     ;; populate the world with special mobs (military in outposts, demons around portals, etc) depending on present factions
     (loop for overall-post-process-func in overall-post-process-func-list
           do

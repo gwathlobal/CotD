@@ -2976,7 +2976,7 @@
     nil))
 
 (defun get-demon-raid-overall-points (world)
-  (loop for feature-id in (feature-id-list (level world))
+  (loop for feature-id in (demonic-portals (level world))
         for feature = (get-feature-by-id feature-id)
         when (= (feature-type feature) +feature-demonic-portal+)
           sum (if (param1 feature)
