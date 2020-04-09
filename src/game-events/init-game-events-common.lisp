@@ -11,6 +11,59 @@
     (values final-str score)
     ))
 
+(declaim (ftype (function (world &key (:final-str string)
+                                 (:score fixnum)
+                                 (:if-player-won boolean)
+                                 (:player-msg string)
+                                 (:game-over-type game-over-type))
+                          null)
+                trigger-game-over))
+(defun trigger-game-over (world &key final-str score if-player-won player-msg game-over-type)
+    
+  (let* ((tmp-world world)
+         (tmp-final-str final-str)
+         (tmp-score score)
+         (tmp-if-player-won if-player-won)
+         (tmp-player-msg player-msg)
+         (tmp-game-over-type game-over-type)
+         (highscores-place)
+         (player-died (player-check-dead)))
+    (declare (type string tmp-final-str player-msg) (type boolean tmp-if-player-won) (type fixnum tmp-score) (type game-over-type game-over-type))
+    
+    (when player-died
+      (multiple-value-setq (tmp-final-str tmp-score) (dump-when-dead)))
+    
+    (setf highscores-place (add-highscore-record (make-highscore-record (name *player*)
+                                                                        tmp-score
+                                                                        (if (mimic-id-list *player*)
+                                                                          (faction-name *player*)
+                                                                          (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
+                                                                        (player-game-time tmp-world)
+                                                                        tmp-final-str
+                                                                        (name (world-sector (level tmp-world))))
+                                                 *highscores*))
+    
+    (write-highscores-to-file *highscores*)
+    (dump-character-on-game-over (name *player*) tmp-score (player-game-time tmp-world) (name (world-sector (level tmp-world)))
+                                 tmp-final-str (return-scenario-stats nil))
+
+    (add-message (format nil "~%"))
+    (add-message tmp-player-msg)
+    (add-message (format nil "~%Press any key...~%"))
+    
+    (setf *current-window* (make-instance 'cell-window))
+    (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+    (make-output *current-window*)
+    (sdl:with-events ()
+      (:quit-event () (funcall (quit-func *current-window*)) t)
+      (:key-down-event () 
+                       (setf *current-window* (make-instance 'final-stats-window :game-over-type tmp-game-over-type :highscores-place highscores-place
+                                                                                 :player-won tmp-if-player-won :player-died player-died))
+                       (make-output *current-window*)
+                       (run-window *current-window*))
+      (:video-expose-event () (make-output *current-window*))))
+  nil)
+
 ;;===========================
 ;; WIN EVENTS
 ;;===========================
@@ -27,35 +80,14 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                            ;; write highscores
-                                                           (let* ((final-str (format nil "Escaped with $~A." (calculate-total-value *player*)))
-                                                                  (score (calculate-player-score 0))
-                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                score
-                                                                                                                                (if (mimic-id-list *player*)
-                                                                                                                                  (faction-name *player*)
-                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (player-game-time world)
-                                                                                                                                final-str
-                                                                                                                                (name (world-sector (level world))))
-                                                                                                         *highscores*)))
-                                                             (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
-                                                                                          final-str (return-scenario-stats nil))
-                                                             
-                                                             (add-message (format nil "~%"))
-                                                             (add-message (format nil "Congratulations! You have won the game!~%"))
-                                                             (add-message (format nil "~%Press any key...~%"))
-                                                             (setf *current-window* (make-instance 'cell-window))
-                                                             (make-output *current-window*)
-                                                             (sdl:with-events ()
-                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
-                                                               (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-thief-won+ :highscores-place highscores-place
-                                                                                                                                          :player-won t :player-died nil))
-                                                                                (make-output *current-window*)
-                                                                                (run-window *current-window*))
-                                                               (:video-expose-event () (make-output *current-window*)))))))
+
+                                                           (trigger-game-over world
+                                                                              :final-str (format nil "Escaped with $~A." (calculate-total-value *player*))
+                                                                              :score (calculate-player-score 0)
+                                                                              :if-player-won t
+                                                                              :player-msg (format nil "Congratulations! You have won the game!~%")
+                                                                              :game-over-type :game-over-thief-won)
+                                                           )))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-eater+
                                            :descr-func #'(lambda ()
@@ -72,38 +104,13 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           ;; write highscores
-                                                           (let* ((final-str (cond
-                                                                               ((zerop (total-demons (level world))) "Enemies of Primordials eliminated.")
-                                                                               ))
-                                                                  (score (calculate-player-score 1430))
-                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                 score
-                                                                                                                                 (if (mimic-id-list *player*)
-                                                                                                                                   (faction-name *player*)
-                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                 (player-game-time world)
-                                                                                                                                 final-str
-                                                                                                                                 (name (world-sector (level world))))
-                                                                                                         *highscores*)))
-                                                           
-                                                             (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
-                                                                                          final-str (return-scenario-stats nil))
-                                                             
-                                                             (add-message (format nil "~%"))
-                                                             (add-message (format nil "Congratulations! You have won the game!~%"))
-                                                             (add-message (format nil "~%Press any key...~%"))
-                                                             (setf *current-window* (make-instance 'cell-window))
-                                                             (make-output *current-window*)
-                                                             (sdl:with-events ()
-                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
-                                                               (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-eater-won+ :highscores-place highscores-place
-                                                                                                                                          :player-won t :player-died nil))
-                                                                                (make-output *current-window*)
-                                                                                (run-window *current-window*))
-                                                               (:video-expose-event () (make-output *current-window*)))))))
+                                                           (trigger-game-over world
+                                                                              :final-str "Enemies of Primordials eliminated."
+                                                                              :score (calculate-player-score 1430)
+                                                                              :if-player-won t
+                                                                              :player-msg (format nil "Congratulations! You have won the game!~%")
+                                                                              :game-over-type :game-over-eater-won)
+                                                           )))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-ghost+
                                            :descr-func #'(lambda ()
@@ -115,33 +122,13 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                            ;; write highscores
-                                                           (let* ((final-str (format nil "Put itself to rest."))
-                                                                  (score (calculate-player-score 1450))
-                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                 score
-                                                                                                                                 (faction-name *player*)
-                                                                                                                                 (player-game-time world)
-                                                                                                                                 final-str
-                                                                                                                                 (name (world-sector (level world))))
-                                                                                                          *highscores*)))
-                                                             (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
-                                                                                          final-str (return-scenario-stats nil))
-                                                             
-                                                             (add-message (format nil "~%"))
-                                                             (add-message (format nil "Congratulations! You have won the game!~%"))
-                                                             (add-message (format nil "~%Press any key...~%"))
-                                                             (setf *current-window* (make-instance 'cell-window))
-                                                             (make-output *current-window*)
-                                                             (sdl:with-events ()
-                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
-                                                               (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-ghost-won+ :highscores-place highscores-place
-                                                                                                                                          :player-won t :player-died nil))
-                                                                                (make-output *current-window*)
-                                                                                (run-window *current-window*))
-                                                               (:video-expose-event () (make-output *current-window*)))))))
+                                                           (trigger-game-over world
+                                                                              :final-str "Put itself to rest."
+                                                                              :score (calculate-player-score 1450)
+                                                                              :if-player-won t
+                                                                              :player-msg (format nil "Congratulations! You have won the game!~%")
+                                                                              :game-over-type :game-over-ghost-won)
+                                                           )))
 
 
 ;;===========================
@@ -153,39 +140,11 @@
                                                          (declare (ignore world))
                                                          (player-check-dead))
                                            :on-trigger #'(lambda (world)
-                                                           ;; write highscores
-                                                           (let* ((final-str (if (null (killed-by *player*))
-                                                                               "Killed by unknown forces."
-                                                                               (format nil "Killed by ~A." (killed-by *player*))))
-                                                                  (score (calculate-player-score 0))
-                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                score
-                                                                                                                                (if (mimic-id-list *player*)
-                                                                                                                                  (faction-name *player*)
-                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (player-game-time world)
-                                                                                                                                final-str
-                                                                                                                                (name (world-sector (level world))))
-                                                                                                         *highscores*)))
-                                                             (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
-                                                                                          final-str (return-scenario-stats nil))
-                                                             
-                                                             (add-message (create-string "~%"))
-                                                             (add-message (create-string "You are dead.~%"))
-                                                             (add-message (format nil "~%Press any key...~%"))
-                                                             (setf *current-window* (make-instance 'cell-window))
-                                                             (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
-                                                             (make-output *current-window*)
-                                                             (sdl:with-events ()
-                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
-                                                               (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-player-dead+ :highscores-place highscores-place
-                                                                                                                                          :player-won nil :player-died t))
-                                                                                (make-output *current-window*)
-                                                                                (run-window *current-window*)
-                                                                                )
-                                                               (:video-expose-event () (make-output *current-window*)))))))
+                                                           (trigger-game-over world
+                                                                              :if-player-won nil
+                                                                              :player-msg (format nil "You are dead.~%")
+                                                                              :game-over-type :game-over-player-dead)
+                                                           )))
 
 (set-game-event (make-instance 'game-event :id +game-event-player-died+ :disabled nil
                                            :on-check #'(lambda (world)
@@ -210,36 +169,13 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           ;; write highscores
-                                                           (let* ((final-str (format nil "Possessed by ~A." (get-qualified-name (get-mob-by-id (master-mob-id *player*)))))
-                                                                  (score (calculate-player-score 0))
-                                                                  (highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                score
-                                                                                                                                (if (mimic-id-list *player*)
-                                                                                                                                  (faction-name *player*)
-                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (player-game-time world)
-                                                                                                                                final-str
-                                                                                                                                (name (world-sector (level world))))
-                                                                                                         *highscores*)))
-                                                             (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (name (world-sector (level world)))
-                                                                                          final-str (return-scenario-stats nil))
-                                                             
-                                                             (add-message (create-string "~%"))
-                                                             (add-message (create-string "You are possessed.~%"))
-                                                             (add-message (format nil "~%Press any key...~%"))
-                                                             (setf *current-window* (make-instance 'cell-window))
-                                                             (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
-                                                             (make-output *current-window*)
-                                                             (sdl:with-events ()
-                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
-                                                               (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-player-possessed+ :highscores-place highscores-place
-                                                                                                                                          :player-won nil :player-died nil))
-                                                                                (make-output *current-window*)
-                                                                                (run-window *current-window*))
-                                                               (:video-expose-event () (make-output *current-window*)))))))
+                                                           (trigger-game-over world
+                                                                              :final-str (format nil "Possessed by ~A." (get-qualified-name (get-mob-by-id (master-mob-id *player*))))
+                                                                              :score (calculate-player-score 0)
+                                                                              :if-player-won nil
+                                                                              :player-msg (format nil "You are possessed.~%")
+                                                                              :game-over-type :game-over-player-possessed)
+                                                           )))
 
 ;;===========================
 ;; ENCHANTMENT EVENTS

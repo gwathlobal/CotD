@@ -81,23 +81,6 @@
                                                         (push #'place-delayed-arrival-points-on-level
                                                               func-list)    
 
-                                                        ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
-                                                        ;;(push #'(lambda (level world-sector mission world)
-                                                        ;;          (declare (ignore world-sector mission world))
-                                                        ;;
-                                                        ;;          (loop for mob-id in (mob-id-list level)
-                                                        ;;                for horse = (get-mob-by-id mob-id)
-                                                        ;;                for rider = (if (mounted-by-mob-id horse)
-                                                        ;;                              (get-mob-by-id (mounted-by-mob-id horse))
-                                                        ;;                              nil)
-                                                        ;;                when rider
-                                                        ;;                  do
-                                                        ;;                     (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
-                                                                  ;; remove the glitch from (0, 0, 0)
-                                                                  ;;(setf (aref (mobs (level world)) 0 0 0) nil)
-                                                        ;;          )
-                                                        ;;      func-list)
-                                                        
                                                         ;; place 1 thief
                                                         (push #'place-ai-thief-on-level
                                                               func-list)
@@ -206,23 +189,6 @@
                                                         (push #'place-delayed-arrival-points-on-level
                                                               func-list)    
 
-                                                        ;; adjust coordinates of all horses to their riders, otherwise all horses created for scouts will have coords of (0, 0)
-                                                        ;;(push #'(lambda (level world-sector mission world)
-                                                        ;;          (declare (ignore world-sector mission world))
-                                                        ;;
-                                                        ;;          (loop for mob-id in (mob-id-list level)
-                                                        ;;                for horse = (get-mob-by-id mob-id)
-                                                        ;;                for rider = (if (mounted-by-mob-id horse)
-                                                        ;;                              (get-mob-by-id (mounted-by-mob-id horse))
-                                                        ;;                              nil)
-                                                        ;;                when rider
-                                                        ;;                  do
-                                                        ;;                     (setf (x horse) (x rider) (y horse) (y rider) (z horse) (z rider)))
-                                                                  ;; remove the glitch from (0, 0, 0)
-                                                                  ;;(setf (aref (mobs (level world)) 0 0 0) nil)
-                                                        ;;          )
-                                                        ;;      func-list)
-                                                        
                                                         ;; place 1 thief
                                                         (push #'place-ai-thief-on-level
                                                               func-list)
