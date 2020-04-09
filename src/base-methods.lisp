@@ -2644,21 +2644,22 @@
      ;; find the nearest hostile mob & set it as target
     (loop for mob-id in (visible-mobs *player*)
           for mob = (get-mob-by-id mob-id)
-          when (and (get-faction-relation (faction *player*) (faction mob))
+          when (and (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob))))
                     (not (and (riding-mob-id *player*)
                               (= (riding-mob-id *player*) mob-id))))
             do
                (push mob allied-mobs))
-    
+
     (setf allied-mobs (sort allied-mobs
                              #'(lambda (mob-1 mob-2)
                                  (if (and (< (get-distance (x *player*) (y *player*) (x mob-1) (y mob-1))
                                              (get-distance (x *player*) (y *player*) (x mob-2) (y mob-2)))
-                                          (get-faction-relation (faction *player*) (faction mob-1))
-                                          (get-faction-relation (faction *player*) (faction mob-2)))
+                                          (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-1))))
+                                          (get-faction-relation (faction *player*) (faction (get-mob-type-by-id (face-mob-type-id mob-2)))))
                                    t
                                    nil))
                              ))
+
     (if allied-mobs
       (setf (view-x *player*) (x (first allied-mobs)) (view-y *player*) (y (first allied-mobs)) (view-z *player*) (z (first allied-mobs)))
       (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
