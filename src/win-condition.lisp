@@ -5,7 +5,9 @@
 (deftype win-cond-type () '(member
                             :win-cond-demonic-attack
                             :win-cond-demonic-raid
-                            :win-cond-thief))
+                            :win-cond-thief
+                            :win-cond-demonic-conquest
+                            :win-cond-military-conquest))
 
 (defclass win-condition ()
   ((id :initarg :id :accessor win-condition/id :type win-cond-type)

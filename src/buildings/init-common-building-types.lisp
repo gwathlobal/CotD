@@ -43,18 +43,6 @@
 ;; Pier
 ;;=====================
 
-(set-building-type (make-building :id +building-city-pier+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
-                                  :func #'(lambda (x y z template-level terrains)
-                                            (declare (ignore terrains))
-                                            (loop for x1 from 0 below 5 do
-                                              (loop for y1 from 0 below 5 do
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 0)) +terrain-floor-pier+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 1)) +terrain-water-liquid-nofreeze+)
-                                                (setf (aref template-level (+ x x1) (+ y y1) (- z 2)) +terrain-water-liquid-nofreeze+)))
-                                            (values nil
-                                                    (list (list +feature-delayed-arrival-point+ 2 2 z))
-                                                    nil))))
-
 (set-building-type (make-building :id +building-city-pier-north+ :grid-dim '(1 . 1) :act-dim '(5 . 5) :type +building-type-none+
                                   :func #'(lambda (x y z template-level terrains)
                                             (declare (ignore terrains))
@@ -718,7 +706,7 @@
                                               )
                                             (values nil
                                                     (list (list +feature-start-repel-demons+ 5 5 z)
-                                                          (list +feature-start-military-point+ 5 5 z))
+                                                          (list +feature-start-place-military+ 5 5 z))
                                                     nil))))
 
 ;;=====================

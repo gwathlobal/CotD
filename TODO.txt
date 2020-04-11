@@ -1,3 +1,4 @@
+- BUG: when a creature moves, steps on damage inflicting terrain (on the original time) and dies, the mob object gets removed from the level due to death, but then finishes the movement as usual. Maybe it is better to create a queue of events where death is checked and inflicted as the last event when necessary (instead of in the middle of an event, like movement)
 - Make the system show normal-looking highscores after the upgrade
 - Level modifier when there are numerous primordial creatures on level
 - Campaign for Lost Soul: library and lair in different sectors, player can move between sectors by going to the edge of the local map

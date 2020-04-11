@@ -256,8 +256,9 @@
                           ;; for size 1 (standard) mobs the loop executes only once, so it devolves into traditional movement 
                           (loop for nx from sx below (+ sx (map-size nmob)) do
                             (loop for ny from sy below (+ sy (map-size nmob)) do
-                              (when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob))))
-                                (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob)))) nmob nx ny (z nmob)))
+                              ;; TODO: disabled due to a bug when the creature dies on razorthorns here but then continue to be placed on the level as usual
+                              ;;(when (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob))))
+                              ;;  (funcall (on-step (get-terrain-type-by-id (get-terrain-* (level *world*) nx ny (z nmob)))) nmob nx ny (z nmob)))
                               (setf (aref (mobs (level *world*)) nx ny (z nmob)) nil)))
 
                           (setf (aref (mob-quadrant-map (level *world*)) (truncate (x nmob) 10) (truncate (y nmob) 10))
@@ -917,7 +918,7 @@
   (set-mob-effect target :effect-type-id +mob-effect-possessed+ :actor-id (id target))
   (setf (face-mob-type-id actor) (mob-type target))
   (incf (stat-possess actor))
-  (decf (nth (loyal-faction target) (total-faction-list (level *world*))))
+  ;(decf (nth (loyal-faction target) (total-faction-list (level *world*))))
 
   ;(when (mob-ability-p target +mob-abil-civilian+)
   ;  (incf (lost-civilians (level *world*))))
@@ -949,7 +950,7 @@
     (rem-mob-effect actor +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-possessed+)
     (rem-mob-effect target +mob-effect-reveal-true-form+)
-    (incf (nth (loyal-faction target) (total-faction-list (level *world*))))
+    ;(incf (nth (loyal-faction target) (total-faction-list (level *world*))))
 
     (when (mob-ability-p target +mob-abil-civilian+)
       (decf (lost-civilians (level *world*))))
@@ -3006,14 +3007,9 @@
         minimize (param1 effect)))
 
 (defun get-military-conquest-check-alive-sigils (world)
-  (loop for mob-id in (mob-id-list (level world))
-        for mob = (get-mob-by-id mob-id)
-        when (= (mob-type mob) +mob-type-demon-sigil+)
-          do
-             (when (> (cur-hp mob) 0)
-               (return-from get-military-conquest-check-alive-sigils t))
-        )
-  nil)
+  (if (> (length (demonic-sigils (level world))) 0)
+    t
+    nil))
 
 (defun get-angel-steal-angel-with-relic (world)
   (loop for mob-id in (mob-id-list (level world))

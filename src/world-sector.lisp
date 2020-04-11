@@ -215,7 +215,7 @@
                                     for side being the hash-keys in sides-hash do
                                       (format t "   ~A : ~A~%" side (gethash side sides-hash))
                                     finally (format t "~%"))))
-         (side-party-list (list (list :demons +feature-demons-arrival-point+)
+         (side-party-list (list (list :demons +feature-delayed-demons-arrival-point+)
                                 (list :military +feature-delayed-military-arrival-point+)
                                 (list :angels +feature-delayed-angels-arrival-point+))))
     
@@ -223,7 +223,10 @@
       (push (list :angels +feature-start-place-angels+) side-party-list))
     
     (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
-      (push (list :military +feature-start-military-point+) side-party-list))
+      (push (list :military +feature-start-place-military+) side-party-list))
+	  
+    (unless (= (controlled-by world-sector) +lm-controlled-by-demons+)
+      (push (list :military +feature-start-place-demons+) side-party-list))
 
     (setf (gethash :n sides-hash) ())
     (setf (gethash :s sides-hash) ())
@@ -609,11 +612,13 @@
 
   (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place outsider beasts~%"))
   
-  (populate-world-with-mobs level (list (cons +mob-type-gargantaur+ 1)
-                                        (cons +mob-type-wisp+ 9))
+  (populate-level-with-mobs level (list (list +mob-type-gargantaur+ 1 nil)
+                                        (list +mob-type-wisp+ 9 nil))
                             #'find-unoccupied-place-inside)
-  (populate-world-with-mobs level (list (cons +mob-type-fiend+ 9))
+
+  (populate-level-with-mobs level (list (list +mob-type-fiend+ 9 nil))
                             #'find-unoccupied-place-inside)
+  
   )
 
 (defun place-blood-on-level (level world-sector mission world)

@@ -64,8 +64,10 @@
 (defun add-mob-to-level-list (level mob &optional (apply-gravity t))
 
   (when (riding-mob-id mob)
-    (add-mob-to-level-list level (get-mob-by-id (riding-mob-id mob)) nil))
-  
+    (let ((mount (get-mob-by-id (riding-mob-id mob))))
+      (setf (x mount) (x mob) (y mount) (y mob) (z mount) (z mob))
+      (add-mob-to-level-list level (get-mob-by-id (riding-mob-id mob)) nil)))
+
   (unless (initial-added mob)
     (setf (initial-added mob) t)
 

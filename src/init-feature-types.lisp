@@ -82,8 +82,6 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-satanist-player+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Player Satanist Starting Position" :trait-remove-on-dungeon-generation t))
 
-(set-feature-type (make-instance 'feature-type :id +feature-delayed-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Arrival Point"))
-
 (set-feature-type (make-instance 'feature-type :id +feature-arrival-point-north+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "North Delayed Arrival Point" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-arrival-point-south+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "South Delayed Arrival Point" :trait-remove-on-dungeon-generation t))
@@ -96,15 +94,15 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-delayed-angels-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Angels Arrival Point" :trait-remove-on-dungeon-generation t))
 
-(set-feature-type (make-instance 'feature-type :id +feature-delayed-angels-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Angels Arrival Point" :trait-remove-on-dungeon-generation t))
+(set-feature-type (make-instance 'feature-type :id +feature-delayed-demons-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Delayed Demons Arrival Point" :trait-remove-on-dungeon-generation t))
 
-(set-feature-type (make-instance 'feature-type :id +feature-demons-arrival-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Demons Arrival Point" :trait-remove-on-dungeon-generation t))
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-demons+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Demons Starting Position" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-small+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Small Gold Pile Placeholder"))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-big+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Big Gold Pile Placeholder"))
 
-(set-feature-type (make-instance 'feature-type :id +feature-start-demon-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Demon Point Starting Position" :trait-remove-on-dungeon-generation t))
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-demons-relic+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Demon Guarding Relic Starting Position" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-smoke-thin+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-thin+ :trait-no-gravity t
@@ -222,7 +220,7 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-strong-repel-demons+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Repel Demons Starting Location" :trait-remove-on-dungeon-generation t))
 
-(set-feature-type (make-instance 'feature-type :id +feature-start-military-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Military Defender Starting Position" :trait-remove-on-dungeon-generation t))
+(set-feature-type (make-instance 'feature-type :id +feature-start-place-military+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Military Starting Position" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-sigil-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Sigil Starting Position" :trait-remove-on-dungeon-generation t))
 

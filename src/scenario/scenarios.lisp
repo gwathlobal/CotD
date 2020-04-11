@@ -884,42 +884,6 @@
                 (add-mob-to-level-list (level world) mob3)
         ))
 
-(defun find-unoccupied-place-inside (world mob)
-  (loop with max-x = (array-dimension (terrain (level world)) 0)
-        with max-y = (array-dimension (terrain (level world)) 1)
-        for x = (random max-x)
-        for y = (random max-y)
-        for z = 2
-        until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
-                   (eq (check-move-on-level mob x y z) t)
-                   (not (get-mob-* (level world) x y z))
-                   (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
-                   (/= (get-level-connect-map-value (level world) x y z (if (riding-mob-id mob)
-                                                                          (map-size (get-mob-by-id (riding-mob-id mob)))
-                                                                          (map-size mob))
-                                                    (get-mob-move-mode mob))
-                       +connect-room-none+)
-                   (or (and (not (mob-ability-p mob +mob-abil-demon+))
-                            (not (mob-ability-p mob +mob-abil-angel+)))
-                       (and (or (mob-ability-p mob +mob-abil-demon+)
-                                (mob-ability-p mob +mob-abil-angel+))
-                            (loop for feature-id in (feature-id-list (level world))
-                                  for feature = (get-feature-by-id feature-id)
-                                  with result = t
-                                  when (and (= (feature-type feature) +feature-start-repel-demons+)
-                                            (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
-                                    do
-                                       (setf result nil)
-                                       (loop-finish)
-                                  when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
-                                            (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
-                                    do
-                                       (setf result nil)
-                                       (loop-finish)
-                                  finally (return result)))))
-        finally (setf (x mob) x (y mob) y (z mob) z)
-                (add-mob-to-level-list (level world) mob)))
-
 (defun find-unoccupied-place-portal (world mob)
   (loop with portals-list = (loop for feature-id in (feature-id-list (level world))
                                   for feature = (get-feature-by-id feature-id)
@@ -945,7 +909,7 @@
 (defun find-unoccupied-place-demon-point (world mob)
   (loop with points-list = (loop for feature-id in (feature-id-list (level world))
                                   for feature = (get-feature-by-id feature-id)
-                                  when (= (feature-type feature) +feature-start-demon-point+)
+                                  when (= (feature-type feature) +feature-start-place-demons-relic+)
                                     collect feature)
         for point = (nth (random (length points-list)) points-list)
         for x = (x point)
@@ -999,26 +963,6 @@
                                   finally (return result)))))
         finally (setf (x mob) x (y mob) y (z mob) nz)
                 (add-mob-to-level-list (level world) mob)))
-
-(defun find-unoccupied-place-water (world mob)
-  (let ((water-cells nil)
-        (r-cell))
-    (loop for x from 0 below (array-dimension (terrain (level *world*)) 0) do
-      (loop for y from 0 below (array-dimension (terrain (level *world*)) 1) do
-        (loop for z from 0 below (array-dimension (terrain (level *world*)) 2)
-              when (and (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-water+)
-                        (eq (check-move-on-level mob x y z) t))
-                do
-                   (push (list x y z) water-cells))))
-    (if water-cells
-      (progn
-        (setf r-cell (nth (random (length water-cells)) water-cells))
-        (setf (x mob) (first r-cell) (y mob) (second r-cell) (z mob) (third r-cell))
-        (add-mob-to-level-list (level world) mob))
-      (progn
-        (find-unoccupied-place-outside world mob)))
-    )
-  )
 
 (defun place-demonic-runes (world)
   (let ((demonic-runes ())

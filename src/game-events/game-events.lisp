@@ -51,6 +51,8 @@
 (defconstant +game-event-angelic-steal-win-for-demons+ 46)
 (defconstant +game-event-delayed-arrival-military+ 47)
 (defconstant +game-event-delayed-arrival-angels+ 48)
+(defconstant +game-event-delayed-arrival-demons+ 49)
+(defconstant +game-event-military-conquest-win-for-satanists+ 50)
 
 (deftype game-over-type () '(member
                              :game-over-player-dead

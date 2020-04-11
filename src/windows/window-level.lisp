@@ -82,30 +82,40 @@
       (when (and (= (mob-type *player*) +mob-type-thief+)
                  (not (mob-ability-p *player* +mob-abil-ghost-possess+)))
         (let ((win-formula (win-condition/win-formula (get-win-condition-by-id :win-cond-thief))))
-          (format str "Value left: ~A$~%" (if (> (- win-formula (get-overall-value (inv *player*))) 0)
+          (format str "~%Value left: ~A$~%" (if (> (- win-formula (get-overall-value (inv *player*))) 0)
                                           (- win-formula (get-overall-value (inv *player*)))
                                           0)))
         )
+
+      ;; win condition for demonic conquest
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                         (= (loyal-faction *player*) +faction-type-angels+)
+                         (= (loyal-faction *player*) +faction-type-military+)
+                         (= (loyal-faction *player*) +faction-type-church+)
+                         (= (loyal-faction *player*) +faction-type-satanists+))
+                     (= (mission-type-id (mission (level *world*))) +mission-type-demonic-conquest+))
+                (= (mission-type-id (mission (level *world*))) +mission-type-test+))
+        (multiple-value-bind (max-sigils max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+          (format str "~%Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) max-sigils
+                  (if (>= (length (demonic-sigils (level *world*))) max-sigils)
+                    (format nil "~D turn~:P left" (- max-turns (get-demon-conquest-turns-left *world*)))
+                    "none")))
+        )
+
+      ;; win condition for military conquest
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                         (= (loyal-faction *player*) +faction-type-angels+)
+                         (= (loyal-faction *player*) +faction-type-military+)
+                         (= (loyal-faction *player*) +faction-type-satanists+))
+                     (= (mission-type-id (mission (level *world*))) +mission-type-military-conquest+))
+                (= (mission-type-id (mission (level *world*))) +mission-type-test+))
+        (let ((max-sigils (win-condition/win-formula (get-win-condition-by-id :win-cond-military-conquest))))
+          (format str "~%Demonic sigils: ~A/~A~%" (length (demonic-sigils (level *world*))) max-sigils))
+        )
       
-      (setf str (format nil "~A~A~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
+      
+      (setf str (format nil "~A~%~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         str
-                        (if (and (or (= (loyal-faction *player*) +faction-type-demons+)
-                                     (= (loyal-faction *player*) +faction-type-angels+)
-                                     (= (loyal-faction *player*) +faction-type-church+)
-                                     (= (loyal-faction *player*) +faction-type-satanists+)
-                                     (= (loyal-faction *player*) +faction-type-military+)))
-                          (cond
-                            ((= (mission-type-id (mission (level *world*))) +mission-type-demonic-conquest+)
-                             (format nil "Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*
-                                     (if (>= (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*)
-                                       (format nil "~D turn~:P left" (- *demonic-conquest-win-sigils-turns* (get-demon-conquest-turns-left *world*)))
-                                       "none")))
-                            ((= (mission-type-id (mission (level *world*))) +mission-type-military-conquest+)
-                             (format nil "Demonic sigils: ~A/~A~%" (length (demonic-sigils (level *world*))) *demonic-conquest-win-sigils-num*))
-                            (t ""))
-                          "")
-                        
-                        
                         (get-weapon-descr-line *player*)
                         (total-humans (level *world*))
                         (total-blessed (level *world*))

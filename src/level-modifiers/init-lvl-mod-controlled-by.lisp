@@ -15,7 +15,7 @@
                                            (list (list +faction-type-demons+ +mission-faction-present+)))
                     :priority 25
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
-                                                 (declare (ignore mission world))
+                                                 (declare (ignore world-sector mission world))
 
                                                  (format t "TEMPLATE LEVEL FUNC: LM CONTROLLED BY DEMONS~%")
 
@@ -48,7 +48,7 @@
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector world mission))
 
-                                                                    (format t "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%~%")
+                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%~%"))
 
                                                                     (loop with sigil = nil
                                                                           for feature-id in (feature-id-list level)
@@ -61,6 +61,53 @@
                                                                                (set-mob-effect sigil :effect-type-id +mob-effect-demonic-sigil+ :actor-id (id sigil) :cd t))
                                                                     )
                                                                 func-list)
+
+                                                          ;; add starting points for demons
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector world mission))
+                                                                    
+                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add starting points for demons~%~%"))
+
+                                                                    (loop repeat 50
+                                                                          do
+                                                                          (loop with max-x = (array-dimension (terrain level) 0)
+                                                                                with max-y = (array-dimension (terrain level) 1)
+                                                                                for x = (random max-x)
+                                                                                for y = (random max-y)
+                                                                                for z = 2
+                                                                                until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
+                                                                                           (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+))
+                                                                                           (not (get-mob-* level x y z))
+                                                                                           (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                                                                                           (/= (get-level-connect-map-value level x y z 1 +connect-map-move-walk+)
+                                                                                               +connect-room-none+)
+                                                                                           (loop for feature-id in (feature-id-list level)
+                                                                                                 for feature = (get-feature-by-id feature-id)
+                                                                                                 with result = t
+                                                                                                 when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                                                                                           (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                                                                                                   do
+                                                                                                      (setf result nil)
+                                                                                                      (loop-finish)
+                                                                                                 when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                                                                                           (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
+                                                                                                   do
+                                                                                                      
+                                                                                                      (setf result nil)
+                                                                                                      (loop-finish)
+                                                                                                 when (and (get-feature-type-trait feature +feature-trait-remove-on-dungeon-generation+)
+                                                                                                           (< (get-distance x y (x feature) (y feature)) 2))
+                                                                                                   do
+                                                                                                      (setf result nil)
+                                                                                                      (loop-finish)
+                                                                                                 finally (return result)))
+                                                                                finally (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-start-place-demons+ :x x :y y :z z))
+                                                                                        ))
+                                                                    
+                                                                    
+                                                                    )
+                                                                func-list)
+                                                          
                                                           func-list))
                     )
 

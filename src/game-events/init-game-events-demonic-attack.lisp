@@ -132,7 +132,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-attack-win-for-satanists+
                                            :descr-func #'(lambda ()
-                                                           "To win, destroy all angels in the district. To lose, get all satanists and demons killed.")
+                                                           (let ((win-figure (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-attack))))
+                                                             (format nil "To win, destroy ~A% of civilians in the district. To lose, have all satanists killed." win-figure)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (= (loyal-faction *player*) +faction-type-satanists+)

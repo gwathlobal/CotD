@@ -214,7 +214,12 @@
           do
              (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
                         (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
-               (push (list x y z) (delayed-angels-arrival-points level)))))
+               (push (list x y z) (delayed-angels-arrival-points level)))
+        when (= (feature-type lvl-feature) +feature-delayed-demons-arrival-point+)
+          do
+             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                        (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
+               (push (list x y z) (delayed-demons-arrival-points level)))))
 
 (defun setup-turns-for-delayed-arrival (level world-sector mission world)
   (declare (ignore mission))
@@ -257,11 +262,11 @@
                        nil))
                  (faction-list mission))
     
-    (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place at the borders~%"))
+    (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place present demons~%"))
     (loop for (demon-type demon-number is-player) in demon-list do
       (loop repeat demon-number do
         (loop with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                           (= (feature-type a) +feature-demons-arrival-point+))
+                                                           (= (feature-type a) +feature-start-place-demons+))
                                                        (feature-id-list level)
                                                        :key #'(lambda (b)
                                                                 (get-feature-by-id b)))
@@ -280,6 +285,27 @@
                    (find-unoccupied-place-around level (make-instance 'mob :mob-type demon-type) x y z))
                  
                  (loop-finish)))))
+
+  (when (find-if #'(lambda (a)
+                     (if (and (= (first a) +faction-type-demons+)
+                              (= (second a) +mission-faction-delayed+))
+                       t
+                       nil))
+                 (faction-list mission))
+    (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Add game event for delayed demons~%"))
+    
+    (pushnew +game-event-delayed-arrival-demons+ (game-events level))
+    
+    ;; add a player to game but do not add him to the level
+    (when (or (= (player-lvl-mod-placement-id mission) +lm-placement-demon-malseraph+)
+              (= (player-lvl-mod-placement-id mission) +lm-placement-demon-crimson+)
+              (= (player-lvl-mod-placement-id mission) +lm-placement-demon-shadow+))
+        (loop for (mob-type-id mob-num is-player) in demon-list do
+          (when is-player
+            (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Add delayed player to the game~%"))
+            (setf *player* (make-instance 'player :mob-type mob-type-id))
+            (setf (player-outside-level *player*) t))))
+    )
   )
 
 (defun place-angels-on-level (level world-sector mission world angel-list)
@@ -330,6 +356,9 @@
                               (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
                               (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
                               (setf (name mob2) (name mob1) (name mob3) (name mob1))
+
+                              (when is-player
+                                (setf *player* mob1))
                               
                               (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
                               (add-mob-to-level-list level mob1)
@@ -337,9 +366,6 @@
                               (add-mob-to-level-list level mob2)
                               (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
                               (add-mob-to-level-list level mob3)
-                              
-                              (when is-player
-                                (setf *player* mob1))
                               
                               (loop-finish))))
                  (progn
@@ -368,38 +394,38 @@
                             (loop-finish))))
                    )))
 
-    (when (find-if #'(lambda (a)
+  (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-angels+)
                               (= (second a) +mission-faction-delayed+))
                        t
                        nil))
                  (faction-list mission))
-      (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add game event for delayed angels~%"))
-      
-      (pushnew +game-event-delayed-arrival-angels+ (game-events level))
-      
-      ;; add a player to game but do not add him to the level
-      (when (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
-                (= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+))
-        (loop for (mob-type-id mob-num is-player) in angel-list do
-          (when is-player
-            (if (or (= mob-type-id +mob-type-star-singer+)
-                    (= mob-type-id +mob-type-star-gazer+)
-                    (= mob-type-id +mob-type-star-mender+))
-              (progn
-                (let ((mob1 (make-instance 'player :mob-type +mob-type-star-singer+))
-                      (mob2 (make-instance 'player :mob-type +mob-type-star-gazer+))
-                      (mob3 (make-instance 'player :mob-type +mob-type-star-mender+)))
-                  (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
-                  (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
-                  (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
-                  (setf (name mob2) (name mob1) (name mob3) (name mob1))
-                  (setf *player* mob1)))
-              (progn
-                (setf *player* (make-instance 'player :mob-type mob-type-id))))
-            (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add delayed player to the game~%"))
-            (setf (player-outside-level *player*) t))))
-      )
+    (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add game event for delayed angels~%"))
+    
+    (pushnew +game-event-delayed-arrival-angels+ (game-events level))
+    
+    ;; add a player to game but do not add him to the level
+    (when (or (= (player-lvl-mod-placement-id mission) +lm-placement-angel-trinity+)
+              (= (player-lvl-mod-placement-id mission) +lm-placement-angel-chrome+))
+      (loop for (mob-type-id mob-num is-player) in angel-list do
+        (when is-player
+          (if (or (= mob-type-id +mob-type-star-singer+)
+                  (= mob-type-id +mob-type-star-gazer+)
+                  (= mob-type-id +mob-type-star-mender+))
+            (progn
+              (let ((mob1 (make-instance 'player :mob-type +mob-type-star-singer+))
+                    (mob2 (make-instance 'player :mob-type +mob-type-star-gazer+))
+                    (mob3 (make-instance 'player :mob-type +mob-type-star-mender+)))
+                (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                (setf *player* mob1)))
+            (progn
+              (setf *player* (make-instance 'player :mob-type mob-type-id))))
+          (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add delayed player to the game~%"))
+          (setf (player-outside-level *player*) t))))
+    )
   )
   
 
@@ -426,7 +452,7 @@
         (declare (ignore mob-num))
         (let ((leader (if is-player (make-instance 'player :mob-type mob-type-id) (make-instance 'mob :mob-type mob-type-id))))
           (loop with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                             (= (feature-type a) +feature-start-military-point+))
+                                                             (= (feature-type a) +feature-start-place-military+))
                                                          (feature-id-list level)
                                                          :key #'(lambda (b)
                                                                   (get-feature-by-id b)))
@@ -438,11 +464,11 @@
                 for z = (z lvl-feature)
                 do
                    (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
+                   (when is-player
+                     (setf *player* leader))
                    
                    (find-unoccupied-place-around level leader x y z)
                    
-                   (when is-player
-                     (setf *player* leader))
                    (when remove-arrival-points
                      (remove-feature-from-level-list level lvl-feature)
                      (remove-feature-from-world lvl-feature))
