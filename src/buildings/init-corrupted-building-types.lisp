@@ -1104,7 +1104,7 @@
                                               
                                               )
                                             (values nil
-                                                    (list (list +feature-start-place-church-relic+ 7 7 z)
+                                                    (list (list +feature-start-place-relic+ 7 7 z)
                                                           (list +feature-start-place-demons+ 7 7 z)
                                                           (list +feature-start-place-demons+ 7 5 z)
                                                           (list +feature-start-place-demons+ 7 9 z)

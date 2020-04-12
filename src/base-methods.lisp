@@ -3006,8 +3006,8 @@
         for effect = (get-effect-by-id (mob-effect-p sigil +mob-effect-demonic-sigil+))
         minimize (param1 effect)))
 
-(defun get-military-conquest-check-alive-sigils (world)
-  (if (> (length (demonic-sigils (level world))) 0)
+(defun get-military-conquest-check-alive-sigils (level)
+  (if (> (length (demonic-sigils level)) 0)
     t
     nil))
 

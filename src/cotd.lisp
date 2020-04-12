@@ -508,7 +508,7 @@
                                         (generate-test-world-map test-world-map)
                                         (setf (world-map *world*) test-world-map)
 
-                                        (setf (mission (aref (cells test-world-map) 2 2)) (generate-mission-on-world-map test-world-map 2 2 +mission-type-military-conquest+ (world-game-time *world*)))
+                                        (setf (mission (aref (cells test-world-map) 1 2)) (generate-mission-on-world-map test-world-map 1 2 +mission-type-military-conquest+ (world-game-time *world*)))
                                         
                                         (setf *current-window* (make-instance 'new-campaign-window
                                                                               :world-map test-world-map
@@ -517,7 +517,7 @@
                                         (multiple-value-setq (mission world-sector) (run-window *current-window*))
                                         (when (and mission world-sector)
 
-                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
+                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-player+)
                                           
                                           (setf *current-window* (return-to *current-window*))
 

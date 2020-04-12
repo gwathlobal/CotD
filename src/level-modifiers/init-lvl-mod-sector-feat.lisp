@@ -278,7 +278,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 
-                                                 (format t "TEMPLATE LEVEL FUNC: LM FEAT CHURCH~%")
+                                                 (logger (format nil "TEMPLATE LEVEL FUNC: Lvl Mod Church~%"))
                                                  
                                                  (loop with church-types = (prepare-spec-build-id-list +building-type-church+)
                                                        for x = (random (array-dimension template-level 0))

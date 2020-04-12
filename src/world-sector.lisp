@@ -621,6 +621,22 @@
   
   )
 
+(defun place-demonic-sigils-on-level (level world-sector mission world)
+  (declare (ignore world-sector world mission))
+  
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%~%"))
+  
+  (loop with sigil = nil
+        for feature-id in (feature-id-list level)
+        for lvl-feature = (get-feature-by-id feature-id)
+        when (= (feature-type lvl-feature) +feature-start-sigil-point+)
+          do
+             (setf sigil (make-instance 'mob :mob-type +mob-type-demon-sigil+))
+             (setf (x sigil) (x lvl-feature) (y sigil) (y lvl-feature) (z sigil) (z lvl-feature))
+             (add-mob-to-level-list level sigil)
+             (set-mob-effect sigil :effect-type-id +mob-effect-demonic-sigil+ :actor-id (id sigil) :cd t))
+  )
+
 (defun place-blood-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
   
@@ -786,6 +802,30 @@
              (level-city-reserve-build-on-grid building-park-id (- x2 3) y 2 template-level)))
   
   )
+
+(defun place-demonic-sigils-on-template-level (template-level)
+  (let ((building-id +building-city-sigil-post+)
+        (x-w 4)
+        (y-n 4)
+        (x-e (- (array-dimension template-level 0) 5))
+        (y-s (- (array-dimension template-level 1) 5)))
+    ;; place nw post
+    (when (level-city-can-place-build-on-grid building-id x-w y-n 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-w y-n 2 template-level))
+    
+    ;; place ne post
+    (when (level-city-can-place-build-on-grid building-id x-e y-n 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-e y-n 2 template-level))
+    
+    ;; place sw post
+    (when (level-city-can-place-build-on-grid building-id x-w y-s 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-w y-s 2 template-level))
+    
+    ;; place se post
+    (when (level-city-can-place-build-on-grid building-id x-e y-s 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level))
+    
+    ))
 
 (defun get-max-buildings-normal ()
   (let ((max-building-types (make-hash-table)))

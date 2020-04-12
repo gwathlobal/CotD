@@ -492,6 +492,13 @@
                                                                                                             +terrain-tree-twintube+)
                                                                               +level-city-terrain-bush+ #'(lambda ()
                                                                                                             +terrain-wall-gloomtwigs+))))
+                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                 (declare (ignore world-sector mission world))
+
+                                                 (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Residential~%"))
+
+                                                 (place-demonic-sigils-on-template-level template-level)
+                                                 )
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -501,6 +508,10 @@
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
 
+                                                             ;; add demonic sigils
+                                                             (push #'place-demonic-sigils-on-level
+                                                                   func-list)
+                                                             
                                                              ;; place outsider beasts
                                                              (push #'place-outsider-beasts-on-level
                                                                    func-list)
@@ -554,7 +565,7 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world mission))
 
-                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR SEAPORT~%")
+                                                     (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Seaport~%"))
 
                                                      (let ((seaport-params (second (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))))
 
@@ -572,10 +583,17 @@
                                                         ((find :w seaport-params)
                                                          (place-seaport-west template-level +building-city-corrupted-warehouse-port-1+ +building-city-corrupted-warehouse-port-2+)))
                                                        )
+                                                     
+                                                     (place-demonic-sigils-on-template-level template-level)
+
                                                      )
                        :overall-post-process-func-list #'(lambda ()
                                                             (let ((func-list ()))
 
+                                                              ;; add demonic sigils
+                                                             (push #'place-demonic-sigils-on-level
+                                                                   func-list)
+                                                              
                                                               ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
@@ -629,13 +647,19 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
 
-                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
+                                                    (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Outskirts~%"))
 
                                                     (place-outskirts-on-template-level template-level +building-city-corrupted-forest-border+ +building-city-corrupted-park-3+)
+
+                                                    (place-demonic-sigils-on-template-level template-level)
                                                     )
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
 
+                                                             ;; add demonic sigils
+                                                             (push #'place-demonic-sigils-on-level
+                                                                   func-list)
+                                                             
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
@@ -682,9 +706,11 @@
                                                                                                             +terrain-wall-gloomtwigs+))))
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
-                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
+                                                    (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Lake~%"))
 
-                                                    (place-lake-on-template-level template-level +building-city-central-lake+))
+                                                    (place-lake-on-template-level template-level +building-city-central-lake+)
+
+                                                    (place-demonic-sigils-on-template-level template-level))
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
                                                              ;; add arrival points for angels, demons & military
@@ -694,6 +720,10 @@
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
 
+                                                             ;; add demonic sigils
+                                                             (push #'place-demonic-sigils-on-level
+                                                                   func-list)
+                                                             
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
@@ -744,9 +774,19 @@
                                                              (push #'add-arrival-points-on-level
                                                                    func-list)
                                                              func-list))
-                       :template-level-gen-func #'place-island-on-template-level
+                       :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                    (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Island~%"))
+
+                                                    (place-island-on-template-level template-level world-sector mission world)
+                                                    
+                                                    (place-demonic-sigils-on-template-level template-level))
+                      
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
+
+                                                             ;; add demonic sigils
+                                                             (push #'place-demonic-sigils-on-level
+                                                                   func-list)
 
                                                              ;; place outsider beasts
                                                               (push #'place-outsider-beasts-on-level

@@ -1,3 +1,11 @@
+- A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints
+- Demons/angels arrive delayed through portals
+- A mission type for military/satanists - find and kill all satanists in the sector, demons will arrive after a delay to stop the military
+- Display time remaning before military/angel/demon arrival
+- Level modifier that makes all angels/demons arrive earlier/later
+- Campaign goal for demons: gather enough flesh points or conquer the whole city. You gather flesh points from demonic raids or from winning the battlefield (from all remaining corpses).
+- Campaign goal for military: defeat all demons in the city, find all satanists and shut down the gates opened from the city
+- Campaign goal for angels: shut down the gates from the inside of hell
 - BUG: when a creature moves, steps on damage inflicting terrain (on the original time) and dies, the mob object gets removed from the level due to death, but then finishes the movement as usual. Maybe it is better to create a queue of events where death is checked and inflicted as the last event when necessary (instead of in the middle of an event, like movement)
 - Make the system show normal-looking highscores after the upgrade
 - Level modifier when there are numerous primordial creatures on level
@@ -5,13 +13,13 @@
 - Acid rain in corrupted districts
 - A style of gameplay where you gain abilities depending on your surroundings
 - Angels get conducts (do not kill allies) they should not break or they will get penalized
-- Angels get wrath management - when they attack or kill, they accomodate wrath. When wrath reaches a threshold, they get a sin (penalty). To reduce wrath, special abilities should be given. Wrath also enables special powerful abilities which produce even more wrath.
+- Angels get wrath management - when they attack or kill, they accamulate wrath. When wrath reaches a threshold, they get a sin (penalty). To reduce wrath, special abilities should be given. Wrath also enables special powerful abilities which produce even more wrath.
 - Malseraph's puppets get additional task from Malseraph
 - Alarak-style gameplay where you gain resource when allies get killed and you can sacrifice your allies
 - Unstable pocket dimensions - complete the goal before the time expires
 - Collapsing pocket dimensions - complete the goal while the map becomes smaller and smaller
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)
-- A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police (or put a certain )
+- A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police (or put a certain number of leaflets/runes on the walls)
 - Chain Lightning attack
 - Beam & Sweep arrack
 - Scenario with attacking a battleship
