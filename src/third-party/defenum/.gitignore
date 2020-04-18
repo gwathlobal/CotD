@@ -1,0 +1,9 @@
+*.*fasl
+*.*fsl
+*.o
+*~
+
+docs/*html*/*
+examples.txt
+tmp/*
+tests/*

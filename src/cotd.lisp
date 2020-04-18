@@ -409,17 +409,22 @@
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
                                         (declare (ignore n))
-                                        (setf *current-window* (make-instance 'custom-scenario-window
-                                                                              :mission-list (get-all-mission-scenarios-list)
-                                                                              :weather-list (get-all-scenario-features-by-type +scenario-feature-weather+ (not *cotd-release*))
-                                                                              :tod-list (get-all-scenario-features-by-type +scenario-feature-time-of-day+ (not *cotd-release*))
-                                                                              ))
-                                        (setf (menu-items *current-window*) (populate-custom-scenario-win-menu *current-window* (cur-step *current-window*)))
-                                        (make-output *current-window*)
-                                        (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (run-window *current-window*)
-                                          (when (and mission-id layout-id weather-id tod-id specific-faction-type faction-list)
-                                            (setf *current-window* (return-to *current-window*))
-                                            (return-from main-menu (values mission-id layout-id weather-id tod-id specific-faction-type faction-list)))))))
+                                        (let ((test-world-map (make-instance 'world-map)))
+                                          (setf *world* (make-instance 'world))
+                                          (generate-empty-world-map test-world-map (world-game-time *world*))
+                                          (setf (world-map *world*) test-world-map)
+
+                                          (setf *current-window* (make-instance 'custom-scenario-window
+                                                                                :world *world*
+                                                                                ))
+                                          (make-output *current-window*)
+                                          
+                                          (multiple-value-bind (world-sector mission) (run-window *current-window*)
+                                            (when (and world-sector mission)
+                                              (setf *current-window* (return-to *current-window*))
+                                              (return-from main-menu (values world-sector mission))))
+                                          )
+                                        )))
         (settings-item (cons "Settings"
                              #'(lambda (n)
                                  (declare (ignore n))

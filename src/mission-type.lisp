@@ -17,6 +17,7 @@
    (enabled :initform t :initarg :enabled :accessor enabled)
    (is-available-func :initform #'(lambda (world-map x y) (declare (ignore world-map x y)) nil) :initarg :is-available-func :accessor is-available-func)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector and returns a list of faction-ids
+   (world-sector-for-custom-scenario :initform () :initarg :world-sector-for-custom-scenario :accessor world-sector-for-custom-scenario) ;; the list of world-sectors available for this mission, specifically for custom scenario
 
    (template-level-gen-func :initform nil :initarg :template-level-gen-func :accessor template-level-gen-func)
    (overall-post-process-func-list :initform nil :initarg :overall-post-process-func-list :accessor overall-post-process-func-list)
@@ -29,7 +30,7 @@
 (defparameter *mission-types* (make-hash-table))
 
 (defun set-mission-type (&key id name (enabled t) is-available-func faction-list-func template-level-gen-func overall-post-process-func-list terrain-post-process-func-list
-                              scenario-faction-list ai-package-list win-condition-list)
+                              scenario-faction-list ai-package-list win-condition-list world-sector-for-custom-scenario)
   (unless id (error ":ID is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   
@@ -43,6 +44,7 @@
                                                                   :scenario-faction-list scenario-faction-list
                                                                   :ai-package-list ai-package-list
                                                                   :win-condition-list win-condition-list
+                                                                  :world-sector-for-custom-scenario world-sector-for-custom-scenario
                                                                   )))
 
 (defun get-mission-type-by-id (mission-type-id)

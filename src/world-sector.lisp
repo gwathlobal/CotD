@@ -13,13 +13,13 @@
    (terrain-post-process-func-list :initform nil :initarg :terrain-post-process-func-list :accessor terrain-post-process-func-list)
    (overall-post-process-func-list :initform nil :initarg :overall-post-process-func-list :accessor overall-post-process-func-list)
    (angel-disguised-mob-type-id :initform +mob-type-man+ :initarg :angel-disguised-mob-type-id :accessor angel-disguised-mob-type-id)
-   ) 
-  )
+   (scenario-enabled-func :initform nil :initarg :scenario-enabled-func :accessor scenario-enabled-func)
+   ))
 
 (defparameter *world-sector-types* (make-hash-table))
 
 (defun set-world-sector-type (&key wtype glyph-idx glyph-color name faction-list-func sector-level-gen-func template-level-gen-func terrain-post-process-func-list
-                                   overall-post-process-func-list angel-disguised-mob-type-id)
+                                   overall-post-process-func-list angel-disguised-mob-type-id scenario-enabled-func)
   (unless wtype (error ":WTYPE is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   (unless glyph-idx (error ":GLYPH-IDX is an obligatory parameter!"))
@@ -32,6 +32,7 @@
                                                                                :terrain-post-process-func-list terrain-post-process-func-list
                                                                                :overall-post-process-func-list overall-post-process-func-list
                                                                                :angel-disguised-mob-type-id angel-disguised-mob-type-id
+                                                                               :scenario-enabled-func scenario-enabled-func
                                                                                )))
 
 (defun get-world-sector-type-by-id (world-sector-type-id)

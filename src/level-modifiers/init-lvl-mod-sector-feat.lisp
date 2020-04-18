@@ -127,7 +127,32 @@
                                                      )
 
                                                    
-                                                   )))
+                                                   ))
+                    :scenario-enabled-func #'(lambda (world-map x y)
+                                               (let ((river-list ()))
+                                                 ;; choose random sides where to add a river
+                                                 (when (zerop (random 4))
+                                                   (push :n river-list))
+                                                 (when (zerop (random 4))
+                                                   (push :s river-list))
+                                                 (when (zerop (random 4))
+                                                   (push :w river-list))
+                                                 (when (zerop (random 4))
+                                                   (push :e river-list))
+                                                 (unless river-list
+                                                   (push (nth (random 4) '(:n :s :e :w))
+                                                         river-list))
+                                                 ;; add rivers to the chosen sides
+                                                 (loop for side in river-list 
+                                                       when (eq side :n) do
+                                                         (push (list +lm-feat-river+ nil) (feats (aref (cells world-map) x (1- y))))
+                                                       when (eq side :s) do
+                                                         (push (list +lm-feat-river+ nil) (feats (aref (cells world-map) x (1+ y))))
+                                                       when (eq side :w) do
+                                                         (push (list +lm-feat-river+ nil) (feats (aref (cells world-map) (1- x) y)))
+                                                       when (eq side :e) do
+                                                         (push (list +lm-feat-river+ nil) (feats (aref (cells world-map) (1+ x) y))))
+                                                 )))
 
 (set-level-modifier :id +lm-feat-sea+ :type +level-mod-sector-feat+
                     :name "Sea"
@@ -225,7 +250,32 @@
                                                               (find :e barricade-params))
                                                      (level-city-reserve-build-on-grid +building-city-barricade-nw+ x2 y2 2 template-level))
                                                    
-                                                   )))
+                                                   ))
+                    :scenario-enabled-func #'(lambda (world-map x y)
+                                               (let ((demon-list ()))
+                                                 ;; choose random sides where to add a controlled by demons lvl-mod
+                                                 (when (zerop (random 4))
+                                                   (push :n demon-list))
+                                                 (when (zerop (random 4))
+                                                   (push :s demon-list))
+                                                 (when (zerop (random 4))
+                                                   (push :w demon-list))
+                                                 (when (zerop (random 4))
+                                                   (push :e demon-list))
+                                                 (unless demon-list
+                                                   (push (nth (random 4) '(:n :s :e :w))
+                                                         demon-list))
+                                                 ;; add controlled by demon lvl-mod to the chosen sides
+                                                 (loop for side in demon-list 
+                                                       when (eq side :n) do
+                                                         (setf (controlled-by (aref (cells world-map) x (1- y))) +lm-controlled-by-demons+)
+                                                       when (eq side :s) do
+                                                         (setf (controlled-by (aref (cells world-map) x (1+ y))) +lm-controlled-by-demons+)
+                                                       when (eq side :w) do
+                                                         (setf (controlled-by (aref (cells world-map) (1- x) y)) +lm-controlled-by-demons+)
+                                                       when (eq side :e) do
+                                                         (setf (controlled-by (aref (cells world-map) (1+ x) y)) +lm-controlled-by-demons+))
+                                                 )))
 
 (set-level-modifier :id +lm-feat-library+ :type +level-mod-sector-feat+
                     :name "Library"

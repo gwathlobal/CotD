@@ -109,6 +109,31 @@
                                                              (push #'place-civilians-on-level
                                                                    func-list)
                                                              func-list))
+                       :scenario-enabled-func #'(lambda (world-map x y)
+                                                  (let ((sea-list ()))
+                                                    ;; choose random sides where to add a sea
+                                                    (when (zerop (random 4))
+                                                      (push :n sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :s sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :w sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :e sea-list))
+                                                    (unless sea-list
+                                                      (push (nth (random 4) '(:n :s :e :w))
+                                                            sea-list))
+                                                    ;; add seas to the chosen sides
+                                                    (loop for side in sea-list 
+                                                          when (eq side :n) do
+                                                            (setf (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+)
+                                                          when (eq side :s) do
+                                                            (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+)
+                                                          when (eq side :w) do
+                                                            (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+)
+                                                          when (eq side :e) do
+                                                            (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+))
+                                                    ))
                        )
 
 (set-world-sector-type :wtype +world-sector-normal-forest+
@@ -328,7 +353,32 @@
                                                               (push #'place-demonic-runes-on-level
                                                                     func-list)
                                                               
-                                                              func-list)))
+                                                              func-list))
+                       :scenario-enabled-func #'(lambda (world-map x y)
+                                                  (let ((sea-list ()))
+                                                    ;; choose random sides where to add a sea
+                                                    (when (zerop (random 4))
+                                                      (push :n sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :s sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :w sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :e sea-list))
+                                                    (unless sea-list
+                                                      (push (nth (random 4) '(:n :s :e :w))
+                                                            sea-list))
+                                                    ;; add seas to the chosen sides
+                                                    (loop for side in sea-list 
+                                                          when (eq side :n) do
+                                                            (setf (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+)
+                                                          when (eq side :s) do
+                                                            (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+)
+                                                          when (eq side :w) do
+                                                            (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+)
+                                                          when (eq side :e) do
+                                                            (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+))
+                                                    )))
 
 (set-world-sector-type :wtype +world-sector-abandoned-forest+
                        :glyph-idx 38
@@ -606,7 +656,32 @@
                                                               (push #'place-demonic-runes-on-level
                                                                     func-list)
                                                               
-                                                              func-list)))
+                                                              func-list))
+                       :scenario-enabled-func #'(lambda (world-map x y)
+                                                  (let ((sea-list ()))
+                                                    ;; choose random sides where to add a sea
+                                                    (when (zerop (random 4))
+                                                      (push :n sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :s sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :w sea-list))
+                                                    (when (zerop (random 4))
+                                                      (push :e sea-list))
+                                                    (unless sea-list
+                                                      (push (nth (random 4) '(:n :s :e :w))
+                                                            sea-list))
+                                                    ;; add seas to the chosen sides
+                                                    (loop for side in sea-list 
+                                                          when (eq side :n) do
+                                                            (setf (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+)
+                                                          when (eq side :s) do
+                                                            (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+)
+                                                          when (eq side :w) do
+                                                            (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+)
+                                                          when (eq side :e) do
+                                                            (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+))
+                                                    )))
 
 (set-world-sector-type :wtype +world-sector-corrupted-forest+
                        :glyph-idx 38

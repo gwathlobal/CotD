@@ -69,9 +69,10 @@
    (terrain-post-process-func-list :initform nil :initarg :terrain-post-process-func-list :accessor terrain-post-process-func-list)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector and returns a list of faction-ids
    (is-available-for-mission :initform nil :initarg :is-available-for-mission :accessor is-available-for-mission) ;; takes world-sector and mission-type
-  ))
+   (scenario-enabled-func :initform nil :initarg :scenario-enabled-func :accessor scenario-enabled-func)
+   ))
 
-(defun set-level-modifier (&key id name type debug disabled priority template-level-gen-func overall-post-process-func-list terrain-post-process-func-list faction-list-func is-available-for-mission)
+(defun set-level-modifier (&key id name type debug disabled priority template-level-gen-func overall-post-process-func-list terrain-post-process-func-list faction-list-func is-available-for-mission scenario-enabled-func)
   (unless id (error ":ID is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   (unless type (error ":TYPE is an obligatory parameter!"))
@@ -83,7 +84,8 @@
                                                                    :overall-post-process-func-list overall-post-process-func-list
                                                                    :terrain-post-process-func-list terrain-post-process-func-list
                                                                    :faction-list-func faction-list-func
-                                                                   :is-available-for-mission is-available-for-mission)))
+                                                                   :is-available-for-mission is-available-for-mission
+                                                                   :scenario-enabled-func scenario-enabled-func)))
 
 (defun get-level-modifier-by-id (level-modifier-id)
   (aref *level-modifiers* level-modifier-id))

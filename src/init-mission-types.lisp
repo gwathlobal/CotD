@@ -6,6 +6,7 @@
 
 (set-mission-type :id +mission-type-test+
                   :name "Test"
+                  :enabled nil
                   :faction-list-func #'(lambda (world-sector)
                                          (declare (ignore world-sector))
                                          (let ((faction-list (list (list +faction-type-none+ +mission-faction-present+)
@@ -58,6 +59,10 @@
                                            (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
                                            faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
+                                                          +world-sector-normal-port+
+                                                          +world-sector-normal-residential+
+                                                          +world-sector-normal-lake+)
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -166,6 +171,11 @@
                                              (push (list +faction-type-military+ +mission-faction-present+) faction-list)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
                                            faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
+                                                          +world-sector-normal-port+
+                                                          +world-sector-normal-residential+
+                                                          +world-sector-normal-lake+
+                                                          +world-sector-normal-island+)
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -335,7 +345,17 @@
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ +mission-faction-present+) faction-list)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
-                                           faction-list)))
+                                           faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
+                                                          +world-sector-normal-port+
+                                                          +world-sector-normal-residential+
+                                                          +world-sector-normal-lake+
+                                                          +world-sector-normal-island+
+                                                          +world-sector-abandoned-forest+
+                                                          +world-sector-abandoned-port+
+                                                          +world-sector-abandoned-island+
+                                                          +world-sector-abandoned-residential+
+                                                          +world-sector-abandoned-lake+))
 
 (set-mission-type :id +mission-type-demonic-thievery+
                   :name "Demonic thievery"
@@ -353,7 +373,17 @@
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ +mission-faction-present+) faction-list)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
-                                           faction-list)))
+                                           faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
+                                                          +world-sector-normal-port+
+                                                          +world-sector-normal-residential+
+                                                          +world-sector-normal-lake+
+                                                          +world-sector-normal-island+
+                                                          +world-sector-abandoned-forest+
+                                                          +world-sector-abandoned-port+
+                                                          +world-sector-abandoned-island+
+                                                          +world-sector-abandoned-residential+
+                                                          +world-sector-abandoned-lake+))
 
 (set-mission-type :id +mission-type-military-conquest+
                   :name "Military conquest"
@@ -384,6 +414,11 @@
                                              (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
                                              )
                                            faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
+                                                          +world-sector-corrupted-port+
+                                                          +world-sector-corrupted-island+
+                                                          +world-sector-corrupted-residential+
+                                                          +world-sector-corrupted-lake+)
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -436,6 +471,22 @@
                                                               func-list)
 
                                                         func-list))
+                  :scenario-faction-list (list (list +specific-faction-type-player+ +lm-placement-player+)
+                                               (list +specific-faction-type-dead-player+ +lm-placement-dead-player+)
+                                               (list +specific-faction-type-angel-chrome+ +lm-placement-angel-chrome+)
+                                               (list +specific-faction-type-angel-trinity+ +lm-placement-angel-trinity+)
+                                               (list +specific-faction-type-demon-crimson+ +lm-placement-demon-crimson+)
+                                               (list +specific-faction-type-demon-shadow+ +lm-placement-demon-shadow+)
+                                               (list +specific-faction-type-demon-malseraph+ +lm-placement-demon-malseraph+)
+                                               (list +specific-faction-type-military-chaplain+ +lm-placement-military-chaplain+)
+                                               (list +specific-faction-type-military-scout+ +lm-placement-military-scout+)
+                                               (list +specific-faction-type-priest+ +lm-placement-priest+)
+                                               (list +specific-faction-type-satanist+ +lm-placement-satanist+)
+                                               (list +specific-faction-type-eater+ +lm-placement-eater+)
+                                               (list +specific-faction-type-skinchanger+ +lm-placement-skinchanger+)
+                                               (list +specific-faction-type-thief+ +lm-placement-thief+)
+                                               (list +specific-faction-type-ghost+ +lm-placement-ghost+)
+                                               )
                   :ai-package-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
                                          (list +faction-type-angels+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
                                          (list +faction-type-military+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
@@ -476,7 +527,12 @@
                                              (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
                                              (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
                                              )
-                                           faction-list)))
+                                           faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-abandoned-forest+
+                                                          +world-sector-abandoned-port+
+                                                          +world-sector-abandoned-island+
+                                                          +world-sector-abandoned-residential+
+                                                          +world-sector-abandoned-lake+))
 
 (set-mission-type :id +mission-type-celestial-purge+
                   :name "Celestial purge"
@@ -498,7 +554,12 @@
                                              (push (list +faction-type-military+ +mission-faction-present+) faction-list)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list)
                                              )
-                                           faction-list)))
+                                           faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
+                                                          +world-sector-corrupted-port+
+                                                          +world-sector-corrupted-island+
+                                                          +world-sector-corrupted-residential+
+                                                          +world-sector-corrupted-lake+))
 
 (set-mission-type :id +mission-type-celestial-retrieval+
                   :name "Celestial retrieval"
@@ -517,7 +578,22 @@
                                              (push (list +faction-type-military+ +mission-faction-present+) faction-list)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list)
                                              )
-                                           faction-list)))
+                                           faction-list))
+                  :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
+                                                          +world-sector-corrupted-port+
+                                                          +world-sector-corrupted-island+
+                                                          +world-sector-corrupted-residential+
+                                                          +world-sector-corrupted-lake+
+                                                          +world-sector-normal-forest+
+                                                          +world-sector-normal-port+
+                                                          +world-sector-normal-residential+
+                                                          +world-sector-normal-lake+
+                                                          +world-sector-normal-island+
+                                                          +world-sector-abandoned-forest+
+                                                          +world-sector-abandoned-port+
+                                                          +world-sector-abandoned-island+
+                                                          +world-sector-abandoned-residential+
+                                                          +world-sector-abandoned-lake+))
 
 ;;----------------------------------------
 ;; MISSION-DISTRICTS

@@ -2,8 +2,11 @@
 
 (defpackage cotd  
   (:use :common-lisp :asdf)
+
   (:export :cotd-main
-           :make-exec))  
+   :make-exec)
+
+  )  
  
 (in-package :cotd)  
 
@@ -12,7 +15,7 @@
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
   :version "1.0.5"  
   :author "Gwathlobal"    
-  :depends-on (lispbuilder-sdl bordeaux-threads)
+  :depends-on (lispbuilder-sdl bordeaux-threads defenum)
   :components
     ((:file "logger")
      (:file "astar")
