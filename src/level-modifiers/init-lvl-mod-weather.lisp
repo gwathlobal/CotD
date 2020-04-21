@@ -11,11 +11,13 @@
                                                   (multiple-value-bind (year month day hour min sec) (get-current-date-time world-time)
                                                     (declare (ignore year day hour min sec))
                                                     (if (and (> month 1) (< month 11))
-                                                      (if (< (random 100) 50)
-                                                        t
-                                                        nil)
+                                                      t
                                                       nil))
                                                   )
+                    :random-available-for-mission #'(lambda ()
+                                                      (if (< (random 100) 25)
+                                                        t
+                                                        nil))
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
                                                           (push #'(lambda (level world-sector mission world)

@@ -7,14 +7,15 @@
 (defconstant +custom-scenario-win-factions+ 4)
 (defconstant +custom-scenario-win-specific-faction+ 5)
 
-(defenum:defenum custom-scenario-window-tab-type (:custom-scenario-tab-mission
+(defenum:defenum custom-scenario-window-tab-type (:custom-scenario-tab-missions
                                                   :custom-scenario-tab-sectors
+                                                  :custom-scenario-tab-months
                                                   :custom-scenario-tab-feats
                                                   :custom-scenario-tab-factions
                                                   :custom-scenario-tab-specific-factions))
 
 (defclass custom-scenario-window (window)
-  ((cur-step :initform :custom-scenario-tab-mission :accessor cur-step)
+  ((cur-step :initform :custom-scenario-tab-missions :accessor cur-step)
    (cur-sel :initform 0 :accessor cur-sel)
    (menu-items :initform () :accessor menu-items)
 
@@ -22,12 +23,15 @@
    
    (world-sector :accessor world-sector)
    (mission :accessor mission)
-      
+
    (mission-type-list :initform () :accessor mission-type-list)
-   (cur-mission-type :initform 0 :accessor cur-mission-type)
+   (cur-mission-type :initform 0 :accessor cur-mission-type :type fixnum)
 
    (sector-list :initform () :accessor sector-list)
-   (cur-sector :initform 0 :accessor cur-sector)
+   (cur-sector :initform 0 :accessor cur-sector :type fixnum)
+
+   (months-list :initform (list "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December") :accessor months-list)
+   (cur-month :initform 0 :accessor cur-month :type fixnum)
 
    (overall-lvl-mods-list :accessor overall-lvl-mods-list)
    (select-lvl-mods-list :accessor select-lvl-mods-list)
@@ -41,22 +45,23 @@
    (select-tod-mod :accessor select-tod-mod)
    (avail-weather-list :accessor avail-weather-list)
    (select-weather-list :accessor select-weather-list)
-   (cur-feat :accessor cur-feat)
+   (cur-feat :initform 0 :accessor cur-feat :type fixnum)
 
    (ref-faction-list :initform () :accessor ref-faction-list)
    (cur-faction-list :initform () :accessor cur-faction-list)
-   (cur-faction :accessor cur-faction)
+   (cur-faction :initform 0 :accessor cur-faction :type fixnum)
    
    (specific-faction-list :initform () :accessor specific-faction-list)
-   (cur-specific-faction :initform 0 :accessor cur-specific-faction)
+   (cur-specific-faction :initform 0 :accessor cur-specific-faction :type fixnum)
    ))
 
 (defmethod initialize-instance :after ((win custom-scenario-window) &key)
 
   (setf *current-window* win)
-  
+
+  (setf (cur-month win) (random 12))
   (setf (world-game-time (world win)) (set-current-date-time 1915
-                                                             (random 12)
+                                                             (cur-month win)
                                                              (random 30)
                                                              0 0 0))
   
@@ -104,13 +109,23 @@
         
     (setf (world-sector win) (make-instance 'world-sector :wtype (wtype (nth (cur-sector win) (sector-list win)))
                                                           :x 1 :y 1))
+    (setf (aref (cells (world-map (world win))) 1 1) (world-sector win))
 
     (when (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win))))
       (funcall (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win)))) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))) 
     
-    (readjust-feats-after-layout-change win)))
+    (readjust-feats-after-sector-change win)))
 
-(defun readjust-feats-after-layout-change (win)
+(defun readjust-months-before-feats (win)
+  (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time (world win)))
+    (declare (ignore month))
+    (setf (world-game-time (world win)) (set-current-date-time year
+                                                               (cur-month win)
+                                                               day
+                                                               hour min sec)))
+  (readjust-feats-after-sector-change win))
+
+(defun readjust-feats-after-sector-change (win)
   ;; find all available controlled-by lvl-mods for the selected mission
   (setf (avail-controlled-list win) (loop for lvl-mod across *level-modifiers*
                                           when (= (lm-type lvl-mod) +level-mod-controlled-by+)
@@ -171,15 +186,15 @@
   
   (setf (overall-lvl-mods-list win) (append (avail-controlled-list win) (avail-feats-list win) (avail-items-list win) (avail-tod-list win) (avail-weather-list win)))
   (setf (select-lvl-mods-list win) (append (list (select-controlled-mod win)) (select-feats-list win) (select-items-list win) (list (select-tod-mod win)) (select-weather-list win)))
-  (setf (cur-feat win) (random (length (overall-lvl-mods-list win))))
+  (setf (cur-feat win) 0)
 
   (setf (level-modifier-list (mission win)) (append (list (id (select-tod-mod win)))
                                                     (loop for lvl-mod in (select-weather-list win)
                                                           collect (id lvl-mod))))
 
-  (readjust-factions-after-layout-change win))
+  (readjust-factions-after-feats-change win))
 
-(defun readjust-factions-after-layout-change (win)
+(defun readjust-factions-after-feats-change (win)
   ;; find all general factions
   (loop with sector-factions = (if (faction-list-func (get-world-sector-type-by-id (wtype (world-sector win))))
                                  (funcall (faction-list-func (get-world-sector-type-by-id (wtype (world-sector win)))))
@@ -233,9 +248,7 @@
     (setf (specific-faction-list win) (loop with result = ()
                                             for (faction-id faction-present) in (cur-faction-list win)
                                             for faction-obj = (get-faction-type-by-id faction-id)
-                                            when (or (= faction-present +mission-faction-attacker+)
-                                                     (= faction-present +mission-faction-defender+)
-                                                     (= faction-present +mission-faction-present+))
+                                            when (= faction-present +mission-faction-present+)
                                               do
                                                  (loop for specific-faction-type in (specific-faction-list faction-obj)
                                                        when (find specific-faction-type (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))
@@ -262,25 +275,29 @@
 
 (defun populate-custom-scenario-win-menu (win step)
   (case step
-    (:custom-scenario-tab-mission (return-from populate-custom-scenario-win-menu
+    (:custom-scenario-tab-missions (return-from populate-custom-scenario-win-menu
                                     (loop for mission-type in (mission-type-list win)
                                           when (enabled mission-type)
                                             collect (name mission-type))))
     (:custom-scenario-tab-sectors (return-from populate-custom-scenario-win-menu
                                     (loop for world-sector-type in (sector-list win)
                                           collect (name world-sector-type))))
+    (:custom-scenario-tab-months (return-from populate-custom-scenario-win-menu
+                                   (copy-list (months-list win))))
     (:custom-scenario-tab-feats (return-from populate-custom-scenario-win-menu
                                   (loop for lvl-mod in (overall-lvl-mods-list win)
-                                        collect (name lvl-mod))))
+                                        collect (format nil "~A ~A"
+                                                        (if (find lvl-mod (select-lvl-mods-list win))
+                                                          "[+]"
+                                                          "   ")
+                                                        (name lvl-mod)))))
     (:custom-scenario-tab-factions (return-from populate-custom-scenario-win-menu
                                      (loop for (faction-id faction-present) in (cur-faction-list win)
                                            collect (format nil "~A ~A"
                                                            (cond
                                                              ((= faction-present +mission-faction-present+) "[+]")
-                                                             ((= faction-present +mission-faction-attacker+) "[A]")
-                                                             ((= faction-present +mission-faction-defender+) "[D]")
                                                              ((= faction-present +mission-faction-delayed+) "[d]")
-                                                             (t "[-]"))
+                                                             (t "   "))
                                                            (name (get-faction-type-by-id faction-id))))))
     (:custom-scenario-tab-specific-factions (return-from populate-custom-scenario-win-menu
                                               (loop for specific-faction-type in (specific-faction-list win)
@@ -303,8 +320,6 @@
                     "")
                   (cond
                     ((= faction-present +mission-faction-present+) "[+]")
-                    ((= faction-present +mission-faction-attacker+) "[A]")
-                    ((= faction-present +mission-faction-defender+) "[D]")
                     ((= faction-present +mission-faction-delayed+) "[d]"))
                   (name (get-faction-type-by-id faction-id)))
           (setf first-no-comma nil)
@@ -332,7 +347,8 @@
   (let ((text-str-num))
     ;; draw the current scenario info
     (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (+ 10 (sdl:char-height sdl:*default-font*)) :w (- *window-width* 20) :h (- (truncate *window-height* 2) 20)))
-      (setf text-str-num (write-text (format nil "Mission: ~A~%Sector: ~A~%Feats: ~A~%Factions: ~A~%Player faction: ~A"
+      (setf text-str-num (write-text (format nil "Date&Time: ~A~%Mission: ~A~%Sector: ~A~%Feats: ~A~%Factions: ~A~%Player faction: ~A"
+                                             (show-date-time-YMD (world-game-time (world win)))
                                              (name (nth (cur-mission-type win) (mission-type-list win)))
                                              (name (nth (cur-sector win) (sector-list win)))
                                              (get-included-lvl-mods (select-lvl-mods-list win))
@@ -344,19 +360,21 @@
                                      rect)))
       
     ;; draw the steps of scenario customization
-    (let ((color-1 sdl:*white*) (color-2 sdl:*white*) (color-3 sdl:*white*) (color-4 sdl:*white*) (color-5 sdl:*white*))
+    (let ((color-1 sdl:*white*) (color-2 sdl:*white*) (color-3 sdl:*white*) (color-4 sdl:*white*) (color-5 sdl:*white*) (color-6 sdl:*white*))
       (case (cur-step win)
-        (:custom-scenario-tab-mission (setf color-1 sdl:*yellow*))
+        (:custom-scenario-tab-missions (setf color-1 sdl:*yellow*))
         (:custom-scenario-tab-sectors (setf color-2 sdl:*yellow*))
-        (:custom-scenario-tab-feats (setf color-3 sdl:*yellow*))
-        (:custom-scenario-tab-factions (setf color-4 sdl:*yellow*))
-        (:custom-scenario-tab-specific-factions (setf color-5 sdl:*yellow*)))
-      
+        (:custom-scenario-tab-months (setf color-3 sdl:*yellow*))
+        (:custom-scenario-tab-feats (setf color-4 sdl:*yellow*))
+        (:custom-scenario-tab-factions (setf color-5 sdl:*yellow*))
+        (:custom-scenario-tab-specific-factions (setf color-6 sdl:*yellow*)))
+
       (sdl:draw-string-solid-* (format nil "1. Mission") 10 (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :left :color color-1)
-      (sdl:draw-string-solid-* (format nil "2. Sector") (* 5 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-2)
-      (sdl:draw-string-solid-* (format nil "3. Feats") (* 9 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-3)
-      (sdl:draw-string-solid-* (format nil "4. Factions") (* 14 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-4)
-      (sdl:draw-string-solid-* (format nil "5. Player faction") (- *window-width* 10) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :right :color color-5))
+      (sdl:draw-string-solid-* (format nil "2. Sector") (* 4 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :left :color color-2)
+      (sdl:draw-string-solid-* (format nil "3. Month") (* 8 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-3)
+      (sdl:draw-string-solid-* (format nil "4. Feats") (* 11 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-4)
+      (sdl:draw-string-solid-* (format nil "5. Factions") (* 14 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-5)
+      (sdl:draw-string-solid-* (format nil "6. Player faction") (- *window-width* 10) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :right :color color-6))
     
     ;; draw the selection for each step
     (let ((cur-str) (color-list nil))
@@ -371,7 +389,7 @@
     (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* 10 (* 2 (sdl:char-height sdl:*default-font*))) :w (- *window-width* 20) :h (* 2 (sdl:char-height sdl:*default-font*))))
       (let ((str (create-string)))
         (case (cur-step win)
-          (:custom-scenario-tab-mission (format str "[Enter/Right] Select  [Up/Down] Move selection  [Esc] Exit"))
+          (:custom-scenario-tab-missions (format str "[Enter/Right] Select  [Up/Down] Move selection  [Esc] Exit"))
           (:custom-scenario-tab-specific-factions (format str "[Enter] Start game  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit"))
           (:custom-scenario-tab-factions (progn
                                            (let* ((cur-faction (first (nth (cur-faction win) (cur-faction-list win))))
@@ -389,6 +407,12 @@
                                                ((= next-faction-present +mission-faction-absent+) (format str "[Space] Exclude the faction  "))))
                                            (format str "[Right] Next step  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")
                                            ))
+          (:custom-scenario-tab-feats (progn
+                                        (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                          (format str "[Space] Remove feat  ")
+                                          (format str "[Space] Add feat  "))
+                                        (format str "[Right] Next step  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")
+                                        ))
           (t (format str "[Enter/Right] Select  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit"))
         )
         (write-text str rect)))
@@ -420,6 +444,58 @@
                         (setf *current-window* (return-to win))
                         (return-from run-window (values nil nil nil nil)))
 
+                       ;; Space - add/remove feat inside feats tab
+                       ((and (sdl:key= key :sdl-key-space)
+                             (eq (cur-step win) :custom-scenario-tab-feats))
+                        (progn
+                          ;; make a radio button for the controlled-by lvl mods
+                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-controlled-by+)
+                            (setf (select-lvl-mods-list win) (remove (select-controlled-mod win) (select-lvl-mods-list win)))
+                            (setf (select-controlled-mod win) (nth (cur-sel win) (overall-lvl-mods-list win)))
+                            (push (select-controlled-mod win) (select-lvl-mods-list win)))
+
+                          ;; make checkboxes for the feats lvl mods
+                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-sector-feat+)
+                            (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win))
+                              (progn
+                                (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
+                                (setf (select-feats-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win))))
+                              (progn
+                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win)))))
+
+                          ;; make checkboxes for the items lvl mods
+                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-sector-item+)
+                            (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win))
+                              (progn
+                                (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
+                                (setf (select-items-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win))))
+                              (progn
+                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win)))))
+
+                          ;; make a radio button for the time of day lvl mods
+                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-time-of-day+)
+                            (setf (select-lvl-mods-list win) (remove (select-tod-mod win) (select-lvl-mods-list win)))
+                            (setf (select-tod-mod win) (nth (cur-sel win) (overall-lvl-mods-list win)))
+                            (push (select-tod-mod win) (select-lvl-mods-list win)))
+
+                          ;; make checkboxes for the weather lvl mods
+                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-weather+)
+                            (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win))
+                              (progn
+                                (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
+                                (setf (select-weather-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win))))
+                              (progn
+                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win)))))
+
+                          (setf (select-lvl-mods-list win) (stable-sort (select-lvl-mods-list win) #'(lambda (a b)
+                                                                                                       (if (< (lm-type a) (lm-type b))
+                                                                                                         t
+                                                                                                         nil))))
+                          (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))))
+                       
                        ;; Space - include/exclude faction as a defender
                        ((and (sdl:key= key :sdl-key-space)
                              (= (cur-step win) +custom-scenario-win-factions+)
@@ -536,6 +612,16 @@
                        
                        ;; enter - select
                        ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                        (if (not (eq (cur-step win) :custom-scenario-tab-specific-factions))
+                          (progn
+                            (setf (cur-step win) (defenum:next-enum-tag 'custom-scenario-window-tab-type (cur-step win)))
+
+                            (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))
+                          (progn
+                            (setf (player-lvl-mod-placement-id (mission win)) (second (find (nth (cur-specific-faction win) (specific-faction-list win)) (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))
+                                                                                            :key #'(lambda (a) (first a)))))
+                            (return-from run-window (values (world-sector win) (mission win)
+                                                            ))))
                         (if (< (cur-step win) +custom-scenario-win-specific-faction+)
                           (progn
                             (incf (cur-step win))
@@ -543,31 +629,42 @@
                               (setf (cur-step win) +custom-scenario-win-specific-faction+))
                             (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))
                           (progn
-                            (return-from run-window (values (nth (cur-mission-type win) (mission-type-list win))
-                                                            (nth (cur-layout win) (layout-list win))
-                                                            (nth (cur-weather win) (weather-list win))
-                                                            (nth (cur-tod win) (tod-list win))
-                                                            (nth (cur-specific-faction win) (specific-faction-list win))
-                                                            (cur-faction-list win))))))
+                            (setf (player-lvl-mod-placement-id (mission win)) (second (find (nth (cur-specific-faction win) (specific-faction-list win)) (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))
+                                                                                            :key #'(lambda (a) (first a)))))
+                            (return-from run-window (values (world-sector win) (mission win)
+                                                            )))))
                        )
 
                      (case (cur-step win)
-                       (:custom-scenario-tab-mission (progn (setf (cur-mission-type win) (run-selection-list key mod unicode (cur-mission-type win)))
-                                                            (setf (cur-mission-type win) (adjust-selection-list (cur-mission-type win) (length (mission-type-list win))))
-                                                            (setf (cur-sel win) (cur-mission-type win))
-                                                            (readjust-sectors-after-mission-change win)))
-                       (:custom-scenario-tab-sectors (progn (setf (cur-sector win) (run-selection-list key mod unicode (cur-sector win)))
-                                                            (setf (cur-sector win) (adjust-selection-list (cur-sector win) (length (sector-list win))))
-                                                            (setf (cur-sel win) (cur-sector win))
-                                                            (readjust-feats-after-layout-change win)))
+                       (:custom-scenario-tab-missions (progn (let ((prev-cur-sel (cur-mission-type win)))
+                                                               (setf (cur-mission-type win) (run-selection-list key mod unicode (cur-mission-type win)))
+                                                               (setf (cur-mission-type win) (adjust-selection-list (cur-mission-type win) (length (mission-type-list win))))
+                                                               (setf (cur-sel win) (cur-mission-type win))
+                                                               
+                                                               (when (/= prev-cur-sel (cur-sel win))
+                                                                 (readjust-sectors-after-mission-change win)))))
+                       (:custom-scenario-tab-sectors (progn (let ((prev-cur-sel (cur-sector win)))
+                                                              (setf (cur-sector win) (run-selection-list key mod unicode (cur-sector win)))
+                                                              (setf (cur-sector win) (adjust-selection-list (cur-sector win) (length (sector-list win))))
+                                                              (setf (cur-sel win) (cur-sector win))
+
+                                                              (when (/= prev-cur-sel (cur-sel win))
+                                                                (readjust-feats-after-sector-change win)))))
+                       (:custom-scenario-tab-months (progn (let ((prev-cur-sel (cur-month win)))
+                                                             (setf (cur-month win) (run-selection-list key mod unicode (cur-month win)))
+                                                             (setf (cur-month win) (adjust-selection-list (cur-month win) (length (months-list win))))
+                                                             (setf (cur-sel win) (cur-month win))
+
+                                                              (when (/= prev-cur-sel (cur-sel win))
+                                                                (readjust-months-before-feats win)))))
                        (:custom-scenario-tab-feats (progn (setf (cur-feat win) (run-selection-list key mod unicode (cur-feat win)))
                                                           (setf (cur-feat win) (adjust-selection-list (cur-feat win) (length (overall-lvl-mods-list win))))
                                                           (setf (cur-sel win) (cur-feat win))
-                                                          (readjust-factions-after-layout-change win)))
+                                                          ))
                        (:custom-scenario-tab-factions (progn (setf (cur-faction win) (run-selection-list key mod unicode (cur-faction win)))
                                                              (setf (cur-faction win) (adjust-selection-list (cur-faction win) (length (cur-faction-list win))))
                                                              (setf (cur-sel win) (cur-faction win))
-                                                             (readjust-specific-factions-after-faction-change win)))
+                                                             ))
                        (:custom-scenario-tab-specific-factions (progn (setf (cur-specific-faction win) (run-selection-list key mod unicode (cur-specific-faction win)))
                                                                       (setf (cur-specific-faction win) (adjust-selection-list (cur-specific-faction win)
                                                                                                                               (length (specific-faction-list win))))

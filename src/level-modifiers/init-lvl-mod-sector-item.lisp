@@ -23,7 +23,7 @@
                                                           (reverse func-list))))
 
 (set-level-modifier :id +lm-item-holy-relic+ :type +level-mod-sector-item+
-                    :name "relic"
+                    :name "Holy Relic"
                     :priority 100
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore mission world))

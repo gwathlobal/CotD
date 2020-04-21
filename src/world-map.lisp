@@ -264,7 +264,9 @@
     (loop for lvl-mod across *level-modifiers*
           for lvl-mod-id = (id lvl-mod)
           when (and (is-available-for-mission lvl-mod)
-                    (funcall (is-available-for-mission lvl-mod) world-sector mission-type-id world-time))
+                    (funcall (is-available-for-mission lvl-mod) world-sector mission-type-id world-time)
+                    (or (not (random-available-for-mission lvl-mod))
+                        (funcall (random-available-for-mission lvl-mod))))
             do
                (setf level-modifier-list (append level-modifier-list (list lvl-mod-id))))
     

@@ -5,7 +5,7 @@
 ;;---------------------------------
 
 (set-level-modifier :id +lm-controlled-by-none+ :type +level-mod-controlled-by+
-                    :name "Is not controlled by anyone"
+                    :name "Uncontrolled"
                     :priority 25)
 
 (set-level-modifier :id +lm-controlled-by-demons+ :type +level-mod-controlled-by+

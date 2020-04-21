@@ -421,6 +421,8 @@
                                           
                                           (multiple-value-bind (world-sector mission) (run-window *current-window*)
                                             (when (and world-sector mission)
+                                              (setf (aref (cells test-world-map) 1 1) world-sector)
+                                              (setf (mission (aref (cells test-world-map) 1 1)) mission)
                                               (setf *current-window* (return-to *current-window*))
                                               (return-from main-menu (values world-sector mission))))
                                           )
