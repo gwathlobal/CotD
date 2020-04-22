@@ -35,6 +35,7 @@
 
    (overall-lvl-mods-list :accessor overall-lvl-mods-list)
    (select-lvl-mods-list :accessor select-lvl-mods-list)
+   (always-lvl-mods-list :initform () :accessor always-lvl-mods-list)
    (avail-controlled-list :accessor avail-controlled-list)
    (select-controlled-mod :accessor select-controlled-mod)
    (avail-feats-list :accessor avail-feats-list)
@@ -42,9 +43,9 @@
    (avail-items-list :accessor avail-items-list)
    (select-items-list :accessor select-items-list)
    (avail-tod-list :accessor avail-tod-list)
-   (select-tod-mod :accessor select-tod-mod)
+   (select-tod-mod  :initform nil :accessor select-tod-mod)
    (avail-weather-list :accessor avail-weather-list)
-   (select-weather-list :accessor select-weather-list)
+   (select-weather-list :initform () :accessor select-weather-list)
    (cur-feat :initform 0 :accessor cur-feat :type fixnum)
 
    (ref-faction-list :initform () :accessor ref-faction-list)
@@ -76,18 +77,34 @@
   
   (setf (cur-mission-type win) (random (length (mission-type-list win))))
 
+  (adjust-mission-after-change win)
+  
+  (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
+  (setf (cur-sel win) (cur-mission-type win))
+  )
+
+(defun adjust-mission-after-change (win)
   (setf (mission win) (make-instance 'mission :mission-type-id (id (nth (cur-mission-type win) (mission-type-list win)))
                                               :x 1 :y 1
                                               :faction-list ()
                                               :level-modifier-list ()))
+  
+  (readjust-sectors-after-mission-change win))
 
-  (readjust-sectors-after-mission-change win)
-
+(defun adjust-world-sector-after-change (win)
+  (loop for x from 0 to 2 do
+    (loop for y from 0 to 2 do
+      (setf (aref (cells (world-map (world win))) x y) (make-instance 'world-sector :wtype +world-sector-normal-residential+ :x x :y y))))
   
+  (setf (world-sector win) (make-instance 'world-sector :wtype (wtype (nth (cur-sector win) (sector-list win)))
+                                                        :x 1 :y 1))
+  (setf (aref (cells (world-map (world win))) 1 1) (world-sector win))
+  (setf (mission (world-sector win)) (mission win))
   
-  (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
+  (when (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win))))
+    (funcall (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win)))) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))) 
   
-  )
+  (readjust-feats-after-sector-change win))
 
 (defun readjust-sectors-after-mission-change (win)
   ;; a precaution for the first start before any sectors are added
@@ -107,16 +124,9 @@
       (progn
         (setf (cur-sector win) (random (length (sector-list win))))))
         
-    (setf (world-sector win) (make-instance 'world-sector :wtype (wtype (nth (cur-sector win) (sector-list win)))
-                                                          :x 1 :y 1))
-    (setf (aref (cells (world-map (world win))) 1 1) (world-sector win))
+    (adjust-world-sector-after-change win)))
 
-    (when (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win))))
-      (funcall (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win)))) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))) 
-    
-    (readjust-feats-after-sector-change win)))
-
-(defun readjust-months-before-feats (win)
+(defun adjust-months-before-feats (win)
   (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time (world win)))
     (declare (ignore month))
     (setf (world-game-time (world win)) (set-current-date-time year
@@ -125,72 +135,191 @@
                                                                hour min sec)))
   (readjust-feats-after-sector-change win))
 
-(defun readjust-feats-after-sector-change (win)
-  ;; find all available controlled-by lvl-mods for the selected mission
-  (setf (avail-controlled-list win) (loop for lvl-mod across *level-modifiers*
-                                          when (= (lm-type lvl-mod) +level-mod-controlled-by+)
-                                            collect lvl-mod))
-  (setf (select-controlled-mod win) (nth (random (length (avail-controlled-list win))) (avail-controlled-list win)))
-  (setf (controlled-by (world-sector win)) (id (select-controlled-mod win)))
-  (when (scenario-enabled-func (get-level-modifier-by-id (controlled-by (world-sector win))))
-    (funcall (scenario-enabled-func (get-level-modifier-by-id (controlled-by (world-sector win)))) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+(defun adjust-controlled-by-lvl-mod-after-change (win)
+  (when (scenario-disabled-func (get-level-modifier-by-id (controlled-by (world-sector win))))
+    (funcall (scenario-disabled-func (get-level-modifier-by-id (controlled-by (world-sector win)))) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
   
-  ;; find all available feat lvl-mods for the selected mission
-  (setf (avail-feats-list win) (loop for lvl-mod across *level-modifiers*
-                                          when (= (lm-type lvl-mod) +level-mod-sector-feat+)
-                                            collect lvl-mod))
-  (setf (select-feats-list win) (loop for lvl-mod in (avail-feats-list win)
-                                      when (zerop (random 4))
-                                        collect lvl-mod))
+  (setf (controlled-by (world-sector win)) (id (select-controlled-mod win)))
+  
+  (when (scenario-enabled-func (get-level-modifier-by-id (controlled-by (world-sector win))))
+    (funcall (scenario-enabled-func (get-level-modifier-by-id (controlled-by (world-sector win)))) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
+
+(defun adjust-single-feat-lvl-mod-after-change (win feat-lvl-mod &key (add t))
+  (if add
+    ;; either add...
+    (progn
+      (push (list (id feat-lvl-mod) nil) (feats (world-sector win)))
+
+      (when (scenario-enabled-func feat-lvl-mod)
+        (funcall (scenario-enabled-func feat-lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
+    ;; ...or remove
+    (progn
+      (when (scenario-disabled-func feat-lvl-mod)
+        (funcall (scenario-disabled-func feat-lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+
+      (setf (feats (world-sector win)) (remove (id feat-lvl-mod) (feats (world-sector win)) :key #'(lambda (a) (first a)))))))
+
+(defun adjust-all-feats-lvl-mod-after-change (win)
+  (loop for lvl-mod in (select-feats-list win)
+        when (scenario-disabled-func lvl-mod) do
+          (funcall (scenario-disabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+  
   (setf (feats (world-sector win)) (loop for lvl-mod in (select-feats-list win)
                                          collect (list (id lvl-mod) nil)))
   (loop for lvl-mod in (select-feats-list win)
         when (scenario-enabled-func lvl-mod) do
-          (funcall (scenario-enabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+          (funcall (scenario-enabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
 
-  ;; find all available item lvl-mods for the selected mission
-  (setf (avail-items-list win) (loop for lvl-mod across *level-modifiers*
-                                          when (= (lm-type lvl-mod) +level-mod-sector-item+)
-                                            collect lvl-mod))
-  (setf (select-items-list win) (loop for lvl-mod in (avail-items-list win)
-                                      when (zerop (random 4))
-                                        collect lvl-mod))
+(defun adjust-single-item-lvl-mod-after-change (win item-lvl-mod &key (add t))
+  (if add
+    ;; either add...
+    (progn
+      (push (id item-lvl-mod) (items (world-sector win)))
+
+      (when (scenario-enabled-func item-lvl-mod)
+        (funcall (scenario-enabled-func item-lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
+    ;; ...or remove
+    (progn
+      (when (scenario-disabled-func item-lvl-mod)
+        (funcall (scenario-disabled-func item-lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+
+      (setf (items (world-sector win)) (remove (id item-lvl-mod) (items (world-sector win)))))))
+
+(defun adjust-all-items-lvl-mod-after-change (win)
+  (loop for lvl-mod in (select-items-list win)
+        when (scenario-disabled-func lvl-mod) do
+          (funcall (scenario-disabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+  
   (setf (items (world-sector win)) (loop for lvl-mod in (select-items-list win)
                                          collect (id lvl-mod)))
   (loop for lvl-mod in (select-items-list win)
         when (scenario-enabled-func lvl-mod) do
-          (funcall (scenario-enabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+          (funcall (scenario-enabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
 
+(defun adjust-tod-lvl-mod-after-change (win)
+  (when (scenario-disabled-func (select-tod-mod win))
+    (funcall (scenario-disabled-func (select-tod-mod win)) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+  
+  (setf (level-modifier-list (mission win)) (append (list (id (select-tod-mod win)))
+                                                    (loop for lvl-mod in (select-weather-list win)
+                                                          collect (id lvl-mod))))
+
+  (when (scenario-enabled-func (select-tod-mod win))
+    (funcall (scenario-enabled-func (select-tod-mod win)) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
+
+(defun adjust-single-weather-lvl-mod-after-change (win weather-lvl-mod &key (add t))
+  (if add
+    ;; either add...
+    (progn
+      (push (id weather-lvl-mod) (level-modifier-list (mission win)))
+
+      (when (scenario-enabled-func weather-lvl-mod)
+        (funcall (scenario-enabled-func weather-lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
+    ;; ...or remove
+    (progn
+      (when (scenario-disabled-func weather-lvl-mod)
+        (funcall (scenario-disabled-func weather-lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+
+      (setf (level-modifier-list (mission win)) (remove (id weather-lvl-mod) (level-modifier-list (mission win)))))))
+
+(defun adjust-weather-lvl-mod-after-change (win)
+  (loop for lvl-mod in (select-weather-list win)
+        when (scenario-disabled-func lvl-mod) do
+          (funcall (scenario-disabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+  
+  (setf (level-modifier-list (mission win)) (append (list (id (select-tod-mod win)))
+                                                    (loop for lvl-mod in (select-weather-list win)
+                                                          collect (id lvl-mod))))
+
+  (loop for lvl-mod in (select-weather-list win)
+        when (scenario-enabled-func lvl-mod) do
+          (funcall (scenario-enabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))))
+
+(defun readd-feats-after-sector-regeneration (win)
+  (setf (always-lvl-mods-list win) ())
+
+  ;; add feats from always present lvl mods from the world sector
+  (loop for lvl-mod-id in (funcall (always-lvl-mods-func (get-world-sector-type-by-id (wtype (world-sector win)))) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))) do
+    (pushnew (get-level-modifier-by-id lvl-mod-id) (always-lvl-mods-list win))
+    (pushnew (get-level-modifier-by-id lvl-mod-id) (select-feats-list win))
+    (pushnew (get-level-modifier-by-id lvl-mod-id) (select-lvl-mods-list win))
+    (adjust-single-feat-lvl-mod-after-change win (get-level-modifier-by-id lvl-mod-id) :add t))
+
+  ;; go through all (select-lvl-mods-list win) and add all lvl-mods they depend on
+  (loop for lvl-mod in (select-lvl-mods-list win)
+        for depend-lvl-mod-list = (funcall (depends-on-lvl-mod-func lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win)))
+        when depend-lvl-mod-list do
+          (loop for depend-lvl-mod-id in depend-lvl-mod-list
+                for depend-lvl-mod = (get-level-modifier-by-id depend-lvl-mod-id)
+                do
+                   (pushnew depend-lvl-mod (always-lvl-mods-list win))
+                   (pushnew depend-lvl-mod (select-feats-list win))
+                   (pushnew depend-lvl-mod (select-lvl-mods-list win))
+                   (adjust-single-feat-lvl-mod-after-change win depend-lvl-mod :add t)))
+  )
+
+(defun readjust-feats-after-sector-change (win)
+  ;; find all available controlled-by lvl-mods for the selected mission
+  (setf (avail-controlled-list win) (loop for lvl-mod across *level-modifiers*
+                                          when (and (= (lm-type lvl-mod) +level-mod-controlled-by+)
+                                                    (is-available-for-mission lvl-mod)
+                                                    (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                            collect lvl-mod))
+  (setf (select-controlled-mod win) (nth (random (length (avail-controlled-list win))) (avail-controlled-list win)))
+  (adjust-controlled-by-lvl-mod-after-change win)
+  
+  ;; find all available feat lvl-mods for the selected mission
+  (setf (avail-feats-list win) (loop for lvl-mod across *level-modifiers*
+                                     when (and (= (lm-type lvl-mod) +level-mod-sector-feat+)
+                                               (is-available-for-mission lvl-mod)
+                                               (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                            collect lvl-mod))
+  (setf (select-feats-list win) (loop for lvl-mod in (avail-feats-list win)
+                                      when (zerop (random 4))
+                                        collect lvl-mod))
+  (adjust-all-feats-lvl-mod-after-change win)
+
+  ;; find all available item lvl-mods for the selected mission
+  (setf (avail-items-list win) (loop for lvl-mod across *level-modifiers*
+                                     when (and (= (lm-type lvl-mod) +level-mod-sector-item+)
+                                               (is-available-for-mission lvl-mod)
+                                               (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                            collect lvl-mod))
+  (setf (select-items-list win) (loop for lvl-mod in (avail-items-list win)
+                                      when (zerop (random 4))
+                                        collect lvl-mod))
+  (adjust-all-items-lvl-mod-after-change win)
+
+  (generate-feats-for-world-sector (world-sector win) (world-map (world win)))
+  
   ;; find all available time of day lvl-mods for the selected mission
   (setf (avail-tod-list win) (loop for lvl-mod across *level-modifiers*
-                                          when (= (lm-type lvl-mod) +level-mod-time-of-day+)
+                                   when (and (= (lm-type lvl-mod) +level-mod-time-of-day+)
+                                             (is-available-for-mission lvl-mod)
+                                             (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
                                             collect lvl-mod))
   (setf (select-tod-mod win) (nth (random (length (avail-tod-list win))) (avail-tod-list win)))
-  (when (scenario-enabled-func (select-tod-mod win))
-    (funcall (scenario-enabled-func (select-tod-mod win)) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
+  (adjust-tod-lvl-mod-after-change win)
   
   ;; find all available weather lvl-mods for the selected mission
   (setf (avail-weather-list win) (loop for lvl-mod across *level-modifiers*
                                        when (and (= (lm-type lvl-mod) +level-mod-weather+)
                                                  (is-available-for-mission lvl-mod)
-                                                 (funcall (is-available-for-mission lvl-mod) (world-sector win) (cur-mission-type win) (world-game-time (world win))))
+                                                 (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
                                          collect lvl-mod))
   (setf (select-weather-list win) (loop for lvl-mod in (avail-weather-list win)
                                       when (zerop (random 4))
                                         collect lvl-mod))
-  (loop for lvl-mod in (select-weather-list win)
-        when (scenario-enabled-func lvl-mod) do
-          (funcall (scenario-enabled-func lvl-mod) (world-map (world win)) (x (world-sector win)) (y (world-sector win))))
-  
-  (generate-feats-for-world-sector (world-sector win) (world-map (world win)))
-  
+  (adjust-weather-lvl-mod-after-change win)
+    
   (setf (overall-lvl-mods-list win) (append (avail-controlled-list win) (avail-feats-list win) (avail-items-list win) (avail-tod-list win) (avail-weather-list win)))
   (setf (select-lvl-mods-list win) (append (list (select-controlled-mod win)) (select-feats-list win) (select-items-list win) (list (select-tod-mod win)) (select-weather-list win)))
   (setf (cur-feat win) 0)
-
-  (setf (level-modifier-list (mission win)) (append (list (id (select-tod-mod win)))
-                                                    (loop for lvl-mod in (select-weather-list win)
-                                                          collect (id lvl-mod))))
+  (readd-feats-after-sector-regeneration win)
+  (setf (select-lvl-mods-list win) (stable-sort (select-lvl-mods-list win) #'(lambda (a b)
+                                                                               (if (< (lm-type a) (lm-type b))
+                                                                                 t
+                                                                                 nil))))
 
   (readjust-factions-after-feats-change win))
 
@@ -301,10 +430,10 @@
                                                            (name (get-faction-type-by-id faction-id))))))
     (:custom-scenario-tab-specific-factions (return-from populate-custom-scenario-win-menu
                                               (loop for specific-faction-type in (specific-faction-list win)
-                                                    when (find specific-faction-type (scenario-faction-list (nth (cur-mission-type win) (mission-type-list win)))
+                                                    when (find specific-faction-type (scenario-faction-list (mission-type-id (mission win)))
                                                                :key #'(lambda (a) (first a)))
                                                       collect (name (get-level-modifier-by-id (second (find specific-faction-type
-                                                                                                            (scenario-faction-list (nth (cur-mission-type win) (mission-type-list win)))
+                                                                                                            (scenario-faction-list (mission-type-id (mission win)))
                                                                                                             :key #'(lambda (a) (first a)))))))
                                               )))
   )
@@ -344,12 +473,16 @@
 
   (sdl:draw-string-solid-* "CUSTOM SCENARIO" (truncate *window-width* 2) 0 :justify :center)
 
-  (let ((text-str-num))
+  (let ((text-str-num)
+        (x-title (+ 10 10 (* *glyph-w* 5)))
+        (y-title (+ 10 (sdl:char-height sdl:*default-font*))))
+    ;; draw the sector image
+    (draw-world-map-cell (world-sector win) 10 (+ 10 y-title))
     ;; draw the current scenario info
-    (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (+ 10 (sdl:char-height sdl:*default-font*)) :w (- *window-width* 20) :h (- (truncate *window-height* 2) 20)))
+    (sdl:with-rectangle (rect (sdl:rectangle :x x-title :y (+ 10 (sdl:char-height sdl:*default-font*)) :w (- *window-width* x-title 10) :h (- (truncate *window-height* 2) 20)))
       (setf text-str-num (write-text (format nil "Date&Time: ~A~%Mission: ~A~%Sector: ~A~%Feats: ~A~%Factions: ~A~%Player faction: ~A"
                                              (show-date-time-YMD (world-game-time (world win)))
-                                             (name (nth (cur-mission-type win) (mission-type-list win)))
+                                             (name (get-mission-type-by-id (mission-type-id (mission win))))
                                              (name (nth (cur-sector win) (sector-list win)))
                                              (get-included-lvl-mods (select-lvl-mods-list win))
                                              (get-included-faction-str (cur-faction-list win))
@@ -380,9 +513,16 @@
     (let ((cur-str) (color-list nil))
       (setf cur-str (cur-sel win))
       (dotimes (i (length (menu-items win)))
-        (if (= i cur-str) 
-          (setf color-list (append color-list (list sdl:*yellow*)))
-          (setf color-list (append color-list (list sdl:*white*)))))
+        (case (cur-step win)
+          (:custom-scenario-tab-feats (progn
+                                        (cond
+                                          ((and (= i cur-str) (find (nth i (overall-lvl-mods-list win)) (always-lvl-mods-list win))) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 0)))))
+                                          ((and (= i cur-str) (not (find (nth i (overall-lvl-mods-list win)) (always-lvl-mods-list win)))) (setf color-list (append color-list (list sdl:*yellow*))))
+                                          ((and (/= i cur-str) (find (nth i (overall-lvl-mods-list win)) (always-lvl-mods-list win))) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 150)))))
+                                          ((and (/= i cur-str) (not (find (nth i (overall-lvl-mods-list win)) (always-lvl-mods-list win)))) (setf color-list (append color-list (list sdl:*white*)))))))
+          (t (if (= i cur-str) 
+               (setf color-list (append color-list (list sdl:*yellow*)))
+               (setf color-list (append color-list (list sdl:*white*)))))))
       (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 4 text-str-num))) :color-list color-list))
     )
     
@@ -408,9 +548,10 @@
                                            (format str "[Right] Next step  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")
                                            ))
           (:custom-scenario-tab-feats (progn
-                                        (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
-                                          (format str "[Space] Remove feat  ")
-                                          (format str "[Space] Add feat  "))
+                                        (when (not (find (nth (cur-sel win) (overall-lvl-mods-list win)) (always-lvl-mods-list win)))
+                                          (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                            (format str "[Space] Remove feat  ")
+                                            (format str "[Space] Add feat  ")))
                                         (format str "[Right] Next step  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")
                                         ))
           (t (format str "[Enter/Right] Select  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit"))
@@ -448,53 +589,79 @@
                        ((and (sdl:key= key :sdl-key-space)
                              (eq (cur-step win) :custom-scenario-tab-feats))
                         (progn
-                          ;; make a radio button for the controlled-by lvl mods
-                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-controlled-by+)
-                            (setf (select-lvl-mods-list win) (remove (select-controlled-mod win) (select-lvl-mods-list win)))
-                            (setf (select-controlled-mod win) (nth (cur-sel win) (overall-lvl-mods-list win)))
-                            (push (select-controlled-mod win) (select-lvl-mods-list win)))
-
-                          ;; make checkboxes for the feats lvl mods
-                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-sector-feat+)
-                            (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win))
-                              (progn
-                                (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
-                                (setf (select-feats-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win))))
-                              (progn
-                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
-                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win)))))
-
-                          ;; make checkboxes for the items lvl mods
-                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-sector-item+)
-                            (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win))
-                              (progn
-                                (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
-                                (setf (select-items-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win))))
-                              (progn
-                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
-                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win)))))
-
-                          ;; make a radio button for the time of day lvl mods
-                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-time-of-day+)
-                            (setf (select-lvl-mods-list win) (remove (select-tod-mod win) (select-lvl-mods-list win)))
-                            (setf (select-tod-mod win) (nth (cur-sel win) (overall-lvl-mods-list win)))
-                            (push (select-tod-mod win) (select-lvl-mods-list win)))
-
-                          ;; make checkboxes for the weather lvl mods
-                          (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-weather+)
-                            (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win))
-                              (progn
-                                (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
-                                (setf (select-weather-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win))))
-                              (progn
-                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
-                                (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win)))))
-
-                          (setf (select-lvl-mods-list win) (stable-sort (select-lvl-mods-list win) #'(lambda (a b)
-                                                                                                       (if (< (lm-type a) (lm-type b))
-                                                                                                         t
-                                                                                                         nil))))
-                          (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))))
+                          (when (not (find (nth (cur-sel win) (overall-lvl-mods-list win)) (always-lvl-mods-list win)))
+                            ;; make a radio button for the controlled-by lvl mods
+                            (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-controlled-by+)
+                              (setf (select-lvl-mods-list win) (remove (select-controlled-mod win) (select-lvl-mods-list win)))
+                              (setf (select-controlled-mod win) (nth (cur-sel win) (overall-lvl-mods-list win)))
+                              (push (select-controlled-mod win) (select-lvl-mods-list win))
+                              
+                              (adjust-controlled-by-lvl-mod-after-change win))
+                            
+                            ;; make checkboxes for the feats lvl mods
+                            (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-sector-feat+)
+                              (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win))
+                                (progn
+                                  (adjust-single-feat-lvl-mod-after-change win (nth (cur-sel win) (overall-lvl-mods-list win)) :add nil)
+                                  
+                                  (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
+                                  (setf (select-feats-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win))))
+                                (progn
+                                  (adjust-single-feat-lvl-mod-after-change win (nth (cur-sel win) (overall-lvl-mods-list win)) :add t)
+                                  
+                                  (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                  (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-feats-list win)))))
+                            
+                            ;; make checkboxes for the items lvl mods
+                            (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-sector-item+)
+                              (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win))
+                                (progn
+                                  (adjust-single-item-lvl-mod-after-change win (nth (cur-sel win) (overall-lvl-mods-list win)) :add nil)
+                                  
+                                  (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
+                                  (setf (select-items-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win))))
+                                (progn
+                                  (adjust-single-item-lvl-mod-after-change win (nth (cur-sel win) (overall-lvl-mods-list win)) :add t)
+                                  
+                                  (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                  (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-items-list win)))))
+                            
+                            ;; make a radio button for the time of day lvl mods
+                            (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-time-of-day+)
+                              (setf (select-lvl-mods-list win) (remove (select-tod-mod win) (select-lvl-mods-list win)))
+                              (setf (select-tod-mod win) (nth (cur-sel win) (overall-lvl-mods-list win)))
+                              (push (select-tod-mod win) (select-lvl-mods-list win))
+                              
+                              (adjust-tod-lvl-mod-after-change win))
+                            
+                            ;; make checkboxes for the weather lvl mods
+                            (when (= (lm-type (nth (cur-sel win) (overall-lvl-mods-list win))) +level-mod-weather+)
+                              (if (find (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win))
+                                (progn
+                                  (adjust-single-weather-lvl-mod-after-change win (nth (cur-sel win) (overall-lvl-mods-list win)) :add nil)
+                                  
+                                  (setf (select-lvl-mods-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win)))
+                                  (setf (select-weather-list win) (remove (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win))))
+                                (progn
+                                  (adjust-single-weather-lvl-mod-after-change win (nth (cur-sel win) (overall-lvl-mods-list win)) :add t)
+                                  
+                                  (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-lvl-mods-list win))
+                                  (push (nth (cur-sel win) (overall-lvl-mods-list win)) (select-weather-list win))))
+                              
+                              (adjust-weather-lvl-mod-after-change win))
+                            
+                            
+                            (generate-feats-for-world-sector (world-sector win) (world-map (world win)))
+                            (readd-feats-after-sector-regeneration win)
+                            
+                            (setf (select-lvl-mods-list win) (stable-sort (select-lvl-mods-list win) #'(lambda (a b)
+                                                                                                         (if (< (lm-type a) (lm-type b))
+                                                                                                           t
+                                                                                                           nil))))
+                            
+                            (readjust-factions-after-feats-change win)
+                            
+                            (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))))
                        
                        ;; Space - include/exclude faction as a defender
                        ((and (sdl:key= key :sdl-key-space)
@@ -642,21 +809,21 @@
                                                                (setf (cur-sel win) (cur-mission-type win))
                                                                
                                                                (when (/= prev-cur-sel (cur-sel win))
-                                                                 (readjust-sectors-after-mission-change win)))))
+                                                                 (adjust-mission-after-change win)))))
                        (:custom-scenario-tab-sectors (progn (let ((prev-cur-sel (cur-sector win)))
                                                               (setf (cur-sector win) (run-selection-list key mod unicode (cur-sector win)))
                                                               (setf (cur-sector win) (adjust-selection-list (cur-sector win) (length (sector-list win))))
                                                               (setf (cur-sel win) (cur-sector win))
 
                                                               (when (/= prev-cur-sel (cur-sel win))
-                                                                (readjust-feats-after-sector-change win)))))
+                                                                (adjust-world-sector-after-change win)))))
                        (:custom-scenario-tab-months (progn (let ((prev-cur-sel (cur-month win)))
                                                              (setf (cur-month win) (run-selection-list key mod unicode (cur-month win)))
                                                              (setf (cur-month win) (adjust-selection-list (cur-month win) (length (months-list win))))
                                                              (setf (cur-sel win) (cur-month win))
 
                                                               (when (/= prev-cur-sel (cur-sel win))
-                                                                (readjust-months-before-feats win)))))
+                                                                (adjust-months-before-feats win)))))
                        (:custom-scenario-tab-feats (progn (setf (cur-feat win) (run-selection-list key mod unicode (cur-feat win)))
                                                           (setf (cur-feat win) (adjust-selection-list (cur-feat win) (length (overall-lvl-mods-list win))))
                                                           (setf (cur-sel win) (cur-feat win))

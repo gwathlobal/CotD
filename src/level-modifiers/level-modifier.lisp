@@ -68,12 +68,22 @@
    (overall-post-process-func-list :initform nil :initarg :overall-post-process-func-list :accessor overall-post-process-func-list)
    (terrain-post-process-func-list :initform nil :initarg :terrain-post-process-func-list :accessor terrain-post-process-func-list)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector and returns a list of faction-ids
-   (is-available-for-mission :initform nil :initarg :is-available-for-mission :accessor is-available-for-mission) ;; takes world-sector and mission-type
+   (is-available-for-mission :initform nil :initarg :is-available-for-mission :accessor is-available-for-mission) ;; takes world-sector, mission-type-id and world-time
    (random-available-for-mission :initform nil :initarg :random-available-for-mission :accessor random-available-for-mission)
    (scenario-enabled-func :initform nil :initarg :scenario-enabled-func :accessor scenario-enabled-func)
+   (scenario-disabled-func :initform nil :initarg :scenario-disabled-func :accessor scenario-disabled-func)
+   (depends-on-lvl-mod-func :initform nil :initarg :depends-on-lvl-mod-func :accessor depends-on-lvl-mod-func) ;; takes world-sector, mission-type-id and world-time
    ))
 
-(defun set-level-modifier (&key id name type debug disabled priority template-level-gen-func overall-post-process-func-list terrain-post-process-func-list faction-list-func is-available-for-mission random-available-for-mission scenario-enabled-func)
+(defun set-level-modifier (&key id name type debug disabled priority template-level-gen-func overall-post-process-func-list terrain-post-process-func-list faction-list-func
+                                (is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                                                              (declare (ignore world-sector mission-type-id world-time))
+                                                              t))
+                                random-available-for-mission
+                                scenario-enabled-func scenario-disabled-func
+                                (depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)
+                                                             (declare (ignore world-sector mission-type-id world-time))
+                                                             nil)))
   (unless id (error ":ID is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   (unless type (error ":TYPE is an obligatory parameter!"))
@@ -87,7 +97,9 @@
                                                                    :faction-list-func faction-list-func
                                                                    :is-available-for-mission is-available-for-mission
                                                                    :random-available-for-mission random-available-for-mission
-                                                                   :scenario-enabled-func scenario-enabled-func)))
+                                                                   :scenario-enabled-func scenario-enabled-func
+                                                                   :scenario-disabled-func scenario-disabled-func
+                                                                   :depends-on-lvl-mod-func depends-on-lvl-mod-func)))
 
 (defun get-level-modifier-by-id (level-modifier-id)
   (aref *level-modifiers* level-modifier-id))

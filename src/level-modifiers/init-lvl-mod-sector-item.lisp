@@ -20,7 +20,11 @@
                                                                                (add-item-to-level-list level item)
                                                                                (setf (relic-id level) (id item))))
                                                                 func-list)
-                                                          (reverse func-list))))
+                                                          (reverse func-list)))
+                    :depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)
+                                                 (declare (ignore world-sector mission-type-id world-time))
+                                                 (list +lm-feat-library+))
+                    )
 
 (set-level-modifier :id +lm-item-holy-relic+ :type +level-mod-sector-item+
                     :name "Holy Relic"
@@ -58,5 +62,14 @@
                                                                                (add-item-to-level-list level item)
                                                                                (setf (relic-id level) (id item))))
                                                                 func-list)
-                                                          (reverse func-list))))
+                                                          (reverse func-list)))
+                    :depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)
+                                                 (declare (ignore mission-type-id world-time))
+                                                 (if (not (or (= (wtype world-sector) +world-sector-corrupted-residential+)
+                                                              (= (wtype world-sector) +world-sector-corrupted-island+)
+                                                              (= (wtype world-sector) +world-sector-corrupted-port+)
+                                                              (= (wtype world-sector) +world-sector-corrupted-lake+)
+                                                              (= (wtype world-sector) +world-sector-corrupted-forest+)))
+                                                   (list +lm-feat-church+)
+                                                   nil)))
 

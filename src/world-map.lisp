@@ -29,7 +29,7 @@
 
   (setf (aref (cells world-map) 0 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 0 :y 1))
   (setf (aref (cells world-map) 1 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 1 :y 1))
-  (setf (aref (cells world-map) 2 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 2 :y 1
+  (setf (aref (cells world-map) 2 1) (make-instance 'world-sector :wtype +world-sector-corrupted-port+ :x 2 :y 1
                                                                   :feats (list (list +lm-feat-river+ (list :n)))))
   (setf (aref (cells world-map) 3 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 3 :y 1))
   (setf (aref (cells world-map) 4 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 4 :y 1))
@@ -84,14 +84,12 @@
         (barricade-feat (find +lm-feat-barricade+ (feats world-sector) :key #'(lambda (a) (first a))))
         (can-barricade-func #'(lambda (sx sy tx ty)
                                 (if (and (or (= (wtype (aref (cells world-map) sx sy)) +world-sector-normal-forest+)
-                                             (= (wtype (aref (cells world-map) sx sy)) +world-sector-normal-island+)
                                              (= (wtype (aref (cells world-map) sx sy)) +world-sector-normal-lake+)
                                              (= (wtype (aref (cells world-map) sx sy)) +world-sector-normal-port+)
                                              (= (wtype (aref (cells world-map) sx sy)) +world-sector-normal-residential+)
                                              (= (controlled-by (aref (cells world-map) sx sy)) +lm-controlled-by-military+))
                                          (or (= (controlled-by (aref (cells world-map) tx ty)) +lm-controlled-by-demons+)
                                              (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-forest+)
-                                             (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-island+)
                                              (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-lake+)
                                              (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-port+)
                                              (= (wtype (aref (cells world-map) tx ty)) +world-sector-corrupted-residential+)))

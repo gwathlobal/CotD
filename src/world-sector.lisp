@@ -14,12 +14,16 @@
    (overall-post-process-func-list :initform nil :initarg :overall-post-process-func-list :accessor overall-post-process-func-list)
    (angel-disguised-mob-type-id :initform +mob-type-man+ :initarg :angel-disguised-mob-type-id :accessor angel-disguised-mob-type-id)
    (scenario-enabled-func :initform nil :initarg :scenario-enabled-func :accessor scenario-enabled-func)
+   (always-lvl-mods-func :initform nil :initarg :always-lvl-mods-func :accessor always-lvl-mods-func)
    ))
 
 (defparameter *world-sector-types* (make-hash-table))
 
 (defun set-world-sector-type (&key wtype glyph-idx glyph-color name faction-list-func sector-level-gen-func template-level-gen-func terrain-post-process-func-list
-                                   overall-post-process-func-list angel-disguised-mob-type-id scenario-enabled-func)
+                                   overall-post-process-func-list angel-disguised-mob-type-id scenario-enabled-func
+                                   (always-lvl-mods-func #'(lambda (world-sector mission-type-id world-time)
+                                                             (declare (ignore world-sector mission-type-id world-time))
+                                                             nil)))
   (unless wtype (error ":WTYPE is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   (unless glyph-idx (error ":GLYPH-IDX is an obligatory parameter!"))
@@ -33,6 +37,7 @@
                                                                                :overall-post-process-func-list overall-post-process-func-list
                                                                                :angel-disguised-mob-type-id angel-disguised-mob-type-id
                                                                                :scenario-enabled-func scenario-enabled-func
+                                                                               :always-lvl-mods-func always-lvl-mods-func
                                                                                )))
 
 (defun get-world-sector-type-by-id (world-sector-type-id)

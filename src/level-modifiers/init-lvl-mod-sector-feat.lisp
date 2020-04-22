@@ -125,11 +125,24 @@
                                                                   (level-city-reserve-build-on-grid +building-city-river+ (+ x off-x) (+ y off-y) 2 template-level))
                                                              ))
                                                      )
-
-                                                   
                                                    ))
+                     :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for islands
+                                                  (if (or (= (wtype world-sector) +world-sector-normal-island+)
+                                                          (= (wtype world-sector) +world-sector-abandoned-island+)
+                                                          (= (wtype world-sector) +world-sector-corrupted-island+))
+                                                    nil
+                                                    t))
+                    :scenario-disabled-func #'(lambda (world-map x y)
+                                                ;; remove all surrounding rivers (if any)
+                                                 (setf (feats (aref (cells world-map) x (1- y))) (remove +lm-feat-river+ (feats (aref (cells world-map) x (1- y))) :key #'(lambda (a) (first a))))
+                                                 (setf (feats (aref (cells world-map) x (1+ y))) (remove +lm-feat-river+ (feats (aref (cells world-map) x (1+ y))) :key #'(lambda (a) (first a))))
+                                                 (setf (feats (aref (cells world-map) (1- x) y)) (remove +lm-feat-river+ (feats (aref (cells world-map) (1- x) y)) :key #'(lambda (a) (first a))))
+                                                 (setf (feats (aref (cells world-map) (1+ x) y)) (remove +lm-feat-river+ (feats (aref (cells world-map) (1+ x) y)) :key #'(lambda (a) (first a)))))
                     :scenario-enabled-func #'(lambda (world-map x y)
                                                (let ((river-list ()))
+                                                 
                                                  ;; choose random sides where to add a river
                                                  (when (zerop (random 4))
                                                    (push :n river-list))
@@ -155,8 +168,16 @@
                                                  )))
 
 (set-level-modifier :id +lm-feat-sea+ :type +level-mod-sector-feat+
-                    :name "Sea"
-                    :priority 0)
+                    :name "Pier"
+                    :priority 0
+                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for everybody other than seaports
+                                                  (if (or (= (wtype world-sector) +world-sector-normal-port+)
+                                                          (= (wtype world-sector) +world-sector-abandoned-port+)
+                                                          (= (wtype world-sector) +world-sector-corrupted-port+))
+                                                    t
+                                                    nil)))
 
 (set-level-modifier :id +lm-feat-barricade+ :type +level-mod-sector-feat+
                     :name "Barricade"
@@ -251,20 +272,41 @@
                                                      (level-city-reserve-build-on-grid +building-city-barricade-nw+ x2 y2 2 template-level))
                                                    
                                                    ))
+                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for islands
+                                                  (if (or (= (wtype world-sector) +world-sector-normal-island+)
+                                                          (= (wtype world-sector) +world-sector-abandoned-island+)
+                                                          (= (wtype world-sector) +world-sector-corrupted-island+))
+                                                    nil
+                                                    t))
+                    :scenario-disabled-func #'(lambda (world-map x y)
+                                                (when (= (controlled-by (aref (cells world-map) x (1- y))) +lm-controlled-by-demons+)
+                                                  (setf (controlled-by (aref (cells world-map) x (1- y))) +lm-controlled-by-none+))
+                                                (when (= (controlled-by (aref (cells world-map) x (1+ y))) +lm-controlled-by-demons+)
+                                                  (setf (controlled-by (aref (cells world-map) x (1+ y))) +lm-controlled-by-none+))
+                                                (when (= (controlled-by (aref (cells world-map) (1- x) y)) +lm-controlled-by-demons+)
+                                                  (setf (controlled-by (aref (cells world-map) (1- x) y)) +lm-controlled-by-none+))
+                                                (when (= (controlled-by (aref (cells world-map) (1+ x) y)) +lm-controlled-by-demons+)
+                                                  (setf (controlled-by (aref (cells world-map) (1+ x) y)) +lm-controlled-by-none+)))
                     :scenario-enabled-func #'(lambda (world-map x y)
-                                               (let ((demon-list ()))
+                                               (let ((demon-list ())
+                                                     (side-list (list :n :s :w :e)))
+                                                 ;; remove a side where the sea or island is
+                                                 (loop for (side dx dy) in '((:n 0 -1) (:s 0 1) (:w -1 0) (:e 1 0)) do
+                                                   (when (or (= (wtype (aref (cells world-map) (+ x dx) (+ y dy))) +world-sector-normal-sea+)
+                                                             (= (wtype (aref (cells world-map) (+ x dx) (+ y dy))) +world-sector-normal-island+)
+                                                             (= (wtype (aref (cells world-map) (+ x dx) (+ y dy))) +world-sector-abandoned-island+)
+                                                             (= (wtype (aref (cells world-map) (+ x dx) (+ y dy))) +world-sector-corrupted-island+))
+                                                     (setf side-list (remove side side-list))))
                                                  ;; choose random sides where to add a controlled by demons lvl-mod
-                                                 (when (zerop (random 4))
-                                                   (push :n demon-list))
-                                                 (when (zerop (random 4))
-                                                   (push :s demon-list))
-                                                 (when (zerop (random 4))
-                                                   (push :w demon-list))
-                                                 (when (zerop (random 4))
-                                                   (push :e demon-list))
-                                                 (unless demon-list
-                                                   (push (nth (random 4) '(:n :s :e :w))
-                                                         demon-list))
+                                                 (loop repeat 4
+                                                       when (zerop (random 2))
+                                                         do
+                                                            (pushnew (nth (random (length side-list)) side-list) demon-list)
+                                                       finally
+                                                          (when (null demon-list)
+                                                            (pushnew (nth (random (length side-list)) side-list) demon-list)))
                                                  ;; add controlled by demon lvl-mod to the chosen sides
                                                  (loop for side in demon-list 
                                                        when (eq side :n) do
