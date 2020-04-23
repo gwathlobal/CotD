@@ -443,10 +443,10 @@
                                                            (name (get-faction-type-by-id faction-id))))))
     (:custom-scenario-tab-specific-factions (return-from populate-custom-scenario-win-menu
                                               (loop for specific-faction-type in (specific-faction-list win)
-                                                    when (find specific-faction-type (scenario-faction-list (mission-type-id (mission win)))
+                                                    when (find specific-faction-type (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))
                                                                :key #'(lambda (a) (first a)))
                                                       collect (name (get-level-modifier-by-id (second (find specific-faction-type
-                                                                                                            (scenario-faction-list (mission-type-id (mission win)))
+                                                                                                            (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))
                                                                                                             :key #'(lambda (a) (first a)))))))
                                               )))
   )
@@ -533,6 +533,19 @@
                                           ((and (= i cur-str) (not (find (nth i (overall-lvl-mods-list win)) (always-lvl-mods-list win)))) (setf color-list (append color-list (list sdl:*yellow*))))
                                           ((and (/= i cur-str) (find (nth i (overall-lvl-mods-list win)) (always-lvl-mods-list win))) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 150)))))
                                           ((and (/= i cur-str) (not (find (nth i (overall-lvl-mods-list win)) (always-lvl-mods-list win)))) (setf color-list (append color-list (list sdl:*white*)))))))
+          (:custom-scenario-tab-factions (progn
+                                           (let* ((cur-faction (first (nth i (cur-faction-list win))))
+                                                  (ref-faction-obj (find cur-faction
+                                                                         (ref-faction-list win) :key #'(lambda (a)
+                                                                                                         (first a))))
+                                                  (more-than-one (if (> (length (second ref-faction-obj)) 1)
+                                                                   t
+                                                                   nil)))
+                                             (cond
+                                               ((and (= i cur-str) (not more-than-one)) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 0)))))
+                                               ((and (= i cur-str) more-than-one) (setf color-list (append color-list (list sdl:*yellow*))))
+                                               ((and (/= i cur-str) (not more-than-one)) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 150)))))
+                                               ((and (/= i cur-str) more-than-one) (setf color-list (append color-list (list sdl:*white*))))))))
           (t (if (= i cur-str) 
                (setf color-list (append color-list (list sdl:*yellow*)))
                (setf color-list (append color-list (list sdl:*white*)))))))
@@ -555,6 +568,7 @@
                                                                           (first (second ref-faction-obj))
                                                                           (nth (1+ ref-faction-present-pos) (second ref-faction-obj)))))
                                              (cond
+                                               ((<= (length (second ref-faction-obj)) 1) nil)
                                                ((= next-faction-present +mission-faction-present+) (format str "[Space] Include as present faction  "))
                                                ((= next-faction-present +mission-faction-delayed+) (format str "[Space] Include as delayed faction  "))
                                                ((= next-faction-present +mission-faction-absent+) (format str "[Space] Exclude the faction  "))))
@@ -647,120 +661,24 @@
                               (readjust-factions-after-feats-change win)
                               
                               (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))))))
-                       
-                       ;; Space - include/exclude faction as a defender
-                       ((and (sdl:key= key :sdl-key-space)
-                             (= (cur-step win) +custom-scenario-win-factions+)
-                             (find-if #'(lambda (a)
-                                          (if (and (= (second a) +mission-faction-defender+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win))
-                             (find-if #'(lambda (a)
-                                          (if (and (/= (second a) +mission-faction-defender+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win)))
-                        (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-defender+)
-                          (when (find-if #'(lambda (a)
-                                             (if (and (= (second a) +mission-faction-absent+)
-                                                      (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                               t
-                                               nil))
-                                         (ref-faction-list win))
-                            (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+)))
-                        (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
-                        )
 
-                       ;; d - include/exclude faction as a delayed defender
-                       ((and (sdl:key= key :sdl-key-d)
-                             (= (cur-step win) +custom-scenario-win-factions+)
-                             (find-if #'(lambda (a)
-                                          (if (and (= (second a) +mission-faction-delayed+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win))
-                             (find-if #'(lambda (a)
-                                          (if (and (/= (second a) +mission-faction-delayed+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win)))
-                        (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-delayed+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-delayed+)
-                          (when (find-if #'(lambda (a)
-                                             (if (and (= (second a) +mission-faction-absent+)
-                                                      (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                               t
-                                               nil))
-                                         (ref-faction-list win))
-                            (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+)))
-                        (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
-                        )
-
-                       ;; Space - include/exclude faction as an attacker
+                       ;; Space - add/remove faction inside factions tab
                        ((and (sdl:key= key :sdl-key-space)
-                             (= (cur-step win) +custom-scenario-win-factions+)
-                             (find-if #'(lambda (a)
-                                          (if (and (= (second a) +mission-faction-attacker+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win))
-                             (find-if #'(lambda (a)
-                                          (if (and (/= (second a) +mission-faction-attacker+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win)))
-                        (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-attacker+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-attacker+)
-                          (when (find-if #'(lambda (a)
-                                             (if (and (= (second a) +mission-faction-absent+)
-                                                      (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                               t
-                                               nil))
-                                         (ref-faction-list win))
-                            (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+)))
-                        (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
-                        )
-
-                       ;; space - include/exclude faction as present
-                       ((and (sdl:key= key :sdl-key-space)
-                             (= (cur-step win) +custom-scenario-win-factions+)
-                             (find-if #'(lambda (a)
-                                          (if (and (= (second a) +mission-faction-present+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win))
-                             (find-if #'(lambda (a)
-                                          (if (and (/= (second a) +mission-faction-present+)
-                                                   (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                            t
-                                            nil))
-                                      (ref-faction-list win))
-                             (not (find-if #'(lambda (a)
-                                               (if (and (= (second a) +mission-faction-defender+)
-                                                        (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                                 t
-                                                 nil))
-                                           (ref-faction-list win)))
-                             (not (find-if #'(lambda (a)
-                                               (if (and (= (second a) +mission-faction-attacker+)
-                                                        (= (first a) (first (nth (cur-faction win) (cur-faction-list win)))))
-                                                 t
-                                                 nil))
-                                           (ref-faction-list win))))
-                        (if (/= (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-present+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-present+)
-                          (setf (second (nth (cur-faction win) (cur-faction-list win))) +mission-faction-absent+))
-                        (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win)))
-                        )
+                             (eq (cur-step win) :custom-scenario-tab-factions))
+                        (progn
+                          (let* ((cur-faction (first (nth (cur-faction win) (cur-faction-list win))))
+                                 (faction-present (second (nth (cur-faction win) (cur-faction-list win))))
+                                 (ref-faction-obj (find cur-faction
+                                                        (ref-faction-list win) :key #'(lambda (a)
+                                                                                        (first a))))
+                                 (ref-faction-present-pos (position faction-present (second ref-faction-obj)))
+                                 (next-faction-present (if (>= (1+ ref-faction-present-pos) (length (second ref-faction-obj)))
+                                                         (first (second ref-faction-obj))
+                                                         (nth (1+ ref-faction-present-pos) (second ref-faction-obj)))))
+                            (setf (nth (cur-faction win) (cur-faction-list win)) (list cur-faction next-faction-present))
+                            
+                            (readjust-specific-factions-after-faction-change win)
+                            (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))))
                        
                        ;; enter - select
                        ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
