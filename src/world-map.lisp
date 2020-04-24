@@ -29,7 +29,7 @@
 
   (setf (aref (cells world-map) 0 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 0 :y 1))
   (setf (aref (cells world-map) 1 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 1 :y 1))
-  (setf (aref (cells world-map) 2 1) (make-instance 'world-sector :wtype +world-sector-corrupted-port+ :x 2 :y 1
+  (setf (aref (cells world-map) 2 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 2 :y 1
                                                                   :feats (list (list +lm-feat-river+ (list :n)))))
   (setf (aref (cells world-map) 3 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 3 :y 1))
   (setf (aref (cells world-map) 4 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 4 :y 1))
@@ -253,7 +253,9 @@
     (loop with tod-lvl-mods = ()
           for lvl-mod across *level-modifiers*
           for lvl-mod-id = (id lvl-mod)
-          when (= (lm-type lvl-mod) +level-mod-time-of-day+)
+          when (and (= (lm-type lvl-mod) +level-mod-time-of-day+)
+                    (is-available-for-mission lvl-mod)
+                    (funcall (is-available-for-mission lvl-mod) world-sector mission-type-id world-time))
             do
                (setf tod-lvl-mods (append tod-lvl-mods (list lvl-mod-id)))
           finally
@@ -261,7 +263,8 @@
     
     (loop for lvl-mod across *level-modifiers*
           for lvl-mod-id = (id lvl-mod)
-          when (and (is-available-for-mission lvl-mod)
+          when (and (or (= (lm-type lvl-mod) +level-mod-weather+))
+                    (is-available-for-mission lvl-mod)
                     (funcall (is-available-for-mission lvl-mod) world-sector mission-type-id world-time)
                     (or (not (random-available-for-mission lvl-mod))
                         (funcall (random-available-for-mission lvl-mod))))

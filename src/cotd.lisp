@@ -412,6 +412,15 @@
                                         (let ((test-world-map (make-instance 'world-map)))
                                           (setf *world* (make-instance 'world))
                                           (generate-empty-world-map test-world-map (world-game-time *world*))
+                                          (loop for lm-controlled-id in (list +lm-controlled-by-demons+ +lm-controlled-by-military+) do
+                                            (loop for x = (random *max-x-world-map*)
+                                                  for y = (random *max-y-world-map*)
+                                                  while (or (and (<= x 2)
+                                                                 (<= y 2))
+                                                            (/= (controlled-by (aref (cells test-world-map) x y)) +lm-controlled-by-none+))
+                                                  finally
+                                                     (setf (controlled-by (aref (cells test-world-map) x y)) lm-controlled-id)))
+                                          
                                           (setf (world-map *world*) test-world-map)
 
                                           (setf *current-window* (make-instance 'custom-scenario-window

@@ -192,94 +192,99 @@
                                                        (y1 1)
                                                        (y2 (- (array-dimension template-level 1) 2))
                                                        (barricade-params (second (find +lm-feat-barricade+ (feats world-sector) :key #'(lambda (a) (first a))))))
-
-                                                   ;; set up barricade lines & entrances
-                                                   (when (find :n barricade-params)
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for x from x1 below (- center-x 2)
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y1 2 template-level))
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for x from (+ center-x 2) to x2
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y1 2 template-level))
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for off-x from -2 below 2
-                                                           when (eq (aref template-level (+ center-x off-x) y1 2) nil)
+                                                   (flet ((place-barricade (barricade-build-id x y)
+                                                            (when (or (null (aref template-level x y 2))
+                                                                      (/= (first (aref template-level x y 2)) +building-city-sea+))
+                                                              (level-city-reserve-build-on-grid barricade-build-id x y 2 template-level))))
+                                                     
+                                                     ;; set up barricade lines & entrances
+                                                     (when (find :n barricade-params)
+                                                       (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                             for x from x1 below (- center-x 2)
                                                              do
-                                                                (setf (aref template-level (+ center-x off-x) y1 2) t)))
-
-                                                   (when (find :s barricade-params)
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for x from x1 below (- center-x 2)
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y2 2 template-level))
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for x from (+ center-x 2) to x2
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-we+ x y2 2 template-level))
-                                                     (loop with center-x = (truncate (array-dimension template-level 0) 2)
-                                                           for off-x from -2 below 2
-                                                           when (eq (aref template-level (+ center-x off-x) y2 2) nil)
+                                                                (place-barricade +building-city-barricade-we+ x y1))
+                                                       (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                             for x from (+ center-x 2) to x2
                                                              do
-                                                                (setf (aref template-level (+ center-x off-x) y2 2) t)))
+                                                                (place-barricade +building-city-barricade-we+ x y1))
+                                                       (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                             for off-x from -2 below 2
+                                                             when (eq (aref template-level (+ center-x off-x) y1 2) nil)
+                                                               do
+                                                                  (setf (aref template-level (+ center-x off-x) y1 2) t)))
 
-                                                   (when (find :w barricade-params)
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                           for y from y1 below (- center-y 2)
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x1 y 2 template-level))
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                           for y from (+ center-y 2) to y2
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x1 y 2 template-level))
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                           for off-y from -2 below 2
-                                                           when (eq (aref template-level x1 (+ center-y off-y) 2) nil)
+                                                     (when (find :s barricade-params)
+                                                       (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                             for x from x1 below (- center-x 2)
                                                              do
-                                                                (setf (aref template-level x1 (+ center-y off-y) 2) t)))
-
-                                                   (when (find :e barricade-params)
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                           for y from y1 below (- center-y 2)
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x2 y 2 template-level))
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                            for y from (+ center-y 2) to y2
-                                                           do
-                                                              (level-city-reserve-build-on-grid +building-city-barricade-ns+ x2 y 2 template-level))
-                                                     (loop with center-y = (truncate (array-dimension template-level 1) 2)
-                                                           for off-y from -2 below 2
-                                                           when (eq (aref template-level x2 (+ center-y off-y) 2) nil)
+                                                                (place-barricade +building-city-barricade-we+ x y2))
+                                                       (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                             for x from (+ center-x 2) to x2
                                                              do
-                                                                (setf (aref template-level x2 (+ center-y off-y) 2) t)))
+                                                                (place-barricade +building-city-barricade-we+ x y2))
+                                                       (loop with center-x = (truncate (array-dimension template-level 0) 2)
+                                                             for off-x from -2 below 2
+                                                             when (eq (aref template-level (+ center-x off-x) y2 2) nil)
+                                                               do
+                                                                  (setf (aref template-level (+ center-x off-x) y2 2) t)))
+                                                     
+                                                     (when (find :w barricade-params)
+                                                       (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                             for y from y1 below (- center-y 2)
+                                                             do
+                                                                (place-barricade +building-city-barricade-ns+ x1 y))
+                                                       (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                             for y from (+ center-y 2) to y2
+                                                             do
+                                                                (place-barricade +building-city-barricade-ns+ x1 y))
+                                                       (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                             for off-y from -2 below 2
+                                                             when (eq (aref template-level x1 (+ center-y off-y) 2) nil)
+                                                               do
+                                                                  (setf (aref template-level x1 (+ center-y off-y) 2) t)))
+                                                     
+                                                     (when (find :e barricade-params)
+                                                       (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                             for y from y1 below (- center-y 2)
+                                                             do
+                                                                (place-barricade +building-city-barricade-ns+ x2 y))
+                                                       (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                             for y from (+ center-y 2) to y2
+                                                             do
+                                                                (place-barricade +building-city-barricade-ns+ x2 y))
+                                                       (loop with center-y = (truncate (array-dimension template-level 1) 2)
+                                                             for off-y from -2 below 2
+                                                             when (eq (aref template-level x2 (+ center-y off-y) 2) nil)
+                                                               do
+                                                                  (setf (aref template-level x2 (+ center-y off-y) 2) t)))
 
-                                                   ;; set up barricade corners
-                                                   (when (and (find :n barricade-params)
-                                                              (find :w barricade-params))
-                                                     (level-city-reserve-build-on-grid +building-city-barricade-se+ x1 y1 2 template-level))
+                                                     ;; set up barricade corners
+                                                     (when (and (find :n barricade-params)
+                                                                (find :w barricade-params))
+                                                       (place-barricade +building-city-barricade-se+ x1 y1))
 
-                                                   (when (and (find :n barricade-params)
-                                                              (find :e barricade-params))
-                                                     (level-city-reserve-build-on-grid +building-city-barricade-sw+ x2 y1 2 template-level))
+                                                     (when (and (find :n barricade-params)
+                                                                (find :e barricade-params))
+                                                       (place-barricade +building-city-barricade-sw+ x2 y1))
+                                                     
+                                                     (when (and (find :s barricade-params)
+                                                                (find :w barricade-params))
+                                                       (place-barricade +building-city-barricade-ne+ x1 y2))
 
-                                                   (when (and (find :s barricade-params)
-                                                              (find :w barricade-params))
-                                                     (level-city-reserve-build-on-grid +building-city-barricade-ne+ x1 y2 2 template-level))
-
-                                                   (when (and (find :s barricade-params)
-                                                              (find :e barricade-params))
-                                                     (level-city-reserve-build-on-grid +building-city-barricade-nw+ x2 y2 2 template-level))
-                                                   
-                                                   ))
+                                                     (when (and (find :s barricade-params)
+                                                                (find :e barricade-params))
+                                                       (place-barricade +building-city-barricade-nw+ x2 y2))
+                                                     
+                                                     )))
                     :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
-                                                  ;; is not available for islands
-                                                  (if (or (= (wtype world-sector) +world-sector-normal-island+)
-                                                          (= (wtype world-sector) +world-sector-abandoned-island+)
-                                                          (= (wtype world-sector) +world-sector-corrupted-island+))
-                                                    nil
-                                                    t))
+                                                  ;; is not available for islands & corrupted & abandoned districts
+                                                  (if (or (= (wtype world-sector) +world-sector-normal-forest+)
+                                                          (= (wtype world-sector) +world-sector-normal-port+)
+                                                          (= (wtype world-sector) +world-sector-normal-residential+)
+                                                          (= (wtype world-sector) +world-sector-normal-lake+))
+                                                    t
+                                                    nil))
                     :scenario-disabled-func #'(lambda (world-map x y)
                                                 (when (= (controlled-by (aref (cells world-map) x (1- y))) +lm-controlled-by-demons+)
                                                   (setf (controlled-by (aref (cells world-map) x (1- y))) +lm-controlled-by-none+))

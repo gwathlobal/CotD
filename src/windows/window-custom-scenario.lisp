@@ -1,12 +1,5 @@
 (in-package :cotd)
 
-(defconstant +custom-scenario-win-mission+ 0)
-(defconstant +custom-scenario-win-layout+ 1)
-(defconstant +custom-scenario-win-weather+ 2)
-(defconstant +custom-scenario-win-time-of-day+ 3)
-(defconstant +custom-scenario-win-factions+ 4)
-(defconstant +custom-scenario-win-specific-faction+ 5)
-
 (defenum:defenum custom-scenario-window-tab-type (:custom-scenario-tab-missions
                                                   :custom-scenario-tab-sectors
                                                   :custom-scenario-tab-months
@@ -390,7 +383,8 @@
     (setf (specific-faction-list win) (loop with result = ()
                                             for (faction-id faction-present) in (cur-faction-list win)
                                             for faction-obj = (get-faction-type-by-id faction-id)
-                                            when (= faction-present +mission-faction-present+)
+                                            when (or (= faction-present +mission-faction-present+)
+                                                     (= faction-present +mission-faction-delayed+))
                                               do
                                                  (loop for specific-faction-type in (specific-faction-list faction-obj)
                                                        when (find specific-faction-type (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))

@@ -63,6 +63,13 @@
                                                                 func-list)
                                                           
                                                           func-list))
+                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                                                  (declare (ignore world-sector world-time))
+                                                  ;; is not available for missions where demons attack
+                                                  (if (or (= mission-type-id +mission-type-demonic-attack+)
+                                                          (= mission-type-id +mission-type-demonic-raid+))
+                                                    nil
+                                                    t))
                     )
 
 (set-level-modifier :id +lm-controlled-by-military+ :type +level-mod-controlled-by+
@@ -82,23 +89,24 @@
                                                        (x-e (- (array-dimension template-level 0) 5))
                                                        (y-s (- (array-dimension template-level 1) 5)))
                                                    ;; place nw post
-                                                   (when (level-city-can-place-build-on-grid building-id x-w y-n 2 template-level)
-                                                     (level-city-reserve-build-on-grid building-id x-w y-n 2 template-level))
-                                                     
+                                                   (level-city-reserve-build-on-grid building-id x-w y-n 2 template-level)
+                                                   
                                                    ;; place ne post
-                                                   (when (level-city-can-place-build-on-grid building-id x-e y-n 2 template-level)
-                                                     (level-city-reserve-build-on-grid building-id x-e y-n 2 template-level))
+                                                   (level-city-reserve-build-on-grid building-id x-e y-n 2 template-level)
                                                    
                                                    ;; place sw post
-                                                   (when (level-city-can-place-build-on-grid building-id x-w y-s 2 template-level)
-                                                     (level-city-reserve-build-on-grid building-id x-w y-s 2 template-level))
-                                                     
+                                                   (level-city-reserve-build-on-grid building-id x-w y-s 2 template-level)
+                                                   
                                                    ;; place se post
-                                                   (when (level-city-can-place-build-on-grid building-id x-e y-s 2 template-level)
-                                                     (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level))
-
+                                                   (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level)
                                                    )
                                                  )
+                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                                                  (declare (ignore world-sector world-time))
+                                                  ;; is not available for missions where military attack
+                                                  (if (or (= mission-type-id +mission-type-military-conquest+))
+                                                    nil
+                                                    t))
                     )
 
 
