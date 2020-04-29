@@ -272,7 +272,7 @@
   (setf (avail-controlled-list win) (loop for lvl-mod across *level-modifiers*
                                           when (and (= (lm-type lvl-mod) +level-mod-controlled-by+)
                                                     (is-available-for-mission lvl-mod)
-                                                    (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                                    (funcall (is-available-for-mission lvl-mod) (wtype (world-sector win)) (mission-type-id (mission win)) (world-game-time (world win))))
                                             collect lvl-mod))
   (add/remove-lvl-mod win (nth (random (length (avail-controlled-list win))) (avail-controlled-list win)) :add-general t)
     
@@ -280,7 +280,7 @@
   (setf (avail-feats-list win) (loop for lvl-mod across *level-modifiers*
                                      when (and (= (lm-type lvl-mod) +level-mod-sector-feat+)
                                                (is-available-for-mission lvl-mod)
-                                               (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                               (funcall (is-available-for-mission lvl-mod) (wtype (world-sector win)) (mission-type-id (mission win)) (world-game-time (world win))))
                                        collect lvl-mod))
   (setf (select-feats-list win) ())
   (loop for lvl-mod in (avail-feats-list win)
@@ -291,20 +291,20 @@
   (setf (avail-items-list win) (loop for lvl-mod across *level-modifiers*
                                      when (and (= (lm-type lvl-mod) +level-mod-sector-item+)
                                                (is-available-for-mission lvl-mod)
-                                               (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                               (funcall (is-available-for-mission lvl-mod) (wtype (world-sector win)) (mission-type-id (mission win)) (world-game-time (world win))))
                                        collect lvl-mod))
   (setf (select-items-list win) ())
   (loop for lvl-mod in (avail-items-list win)
         when (zerop (random 4)) do
           (add/remove-lvl-mod win lvl-mod :add-general t))
-  
+
   (generate-feats-for-world-sector (world-sector win) (world-map (world win)))
   
   ;; find all available time of day lvl-mods for the selected mission
   (setf (avail-tod-list win) (loop for lvl-mod across *level-modifiers*
                                    when (and (= (lm-type lvl-mod) +level-mod-time-of-day+)
                                              (is-available-for-mission lvl-mod)
-                                             (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                             (funcall (is-available-for-mission lvl-mod) (wtype (world-sector win)) (mission-type-id (mission win)) (world-game-time (world win))))
                                      collect lvl-mod))
   (add/remove-lvl-mod win (nth (random (length (avail-tod-list win))) (avail-tod-list win)) :add-general t)
     
@@ -312,7 +312,7 @@
   (setf (avail-weather-list win) (loop for lvl-mod across *level-modifiers*
                                        when (and (= (lm-type lvl-mod) +level-mod-weather+)
                                                  (is-available-for-mission lvl-mod)
-                                                 (funcall (is-available-for-mission lvl-mod) (world-sector win) (mission-type-id (mission win)) (world-game-time (world win))))
+                                                 (funcall (is-available-for-mission lvl-mod) (wtype (world-sector win)) (mission-type-id (mission win)) (world-game-time (world win))))
                                          collect lvl-mod))
   (setf (select-weather-list win) ())
   (loop for lvl-mod in (avail-weather-list win)
@@ -322,6 +322,7 @@
   (setf (overall-lvl-mods-list win) (append (avail-controlled-list win) (avail-feats-list win) (avail-items-list win) (avail-tod-list win) (avail-weather-list win)))
   (setf (cur-feat win) 0)
   (readd-lvl-mods-after-sector-regeneration win)
+    
   (setf (select-lvl-mods-list win) (stable-sort (select-lvl-mods-list win) #'(lambda (a b)
                                                                                (if (< (lm-type a) (lm-type b))
                                                                                  t
@@ -336,16 +337,16 @@
                                  nil)
         
         with controlled-by-factions = (if (faction-list-func (get-level-modifier-by-id (controlled-by (world-sector win))))
-                                        (funcall (faction-list-func (get-level-modifier-by-id (controlled-by (world-sector win)))) (world-sector win))
+                                        (funcall (faction-list-func (get-level-modifier-by-id (controlled-by (world-sector win)))) (wtype (world-sector win)))
                                         nil)
         
         with feats-factions = (loop for (feat-id) in (feats (world-sector win))
                                     when (faction-list-func (get-level-modifier-by-id feat-id))
-                                      append (funcall (faction-list-func (get-level-modifier-by-id feat-id)) (world-sector win)))
+                                      append (funcall (faction-list-func (get-level-modifier-by-id feat-id)) (wtype (world-sector win))))
         
         with items-factions = (loop for item-id in (items (world-sector win))
                                     when (faction-list-func (get-level-modifier-by-id item-id))
-                                      append (funcall (faction-list-func (get-level-modifier-by-id item-id)) (world-sector win)))
+                                      append (funcall (faction-list-func (get-level-modifier-by-id item-id)) (wtype (world-sector win))))
         
         with mission-factions = (if (faction-list-func (get-mission-type-by-id (mission-type-id (mission win))))
                                   (funcall (faction-list-func (get-mission-type-by-id (mission-type-id (mission win)))) (world-sector win))
@@ -680,17 +681,6 @@
                           (progn
                             (setf (cur-step win) (defenum:next-enum-tag 'custom-scenario-window-tab-type (cur-step win)))
 
-                            (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))
-                          (progn
-                            (setf (player-lvl-mod-placement-id (mission win)) (second (find (nth (cur-specific-faction win) (specific-faction-list win)) (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))
-                                                                                            :key #'(lambda (a) (first a)))))
-                            (return-from run-window (values (world-sector win) (mission win)
-                                                            ))))
-                        (if (< (cur-step win) +custom-scenario-win-specific-faction+)
-                          (progn
-                            (incf (cur-step win))
-                            (when (> (cur-step win) +custom-scenario-win-specific-faction+)
-                              (setf (cur-step win) +custom-scenario-win-specific-faction+))
                             (setf (menu-items win) (populate-custom-scenario-win-menu win (cur-step win))))
                           (progn
                             (setf (player-lvl-mod-placement-id (mission win)) (second (find (nth (cur-specific-faction win) (specific-faction-list win)) (scenario-faction-list (get-mission-type-by-id (mission-type-id (mission win))))

@@ -114,7 +114,9 @@
     ;; add sea features
     (when (and (>= (1- x) 0)
                (or (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+)
-                   (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-island+)))
+                   (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-island+)
+                   (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-abandoned-island+)
+                   (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-corrupted-island+)))
       (if sea-feat
         (push :w (second sea-feat))
         (progn
@@ -122,7 +124,9 @@
           (setf sea-feat (find +lm-feat-sea+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
     (when (and (>= (1- y) 0)
                (or (= (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+)
-                   (= (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-island+)))
+                   (= (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-island+)
+                   (= (wtype (aref (cells world-map) x (1- y))) +world-sector-abandoned-island+)
+                   (= (wtype (aref (cells world-map) x (1- y))) +world-sector-corrupted-island+)))
       (if sea-feat
         (push :n (second sea-feat))
         (progn
@@ -130,7 +134,9 @@
           (setf sea-feat (find +lm-feat-sea+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
     (when (and (< (1+ x) *max-x-world-map*)
                (or (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+)
-                   (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-island+)))
+                   (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-island+)
+                   (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-abandoned-island+)
+                   (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-corrupted-island+)))
       (if sea-feat
         (push :e (second sea-feat))
         (progn
@@ -138,7 +144,9 @@
           (setf sea-feat (find +lm-feat-sea+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
     (when (and (< (1+ y) *max-y-world-map*)
                (or (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+)
-                   (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-island+)))
+                   (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-island+)
+                   (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-abandoned-island+)
+                   (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-corrupted-island+)))
       (if sea-feat
         (push :s (second sea-feat))
         (progn
@@ -211,16 +219,16 @@
                                    nil)
           
           with controlled-by-factions = (if (faction-list-func (get-level-modifier-by-id (controlled-by world-sector)))
-                                          (funcall (faction-list-func (get-level-modifier-by-id (controlled-by world-sector))) world-sector)
+                                          (funcall (faction-list-func (get-level-modifier-by-id (controlled-by world-sector))) (wtype world-sector))
                                           nil)
           
           with feats-factions = (loop for (feat-id) in (feats world-sector)
                                       when (faction-list-func (get-level-modifier-by-id feat-id))
-                                        append (funcall (faction-list-func (get-level-modifier-by-id feat-id)) world-sector))
+                                        append (funcall (faction-list-func (get-level-modifier-by-id feat-id)) (wtype world-sector)))
           
           with items-factions = (loop for item-id in (items world-sector)
                                       when (faction-list-func (get-level-modifier-by-id item-id))
-                                        append (funcall (faction-list-func (get-level-modifier-by-id item-id)) world-sector))
+                                        append (funcall (faction-list-func (get-level-modifier-by-id item-id)) (wtype world-sector)))
           
           with mission-factions = (if (faction-list-func (get-mission-type-by-id mission-type-id))
                                     (funcall (faction-list-func (get-mission-type-by-id mission-type-id)) world-sector)
@@ -255,7 +263,7 @@
           for lvl-mod-id = (id lvl-mod)
           when (and (= (lm-type lvl-mod) +level-mod-time-of-day+)
                     (is-available-for-mission lvl-mod)
-                    (funcall (is-available-for-mission lvl-mod) world-sector mission-type-id world-time))
+                    (funcall (is-available-for-mission lvl-mod) (wtype world-sector) mission-type-id world-time))
             do
                (setf tod-lvl-mods (append tod-lvl-mods (list lvl-mod-id)))
           finally
@@ -265,7 +273,7 @@
           for lvl-mod-id = (id lvl-mod)
           when (and (or (= (lm-type lvl-mod) +level-mod-weather+))
                     (is-available-for-mission lvl-mod)
-                    (funcall (is-available-for-mission lvl-mod) world-sector mission-type-id world-time)
+                    (funcall (is-available-for-mission lvl-mod) (wtype world-sector) mission-type-id world-time)
                     (or (not (random-available-for-mission lvl-mod))
                         (funcall (random-available-for-mission lvl-mod))))
             do

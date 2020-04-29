@@ -1,3 +1,5 @@
+- Make new game window (and probably random generation) take a list of req lvl mods (for example, to have shadow demons & thief always start during the night or eater of the dead never starts during snow)
+- Refactor random generation & custom scenario window to use the same functions
 - THIRD-PARTY: Remove defenum dependency once the prev-tag fix is merged and uploaded into quicklisp
 - A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints
 - Demons/angels arrive delayed through portals

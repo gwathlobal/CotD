@@ -10,8 +10,8 @@
 
 (set-level-modifier :id +lm-controlled-by-demons+ :type +level-mod-controlled-by+
                     :name "Controlled by demons"
-                    :faction-list-func #'(lambda (world-sector)
-                                           (declare (ignore world-sector))
+                    :faction-list-func #'(lambda (sector-type-id)
+                                           (declare (ignore sector-type-id))
                                            (list (list +faction-type-demons+ +mission-faction-present+)))
                     :priority 25
                     :overall-post-process-func-list #'(lambda ()
@@ -63,19 +63,23 @@
                                                                 func-list)
                                                           
                                                           func-list))
-                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
-                                                  (declare (ignore world-sector world-time))
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
                                                   ;; is not available for missions where demons attack
-                                                  (if (or (= mission-type-id +mission-type-demonic-attack+)
-                                                          (= mission-type-id +mission-type-demonic-raid+))
-                                                    nil
-                                                    t))
+                                                  (if (or (= world-sector-type-id +world-sector-corrupted-forest+)
+                                                          (= world-sector-type-id +world-sector-corrupted-lake+)
+                                                          (= world-sector-type-id +world-sector-corrupted-residential+)
+                                                          (= world-sector-type-id +world-sector-corrupted-island+)
+                                                          (= world-sector-type-id +world-sector-corrupted-port+))
+                                                    t
+                                                    nil)
+                                                  )
                     )
 
 (set-level-modifier :id +lm-controlled-by-military+ :type +level-mod-controlled-by+
                     :name "Controlled by the military"
-                    :faction-list-func #'(lambda (world-sector)
-                                           (declare (ignore world-sector))
+                    :faction-list-func #'(lambda (sector-type-id)
+                                           (declare (ignore sector-type-id))
                                            (list (list +faction-type-military+ +mission-faction-present+)))
                     :priority 25
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
@@ -101,12 +105,16 @@
                                                    (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level)
                                                    )
                                                  )
-                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
-                                                  (declare (ignore world-sector world-time))
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
                                                   ;; is not available for missions where military attack
-                                                  (if (or (= mission-type-id +mission-type-military-conquest+))
-                                                    nil
-                                                    t))
+                                                  (if (or (= world-sector-type-id +world-sector-normal-forest+)
+                                                          (= world-sector-type-id +world-sector-normal-port+)
+                                                          (= world-sector-type-id +world-sector-normal-island+)
+                                                          (= world-sector-type-id +world-sector-normal-residential+)
+                                                          (= world-sector-type-id +world-sector-normal-lake+))
+                                                    t
+                                                    nil))
                     )
 
 

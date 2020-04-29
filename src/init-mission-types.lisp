@@ -167,8 +167,7 @@
                                                                    (list +faction-type-angels+ +mission-faction-delayed+)
                                                                    (list +faction-type-angels+ +mission-faction-absent+)
                                                                    )))
-                                           (if (= (controlled-by world-sector) +lm-controlled-by-military+)
-                                             (push (list +faction-type-military+ +mission-faction-present+) faction-list)
+                                           (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-normal-forest+

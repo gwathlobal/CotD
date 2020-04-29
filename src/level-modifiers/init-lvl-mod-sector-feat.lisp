@@ -126,12 +126,12 @@
                                                              ))
                                                      )
                                                    ))
-                     :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for islands
-                                                  (if (or (= (wtype world-sector) +world-sector-normal-island+)
-                                                          (= (wtype world-sector) +world-sector-abandoned-island+)
-                                                          (= (wtype world-sector) +world-sector-corrupted-island+))
+                                                  (if (or (= world-sector-type-id +world-sector-normal-island+)
+                                                          (= world-sector-type-id +world-sector-abandoned-island+)
+                                                          (= world-sector-type-id +world-sector-corrupted-island+))
                                                     nil
                                                     t))
                     :scenario-disabled-func #'(lambda (world-map x y)
@@ -170,12 +170,12 @@
 (set-level-modifier :id +lm-feat-sea+ :type +level-mod-sector-feat+
                     :name "Pier"
                     :priority 0
-                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for everybody other than seaports
-                                                  (if (or (= (wtype world-sector) +world-sector-normal-port+)
-                                                          (= (wtype world-sector) +world-sector-abandoned-port+)
-                                                          (= (wtype world-sector) +world-sector-corrupted-port+))
+                                                  (if (or (= world-sector-type-id +world-sector-normal-port+)
+                                                          (= world-sector-type-id +world-sector-abandoned-port+)
+                                                          (= world-sector-type-id +world-sector-corrupted-port+))
                                                     t
                                                     nil)))
 
@@ -276,13 +276,13 @@
                                                        (place-barricade +building-city-barricade-nw+ x2 y2))
                                                      
                                                      )))
-                    :is-available-for-mission #'(lambda (world-sector mission-type-id world-time)
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for islands & corrupted & abandoned districts
-                                                  (if (or (= (wtype world-sector) +world-sector-normal-forest+)
-                                                          (= (wtype world-sector) +world-sector-normal-port+)
-                                                          (= (wtype world-sector) +world-sector-normal-residential+)
-                                                          (= (wtype world-sector) +world-sector-normal-lake+))
+                                                  (if (or (= world-sector-type-id +world-sector-normal-forest+)
+                                                          (= world-sector-type-id +world-sector-normal-port+)
+                                                          (= world-sector-type-id +world-sector-normal-residential+)
+                                                          (= world-sector-type-id +world-sector-normal-lake+))
                                                     t
                                                     nil))
                     :scenario-disabled-func #'(lambda (world-map x y)
@@ -362,13 +362,13 @@
 (set-level-modifier :id +lm-feat-church+ :type +level-mod-sector-feat+
                     :name "Church"
                     :priority 30
-                    :faction-list-func #'(lambda (world-sector)
-                                           (if (or (= (wtype world-sector) +world-sector-normal-residential+)
-                                                   (= (wtype world-sector) +world-sector-normal-sea+)
-                                                   (= (wtype world-sector) +world-sector-normal-island+)
-                                                   (= (wtype world-sector) +world-sector-normal-port+)
-                                                   (= (wtype world-sector) +world-sector-normal-lake+)
-                                                   (= (wtype world-sector) +world-sector-normal-forest+))
+                    :faction-list-func #'(lambda (sector-type-id)
+                                           (if (or (= sector-type-id +world-sector-normal-residential+)
+                                                   (= sector-type-id +world-sector-normal-sea+)
+                                                   (= sector-type-id +world-sector-normal-island+)
+                                                   (= sector-type-id +world-sector-normal-port+)
+                                                   (= sector-type-id +world-sector-normal-lake+)
+                                                   (= sector-type-id +world-sector-normal-forest+))
                                              (list (list +faction-type-church+ +mission-faction-present+))
                                              nil)
                                            )
@@ -423,8 +423,8 @@
 (set-level-modifier :id +lm-feat-lair+ :type +level-mod-sector-feat+
                     :name "Satanists' lair"
                     :priority 30
-                    :faction-list-func #'(lambda (world-sector)
-                                           (declare (ignore world-sector))
+                    :faction-list-func #'(lambda (sector-type-id)
+                                           (declare (ignore sector-type-id))
                                            (list (list +faction-type-satanists+ +mission-faction-present+)))
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))

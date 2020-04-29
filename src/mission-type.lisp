@@ -1,22 +1,11 @@
 (in-package :cotd)
 
-(defconstant +mission-type-none+ -1)
-(defconstant +mission-type-test+ 0)
-(defconstant +mission-type-demonic-attack+ 1)
-(defconstant +mission-type-demonic-raid+ 2)
-(defconstant +mission-type-demonic-conquest+ 3)
-(defconstant +mission-type-demonic-thievery+ 4)
-(defconstant +mission-type-military-raid+ 5)
-(defconstant +mission-type-military-conquest+ 6)
-(defconstant +mission-type-celestial-purge+ 7)
-(defconstant +mission-type-celestial-retrieval+ 8)
-
 (defclass mission-type ()
   ((id :initform +mission-type-none+ :initarg :id :accessor id)
    (name :initform "Mission type name" :initarg :name :accessor name)
    (enabled :initform t :initarg :enabled :accessor enabled)
    (is-available-func :initform #'(lambda (world-map x y) (declare (ignore world-map x y)) nil) :initarg :is-available-func :accessor is-available-func)
-   (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector and returns a list of faction-ids
+   (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector-type-id and returns a list of faction-ids
    (world-sector-for-custom-scenario :initform () :initarg :world-sector-for-custom-scenario :accessor world-sector-for-custom-scenario) ;; the list of world-sectors available for this mission, specifically for custom scenario
 
    (template-level-gen-func :initform nil :initarg :template-level-gen-func :accessor template-level-gen-func)

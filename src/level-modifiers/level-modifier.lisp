@@ -67,8 +67,8 @@
    (template-level-gen-func :initform nil :initarg :template-level-gen-func :accessor template-level-gen-func)
    (overall-post-process-func-list :initform nil :initarg :overall-post-process-func-list :accessor overall-post-process-func-list)
    (terrain-post-process-func-list :initform nil :initarg :terrain-post-process-func-list :accessor terrain-post-process-func-list)
-   (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector and returns a list of faction-ids
-   (is-available-for-mission :initform nil :initarg :is-available-for-mission :accessor is-available-for-mission) ;; takes world-sector, mission-type-id and world-time
+   (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector-type and returns a list of faction-ids
+   (is-available-for-mission :initform nil :initarg :is-available-for-mission :accessor is-available-for-mission) ;; takes world-sector-type-id, mission-type-id and world-time
    (random-available-for-mission :initform nil :initarg :random-available-for-mission :accessor random-available-for-mission)
    (scenario-enabled-func :initform nil :initarg :scenario-enabled-func :accessor scenario-enabled-func)
    (scenario-disabled-func :initform nil :initarg :scenario-disabled-func :accessor scenario-disabled-func)

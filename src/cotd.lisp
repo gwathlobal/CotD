@@ -289,109 +289,7 @@
   (when (player-outside-level *player*)
     (add-message (format nil "~%Your arrival here is delayed, please wait!")))
 
-  )  
-
-(defun find-random-scenario-options (specific-faction-type &key (mission-id nil))
-  (let ((available-faction-list)
-        (available-layout-list)
-        (available-mission-list)
-        (layout-id)
-        (faction-list))
-
-    (setf available-faction-list (loop for faction-type across *faction-types*
-                                       when (and faction-type
-                                                 (find specific-faction-type (specific-faction-list faction-type)))
-                                         collect (id faction-type)))
-
-    (setf available-layout-list
-          (loop for mission-district across *mission-districts* 
-                when (eq t (loop with result = nil
-                                 for faction-type-id in available-faction-list
-                                 when (and mission-district
-                                           (find-if #'(lambda (a)
-                                                        (if (and (or (= (second a) +mission-faction-attacker+)
-                                                                     (= (second a) +mission-faction-defender+)
-                                                                     (= (second a) +mission-faction-present+))
-                                                                 (= (first a) faction-type-id))
-                                                          t
-                                                          nil))
-                                                    (faction-list mission-district)))
-                                   do
-                                      (setf result t)
-                                      (loop-finish)
-                                 finally (return-from nil result)))
-                  collect (id mission-district)))
-    
-    (setf available-mission-list (loop for mission-scenario across *mission-scenarios*
-                                       when (and (enabled mission-scenario)
-                                                 (or (eq t (loop with result = nil
-                                                                 for layout-id in available-layout-list
-                                                                 when (find layout-id (district-layout-list mission-scenario)) do
-                                                                   (setf result t)
-                                                                   (loop-finish)
-                                                                 finally (return-from nil result)))
-                                                     (eq t (loop with result = nil
-                                                                 for faction-type-id in available-faction-list
-                                                                 when (find-if #'(lambda (a)
-                                                                                   (if (and (or (= (second a) +mission-faction-attacker+)
-                                                                                                (= (second a) +mission-faction-defender+)
-                                                                                                (= (second a) +mission-faction-present+))
-                                                                                            (= (first a) faction-type-id))
-                                                                                     t
-                                                                                     nil))
-                                                                               (faction-list mission-scenario))
-                                                                   do
-                                                                      (setf result t)
-                                                                      (loop-finish)
-                                                                 finally (return-from nil result)))))
-                                         collect (id mission-scenario)))
-
-    (unless mission-id
-      (setf mission-id (nth (random (length available-mission-list)) available-mission-list)))
-    
-    (setf layout-id (nth (random (length (district-layout-list (get-mission-scenario-by-id mission-id)))) (district-layout-list (get-mission-scenario-by-id mission-id))))
-    
-    ;; collecting all available factions with the structure (faction-id (<faction-present> <faction-present> ...)) 
-    (setf faction-list (loop with result = ()
-                             for (faction-id faction-present) in (append (faction-list (get-mission-district-by-id layout-id))
-                                                                         (faction-list (get-mission-scenario-by-id mission-id)))
-                             for faction-obj = (find faction-id result :key #'(lambda (a) (first a)))
-                             do
-                                (if faction-obj
-                                  (progn
-                                    (pushnew faction-present (second faction-obj)))
-                                  (progn
-                                    (push (list faction-id (list faction-present)) result)))
-                             finally (return-from nil result)))
-    
-    ;; remove +mission-faction-present+ if there are +mission-faction-defender+ or +mission-faction-attacker+ options available for this faction
-    (loop for (faction-id faction-present-list) in faction-list
-          for n from 0
-          when (and (find +mission-faction-present+ faction-present-list)
-                    (or (find +mission-faction-attacker+ faction-present-list)
-                        (find +mission-faction-defender+ faction-present-list)))
-            do
-               (setf (nth n faction-list) (list faction-id (remove +mission-faction-present+ faction-present-list))))
-
-    ;; remove +mission-faction-delayed+ and +mission-faction-absent+ for the player faction
-    (loop for (faction-id faction-present-list) in faction-list
-          for n from 0
-          when (and (or (find +mission-faction-delayed+ faction-present-list)
-                        (find +mission-faction-absent+ faction-present-list) )
-                    (find faction-id available-faction-list))
-            do
-               (setf (nth n faction-list) (list faction-id (remove +mission-faction-delayed+ (second (nth n faction-list)))))
-               (setf (nth n faction-list) (list faction-id (remove +mission-faction-absent+ (second (nth n faction-list))))))
-        
-    ;; set up random presence options in the faction list
-    (loop for (faction-id faction-present-list) in faction-list
-          for n from 0
-          do
-             (setf (nth n faction-list) (list faction-id (nth (random (length faction-present-list)) faction-present-list))))
-    
-    (return-from find-random-scenario-options (values mission-id
-                                                      layout-id
-                                                      faction-list))))
+  )
 
 (defun main-menu ()
   (let ((menu-items nil)
@@ -401,11 +299,10 @@
                                  (declare (ignore n))
                                  (setf *current-window* (make-instance 'new-game-window))
                                  (make-output *current-window*)
-                                 (multiple-value-bind (mission-id layout-id weather-id tod-id specific-faction-type faction-list) (run-window *current-window*)
-                                   (format t "~A ~A ~A ~A ~A ~A~%" mission-id layout-id weather-id tod-id specific-faction-type faction-list)
-                                   (when (and mission-id layout-id weather-id tod-id specific-faction-type faction-list)
+                                 (multiple-value-bind (world-sector mission) (run-window *current-window*)
+                                   (when (and mission world-sector)
                                      (setf *current-window* (return-to *current-window*))
-                                     (return-from main-menu (values mission-id layout-id weather-id tod-id specific-faction-type faction-list)))))))
+                                     (return-from main-menu (values world-sector mission)))))))
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
                                         (declare (ignore n))
@@ -461,20 +358,11 @@
         (all-see-item (cons "City with all-seeing"
                             #'(lambda (n) 
                                 (declare (ignore n))
-                                (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                      (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                      (mission-id)
-                                      (layout-id)
-                                      (faction-list))
-
-                                  (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options +specific-faction-type-angel-chrome+))
-                                  
-                                  (return-from main-menu (values mission-id
-                                                                 layout-id
-                                                                 (nth (random (length weather-types)) weather-types)
-                                                                 (nth (random (length tod-types)) tod-types)
-                                                                 +specific-faction-type-player+
-                                                                 faction-list))))))
+                                (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-player+)
+                                  (when (and mission world-sector)
+                                    (return-from main-menu (values world-sector mission))
+                                    ))
+                                )))
         (test-level-item (cons "Test level"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -499,20 +387,11 @@
         (play-prev-scenario (cons "Replay the previous scenario"
                                   #'(lambda (n) 
                                       (declare (ignore n))
-                                      (let ((weather-types (get-all-scenario-features-by-type +scenario-feature-weather+ nil))
-                                            (tod-types (get-all-scenario-features-by-type +scenario-feature-time-of-day+ nil))
-                                            (mission-id)
-                                            (layout-id)
-                                            (faction-list))
-                                        
-                                        (multiple-value-setq (mission-id layout-id faction-list) (find-random-scenario-options (second *previous-scenario*) :mission-id (first *previous-scenario*)))
-                                        
-                                        (return-from main-menu (values mission-id
-                                                                       layout-id
-                                                                       (nth (random (length weather-types)) weather-types)
-                                                                       (nth (random (length tod-types)) tod-types)
-                                                                       (second *previous-scenario*)
-                                                                       faction-list))))))
+                                      (multiple-value-bind (mission world-sector) (find-random-scenario-options (second *previous-scenario*) :mission-type-id (first *previous-scenario*))
+                                        (when (and mission world-sector)
+                                          (return-from main-menu (values world-sector mission))
+                                          ))
+                                      )))
         (test-campaign-item (cons "Test campaign"
                                   #'(lambda (n)
                                       (declare (ignore n))
