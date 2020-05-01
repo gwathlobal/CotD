@@ -103,3 +103,28 @@
 
 (defun get-level-modifier-by-id (level-modifier-id)
   (aref *level-modifiers* level-modifier-id))
+
+(defun get-all-lvl-mods-list (&key (include-disabled nil))
+  (loop for lvl-mod across *level-modifiers*
+        when (or (not include-disabled)
+                 (and include-disabled
+                      (disabled lvl-mod)))
+        collect lvl-mod))
+
+(defun change-level-to-snow (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  (loop for x from 0 below (array-dimension (terrain level) 0) do
+    (loop for y from 0 below (array-dimension (terrain level) 1) do
+      (loop for z from (1- (array-dimension (terrain level) 2)) downto 0 do
+        (cond
+          ((= (aref (terrain level) x y z) +terrain-border-floor+) (setf (aref (terrain level) x y z) +terrain-border-floor-snow+))
+          ((= (aref (terrain level) x y z) +terrain-border-grass+) (setf (aref (terrain level) x y z) +terrain-border-floor-snow+))
+          ((= (aref (terrain level) x y z) +terrain-floor-dirt+) (setf (aref (terrain level) x y z) +terrain-floor-snow+))
+          ((= (aref (terrain level) x y z) +terrain-floor-dirt-bright+) (setf (aref (terrain level) x y z) +terrain-floor-snow+))
+          ((= (aref (terrain level) x y z) +terrain-floor-grass+) (setf (aref (terrain level) x y z) +terrain-floor-snow+))
+          ((= (aref (terrain level) x y z) +terrain-tree-birch+) (setf (aref (terrain level) x y z) +terrain-tree-birch-snow+))
+          ((= (aref (terrain level) x y z) +terrain-water-liquid+) (progn (setf (aref (terrain level) x y z) +terrain-water-ice+)
+                                                                         (when (< z (1- (array-dimension (terrain level) 2)))
+                                                                           (setf (aref (terrain level) x y (1+ z)) +terrain-water-ice+))))
+          ((= (aref (terrain level) x y z) +terrain-floor-leaves+) (setf (aref (terrain level) x y z) +terrain-floor-leaves-snow+))))))
+  )

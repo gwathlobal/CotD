@@ -39,6 +39,12 @@
 (defun get-mission-type-by-id (mission-type-id)
   (gethash mission-type-id *mission-types*))
 
+(defun get-all-mission-types-list (&key (include-disabled nil))
+  (loop for mission-type being the hash-values in *mission-types*
+        when (or (not include-disabled)
+                 (and include-disabled
+                      (not (enabled mission-type))))
+        collect mission-type))
 
 (defun get-ai-based-on-faction (faction-id mission-type-id)
   (if (find faction-id (ai-package-list (get-mission-type-by-id mission-type-id)) :key #'(lambda (a) (first a)))

@@ -113,6 +113,8 @@
                                                         :x 1 :y 1))
   (setf (aref (cells (world-map (world win))) 1 1) (world-sector win))
   (setf (mission (world-sector win)) (mission win))
+  (setf (level-modifier-list (mission win)) ())
+  (setf (faction-list (mission win)) ())
   
   (when (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win))))
     (funcall (scenario-enabled-func (get-world-sector-type-by-id (wtype (world-sector win)))) (world-map (world win)) (x (world-sector win)) (y (world-sector win)))) 

@@ -102,9 +102,13 @@
         (join-shadow-item (list "Join the Pandemonium Hierarchy (as a Shadow imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
-                                    (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-demon-shadow+)
-                                      (when (and mission world-sector)
-                                        (values world-sector mission)))
+                                    ;; start in the evening
+                                    (let ((lvl-mod-list (append (list (get-level-modifier-by-id +lm-tod-evening+))
+                                                                (remove +level-mod-time-of-day+ (get-all-lvl-mods-list) :key #'(lambda (a)
+                                                                                                                                 (lm-type a))))))
+                                      (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-demon-shadow+ :avail-lvl-mods-list lvl-mod-list)
+                                        (when (and mission world-sector)
+                                          (values world-sector mission))))
                                     )
                                 (get-txt-from-file "data/descriptions/pandemonium_shadowimp.txt")))
         (join-puppet-item (list "Join the Pandemonium Hierarchy (as Malseraph's puppet)"
@@ -134,9 +138,13 @@
         (join-thief-item (list "Join as the Thief"
                                #'(lambda (n) 
                                    (declare (ignore n))
-                                   (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-thief+)
-                                     (when (and mission world-sector)
-                                       (values world-sector mission)))
+                                   ;; start in the evening
+                                    (let ((lvl-mod-list (append (list (get-level-modifier-by-id +lm-tod-evening+))
+                                                                (remove +level-mod-time-of-day+ (get-all-lvl-mods-list) :key #'(lambda (a)
+                                                                                                                                 (lm-type a))))))
+                                      (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-thief+ :avail-lvl-mods-list lvl-mod-list)
+                                        (when (and mission world-sector)
+                                          (values world-sector mission))))
                                    )
                                (get-txt-from-file "data/descriptions/criminals.txt")))
         (join-satanist-item (list "Join the Satanists"
@@ -158,17 +166,23 @@
         (join-eater-item (list "Join as the Eater of the dead"
                                #'(lambda (n) 
                                    (declare (ignore n))
-                                   (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-eater+)
-                                      (when (and mission world-sector)
-                                        (values world-sector mission)))
+                                   ;; do not start in the snow
+                                   (let ((lvl-mod-list (remove +lm-weather-snow+ (get-all-lvl-mods-list) :key #'(lambda (a)
+                                                                                                                  (lm-type a)))))
+                                      (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-eater+ :avail-lvl-mods-list lvl-mod-list)
+                                        (when (and mission world-sector)
+                                          (values world-sector mission))))
                                    )
                                (get-txt-from-file "data/descriptions/primordials_eater.txt")))
         (join-skin-item (list "Join as the Skinchanger"
                               #'(lambda (n) 
                                   (declare (ignore n))
-                                  (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-skinchanger+)
-                                      (when (and mission world-sector)
-                                        (values world-sector mission)))
+                                  ;; do not start in the snow
+                                   (let ((lvl-mod-list (remove +lm-weather-snow+ (get-all-lvl-mods-list) :key #'(lambda (a)
+                                                                                                                  (lm-type a)))))
+                                     (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-skinchanger+ :avail-lvl-mods-list lvl-mod-list)
+                                       (when (and mission world-sector)
+                                         (values world-sector mission))))
                                   )
                               (get-txt-from-file "data/descriptions/primordials_skinchanger.txt")))
         (join-ghost-item (list "Join as the Lost soul"

@@ -23,6 +23,8 @@
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector mission world))
 
+                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add rain weather~%~%"))
+
                                                                     (pushnew +game-event-rain-falls+ (game-events level))
                                                                     
                                                                     )
@@ -37,4 +39,22 @@
                                                     (declare (ignore year day hour min sec))
                                                     (if (or (= month 11) (= month 0) (= month 1))
                                                       t
-                                                      nil))))
+                                                      nil)))
+                    :terrain-post-process-func-list (lambda ()
+                                                      (let ((func-list ()))
+                                                        
+                                                        (push #'change-level-to-snow func-list)
+                                                                                                                
+                                                        func-list))
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+
+                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add snow weather~%~%"))
+                                                                    
+                                                                    (pushnew +game-event-snow-falls+ (game-events level))
+                                                                    
+                                                                    )
+                                                                func-list)
+                                                          func-list)))

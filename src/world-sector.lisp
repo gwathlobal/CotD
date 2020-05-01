@@ -43,6 +43,10 @@
 (defun get-world-sector-type-by-id (world-sector-type-id)
   (gethash world-sector-type-id *world-sector-types*))
 
+(defun get-all-world-sector-types-list ()
+  (loop for world-sector-type being the hash-values in *world-sector-types*
+        collect world-sector-type))
+
 (defclass world-sector ()
   ((wtype :initform nil :initarg :wtype :accessor wtype) ;; ids from feature-layout
    (x :initarg :x :accessor x)

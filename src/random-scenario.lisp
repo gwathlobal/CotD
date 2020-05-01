@@ -1,9 +1,7 @@
 (in-package :cotd)
 
-(defun find-random-scenario-options (specific-faction-type &key (mission-type-id nil))
+(defun find-random-scenario-options (specific-faction-type &key (avail-mission-type-list nil) (avail-world-sector-type-list nil) (avail-lvl-mods-list nil) )
   (let ((available-faction-list ())
-        (overall-sector-list ())
-        (overall-mission-list ())
         (available-variants-list ())
         )
 
@@ -14,27 +12,30 @@
                                          collect (id faction-type)))
 
     (when (null available-faction-list)
-      (if mission-type-id
-        (return-from find-random-scenario-options (generate-random-scenario nil nil (get-mission-type-by-id mission-type-id) nil +mission-faction-present+ specific-faction-type))
-        (return-from find-random-scenario-options (generate-random-scenario nil nil nil nil +mission-faction-present+ specific-faction-type))))
+      (return-from find-random-scenario-options (generate-random-scenario nil nil +mission-faction-present+ specific-faction-type
+                                                                          :avail-mission-type-list avail-mission-type-list
+                                                                          :avail-world-sector-type-list nil
+                                                                          :avail-lvl-mods-list avail-lvl-mods-list)))
+
+    ;; if available lvl-mods are not supplied, take all of them
+    (when (not avail-lvl-mods-list)
+      (setf avail-lvl-mods-list (get-all-lvl-mods-list)))
+
+    ;; if available mission-types are not supplied, take all of them
+    (when (not avail-mission-type-list)
+      (setf avail-mission-type-list (get-all-mission-types-list))
+      (setf avail-mission-type-list (list (get-mission-type-by-id +mission-type-demonic-attack+)
+                                          (get-mission-type-by-id +mission-type-demonic-raid+)
+                                          (get-mission-type-by-id +mission-type-military-conquest+))))
     
-    ;; find all possible sectors in game
-    (setf overall-sector-list
-          (loop for world-sector-type being the hash-values in *world-sector-types*
-                collect world-sector-type))
-
-    (setf overall-mission-list
-          (loop for mission-type being the hash-values in *mission-types*
-                collect mission-type))
-
-    (setf overall-mission-list (list (get-mission-type-by-id +mission-type-demonic-attack+)
-                                     (get-mission-type-by-id +mission-type-demonic-raid+)
-                                     (get-mission-type-by-id +mission-type-military-conquest+)))
-
+    ;; if available sector types are not supplied, find all possible sectors in game
+    (when (not avail-world-sector-type-list)
+      (setf avail-world-sector-type-list (get-all-world-sector-types-list)))
+    
     ;; find all lvl mods that produce the required faction & are available for mission & world-sector
-    (loop for lvl-mod across *level-modifiers*
+    (loop for lvl-mod in avail-lvl-mods-list
           when (faction-list-func lvl-mod) do
-            (loop for world-sector-type in overall-sector-list do
+            (loop for world-sector-type in avail-world-sector-type-list do
               (loop with result-1 = nil
                     for (faction-type-id faction-present) in (funcall (faction-list-func lvl-mod) (wtype world-sector-type))
                     when (= faction-present +mission-faction-present+) do
@@ -45,7 +46,7 @@
                                              (loop-finish)
                                            finally (return result-2)))
                       (when result-1
-                        (loop for mission-type in overall-mission-list
+                        (loop for mission-type in avail-mission-type-list
                               when (world-sector-for-custom-scenario mission-type) do
                                 (loop for world-sector-type-id in (world-sector-for-custom-scenario mission-type)
                                       when (= world-sector-type-id (wtype world-sector-type)) do
@@ -58,7 +59,7 @@
                                       ))))))
 
     ;; find all world-sectors that produce the required faction & are available for mission
-    (loop for world-sector-type in overall-sector-list
+    (loop for world-sector-type in avail-world-sector-type-list
           when (faction-list-func world-sector-type) do
             (loop with result-1 = nil
                   for (faction-type-id faction-present) in (funcall (faction-list-func world-sector-type))
@@ -70,16 +71,16 @@
                                            (loop-finish)
                                          finally (return result-2)))
                     (when result-1
-                      (loop for mission-type in overall-mission-list
+                      (loop for mission-type in avail-mission-type-list
                             when (world-sector-for-custom-scenario mission-type) do
                               (loop for world-sector-type-id in (world-sector-for-custom-scenario mission-type)
                                     when (= world-sector-type-id (wtype world-sector-type)) do
                                       (push (list nil world-sector-type mission-type) available-variants-list))))))
 
     ;; find all missions that produce the required faction
-    (loop for mission-type in overall-mission-list
+    (loop for mission-type in avail-mission-type-list
           when (faction-list-func mission-type) do
-            (loop for world-sector-type in overall-sector-list
+            (loop for world-sector-type in avail-world-sector-type-list
                   for world-sector = (make-instance 'world-sector :wtype (wtype world-sector-type) :x 1 :y 1)
                   do
                      (loop with result-1 = nil
@@ -111,21 +112,16 @@
                 "NIL")))
 
     (when available-variants-list
-      ;; if mission-type-id is set, filter to contain lvl-mods with this mission-type-id only
-      (when mission-type-id
-        (setf available-variants-list (remove-if #'(lambda (a)
-                                                     (if (/= (id (third a)) mission-type-id)
-                                                       t
-                                                       nil))
-                                                 available-variants-list)))
-
       ;; generate a mission with all other parameters & exit
       (let ((lvl-mod-obj (nth (random (length available-variants-list)) available-variants-list)))
-        (return-from find-random-scenario-options (generate-random-scenario (first lvl-mod-obj) (second lvl-mod-obj) (third lvl-mod-obj) (nth (random (length available-faction-list)) available-faction-list) +mission-faction-present+ specific-faction-type)))
+        (return-from find-random-scenario-options (generate-random-scenario (first lvl-mod-obj) (nth (random (length available-faction-list)) available-faction-list) +mission-faction-present+ specific-faction-type
+                                                                            :avail-mission-type-list (list (third lvl-mod-obj))
+                                                                            :avail-world-sector-type-list (list (second lvl-mod-obj))
+                                                                            :avail-lvl-mods-list avail-lvl-mods-list)))
    
       )))
 
-(defun generate-random-scenario (req-lvl-mod world-sector-type req-mission-type req-faction-id req-faction-present specific-faction-type)
+(defun generate-random-scenario (req-lvl-mod req-faction-id req-faction-present specific-faction-type &key (avail-mission-type-list nil) (avail-world-sector-type-list nil) (avail-lvl-mods-list nil))
   (let ((world nil)
         (test-world-map (make-instance 'world-map))
         (mission nil)
@@ -214,6 +210,10 @@
                                                                     (push (id lvl-mod) (level-modifier-list mission)))
                                                                   (when (scenario-enabled-func lvl-mod)
                                                                     (funcall (scenario-enabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))))))))
+
+      (when (not avail-lvl-mods-list)
+        (setf avail-lvl-mods-list (get-all-lvl-mods-list)))
+      
       ;; create the supporting world
       (setf world (make-instance 'world))
       (setf *world* world)
@@ -233,35 +233,31 @@
                                                            (random 30)
                                                            0 0 0))
 
-      ;; if no specific mission is supplied, find a random mission
-      (when (null req-mission-type)
-        (loop with mission-type-list = ()
-              ;;for id being the hash-keys in *mission-types*
-              for id in (list +mission-type-demonic-attack+ +mission-type-demonic-raid+ +mission-type-military-conquest+)
-              for mission-type = (get-mission-type-by-id id)
-              when (enabled mission-type) do
-                (push mission-type mission-type-list)
-              finally (setf req-mission-type (nth (random (length mission-type-list)) mission-type-list))))
+      ;; find a random mission from the list,
+      ;; if no specific mission list is supplied, select from all enabled missions
+      (when (null avail-mission-type-list)
+        (setf avail-mission-type-list (get-all-mission-types-list))
+        (setf avail-mission-type-list (list (get-mission-type-by-id +mission-type-demonic-attack+)
+                                            (get-mission-type-by-id +mission-type-demonic-raid+)
+                                            (get-mission-type-by-id +mission-type-military-conquest+))))
       
       ;; create the mission
-      (setf mission (make-instance 'mission :mission-type-id (id req-mission-type)
+      (setf mission (make-instance 'mission :mission-type-id (id (nth (random (length avail-mission-type-list)) avail-mission-type-list))
                                             :x 1 :y 1
                                             :faction-list ()
                                             :level-modifier-list ()))
       
       ;; select a random world sector available for the mission, if none already selected
-      (when (not world-sector-type)
-        (let ((sector-list nil))
-          (setf sector-list (loop for world-sector-id in (world-sector-for-custom-scenario (get-mission-type-by-id (mission-type-id mission)))
-                                  collect (get-world-sector-type-by-id world-sector-id)))
-          (setf world-sector-type (nth (random (length sector-list)) sector-list))))
-      
+      (when (null avail-world-sector-type-list)
+        (setf avail-world-sector-type-list (loop for world-sector-id in (world-sector-for-custom-scenario (get-mission-type-by-id (mission-type-id mission)))
+                                                 collect (get-world-sector-type-by-id world-sector-id))))
+            
       ;; make necessary adjustments for the selected world-sector
       (loop for x from 0 to 2 do
         (loop for y from 0 to 2 do
           (setf (aref (cells (world-map world)) x y) (make-instance 'world-sector :wtype +world-sector-normal-residential+ :x x :y y))))
       
-      (setf world-sector (make-instance 'world-sector :wtype (wtype world-sector-type)
+      (setf world-sector (make-instance 'world-sector :wtype (wtype (nth (random (length avail-world-sector-type-list)) avail-world-sector-type-list))
                                                       :x 1 :y 1))
       (setf (aref (cells (world-map world)) 1 1) world-sector)
       (setf (mission world-sector) mission)
@@ -274,7 +270,7 @@
 
       ;; if controlled-by is not already set, find and set a random controlled-by lvl-mod
       (when (not lvl-mod-controlled-by-set)
-        (setf avail-controlled-list (loop for lvl-mod across *level-modifiers*
+        (setf avail-controlled-list (loop for lvl-mod in avail-lvl-mods-list
                                           when (and (= (lm-type lvl-mod) +level-mod-controlled-by+)
                                                     (is-available-for-mission lvl-mod)
                                                     (funcall (is-available-for-mission lvl-mod) (wtype world-sector) (mission-type-id mission) (world-game-time world)))
@@ -282,7 +278,7 @@
         (add/remove-lvl-mod (nth (random (length avail-controlled-list)) avail-controlled-list)))
       
       ;; add random feats lvl-mods, except req-lvl-mod
-      (setf avail-feats-list (loop for lvl-mod across *level-modifiers*
+      (setf avail-feats-list (loop for lvl-mod in avail-lvl-mods-list
                                    when (and (= (lm-type lvl-mod) +level-mod-sector-feat+)
                                              (is-available-for-mission lvl-mod)
                                              (funcall (is-available-for-mission lvl-mod) (wtype world-sector) (mission-type-id mission) (world-game-time world)))
@@ -294,7 +290,7 @@
               (add/remove-lvl-mod lvl-mod))
       
       ;; add random items lvl-mods, except req-lvl-mod
-      (setf avail-items-list (loop for lvl-mod across *level-modifiers*
+      (setf avail-items-list (loop for lvl-mod in avail-lvl-mods-list
                                    when (and (= (lm-type lvl-mod) +level-mod-sector-item+)
                                              (is-available-for-mission lvl-mod)
                                              (funcall (is-available-for-mission lvl-mod) (wtype world-sector) (mission-type-id mission) (world-game-time world)))
@@ -309,7 +305,7 @@
   
       ;; if tod is not already set, find and set a random time-of-day lvl-mod
       (when (not lvl-mod-tod-set)
-        (setf avail-tod-list (loop for lvl-mod across *level-modifiers*
+        (setf avail-tod-list (loop for lvl-mod in avail-lvl-mods-list
                                    when (and (= (lm-type lvl-mod) +level-mod-time-of-day+)
                                              (is-available-for-mission lvl-mod)
                                              (funcall (is-available-for-mission lvl-mod) (wtype world-sector) (mission-type-id mission) (world-game-time world)))
@@ -317,7 +313,7 @@
         (add/remove-lvl-mod (nth (random (length avail-tod-list)) avail-tod-list)))
     
       ;; add random weather lvl-mods, except req-lvl-mod
-      (setf avail-weather-list (loop for lvl-mod across *level-modifiers*
+      (setf avail-weather-list (loop for lvl-mod in avail-lvl-mods-list
                                      when (and (= (lm-type lvl-mod) +level-mod-weather+)
                                                (is-available-for-mission lvl-mod)
                                                (funcall (is-available-for-mission lvl-mod) (wtype world-sector) (mission-type-id mission) (world-game-time world)))
