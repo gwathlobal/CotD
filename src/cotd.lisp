@@ -306,32 +306,12 @@
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
                                         (declare (ignore n))
-                                        (let ((test-world-map (make-instance 'world-map)))
-                                          (setf *world* (make-instance 'world))
-                                          (generate-empty-world-map test-world-map (world-game-time *world*))
-                                          (loop for lm-controlled-id in (list +lm-controlled-by-demons+ +lm-controlled-by-military+) do
-                                            (loop for x = (random *max-x-world-map*)
-                                                  for y = (random *max-y-world-map*)
-                                                  while (or (and (<= x 2)
-                                                                 (<= y 2))
-                                                            (/= (controlled-by (aref (cells test-world-map) x y)) +lm-controlled-by-none+))
-                                                  finally
-                                                     (setf (controlled-by (aref (cells test-world-map) x y)) lm-controlled-id)))
-                                          
-                                          (setf (world-map *world*) test-world-map)
-
-                                          (setf *current-window* (make-instance 'custom-scenario-window
-                                                                                :world *world*
-                                                                                ))
-                                          (make-output *current-window*)
-                                          
-                                          (multiple-value-bind (world-sector mission) (run-window *current-window*)
+                                        (setf *current-window* (make-instance 'custom-scenario-window))
+                                        (make-output *current-window*)
+                                        (multiple-value-bind (world-sector mission) (run-window *current-window*)
                                             (when (and world-sector mission)
-                                              (setf (aref (cells test-world-map) 1 1) world-sector)
-                                              (setf (mission world-sector) mission)
                                               (setf *current-window* (return-to *current-window*))
                                               (return-from main-menu (values world-sector mission))))
-                                          )
                                         )))
         (settings-item (cons "Settings"
                              #'(lambda (n)
@@ -373,7 +353,7 @@
                                          (world-sector (make-instance 'world-sector :wtype +world-sector-test+ :x 0 :y 0)))
                                      (setf *world* (make-instance 'world))
                                      (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                     (generate-empty-world-map test-world-map (world-game-time *world*))
+                                     (generate-empty-world-map test-world-map)
                                      (setf (world-map *world*) test-world-map)
 
                                      (setf (aref (cells test-world-map) 0 0) world-sector)
@@ -387,7 +367,7 @@
         (play-prev-scenario (cons "Replay the previous scenario"
                                   #'(lambda (n) 
                                       (declare (ignore n))
-                                      (multiple-value-bind (mission world-sector) (find-random-scenario-options (second *previous-scenario*) :mission-type-id (first *previous-scenario*))
+                                      (multiple-value-bind (mission world-sector) (find-random-scenario-options (second *previous-scenario*) :avail-mission-type-list (list (get-mission-type-by-id (first *previous-scenario*))))
                                         (when (and mission world-sector)
                                           (return-from main-menu (values world-sector mission))
                                           ))

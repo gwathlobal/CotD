@@ -8,8 +8,7 @@
   ((cells :initform nil :accessor cells :type simple-array) ;; array of world-sector
    ))
 
-(defun generate-empty-world-map (world-map world-time)
-  (declare (ignore world-time))
+(defun generate-empty-world-map (world-map)
   (setf (cells world-map) (make-array (list *max-x-world-map* *max-y-world-map*) :element-type '(or world-sector null) :initial-element nil))
 
   (loop for x from 0 below *max-x-world-map* do

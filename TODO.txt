@@ -1,4 +1,3 @@
-- Refactor random generation & custom scenario window to use the same functions
 - THIRD-PARTY: Remove defenum dependency once the prev-tag fix is merged and uploaded into quicklisp
 - A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints
 - Demons/angels arrive delayed through portals
