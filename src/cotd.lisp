@@ -375,18 +375,16 @@
         (test-campaign-item (cons "Test campaign"
                                   #'(lambda (n)
                                       (declare (ignore n))
-                                      (let ((test-world-map (make-instance 'world-map))
-                                            (mission nil)
+                                      (let ((mission nil)
                                             (world-sector nil))
                                         (setf *world* (make-instance 'world))
                                         (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                        (generate-test-world-map test-world-map)
-                                        (setf (world-map *world*) test-world-map)
-
-                                        (setf (mission (aref (cells test-world-map) 1 2)) (generate-mission-on-world-map test-world-map 1 2 +mission-type-military-conquest+ (world-game-time *world*)))
+                                        (generate-test-world-map *world*)
+                                        
+                                        (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 +mission-type-military-conquest+))
                                         
                                         (setf *current-window* (make-instance 'new-campaign-window
-                                                                              :world-map test-world-map
+                                                                              :world-map (world-map *world*)
                                                                               :world-time (world-game-time *world*)))
                                         (make-output *current-window*)
                                         (multiple-value-setq (mission world-sector) (run-window *current-window*))

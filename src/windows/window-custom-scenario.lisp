@@ -115,7 +115,9 @@
 
       ;; add random weather lvl-mods
       (loop for lvl-mod in avail-weather-list
-        when (zerop (random 4)) do
+        when (or (not (random-available-for-mission lvl-mod))
+                 (funcall (random-available-for-mission lvl-mod)))
+          do
           (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t))
       
       (setf cur-feat 0)
@@ -405,7 +407,7 @@
                            
                            ;; Space - add/remove faction inside factions tab
                            ((and (sdl:key= key :sdl-key-space)
-                                 (eq (cur-step win) :custom-scenario-tab-factions))
+                                 (eq cur-step :custom-scenario-tab-factions))
                             (progn
                               (let* ((current-faction (first (nth cur-faction cur-faction-list)))
                                      (faction-present (second (nth cur-faction cur-faction-list)))

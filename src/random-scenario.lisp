@@ -29,7 +29,7 @@
    (specific-faction-list :initform () :accessor  scenario-gen-class/specific-faction-list :type list)
    ))
 
-(defmethod scenario-set-avail-mission-types ((scenario scenario-gen-class) &optional (new-mission-type-list ()))
+(defun scenario-set-avail-mission-types (scenario &optional (new-mission-type-list ()))
   (with-slots (avail-mission-type-list) scenario
     ;; set a list of available mission types
     (setf avail-mission-type-list new-mission-type-list)
@@ -42,7 +42,7 @@
                                           (get-mission-type-by-id +mission-type-military-conquest+))))
     ))
 
-(defmethod scenario-set-avail-world-sector-types ((scenario scenario-gen-class) &optional (new-world-sector-type-list ()))
+(defun scenario-set-avail-world-sector-types (scenario &optional (new-world-sector-type-list ()))
   (with-slots (avail-world-sector-type-list mission) scenario
     ;; set a list of available world sector types
     (setf avail-world-sector-type-list new-world-sector-type-list)
@@ -53,7 +53,7 @@
                                                collect (get-world-sector-type-by-id world-sector-id))))
     ))
 
-(defmethod scenario-set-avail-lvl-mods ((scenario scenario-gen-class) &optional (new-avail-lvl-mods-list ()))
+(defun scenario-set-avail-lvl-mods (scenario &optional (new-avail-lvl-mods-list ()))
   (with-slots (overall-lvl-mods-list select-lvl-mods-list select-controlled-mod select-feats-list select-items-list select-tod-mod select-weather-list
                avail-lvl-mods-list avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list world-sector mission world)
       scenario
@@ -89,7 +89,7 @@
           finally (setf overall-lvl-mods-list (append avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list))) 
     ))
 
-(defmethod scenario-create-world ((scenario scenario-gen-class))
+(defun scenario-create-world (scenario)
   (with-slots (world) scenario
     (setf world (make-instance 'world))
 
@@ -108,16 +108,16 @@
 
       (scenario-set-world-date scenario 1915 (random 12) (random 30) 0 0 0))))
 
-(defmethod scenario-create-mission ((scenario scenario-gen-class) mission-type-id)
+(defun scenario-create-mission (scenario mission-type-id &key (x 1) (y 1))
   (with-slots (mission) scenario
     ;; create the mission
     (setf mission (make-instance 'mission :mission-type-id mission-type-id
-                                          :x 1 :y 1
+                                          :x x :y y
                                           :faction-list ()
                                           :level-modifier-list ()))
     ))
 
-(defmethod scenario-create-sector ((scenario scenario-gen-class) world-sector-type-id)
+(defun scenario-create-sector (scenario world-sector-type-id)
   (with-slots (world world-sector mission) scenario
     (loop for x from 0 to 2 do
       (loop for y from 0 to 2 do
@@ -133,18 +133,19 @@
     (when (scenario-enabled-func (get-world-sector-type-by-id (wtype world-sector)))
       (funcall (scenario-enabled-func (get-world-sector-type-by-id (wtype world-sector))) (world-map world) (x world-sector) (y world-sector)))))
 
-(defmethod scenario-set-world-date ((scenario scenario-gen-class) &optional (year 1915) (month 0) (day 0) (hour 0) (min 0) (sec 0))
+(defun scenario-set-world-date (scenario &optional (year 1915) (month 0) (day 0) (hour 0) (min 0) (sec 0))
   (with-slots (world) scenario
     (setf (world-game-time world) (set-current-date-time year
                                                          month
                                                          day
                                                          hour min sec))))
 
-(defmethod scenario-set-controlled-by-lvl-mod ((scenario scenario-gen-class) lvl-mod &key (add-to-sector t))
+(defun scenario-set-controlled-by-lvl-mod (scenario lvl-mod &key (add-to-sector t) (apply-scenario-func t))
   (with-slots (world-sector world select-lvl-mods-list select-controlled-mod) scenario
     (let ((prev-lvl-mod (get-level-modifier-by-id (controlled-by world-sector))))
       ;; remove previous controlled-by from sector
       (when (and prev-lvl-mod
+                 apply-scenario-func
                  (scenario-disabled-func prev-lvl-mod))
         (funcall (scenario-disabled-func prev-lvl-mod) (world-map world) (x world-sector) (y world-sector)))
       
@@ -156,10 +157,11 @@
       ;; add new controlled-by to sector
       (when add-to-sector
         (setf (controlled-by world-sector) (id lvl-mod)))
-      (when (scenario-enabled-func lvl-mod)
+      (when (and apply-scenario-func
+                 (scenario-enabled-func lvl-mod))
         (funcall (scenario-enabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector))))))
 
-(defmethod scenario-add/remove-feat-lvl-mod ((scenario scenario-gen-class) lvl-mod &key (add-general t) (add-to-sector t))
+(defun scenario-add/remove-feat-lvl-mod (scenario lvl-mod &key (add-general t) (add-to-sector t) (apply-scenario-func t))
   (with-slots (world world-sector select-lvl-mods-list select-feats-list) scenario
     (if add-general
       ;; either add...
@@ -171,18 +173,20 @@
           
           (when add-to-sector
             (push (list (id lvl-mod) nil) (feats world-sector)))
-          (when (scenario-enabled-func lvl-mod)
+          (when (and apply-scenario-func
+                     (scenario-enabled-func lvl-mod))
             (funcall (scenario-enabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))))
       ;; ...or remove
       (progn
-        (when (scenario-disabled-func lvl-mod)
+        (when (and apply-scenario-func
+                   (scenario-disabled-func lvl-mod))
           (funcall (scenario-disabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))
         (setf (feats world-sector) (remove (id lvl-mod) (feats world-sector) :key #'(lambda (a) (first a))))
         
         (setf select-lvl-mods-list (remove lvl-mod select-lvl-mods-list))
         (setf select-feats-list (remove lvl-mod select-feats-list))))))
 
-(defmethod scenario-add/remove-item-lvl-mod ((scenario scenario-gen-class) lvl-mod &key (add-general t) (add-to-sector t))
+(defun scenario-add/remove-item-lvl-mod (scenario lvl-mod &key (add-general t) (add-to-sector t) (apply-scenario-func t))
   (with-slots (world world-sector select-lvl-mods-list select-items-list) scenario
     (if add-general
       ;; either add...
@@ -194,24 +198,27 @@
           
           (when add-to-sector
             (push (id lvl-mod) (items world-sector)))
-          (when (scenario-enabled-func lvl-mod)
+          (when (and apply-scenario-func
+                     (scenario-enabled-func lvl-mod))
             (funcall (scenario-enabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))))
       ;; ...or remove
       (progn
-        (when (scenario-disabled-func lvl-mod)
+        (when (and apply-scenario-func
+                   (scenario-disabled-func lvl-mod))
           (funcall (scenario-disabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))
         (setf (items world-sector) (remove (id lvl-mod) (items world-sector)))
         
         (setf select-lvl-mods-list (remove lvl-mod select-lvl-mods-list))
         (setf select-items-list (remove lvl-mod select-items-list))))))
 
-(defmethod scenario-set-tod-lvl-mod ((scenario scenario-gen-class) lvl-mod &key (add-to-sector t))
+(defun scenario-set-tod-lvl-mod (scenario lvl-mod &key (add-to-sector t) (apply-scenario-func t))
   (with-slots (world world-sector mission select-lvl-mods-list select-tod-mod) scenario
     (let ((prev-lvl-mod (find +level-mod-time-of-day+ (level-modifier-list mission)
                               :key #'(lambda (a)
                                        (lm-type (get-level-modifier-by-id a))))))
       ;; remove previous tod from sector
       (when (and prev-lvl-mod
+                 apply-scenario-func
                  (scenario-disabled-func prev-lvl-mod))
         (funcall (scenario-disabled-func prev-lvl-mod) (world-map world) (x world-sector) (y world-sector))
         (remove (id prev-lvl-mod) (level-modifier-list mission)))
@@ -224,10 +231,11 @@
       ;; add new to to sector
       (when add-to-sector
         (push (id lvl-mod) (level-modifier-list mission)))
-      (when (scenario-enabled-func lvl-mod)
+      (when (and apply-scenario-func
+                 (scenario-enabled-func lvl-mod))
         (funcall (scenario-enabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector))))))
 
-(defmethod scenario-add/remove-weather-lvl-mod ((scenario scenario-gen-class) lvl-mod &key (add-general t) (add-to-sector t))
+(defun scenario-add/remove-weather-lvl-mod (scenario lvl-mod &key (add-general t) (add-to-sector t) (apply-scenario-func t))
   (with-slots (world world-sector mission select-lvl-mods-list select-weather-list) scenario
     (if add-general
       ;; either add...
@@ -239,26 +247,28 @@
           
           (when add-to-sector
             (push (id lvl-mod) (level-modifier-list mission)))
-          (when (scenario-enabled-func lvl-mod)
+          (when (and apply-scenario-func
+                     (scenario-enabled-func lvl-mod))
             (funcall (scenario-enabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))))
       ;; ...or remove
       (progn
-        (when (scenario-disabled-func lvl-mod)
+        (when (and apply-scenario-func
+                   (scenario-disabled-func lvl-mod))
           (funcall (scenario-disabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))
         (setf (level-modifier-list mission) (remove (id lvl-mod) (level-modifier-list mission)))
         
         (setf select-lvl-mods-list (remove lvl-mod select-lvl-mods-list))
         (setf select-weather-list (remove lvl-mod select-weather-list))))))
 
-(defmethod scenario-add/remove-lvl-mod ((scenario scenario-gen-class) lvl-mod &key (add-general t) (add-to-sector t))
+(defun scenario-add/remove-lvl-mod (scenario lvl-mod &key (add-general t) (add-to-sector t) (apply-scenario-func t))
   (cond
-    ((= (lm-type lvl-mod) +level-mod-controlled-by+) (scenario-set-controlled-by-lvl-mod scenario lvl-mod :add-to-sector add-to-sector))
-    ((= (lm-type lvl-mod) +level-mod-sector-feat+) (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector))
-    ((= (lm-type lvl-mod) +level-mod-sector-item+) (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector))
-    ((= (lm-type lvl-mod) +level-mod-time-of-day+) (scenario-set-tod-lvl-mod scenario lvl-mod :add-to-sector add-to-sector))
-    ((= (lm-type lvl-mod) +level-mod-weather+) (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector))))
+    ((= (lm-type lvl-mod) +level-mod-controlled-by+) (scenario-set-controlled-by-lvl-mod scenario lvl-mod :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    ((= (lm-type lvl-mod) +level-mod-sector-feat+) (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    ((= (lm-type lvl-mod) +level-mod-sector-item+) (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    ((= (lm-type lvl-mod) +level-mod-time-of-day+) (scenario-set-tod-lvl-mod scenario lvl-mod :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    ((= (lm-type lvl-mod) +level-mod-weather+) (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))))
 
-(defmethod scenario-adjust-lvl-mods-after-sector-regeneration ((scenario scenario-gen-class))
+(defun scenario-adjust-lvl-mods-after-sector-regeneration (scenario)
   (with-slots (world world-sector mission always-lvl-mods-list select-lvl-mods-list) scenario
     ;; if there are lvl mods in world sector that are not added properly, add them (availability check is done inside add/remove, so lvl-mods are not duplicated)
     (loop for (lvl-mod-id aux) in (feats world-sector)
@@ -292,14 +302,14 @@
             (funcall push-dependent-func (funcall (depends-on-lvl-mod-func lvl-mod) world-sector (mission-type-id mission) (world-game-time world))))
     ))
 
-(defmethod scenario-sort-select-lvl-mods ((scenario scenario-gen-class))
+(defun scenario-sort-select-lvl-mods (scenario)
   (with-slots (select-lvl-mods-list) scenario
     (setf select-lvl-mods-list (stable-sort select-lvl-mods-list #'(lambda (a b)
                                                                      (if (< (lm-type a) (lm-type b))
                                                                        t
                                                                        nil))))))
 
-(defmethod scenario-adjust-factions ((scenario scenario-gen-class) &key (req-faction-id nil) (req-faction-present nil))
+(defun scenario-adjust-factions (scenario &key (req-faction-id nil) (req-faction-present nil))
   (with-slots (world-sector mission avail-faction-list cur-faction-list) scenario
     ;; find all general factions
     (loop initially (setf avail-faction-list ())
@@ -341,9 +351,16 @@
                         (push (list faction-id req-faction-present) cur-faction-list)
                         (push (list faction-id (nth (random (length faction-present-list)) faction-present-list))
                               cur-faction-list))
-                   finally (setf (faction-list mission) cur-faction-list)))))
+                   finally (setf cur-faction-list (stable-sort cur-faction-list #'(lambda (a b)
+                                                                                    (if (= (second a) +mission-faction-present+)
+                                                                                      (if (string-lessp (name (get-faction-type-by-id (first a)))
+                                                                                                        (name (get-faction-type-by-id (first b))))
+                                                                                        t
+                                                                                        nil)
+                                                                                      nil))))
+                           (setf (faction-list mission) cur-faction-list)))))
 
-(defmethod scenario-adjust-specific-factions ((scenario scenario-gen-class))
+(defun scenario-adjust-specific-factions (scenario)
   (with-slots (mission cur-faction-list specific-faction-list) scenario
     (loop initially (setf specific-faction-list ())
           for (faction-id faction-present) in cur-faction-list
@@ -366,7 +383,7 @@
                       (push +specific-faction-type-dead-player+ specific-faction-list)))
                   (remove-duplicates specific-faction-list))))
 
-(defmethod scenario-set-player-specific-faction ((scenario scenario-gen-class) specific-faction-type)
+(defun scenario-set-player-specific-faction (scenario specific-faction-type)
   (with-slots (mission) scenario
     (setf (player-lvl-mod-placement-id mission) (second (find specific-faction-type (scenario-faction-list (get-mission-type-by-id (mission-type-id mission)))
                                                               :key #'(lambda (a) (first a)))))))
@@ -562,8 +579,10 @@
 
         ;; add random weather lvl-mods
         (loop for lvl-mod in avail-weather-list
-              when (zerop (random 4)) do
-                (add-lvl-mod lvl-mod))
+              when (or (not (random-available-for-mission lvl-mod))
+                       (funcall (random-available-for-mission lvl-mod)))
+                do
+                   (add-lvl-mod lvl-mod))
 
         ;; add all dependent lvl mods, as well as lvl mods after wrold sector generation above
         (scenario-adjust-lvl-mods-after-sector-regeneration scenario)
