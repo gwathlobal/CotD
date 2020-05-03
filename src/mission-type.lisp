@@ -1,7 +1,7 @@
 (in-package :cotd)
 
 (defclass mission-type ()
-  ((id :initform +mission-type-none+ :initarg :id :accessor id)
+  ((id :initform :mission-type-none :initarg :id :accessor id :type mission-type-enum)
    (name :initform "Mission type name" :initarg :name :accessor name)
    (enabled :initform t :initarg :enabled :accessor enabled)
    (is-available-func :initform #'(lambda (world-map x y) (declare (ignore world-map x y)) nil) :initarg :is-available-func :accessor is-available-func)

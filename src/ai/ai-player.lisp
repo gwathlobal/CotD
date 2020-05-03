@@ -29,15 +29,15 @@
                  (= (loyal-faction *player*) +faction-type-church+)
                  (= (loyal-faction *player*) +faction-type-satanists+)
                  (= (loyal-faction *player*) +faction-type-military+))
-             (or (= (mission-type-id (mission (level *world*))) +mission-type-demonic-thievery+)
-                 (= (mission-type-id (mission (level *world*))) +mission-type-celestial-retrieval+)))
+             (or (eq (mission-type-id (mission (level *world*))) :mission-type-demonic-thievery)
+                 (eq (mission-type-id (mission (level *world*))) :mission-type-celestial-retrieval)))
     (sense-relic))
   (when (and (or (= (loyal-faction *player*) +faction-type-demons+)
                  (= (loyal-faction *player*) +faction-type-angels+)
                  (= (loyal-faction *player*) +faction-type-church+)
                  (= (loyal-faction *player*) +faction-type-satanists+)
                  (= (loyal-faction *player*) +faction-type-military+))
-             (= (mission-type-id (mission (level *world*))) +mission-type-demonic-conquest+))
+             (eq (mission-type-id (mission (level *world*))) :mission-type-demonic-conquest))
     (sense-sigil))
 
   ;; print out the items on the player's tile

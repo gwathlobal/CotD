@@ -4,7 +4,7 @@
 ;; MISSION-TYPES
 ;;----------------------------------------
 
-(set-mission-type :id +mission-type-test+
+(set-mission-type :id :mission-type-test
                   :name "Test"
                   :enabled nil
                   :faction-list-func #'(lambda (world-sector)
@@ -29,7 +29,7 @@
 
                   )
 
-(set-mission-type :id +mission-type-demonic-attack+
+(set-mission-type :id :mission-type-demonic-attack
                   :name "Demonic attack"
                   :is-available-func #'(lambda (world-map x y)
                                          (let ((near-demons nil))
@@ -151,7 +151,7 @@
                                             )
                   )
 
-(set-mission-type :id +mission-type-demonic-raid+
+(set-mission-type :id :mission-type-demonic-raid
                   :name "Demonic raid"
                   :is-available-func #'(lambda (world-map x y)
                                          (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
@@ -320,7 +320,7 @@
                                             )
                   )
 
-(set-mission-type :id +mission-type-demonic-conquest+
+(set-mission-type :id :mission-type-demonic-conquest
                   :name "Demonic conquest"
                   :is-available-func #'(lambda (world-map x y)
                                          (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
@@ -356,7 +356,7 @@
                                                           +world-sector-abandoned-residential+
                                                           +world-sector-abandoned-lake+))
 
-(set-mission-type :id +mission-type-demonic-thievery+
+(set-mission-type :id :mission-type-demonic-thievery
                   :name "Demonic thievery"
                   :is-available-func #'(lambda (world-map x y)
                                          (if (and (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
@@ -384,7 +384,7 @@
                                                           +world-sector-abandoned-residential+
                                                           +world-sector-abandoned-lake+))
 
-(set-mission-type :id +mission-type-military-conquest+
+(set-mission-type :id :mission-type-military-conquest
                   :name "Military conquest"
                   :is-available-func #'(lambda (world-map x y)
                                          (let ((near-military nil))
@@ -498,7 +498,7 @@
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             ))
 
-(set-mission-type :id +mission-type-military-raid+
+(set-mission-type :id :mission-type-military-raid
                   :name "Military raid"
                   :is-available-func #'(lambda (world-map x y)
                                          (let ((near-military nil))
@@ -533,7 +533,7 @@
                                                           +world-sector-abandoned-residential+
                                                           +world-sector-abandoned-lake+))
 
-(set-mission-type :id +mission-type-celestial-purge+
+(set-mission-type :id :mission-type-celestial-purge
                   :name "Celestial purge"
                   :is-available-func #'(lambda (world-map x y)
                                          (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
@@ -560,7 +560,7 @@
                                                           +world-sector-corrupted-residential+
                                                           +world-sector-corrupted-lake+))
 
-(set-mission-type :id +mission-type-celestial-retrieval+
+(set-mission-type :id :mission-type-celestial-retrieval
                   :name "Celestial retrieval"
                   :is-available-func #'(lambda (world-map x y)
                                          (if (and (not (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a))))

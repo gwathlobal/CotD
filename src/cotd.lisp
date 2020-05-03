@@ -347,7 +347,7 @@
                                #'(lambda (n) 
                                    (declare (ignore n))
                                    (let ((test-world-map (make-instance 'world-map))
-                                         (mission (make-instance 'mission :mission-type-id +mission-type-test+
+                                         (mission (make-instance 'mission :mission-type-id :mission-type-test
                                                                           :x 0 :y 0
                                                                           :level-modifier-list (list +lm-tod-night+)))
                                          (world-sector (make-instance 'world-sector :wtype +world-sector-test+ :x 0 :y 0)))
@@ -381,7 +381,7 @@
                                         (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
                                         (generate-test-world-map *world*)
                                         
-                                        (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 +mission-type-military-conquest+))
+                                        (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 :mission-type-military-conquest))
                                         
                                         (setf *current-window* (make-instance 'new-campaign-window
                                                                               :world-map (world-map *world*)
