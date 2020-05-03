@@ -96,7 +96,7 @@
             with faction-comma = nil
             for (faction-type faction-presence) in (faction-list (mission sector))
             for faction-name = (name (get-faction-type-by-id faction-type))
-            when (= faction-presence +mission-faction-present+)
+            when (eq faction-presence :mission-faction-present)
               do
                  (when first-line
                    (format faction-str "~%   Present factions:~%      ")
@@ -109,7 +109,7 @@
             with faction-comma = nil
             for (faction-type faction-presence) in (faction-list (mission sector))
             for faction-name = (name (get-faction-type-by-id faction-type))
-            when (= faction-presence +mission-faction-delayed+)
+            when (eq faction-presence :mission-faction-delayed)
               do
                  (when first-line
                    (format faction-str "~%   Delayed arrival:~%      ")
@@ -591,7 +591,7 @@
   (loop with civilians-present = nil
         for (faction-type faction-presence) in (faction-list mission)
         when (and (= faction-type +faction-type-civilians+)
-                  (= faction-presence +mission-faction-present+))
+                  (eq faction-presence :mission-faction-present))
           do
              (setf civilians-present t)
         finally

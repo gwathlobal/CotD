@@ -9,7 +9,7 @@
                   :enabled nil
                   :faction-list-func #'(lambda (world-sector)
                                          (declare (ignore world-sector))
-                                         (let ((faction-list (list (list +faction-type-none+ +mission-faction-present+)
+                                         (let ((faction-list (list (list +faction-type-none+ :mission-faction-present)
                                                                    )))
                                            
                                            faction-list))
@@ -51,13 +51,13 @@
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                   (list +faction-type-angels+ +mission-faction-absent+)
+                                         (let ((faction-list (list (list +faction-type-demons+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-delayed)
+                                                                   (list +faction-type-angels+ :mission-faction-absent)
                                                                    )))
                                            (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
-                                             (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-normal-forest+
                                                           +world-sector-normal-port+
@@ -162,13 +162,13 @@
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                   (list +faction-type-angels+ +mission-faction-absent+)
+                                         (let ((faction-list (list (list +faction-type-demons+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-delayed)
+                                                                   (list +faction-type-angels+ :mission-faction-absent)
                                                                    )))
                                            (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
-                                             (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-normal-forest+
                                                           +world-sector-normal-port+
@@ -336,14 +336,14 @@
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                   (list +faction-type-angels+ +mission-faction-absent+)
+                                         (let ((faction-list (list (list +faction-type-demons+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-delayed)
+                                                                   (list +faction-type-angels+ :mission-faction-absent)
                                                                    )))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
-                                             (push (list +faction-type-military+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                             (push (list +faction-type-military+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-normal-forest+
                                                           +world-sector-normal-port+
@@ -364,14 +364,14 @@
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-demons+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                   (list +faction-type-angels+ +mission-faction-absent+)
+                                         (let ((faction-list (list (list +faction-type-demons+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-delayed)
+                                                                   (list +faction-type-angels+ :mission-faction-absent)
                                                                    )))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
-                                             (push (list +faction-type-military+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-military+ +mission-faction-delayed+) faction-list))
+                                             (push (list +faction-type-military+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-normal-forest+
                                                           +world-sector-normal-port+
@@ -403,14 +403,14 @@
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-military+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                   (list +faction-type-angels+ +mission-faction-absent+)
+                                         (let ((faction-list (list (list +faction-type-military+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-delayed)
+                                                                   (list +faction-type-angels+ :mission-faction-absent)
                                                                    )))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
-                                             (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
@@ -517,14 +517,14 @@
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-military+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-present+)
-                                                                   (list +faction-type-angels+ +mission-faction-delayed+)
-                                                                   (list +faction-type-angels+ +mission-faction-absent+)
+                                         (let ((faction-list (list (list +faction-type-military+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-present)
+                                                                   (list +faction-type-angels+ :mission-faction-delayed)
+                                                                   (list +faction-type-angels+ :mission-faction-absent)
                                                                    )))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
-                                             (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-abandoned-forest+
@@ -544,14 +544,14 @@
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-angels+ +mission-faction-present+))))
+                                         (let ((faction-list (list (list +faction-type-angels+ :mission-faction-present))))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
-                                             (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
-                                             (push (list +faction-type-military+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-military+ +mission-faction-delayed+) faction-list)
+                                             (push (list +faction-type-military+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
@@ -568,14 +568,14 @@
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
-                                         (let ((faction-list (list (list +faction-type-angels+ +mission-faction-present+))))
+                                         (let ((faction-list (list (list +faction-type-angels+ :mission-faction-present))))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
-                                             (push (list +faction-type-demons+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-demons+ +mission-faction-delayed+) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
-                                             (push (list +faction-type-military+ +mission-faction-present+) faction-list)
-                                             (push (list +faction-type-military+ +mission-faction-delayed+) faction-list)
+                                             (push (list +faction-type-military+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
                   :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
@@ -597,6 +597,12 @@
 ;;----------------------------------------
 ;; MISSION-DISTRICTS
 ;;----------------------------------------
+
+(defconstant +mission-faction-present+ 0)
+(defconstant +mission-faction-absent+ 1)
+(defconstant +mission-faction-delayed+ 2)
+(defconstant +mission-faction-attacker+ 3)
+(defconstant +mission-faction-defender+ 4)
 
 (set-mission-district (make-instance 'mission-district :id +city-layout-normal+
                                                        :faction-list (list (list +faction-type-civilians+ +mission-faction-present+)

@@ -1,11 +1,5 @@
 (in-package :cotd)
 
-(defconstant +mission-faction-absent+ 0)
-(defconstant +mission-faction-attacker+ 1)
-(defconstant +mission-faction-defender+ 2)
-(defconstant +mission-faction-delayed+ 3)
-(defconstant +mission-faction-present+ 4)
-
 ;;---------------------------------
 ;; LEVEL-MOD-TYPE Constants
 ;;---------------------------------

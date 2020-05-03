@@ -56,8 +56,8 @@
   (loop for (faction-id game-event-id) in (win-condition-list (get-mission-type-by-id (mission-type-id mission)))
         when (find-if #'(lambda (a)
                           (if (and (= (first a) faction-id)
-                                   (or (= (second a) +mission-faction-present+)
-                                       (= (second a) +mission-faction-delayed+)))
+                                   (or (eq (second a) :mission-faction-present)
+                                       (eq (second a) :mission-faction-delayed)))
                             t
                             nil))
                       (faction-list mission))
@@ -155,7 +155,7 @@
   (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-ghost+)
              (find-if #'(lambda (a)
                           (if (and (= (first a) +faction-type-ghost+)
-                                   (= (second a) +mission-faction-present+))
+                                   (eq (second a) :mission-faction-present))
                             t
                             nil))
                       (faction-list mission)))
@@ -170,7 +170,7 @@
              (/= (player-lvl-mod-placement-id mission) +lm-placement-skinchanger+)
              (find-if #'(lambda (a)
                           (if (and (= (first a) +faction-type-eater+)
-                                   (= (second a) +mission-faction-present+))
+                                   (eq (second a) :mission-faction-present))
                             t
                             nil))
                       (faction-list mission)))
@@ -186,7 +186,7 @@
   (when (and (/= (player-lvl-mod-placement-id mission) +specific-faction-type-thief+)
              (find-if #'(lambda (a)
                           (if (and (= (first a) +faction-type-criminals+)
-                                   (= (second a) +mission-faction-present+))
+                                   (eq (second a) :mission-faction-present))
                             t
                             nil))
                       (faction-list mission)))
@@ -254,7 +254,7 @@
   (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place demons function~%"))
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-demons+)
-                              (= (second a) +mission-faction-present+))
+                              (eq (second a) :mission-faction-present))
                        t
                        nil))
                  (faction-list mission))
@@ -285,7 +285,7 @@
 
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-demons+)
-                              (= (second a) +mission-faction-delayed+))
+                              (eq (second a) :mission-faction-delayed))
                        t
                        nil))
                  (faction-list mission))
@@ -312,7 +312,7 @@
   
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-angels+)
-                              (= (second a) +mission-faction-present+))
+                              (eq (second a) :mission-faction-present))
                        t
                        nil))
                  (faction-list mission))
@@ -393,7 +393,7 @@
 
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-angels+)
-                              (= (second a) +mission-faction-delayed+))
+                              (eq (second a) :mission-faction-delayed))
                        t
                        nil))
                  (faction-list mission))
@@ -438,7 +438,7 @@
   
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-military+)
-                              (= (second a) +mission-faction-present+))
+                              (eq (second a) :mission-faction-present))
                        t
                        nil))
                  (faction-list mission))
@@ -483,7 +483,7 @@
   
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-military+)
-                              (= (second a) +mission-faction-delayed+))
+                              (eq (second a) :mission-faction-delayed))
                        t
                        nil))
                  (faction-list mission))
@@ -552,12 +552,6 @@
 (defconstant +mission-type-district-layout-living+ 0)
 (defconstant +mission-type-district-layout-abandoned+ 1)
 (defconstant +mission-type-district-layout-corrupted+ 2)
-
-(defconstant +mission-faction-absent+ 0)
-(defconstant +mission-faction-attacker+ 1)
-(defconstant +mission-faction-defender+ 2)
-(defconstant +mission-faction-delayed+ 3)
-(defconstant +mission-faction-present+ 4)
 
 (defclass mission-district ()
   ((id :initarg :id :accessor id :type fixnum)

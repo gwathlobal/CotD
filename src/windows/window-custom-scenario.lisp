@@ -25,9 +25,10 @@
 
 (defmethod initialize-instance :after ((win custom-scenario-window) &key)
   (with-slots (scenario cur-mission-type cur-month menu-items cur-sel cur-step) win
-    (with-slots (avail-mission-type-list) scenario
+    (with-slots (world avail-mission-type-list) scenario
       ;; set up supporting world
       (scenario-create-world scenario)
+      (setf *world* world)
 
       (setf cur-month (random 12))
       (scenario-set-world-date scenario 1915 cur-month (random 30) 0 0 0)
@@ -177,9 +178,9 @@
         (:custom-scenario-tab-factions (return-from populate-custom-scenario-win-menu
                                          (loop for (faction-id faction-present) in cur-faction-list
                                                collect (format nil "~A ~A"
-                                                               (cond
-                                                                 ((= faction-present +mission-faction-present+) "[+]")
-                                                                 ((= faction-present +mission-faction-delayed+) "[d]")
+                                                               (case faction-present
+                                                                 (:mission-faction-present "[+]")
+                                                                 (:mission-faction-delayed "[d]")
                                                                  (t "   "))
                                                                (name (get-faction-type-by-id faction-id))))))
         (:custom-scenario-tab-specific-factions (return-from populate-custom-scenario-win-menu
@@ -196,14 +197,14 @@
   (loop with str = (create-string)
         with first-no-comma = t
         for (faction-id faction-present) in win-faction-list
-        when (/= faction-present +mission-faction-absent+) do
+        when (not (eq faction-present :mission-faction-absent)) do
           (format str "~A~A ~A"
                   (if (not first-no-comma)
                     ", "
                     "")
-                  (cond
-                    ((= faction-present +mission-faction-present+) "[+]")
-                    ((= faction-present +mission-faction-delayed+) "[d]"))
+                  (case faction-present
+                    (:mission-faction-present "[+]")
+                    (:mission-faction-delayed "[d]"))
                   (name (get-faction-type-by-id faction-id)))
           (setf first-no-comma nil)
         finally (return-from nil str)))
@@ -311,9 +312,9 @@
                                                                             (nth (1+ ref-faction-present-pos) (second ref-faction-obj)))))
                                                (cond
                                                  ((<= (length (second ref-faction-obj)) 1) nil)
-                                                 ((= next-faction-present +mission-faction-present+) (format str "[Space] Include as present faction  "))
-                                                 ((= next-faction-present +mission-faction-delayed+) (format str "[Space] Include as delayed faction  "))
-                                                 ((= next-faction-present +mission-faction-absent+) (format str "[Space] Exclude the faction  "))))
+                                                 ((eq next-faction-present :mission-faction-present) (format str "[Space] Include as present faction  "))
+                                                 ((eq next-faction-present :mission-faction-delayed) (format str "[Space] Include as delayed faction  "))
+                                                 ((eq next-faction-present :mission-faction-absent) (format str "[Space] Exclude the faction  "))))
                                              (format str "[Right] Next step  [Up/Down] Move selection  [Left] Previous step  [Esc] Exit")
                                              ))
             (:custom-scenario-tab-feats (progn

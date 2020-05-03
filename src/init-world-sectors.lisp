@@ -26,13 +26,13 @@
                        :glyph-color sdl:*white*
                        :name "An ordinary district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-civilians+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)
-                                                    (list +faction-type-criminals+ +mission-faction-present+)
-                                                    (list +faction-type-criminals+ +mission-faction-absent+)
-                                                    (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                                              (list (list +faction-type-civilians+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)
+                                                    (list +faction-type-criminals+ :mission-faction-present)
+                                                    (list +faction-type-criminals+ :mission-faction-absent)
+                                                    (list +faction-type-ghost+ :mission-faction-present)
+                                                    (list +faction-type-ghost+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-man+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -60,13 +60,13 @@
                        :glyph-color sdl:*white*
                        :name "A seaport district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-civilians+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)
-                                                    (list +faction-type-criminals+ +mission-faction-present+)
-                                                    (list +faction-type-criminals+ +mission-faction-absent+)
-                                                    (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                                              (list (list +faction-type-civilians+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)
+                                                    (list +faction-type-criminals+ :mission-faction-present)
+                                                    (list +faction-type-criminals+ :mission-faction-absent)
+                                                    (list +faction-type-ghost+ :mission-faction-present)
+                                                    (list +faction-type-ghost+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-man+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -128,13 +128,13 @@
                        :glyph-color sdl:*white*
                        :name "The outskirts of the city"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-civilians+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)
-                                                    (list +faction-type-criminals+ +mission-faction-present+)
-                                                    (list +faction-type-criminals+ +mission-faction-absent+)
-                                                    (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                                              (list (list +faction-type-civilians+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)
+                                                    (list +faction-type-criminals+ :mission-faction-present)
+                                                    (list +faction-type-criminals+ :mission-faction-absent)
+                                                    (list +faction-type-ghost+ :mission-faction-present)
+                                                    (list +faction-type-ghost+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-man+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -168,13 +168,13 @@
                        :glyph-color sdl:*white*
                        :name "A district upon a lake"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-civilians+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)
-                                                    (list +faction-type-criminals+ +mission-faction-present+)
-                                                    (list +faction-type-criminals+ +mission-faction-absent+)
-                                                    (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                                              (list (list +faction-type-civilians+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)
+                                                    (list +faction-type-criminals+ :mission-faction-present)
+                                                    (list +faction-type-criminals+ :mission-faction-absent)
+                                                    (list +faction-type-ghost+ :mission-faction-present)
+                                                    (list +faction-type-ghost+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-man+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -212,13 +212,13 @@
                        :glyph-color sdl:*white*
                        :name "An island district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-civilians+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)
-                                                    (list +faction-type-criminals+ +mission-faction-present+)
-                                                    (list +faction-type-criminals+ +mission-faction-absent+)
-                                                    (list +faction-type-ghost+ +mission-faction-present+)
-                                                    (list +faction-type-ghost+ +mission-faction-absent+)))
+                                              (list (list +faction-type-civilians+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)
+                                                    (list +faction-type-criminals+ :mission-faction-present)
+                                                    (list +faction-type-criminals+ :mission-faction-absent)
+                                                    (list +faction-type-ghost+ :mission-faction-present)
+                                                    (list +faction-type-ghost+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-man+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -251,8 +251,8 @@
                         :glyph-color (sdl:color :r 150 :g 150 :b 150)
                         :name "An abandoned district"
                         :faction-list-func #'(lambda ()
-                                               (list (list +faction-type-eater+ +mission-faction-present+)
-                                                     (list +faction-type-eater+ +mission-faction-absent+)))
+                                               (list (list +faction-type-eater+ :mission-faction-present)
+                                                     (list +faction-type-eater+ :mission-faction-absent)))
                         :angel-disguised-mob-type-id +mob-type-soldier+
                         :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -288,8 +288,8 @@
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned seaport district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -356,8 +356,8 @@
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "The abandoned outskirts of the city"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -400,8 +400,8 @@
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned district upon a lake"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -446,8 +446,8 @@
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned island district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -488,8 +488,8 @@
                        :glyph-color sdl:*magenta*
                        :name "A corrupted residential district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -552,8 +552,8 @@
                        :glyph-color sdl:*magenta*
                        :name "A corrupted seaport district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -643,8 +643,8 @@
                        :glyph-color sdl:*magenta*
                        :name "The corrupted outskirts of the city"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -709,8 +709,8 @@
                        :glyph-color sdl:*magenta*
                        :name "A corrupted district upon a lake"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
@@ -773,8 +773,8 @@
                        :glyph-color sdl:*magenta*
                        :name "A corrupted island district"
                        :faction-list-func #'(lambda ()
-                                              (list (list +faction-type-eater+ +mission-faction-present+)
-                                                    (list +faction-type-eater+ +mission-faction-absent+)))
+                                              (list (list +faction-type-eater+ :mission-faction-present)
+                                                    (list +faction-type-eater+ :mission-faction-absent)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z

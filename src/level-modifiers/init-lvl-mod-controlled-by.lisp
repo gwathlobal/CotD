@@ -12,7 +12,7 @@
                     :name "Controlled by demons"
                     :faction-list-func #'(lambda (sector-type-id)
                                            (declare (ignore sector-type-id))
-                                           (list (list +faction-type-demons+ +mission-faction-present+)))
+                                           (list (list +faction-type-demons+ :mission-faction-present)))
                     :priority 25
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -80,7 +80,7 @@
                     :name "Controlled by the military"
                     :faction-list-func #'(lambda (sector-type-id)
                                            (declare (ignore sector-type-id))
-                                           (list (list +faction-type-military+ +mission-faction-present+)))
+                                           (list (list +faction-type-military+ :mission-faction-present)))
                     :priority 25
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))

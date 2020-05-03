@@ -369,7 +369,7 @@
                                                    (= sector-type-id +world-sector-normal-port+)
                                                    (= sector-type-id +world-sector-normal-lake+)
                                                    (= sector-type-id +world-sector-normal-forest+))
-                                             (list (list +faction-type-church+ +mission-faction-present+))
+                                             (list (list +faction-type-church+ :mission-faction-present))
                                              nil)
                                            )
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
@@ -396,7 +396,7 @@
                                                                     (loop with church-present = nil
                                                                           for (faction-type faction-presence) in (faction-list mission)
                                                                           when (and (= faction-type +faction-type-church+)
-                                                                                    (= faction-presence +mission-faction-present+))
+                                                                                    (eq faction-presence :mission-faction-present))
                                                                             do
                                                                                (setf church-present t)
                                                                           finally
@@ -425,7 +425,7 @@
                     :priority 30
                     :faction-list-func #'(lambda (sector-type-id)
                                            (declare (ignore sector-type-id))
-                                           (list (list +faction-type-satanists+ +mission-faction-present+)))
+                                           (list (list +faction-type-satanists+ :mission-faction-present)))
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 

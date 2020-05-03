@@ -352,7 +352,7 @@
                         (push (list faction-id (nth (random (length faction-present-list)) faction-present-list))
                               cur-faction-list))
                    finally (setf cur-faction-list (stable-sort cur-faction-list #'(lambda (a b)
-                                                                                    (if (= (second a) +mission-faction-present+)
+                                                                                    (if (eq (second a) :mission-faction-present)
                                                                                       (if (string-lessp (name (get-faction-type-by-id (first a)))
                                                                                                         (name (get-faction-type-by-id (first b))))
                                                                                         t
@@ -365,8 +365,8 @@
     (loop initially (setf specific-faction-list ())
           for (faction-id faction-present) in cur-faction-list
           for faction-obj = (get-faction-type-by-id faction-id)
-          when (or (= faction-present +mission-faction-present+)
-                   (= faction-present +mission-faction-delayed+))
+          when (or (eq faction-present :mission-faction-present)
+                   (eq faction-present :mission-faction-delayed))
             do
                (loop for specific-faction-type in (specific-faction-list faction-obj)
                      when (find specific-faction-type (scenario-faction-list (get-mission-type-by-id (mission-type-id mission)))
@@ -399,7 +399,7 @@
                                          collect (id faction-type)))
 
     (when (null available-faction-list)
-      (return-from find-random-scenario-options (generate-random-scenario nil nil +mission-faction-present+ specific-faction-type
+      (return-from find-random-scenario-options (generate-random-scenario nil nil :mission-faction-present specific-faction-type
                                                                           :avail-mission-type-list avail-mission-type-list
                                                                           :avail-world-sector-type-list nil
                                                                           :avail-lvl-mods-list avail-lvl-mods-list)))
@@ -425,7 +425,7 @@
             (loop for world-sector-type in avail-world-sector-type-list do
               (loop with result-1 = nil
                     for (faction-type-id faction-present) in (funcall (faction-list-func lvl-mod) (wtype world-sector-type))
-                    when (= faction-present +mission-faction-present+) do
+                    when (eq faction-present :mission-faction-present) do
                       (setf result-1 (loop with result-2 = nil
                                            for target-faction-id in available-faction-list
                                            when (= target-faction-id faction-type-id) do
@@ -450,7 +450,7 @@
           when (faction-list-func world-sector-type) do
             (loop with result-1 = nil
                   for (faction-type-id faction-present) in (funcall (faction-list-func world-sector-type))
-                  when (= faction-present +mission-faction-present+) do
+                  when (eq faction-present :mission-faction-present) do
                     (setf result-1 (loop with result-2 = nil
                                          for target-faction-id in available-faction-list
                                          when (= target-faction-id faction-type-id) do
@@ -472,7 +472,7 @@
                   do
                      (loop with result-1 = nil
                            for (faction-type-id faction-present) in (funcall (faction-list-func mission-type) world-sector)
-                           when (= faction-present +mission-faction-present+) do
+                           when (eq faction-present :mission-faction-present) do
                              (setf result-1 (loop with result-2 = nil
                                                   for target-faction-id in available-faction-list
                                                   when (= target-faction-id faction-type-id) do
@@ -501,7 +501,7 @@
     (when available-variants-list
       ;; generate a mission with all other parameters & exit
       (let ((lvl-mod-obj (nth (random (length available-variants-list)) available-variants-list)))
-        (return-from find-random-scenario-options (generate-random-scenario (first lvl-mod-obj) (nth (random (length available-faction-list)) available-faction-list) +mission-faction-present+ specific-faction-type
+        (return-from find-random-scenario-options (generate-random-scenario (first lvl-mod-obj) (nth (random (length available-faction-list)) available-faction-list) :mission-faction-present specific-faction-type
                                                                             :avail-mission-type-list (list (third lvl-mod-obj))
                                                                             :avail-world-sector-type-list (list (second lvl-mod-obj))
                                                                             :avail-lvl-mods-list avail-lvl-mods-list)))

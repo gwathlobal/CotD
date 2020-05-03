@@ -380,23 +380,6 @@
     (setf (aref reserved-level (+ x 0) (+ y 1) 2) +building-city-river+)
     (setf (aref reserved-level (+ x 1) (+ y 1) 2) +building-city-river+)))
 
-(defun change-level-to-snow (template-level)
-  (loop for x from 0 below (array-dimension template-level 0) do
-    (loop for y from 0 below (array-dimension template-level 1) do
-      (loop for z from (1- (array-dimension template-level 2)) downto 0 do
-        (cond
-          ((= (aref template-level x y z) +terrain-border-floor+) (setf (aref template-level x y z) +terrain-border-floor-snow+))
-          ((= (aref template-level x y z) +terrain-border-grass+) (setf (aref template-level x y z) +terrain-border-floor-snow+))
-          ((= (aref template-level x y z) +terrain-floor-dirt+) (setf (aref template-level x y z) +terrain-floor-snow+))
-          ((= (aref template-level x y z) +terrain-floor-dirt-bright+) (setf (aref template-level x y z) +terrain-floor-snow+))
-          ((= (aref template-level x y z) +terrain-floor-grass+) (setf (aref template-level x y z) +terrain-floor-snow+))
-          ((= (aref template-level x y z) +terrain-tree-birch+) (setf (aref template-level x y z) +terrain-tree-birch-snow+))
-          ((= (aref template-level x y z) +terrain-water-liquid+) (progn (setf (aref template-level x y z) +terrain-water-ice+)
-                                                                         (when (< z (1- (array-dimension template-level 2)))
-                                                                           (setf (aref template-level x y (1+ z)) +terrain-water-ice+))))
-          ((= (aref template-level x y z) +terrain-floor-leaves+) (setf (aref template-level x y z) +terrain-floor-leaves-snow+))))))
-  template-level)
-
 (defun place-reserved-buildings-river (reserved-level)
   (let ((result) (r) (n nil) (s nil) (w nil) (e nil))
 
