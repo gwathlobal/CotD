@@ -39,6 +39,7 @@
       (setf avail-mission-type-list (get-all-mission-types-list))
       (setf avail-mission-type-list (list (get-mission-type-by-id :mission-type-demonic-attack)
                                           (get-mission-type-by-id :mission-type-demonic-raid)
+                                          (get-mission-type-by-id :mission-type-demonic-conquest)
                                           (get-mission-type-by-id :mission-type-military-conquest))))
     ))
 
