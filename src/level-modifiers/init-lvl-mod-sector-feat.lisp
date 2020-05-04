@@ -126,7 +126,7 @@
                                                              ))
                                                      )
                                                    ))
-                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for islands
                                                   (if (or (= world-sector-type-id +world-sector-normal-island+)

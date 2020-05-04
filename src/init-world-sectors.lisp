@@ -349,7 +349,10 @@
                                                       (:s (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+))
                                                       (:w (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+))
                                                       (:e (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+)))
-                                                    )))
+                                                    ))
+                       :always-lvl-mods-func #'(lambda (world-sector mission-type-id world-time)
+                                                 (declare (ignore world-sector mission-type-id world-time))
+                                                 (list +lm-feat-sea+)))
 
 (set-world-sector-type :wtype +world-sector-abandoned-forest+
                        :glyph-idx 38
@@ -636,7 +639,10 @@
                                                       (:s (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+))
                                                       (:w (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+))
                                                       (:e (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+)))
-                                                    )))
+                                                    ))
+                       :always-lvl-mods-func #'(lambda (world-sector mission-type-id world-time)
+                                                 (declare (ignore world-sector mission-type-id world-time))
+                                                 (list +lm-feat-sea+)))
 
 (set-world-sector-type :wtype +world-sector-corrupted-forest+
                        :glyph-idx 38

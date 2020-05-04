@@ -40,6 +40,7 @@
       (setf avail-mission-type-list (list (get-mission-type-by-id :mission-type-demonic-attack)
                                           (get-mission-type-by-id :mission-type-demonic-raid)
                                           (get-mission-type-by-id :mission-type-demonic-conquest)
+                                          (get-mission-type-by-id :mission-type-demonic-thievery)
                                           (get-mission-type-by-id :mission-type-military-conquest))))
     ))
 
@@ -277,12 +278,18 @@
           do
              (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t :add-to-sector nil))
     
-    ;; add feats from always present lvl mods from the world sector
-    (loop initially (setf always-lvl-mods-list ())
-          for lvl-mod-id in (funcall (always-lvl-mods-func (get-world-sector-type-by-id (wtype world-sector))) world-sector (mission-type-id mission) (world-game-time world))
-          do
-             (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id lvl-mod-id) :add-general t)
-             (pushnew (get-level-modifier-by-id lvl-mod-id) always-lvl-mods-list))
+    ;; add feats from always present lvl mods from the world sector & mission
+    (setf always-lvl-mods-list ())
+    (when (always-lvl-mods-func (get-world-sector-type-by-id (wtype world-sector)))
+      (loop for lvl-mod-id in (funcall (always-lvl-mods-func (get-world-sector-type-by-id (wtype world-sector))) world-sector (mission-type-id mission) (world-game-time world))
+            do
+               (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id lvl-mod-id) :add-general t)
+               (pushnew (get-level-modifier-by-id lvl-mod-id) always-lvl-mods-list)))
+    (when (always-lvl-mods-func (get-mission-type-by-id (mission-type-id mission)))
+      (loop for lvl-mod-id in (funcall (always-lvl-mods-func (get-mission-type-by-id (mission-type-id mission))) world-sector mission (world-game-time world))
+            do
+               (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id lvl-mod-id) :add-general t)
+               (pushnew (get-level-modifier-by-id lvl-mod-id) always-lvl-mods-list)))
     
     ;; go through all (select-lvl-mods-list win) and add all lvl-mods they depend on (as well as dependencies of dependencies, etc.)
     (loop with overall-depend-lvl-mod-list = ()
