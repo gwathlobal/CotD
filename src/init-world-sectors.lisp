@@ -249,7 +249,7 @@
 (set-world-sector-type  :wtype +world-sector-abandoned-residential+
                         :glyph-idx 40
                         :glyph-color (sdl:color :r 150 :g 150 :b 150)
-                        :name "An abandoned district"
+                        :name "An abandoned residential district"
                         :faction-list-func #'(lambda ()
                                                (list (list +faction-type-eater+ :mission-faction-present)
                                                      (list +faction-type-eater+ :mission-faction-absent)))

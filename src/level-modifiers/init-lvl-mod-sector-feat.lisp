@@ -418,6 +418,18 @@
                                                           
                                                           
                                                           func-list))
+                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore world-time))
+                                                  ;; is not available for celestial retrieval
+                                                   (if (or (not (eq mission-type-id :mission-type-celestial-retrieval))
+                                                           (and (eq mission-type-id :mission-type-celestial-retrieval)
+                                                                (or (= world-sector-type-id +world-sector-abandoned-forest+)
+                                                                    (= world-sector-type-id +world-sector-abandoned-port+)
+                                                                    (= world-sector-type-id +world-sector-abandoned-residential+)
+                                                                    (= world-sector-type-id +world-sector-abandoned-lake+)
+                                                                    (= world-sector-type-id +world-sector-abandoned-island+))))
+                                                     t
+                                                     nil))
                     )
 
 (set-level-modifier :id +lm-feat-lair+ :type +level-mod-sector-feat+

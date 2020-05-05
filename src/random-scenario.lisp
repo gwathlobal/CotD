@@ -36,13 +36,7 @@
     
     ;; if no specific mission list is supplied, find all enabled missions
     (when (null avail-mission-type-list)
-      (setf avail-mission-type-list (get-all-mission-types-list))
-      (setf avail-mission-type-list (list (get-mission-type-by-id :mission-type-demonic-attack)
-                                          (get-mission-type-by-id :mission-type-demonic-raid)
-                                          (get-mission-type-by-id :mission-type-demonic-conquest)
-                                          (get-mission-type-by-id :mission-type-demonic-thievery)
-                                          (get-mission-type-by-id :mission-type-military-conquest)
-                                          (get-mission-type-by-id :mission-type-military-raid))))
+      (setf avail-mission-type-list (get-all-mission-types-list)))
     ))
 
 (defun scenario-set-avail-world-sector-types (scenario &optional (new-world-sector-type-list ()))

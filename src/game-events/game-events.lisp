@@ -45,9 +45,11 @@
 (defconstant +game-event-military-raid-win-for-satanists+ 40)
 (defconstant +game-event-angelic-steal-win-for-angels+ 41)
 (defconstant +game-event-angelic-steal-win-for-demons+ 42)
-(defconstant +game-event-delayed-arrival-military+ 43)
-(defconstant +game-event-delayed-arrival-angels+ 44)
-(defconstant +game-event-delayed-arrival-demons+ 45)
+(defconstant +game-event-angelic-steal-win-for-military+ 43)
+(defconstant +game-event-angelic-steal-win-for-satanists+ 44)
+(defconstant +game-event-delayed-arrival-military+ 45)
+(defconstant +game-event-delayed-arrival-angels+ 46)
+(defconstant +game-event-delayed-arrival-demons+ 47)
 
 
 (deftype game-over-type () '(member

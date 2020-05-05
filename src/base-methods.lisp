@@ -2990,11 +2990,11 @@
     nil))
 
 (defun get-angel-steal-angel-with-relic (world)
-  (loop for mob-id in (mob-id-list (level world))
-        for mob = (get-mob-by-id mob-id)
-        when (and (mob-ability-p mob +mob-type-angel+)
-                  (get-inv-items-by-type (inv mob) +item-type-church-reliс+))
-          do
-             (return-from get-angel-steal-angel-with-relic mob)
-        )
+  (let ((relic-item (if (level/relic-id (level world))
+                      (get-item-by-id (level/relic-id (level world)))
+                      nil)))
+    (when (and relic-item
+               (inv-id relic-item)
+               (mob-ability-p (get-mob-by-id (inv-id relic-item)) +mob-type-angel+))
+      (return-from get-angel-steal-angel-with-relic (get-mob-by-id (inv-id relic-item)))))
   nil)

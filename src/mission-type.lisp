@@ -46,7 +46,8 @@
 
 (defun get-all-mission-types-list (&key (include-disabled nil))
   (loop for mission-type being the hash-values in *mission-types*
-        when (or (not include-disabled)
+        when (or (and (not include-disabled)
+                      (enabled mission-type))
                  (and include-disabled
                       (not (enabled mission-type))))
         collect mission-type))
@@ -247,6 +248,59 @@
     (if nearest-military-sector
       (setf (turns-for-delayed-military level) (+ 120 (* (truncate (get-distance (x nearest-military-sector) (y nearest-military-sector) (x world-sector) (y world-sector))) 20)))
       (setf (turns-for-delayed-military level) 220)))
+  )
+
+(defun place-demonic-portals (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Placing demonic portals~%"))
+  
+  ;; remove standard demon arrival points
+  (loop for feature-id in (feature-id-list level)
+        for lvl-feature = (get-feature-by-id feature-id)
+        when (= (feature-type lvl-feature) +feature-start-place-demons+) do
+          (remove-feature-from-level-list level lvl-feature))
+  
+  ;; add portals
+  (let ((portals ())
+        (max-portals 6))
+    (loop with max-x = (- (array-dimension (terrain level) 0) 60)
+          with max-y = (- (array-dimension (terrain level) 1) 60)
+          with cur-portal = 0
+          for free-place = t
+          for x = (+ (random max-x) 30)
+          for y = (+ (random max-y) 30)
+          while (< (length portals) max-portals) do
+            (check-surroundings x y t #'(lambda (dx dy)
+                                          (when (or (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-blocks-move+)
+                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-opaque-floor+))
+                                                    (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-water+))
+                                            (setf free-place nil))))
+            (when (and free-place
+                       (not (find (list x y 2) portals :test #'(lambda (a b)
+                                                                 (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
+                                                                   t
+                                                                   nil)
+                                                                 )))
+                       (loop for feature-id in (feature-id-list level)
+                             for feature = (get-feature-by-id feature-id)
+                             with result = t
+                             when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                       (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                               do
+                                  (setf result nil)
+                                  (loop-finish)
+                             when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                       (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
+                               do
+                                  (setf result nil)
+                                  (loop-finish)
+                             finally (return result)))
+              (push (list x y 2) portals)
+              (incf cur-portal)))
+    (loop for (x y z) in portals do
+      ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id +feature-demonic-portal+)) x y z)
+      (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-demonic-portal+ :x x :y y :z z))
+      (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-start-place-demons+ :x x :y y :z z))))
   )
 
 ;;=======================
@@ -550,71 +604,3 @@
   (when (/= (player-lvl-mod-placement-id mission) +specific-faction-type-player+)
     (setup-win-conditions mission level)))
 
-;;========================================
-;; MISSION-DISTRICTS
-;;========================================
-
-(defconstant +mission-type-district-layout-living+ 0)
-(defconstant +mission-type-district-layout-abandoned+ 1)
-(defconstant +mission-type-district-layout-corrupted+ 2)
-
-(defclass mission-district ()
-  ((id :initarg :id :accessor id :type fixnum)
-   (faction-list :initarg :faction-list :accessor faction-list)))
-
-(defparameter *mission-districts* (make-array (list 0) :adjustable t))
-
-(defun set-mission-district (mission-district)
-  (when (>= (id mission-district) (length *mission-districts*))
-    (adjust-array *mission-districts* (list (1+ (id mission-district))) :initial-element nil))
-  (setf (aref *mission-districts* (id mission-district)) mission-district))
-
-(defun get-mission-district-by-id (mission-district-id)
-  (aref *mission-districts* mission-district-id))
-
-;;========================================
-;; MISSION-SCENARIOS
-;;========================================
-
-(defconstant +mission-scenario-test+ 0)
-(defconstant +mission-scenario-demon-attack+ 1)
-(defconstant +mission-scenario-demon-raid+ 2)
-(defconstant +mission-scenario-demon-steal+ 3)
-(defconstant +mission-scenario-demon-conquest+ 4)
-(defconstant +mission-scenario-demon-raid-ruined+ 5)
-(defconstant +mission-scenario-demon-conquest-ruined+ 6)
-(defconstant +mission-scenario-military-conquest-ruined+ 7)
-(defconstant +mission-scenario-military-raid-ruined+ 8)
-(defconstant +mission-scenario-demon-conquest-corrupted+ 9)
-(defconstant +mission-scenario-military-conquest-corrupted+ 10)
-(defconstant +mission-scenario-angelic-conquest-corrupted+ 11)
-(defconstant +mission-scenario-angelic-steal-corrupted+ 12)
-
-(defclass mission-scenario ()
-  ((id :initarg :id :accessor id :type fixnum)
-   (name :initarg :name :accessor name :type string)
-   (enabled :initform t :initarg :enabled :accessor enabled)
-   (district-layout-list :initarg :district-layout-list :accessor district-layout-list)
-   (faction-list :initarg :faction-list :accessor faction-list)
-   (scenario-faction-list :initarg :scenario-faction-list :accessor scenario-faction-list)
-   (objective-list :initform () :initarg :objective-list :accessor objective-list) ;; of type ((<faction-id> <objective-type-id>)...)
-   (win-condition-list :initform () :initarg :win-condition-list :accessor win-condition-list) ;; of type ((<faction-id> <game-event-id>)...)
-   (post-sf-list :initform () :initarg :post-sf-list :accessor post-sf-list)  ;; a list of scenario ids
-   (win-value-func :initform nil :initarg :win-value-func :accessor win-value-func) ;; a lambda with no params
-   (angel-disguised-mob-type-id :initform nil :initarg :angel-disguised-mob-type-id :accessor angel-disguised-mob-type-id)
-   ))
-
-(defparameter *mission-scenarios* (make-array (list 0) :adjustable t))
-
-(defun set-mission-scenario (mission-scenario)
-  (when (>= (id mission-scenario) (length *mission-scenarios*))
-    (adjust-array *mission-scenarios* (list (1+ (id mission-scenario)))))
-  (setf (aref *mission-scenarios* (id mission-scenario)) mission-scenario))
-
-(defun get-mission-scenario-by-id (mission-scenario-id)
-  (aref *mission-scenarios* mission-scenario-id))
-
-(defun get-all-mission-scenarios-list ()
-  (loop for id from 0 below (length *mission-scenarios*)
-        when (enabled (get-mission-scenario-by-id id))
-        collect id))

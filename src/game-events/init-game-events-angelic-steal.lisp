@@ -17,65 +17,31 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           ;; write highscores
-                                                           (let* ((final-str "Relic sucessfully returned.")
-                                                                  (score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
-                                                                                                           0
-                                                                                                           (loop for mimic-id in (mimic-id-list *player*)
-                                                                                                                 for mimic = (get-mob-by-id mimic-id)
-                                                                                                                 with cur-score = 0
-                                                                                                                 when (not (eq mimic *player*))
-                                                                                                                   do
-                                                                                                                      (incf cur-score (cur-score mimic))
-                                                                                                                 finally (return cur-score))))))
-                                                                  (highscores-place)
-                                                                  (player-faction (if (or (= (loyal-faction *player*) +faction-type-angels+)
-                                                                                          (= (loyal-faction *player*) +faction-type-church+))
-                                                                                    t
-                                                                                    nil))
-                                                                  (player-died (player-check-dead)))
-
-                                                             (when player-died
-                                                               (multiple-value-setq (final-str score) (dump-when-dead)))
-
-                                                             (setf highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                 score
-                                                                                                                                 (if (mimic-id-list *player*)
-                                                                                                                                   (faction-name *player*)
-                                                                                                                                   (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                 (player-game-time world)
-                                                                                                                                 final-str
-                                                                                                                                 (level-layout (level world)))
-                                                                                                          *highscores*))
-                                                           
-                                                             (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
-                                                                                          final-str (return-scenario-stats nil))
-
-                                                             (if player-faction
-                                                               (progn
-                                                                 (add-message (format nil "~%"))
-                                                                 (add-message (format nil "Congratulations! Your faction has won!~%"))
-                                                                 (add-message (format nil "~%Press any key...~%")))
-                                                               (progn
-                                                                 (add-message (format nil "~%"))
-                                                                 (add-message (format nil "Curses! Your faction has lost!~%"))
-                                                                 (add-message (format nil "~%Press any key...~%"))))
-                                                             
-                                                             (setf *current-window* (make-instance 'cell-window))
-                                                             (make-output *current-window*)
-                                                             (sdl:with-events ()
-                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
-                                                               (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-angels-won+ :highscores-place highscores-place
-                                                                                                                                          :player-won player-faction :player-died player-died))
-                                                                                (make-output *current-window*)
-                                                                                (run-window *current-window*))
-                                                               (:video-expose-event () (make-output *current-window*)))))))
+                                                           (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-angels+)
+                                                                                        (= (loyal-faction *player*) +faction-type-church+))
+                                                                                  t
+                                                                                  nil)))
+                                                             (trigger-game-over world
+                                                                                :final-str "Relic sucessfully returned."
+                                                                                :score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
+                                                                                                                         0
+                                                                                                                         (loop for mimic-id in (mimic-id-list *player*)
+                                                                                                                               for mimic = (get-mob-by-id mimic-id)
+                                                                                                                               with cur-score = 0
+                                                                                                                               when (not (eq mimic *player*))
+                                                                                                                                 do
+                                                                                                                                    (incf cur-score (cur-score mimic))
+                                                                                                                               finally (return cur-score)))))
+                                                                                :if-player-won if-player-won
+                                                                                :player-msg (if if-player-won
+                                                                                              (format nil "Congratulations! Your faction has won!~%")
+                                                                                              (format nil "Curses! Your faction has lost!~%"))
+                                                                                :game-over-type :game-over-angels-won))
+                                                           )))
 
 (set-game-event (make-instance 'game-event :id +game-event-angelic-steal-win-for-demons+
                                            :descr-func #'(lambda ()
-                                                           "To win, destroy all angels in the district. To lose, have all demons killed or let the angels take the relic and escape with it.")
+                                                           "To win, destroy all angels & military in the district. To lose, have all demons killed or let the angels take the relic and escape with it.")
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (or (and (= (loyal-faction *player*) +faction-type-demons+)
@@ -89,63 +55,65 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           ;; write highscores
-                                                           (let* ((final-str "Angelic retrieval attempt prevented.")
-                                                                  (score (calculate-player-score 1350))
-                                                                  (highscores-place)
-                                                                  (player-faction (if (or (= (loyal-faction *player*) +faction-type-demons+)
-                                                                                          (= (loyal-faction *player*) +faction-type-satanists+))
-                                                                                    t
-                                                                                    nil))
-                                                                  (player-died (player-check-dead)))
+                                                           (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-demons+)
+                                                                                        (= (loyal-faction *player*) +faction-type-satanists+))
+                                                                                  t
+                                                                                  nil)))
+                                                             (trigger-game-over world
+                                                                                :final-str "Angelic retrieval attempt prevented."
+                                                                                :score (calculate-player-score 1350)
+                                                                                :if-player-won if-player-won
+                                                                                :player-msg (if if-player-won
+                                                                                              (format nil "Congratulations! Your faction has won!~%")
+                                                                                              (format nil "Curses! Your faction has lost!~%"))
+                                                                                :game-over-type :game-over-demons-won))
+                                                           )))
 
-                                                             (when player-died
-                                                               (multiple-value-setq (final-str score) (dump-when-dead)))
+(set-game-event (make-instance 'game-event :id +game-event-angelic-steal-win-for-military+
+                                           :descr-func #'(lambda ()
+                                                           (format nil "To win, destroy all demons in the district. To lose, have all military killed."))
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (> (total-humans (level world)) 0)
+                                                                  (zerop (total-demons (level world))))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (let ((if-player-won (if (= (loyal-faction *player*) +faction-type-military+)
+                                                                                  t
+                                                                                  nil)))
+                                                             (trigger-game-over world
+                                                                                :final-str "Enemies eliminated."
+                                                                                :score (calculate-player-score (+ 1500 (* 7 (total-humans (level world)))))
+                                                                                :if-player-won if-player-won
+                                                                                :player-msg (if if-player-won
+                                                                                              (format nil "Congratulations! Your faction has won!~%")
+                                                                                              (format nil "Curses! Your faction has lost!~%"))
+                                                                                :game-over-type :game-over-military-won))
+                                                           )))
 
-                                                             (setf highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                                                                                score
-                                                                                                                                (if (mimic-id-list *player*)
-                                                                                                                                  (faction-name *player*)
-                                                                                                                                  (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                                                                                (player-game-time world)
-                                                                                                                                final-str
-                                                                                                                                (level-layout (level world)))
-                                                                                                          *highscores*))
-                                                             
-                                                             (write-highscores-to-file *highscores*)
-                                                             (dump-character-on-game-over (name *player*) score (player-game-time world) (sf-name (get-scenario-feature-by-id (level-layout (level world))))
-                                                                                          final-str (return-scenario-stats nil))
-                                                             
-                                                             (if player-faction
-                                                               (progn
-                                                                 (add-message (format nil "~%"))
-                                                                 (add-message (format nil "Congratulations! Your faction has won!~%"))
-                                                                 (add-message (format nil "~%Press any key...~%")))
-                                                               (progn
-                                                                 (add-message (format nil "~%"))
-                                                                 (add-message (format nil "Curses! Your faction has lost!~%"))
-                                                                 (add-message (format nil "~%Press any key...~%"))))
-                                                             (setf *current-window* (make-instance 'cell-window))
-                                                             (make-output *current-window*)
-                                                             (sdl:with-events ()
-                                                               (:quit-event () (funcall (quit-func *current-window*)) t)
-                                                               (:key-down-event () 
-                                                                                (setf *current-window* (make-instance 'final-stats-window :game-over-type +game-over-demons-won+ :highscores-place highscores-place
-                                                                                                                      :player-won player-faction :player-died player-died))
-                                                                                (make-output *current-window*)
-                                                                                (run-window *current-window*))
-                                                               (:video-expose-event () (make-output *current-window*)))))))
-
-
-
-
-
-
-
-;;===========================
-;; ARRIVAL EVENTS
-;;===========================
-
-
-
-
+(set-game-event (make-instance 'game-event :id +game-event-angelic-steal-win-for-satanists+
+                                           :descr-func #'(lambda ()
+                                                           "To win, destroy all angels & military in the district. To lose, have all demons & satanists killed or let the angels take the relic and escape with it.")
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (= (loyal-faction *player*) +faction-type-satanists+)
+                                                                  (> (nth +faction-type-satanists+ (total-faction-list (level world))) 0)
+                                                                  (zerop (total-angels (level world))))
+                                                           t
+                                                           nil)
+                                                         )
+                                           :on-trigger #'(lambda (world)
+                                                           (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-demons+)
+                                                                                        (= (loyal-faction *player*) +faction-type-satanists+))
+                                                                                  t
+                                                                                  nil)))
+                                                             (trigger-game-over world
+                                                                                :final-str "Angelic retrieval attempt prevented."
+                                                                                :score (calculate-player-score 1350)
+                                                                                :if-player-won if-player-won
+                                                                                :player-msg (if if-player-won
+                                                                                              (format nil "Congratulations! Your faction has won!~%")
+                                                                                              (format nil "Curses! Your faction has lost!~%"))
+                                                                                :game-over-type :game-over-satanists-won))
+                                                           )))

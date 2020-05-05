@@ -118,5 +118,5 @@
                                                                                 :player-msg (if if-player-won
                                                                                               (format nil "Congratulations! Your faction has won!~%")
                                                                                               (format nil "Curses! Your faction has lost!~%"))
-                                                                                :game-over-type :game-over-demons-won))
+                                                                                :game-over-type :game-over-satanists-won))
                                                            )))
