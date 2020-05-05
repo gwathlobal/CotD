@@ -177,7 +177,14 @@
                                                           (= world-sector-type-id +world-sector-abandoned-port+)
                                                           (= world-sector-type-id +world-sector-corrupted-port+))
                                                     t
-                                                    nil)))
+                                                    nil))
+                    :always-present-func #'(lambda (world-sector mission world-time)
+                                             (declare (ignore mission world-time))
+                                             (if (or (eq (wtype world-sector) +world-sector-normal-port+)
+                                                     (eq (wtype world-sector) +world-sector-abandoned-port+)
+                                                     (eq (wtype world-sector) +world-sector-corrupted-port+))
+                                               t
+                                               nil)))
 
 (set-level-modifier :id +lm-feat-barricade+ :type +level-mod-sector-feat+
                     :name "Barricade"

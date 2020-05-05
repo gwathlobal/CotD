@@ -71,5 +71,11 @@
                                                               (= (wtype world-sector) +world-sector-corrupted-lake+)
                                                               (= (wtype world-sector) +world-sector-corrupted-forest+)))
                                                    (list +lm-feat-church+)
-                                                   nil)))
+                                                   nil))
+                    :always-present-func #'(lambda (world-sector mission world-time)
+                                             (declare (ignore world-sector world-time))
+                                             (if (or (eq (mission-type-id mission) :mission-type-demonic-thievery)
+                                                     (eq (mission-type-id mission) :mission-type-celestial-retrieval))
+                                               t
+                                               nil)))
 

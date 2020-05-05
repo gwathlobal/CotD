@@ -67,6 +67,7 @@
    (scenario-enabled-func :initform nil :initarg :scenario-enabled-func :accessor scenario-enabled-func)
    (scenario-disabled-func :initform nil :initarg :scenario-disabled-func :accessor scenario-disabled-func)
    (depends-on-lvl-mod-func :initform nil :initarg :depends-on-lvl-mod-func :accessor depends-on-lvl-mod-func) ;; takes world-sector, mission-type-id and world-time
+   (always-present-func :initform nil :initarg :always-present-func :accessor always-present-func) ;; takes world-sector, mission and world-time
    ))
 
 (defun set-level-modifier (&key id name type debug disabled priority template-level-gen-func overall-post-process-func-list terrain-post-process-func-list faction-list-func
@@ -77,7 +78,10 @@
                                 scenario-enabled-func scenario-disabled-func
                                 (depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)
                                                              (declare (ignore world-sector mission-type-id world-time))
-                                                             nil)))
+                                                             nil))
+                                (always-present-func #'(lambda (world-sector mission world-time)
+                                                         (declare (ignore world-sector mission world-time))
+                                                         nil)))
   (unless id (error ":ID is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   (unless type (error ":TYPE is an obligatory parameter!"))
@@ -93,7 +97,8 @@
                                                                    :random-available-for-mission random-available-for-mission
                                                                    :scenario-enabled-func scenario-enabled-func
                                                                    :scenario-disabled-func scenario-disabled-func
-                                                                   :depends-on-lvl-mod-func depends-on-lvl-mod-func)))
+                                                                   :depends-on-lvl-mod-func depends-on-lvl-mod-func
+                                                                   :always-present-func always-present-func)))
 
 (defun get-level-modifier-by-id (level-modifier-id)
   (aref *level-modifiers* level-modifier-id))

@@ -522,9 +522,7 @@
                                             (list +faction-type-criminals+ +game-event-win-for-thief+)
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )
-                  :always-lvl-mods-func #'(lambda (world-sector mission world-time)
-                                            (declare (ignore world-sector mission world-time))
-                                            (list +lm-item-holy-relic+)))
+                  )
 
 (set-mission-type :id :mission-type-military-conquest
                   :name "Military conquest"
@@ -983,6 +981,4 @@
                                             (list +faction-type-satanists+ +game-event-angelic-steal-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             )
-                  :always-lvl-mods-func #'(lambda (world-sector mission world-time)
-                                            (declare (ignore world-sector mission world-time))
-                                            (list +lm-item-holy-relic+)))
+                  )
