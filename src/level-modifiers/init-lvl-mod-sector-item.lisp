@@ -18,7 +18,7 @@
                                                                             do
                                                                                (setf item (make-instance 'item :item-type +item-type-book-of-rituals+ :x (x lvl-feature) :y (y lvl-feature) :z (z lvl-feature))) 
                                                                                (add-item-to-level-list level item)
-                                                                               (setf (relic-id level) (id item))))
+                                                                               (setf (level/book-id level) (id item))))
                                                                 func-list)
                                                           (reverse func-list)))
                     :depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)
@@ -60,7 +60,7 @@
                                                                             do
                                                                                (setf item (make-instance 'item :item-type +item-type-church-reliс+ :x (x lvl-feature) :y (y lvl-feature) :z (z lvl-feature))) 
                                                                                (add-item-to-level-list level item)
-                                                                               (setf (relic-id level) (id item))))
+                                                                               (setf (level/relic-id level) (id item))))
                                                                 func-list)
                                                           (reverse func-list)))
                     :depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)

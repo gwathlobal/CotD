@@ -32,7 +32,8 @@
    (game-events :initform () :accessor game-events)
 
    (demonic-portals :initform () :initarg :demonic-portals :accessor demonic-portals)
-   (relic-id :initform () :initarg :relic-id :accessor relic-id)
+   (relic-id :initform nil :initarg :relic-id :accessor level/relic-id)
+   (book-id :initform nil :initarg :book-id :accessor level/book-id)
    (demonic-sigils :initform () :initarg :demonic-sigils :accessor demonic-sigils)
    (mob-quadrant-map :initform nil :initarg :mob-quadrant-map :accessor mob-quadrant-map)
    (item-quadrant-map :initform nil :initarg :item-quadrant-map :accessor item-quadrant-map)

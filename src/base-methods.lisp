@@ -2124,32 +2124,22 @@
 
 (defun sense-unnatural ()
   (setf (sense-unnatural-pos *player*) nil)
-  (let ((nearest-power nil))
-    ;; search for item on the map
-    (loop for item-id in (item-id-list (level *world*))
-          for item = (get-item-by-id item-id)
-          when (= (item-type item) +item-type-book-of-rituals+)
-            do
-               (unless nearest-power (setf nearest-power (list (x item) (y item))))
-               (when (< (get-distance (x *player*) (y *player*) (x item) (y item))
-                        (get-distance (x *player*) (y *player*) (first nearest-power) (second nearest-power)))
-                 (setf nearest-power (list (x item) (y item)))))
-    ;; search for mob's inventories
-    (loop for mob-id in (mob-id-list (level *world*))
-          for mob = (get-mob-by-id mob-id)
-          when (and (not (check-dead mob))
-                    (not (eq mob *player*)))
-            do
-               (loop for item-id in (inv mob)
-                     for item = (get-item-by-id item-id)
-                     when (= (item-type item) +item-type-book-of-rituals+)
-                       do
-                          (unless nearest-power (setf nearest-power (list (x mob) (y mob))))
-                          (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
-                                   (get-distance (x *player*) (y *player*) (first nearest-power) (second nearest-power)))
-                            (setf nearest-power (list (x mob) (y mob)))
-                            (loop-finish)))
-          )
+  
+  (let ((nearest-power nil)
+        (book-item)
+        (mob-with-book))
+    ;; find the book
+    (when (level/book-id (level *world*))
+      (setf book-item (get-item-by-id (level/book-id (level *world*))))
+      (if (null (inv-id book-item))
+        (progn
+          (setf nearest-power (list (x book-item) (y book-item))))
+        (progn
+          (setf mob-with-book (get-mob-by-id (inv-id book-item)))
+          (when (and (not (check-dead mob-with-book))
+                     (not (eq mob-with-book *player*)))
+            (setf nearest-power (list (x mob-with-book) (y mob-with-book)))))))
+    
     ;; search for features
     (loop for feature-id in (feature-id-list (level *world*))
           for feature = (get-feature-by-id feature-id)
@@ -2164,32 +2154,20 @@
 
 (defun sense-relic ()
   (setf (sense-relic-pos *player*) nil)
-  (let ((nearest-power nil))
-    ;; search for item on the map
-    (loop for item-id in (item-id-list (level *world*))
-          for item = (get-item-by-id item-id)
-          when (= (item-type item) +item-type-church-reliс+)
-            do
-               (unless nearest-power (setf nearest-power (list (x item) (y item))))
-               (when (< (get-distance (x *player*) (y *player*) (x item) (y item))
-                        (get-distance (x *player*) (y *player*) (first nearest-power) (second nearest-power)))
-                 (setf nearest-power (list (x item) (y item)))))
-    ;; search for mob's inventories
-    (loop for mob-id in (mob-id-list (level *world*))
-          for mob = (get-mob-by-id mob-id)
-          when (and (not (check-dead mob))
-                    (not (eq mob *player*)))
-            do
-               (loop for item-id in (inv mob)
-                     for item = (get-item-by-id item-id)
-                     when (= (item-type item) +item-type-church-reliс+)
-                       do
-                          (unless nearest-power (setf nearest-power (list (x mob) (y mob))))
-                          (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
-                                   (get-distance (x *player*) (y *player*) (first nearest-power) (second nearest-power)))
-                            (setf nearest-power (list (x mob) (y mob)))
-                            (loop-finish)))
-          )
+  (let ((nearest-power nil)
+        (relic-item)
+        (mob-with-relic))
+    ;; find the relic (on the map or inside somebody's inventory)
+    (when (level/relic-id (level *world*))
+      (setf relic-item (get-item-by-id (level/relic-id (level *world*))))
+      (if (null (inv-id relic-item))
+        (progn
+          (setf nearest-power (list (x relic-item) (y relic-item))))
+        (progn
+          (setf mob-with-relic (get-mob-by-id (inv-id relic-item)))
+          (when (and (not (check-dead mob-with-relic))
+                     (not (eq mob-with-relic *player*)))
+            (setf nearest-power (list (x mob-with-relic) (y mob-with-relic)))))))
         
     (setf (sense-relic-pos *player*) nearest-power)))
 

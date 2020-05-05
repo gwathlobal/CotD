@@ -41,7 +41,8 @@
                                           (get-mission-type-by-id :mission-type-demonic-raid)
                                           (get-mission-type-by-id :mission-type-demonic-conquest)
                                           (get-mission-type-by-id :mission-type-demonic-thievery)
-                                          (get-mission-type-by-id :mission-type-military-conquest))))
+                                          (get-mission-type-by-id :mission-type-military-conquest)
+                                          (get-mission-type-by-id :mission-type-military-raid))))
     ))
 
 (defun scenario-set-avail-world-sector-types (scenario &optional (new-world-sector-type-list ()))

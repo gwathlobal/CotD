@@ -38,15 +38,17 @@
 (defconstant +game-event-military-conquest-win-for-angels+ 33)
 (defconstant +game-event-military-conquest-win-for-demons+ 34)
 (defconstant +game-event-military-conquest-win-for-military+ 35)
-(defconstant +game-event-military-raid-win-for-angels+ 36)
-(defconstant +game-event-military-raid-win-for-demons+ 37)
-(defconstant +game-event-military-raid-win-for-military+ 38)
-(defconstant +game-event-angelic-steal-win-for-angels+ 39)
-(defconstant +game-event-angelic-steal-win-for-demons+ 40)
-(defconstant +game-event-delayed-arrival-military+ 41)
-(defconstant +game-event-delayed-arrival-angels+ 42)
-(defconstant +game-event-delayed-arrival-demons+ 43)
-(defconstant +game-event-military-conquest-win-for-satanists+ 44)
+(defconstant +game-event-military-conquest-win-for-satanists+ 36)
+(defconstant +game-event-military-raid-win-for-angels+ 37)
+(defconstant +game-event-military-raid-win-for-demons+ 38)
+(defconstant +game-event-military-raid-win-for-military+ 39)
+(defconstant +game-event-military-raid-win-for-satanists+ 40)
+(defconstant +game-event-angelic-steal-win-for-angels+ 41)
+(defconstant +game-event-angelic-steal-win-for-demons+ 42)
+(defconstant +game-event-delayed-arrival-military+ 43)
+(defconstant +game-event-delayed-arrival-angels+ 44)
+(defconstant +game-event-delayed-arrival-demons+ 45)
+
 
 (deftype game-over-type () '(member
                              :game-over-player-dead
