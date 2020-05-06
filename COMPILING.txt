@@ -114,7 +114,7 @@ The key strings here are:
 - (setq inferior-lisp-program "C:/Lisp/SBCL/1.3.12/sbcl.exe") which sets the path to you SBCL executable file. Change as appropriate.
 - (add-to-list 'load-path "C:/Lisp/libraries/slime-2.15") which sets the path to SLIME. Change as appropriate.
 
-5. Install LISPBUILDER-SDL and BORDEAUX-THREADS
+5. Install LISPBUILDER-SDL, BORDEAUX-THREADS and DEFENUM
 
 Download SDL 1.2 runtime library from www.libsdl.org and put SDL.dll into C:\Lisp\SBCL\1.3.12.
 Start Emacs, press Alt + X (M x) and enter the word "slime" (without quotes) to run SLIME.
@@ -122,6 +122,8 @@ In the SLIME prompt enter the following command to load LISPBUILDER-SDL:
 (ql:quickload "lispbuilder-sdl")
 Enter the following command to load BORDEAUX-THREADS:
 (ql:quickload "bordeaux-threads")
+Enter the following command to load DEFENUM:
+(ql:quickload "defenum")
 
 6. Fetch CotD source files
 

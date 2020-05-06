@@ -1,7 +1,6 @@
 City of the Damned depends on the following Common Lisp libraries:
  - LISPBUILDER-SDL
  - BORDEAUX-THREADS
+ - DEFENUM
 
 You may download and install them using Quicklisp.
-
-The game is also dependent on DEFENUM, but there is a bug in it at the moment, so DEFENUM sources with the applied fix are located inside "third-party" folder until the fix is merged upstream.
