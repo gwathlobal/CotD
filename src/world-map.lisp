@@ -17,6 +17,156 @@
 
   world-map)
 
+(defun generate-normal-world-map (world)
+  (with-slots (world-map) world
+    (setf world-map (make-instance 'world-map))
+    (setf (cells world-map) (make-array (list *max-x-world-map* *max-y-world-map*) :element-type '(or world-sector null) :initial-element nil))
+    
+    ;; create a template map of world sector types
+    (let ((template-map (make-array (list *max-x-world-map* *max-y-world-map*) :initial-element +world-sector-normal-residential+)))
+
+      ;; determine if sea should be placed
+      (when (zerop (random 2))
+        ;; determine which side should have the sea
+        (let* ((sides '(:n :s :w :e))
+               (chosen-side (nth (random (length sides)) sides)))
+          (case chosen-side
+            (:n (loop with y = 0
+                      with y1 = 1
+                      for x from 0 below (array-dimension template-map 0)
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-sea+)
+                         (setf (aref template-map x y1) +world-sector-normal-port+)))
+            (:s (loop with y = (1- (array-dimension template-map 1))
+                      with y1 = (- (array-dimension template-map 1) 2)
+                      for x from 0 below (array-dimension template-map 0)
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-sea+)
+                         (setf (aref template-map x y1) +world-sector-normal-port+)))
+            (:w (loop with x = 0
+                      with x1 = 1
+                      for y from 0 below (array-dimension template-map 1)
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-sea+)
+                         (setf (aref template-map x1 y) +world-sector-normal-port+)))
+            (:e (loop with x = (1- (array-dimension template-map 0))
+                      with x1 = (- (array-dimension template-map 0) 2)
+                      for y from 0 below (array-dimension template-map 1)
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-sea+)
+                         (setf (aref template-map x1 y) +world-sector-normal-port+)))))
+
+        ;; place up to 2 islands on the sea tiles
+        (loop with islands-num = (random 3)
+              repeat islands-num
+              do
+                 (loop for x = (random (array-dimension template-map 0))
+                       for y = (random (array-dimension template-map 1))
+                       while (/= (aref template-map x y) +world-sector-normal-sea+)
+                       finally (setf (aref template-map x y) +world-sector-normal-island+)))
+        )
+
+      ;; place outskirts on some of the borders
+      (let* ((sides '(:n :s :w :e))
+             (chosen-sides (loop for side in sides
+                                 when (zerop (random 3))
+                                   collect side)))
+        (loop for side in chosen-sides do
+          (case side
+            (:n (loop with y = 0
+                      for x from 0 below (array-dimension template-map 0)
+                      when (and (= (aref template-map x y) +world-sector-normal-residential+)
+                                (not (zerop (random 4))))
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-forest+)))
+            (:s (loop with y = (1- (array-dimension template-map 1))
+                      for x from 0 below (array-dimension template-map 0)
+                      when (and (= (aref template-map x y) +world-sector-normal-residential+)
+                                (not (zerop (random 4))))
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-forest+)))
+            (:w (loop with x = 0
+                      for y from 0 below (array-dimension template-map 1)
+                      when (and (= (aref template-map x y) +world-sector-normal-residential+)
+                                (not (zerop (random 4))))
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-forest+)))
+            (:e (loop with x = (1- (array-dimension template-map 0))
+                      for y from 0 below (array-dimension template-map 1)
+                      when (and (= (aref template-map x y) +world-sector-normal-residential+)
+                                (not (zerop (random 4))))
+                      do
+                         (setf (aref template-map x y) +world-sector-normal-forest+))))))
+
+      ;; place up to 3 lakes
+      (loop with lakes-num = (random 3)
+            repeat lakes-num
+            do
+               (loop for x = (random (array-dimension template-map 0))
+                     for y = (random (array-dimension template-map 1))
+                     while (not (or (= (aref template-map x y) +world-sector-normal-residential+)
+                                    (= (aref template-map x y) +world-sector-normal-forest+)))
+                     finally (setf (aref template-map x y) +world-sector-normal-lake+)))
+      
+      ;; translate the template map into the real world-map
+      (loop for x from 0 below (array-dimension (cells world-map) 0) do
+        (loop for y from 0 below (array-dimension (cells world-map) 1) do
+          (setf (aref (cells world-map) x y) (make-instance 'world-sector :wtype (aref template-map x y) :x x :y y))))
+      )
+
+    ;; place up to 1-2 churches & 1 relic in one of them
+    (loop with church-num = (1+ (random 2))
+          with church-sectors = ()
+          repeat church-num
+          do
+             (loop for x = (random (array-dimension (cells world-map) 0))
+                   for y = (random (array-dimension (cells world-map) 1))
+                   for world-sector = (aref (cells world-map) x y)
+                   while (or (= (wtype world-sector) +world-sector-normal-sea+)
+                             (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a))))
+                   finally (push (list +lm-feat-church+ nil) (feats world-sector))
+                           (push world-sector church-sectors))
+          finally (push +lm-item-holy-relic+ (items (nth (random (length church-sectors)) church-sectors))))
+    
+    ;; place 1 lair
+    (loop with lair-num = 1
+          repeat lair-num
+          do
+             (loop for x = (random (array-dimension (cells world-map) 0))
+                   for y = (random (array-dimension (cells world-map) 1))
+                   for world-sector = (aref (cells world-map) x y)
+                   while (or (= (wtype world-sector) +world-sector-normal-sea+)
+                             (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a))))
+                   finally (push (list +lm-feat-lair+ nil) (feats world-sector))))
+
+    ;; place 1 library & 1 book in it
+    (loop with library-num = 1
+          with library-sectors = ()
+          repeat library-num
+          do
+             (loop for x = (random (array-dimension (cells world-map) 0))
+                   for y = (random (array-dimension (cells world-map) 1))
+                   for world-sector = (aref (cells world-map) x y)
+                   while (or (= (wtype world-sector) +world-sector-normal-sea+)
+                             (find +lm-feat-library+ (feats world-sector) :key #'(lambda (a) (first a))))
+                   finally (push (list +lm-feat-library+ nil) (feats world-sector))
+                           (push world-sector library-sectors))
+          finally (push +lm-item-book-of-rituals+ (items (nth (random (length library-sectors)) library-sectors))))
+
+    ;; place 1 military
+    (loop with military-num = 1
+          repeat military-num
+          do
+             (loop for x = (random (array-dimension (cells world-map) 0))
+                   for y = (random (array-dimension (cells world-map) 1))
+                   for world-sector = (aref (cells world-map) x y)
+                   while (or (= (wtype world-sector) +world-sector-normal-sea+)
+                             (/= (controlled-by world-sector) +lm-controlled-by-none+))
+                   finally (setf (controlled-by world-sector) +lm-controlled-by-military+)))
+
+    
+    world-map))
+
 (defun generate-test-world-map (world)
   (with-slots (world-map) world
     (setf world-map (make-instance 'world-map))

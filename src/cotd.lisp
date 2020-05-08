@@ -377,25 +377,29 @@
                                       (declare (ignore n))
                                       (let ((mission nil)
                                             (world-sector nil))
-                                        (setf *world* (make-instance 'world))
-                                        (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                        (generate-test-world-map *world*)
-                                        
-                                        (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 :mission-type-military-conquest))
-                                        
-                                        (setf *current-window* (make-instance 'new-campaign-window
-                                                                              :world-map (world-map *world*)
-                                                                              :world-time (world-game-time *world*)))
-                                        (make-output *current-window*)
-                                        (multiple-value-setq (mission world-sector) (run-window *current-window*))
-                                        (when (and mission world-sector)
-
-                                          (setf (player-lvl-mod-placement-id mission) +lm-placement-player+)
+                                        (flet ((test-map-func ()
+                                                 (setf (world-map *world*) (generate-test-world-map *world*))
+                                                 (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 :mission-type-military-conquest))
+                                                 (world-map *world*)))
+                                          (setf *world* (make-instance 'world))
+                                          (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
+                                          (test-map-func)
                                           
-                                          (setf *current-window* (return-to *current-window*))
-
-                                          (return-from main-menu (values world-sector mission))
-                                          ))))))
+                                          (setf *current-window* (make-instance 'new-campaign-window
+                                                                                :world *world*
+                                                                                :world-map (world-map *world*)
+                                                                                :world-time (world-game-time *world*)
+                                                                                :test-map-func #'test-map-func))
+                                          (make-output *current-window*)
+                                          (multiple-value-setq (mission world-sector) (run-window *current-window*))
+                                          (when (and mission world-sector)
+                                            
+                                            (setf (player-lvl-mod-placement-id mission) +lm-placement-player+)
+                                            
+                                            (setf *current-window* (return-to *current-window*))
+                                            
+                                            (return-from main-menu (values world-sector mission))
+                                          )))))))
     (if *cotd-release*
       (progn
         (setf menu-items (list (car new-game-item) 
