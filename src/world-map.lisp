@@ -114,6 +114,55 @@
           (setf (aref (cells world-map) x y) (make-instance 'world-sector :wtype (aref template-map x y) :x x :y y))))
       )
 
+    ;; place rivers
+    (let ((river-origin-list ()))
+      ;; find all river origins
+      (loop for x from 0 below (array-dimension (cells world-map) 0) do
+        (loop for y from 0 below (array-dimension (cells world-map) 1) do
+          (when (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
+                    (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+))
+            (push (list x y) river-origin-list))))
+
+      ;; choose 1-3 of them
+      (loop with max-origins = (1+ (random 3))
+            while (> (length river-origin-list) max-origins) do
+              (setf river-origin-list (remove (nth (random (length river-origin-list)) river-origin-list) river-origin-list)))
+
+      (labels ((make-river (sx sy)
+                 (let ((dirs)
+                       (r (random 5)))
+                   (push (list +lm-feat-river+ nil) (feats (aref (cells world-map) sx sy)))
+                   (setf dirs (loop for (dx dy) in '((1 0) (-1 0) (0 1) (0 -1))
+                                    when (and (> (+ sx dx) 0) (> (+ sy dy) 0)
+                                              (< (+ sx dx) (array-dimension (cells world-map) 0))
+                                              (< (+ sy dy) (array-dimension (cells world-map) 1))
+                                              (or (= (wtype (aref (cells world-map) (+ sx dx) (+ sy dy))) +world-sector-normal-residential+)
+                                                  (= (wtype (aref (cells world-map) (+ sx dx) (+ sy dy))) +world-sector-normal-forest+)
+                                                  (= (wtype (aref (cells world-map) (+ sx dx) (+ sy dy))) +world-sector-normal-lake+))
+                                              (not (find +lm-feat-river+ (feats (aref (cells world-map) (+ sx dx) (+ sy dy))) :key #'(lambda (a) (first a)))))
+                                      collect (list dx dy)))
+                   (when (zerop r)
+                     (when dirs
+                       (let* ((dir (nth (random (length dirs)) dirs))
+                              (dx (first dir))
+                              (dy (second dir)))
+                         (setf dirs (remove dir dirs))
+                         (make-river (+ sx dx) (+ sy dy)))))
+                   
+                   (when (or (= r 1)
+                             (= r 2))
+                     (when dirs
+                       (let* ((dir (nth (random (length dirs)) dirs))
+                              (dx (first dir))
+                              (dy (second dir)))
+                         (setf dirs (remove dir dirs))
+                         (make-river  (+ sx dx) (+ sy dy)))))
+                   )))
+        (loop for (ox oy) in river-origin-list
+              do
+                 (make-river ox oy)))
+      )
+    
     ;; place up to 1-2 churches & 1 relic in one of them
     (loop with church-num = (1+ (random 2))
           with church-sectors = ()
@@ -164,6 +213,7 @@
                              (/= (controlled-by world-sector) +lm-controlled-by-none+))
                    finally (setf (controlled-by world-sector) +lm-controlled-by-military+)))
 
+    (generate-feats-on-world-map world-map)
     
     world-map))
 
@@ -181,7 +231,7 @@
     (setf (aref (cells world-map) 0 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 0 :y 1))
     (setf (aref (cells world-map) 1 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 1 :y 1))
     (setf (aref (cells world-map) 2 1) (make-instance 'world-sector :wtype +world-sector-abandoned-port+ :x 2 :y 1
-                                                                    :feats (list (list +lm-feat-river+ (list :n)))))
+                                                                    :feats (list (list +lm-feat-river+ nil))))
     (setf (aref (cells world-map) 3 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 3 :y 1))
     (setf (aref (cells world-map) 4 1) (make-instance 'world-sector :wtype +world-sector-normal-port+ :x 4 :y 1))
     
@@ -247,16 +297,32 @@
     ;; add river features
     (when river-feat
       (when (and (>= (1- x) 0)
-                 (find +lm-feat-river+ (feats (aref (cells world-map) (1- x) y)) :key #'(lambda (a) (first a))))
+                 (or (find +lm-feat-river+ (feats (aref (cells world-map) (1- x) y)) :key #'(lambda (a) (first a)))
+                     (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+)
+                     (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-island+)
+                     (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-abandoned-island+)
+                     (= (wtype (aref (cells world-map) (1- x) y)) +world-sector-corrupted-island+)))
         (setf (second river-feat) (append (second river-feat) '(:w))))
       (when (and (>= (1- y) 0)
-                 (find +lm-feat-river+ (feats (aref (cells world-map) x (1- y))) :key #'(lambda (a) (first a))))
+                 (or (find +lm-feat-river+ (feats (aref (cells world-map) x (1- y))) :key #'(lambda (a) (first a)))
+                     (= (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+)
+                     (= (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-island+)
+                     (= (wtype (aref (cells world-map) x (1- y))) +world-sector-abandoned-island+)
+                     (= (wtype (aref (cells world-map) x (1- y))) +world-sector-corrupted-island+)))
         (setf (second river-feat) (append (second river-feat) '(:n))))
       (when (and (< (1+ x) *max-x-world-map*)
-                 (find +lm-feat-river+ (feats (aref (cells world-map) (1+ x) y)) :key #'(lambda (a) (first a))))
+                 (or (find +lm-feat-river+ (feats (aref (cells world-map) (1+ x) y)) :key #'(lambda (a) (first a)))
+                     (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+)
+                     (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-island+)
+                     (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-abandoned-island+)
+                     (= (wtype (aref (cells world-map) (1+ x) y)) +world-sector-corrupted-island+)))
         (setf (second river-feat) (append (second river-feat) '(:e))))
       (when (and (< (1+ y) *max-y-world-map*)
-                 (find +lm-feat-river+ (feats (aref (cells world-map) x (1+ y))) :key #'(lambda (a) (first a))))
+                 (or (find +lm-feat-river+ (feats (aref (cells world-map) x (1+ y))) :key #'(lambda (a) (first a)))
+                     (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+)
+                     (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-island+)
+                     (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-abandoned-island+)
+                     (= (wtype (aref (cells world-map) x (1+ y))) +world-sector-corrupted-island+)))
         (setf (second river-feat) (append (second river-feat) '(:s))))
       )
 
