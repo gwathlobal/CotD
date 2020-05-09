@@ -384,6 +384,7 @@
 
 (defun scenario-set-player-specific-faction (scenario specific-faction-type)
   (with-slots (mission) scenario
+    (setf (player-specific-faction mission) specific-faction-type)
     (setf (player-lvl-mod-placement-id mission) (second (find specific-faction-type (scenario-faction-list (get-mission-type-by-id (mission-type-id mission)))
                                                               :key #'(lambda (a) (first a)))))))
 

@@ -225,7 +225,7 @@
                                                                 nil)
                                                               ))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
-                                                             (declare (ignore hostile-mobs allied-mobs))
+                                                             (declare (ignore nearest-ally nearest-enemy hostile-mobs allied-mobs))
 
                                                              (logger (format nil "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] decided to give blessings to ~A [~A]~%"
                                                                              (name actor) (id actor) (if check-result (name check-result) nil) (if check-result (id check-result) nil)))

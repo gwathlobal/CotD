@@ -271,10 +271,9 @@
                                 :mission mission
                                 :world *world*)
     )
-  
-  ;;(create-world *world* mission-id layout-id weather-id tod-id specific-faction-type faction-list)
 
-  ;;(setf *previous-scenario* (list mission-id specific-faction-type))
+  (when (player-specific-faction mission)
+    (setf *previous-scenario* (list (mission-type-id mission) (player-specific-faction mission))))
 
   ;;(format t "FACTION-LIST ~A~%" faction-list)
   
@@ -359,6 +358,7 @@
                                      (setf (aref (cells test-world-map) 0 0) world-sector)
                                      (setf (mission (aref (cells test-world-map) 0 0)) mission)
                                      (setf (player-lvl-mod-placement-id mission) +lm-placement-test+)
+                                     (setf (player-specific-faction mission) nil)
                                      
                                      (return-from main-menu (values world-sector mission))
                                      )
@@ -395,6 +395,7 @@
                                           (when (and mission world-sector)
                                             
                                             (setf (player-lvl-mod-placement-id mission) +lm-placement-player+)
+                                            (setf (player-specific-faction mission) nil)
                                             
                                             (setf *current-window* (return-to *current-window*))
                                             
