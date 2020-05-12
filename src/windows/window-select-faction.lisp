@@ -1,77 +1,74 @@
 (in-package :cotd)
 
-(defclass new-game-window (window)
-  ((cur-sel :initform 0 :accessor cur-sel)
-   (menu-items :initform () :accessor menu-items)
-   (menu-funcs :initform () :accessor menu-funcs)
-   (menu-descrs :initform () :accessor menu-descrs)
-   (max-menu-length :initform (truncate (- (/ *window-height* 2) 60) (sdl:char-height sdl:*default-font*)) :initarg :max-menu-length :accessor max-menu-length)
+(defclass select-faction-window (window)
+  ((menu-items :initarg :menu-items :accessor select-faction-window/menu-items)
+   (menu-descrs :initarg :menu-descrs :accessor select-faction-window/menu-descrs)
+
+   (cur-sel :initform 0 :accessor select-faction-window/cur-sel)
+      
+   (max-menu-length :initform (truncate (- (/ *window-height* 2) 60) (sdl:char-height sdl:*default-font*)) :initarg :max-menu-length :accessor select-faction-window/max-menu-length)
+   (window-title :initform "QUICK SCENARIO" :initarg :window-title :accessor select-faction-window/window-title)
+   (window-subtitle :initform "Choose your faction & character:" :initarg :window-subtitle :accessor select-faction-window/window-subtitle)
    ))
 
-(defmethod initialize-instance :after ((win new-game-window) &key)
-  (multiple-value-bind (new-game-items new-game-funcs new-game-descrs) (new-game-menu-items)
-    (setf (menu-items win) new-game-items)
-    (setf (menu-funcs win) new-game-funcs)
-    (setf (menu-descrs win) new-game-descrs))
-  )
-
-(defmethod make-output ((win new-game-window))
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
-
-  (sdl:draw-string-solid-* "NEW GAME" (truncate *window-width* 2) 0 :justify :center :color sdl:*white*)
-
-  (sdl:draw-string-solid-* (format nil "Choose your faction & character:")
-                           10 (+ 10 (sdl:char-height sdl:*default-font*)))
-  
-  ;; drawing selection list
-  (let ((cur-str (cur-sel win)) (color-list nil))
-
-    ;;(format t "max-menu-length = ~A, cur-str ~A~%" (max-menu-length win) (cur-sel win))
+(defmethod make-output ((win select-faction-window))
+  (with-slots (window-title window-subtitle cur-sel menu-descrs menu-items max-menu-length) win
+    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+      (sdl:fill-surface sdl:*black* :template a-rect))
     
-    (dotimes (i (length (menu-items win)))
-      ;; choose the description
-      ;;(setf lst (append lst (list (aref (line-array win) i))))
+    (sdl:draw-string-solid-* window-title (truncate *window-width* 2) 0 :justify :center :color sdl:*white*)
+    
+    (sdl:draw-string-solid-* window-subtitle
+                             10 (+ 10 (sdl:char-height sdl:*default-font*)))
+    
+    ;; drawing selection list
+    (let ((color-list nil))
       
-      (if (= i cur-str) 
-        (setf color-list (append color-list (list sdl:*yellow*)))
-        (setf color-list (append color-list (list sdl:*white*)))))
-    (draw-selection-list (menu-items win) cur-str (max-menu-length win) 20 (+ 30 (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
+      ;;(format t "max-menu-length = ~A, cur-str ~A~%" (max-menu-length win) (cur-sel win))
+      
+      (dotimes (i (length menu-items))
+        ;; choose the description
+        ;;(setf lst (append lst (list (aref (line-array win) i))))
+        
+        (if (= i cur-sel) 
+          (setf color-list (append color-list (list sdl:*yellow*)))
+          (setf color-list (append color-list (list sdl:*white*)))))
+      (draw-selection-list menu-items cur-sel max-menu-length 20 (+ 30 (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
+    
+    ;; drawing selection description
+    (let ((descr (nth cur-sel menu-descrs)))
+      (sdl:with-rectangle (rect (sdl:rectangle :x 20 :y (+ (truncate *window-height* 2) 0)
+                                               :w (- *window-width* 40)
+                                               :h (- (truncate *window-height* 2) 20 0 (sdl:char-height sdl:*default-font*))))
+        (write-text descr rect :start-line 0)))
+    
+    (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
+                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+    
+    (sdl:update-display)))
 
-  ;; drawing selection description
-  (let ((descr (nth (cur-sel win) (menu-descrs win))))
-    (sdl:with-rectangle (rect (sdl:rectangle :x 20 :y (+ (truncate *window-height* 2) 0)
-                                             :w (- *window-width* 40)
-                                             :h (- (truncate *window-height* 2) 20 0 (sdl:char-height sdl:*default-font*))))
-      (write-text descr rect :start-line 0)))
+(defmethod run-window ((win select-faction-window))
+  (with-slots (quit-func return-to cur-sel menu-items max-menu-length) win
+    (sdl:with-events ()
+      (:quit-event () (funcall quit-func) t)
+      (:key-down-event (:key key :mod mod :unicode unicode)
+                       
+                       (setf cur-sel (run-selection-list key mod unicode cur-sel :start-page (truncate cur-sel (length menu-items)) :max-str-per-page max-menu-length))
+                       (setf cur-sel (adjust-selection-list cur-sel (length menu-items)))
+                       
+                       (cond
+                         ;; escape - quit
+                         ((sdl:key= key :sdl-key-escape) 
+                          (setf *current-window* return-to)
+                          (return-from run-window nil))
+                         ;; enter - select
+                         ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                          (return-from run-window cur-sel)
+                          ))
+                       (make-output *current-window*))
+      (:video-expose-event () (make-output *current-window*)))))
 
-  (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
-                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
-  
-  (sdl:update-display))
-
-(defmethod run-window ((win new-game-window))
-     (sdl:with-events ()
-       (:quit-event () (funcall (quit-func win)) t)
-       (:key-down-event (:key key :mod mod :unicode unicode)
-
-                        (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win) :start-page (truncate (cur-sel win) (length (menu-items win))) :max-str-per-page (max-menu-length win)))
-                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win))))
-                        
-                        (cond
-			  ;; escape - quit
-			  ((sdl:key= key :sdl-key-escape) 
-			   (setf *current-window* (return-to win))
-                           (return-from run-window (values nil nil nil nil)))
-			  ;; enter - select
-			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-                           (when (and (menu-funcs win) (nth (cur-sel win) (menu-funcs win)))
-                             (return-from run-window (funcall (nth (cur-sel win) (menu-funcs win)) (cur-sel win))))
-                           ))
-			(make-output *current-window*))
-       (:video-expose-event () (make-output *current-window*))))
-
-(defun new-game-menu-items ()
+(defun quick-scenario-menu-items ()
   (let ((menu-items nil)
         (menu-funcs nil)
         (menu-descrs nil)

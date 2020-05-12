@@ -293,15 +293,24 @@
 (defun main-menu ()
   (let ((menu-items nil)
         (menu-funcs nil)
-        (new-game-item (cons "New game"
-                             #'(lambda (n) 
-                                 (declare (ignore n))
-                                 (setf *current-window* (make-instance 'new-game-window))
-                                 (make-output *current-window*)
-                                 (multiple-value-bind (world-sector mission) (run-window *current-window*)
-                                   (when (and mission world-sector)
-                                     (setf *current-window* (return-to *current-window*))
-                                     (return-from main-menu (values world-sector mission)))))))
+        (new-campaign-item (cons "New campaign"
+                                 #'(lambda (n)
+                                     nil)))
+        (quick-scenario-item (cons "Quick scenario"
+                                   #'(lambda (n) 
+                                       (declare (ignore n))
+                                       (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs) (quick-scenario-menu-items)
+                                         (setf *current-window* (make-instance 'select-faction-window :menu-items quick-scenario-items :menu-descrs quick-scenario-descrs))
+                                         (make-output *current-window*)
+                                         (let ((select-n (run-window *current-window*)))
+                                           (when select-n
+                                             (multiple-value-bind (world-sector mission) (funcall (nth select-n quick-scenario-funcs) select-n)
+                                               (when (and mission world-sector)
+                                                 (setf *current-window* (return-to *current-window*))
+                                                 (return-from main-menu (values world-sector mission))))))
+                                         
+                                         ))
+                                   ))
         (custom-scenario-item (cons "Custom scenario"
                                     #'(lambda (n)
                                         (declare (ignore n))
@@ -403,16 +412,16 @@
                                           )))))))
     (if *cotd-release*
       (progn
-        (setf menu-items (list (car new-game-item) 
+        (setf menu-items (list (car quick-scenario-item) 
                                (car custom-scenario-item) (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
-        (setf menu-funcs (list (cdr new-game-item)
+        (setf menu-funcs (list (cdr quick-scenario-item)
                                (cdr custom-scenario-item) (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
         )
       (progn
-        (setf menu-items (list (car new-game-item)
+        (setf menu-items (list (car quick-scenario-item)
                                (car custom-scenario-item) (car all-see-item) (car test-level-item) (car test-campaign-item)
                                (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
-        (setf menu-funcs (list (cdr new-game-item)
+        (setf menu-funcs (list (cdr quick-scenario-item)
                                (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item) (cdr test-campaign-item)
                                (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
         
