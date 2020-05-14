@@ -66,11 +66,11 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for missions where demons attack
-                                                  (if (or (= world-sector-type-id +world-sector-corrupted-forest+)
-                                                          (= world-sector-type-id +world-sector-corrupted-lake+)
-                                                          (= world-sector-type-id +world-sector-corrupted-residential+)
-                                                          (= world-sector-type-id +world-sector-corrupted-island+)
-                                                          (= world-sector-type-id +world-sector-corrupted-port+))
+                                                  (if (or (eq world-sector-type-id :world-sector-corrupted-forest)
+                                                          (eq world-sector-type-id :world-sector-corrupted-lake)
+                                                          (eq world-sector-type-id :world-sector-corrupted-residential)
+                                                          (eq world-sector-type-id :world-sector-corrupted-island)
+                                                          (eq world-sector-type-id :world-sector-corrupted-port))
                                                     t
                                                     nil)
                                                   )
@@ -108,11 +108,11 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for missions where military attack
-                                                  (if (or (= world-sector-type-id +world-sector-normal-forest+)
-                                                          (= world-sector-type-id +world-sector-normal-port+)
-                                                          (= world-sector-type-id +world-sector-normal-island+)
-                                                          (= world-sector-type-id +world-sector-normal-residential+)
-                                                          (= world-sector-type-id +world-sector-normal-lake+))
+                                                  (if (or (eq world-sector-type-id :world-sector-normal-forest)
+                                                          (eq world-sector-type-id :world-sector-normal-port)
+                                                          (eq world-sector-type-id :world-sector-normal-island)
+                                                          (eq world-sector-type-id :world-sector-normal-residential)
+                                                          (eq world-sector-type-id :world-sector-normal-lake))
                                                     t
                                                     nil))
                     )

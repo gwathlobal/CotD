@@ -490,13 +490,13 @@
          (displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*))))
     
     ;; display sea sector 
-    (when (= (wtype world-sector) +world-sector-normal-sea+)
+    (when (eq (wtype world-sector) :world-sector-normal-sea)
       (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*))))
 
     ;; display island sector
-    (when (or (= (wtype world-sector) +world-sector-normal-island+)
-              (= (wtype world-sector) +world-sector-abandoned-island+)
-              (= (wtype world-sector) +world-sector-corrupted-island+))
+    (when (or (eq (wtype world-sector) :world-sector-normal-island)
+              (eq (wtype world-sector) :world-sector-abandoned-island)
+              (eq (wtype world-sector) :world-sector-corrupted-island))
       (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
       (loop for x from 1 to 3 do
         (loop for y from 1 to 3 do
@@ -572,9 +572,9 @@
         (setf (aref displayed-cells 4 4) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))))
     
     ;; display lake
-    (when (or (= (wtype world-sector) +world-sector-normal-lake+)
-              (= (wtype world-sector) +world-sector-abandoned-lake+)
-              (= (wtype world-sector) +world-sector-corrupted-lake+))
+    (when (or (eq (wtype world-sector) :world-sector-normal-lake)
+              (eq (wtype world-sector) :world-sector-abandoned-lake)
+              (eq (wtype world-sector) :world-sector-corrupted-lake))
       (setf (aref displayed-cells 1 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
       (setf (aref displayed-cells 1 2) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
       (setf (aref displayed-cells 1 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))

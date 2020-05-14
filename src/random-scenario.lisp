@@ -118,7 +118,7 @@
   (with-slots (world world-sector mission) scenario
     (loop for x from 0 to 2 do
       (loop for y from 0 to 2 do
-        (setf (aref (cells (world-map world)) x y) (make-instance 'world-sector :wtype +world-sector-normal-residential+ :x x :y y))))
+        (setf (aref (cells (world-map world)) x y) (make-instance 'world-sector :wtype :world-sector-normal-residential :x x :y y))))
     
     (setf world-sector (make-instance 'world-sector :wtype world-sector-type-id
                                                     :x 1 :y 1))
@@ -436,7 +436,7 @@
                         (loop for mission-type in avail-mission-type-list
                               when (world-sector-for-custom-scenario mission-type) do
                                 (loop for world-sector-type-id in (world-sector-for-custom-scenario mission-type)
-                                      when (= world-sector-type-id (wtype world-sector-type)) do
+                                      when (eq world-sector-type-id (wtype world-sector-type)) do
                                         (loop for month in (list 0 1 2 3 4 5 6 7 8 9 10 11)
                                               for world-time = (set-current-date-time 1915 month 0 0 0 0) do
                                                 (when (and (is-available-for-mission lvl-mod)
@@ -461,7 +461,7 @@
                       (loop for mission-type in avail-mission-type-list
                             when (world-sector-for-custom-scenario mission-type) do
                               (loop for world-sector-type-id in (world-sector-for-custom-scenario mission-type)
-                                    when (= world-sector-type-id (wtype world-sector-type)) do
+                                    when (eq world-sector-type-id (wtype world-sector-type)) do
                                       (push (list nil world-sector-type mission-type) available-variants-list))))))
 
     ;; find all missions that produce the required faction
@@ -482,7 +482,7 @@
                              (when result-1
                                (when (world-sector-for-custom-scenario mission-type)
                                  (loop for world-sector-type-id in (world-sector-for-custom-scenario mission-type)
-                                       when (= world-sector-type-id (wtype world-sector-type)) do
+                                       when (eq world-sector-type-id (wtype world-sector-type)) do
                                          (push (list nil world-sector-type mission-type) available-variants-list)))))
                      ))
     

@@ -4,7 +4,7 @@
 ;; TEST
 ;;============
 
-(set-world-sector-type :wtype +world-sector-test+
+(set-world-sector-type :wtype :world-sector-test
                        :glyph-idx +glyph-id-large-t+
                        :glyph-color sdl:*white*
                        :name "A test district"
@@ -21,7 +21,7 @@
 ;; NORMAL
 ;;============
 
-(set-world-sector-type :wtype +world-sector-normal-residential+
+(set-world-sector-type :wtype :world-sector-normal-residential
                        :glyph-idx 40
                        :glyph-color sdl:*white*
                        :name "An ordinary district"
@@ -55,7 +55,7 @@
                                                              func-list))
                        )
 
-(set-world-sector-type :wtype +world-sector-normal-port+
+(set-world-sector-type :wtype :world-sector-normal-port
                        :glyph-idx 48
                        :glyph-color sdl:*white*
                        :name "A seaport district"
@@ -113,14 +113,14 @@
                                                   ;; choose random sides where to add a sea
                                                   (let ((side (nth (random 4) '(:n :s :e :w))))
                                                     (case side
-                                                      (:n (setf (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+))
-                                                      (:s (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+))
-                                                      (:w (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+))
-                                                      (:e (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+)))
+                                                      (:n (setf (wtype (aref (cells world-map) x (1- y))) :world-sector-normal-sea))
+                                                      (:s (setf (wtype (aref (cells world-map) x (1+ y))) :world-sector-normal-sea))
+                                                      (:w (setf (wtype (aref (cells world-map) (1- x) y)) :world-sector-normal-sea))
+                                                      (:e (setf (wtype (aref (cells world-map) (1+ x) y)) :world-sector-normal-sea)))
                                                     ))
                        )
 
-(set-world-sector-type :wtype +world-sector-normal-forest+
+(set-world-sector-type :wtype :world-sector-normal-forest
                        :glyph-idx 38
                        :glyph-color sdl:*white*
                        :name "The outskirts of the city"
@@ -160,7 +160,7 @@
                                                                    func-list)
                                                              func-list)))
 
-(set-world-sector-type :wtype +world-sector-normal-lake+
+(set-world-sector-type :wtype :world-sector-normal-lake
                        :glyph-idx 44
                        :glyph-color sdl:*white*
                        :name "A district upon a lake"
@@ -199,12 +199,12 @@
                                                              func-list))
                        )
 
-(set-world-sector-type :wtype +world-sector-normal-sea+
+(set-world-sector-type :wtype :world-sector-normal-sea
                        :glyph-idx 51
                        :glyph-color sdl:*white*
                        :name "Sea")
 
-(set-world-sector-type :wtype +world-sector-normal-island+
+(set-world-sector-type :wtype :world-sector-normal-island
                        :glyph-idx 41
                        :glyph-color sdl:*white*
                        :name "An island district"
@@ -243,7 +243,7 @@
 ;; ABANDONED
 ;;============
 
-(set-world-sector-type  :wtype +world-sector-abandoned-residential+
+(set-world-sector-type  :wtype :world-sector-abandoned-residential
                         :glyph-idx 40
                         :glyph-color (sdl:color :r 150 :g 150 :b 150)
                         :name "An abandoned residential district"
@@ -280,7 +280,7 @@
                                                               
                                                               func-list)))
 
-(set-world-sector-type :wtype +world-sector-abandoned-port+
+(set-world-sector-type :wtype :world-sector-abandoned-port
                        :glyph-idx 48
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned seaport district"
@@ -342,14 +342,14 @@
                                                   ;; choose random side where to place a sea
                                                   (let ((side (nth (random 4) '(:n :s :e :w))))
                                                     (case side
-                                                      (:n (setf (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+))
-                                                      (:s (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+))
-                                                      (:w (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+))
-                                                      (:e (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+)))
+                                                      (:n (setf (wtype (aref (cells world-map) x (1- y))) :world-sector-normal-sea))
+                                                      (:s (setf (wtype (aref (cells world-map) x (1+ y))) :world-sector-normal-sea))
+                                                      (:w (setf (wtype (aref (cells world-map) (1- x) y)) :world-sector-normal-sea))
+                                                      (:e (setf (wtype (aref (cells world-map) (1+ x) y)) :world-sector-normal-sea)))
                                                     ))
                        )
 
-(set-world-sector-type :wtype +world-sector-abandoned-forest+
+(set-world-sector-type :wtype :world-sector-abandoned-forest
                        :glyph-idx 38
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "The abandoned outskirts of the city"
@@ -393,7 +393,7 @@
                                                              
                                                              func-list)))
 
-(set-world-sector-type :wtype +world-sector-abandoned-lake+
+(set-world-sector-type :wtype :world-sector-abandoned-lake
                        :glyph-idx 44
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned district upon a lake"
@@ -439,7 +439,7 @@
                                                              
                                                              func-list)))
 
-(set-world-sector-type :wtype +world-sector-abandoned-island+
+(set-world-sector-type :wtype :world-sector-abandoned-island
                        :glyph-idx 41
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned island district"
@@ -481,7 +481,7 @@
 ;; CORRUPTED
 ;;============
 
-(set-world-sector-type :wtype +world-sector-corrupted-residential+
+(set-world-sector-type :wtype :world-sector-corrupted-residential
                        :glyph-idx 40
                        :glyph-color sdl:*magenta*
                        :name "A corrupted residential district"
@@ -545,7 +545,7 @@
                                                              
                                                              func-list)))
 
-(set-world-sector-type :wtype +world-sector-corrupted-port+
+(set-world-sector-type :wtype :world-sector-corrupted-port
                        :glyph-idx 48
                        :glyph-color sdl:*magenta*
                        :name "A corrupted seaport district"
@@ -630,14 +630,14 @@
                                                   ;; choose random side where to place a sea
                                                   (let ((side (nth (random 4) '(:n :s :e :w))))
                                                     (case side
-                                                      (:n (setf (wtype (aref (cells world-map) x (1- y))) +world-sector-normal-sea+))
-                                                      (:s (setf (wtype (aref (cells world-map) x (1+ y))) +world-sector-normal-sea+))
-                                                      (:w (setf (wtype (aref (cells world-map) (1- x) y)) +world-sector-normal-sea+))
-                                                      (:e (setf (wtype (aref (cells world-map) (1+ x) y)) +world-sector-normal-sea+)))
+                                                      (:n (setf (wtype (aref (cells world-map) x (1- y))) :world-sector-normal-sea))
+                                                      (:s (setf (wtype (aref (cells world-map) x (1+ y))) :world-sector-normal-sea))
+                                                      (:w (setf (wtype (aref (cells world-map) (1- x) y)) :world-sector-normal-sea))
+                                                      (:e (setf (wtype (aref (cells world-map) (1+ x) y)) :world-sector-normal-sea)))
                                                     ))
                        )
 
-(set-world-sector-type :wtype +world-sector-corrupted-forest+
+(set-world-sector-type :wtype :world-sector-corrupted-forest
                        :glyph-idx 38
                        :glyph-color sdl:*magenta*
                        :name "The corrupted outskirts of the city"
@@ -703,7 +703,7 @@
                                                              
                                                              func-list)))
 
-(set-world-sector-type :wtype +world-sector-corrupted-lake+
+(set-world-sector-type :wtype :world-sector-corrupted-lake
                        :glyph-idx 44
                        :glyph-color sdl:*magenta*
                        :name "A corrupted district upon a lake"
@@ -767,7 +767,7 @@
                                                              
                                                              func-list)))
 
-(set-world-sector-type :wtype +world-sector-corrupted-island+
+(set-world-sector-type :wtype :world-sector-corrupted-island
                        :glyph-idx 41
                        :glyph-color sdl:*magenta*
                        :name "A corrupted island district"

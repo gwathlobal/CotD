@@ -38,16 +38,16 @@
                                                                                       (< dx (array-dimension (cells world-map) 0))
                                                                                       (< dy (array-dimension (cells world-map) 1))
                                                                                       (or (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-demons+)
-                                                                                          (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-forest+)
-                                                                                          (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-port+)
-                                                                                          (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-residential+)
-                                                                                          (= (wtype (aref (cells world-map) dx dy)) +world-sector-corrupted-lake+)))
+                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
+                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port)
+                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
+                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)))
                                                                              (setf near-demons t))))
                                            (if (and near-demons
-                                                    (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+)))
+                                                    (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)))
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
@@ -59,10 +59,10 @@
                                            (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
-                                                          +world-sector-normal-port+
-                                                          +world-sector-normal-residential+
-                                                          +world-sector-normal-lake+)
+                  :world-sector-for-custom-scenario (list :world-sector-normal-forest
+                                                          :world-sector-normal-port
+                                                          :world-sector-normal-residential
+                                                          :world-sector-normal-lake)
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -154,11 +154,11 @@
 (set-mission-type :id :mission-type-demonic-raid
                   :name "Demonic raid"
                   :is-available-func #'(lambda (world-map x y)
-                                         (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+))
+                                         (if (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -170,11 +170,11 @@
                                            (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
-                                                          +world-sector-normal-port+
-                                                          +world-sector-normal-residential+
-                                                          +world-sector-normal-lake+
-                                                          +world-sector-normal-island+)
+                  :world-sector-for-custom-scenario (list :world-sector-normal-forest
+                                                          :world-sector-normal-port
+                                                          :world-sector-normal-residential
+                                                          :world-sector-normal-lake
+                                                          :world-sector-normal-island)
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -272,16 +272,16 @@
 (set-mission-type :id :mission-type-demonic-conquest
                   :name "Demonic conquest"
                   :is-available-func #'(lambda (world-map x y)
-                                         (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-forest+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-port+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-island+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+))
+                                         (if (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -294,16 +294,16 @@
                                              (push (list +faction-type-military+ :mission-faction-present) faction-list)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
-                                                          +world-sector-normal-port+
-                                                          +world-sector-normal-residential+
-                                                          +world-sector-normal-lake+
-                                                          +world-sector-normal-island+
-                                                          +world-sector-abandoned-forest+
-                                                          +world-sector-abandoned-port+
-                                                          +world-sector-abandoned-island+
-                                                          +world-sector-abandoned-residential+
-                                                          +world-sector-abandoned-lake+)
+                  :world-sector-for-custom-scenario (list :world-sector-normal-forest
+                                                          :world-sector-normal-port
+                                                          :world-sector-normal-residential
+                                                          :world-sector-normal-lake
+                                                          :world-sector-normal-island
+                                                          :world-sector-abandoned-forest
+                                                          :world-sector-abandoned-port
+                                                          :world-sector-abandoned-island
+                                                          :world-sector-abandoned-residential
+                                                          :world-sector-abandoned-lake)
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -400,16 +400,16 @@
                   :is-available-func #'(lambda (world-map x y)
                                          (if (and (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
                                                   (find +item-type-church-reliс+ (items (aref (cells world-map) x y)))
-                                                  (or (= (wtype (aref (cells world-map) x y)) +world-sector-normal-forest+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-normal-port+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-normal-island+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-normal-residential+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-normal-lake+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-forest+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-port+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-island+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+)))
+                                                  (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake)))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -422,16 +422,16 @@
                                              (push (list +faction-type-military+ :mission-faction-present) faction-list)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-normal-forest+
-                                                          +world-sector-normal-port+
-                                                          +world-sector-normal-residential+
-                                                          +world-sector-normal-lake+
-                                                          +world-sector-normal-island+
-                                                          +world-sector-abandoned-forest+
-                                                          +world-sector-abandoned-port+
-                                                          +world-sector-abandoned-island+
-                                                          +world-sector-abandoned-residential+
-                                                          +world-sector-abandoned-lake+)
+                  :world-sector-for-custom-scenario (list :world-sector-normal-forest
+                                                          :world-sector-normal-port
+                                                          :world-sector-normal-residential
+                                                          :world-sector-normal-lake
+                                                          :world-sector-normal-island
+                                                          :world-sector-abandoned-forest
+                                                          :world-sector-abandoned-port
+                                                          :world-sector-abandoned-island
+                                                          :world-sector-abandoned-residential
+                                                          :world-sector-abandoned-lake)
                    :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -535,11 +535,11 @@
                                                                                       (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-military+))
                                                                              (setf near-military t))))
                                            (if (and near-military
-                                                    (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-port+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-island+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-residential+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-lake+)))
+                                                    (or (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake)))
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
@@ -553,11 +553,11 @@
                                              (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
-                                                          +world-sector-corrupted-port+
-                                                          +world-sector-corrupted-island+
-                                                          +world-sector-corrupted-residential+
-                                                          +world-sector-corrupted-lake+)
+                  :world-sector-for-custom-scenario (list :world-sector-corrupted-forest
+                                                          :world-sector-corrupted-port
+                                                          :world-sector-corrupted-island
+                                                          :world-sector-corrupted-residential
+                                                          :world-sector-corrupted-lake)
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
@@ -650,11 +650,11 @@
                                                                                       (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-military+))
                                                                              (setf near-military t))))
                                            (if (and near-military
-                                                    (or (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-forest+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-port+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-island+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
-                                                        (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+)))
+                                                    (or (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
+                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake)))
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
@@ -668,11 +668,11 @@
                                              (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-abandoned-forest+
-                                                          +world-sector-abandoned-port+
-                                                          +world-sector-abandoned-island+
-                                                          +world-sector-abandoned-residential+
-                                                          +world-sector-abandoned-lake+)
+                  :world-sector-for-custom-scenario (list :world-sector-abandoned-forest
+                                                          :world-sector-abandoned-port
+                                                          :world-sector-abandoned-island
+                                                          :world-sector-abandoned-residential
+                                                          :world-sector-abandoned-lake)
                    :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
                                                          
@@ -758,11 +758,11 @@
 (set-mission-type :id :mission-type-celestial-purge
                   :name "Celestial purge"
                   :is-available-func #'(lambda (world-map x y)
-                                         (if (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-port+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-island+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-residential+)
-                                                 (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-lake+))
+                                         (if (or (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential)
+                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -776,11 +776,11 @@
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
-                                                          +world-sector-corrupted-port+
-                                                          +world-sector-corrupted-island+
-                                                          +world-sector-corrupted-residential+
-                                                          +world-sector-corrupted-lake+)
+                  :world-sector-for-custom-scenario (list :world-sector-corrupted-forest
+                                                          :world-sector-corrupted-port
+                                                          :world-sector-corrupted-island
+                                                          :world-sector-corrupted-residential
+                                                          :world-sector-corrupted-lake)
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
                                                          
@@ -868,16 +868,16 @@
                   :is-available-func #'(lambda (world-map x y)
                                          (if (and (not (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a))))
                                                   (find +item-type-church-reliс+ (items (aref (cells world-map) x y)))
-                                                  (or (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-forest+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-port+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-island+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-residential+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-corrupted-lake+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-forest+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-port+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-island+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-residential+)
-                                                      (= (wtype (aref (cells world-map) x y)) +world-sector-abandoned-lake+)))
+                                                  (or (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake)))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -891,16 +891,16 @@
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
-                  :world-sector-for-custom-scenario (list +world-sector-corrupted-forest+
-                                                          +world-sector-corrupted-port+
-                                                          +world-sector-corrupted-island+
-                                                          +world-sector-corrupted-residential+
-                                                          +world-sector-corrupted-lake+
-                                                          +world-sector-abandoned-forest+
-                                                          +world-sector-abandoned-port+
-                                                          +world-sector-abandoned-island+
-                                                          +world-sector-abandoned-residential+
-                                                          +world-sector-abandoned-lake+)
+                  :world-sector-for-custom-scenario (list :world-sector-corrupted-forest
+                                                          :world-sector-corrupted-port
+                                                          :world-sector-corrupted-island
+                                                          :world-sector-corrupted-residential
+                                                          :world-sector-corrupted-lake
+                                                          :world-sector-abandoned-forest
+                                                          :world-sector-abandoned-port
+                                                          :world-sector-abandoned-island
+                                                          :world-sector-abandoned-residential
+                                                          :world-sector-abandoned-lake)
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
                                                          

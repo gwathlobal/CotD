@@ -77,6 +77,7 @@
      (:file "init-card-types" :depends-on ("base-methods"))
      (:file "init-gods" :depends-on ("base-methods"))
      (:file "init-mission-types" :depends-on ("mission-type"))
+     (:file "game-state")
      (:module "windows" :depends-on ("base-methods")
       :components ((:file "window-classes")
                    (:file "window-methods" :depends-on ("window-classes"))

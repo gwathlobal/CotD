@@ -358,7 +358,7 @@
                                          (mission (make-instance 'mission :mission-type-id :mission-type-test
                                                                           :x 0 :y 0
                                                                           :level-modifier-list (list +lm-tod-night+)))
-                                         (world-sector (make-instance 'world-sector :wtype +world-sector-test+ :x 0 :y 0)))
+                                         (world-sector (make-instance 'world-sector :wtype :world-sector-test :x 0 :y 0)))
                                      (setf *world* (make-instance 'world))
                                      (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
                                      (generate-empty-world-map test-world-map)
