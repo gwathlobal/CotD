@@ -15,14 +15,13 @@
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
   :version "1.0.5"  
   :author "Gwathlobal"    
-  :depends-on (lispbuilder-sdl bordeaux-threads defenum)
+  :depends-on (lispbuilder-sdl bordeaux-threads defenum cl-store)
   :components
     ((:file "logger")
      (:file "astar")
      (:file "glyph-globals")
      (:file "globals")
      (:file "world-globals")
-     (:file "mission-type-globals")
      (:file "colored-text")
      (:file "message-box")
      (:file "options")

@@ -650,6 +650,10 @@
 (defvar *max-progress-bar*)
 
 (defparameter *current-dir* (asdf:system-source-directory :cotd))
+(defparameter *campaign-saves-dir* (list "saves" "campaign"))
+(defparameter *scenario-saves-dir* (list "saves" "scenario"))
+(defparameter *campaign-saves-filename* "world")
+(defparameter *scenario-saves-filename* "scenario")
 
 (defconstant +normal-ap+ 10)
 (defparameter *possessed-revolt-chance* 12)

@@ -492,6 +492,26 @@
    (world-map :initform nil :accessor world-map)
    ))
 
+(defun save-world-to-disk (world dir filename)
+  (handler-case
+      (let ((pathname (merge-pathnames (make-pathname :name filename :directory (append '(:relative) dir)) *current-dir*)))
+        (ensure-directories-exist pathname)
+        (cl-store:store world pathname))
+    (t ()
+      (logger "~%SAVE-WORLD-TO-DISK: Error occured while saving the world to file.~%~%"))))
+
+(defun load-world-from-disk (dir filename)
+  (handler-case
+      (let ((pathname (merge-pathnames (make-pathname :name filename :directory (append '(:relative) dir)) *current-dir*)))
+        (if (probe-file pathname)
+          (cl-store:restore pathname)
+          (progn
+            (logger "~%LOAD-WORLD-FROM-DISK: No file to read the world from.~%~%")
+            nil)))
+    (t ()
+      (logger "~%LOAD-WORLD-FROM-DISK: Error occured while reading the world from file.~%~%")
+      nil)))
+
 ;;----------------------
 ;; DATE
 ;;----------------------
