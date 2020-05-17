@@ -144,15 +144,8 @@
     
     (when (mob-ability-p mob +mob-abil-civilian+)
       (incf (lost-civilians (level *world*))))
-    ;; increase total civilian count of the slave mob otherwise it will be decreased twice - once during possession and once during death
-    ;(when (and (master-mob-id mob)
-    ;           (mob-ability-p mob +mob-abil-civilian+))
-    ;  (decf (lost-civilians (level *world*))))
     
     (decf (nth (loyal-faction mob) (total-faction-list (level *world*))))
-    ;; increase total faction count of the slave mob otherwise it will be decreased twice - once during possession and once during death
-    ;(when (master-mob-id mob)
-    ;  (incf (nth (loyal-faction mob) (total-faction-list (level *world*)))))
     
     (setf (mob-id-list level) (remove (id mob) (mob-id-list level))))
   
@@ -491,26 +484,6 @@
 
    (world-map :initform nil :accessor world-map)
    ))
-
-(defun save-world-to-disk (world dir filename)
-  (handler-case
-      (let ((pathname (merge-pathnames (make-pathname :name filename :directory (append '(:relative) dir)) *current-dir*)))
-        (ensure-directories-exist pathname)
-        (cl-store:store world pathname))
-    (t ()
-      (logger "~%SAVE-WORLD-TO-DISK: Error occured while saving the world to file.~%~%"))))
-
-(defun load-world-from-disk (dir filename)
-  (handler-case
-      (let ((pathname (merge-pathnames (make-pathname :name filename :directory (append '(:relative) dir)) *current-dir*)))
-        (if (probe-file pathname)
-          (cl-store:restore pathname)
-          (progn
-            (logger "~%LOAD-WORLD-FROM-DISK: No file to read the world from.~%~%")
-            nil)))
-    (t ()
-      (logger "~%LOAD-WORLD-FROM-DISK: Error occured while reading the world from file.~%~%")
-      nil)))
 
 ;;----------------------
 ;; DATE

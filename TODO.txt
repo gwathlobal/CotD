@@ -1,3 +1,4 @@
+- More sensible management of game flow through state machine 
 - A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints
 - Demons/angels arrive delayed through portals
 - A mission type for military/satanists - find and kill all satanists in the sector, demons will arrive after a delay to stop the military

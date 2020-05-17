@@ -321,6 +321,12 @@
                                               (setf *current-window* (return-to *current-window*))
                                               (return-from main-menu (values world-sector mission))))
                                         )))
+        (load-scenario-item (cons "Load scenario"
+                                  #'(lambda (n)
+                                      (declare (ignore n))
+                                      (setf *current-window* (make-instance 'load-game-window :save-game-type :save-game-scenario))
+                                      (make-output *current-window*)
+                                      (run-window *current-window*))))
         (settings-item (cons "Settings"
                              #'(lambda (n)
                                  (declare (ignore n))
@@ -413,16 +419,16 @@
     (if *cotd-release*
       (progn
         (setf menu-items (list (car quick-scenario-item) 
-                               (car custom-scenario-item) (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
+                               (car custom-scenario-item) (car load-scenario-item) (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
         (setf menu-funcs (list (cdr quick-scenario-item)
-                               (cdr custom-scenario-item) (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
+                               (cdr custom-scenario-item) (cdr load-scenario-item) (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
         )
       (progn
         (setf menu-items (list (car quick-scenario-item)
-                               (car custom-scenario-item) (car all-see-item) (car test-level-item) (car test-campaign-item)
+                               (car custom-scenario-item) (car load-scenario-item) (car all-see-item) (car test-level-item) (car test-campaign-item)
                                (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
         (setf menu-funcs (list (cdr quick-scenario-item)
-                               (cdr custom-scenario-item) (cdr all-see-item) (cdr test-level-item) (cdr test-campaign-item)
+                               (cdr custom-scenario-item) (cdr load-scenario-item) (cdr all-see-item) (cdr test-level-item) (cdr test-campaign-item)
                                (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
         
         ))
@@ -526,11 +532,13 @@
 
     (setf *path-thread* nil)
     (setf *previous-scenario* nil)
-    
+        
     (tagbody
        (setf *quit-func* #'(lambda () (go exit-tag)))
        (setf *start-func* #'(lambda () (go start-tag)))
+       (setf *game-func* #'(lambda () (go game-tag)))
      start-tag
+       (setf *game-manager* (make-instance 'game-manager))
        (when (and *path-thread* (bt:thread-alive-p *path-thread*))
          (bt:destroy-thread *path-thread*))
        (multiple-value-bind (world-sector mission) (main-menu)
@@ -596,7 +604,7 @@
        
        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
          (format file "~A" (create-options-file-string *options*)))
-       
+     game-tag
        (setf *current-window* (make-instance 'cell-window))
        (make-output *current-window*)
        ;; the game loop

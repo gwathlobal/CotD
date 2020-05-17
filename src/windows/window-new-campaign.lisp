@@ -169,16 +169,16 @@
                           (setf cur-mode :new-campaign-window-map-mode))
                          ;; s - save map
                          ((and (sdl:key= key :sdl-key-s) (not *cotd-release*))
-                          (save-world-to-disk world *campaign-saves-dir* *campaign-saves-filename*)
+                          ;(save-world-to-disk world *campaign-saves-dir* *campaign-saves-filename*)
                           )
                          ;; l - save map
                          ((and (sdl:key= key :sdl-key-l) (not *cotd-release*))
-                          (let ((saved-world (load-world-from-disk *campaign-saves-dir* *campaign-saves-filename*)))
-                            (when saved-world
-                              (setf world saved-world)
-                              (setf world-map (world-map world))
-                              (setf world-time (world-game-time world))
-                              (setf *world* world)))
+                          ;(let ((saved-world (load-world-from-disk *campaign-saves-dir* *campaign-saves-filename*)))
+                          ;  (when saved-world
+                          ;    (setf world saved-world)
+                          ;    (setf world-map (world-map world))
+                          ;    (setf world-time (world-game-time world))
+                          ;    (setf *world* world)))
                           )
                          ;; tab - change mode
                          ((sdl:key= key :sdl-key-tab)

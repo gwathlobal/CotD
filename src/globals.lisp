@@ -644,16 +644,18 @@
 
 (defparameter *world* nil)
 (defparameter *player* nil)
+(defparameter *game-manager* nil)
 
 (defvar *update-screen-closure*)
 (defvar *cur-progress-bar*)
 (defvar *max-progress-bar*)
 
 (defparameter *current-dir* (asdf:system-source-directory :cotd))
-(defparameter *campaign-saves-dir* (list "saves" "campaign"))
-(defparameter *scenario-saves-dir* (list "saves" "scenario"))
-(defparameter *campaign-saves-filename* "world")
-(defparameter *scenario-saves-filename* "scenario")
+(defparameter *campaign-saves-pathlist* (list "saves" "campaign"))
+(defparameter *scenario-saves-pathlist* (list "saves" "scenario"))
+(defparameter *save-final-base-dirname* "save")
+(defparameter *save-descr-filename* "descr")
+(defparameter *save-game-filename* "game")
 
 (defconstant +normal-ap+ 10)
 (defparameter *possessed-revolt-chance* 12)

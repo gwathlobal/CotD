@@ -774,19 +774,26 @@
 								:return-to *current-window*))
                           (make-output *current-window*))
                         ;;------------------
-			;; quit to menu - Shift + q
-                        (when (or (and (sdl:key= key :sdl-key-q) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
-                                  (eq unicode +cotd-unicode-latin-q-captial+))
+			;; scenario main menu - Esc
+                        (when (sdl:key= key :sdl-key-escape)
                           (setf *current-window* (make-instance 'select-obj-window 
                                                                 :return-to *current-window*
-                                                                :header-line "Are you sure you want to quit?"
+                                                                :header-line "Scenario Menu"
                                                                 :enter-func #'(lambda (cur-sel)
-                                                                                (if (= cur-sel 0)
-                                                                                  (funcall *start-func*)
-                                                                                  (setf *current-window* (return-to *current-window*)))
+                                                                                (case cur-sel
+                                                                                  (0 (progn
+                                                                                       (save-game-to-disk :save-game-scenario)
+                                                                                       (funcall *start-func*)))
+                                                                                  (1 (progn
+                                                                                       (funcall *start-func*)))
+                                                                                  (t (progn
+                                                                                       (setf *current-window* (return-to *current-window*)))))
                                                                                 )
-                                                                :line-list (list "Yes" "No")
+                                                                :line-list (list "Save game & quit" "Quit without saving" "Close")
                                                                 :prompt-list (list #'(lambda (cur-sel)
+                                                                                       (declare (ignore cur-sel))
+                                                                                       "[Enter] Select  [Esc] Exit")
+                                                                                   #'(lambda (cur-sel)
                                                                                        (declare (ignore cur-sel))
                                                                                        "[Enter] Select  [Esc] Exit")
                                                                                    #'(lambda (cur-sel)
