@@ -3,10 +3,9 @@
 (defpackage cotd  
   (:use :common-lisp :asdf)
 
-  (:export :cotd-main
-   :make-exec)
-
-  )  
+  (:export
+   :cotd-main
+   :make-exec))  
  
 (in-package :cotd)  
 
@@ -81,6 +80,7 @@
      (:module "windows" :depends-on ("base-methods")
       :components ((:file "window-classes")
                    (:file "window-methods" :depends-on ("window-classes"))
+                   (:file "window-display-msg" :depends-on ("window-classes"))
                    (:file "window-main-menu" :depends-on ("window-methods"))
                    (:file "window-select-faction" :depends-on ("window-methods"))
                    (:file "window-messages" :depends-on ("window-methods"))

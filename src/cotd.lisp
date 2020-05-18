@@ -418,18 +418,28 @@
                                           )))))))
     (if *cotd-release*
       (progn
-        (setf menu-items (list (car quick-scenario-item) 
-                               (car custom-scenario-item) (car load-scenario-item) (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
-        (setf menu-funcs (list (cdr quick-scenario-item)
-                               (cdr custom-scenario-item) (cdr load-scenario-item) (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
+        (setf menu-items (list (car quick-scenario-item) (car custom-scenario-item)))
+        (when (find-all-save-game-paths :save-game-scenario)
+          (setf menu-items (append menu-items (list (car load-scenario-item)))))
+        (setf menu-items (append menu-items (list (car settings-item) (car highscores-item) (car help-item) (car exit-item))))
+        
+        (setf menu-funcs (list (cdr quick-scenario-item) (cdr custom-scenario-item)))
+        (when (find-all-save-game-paths :save-game-scenario)
+          (setf menu-funcs (append menu-funcs (list (cdr load-scenario-item)))))
+        (setf menu-funcs (append menu-funcs (list (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item))))
         )
       (progn
-        (setf menu-items (list (car quick-scenario-item)
-                               (car custom-scenario-item) (car load-scenario-item) (car all-see-item) (car test-level-item) (car test-campaign-item)
-                               (car settings-item) (car highscores-item) (car help-item) (car exit-item)))
-        (setf menu-funcs (list (cdr quick-scenario-item)
-                               (cdr custom-scenario-item) (cdr load-scenario-item) (cdr all-see-item) (cdr test-level-item) (cdr test-campaign-item)
-                               (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item)))
+        (setf menu-items (list (car quick-scenario-item) (car custom-scenario-item)))
+        (when (find-all-save-game-paths :save-game-scenario)
+          (setf menu-items (append menu-items (list (car load-scenario-item)))))
+        (setf menu-items (append menu-items (list (car all-see-item) (car test-level-item) (car test-campaign-item)
+                                                  (car settings-item) (car highscores-item) (car help-item) (car exit-item))))
+        
+        (setf menu-funcs (list (cdr quick-scenario-item) (cdr custom-scenario-item)))
+        (when (find-all-save-game-paths :save-game-scenario)
+          (setf menu-funcs (append menu-funcs (list (cdr load-scenario-item)))))
+        (setf menu-funcs (append menu-funcs (list (cdr all-see-item) (cdr test-level-item) (cdr test-campaign-item)
+                                                  (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item))))
         
         ))
     (when *previous-scenario*

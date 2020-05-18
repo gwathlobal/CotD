@@ -81,7 +81,7 @@
         (cl-store:store serialized-save-descr descr-file-pathname)
         (cl-store:store serialized-game game-file-pathname))
     (t ()
-      (logger "~%SAVE-GAME-TO-DISK: Error occured while saving to file.~%~%")))
+      (logger (format nil "~%SAVE-GAME-TO-DISK: Error occured while saving to file.~%~%"))))
   nil
   )
 
@@ -96,10 +96,10 @@
         (if (probe-file descr-pathname)
           (setf saved-descr (cl-store:restore descr-pathname))
           (progn
-            (logger "~%LOAD-DESCR-FROM-DISK: No file ~A to read the save description from.~%~%" descr-pathname)
+            (logger (format nil "~%LOAD-DESCR-FROM-DISK: No file ~A to read the save description from.~%~%" descr-pathname))
             nil))
       (t ()
-        (logger "~%LOAD-DESCR-FROM-DISK: Error occured while reading the save description from file ~A.~%~%" descr-pathname)
+        (logger (format nil "~%LOAD-DESCR-FROM-DISK: Error occured while reading the save description from file ~A.~%~%" descr-pathname))
         nil))
     saved-descr))
 
@@ -114,10 +114,10 @@
         (if (probe-file game-pathname)
           (setf saved-game (cl-store:restore game-pathname))
           (progn
-            (logger "~%LOAD-GAME-FROM-DISK: No file ~A to read the saved game from.~%~%" game-pathname)
+            (logger (format nil "~%LOAD-GAME-FROM-DISK: No file ~A to read the saved game from.~%~%" game-pathname))
             nil))
       (t ()
-        (logger "~%LOAD-GAME-FROM-DISK: Error occured while reading the saved game from file ~A.~%~%" game-pathname)
+        (logger (format nil "~%LOAD-GAME-FROM-DISK: Error occured while reading the saved game from file ~A.~%~%" game-pathname))
         nil))
     (when saved-game
       (with-slots (world mobs items lvl-features effects) saved-game
@@ -129,3 +129,51 @@
         (setf *player* (find 'player *mobs* :key #'(lambda (a)
                                                      (type-of a))))))
     saved-game))
+
+(declaim (ftype (function (pathname)
+                          (or null t))
+                delete-descr-from-disk))
+
+(defun delete-descr-from-disk (descr-pathname)
+  (declare (type pathname descr-pathname))
+  (handler-case
+      (if (probe-file descr-pathname)
+        (delete-file descr-pathname)
+        (progn
+          (logger (format nil "~%DELETE-DESCR-FROM-DISK: No file ~A to remove the saved description.~%~%" descr-pathname))
+          nil))
+    (t ()
+      (logger (format nil "~%DELETE-DESCR-FROM-DISK: Error occured while deleting the saved description from file ~A.~%~%" descr-pathname))
+      nil)))
+
+(declaim (ftype (function (pathname)
+                          (or null t))
+                delete-game-from-disk))
+
+(defun delete-game-from-disk (game-pathname)
+  (declare (type pathname game-pathname))
+  (handler-case
+      (if (probe-file game-pathname)
+        (delete-file game-pathname)
+        (progn
+          (logger (format nil "~%DELETE-GAME-FROM-DISK: No file ~A to remove the saved game.~%~%" game-pathname))
+          nil))
+    (t ()
+      (logger (format nil "~%DELETE-GAME-FROM-DISK: Error occured while deleting the saved game from file ~A.~%~%" game-pathname))
+      nil)))
+
+(declaim (ftype (function (pathname)
+                          (or null t))
+                delete-dir-from-disk))
+
+(defun delete-dir-from-disk (dir-pathname)
+  (declare (type pathname dir-pathname))
+  (handler-case
+      (if (probe-file dir-pathname)
+        (uiop:delete-directory-tree dir-pathname :validate t)
+        (progn
+          (logger (format nil "~%DELETE-DIR-FROM-DISK: No directory ~A to remove.~%~%" dir-pathname))
+          nil))
+    (t ()
+      (logger (format nil "~%DELETE-DIR-FROM-DISK: Error occured while deleting the directory ~A.~%~%" dir-pathname))
+      nil)))
