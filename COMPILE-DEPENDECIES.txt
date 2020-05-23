@@ -3,5 +3,6 @@ City of the Damned depends on the following Common Lisp libraries:
  - BORDEAUX-THREADS
  - DEFENUM
  - CL-STORE
+ - UIOP
 
 You may download and install them using Quicklisp.
