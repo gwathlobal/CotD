@@ -782,10 +782,19 @@
                                                                 :enter-func #'(lambda (cur-sel)
                                                                                 (case cur-sel
                                                                                   (0 (progn
-                                                                                       (save-game-to-disk :save-game-scenario)
-                                                                                       (funcall *start-func*)))
+                                                                                       (with-slots (game-state) *game-manager*
+                                                                                         (case game-state
+                                                                                           (:game-state-custom-scenario (save-game-to-disk :save-game-scenario))
+                                                                                           (:game-state-campaign-scenario (save-game-to-disk :save-game-campaign))))
+                                                                                       (game-state-custom-scenario->menu)
+                                                                                       (go-to-main-menu)
+                                                                                       ;(funcall *start-func*)
+                                                                                       ))
                                                                                   (1 (progn
-                                                                                       (funcall *start-func*)))
+                                                                                       (game-state-custom-scenario->menu)
+                                                                                       (go-to-main-menu)
+                                                                                       ;(funcall *start-func*)
+                                                                                       ))
                                                                                   (t (progn
                                                                                        (setf *current-window* (return-to *current-window*)))))
                                                                                 )

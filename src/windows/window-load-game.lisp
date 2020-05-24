@@ -123,7 +123,9 @@
                               (setf result (load-game-from-disk (nth cur-sel game-pathname-list)))
                               (when result
                                 (setf (game-manager/game-slot-id *game-manager*) (nth cur-sel game-slot-list))
-                                (funcall *game-func*))))
+                                ;(funcall *game-func*)
+                                (return-from run-window :main-menu-load-scenario)
+                                )))
                            )
                          )
                        (make-output *current-window*)

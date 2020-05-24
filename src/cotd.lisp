@@ -290,6 +290,11 @@
 
   )
 
+(defenum:defenum main-menu-command-enum (:main-menu-custom-scenario
+                                         :main-menu-load-scenario
+                                         :main-menu-campaign
+                                         :main-menu-quit))
+
 (defun main-menu ()
   (let ((menu-items nil)
         (menu-funcs nil)
@@ -307,8 +312,7 @@
                                              (multiple-value-bind (world-sector mission) (funcall (nth select-n quick-scenario-funcs) select-n)
                                                (when (and mission world-sector)
                                                  (setf *current-window* (return-to *current-window*))
-                                                 (return-from main-menu (values world-sector mission))))))
-                                         
+                                                 (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))))))
                                          ))
                                    ))
         (custom-scenario-item (cons "Custom scenario"
@@ -319,14 +323,15 @@
                                         (multiple-value-bind (world-sector mission) (run-window *current-window*)
                                             (when (and world-sector mission)
                                               (setf *current-window* (return-to *current-window*))
-                                              (return-from main-menu (values world-sector mission))))
+                                              (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))))
                                         )))
         (load-scenario-item (cons "Load scenario"
                                   #'(lambda (n)
                                       (declare (ignore n))
                                       (setf *current-window* (make-instance 'load-game-window :save-game-type :save-game-scenario))
                                       (make-output *current-window*)
-                                      (run-window *current-window*))))
+                                      (when (eq :main-menu-load-scenario (run-window *current-window*))
+                                        (return-from main-menu (values :main-menu-load-scenario nil))))))
         (settings-item (cons "Settings"
                              #'(lambda (n)
                                  (declare (ignore n))
@@ -348,13 +353,15 @@
         (exit-item (cons "Exit"
                          #'(lambda (n) 
                              (declare (ignore n))
-                             (funcall *quit-func*))))
+                             (return-from main-menu (values :main-menu-quit nil))
+                             ;(funcall *quit-func*)
+                             )))
         (all-see-item (cons "City with all-seeing"
                             #'(lambda (n) 
                                 (declare (ignore n))
                                 (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-player+)
                                   (when (and mission world-sector)
-                                    (return-from main-menu (values world-sector mission))
+                                    (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
                                     ))
                                 )))
         (test-level-item (cons "Test level"
@@ -375,7 +382,7 @@
                                      (setf (player-lvl-mod-placement-id mission) +lm-placement-test+)
                                      (setf (player-specific-faction mission) nil)
                                      
-                                     (return-from main-menu (values world-sector mission))
+                                     (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
                                      )
                                    
                                    )))
@@ -384,7 +391,7 @@
                                       (declare (ignore n))
                                       (multiple-value-bind (mission world-sector) (find-random-scenario-options (second *previous-scenario*) :avail-mission-type-list (list (get-mission-type-by-id (first *previous-scenario*))))
                                         (when (and mission world-sector)
-                                          (return-from main-menu (values world-sector mission))
+                                          (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
                                           ))
                                       )))
         (test-campaign-item (cons "Test campaign"
@@ -414,7 +421,7 @@
                                             
                                             (setf *current-window* (return-to *current-window*))
                                             
-                                            (return-from main-menu (values world-sector mission))
+                                            (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
                                           )))))))
     (if *cotd-release*
       (progn
@@ -453,177 +460,205 @@
   (make-output *current-window*)
   (run-window *current-window*)
   )
+
+(defun cotd-init ()
+  (let ((tiles-path))
+    ;; create default options
+    (setf *options* (make-options :tiles 'large))
+    
+    ;; get options from file if possible
+    (if (probe-file (merge-pathnames "options.cfg" *current-dir*))
+      (progn
+        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :input)
+          (handler-case
+              (loop for s-expr = (read file nil) 
+                    while s-expr do
+                      (read-options s-expr *options*))
+            (t ()
+              (logger "OPTIONS.CFG: Error occured while reading the options.cfg. Overwriting with defaults.~%")
+              (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
+                (format file "~A" (create-options-file-string *options*)))))))   
+      (progn 
+        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
+          (format file "~A" (create-options-file-string *options*))))
+      )
+    
+    ;; set parameters depending on options
+    ;; tiles
+    (cond
+      (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
+    ;; font
+    (cond
+      ((equal (options-font *options*) 'font-6x13) (sdl:initialise-default-font sdl:*font-6x13*))
+      (t (sdl:initialise-default-font sdl:*font-8x13*)))
+    ;; name
+    (cond
+      ((options-player-name *options*) nil)
+      (t (setf (options-player-name *options*) "Player")))
+    
+    ;; create default highscores
+    (setf *highscores* (make-highscores))
+    
+    (if (probe-file (merge-pathnames "scenario-highscores" *current-dir*))
+      (progn
+        (with-open-file (file (merge-pathnames "scenario-highscores" *current-dir*) :direction :input)
+          (handler-case
+              (loop for s-expr = (read file nil) 
+                    while s-expr do
+                      (add-highscore-record (read-highscore-record s-expr) *highscores*))
+            (t ()
+              (logger "OPTIONS.CFG: Error occured while reading the scenario-highscores. Overwriting with defaults.~%")
+              (write-highscores-to-file *highscores*)
+              ))))   
+      (progn 
+        (write-highscores-to-file *highscores*)
+        )
+      )
+    
+    
+    (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
+    (setf *random-state* (make-random-state t))
+    
+    (setf *window-width* (+ 540 (+ 30 (* *glyph-w* *max-x-view*))) 
+          *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (* 3 (sdl:char-height sdl:*default-font*))))
+    
+    (when (<= *window-height* 384)
+      (incf *window-height* (+ (* 6 (sdl:char-height sdl:*default-font*)) 0)))
+    
+    (sdl:window *window-width* *window-height*
+                :title-caption "The City of the Damned"
+                :icon-caption "The City of the Damned")
+    (sdl:enable-key-repeat nil nil)
+    (sdl:enable-unicode)
+    
+    (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
+    
+    
+    (logger (format nil "current-dir = ~A~%" *current-dir*))
+    (logger (format nil "path = ~A~%" (sdl:create-path tiles-path *current-dir*)))
+    
+    (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
+                                        :color-key sdl:*white*))
+    (setf *glyph-temp* (sdl:create-surface *glyph-w* *glyph-h* :color-key sdl:*black*))
+    
+    (setf *path-thread* nil)
+    (setf *previous-scenario* nil)
+    (setf *game-manager* (make-instance 'game-manager))
+    (game-state-start->init)))
+
+(defun stop-path-thread ()
+  (when (and *path-thread* (bt:thread-alive-p *path-thread*))
+    (bt:destroy-thread *path-thread*)))
+
+(defun go-to-quit-game ()
+  (funcall *quit-func*))
+
+(defun go-to-main-menu ()
+  (funcall *start-func*))
+
+(defun prepare-game-scenario (mission world-sector)
+  (setf *current-window* (make-instance 'loading-window 
+                                        :update-func #'(lambda (win)
+                                                         (when (/= *max-progress-bar* 0) 
+                                                           (let ((str (format nil "~A... ~3D%"
+                                                                              (cur-str win)
+                                                                              (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
+                                                             (sdl:draw-string-solid-*  str
+                                                                                       (truncate (- (/ *window-width* 2) (/ (* (length str) (sdl:char-width sdl:*default-font*)) 2)))
+                                                                                       (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
+                                                                                       :color sdl:*white*))
+                                                           ))))
+  (init-game mission world-sector)
+
+   ;; initialize thread, that will calculate random-movement paths while the system waits for player input
+  (let ((out *standard-output*))
+    (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
+      (t ()
+        (logger "MAIN: This system does not support multithreading!~%"))))
   
+  (bt:condition-notify (path-cv *world*))
+  (bt:condition-notify (fov-cv *world*))
+
+  ;; let player enter his\her name
+  (setf *current-window* (make-instance 'input-str-window 
+                                        :init-input (options-player-name *options*)
+                                        :header-str "Choose name"
+                                        :main-str "Enter you name"
+                                        :prompt-str "[Enter] Confirm"
+                                        :all-func nil
+                                        :no-escape t
+                                        :input-check-func #'(lambda (char cur-str)
+                                                              (if (and (not (null char))
+                                                                       (or (find (string-downcase (string char)) *char-list* :test #'string=)
+                                                                           (char= char #\Space)
+                                                                           (char= char #\-))
+                                                                       (< (length cur-str) *max-player-name-length*))
+                                                                t
+                                                                nil))
+                                        :final-check-func #'(lambda (full-input-str)
+                                                              (if (not (null full-input-str))
+                                                                t
+                                                                nil))
+                                        ))
+  (make-output *current-window*)
+  (setf (options-player-name *options*) (run-window *current-window*))
+
+  ;; set the same name for mimics if any
+  (setf (name *player*) (options-player-name *options*))
+  (setf (alive-name *player*) (name *player*))
+  (when (mob-ability-p *player* +mob-abil-trinity-mimic+)
+    (loop for mob-id in (mimic-id-list *player*)
+          for mob = (get-mob-by-id mob-id)
+          do
+             (setf (faction-name mob) (faction-name *player*))
+             (setf (name mob) (name *player*))))
+  
+  (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
+    (format file "~A" (create-options-file-string *options*))))
+
+(defun scenario-game-loop ()
+  (setf *current-window* (make-instance 'cell-window))
+  (make-output *current-window*)
+  ;; the game loop
+  (game-loop))
+
 (defun cotd-main () 
   (in-package :cotd)
     
   (sdl:with-init ()
+
+    ;(game-init)
+    ;(show-main-menu)
+    ;(case menu-result
+    ;  (:scenario (custom-scenario-loop))
+    ;  (:campaign (campaign-loop))))
     
-    (let ((tiles-path))
-    
-      ;; create default options
-      (setf *options* (make-options :tiles 'large))
-      
-      ;; get options from file if possible
-      (if (probe-file (merge-pathnames "options.cfg" *current-dir*))
-        (progn
-          (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :input)
-            (handler-case
-                (loop for s-expr = (read file nil) 
-                      while s-expr do
-                        (read-options s-expr *options*))
-              (t ()
-                (logger "OPTIONS.CFG: Error occured while reading the options.cfg. Overwriting with defaults.~%")
-                (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
-                  (format file "~A" (create-options-file-string *options*)))))))   
-        (progn 
-          (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
-            (format file "~A" (create-options-file-string *options*))))
-        )
-      
-      ;; set parameters depending on options
-      ;; tiles
-      (cond
-        (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
-      ;; font
-      (cond
-        ((equal (options-font *options*) 'font-6x13) (sdl:initialise-default-font sdl:*font-6x13*))
-        (t (sdl:initialise-default-font sdl:*font-8x13*)))
-      ;; name
-      (cond
-        ((options-player-name *options*) nil)
-        (t (setf (options-player-name *options*) "Player")))
+    (cotd-init)
 
-      ;; create default highscores
-      (setf *highscores* (make-highscores))
-
-      (if (probe-file (merge-pathnames "scenario-highscores" *current-dir*))
-        (progn
-          (with-open-file (file (merge-pathnames "scenario-highscores" *current-dir*) :direction :input)
-            (handler-case
-                (loop for s-expr = (read file nil) 
-                      while s-expr do
-                        (add-highscore-record (read-highscore-record s-expr) *highscores*))
-              (t ()
-                (logger "OPTIONS.CFG: Error occured while reading the scenario-highscores. Overwriting with defaults.~%")
-                (write-highscores-to-file *highscores*)
-                ))))   
-        (progn 
-          (write-highscores-to-file *highscores*)
-          )
-        )
-      
-
-      (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
-      (setf *random-state* (make-random-state t))
-
-      (setf *window-width* (+ 540 (+ 30 (* *glyph-w* *max-x-view*))) 
-            *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (* 3 (sdl:char-height sdl:*default-font*))))
-
-      (when (<= *window-height* 384)
-        (incf *window-height* (+ (* 6 (sdl:char-height sdl:*default-font*)) 0)))
-      
-      (sdl:window *window-width* *window-height*
-                  :title-caption "The City of the Damned"
-                  :icon-caption "The City of the Damned")
-      (sdl:enable-key-repeat nil nil)
-      (sdl:enable-unicode)
-      
-      (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
-      
-
-      (logger (format nil "current-dir = ~A~%" *current-dir*))
-      (logger (format nil "path = ~A~%" (sdl:create-path tiles-path *current-dir*)))
-      
-      (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
-                                          :color-key sdl:*white*))
-      (setf *glyph-temp* (sdl:create-surface *glyph-w* *glyph-h* :color-key sdl:*black*))
-      )
-
-    (setf *path-thread* nil)
-    (setf *previous-scenario* nil)
-        
     (tagbody
-       (setf *quit-func* #'(lambda () (go exit-tag)))
-       (setf *start-func* #'(lambda () (go start-tag)))
-       (setf *game-func* #'(lambda () (go game-tag)))
-     start-tag
-       (setf *game-manager* (make-instance 'game-manager))
-       (when (and *path-thread* (bt:thread-alive-p *path-thread*))
-         (bt:destroy-thread *path-thread*))
-       (multiple-value-bind (world-sector mission) (main-menu)
-         (setf *current-window* (make-instance 'loading-window 
-                                               :update-func #'(lambda (win)
-                                                                (when (/= *max-progress-bar* 0) 
-                                                                  (let ((str (format nil "~A... ~3D%"
-                                                                                     (cur-str win)
-                                                                                     (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
-                                                                    (sdl:draw-string-solid-*  str
-                                                                                              (truncate (- (/ *window-width* 2) (/ (* (length str) (sdl:char-width sdl:*default-font*)) 2)))
-                                                                                              (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
-                                                                                              :color sdl:*white*))
-                                                                  ))))
-         (init-game mission world-sector))
-
-       ;; initialize thread, that will calculate random-movement paths while the system waits for player input
-       (let ((out *standard-output*))
-         
-         (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
-           (t ()
-             (logger "MAIN: This system does not support multithreading!~%")))
-       ;  (handler-case (setf *fov-thread* (bt:make-thread #'(lambda () (thread-fov-loop out)) :name "FOV thread"))
-       ;    (t ()
-       ;      (logger "MAIN: This system does not support multithreading!~%")))
-         )
-       (bt:condition-notify (path-cv *world*))
-       (bt:condition-notify (fov-cv *world*))
-
-       ;; let player enter his\her name
-       (setf *current-window* (make-instance 'input-str-window 
-                                             :init-input (options-player-name *options*)
-                                             :header-str "Choose name"
-                                             :main-str "Enter you name"
-                                             :prompt-str "[Enter] Confirm"
-                                             :all-func nil
-                                             :no-escape t
-                                             :input-check-func #'(lambda (char cur-str)
-                                                                   (if (and (not (null char))
-                                                                            (or (find (string-downcase (string char)) *char-list* :test #'string=)
-                                                                                (char= char #\Space)
-                                                                                (char= char #\-))
-                                                                            (< (length cur-str) *max-player-name-length*))
-                                                                       t
-                                                                       nil))
-                                             :final-check-func #'(lambda (full-input-str)
-                                                                   (if (not (null full-input-str))
-                                                                       t
-                                                                       nil))
-                                             ))
-       (make-output *current-window*)
-       (setf (options-player-name *options*) (run-window *current-window*))
-
-       ;; set the same name for mimics if any
-       (setf (name *player*) (options-player-name *options*))
-       (setf (alive-name *player*) (name *player*))
-       (when (mob-ability-p *player* +mob-abil-trinity-mimic+)
-         (loop for mob-id in (mimic-id-list *player*)
-               for mob = (get-mob-by-id mob-id)
-               do
-                  (setf (faction-name mob) (faction-name *player*))
-                  (setf (name mob) (name *player*))))
-       
-       (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
-         (format file "~A" (create-options-file-string *options*)))
-     game-tag
-       (setf *current-window* (make-instance 'cell-window))
-       (make-output *current-window*)
-       ;; the game loop
-       (game-loop)
-     exit-tag
-       ;; destroy the thread once the game is about to be exited
-       (when (and *path-thread* (bt:thread-alive-p *path-thread*)) (bt:destroy-thread *path-thread*))
-       ;(when (and *fov-thread* (bt:thread-alive-p *fov-thread*)) (bt:destroy-thread *fov-thread*))
-     nil))
+       (setf *quit-func* #'(lambda () (go quit-menu-tag)))
+       (setf *start-func* #'(lambda () (go main-menu-tag)))
+       (game-state-init->menu)
+     main-menu-tag
+       (stop-path-thread)
+       (with-slots (game-slot-id) *game-manager*
+         (setf game-slot-id nil))
+       (multiple-value-bind (main-menu-command data) (main-menu)
+         (case main-menu-command
+           (:main-menu-custom-scenario (progn
+                                         (game-state-menu->custom-scenario)
+                                         (multiple-value-bind (world-sector mission) (values-list data)
+                                           (prepare-game-scenario mission world-sector)
+                                           (scenario-game-loop))))
+           (:main-menu-load-scenario (progn
+                                       (game-state-menu->custom-scenario)
+                                       (scenario-game-loop)))
+           (:main-menu-quit (progn
+                              (game-state-menu->quit)
+                              (go-to-quit-game)))))
+     quit-menu-tag
+       (stop-path-thread))
+    nil)
 )
 
 #+clisp
