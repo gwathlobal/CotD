@@ -153,8 +153,8 @@
                        (cond
                          ;; escape - quit
                          ((sdl:key= key :sdl-key-escape)
-                          (setf *current-window* return-to)
-                          (return-from run-window nil))
+                          (game-state-campaign-map->menu)
+                          (go-to-main-menu))
                          ;; t - return test map
                          ((sdl:key= key :sdl-key-t)
                           (setf world-map (funcall test-map-func))
@@ -167,19 +167,6 @@
                           (setf (world-map world) world-map)
                           (campaign-win-calculate-avail-missions win)
                           (setf cur-mode :new-campaign-window-map-mode))
-                         ;; s - save map
-                         ((and (sdl:key= key :sdl-key-s) (not *cotd-release*))
-                          ;(save-world-to-disk world *campaign-saves-dir* *campaign-saves-filename*)
-                          )
-                         ;; l - save map
-                         ((and (sdl:key= key :sdl-key-l) (not *cotd-release*))
-                          ;(let ((saved-world (load-world-from-disk *campaign-saves-dir* *campaign-saves-filename*)))
-                          ;  (when saved-world
-                          ;    (setf world saved-world)
-                          ;    (setf world-map (world-map world))
-                          ;    (setf world-time (world-game-time world))
-                          ;    (setf *world* world)))
-                          )
                          ;; tab - change mode
                          ((sdl:key= key :sdl-key-tab)
                           (if (eq cur-mode :new-campaign-window-mission-mode)

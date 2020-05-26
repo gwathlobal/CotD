@@ -51,7 +51,8 @@
   
   ;; display scenario stats
   (let* ((str (return-scenario-stats))
-         (max-lines))
+         (max-lines)
+         (prompt-str))
     
     (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 1 (sdl:get-font-height))))
       (setf max-lines (write-text str a-rect :count-only t)))
@@ -60,8 +61,12 @@
       (write-text str a-rect))
 
     (show-message-box 6 (+ 40 (* max-lines (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* (1+ max-lines) (sdl:get-font-height))) *full-message-box*)
+
     
-    (sdl:draw-string-solid-* (format nil "[m] Main menu  [Esc] High Scores")
+    (case (game-manager/game-state *game-manager*)
+      (:game-state-campaign-scenario (setf prompt-str (format nil "[m] Return to Campaign Map  [Esc] High Scores")))
+      (:game-state-custom-scenario (setf prompt-str (format nil "[m] Main menu  [Esc] High Scores"))))
+    (sdl:draw-string-solid-* prompt-str
                              10 (- *window-height* 13 (sdl:char-height sdl:*default-font*))))
   
   (sdl:update-display))
@@ -78,10 +83,24 @@
                            (setf *current-window* (make-instance 'highscores-window :highscores-place (highscores-place win)))
                            (make-output *current-window*)
                            (run-window *current-window*)
-                           (funcall *start-func*))
-                          ;; m - main menu
-                          ((sdl:key= key :sdl-key-m) 
-                           (funcall *start-func*))
+                           (case (game-manager/game-state *game-manager*)
+                             (:game-state-campaign-scenario (progn
+                                                              (game-state-campaign-scenario->campaign-map)
+                                                              (go-to-start-game)))
+                             (:game-state-custom-scenario (progn
+                                                            (game-state-custom-scenario->menu)
+                                                            (go-to-main-menu))))
+                           )
+                          ;; m - return to main menu/campaign map
+                          ((sdl:key= key :sdl-key-m)
+                           (case (game-manager/game-state *game-manager*)
+                             (:game-state-campaign-scenario (progn
+                                                              (game-state-campaign-scenario->campaign-map)
+                                                              (go-to-start-game)))
+                             (:game-state-custom-scenario (progn
+                                                            (game-state-custom-scenario->menu)
+                                                            (go-to-main-menu))))
+                           )
                           )
                         )
        (:video-expose-event () (make-output *current-window*)))

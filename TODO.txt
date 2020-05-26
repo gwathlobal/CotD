@@ -1,4 +1,5 @@
-- More sensible management of game flow through state machine 
+- Basic campaign loop where the player goes to campaign map, selects mission, wins/loses, the time goes forward and next day results are brought up and the cycle goes once again
+- Make the game differentiate between campaign mission win and loss (including abandoning mission)
 - A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints
 - Demons/angels arrive delayed through portals
 - A mission type for military/satanists - find and kill all satanists in the sector, demons will arrive after a delay to stop the military

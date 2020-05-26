@@ -411,7 +411,8 @@
     (loop for rx = (random *max-x-world-map*)
           for ry = (random *max-y-world-map*)
           for avail-missions = (loop for mission-type being the hash-values in *mission-types*
-                                     when (funcall (is-available-func mission-type) (world-map world) rx ry)
+                                     when (and (is-available-func mission-type)
+                                               (funcall (is-available-func mission-type) (world-map world) rx ry))
                                        collect (id mission-type))
           for world-sector = (aref (cells (world-map world)) rx ry)
           until (and (not (mission world-sector))

@@ -203,3 +203,62 @@
                             (third join-eater-item) (third join-skin-item) (third join-ghost-item)))
 
     (values menu-items menu-funcs menu-descrs)))
+
+(defun new-campaign-menu-items ()
+  (let ((menu-items nil)
+        (menu-funcs nil)
+        (menu-descrs nil)
+        (join-heaven-item (list "Join the Celestial Communion (as a Chrome angel)"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    +specific-faction-type-angel-chrome+
+                                    )
+                                (get-txt-from-file "data/descriptions/communion_chrome.txt")))
+        (join-trinity-item (list "Join the Celestial Communion (as a Trinity mimic)"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    +specific-faction-type-angel-trinity+
+                                    )
+                                (get-txt-from-file "data/descriptions/communion_trinity.txt")))
+        (join-legion-item (list "Join the Pandemonium Hierarchy (as a Crimson imp)"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    +specific-faction-type-demon-crimson+
+                                    )
+                                (get-txt-from-file "data/descriptions/pandemonium_crimsonimp.txt")))
+        (join-shadow-item (list "Join the Pandemonium Hierarchy (as a Shadow imp)"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    ;; start in the evening
+                                    +specific-faction-type-demon-shadow+
+                                    )
+                                (get-txt-from-file "data/descriptions/pandemonium_shadowimp.txt")))
+        (join-puppet-item (list "Join the Pandemonium Hierarchy (as Malseraph's puppet)"
+                                #'(lambda (n) 
+                                    (declare (ignore n))
+                                    +specific-faction-type-demon-malseraph+
+                                    )
+                                (get-txt-from-file "data/descriptions/pandemonium_puppet.txt")))
+        (join-chaplain-item (list "Join the Military (as a Chaplain)"
+                                  #'(lambda (n) 
+                                      (declare (ignore n))
+                                      +specific-faction-type-military-chaplain+
+                                      )
+                                  (get-txt-from-file "data/descriptions/military_chaplain.txt")))
+        (join-scout-item (list "Join the Military (as a Scout)"
+                               #'(lambda (n) 
+                                   (declare (ignore n))
+                                   +specific-faction-type-military-scout+
+                                   )
+                               (get-txt-from-file "data/descriptions/military_scout.txt")))
+        
+        )
+
+    (setf menu-items (list (first join-heaven-item) (first join-trinity-item) (first join-legion-item) (first join-shadow-item) (first join-puppet-item)
+                           (first join-chaplain-item) (first join-scout-item)))
+    (setf menu-funcs (list (second join-heaven-item) (second join-trinity-item) (second join-legion-item) (second join-shadow-item) (second join-puppet-item)
+                           (second join-chaplain-item) (second join-scout-item)))
+    (setf menu-descrs (list (third join-heaven-item) (third join-trinity-item) (third join-legion-item) (third join-shadow-item) (third join-puppet-item)
+                            (third join-chaplain-item) (third join-scout-item)))
+
+    (values menu-items menu-funcs menu-descrs)))

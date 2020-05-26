@@ -483,6 +483,7 @@
    (animation-queue :initform () :accessor animation-queue)
 
    (world-map :initform nil :accessor world-map)
+   (player-specific-faction :initform nil :accessor world/player-specific-faction)
    ))
 
 ;;----------------------
