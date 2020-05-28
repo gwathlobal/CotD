@@ -41,19 +41,28 @@
   (with-slots (cur-mode cur-sector cur-sel world-map world-time avail-missions) win
     (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
       (sdl:fill-surface sdl:*black* :template a-rect))
-    
-    (sdl:draw-string-solid-* "NEW CAMPAIGN" (truncate *window-width* 2) 0 :justify :center :color sdl:*white*)
-    
+
+    (with-slots (game-state) *game-manager*
+      (case game-state
+        (:game-state-campaign-init (sdl:draw-string-solid-* "NEW CAMPAIGN" (truncate *window-width* 2) 0 :justify :center :color sdl:*white*))
+        (:game-state-campaign-map (sdl:draw-string-solid-* "CAMPAIGN MAP" (truncate *window-width* 2) 0 :justify :center :color sdl:*white*)))
+      )
     
     (let* ((x1 20) (y1 20) (map-w (* *glyph-w* 5 *max-x-world-map*)) (map-h (* *glyph-h* 5 *max-y-world-map*))
            (x2 (+ x1 map-w 20)) (y2 (+ y1 20))
            (str1 "Select mission in a sector:")
            (str2 "Select available mission:")
-           (str3 (format nil "~A" (show-date-time-YMD world-time))))
-      (if (eq cur-mode :new-campaign-window-map-mode)
-        (sdl:draw-string-solid-* str1 (+ x1 (truncate map-w 2)) y1 :justify :center :color sdl:*white*)
-        (sdl:draw-string-solid-* str2 (+ x2 (truncate (- *window-width* x2 20) 2)) y1 :justify :center :color sdl:*white*))
-      
+           (str3 (format nil "~A" (show-date-time-YMD world-time)))
+           (str4 "Generate a campaign map, press [r] to create a new one:"))
+      (with-slots (game-state) *game-manager*
+        (case game-state
+          (:game-state-campaign-init (sdl:draw-string-solid-* str4 (- (truncate *window-width* 2) (truncate (* (length str4) (sdl:char-width sdl:*default-font*)) 2)) y1 :justify :left :color sdl:*white*))
+          (:game-state-campaign-map (if (eq cur-mode :new-campaign-window-map-mode)
+                                      (sdl:draw-string-solid-* str1 (+ x1 (truncate map-w 2)) y1 :justify :center :color sdl:*white*)
+                                      (sdl:draw-string-solid-* str2 (+ x2 (truncate (- *window-width* x2 20) 2)) y1 :justify :center :color sdl:*white*)))
+          )
+      )
+            
       (draw-world-map world-map x1 y2)
       
       (highlight-world-map-tile (+ x1 (* (car cur-sector) (* *glyph-w* 5))) (+ y2 (* (cdr cur-sector) (* *glyph-h* 5))))
@@ -84,14 +93,22 @@
                           rect))))
         )
       )
-    (let ((run-mission-str (if (mission (aref (cells world-map) (car cur-sector) (cdr cur-sector)))
-                             "[Enter] Start mission  "
-                             ""))
-          (test-gen-str (if (not *cotd-release*)
-                          "[r] Randomize map  [t] Test map  "
-                          "")))
-      (sdl:draw-string-solid-* (format nil "~A[Arrows/Numpad] Move selection  [Tab] Change mode  ~A[Esc] Exit" run-mission-str test-gen-str)
-                               10 (- *window-height* 10 (sdl:char-height sdl:*default-font*))))
+
+    (with-slots (game-state) *game-manager*
+      (case game-state
+        (:game-state-campaign-init (sdl:draw-string-solid-* (format nil "[Enter] Accept map  [r] Randomize map  [Arrows/Numpad] Move selection")
+                                                            10 (- *window-height* 10 (sdl:char-height sdl:*default-font*))))
+        (:game-state-campaign-map (let ((run-mission-str (if (mission (aref (cells world-map) (car cur-sector) (cdr cur-sector)))
+                                                           "[Enter] Start mission  "
+                                                           ""))
+                                        (test-gen-str (if (not *cotd-release*)
+                                                        "[r] Randomize map  [t] Test map  "
+                                                        "")))
+                                    (sdl:draw-string-solid-* (format nil "~A[Arrows/Numpad] Move selection  [Tab] Change mode  ~A[Esc] Exit" run-mission-str test-gen-str)
+                                                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))))
+        )
+      )
+    
     
     (sdl:update-display)))
 
@@ -153,8 +170,13 @@
                        (cond
                          ;; escape - quit
                          ((sdl:key= key :sdl-key-escape)
-                          (game-state-campaign-map->menu)
-                          (go-to-main-menu))
+                          (with-slots (game-state) *game-manager*
+                            (case game-state
+                              (:game-state-campaign-map (progn
+                                                          (game-state-campaign-map->menu)
+                                                          (go-to-main-menu))))
+                            )
+                          )
                          ;; t - return test map
                          ((sdl:key= key :sdl-key-t)
                           (setf world-map (funcall test-map-func))
@@ -176,9 +198,16 @@
                               (campaign-win-move-select-to-mission win))))
                          ;; enter - select
                          ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-                          (when (mission (aref (cells world-map) (car cur-sector) (cdr cur-sector)))
-                            (return-from run-window (values (mission (aref (cells world-map) (car cur-sector) (cdr cur-sector)))
-                                                            (aref (cells world-map) (car cur-sector) (cdr cur-sector)))))
+                          (with-slots (game-state) *game-manager*
+                            (case game-state
+                              (:game-state-campaign-init (progn
+                                                           (game-state-campaign-init->campaign-map)
+                                                           ))
+                              (:game-state-campaign-map (when (mission (aref (cells world-map) (car cur-sector) (cdr cur-sector)))
+                                                          (return-from run-window (values (mission (aref (cells world-map) (car cur-sector) (cdr cur-sector)))
+                                                                                          (aref (cells world-map) (car cur-sector) (cdr cur-sector)))))))
+                            )
+                          
                           ))
                        (make-output *current-window*)))
     (:video-expose-event () (make-output *current-window*))))

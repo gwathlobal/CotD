@@ -149,6 +149,12 @@
                                             (list +faction-type-criminals+ +game-event-win-for-thief+)
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )
+                  :campaign-result (list (list :game-over-angels-won nil)
+                                         (list :game-over-demons-won (list #'transform-residential-sector-to-abandoned))
+                                         (list :game-over-military-won nil)
+                                         (list :game-over-church-won nil)
+                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-abandoned))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
                   )
 
 (set-mission-type :id :mission-type-demonic-raid

@@ -15,6 +15,7 @@
    (scenario-faction-list :initform nil :initarg :scenario-faction-list :accessor scenario-faction-list)
    (ai-package-list :initform nil :initarg :ai-package-list :accessor ai-package-list)
    (win-condition-list :initform nil :initarg :win-condition-list :accessor win-condition-list)
+   (campaign-result :initform () :initarg :campaign-result :accessor mission-type/campaign-result :type list)
    ))
 
 (defparameter *mission-types* (make-hash-table))
@@ -22,8 +23,9 @@
 (defun set-mission-type (&key id name (enabled t) is-available-func faction-list-func template-level-gen-func overall-post-process-func-list terrain-post-process-func-list
                               scenario-faction-list ai-package-list win-condition-list world-sector-for-custom-scenario
                               (always-lvl-mods-func #'(lambda (world-sector mission world-time)
-                                                             (declare (ignore world-sector mission world-time))
-                                                             nil)))
+                                                        (declare (ignore world-sector mission world-time))
+                                                        nil))
+                              campaign-result)
   (unless id (error ":ID is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
   
@@ -39,6 +41,7 @@
                                                                   :win-condition-list win-condition-list
                                                                   :world-sector-for-custom-scenario world-sector-for-custom-scenario
                                                                   :always-lvl-mods-func always-lvl-mods-func
+                                                                  :campaign-result campaign-result
                                                                   )))
 
 (defun get-mission-type-by-id (mission-type-id)

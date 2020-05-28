@@ -85,7 +85,7 @@
                            (run-window *current-window*)
                            (case (game-manager/game-state *game-manager*)
                              (:game-state-campaign-scenario (progn
-                                                              (game-state-campaign-scenario->campaign-map)
+                                                              (game-state-campaign-scenario->post-scenario)
                                                               (go-to-start-game)))
                              (:game-state-custom-scenario (progn
                                                             (game-state-custom-scenario->menu)
@@ -95,7 +95,7 @@
                           ((sdl:key= key :sdl-key-m)
                            (case (game-manager/game-state *game-manager*)
                              (:game-state-campaign-scenario (progn
-                                                              (game-state-campaign-scenario->campaign-map)
+                                                              (game-state-campaign-scenario->post-scenario)
                                                               (go-to-start-game)))
                              (:game-state-custom-scenario (progn
                                                             (game-state-custom-scenario->menu)

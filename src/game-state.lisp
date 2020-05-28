@@ -4,8 +4,10 @@
                                   :game-state-init
                                   :game-state-main-menu
                                   :game-state-custom-scenario
+                                  :game-state-campaign-init
                                   :game-state-campaign-map
                                   :game-state-campaign-scenario
+                                  :game-state-post-scenario
                                   :game-state-quit))
 
 (defclass game-manager ()
@@ -42,6 +44,18 @@
       (error (format nil "GAME-STATE-CUSTOM-SCENARIO->MENU: Game state is ~A, not GAME-STATE-CUSTOM-SCENARIO" game-state)))
     (setf game-state :game-state-main-menu)))
 
+(defun game-state-menu->campaign-init ()
+  (with-slots (game-state) *game-manager*
+    (when (not (eq game-state :game-state-main-menu))
+      (error (format nil "GAME-STATE-MENU->CAMPAIGN-INIT: Game state is ~A, not GAME-STATE-MAIN-MENU" game-state)))
+    (setf game-state :game-state-campaign-init)))
+
+(defun game-state-campaign-init->campaign-map ()
+  (with-slots (game-state) *game-manager*
+    (when (not (eq game-state :game-state-campaign-init))
+      (error (format nil "GAME-STATE-CAMPAIGN-INIT->CAMPAIGN-MAP: Game state is ~A, not GAME-STATE-CAMPAIGN-INIT" game-state)))
+    (setf game-state :game-state-campaign-map)))
+
 (defun game-state-menu->campaign-map ()
   (with-slots (game-state) *game-manager*
     (when (not (eq game-state :game-state-main-menu))
@@ -72,8 +86,14 @@
       (error (format nil "GAME-STATE-CAMPAIGN-MAP->MENU: Game state is ~A, not GAME-STATE-CAMPAIGN-MAP" game-state)))
     (setf game-state :game-state-main-menu)))
 
-(defun game-state-campaign-scenario->campaign-map ()
+(defun game-state-campaign-scenario->post-scenario ()
   (with-slots (game-state) *game-manager*
     (when (not (eq game-state :game-state-campaign-scenario))
-      (error (format nil "GAME-STATE-CAMPAIGN-SCENARIO->CAMPAIGN-MAP: Game state is ~A, not GAME-STATE-CAMPAIGN-SCENARIO" game-state)))
+      (error (format nil "GAME-STATE-CAMPAIGN-SCENARIO->POST-SCENARIO: Game state is ~A, not GAME-STATE-CAMPAIGN-SCENARIO" game-state)))
+    (setf game-state :game-state-post-scenario)))
+
+(defun game-state-post-scenario->campaign-map ()
+  (with-slots (game-state) *game-manager*
+    (when (not (eq game-state :game-state-post-scenario))
+      (error (format nil "GAME-STATE-POST-SCENARIO->CAMPAIGN-MAP: Game state is ~A, not GAME-STATE-POST-SCENARIO" game-state)))
     (setf game-state :game-state-campaign-map)))

@@ -48,7 +48,7 @@
         collect world-sector-type))
 
 (defclass world-sector ()
-  ((wtype :initform nil :initarg :wtype :accessor wtype) ;; ids from feature-layout
+  ((wtype :initform nil :initarg :wtype :accessor wtype)
    (x :initarg :x :accessor x)
    (y :initarg :y :accessor y)
    (feats :initform () :initarg :feats :accessor feats) ;; auxiliary features of the sector, like rivers present

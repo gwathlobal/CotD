@@ -799,7 +799,7 @@
                                                                                            (go-to-main-menu)
                                                                                            ))
                                                                                       (1 (progn
-                                                                                           (game-state-campaign-scenario->campaign-map)
+                                                                                           (game-state-campaign-scenario->post-scenario)
                                                                                            (go-to-start-game)
                                                                                            ))
                                                                                       (t (progn

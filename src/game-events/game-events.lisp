@@ -51,19 +51,16 @@
 (defconstant +game-event-delayed-arrival-angels+ 46)
 (defconstant +game-event-delayed-arrival-demons+ 47)
 
-
-(deftype game-over-type () '(member
-                             :game-over-player-dead
-                             :game-over-demons-won
-                             :game-over-angels-won
-                             :game-over-military-won
-                             :game-over-church-won
-                             :game-over-satanists-won
-                             :game-over-player-possessed
-                             :game-over-thief-won
-                             :game-over-eater-won
-                             :game-over-ghost-won
-                             ))
+(defenum:defenum game-over-type (:game-over-player-dead
+                                 :game-over-demons-won
+                                 :game-over-angels-won
+                                 :game-over-military-won
+                                 :game-over-church-won
+                                 :game-over-satanists-won
+                                 :game-over-player-possessed
+                                 :game-over-thief-won
+                                 :game-over-eater-won
+                                 :game-over-ghost-won))
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)

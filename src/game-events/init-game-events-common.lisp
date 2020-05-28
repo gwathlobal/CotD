@@ -61,7 +61,9 @@
                                                                                  :player-won tmp-if-player-won :player-died player-died))
                        (make-output *current-window*)
                        (run-window *current-window*))
-      (:video-expose-event () (make-output *current-window*))))
+      (:video-expose-event () (make-output *current-window*)))
+    
+    (setf (level/mission-result (level tmp-world)) tmp-game-over-type))
   nil)
 
 ;;===========================

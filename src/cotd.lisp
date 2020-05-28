@@ -676,6 +676,69 @@
       (prepare-game-scenario mission world-sector)
       (return-from campaign-game-loop (values world-sector mission)))))
 
+(defun process-post-scenario ()
+  (with-slots (level world-map) *world*
+    (let ((present-missions (loop with result = ()
+                                for x from 0 below *max-x-world-map* do
+                                  (loop for y from 0 below *max-y-world-map*
+                                        for mission = (mission (aref (cells world-map) x y))
+                                        when mission
+                                          do
+                                             (push mission result))
+                                finally (return result))))
+      ;; process the previous mission which the player took personally  
+      (when level
+        (with-slots (mission world-sector mission-result) level
+          (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (wtype mission))) :key #'(lambda (a)
+                                                                                                                                                     (first a)))
+                for transform-sector-func in (second campaign-mission-result) do
+                  (funcall transform-sector-func world-map (x mission) (y mission)))
+          (setf present-missions (remove mission present-missions))))
+
+      ;; process missions where the player was absent
+      (loop for mission in present-missions do
+        (loop with avail-results = ()
+              with mission-result = nil
+              for (faction-id faction-present) in (faction-list mission)
+              when (not (eq faction-present :mission-faction-absent))
+              do
+                 (cond
+                   ((= faction-id +faction-type-angels+) (progn
+                                                           (push :game-over-angels-won avail-results)
+                                                           (when (eq faction-present :mission-faction-present)
+                                                             (push :game-over-angels-won avail-results))))
+                   ((= faction-id +faction-type-demons+) (progn
+                                                           (push :game-over-demons-won avail-results)
+                                                           (when (eq faction-present :mission-faction-present)
+                                                             (push :game-over-demons-won avail-results))))
+                   ((= faction-id +faction-type-military+) (progn
+                                                             (push :game-over-military-won avail-results)
+                                                             (when (eq faction-present :mission-faction-present)
+                                                               (push :game-over-demons-won avail-results))))
+                   ((= faction-id +faction-type-church+) (progn
+                                                           (push :game-over-church-won avail-results)
+                                                           (when (eq faction-present :mission-faction-present)
+                                                             (push :game-over-church-won avail-results))))
+                   ((= faction-id +faction-type-satanists+) (progn
+                                                              (push :game-over-demons-won avail-results)
+                                                              (when (eq faction-present :mission-faction-present)
+                                                                (push :game-over-demons-won avail-results))))
+                   ((= faction-id +faction-type-eater+) (progn
+                                                          (push :game-over-eater-won avail-results)
+                                                          (when (eq faction-present :mission-faction-present)
+                                                            (push :game-over-eater-won avail-results)))))
+              finally
+                 (setf mission-result (nth (random (length avail-results)) avail-results))
+                 (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (wtype mission))) :key #'(lambda (a)
+                                                                                                                                                            (first a)))
+                       for transform-sector-func in (second campaign-mission-result) do
+                         (funcall transform-sector-func world-map (x mission) (y mission)))))
+      
+      ;; reset all missions and regenerate them
+      (reset-all-missions-on-world-map world-map)
+      (generate-missions-on-world-map *world*)))
+  (game-state-post-scenario->campaign-map))
+
 (defun cotd-main () 
   (in-package :cotd)
     
@@ -703,7 +766,7 @@
            (:main-menu-campaign (progn
                                   (case data
                                     (:load-campaign-map (game-state-menu->campaign-scenario))
-                                    (t (game-state-menu->campaign-map)))))
+                                    (t (game-state-menu->campaign-init)))))
            (:main-menu-quit (progn
                               (game-state-menu->quit)
                               (go-to-quit-game)))))
@@ -711,8 +774,9 @@
        (loop while t do
          (case (game-manager/game-state *game-manager*)
            (:game-state-custom-scenario (scenario-game-loop))
-           (:game-state-campaign-map (campaign-game-loop))
-           (:game-state-campaign-scenario (scenario-game-loop))))
+           ((:game-state-campaign-map :game-state-campaign-init) (campaign-game-loop))
+           (:game-state-campaign-scenario (scenario-game-loop))
+           (:game-state-post-scenario (process-post-scenario))))
      quit-menu-tag
        (stop-path-thread))
     nil)
