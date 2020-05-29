@@ -114,6 +114,7 @@
                                           (multiple-value-bind (world-sector mission) (run-window *current-window*)
                                             (when (and world-sector mission)
                                               (setf *current-window* (return-to *current-window*))
+                                              (prepare-game-scenario mission world-sector)
                                               (game-state-menu->custom-scenario)
                                               :menu-stop-loop
                                               ))

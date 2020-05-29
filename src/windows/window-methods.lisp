@@ -448,6 +448,71 @@
     
     (values cur-line final-txt)))
 
+(defun show-escape-menu ()
+  (let ((menu-items ())
+        (prompt-list ())
+        (enter-func nil))
+    (case (game-manager/game-state *game-manager*)
+      (:game-state-campaign-scenario (progn
+                                       (setf menu-items (list "Save game & quit" "Abandon mission" "Close"))
+                                       (setf prompt-list (list #'(lambda (cur-sel)
+                                                                   (declare (ignore cur-sel))
+                                                                   "[Enter] Select  [Esc] Exit")
+                                                               #'(lambda (cur-sel)
+                                                                   (declare (ignore cur-sel))
+                                                                   "[Enter] Select  [Esc] Exit")
+                                                               #'(lambda (cur-sel)
+                                                                   (declare (ignore cur-sel))
+                                                                   "[Enter] Select  [Esc] Exit")))
+                                       (setf enter-func #'(lambda (cur-sel)
+                                                            (case cur-sel
+                                                              (0 (progn
+                                                                   (save-game-to-disk :save-game-campaign)
+                                                                   (game-state-campaign-scenario->menu)
+                                                                   (go-to-start-game)
+                                                                   ))
+                                                              (1 (progn
+                                                                   (game-state-campaign-scenario->post-scenario)
+                                                                   (go-to-start-game)
+                                                                   ))
+                                                              (t (progn
+                                                                   (setf *current-window* (return-to *current-window*)))))
+                                                            ))))
+      (:game-state-custom-scenario (progn
+                                     (setf menu-items (list "Save game & quit" "Quit without saving" "Close"))
+                                     (setf prompt-list (list #'(lambda (cur-sel)
+                                                                 (declare (ignore cur-sel))
+                                                                 "[Enter] Select  [Esc] Exit")
+                                                             #'(lambda (cur-sel)
+                                                                 (declare (ignore cur-sel))
+                                                                 "[Enter] Select  [Esc] Exit")
+                                                             #'(lambda (cur-sel)
+                                                                 (declare (ignore cur-sel))
+                                                                 "[Enter] Select  [Esc] Exit")))
+                                     (setf enter-func #'(lambda (cur-sel)
+                                                          (case cur-sel
+                                                            (0 (progn
+                                                                 (save-game-to-disk :save-game-scenario)
+                                                                 (game-state-custom-scenario->menu)
+                                                                 (go-to-start-game)
+                                                                 ))
+                                                            (1 (progn
+                                                                 (game-state-custom-scenario->menu)
+                                                                 (go-to-start-game)
+                                                                 ))
+                                                            (t (progn
+                                                                 (setf *current-window* (return-to *current-window*)))))
+                                                          )))))
+    (setf *current-window* (make-instance 'select-obj-window 
+                                          :return-to *current-window*
+                                          :header-line "Scenario Menu"
+                                          :line-list menu-items
+                                          :prompt-list prompt-list
+                                          :enter-func enter-func
+                                          ))
+    (make-output *current-window*)
+    (run-window *current-window*)))
+
 (defun pause-for-poll ()
   (sdl:with-events (:poll)
     (:quit-event () (funcall (quit-func *current-window*)) t)
@@ -456,23 +521,7 @@
                      (cond
                        ;; escape - quit
                        ((sdl:key= key :sdl-key-escape)
-                        (setf *current-window* (make-instance 'select-obj-window 
-                                                              :return-to *current-window*
-                                                              :header-line "Are you sure you want to quit?"
-                                                              :enter-func #'(lambda (cur-sel)
-                                                                              (if (= cur-sel 0)
-                                                                                (funcall *start-func*)
-                                                                                (setf *current-window* (return-to *current-window*)))
-                                                                              )
-                                                              :line-list (list "Yes" "No")
-                                                              :prompt-list (list #'(lambda (cur-sel)
-                                                                                     (declare (ignore cur-sel))
-                                                                                     "[Enter] Select  [Esc] Exit")
-                                                                                 #'(lambda (cur-sel)
-                                                                                     (declare (ignore cur-sel))
-                                                                                     "[Enter] Select  [Esc] Exit"))))
-                        (make-output *current-window*)
-                        (run-window *current-window*))
+                        (show-escape-menu))
                        )
                      )
     (:video-expose-event () (make-output *current-window*))
