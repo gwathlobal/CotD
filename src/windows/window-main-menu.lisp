@@ -88,7 +88,9 @@
                                           (progn
                                             (game-state-menu->campaign-scenario)
                                             :menu-stop-loop)
-                                          nil))))
+                                          (progn
+                                            (populate-main-menu win)
+                                            nil)))))
           (quick-scenario-item (list "Quick scenario"
                                      #'(lambda () 
                                          (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs) (quick-scenario-menu-items)
@@ -124,7 +126,9 @@
                                           (progn
                                             (game-state-menu->custom-scenario)
                                             :menu-stop-loop)
-                                          nil)
+                                          (progn
+                                            (populate-main-menu win)
+                                            nil))
                                         )))
           (settings-item (list "Settings"
                                #'(lambda ()

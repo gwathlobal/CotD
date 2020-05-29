@@ -72,7 +72,9 @@
                        (cond
                          ;; esc - exit the window
                          ((sdl:key= key :sdl-key-escape) 
-                          (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
+                          (setf *current-window* (return-to win))
+                          (make-output *current-window*)
+                          (return-from run-window nil))
                          ;; d - remove the selected game
                          ((or (and (sdl:key= key :sdl-key-d))
                               (eq unicode +cotd-unicode-latin-d-small+))
@@ -82,8 +84,8 @@
                             (setf *current-window* (make-instance 'select-obj-window 
                                                                   :return-to *current-window*
                                                                   :header-line "Are you sure you want to delete this game?"
-                                                                  :enter-func #'(lambda (cur-sel)
-                                                                                  (case cur-sel
+                                                                  :enter-func #'(lambda (current-sel)
+                                                                                  (case current-sel
                                                                                     (0 (progn
                                                                                          (let* ((descr-pathname (nth cur-sel descr-pathname-list))
                                                                                                 (dir-to-delete (make-pathname :host (pathname-host descr-pathname)
