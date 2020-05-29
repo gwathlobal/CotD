@@ -290,208 +290,8 @@
 
   )
 
-(defenum:defenum main-menu-command-enum (:main-menu-custom-scenario
-                                         :main-menu-load-scenario
-                                         :main-menu-campaign
-                                         :main-menu-quit))
-
 (defun main-menu ()
-  (let ((menu-items nil)
-        (menu-funcs nil)
-        (new-campaign-item (cons "New campaign"
-                                 #'(lambda (n)
-                                     (declare (ignore n))
-                                     (setf *world* (make-instance 'world))
-                                     (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                     (setf (world-map *world*) (generate-normal-world-map *world*))
-                                     (generate-missions-on-world-map *world*)
-                                     
-                                     (multiple-value-bind (campaign-items campaign-funcs campaign-descrs) (new-campaign-menu-items)
-                                       (setf *current-window* (make-instance 'select-faction-window :menu-items campaign-items :menu-descrs campaign-descrs))
-                                       (make-output *current-window*)
-                                       (let ((select-n (run-window *current-window*)))
-                                         (when select-n
-                                           (setf (world/player-specific-faction *world*) (funcall (nth select-n campaign-funcs) select-n))
-                                           (return-from main-menu (values :main-menu-campaign :start-campaign-map))
-                                           )))
-                                     )))
-        (load-campaign-item (cons "Load campaign"
-                                  #'(lambda (n)
-                                      (declare (ignore n))
-                                      (setf *current-window* (make-instance 'load-game-window :save-game-type :save-game-campaign))
-                                      (make-output *current-window*)
-                                      (when (eq :main-menu-load-scenario (run-window *current-window*))
-                                        (return-from main-menu (values :main-menu-campaign :load-campaign-map))))))
-        (quick-scenario-item (cons "Quick scenario"
-                                   #'(lambda (n) 
-                                       (declare (ignore n))
-                                       (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs) (quick-scenario-menu-items)
-                                         (setf *current-window* (make-instance 'select-faction-window :menu-items quick-scenario-items :menu-descrs quick-scenario-descrs))
-                                         (make-output *current-window*)
-                                         (let ((select-n (run-window *current-window*)))
-                                           (when select-n
-                                             (multiple-value-bind (world-sector mission) (funcall (nth select-n quick-scenario-funcs) select-n)
-                                               (when (and mission world-sector)
-                                                 (setf *current-window* (return-to *current-window*))
-                                                 (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))))))
-                                         ))
-                                   ))
-        (custom-scenario-item (cons "Custom scenario"
-                                    #'(lambda (n)
-                                        (declare (ignore n))
-                                        (setf *current-window* (make-instance 'custom-scenario-window))
-                                        (make-output *current-window*)
-                                        (multiple-value-bind (world-sector mission) (run-window *current-window*)
-                                            (when (and world-sector mission)
-                                              (setf *current-window* (return-to *current-window*))
-                                              (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))))
-                                        )))
-        (load-scenario-item (cons "Load scenario"
-                                  #'(lambda (n)
-                                      (declare (ignore n))
-                                      (setf *current-window* (make-instance 'load-game-window :save-game-type :save-game-scenario))
-                                      (make-output *current-window*)
-                                      (when (eq :main-menu-load-scenario (run-window *current-window*))
-                                        (return-from main-menu (values :main-menu-load-scenario nil))))))
-        (settings-item (cons "Settings"
-                             #'(lambda (n)
-                                 (declare (ignore n))
-                                 (setf *current-window* (make-instance 'settings-window))
-                                 (make-output *current-window*)
-                                 (run-window *current-window*))))
-        (highscores-item (cons "High scores"
-                               #'(lambda (n) 
-                                   (declare (ignore n))
-                                   (setf *current-window* (make-instance 'highscores-window))
-                                   (make-output *current-window*)
-                                   (run-window *current-window*))))
-        (help-item (cons "Help"
-                         #'(lambda (n) 
-                             (declare (ignore n))
-                             (setf *current-window* (make-instance 'help-window))
-                             (make-output *current-window*)
-                             (run-window *current-window*))))
-        (exit-item (cons "Exit"
-                         #'(lambda (n) 
-                             (declare (ignore n))
-                             (return-from main-menu (values :main-menu-quit nil))
-                             ;(funcall *quit-func*)
-                             )))
-        (all-see-item (cons "City with all-seeing"
-                            #'(lambda (n) 
-                                (declare (ignore n))
-                                (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-player+)
-                                  (when (and mission world-sector)
-                                    (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
-                                    ))
-                                )))
-        (test-level-item (cons "Test level"
-                               #'(lambda (n) 
-                                   (declare (ignore n))
-                                   (let ((test-world-map (make-instance 'world-map))
-                                         (mission (make-instance 'mission :mission-type-id :mission-type-test
-                                                                          :x 0 :y 0
-                                                                          :level-modifier-list (list +lm-tod-night+)))
-                                         (world-sector (make-instance 'world-sector :wtype :world-sector-test :x 0 :y 0)))
-                                     (setf *world* (make-instance 'world))
-                                     (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                     (generate-empty-world-map test-world-map)
-                                     (setf (world-map *world*) test-world-map)
-
-                                     (setf (aref (cells test-world-map) 0 0) world-sector)
-                                     (setf (mission (aref (cells test-world-map) 0 0)) mission)
-                                     (setf (player-lvl-mod-placement-id mission) +lm-placement-test+)
-                                     (setf (player-specific-faction mission) nil)
-                                     
-                                     (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
-                                     )
-                                   
-                                   )))
-        (play-prev-scenario (cons "Replay the previous scenario"
-                                  #'(lambda (n) 
-                                      (declare (ignore n))
-                                      (multiple-value-bind (mission world-sector) (find-random-scenario-options (second *previous-scenario*) :avail-mission-type-list (list (get-mission-type-by-id (first *previous-scenario*))))
-                                        (when (and mission world-sector)
-                                          (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
-                                          ))
-                                      )))
-        (test-campaign-item (cons "Test campaign"
-                                  #'(lambda (n)
-                                      (declare (ignore n))
-                                      (let ((mission nil)
-                                            (world-sector nil))
-                                        (flet ((test-map-func ()
-                                                 (setf (world-map *world*) (generate-test-world-map *world*))
-                                                 (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 :mission-type-military-conquest))
-                                                 (world-map *world*)))
-                                          (setf *world* (make-instance 'world))
-                                          (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
-                                          (test-map-func)
-                                          
-                                          (game-state-menu->campaign-map)
-                                          (setf *current-window* (make-instance 'new-campaign-window
-                                                                                :world *world*
-                                                                                :world-map (world-map *world*)
-                                                                                :world-time (world-game-time *world*)
-                                                                                :test-map-func #'test-map-func))
-                                          (make-output *current-window*)
-                                          (multiple-value-setq (mission world-sector) (run-window *current-window*))
-                                          (when (and mission world-sector)
-                                            
-                                            (setf (player-lvl-mod-placement-id mission) +lm-placement-player+)
-                                            (setf (player-specific-faction mission) nil)
-                                            
-                                            (setf *current-window* (return-to *current-window*))
-                                            (game-state-campaign-map->menu)
-                                            
-                                            (return-from main-menu (values :main-menu-custom-scenario (list world-sector mission)))
-                                          )))))))
-    (if *cotd-release*
-      (progn
-        (setf menu-items (list (car new-campaign-item)))
-        (when (find-all-save-game-paths :save-game-campaign)
-          (setf menu-items (append menu-items (list (car load-campaign-item)))))
-        (setf menu-items (append menu-items (list (car quick-scenario-item) (car custom-scenario-item))))
-        (when (find-all-save-game-paths :save-game-scenario)
-          (setf menu-items (append menu-items (list (car load-scenario-item)))))
-        (setf menu-items (append menu-items (list (car settings-item) (car highscores-item) (car help-item) (car exit-item))))
-
-        (setf menu-funcs (list (cdr new-campaign-item)))
-        (when (find-all-save-game-paths :save-game-campaign)
-          (setf menu-funcs (append menu-items (list (cdr load-campaign-item)))))
-        (setf menu-funcs (append menu-funcs (list (cdr quick-scenario-item) (cdr custom-scenario-item))))
-        (when (find-all-save-game-paths :save-game-scenario)
-          (setf menu-funcs (append menu-funcs (list (cdr load-scenario-item)))))
-        (setf menu-funcs (append menu-funcs (list (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item))))
-        )
-      (progn
-        (setf menu-items (list (car new-campaign-item)))
-        (when (find-all-save-game-paths :save-game-campaign)
-          (setf menu-items (append menu-items (list (car load-campaign-item)))))
-        (setf menu-items (append menu-items (list (car quick-scenario-item) (car custom-scenario-item))))
-        (when (find-all-save-game-paths :save-game-scenario)
-          (setf menu-items (append menu-items (list (car load-scenario-item)))))
-        (setf menu-items (append menu-items (list (car all-see-item) (car test-level-item) (car test-campaign-item)
-                                                  (car settings-item) (car highscores-item) (car help-item) (car exit-item))))
-
-        (setf menu-funcs (list (cdr new-campaign-item)))
-        (when (find-all-save-game-paths :save-game-campaign)
-          (setf menu-funcs (append menu-funcs (list (cdr load-campaign-item)))))
-        (setf menu-funcs (append menu-funcs (list (cdr quick-scenario-item) (cdr custom-scenario-item))))
-        (when (find-all-save-game-paths :save-game-scenario)
-          (setf menu-funcs (append menu-funcs (list (cdr load-scenario-item)))))
-        (setf menu-funcs (append menu-funcs (list (cdr all-see-item) (cdr test-level-item) (cdr test-campaign-item)
-                                                  (cdr settings-item) (cdr highscores-item) (cdr help-item) (cdr exit-item))))
-        
-        ))
-    (when *previous-scenario*
-      (push (car play-prev-scenario) menu-items)
-      (push (cdr play-prev-scenario) menu-funcs))
-    (setf *current-window* (make-instance 'main-menu-window 
-                                          :menu-items menu-items
-                                          :menu-funcs menu-funcs)))
-  
-  
+  (setf *current-window* (make-instance 'main-menu-window))
   (make-output *current-window*)
   (run-window *current-window*)
   )
@@ -588,11 +388,8 @@
 (defun go-to-quit-game ()
   (funcall *quit-func*))
 
-(defun go-to-main-menu ()
-  (funcall *start-func*))
-
 (defun go-to-start-game ()
-  (funcall *game-func*))
+  (funcall *start-func*))
 
 (defun prepare-game-scenario (mission world-sector)
   (setf *current-window* (make-instance 'loading-window 
@@ -748,31 +545,16 @@
 
     (tagbody
        (setf *quit-func* #'(lambda () (go quit-menu-tag)))
-       (setf *start-func* #'(lambda () (go main-menu-tag)))
-       (setf *game-func* #'(lambda () (go start-game-tag)))
+       (setf *start-func* #'(lambda () (go start-game-tag)))
        (game-state-init->menu)
-     main-menu-tag
-       (stop-path-thread)
-       (with-slots (game-slot-id) *game-manager*
-         (setf game-slot-id nil))
-       (multiple-value-bind (main-menu-command data) (main-menu)
-         (case main-menu-command
-           (:main-menu-custom-scenario (progn
-                                         (game-state-menu->custom-scenario)
-                                         (multiple-value-bind (world-sector mission) (values-list data)
-                                           (prepare-game-scenario mission world-sector))))
-           (:main-menu-load-scenario (progn
-                                       (game-state-menu->custom-scenario)))
-           (:main-menu-campaign (progn
-                                  (case data
-                                    (:load-campaign-map (game-state-menu->campaign-scenario))
-                                    (t (game-state-menu->campaign-init)))))
-           (:main-menu-quit (progn
-                              (game-state-menu->quit)
-                              (go-to-quit-game)))))
      start-game-tag
        (loop while t do
          (case (game-manager/game-state *game-manager*)
+           (:game-state-main-menu (progn
+                                    (stop-path-thread)
+                                    (with-slots (game-slot-id) *game-manager*
+                                      (setf game-slot-id nil))
+                                    (main-menu)))
            (:game-state-custom-scenario (scenario-game-loop))
            ((:game-state-campaign-map :game-state-campaign-init) (campaign-game-loop))
            (:game-state-campaign-scenario (scenario-game-loop))

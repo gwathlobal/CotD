@@ -124,7 +124,7 @@
                               (when result
                                 (setf (game-manager/game-slot-id *game-manager*) (nth cur-sel game-slot-list))
                                 ;(funcall *game-func*)
-                                (return-from run-window :main-menu-load-scenario)
+                                (return-from run-window :menu-load-scenario)
                                 )))
                            )
                          )

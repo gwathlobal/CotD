@@ -19,10 +19,14 @@
 
 (defvar *quit-func* 0)
 (defvar *start-func* 0)
-(defvar *game-func* 0)
 (defparameter *current-window* nil)
 (defparameter *rects-to-update* ())
 (defvar *msg-box-window-height*)
+
+(defenum:defenum menu-command-enum (:menu-stop-loop
+                                    :menu-continue
+                                    :menu-load-scenario
+                                    ))
 
 (defclass window ()
   ((return-to :initarg :return-to :initform *current-window* :accessor return-to)

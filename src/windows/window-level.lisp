@@ -796,7 +796,7 @@
                                                                                       (0 (progn
                                                                                            (save-game-to-disk :save-game-campaign)
                                                                                            (game-state-campaign-scenario->menu)
-                                                                                           (go-to-main-menu)
+                                                                                           (go-to-start-game)
                                                                                            ))
                                                                                       (1 (progn
                                                                                            (game-state-campaign-scenario->post-scenario)
@@ -821,11 +821,11 @@
                                                                                       (0 (progn
                                                                                            (save-game-to-disk :save-game-scenario)
                                                                                            (game-state-custom-scenario->menu)
-                                                                                           (go-to-main-menu)
+                                                                                           (go-to-start-game)
                                                                                            ))
                                                                                       (1 (progn
                                                                                            (game-state-custom-scenario->menu)
-                                                                                           (go-to-main-menu)
+                                                                                           (go-to-start-game)
                                                                                            ))
                                                                                       (t (progn
                                                                                            (setf *current-window* (return-to *current-window*)))))

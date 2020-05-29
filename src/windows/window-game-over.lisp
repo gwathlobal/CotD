@@ -12,7 +12,7 @@
 (defconstant +game-over-satanists-won+ 9)
 
 (defclass final-stats-window (window)
-  ((game-over-type :initarg :game-over-type :accessor game-over-type :type game-over-type)
+  ((game-over-type :initarg :game-over-type :accessor game-over-type :type game-over-enum)
    (highscores-place :initform nil :initarg :highscores-place :accessor highscores-place)
    (player-died :initform nil :initarg :player-died :accessor player-died)
    (player-won :initform nil :initarg :player-won :accessor player-won)))
@@ -89,7 +89,7 @@
                                                               (go-to-start-game)))
                              (:game-state-custom-scenario (progn
                                                             (game-state-custom-scenario->menu)
-                                                            (go-to-main-menu))))
+                                                            (go-to-start-game))))
                            )
                           ;; m - return to main menu/campaign map
                           ((sdl:key= key :sdl-key-m)
@@ -99,7 +99,7 @@
                                                               (go-to-start-game)))
                              (:game-state-custom-scenario (progn
                                                             (game-state-custom-scenario->menu)
-                                                            (go-to-main-menu))))
+                                                            (go-to-start-game))))
                            )
                           )
                         )

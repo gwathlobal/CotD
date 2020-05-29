@@ -15,7 +15,7 @@
                                  (:score fixnum)
                                  (:if-player-won boolean)
                                  (:player-msg string)
-                                 (:game-over-type game-over-type))
+                                 (:game-over-type game-over-enum))
                           null)
                 trigger-game-over))
 (defun trigger-game-over (world &key final-str score if-player-won player-msg game-over-type)
@@ -28,7 +28,7 @@
          (tmp-game-over-type game-over-type)
          (highscores-place)
          (player-died (player-check-dead)))
-    (declare (type string tmp-final-str player-msg) (type boolean tmp-if-player-won) (type fixnum tmp-score) (type game-over-type game-over-type))
+    (declare (type string tmp-final-str player-msg) (type boolean tmp-if-player-won) (type fixnum tmp-score) (type game-over-enum game-over-type))
     
     (when player-died
       (multiple-value-setq (tmp-final-str tmp-score) (dump-when-dead)))

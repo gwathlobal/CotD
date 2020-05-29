@@ -174,7 +174,7 @@
                             (case game-state
                               (:game-state-campaign-map (progn
                                                           (game-state-campaign-map->menu)
-                                                          (go-to-main-menu))))
+                                                          (go-to-start-game))))
                             )
                           )
                          ;; t - return test map

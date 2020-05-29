@@ -51,7 +51,7 @@
 (defconstant +game-event-delayed-arrival-angels+ 46)
 (defconstant +game-event-delayed-arrival-demons+ 47)
 
-(defenum:defenum game-over-type (:game-over-player-dead
+(defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won
                                  :game-over-angels-won
                                  :game-over-military-won
