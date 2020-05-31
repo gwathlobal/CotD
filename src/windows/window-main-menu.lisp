@@ -67,8 +67,7 @@
                                        (setf *world* (make-instance 'world))
                                        (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
                                        (setf (world-map *world*) (generate-normal-world-map *world*))
-                                       (generate-missions-on-world-map *world*)
-                                       
+                                                                              
                                        (multiple-value-bind (campaign-items campaign-funcs campaign-descrs) (new-campaign-menu-items)
                                          (setf *current-window* (make-instance 'select-faction-window :menu-items campaign-items :menu-descrs campaign-descrs))
                                          (make-output *current-window*)
@@ -213,10 +212,7 @@
                                           (test-map-func)
                                           
                                           (game-state-menu->campaign-map)
-                                          (setf *current-window* (make-instance 'new-campaign-window
-                                                                                :world *world*
-                                                                                :world-map (world-map *world*)
-                                                                                :world-time (world-game-time *world*)
+                                          (setf *current-window* (make-instance 'campaign-window
                                                                                 :test-map-func #'test-map-func))
                                           (make-output *current-window*)
                                           (multiple-value-setq (mission world-sector) (run-window *current-window*))

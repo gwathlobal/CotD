@@ -97,7 +97,7 @@
                    (:file "window-highscores" :depends-on ("window-methods"))
                    (:file "window-settings" :depends-on ("window-methods"))
                    (:file "window-journal" :depends-on ("window-methods"))
-                   (:file "window-new-campaign" :depends-on ("window-methods"))
+                   (:file "window-campaign" :depends-on ("window-methods"))
                    (:file "window-load-game" :depends-on ("window-methods"))))
      (:module "ai" :depends-on ("base-methods" "windows")
       :components ((:file "ai-common")

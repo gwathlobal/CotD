@@ -37,3 +37,9 @@
 (defgeneric get-input (win key mod unicode))
 
 (defgeneric run-window (win))
+
+(defun go-to-quit-game ()
+  (funcall *quit-func*))
+
+(defun go-to-start-game ()
+  (funcall *start-func*))

@@ -385,12 +385,6 @@
   (when (and *path-thread* (bt:thread-alive-p *path-thread*))
     (bt:destroy-thread *path-thread*)))
 
-(defun go-to-quit-game ()
-  (funcall *quit-func*))
-
-(defun go-to-start-game ()
-  (funcall *start-func*))
-
 (defun enter-player-name ()
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
     (sdl:fill-surface sdl:*black* :template a-rect))
@@ -462,10 +456,7 @@
   (game-loop))
 
 (defun campaign-game-loop ()
-  (setf *current-window* (make-instance 'new-campaign-window
-                                        :world *world*
-                                        :world-map (world-map *world*)
-                                        :world-time (world-game-time *world*)))
+  (setf *current-window* (make-instance 'campaign-window))
   (make-output *current-window*)
   (multiple-value-bind (mission world-sector) (run-window *current-window*)
     (when (and mission world-sector)
@@ -490,7 +481,7 @@
       ;; process the previous mission which the player took personally  
       (when level
         (with-slots (mission world-sector mission-result) level
-          (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (wtype mission))) :key #'(lambda (a)
+          (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission))) :key #'(lambda (a)
                                                                                                                                                      (first a)))
                 for transform-sector-func in (second campaign-mission-result) do
                   (funcall transform-sector-func world-map (x mission) (y mission)))
@@ -530,10 +521,14 @@
                                                             (push :game-over-eater-won avail-results)))))
               finally
                  (setf mission-result (nth (random (length avail-results)) avail-results))
-                 (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (wtype mission))) :key #'(lambda (a)
+                 (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission))) :key #'(lambda (a)
                                                                                                                                                             (first a)))
                        for transform-sector-func in (second campaign-mission-result) do
                          (funcall transform-sector-func world-map (x mission) (y mission)))))
+
+      ;; advance one day forward
+      (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time *world*))
+        (setf (world-game-time *world*) (set-current-date-time year month (1+ day) hour min sec)))
       
       ;; reset all missions and regenerate them
       (reset-all-missions-on-world-map world-map)
