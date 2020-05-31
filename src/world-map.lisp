@@ -505,3 +505,15 @@
       (:world-sector-corrupted-island (setf (wtype world-sector) :world-sector-normal-island))
       (:world-sector-corrupted-lake (setf (wtype world-sector) :world-sector-normal-lake)))
     ))
+
+(defun transform-corrupted-sector-to-abandoned (world-map x y)
+  (let ((world-sector (aref (cells world-map) x y)))
+    (case (wtype world-sector)
+      (:world-sector-corrupted-residential (setf (wtype world-sector) :world-sector-abandoned-residential))
+      (:world-sector-corrupted-forest (setf (wtype world-sector) :world-sector-abandoned-forest))
+      (:world-sector-corrupted-port (setf (wtype world-sector) :world-sector-abandoned-port))
+      (:world-sector-corrupted-island (setf (wtype world-sector) :world-sector-abandoned-island))
+      (:world-sector-corrupted-lake (setf (wtype world-sector) :world-sector-abandoned-lake)))
+    ))
+
+

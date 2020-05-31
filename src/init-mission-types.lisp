@@ -273,6 +273,12 @@
                                             (list +faction-type-criminals+ +game-event-win-for-thief+)
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )
+                  :campaign-result (list (list :game-over-angels-won nil)
+                                         (list :game-over-demons-won (list #'transform-residential-sector-to-abandoned))
+                                         (list :game-over-military-won nil)
+                                         (list :game-over-church-won nil)
+                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-abandoned))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
                   )
 
 (set-mission-type :id :mission-type-demonic-conquest
@@ -399,12 +405,29 @@
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             (list +faction-type-criminals+ +game-event-win-for-thief+)
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
-                                            ))
+                                            )
+                  :campaign-result (list (list :game-over-angels-won nil)
+                                         (list :game-over-demons-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted))
+                                         (list :game-over-military-won nil)
+                                         (list :game-over-church-won nil)
+                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted)))
+                  )
 
 (set-mission-type :id :mission-type-demonic-thievery
                   :name "Demonic thievery"
                   :is-available-func #'(lambda (world-map x y)
-                                         (if (and (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+                                         (if (and (loop with corrupted-district-present = nil
+                                                        for dx from 0 below (array-dimension (cells world-map) 0) do
+                                                          (loop for dy from 0 below (array-dimension (cells world-map) 1) do
+                                                            (when (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-island)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port))
+                                                              (setf corrupted-district-present t)))
+                                                        finally (return corrupted-district-present))
+                                                  (find :church (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
                                                   (find +item-type-church-reliс+ (items (aref (cells world-map) x y)))
                                                   (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
                                                       (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
@@ -643,7 +666,14 @@
                                             (list +faction-type-military+ +game-event-military-conquest-win-for-military+)
                                             (list +faction-type-satanists+ +game-event-military-conquest-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
-                                            ))
+                                            )
+                  :campaign-result (list (list :game-over-angels-won (list #'transform-corrupted-sector-to-residential))
+                                         (list :game-over-demons-won nil)
+                                         (list :game-over-military-won (list #'transform-corrupted-sector-to-residential))
+                                         (list :game-over-church-won (list #'transform-corrupted-sector-to-residential))
+                                         (list :game-over-satanists-won nil)
+                                         (list :game-over-eater-won nil))
+                  )
 
 (set-mission-type :id :mission-type-military-raid
                   :name "Military raid"
@@ -759,6 +789,12 @@
                                             (list +faction-type-satanists+ +game-event-military-raid-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             )
+                  :campaign-result (list (list :game-over-angels-won (list #'transform-abandoned-sector-to-residential))
+                                         (list :game-over-demons-won nil)
+                                         (list :game-over-military-won (list #'transform-abandoned-sector-to-residential))
+                                         (list :game-over-church-won (list #'transform-abandoned-sector-to-residential))
+                                         (list :game-over-satanists-won nil)
+                                         (list :game-over-eater-won nil))
                   )
 
 (set-mission-type :id :mission-type-celestial-purge
@@ -867,6 +903,12 @@
                                             (list +faction-type-satanists+ +game-event-military-conquest-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             )
+                  :campaign-result (list (list :game-over-angels-won (list #'transform-corrupted-sector-to-abandoned))
+                                         (list :game-over-demons-won nil)
+                                         (list :game-over-military-won (list #'transform-corrupted-sector-to-abandoned))
+                                         (list :game-over-church-won (list #'transform-corrupted-sector-to-abandoned))
+                                         (list :game-over-satanists-won nil)
+                                         (list :game-over-eater-won nil))
                   )
 
 (set-mission-type :id :mission-type-celestial-retrieval

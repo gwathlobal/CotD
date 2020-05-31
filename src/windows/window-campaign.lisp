@@ -197,8 +197,6 @@
                          ;; r - random map
                          ((sdl:key= key :sdl-key-r)
                           (setf (world-map *world*) (generate-normal-world-map *world*))
-                          (generate-missions-on-world-map *world*)
-                          (campaign-win-calculate-avail-missions win)
                           (setf cur-mode :campaign-window-map-mode))
                          ;; tab - change mode
                          ((sdl:key= key :sdl-key-tab)

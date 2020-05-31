@@ -1,3 +1,5 @@
+- Situation report on the campaign map
+- Stealing/returning relics on the campaign map
 - Basic campaign loop where the player goes to campaign map, selects mission, wins/loses, the time goes forward and next day results are brought up and the cycle goes once again
 - Make the game differentiate between campaign mission win and loss (including abandoning mission)
 - A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints

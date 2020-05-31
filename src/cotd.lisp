@@ -456,7 +456,9 @@
   (game-loop))
 
 (defun campaign-game-loop ()
-  (setf *current-window* (make-instance 'campaign-window))
+  (setf *current-window* (make-instance 'campaign-window :cur-mode (case (game-manager/game-state *game-manager*)
+                                                                     (:game-state-campaign-init :campaign-window-map-mode)
+                                                                     (t :campaign-window-mission-mode))))
   (make-output *current-window*)
   (multiple-value-bind (mission world-sector) (run-window *current-window*)
     (when (and mission world-sector)
@@ -478,8 +480,8 @@
                                           do
                                              (push mission result))
                                 finally (return result))))
-      ;; process the previous mission which the player took personally  
-      (when level
+      ;; process the previous mission which the player took personally (or when the player abandoned a mission) 
+      (when (and level (level/mission-result level))
         (with-slots (mission world-sector mission-result) level
           (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission))) :key #'(lambda (a)
                                                                                                                                                      (first a)))
