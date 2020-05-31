@@ -6,9 +6,6 @@
   (had-message-this-turn nil :type boolean)
   (strings (make-colored-txt) :type colored-txt))
 
-;(defvar *full-message-box* (make-message-box))
-;(defvar (level/small-message-box (level *world*)) (make-message-box))
-
 (defun add-message (str &optional (color sdl:*white*))
   (logger (format nil "ADD-MESSAGE: ~A~%" str))
   (with-slots (full-message-box small-message-box) (level *world*)

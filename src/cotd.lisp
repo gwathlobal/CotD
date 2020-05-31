@@ -391,29 +391,10 @@
 (defun go-to-start-game ()
   (funcall *start-func*))
 
-(defun prepare-game-scenario (mission world-sector)
-  (setf *current-window* (make-instance 'loading-window 
-                                        :update-func #'(lambda (win)
-                                                         (when (/= *max-progress-bar* 0) 
-                                                           (let ((str (format nil "~A... ~3D%"
-                                                                              (cur-str win)
-                                                                              (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
-                                                             (sdl:draw-string-solid-*  str
-                                                                                       (truncate (- (/ *window-width* 2) (/ (* (length str) (sdl:char-width sdl:*default-font*)) 2)))
-                                                                                       (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
-                                                                                       :color sdl:*white*))
-                                                           ))))
-  (init-game mission world-sector)
-
-   ;; initialize thread, that will calculate random-movement paths while the system waits for player input
-  (let ((out *standard-output*))
-    (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
-      (t ()
-        (logger "MAIN: This system does not support multithreading!~%"))))
+(defun enter-player-name ()
+  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (sdl:fill-surface sdl:*black* :template a-rect))
   
-  (bt:condition-notify (path-cv *world*))
-  (bt:condition-notify (fov-cv *world*))
-
   ;; let player enter his\her name
   (setf *current-window* (make-instance 'input-str-window 
                                         :init-input (options-player-name *options*)
@@ -436,7 +417,30 @@
                                                                 nil))
                                         ))
   (make-output *current-window*)
-  (setf (options-player-name *options*) (run-window *current-window*))
+  (setf (options-player-name *options*) (run-window *current-window*)))
+
+(defun prepare-game-scenario (mission world-sector)
+  (setf *current-window* (make-instance 'loading-window 
+                                        :update-func #'(lambda (win)
+                                                         (when (/= *max-progress-bar* 0) 
+                                                           (let ((str (format nil "~A... ~3D%"
+                                                                              (cur-str win)
+                                                                              (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
+                                                             (sdl:draw-string-solid-*  str
+                                                                                       (truncate (- (/ *window-width* 2) (/ (* (length str) (sdl:char-width sdl:*default-font*)) 2)))
+                                                                                       (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
+                                                                                       :color sdl:*white*))
+                                                           ))))
+  (init-game mission world-sector)
+
+   ;; initialize thread, that will calculate random-movement paths while the system waits for player input
+  (let ((out *standard-output*))
+    (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
+      (t ()
+        (logger "MAIN: This system does not support multithreading!~%"))))
+  
+  (bt:condition-notify (path-cv *world*))
+  (bt:condition-notify (fov-cv *world*))
 
   ;; set the same name for mimics if any
   (setf (name *player*) (options-player-name *options*))

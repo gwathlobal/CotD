@@ -229,7 +229,6 @@
         (join-shadow-item (list "Join the Pandemonium Hierarchy (as a Shadow imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
-                                    ;; start in the evening
                                     +specific-faction-type-demon-shadow+
                                     )
                                 (get-txt-from-file "data/descriptions/pandemonium_shadowimp.txt")))
