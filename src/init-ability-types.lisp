@@ -328,7 +328,7 @@
                                                                                                      :return-to *current-window* 
                                                                                                      :header-line "Choose a demonic rune to purge:"
                                                                                                      :enter-func #'(lambda (cur-sel)
-                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                      (mob-invoke-ability *player* (get-feature-by-id (nth cur-sel feature-list)) ability-type-id)
                                                                                                                      (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      (make-output *current-window*)
@@ -344,7 +344,7 @@
                                                                 (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
                                                                 (= (length features) 1))
                                                            (progn
-                                                             (clear-message-list *small-message-box*)
+                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                              (mob-invoke-ability *player* (get-feature-by-id (first features)) ability-type-id)
                                                              t))
                                                           (t
@@ -1279,7 +1279,7 @@
                                                         (progn
                                                           nil)
                                                         (progn
-                                                          (clear-message-list *small-message-box*)
+                                                          (clear-message-list (level/small-message-box (level *world*)))
                                                           (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                           t))
                                                       )))
@@ -1363,7 +1363,7 @@
                                                                (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                (find (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (visible-mobs *player*)))
                                                         (progn
-                                                          (clear-message-list *small-message-box*)
+                                                          (clear-message-list (level/small-message-box (level *world*)))
                                                           (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
@@ -1454,7 +1454,7 @@
                                                                                      t
                                                                                      nil)))))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -1541,7 +1541,7 @@
                                                                (not (mounted-by-mob-id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
                                                                (find (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (visible-mobs *player*)))
                                                         (progn
-                                                          (clear-message-list *small-message-box*)
+                                                          (clear-message-list (level/small-message-box (level *world*)))
                                                           (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
@@ -1639,7 +1639,7 @@
                                                                            (not (mob-effect-p mob +mob-effect-divine-concealed+))))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -1705,7 +1705,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -1855,7 +1855,7 @@
                                                         
                                                         (if (find (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) mount-list)
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                         (progn
@@ -1908,7 +1908,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -2027,7 +2027,7 @@
                                                                                 result)))
                                                                  )
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -2122,7 +2122,7 @@
                                                                  (or (= terrain +terrain-door-closed+)
                                                                      (= terrain +terrain-door-open+)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -2195,7 +2195,7 @@
                                                                  (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
                                                                  (get-terrain-type-trait terrain +terrain-trait-light-source+))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -2251,7 +2251,7 @@
                                                                  (or (= terrain +terrain-wall-window+)
                                                                      (= terrain +terrain-wall-window-opened+)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -2437,7 +2437,7 @@
                                                                                                      :return-to *current-window* 
                                                                                                      :header-line "Choose a body part to reanimate:"
                                                                                                      :enter-func #'(lambda (cur-sel)
-                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                      (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
                                                                                                                      (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      ;(set-idle-calcing win)
@@ -2455,7 +2455,7 @@
                                                                 (= (length items) 1)
                                                                 (item-ability-p (get-item-by-id (first items)) +item-abil-corpse+))
                                                            (progn
-                                                             (clear-message-list *small-message-box*)
+                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                              (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
                                                              t))
                                                           (t
@@ -2531,7 +2531,7 @@
                                                                  (not (mob-effect-p target +mob-effect-empowered-undead+))
                                                                  (find (id target) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* target ability-type-id)
                                                             t)
                                                           (progn
@@ -2594,7 +2594,7 @@
                                                                  (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
                                                                  (get-terrain-type-trait terrain +terrain-trait-flammable+))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -2703,7 +2703,7 @@
                                                                  (not (eq *player* target))
                                                                  (find (id target) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* target ability-type-id)
                                                             t)
                                                           (progn
@@ -2831,7 +2831,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -2885,7 +2885,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -3016,7 +3016,7 @@
                                                                  (< (calculate-single-tile-brightness (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) *mob-visibility-threshold*)
                                                                  )
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -3096,7 +3096,7 @@
                                                                           (> (cur-light (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) 0)
                                                                           (find (id (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))) (visible-mobs *player*)))))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -3238,7 +3238,7 @@
                                                                  (not (riding-mob-id target))
                                                                  (get-terrain-type-trait (get-terrain-* (level *world*) (x target) (y target) (z target)) +terrain-trait-opaque-floor+))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* target ability-type-id)
                                                             t)
                                                           (progn
@@ -3395,7 +3395,7 @@
                                                                  (check-mob-visible target :observer *player* :complete-check t)
                                                                  (find (id target) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* target ability-type-id)
                                                             t)
                                                           (progn
@@ -3493,7 +3493,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -3560,7 +3560,7 @@
                                                                  (get-faction-relation (faction *player*) (faction target))
                                                                  (check-mob-visible target :observer *player* :complete-check t))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* target ability-type-id)
                                                             t)
                                                           (progn
@@ -3617,7 +3617,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -3684,7 +3684,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -3765,7 +3765,7 @@
                                                                      (get-terrain-type-trait terrain +terrain-trait-water+))
                                                                  (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -4018,7 +4018,7 @@
                                                                                                      :return-to *current-window* 
                                                                                                      :header-line "Choose a body to resurrect:"
                                                                                                      :enter-func #'(lambda (cur-sel)
-                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                      (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
                                                                                                                      (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      ;(set-idle-calcing win)
@@ -4036,7 +4036,7 @@
                                                                 (= (length items) 1)
                                                                 (item-ability-p (get-item-by-id (first items)) +item-abil-corpse+))
                                                            (progn
-                                                             (clear-message-list *small-message-box*)
+                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                              (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
                                                              t))
                                                           (t
@@ -4178,7 +4178,7 @@
                                                         (progn
                                                           nil)
                                                         (progn
-                                                          (clear-message-list *small-message-box*)
+                                                          (clear-message-list (level/small-message-box (level *world*)))
                                                           (mob-invoke-ability *player* (cons (view-x *player*) (view-y *player*)) ability-type-id)
                                                           t))
                                                       )))
@@ -4264,7 +4264,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -4439,7 +4439,7 @@
                                                                                                      :return-to *current-window* 
                                                                                                      :header-line "Choose a body part to devour:"
                                                                                                      :enter-func #'(lambda (cur-sel)
-                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                      (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
                                                                                                                      (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      ;(set-idle-calcing win)
@@ -4454,7 +4454,7 @@
                                                            )
                                                           ((= (length items) 1)
                                                            (progn
-                                                             (clear-message-list *small-message-box*)
+                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                              (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
                                                              t))
                                                           (t
@@ -4648,7 +4648,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -4983,7 +4983,7 @@
                                                                           (loop-finish)
                                                                      finally (return clear-path)))
                                                         (progn
-                                                          (clear-message-list *small-message-box*)
+                                                          (clear-message-list (level/small-message-box (level *world*)))
                                                           (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
@@ -5891,7 +5891,7 @@
                                                                                                      :return-to *current-window* 
                                                                                                      :header-line "Choose a mutation to cure:"
                                                                                                      :enter-func #'(lambda (cur-sel)
-                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                      (mob-invoke-ability *player* (nth cur-sel mutation-list) ability-type-id)
                                                                                                                      (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      (make-output *current-window*)
@@ -6738,7 +6738,7 @@
                                                                                                      :return-to *current-window* 
                                                                                                      :header-line "Choose a body part to possess:"
                                                                                                      :enter-func #'(lambda (cur-sel)
-                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                      (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
                                                                                                                      (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      (make-output *current-window*)
@@ -6754,7 +6754,7 @@
                                                                     (eq mob *player*))
                                                                 (= (length items) 1))
                                                            (progn
-                                                             (clear-message-list *small-message-box*)
+                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                              (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
                                                              t))
                                                           ((and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
@@ -6762,7 +6762,7 @@
                                                                 (not (eq *player* mob))
                                                                 (find (id mob) (visible-mobs *player*)))
                                                            (progn
-                                                             (clear-message-list *small-message-box*)
+                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                              (mob-invoke-ability *player* mob ability-type-id)
                                                              t))
                                                           (t
@@ -6883,7 +6883,7 @@
                                                                           (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)))
                                                                  (mob-move-passwall *player* (- (view-x *player*) (x *player*)) (- (view-y *player*) (y *player*)) (- (view-z *player*) (z *player*))))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -6949,7 +6949,7 @@
                                                                (not (and (not (mob-ability-p *player* +mob-abil-undead+))
                                                                          (= (get-distance-3d (view-x *player*) (view-y *player*) (view-z *player*) (x *player*) (y *player*) (z *player*)) 0))))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                             t)
                                                           (progn
@@ -7050,7 +7050,7 @@
                                                                                                      :return-to *current-window* 
                                                                                                      :header-line "Choose a demonic rune to decipher:"
                                                                                                      :enter-func #'(lambda (cur-sel)
-                                                                                                                     (clear-message-list *small-message-box*)
+                                                                                                                     (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                      (mob-invoke-ability *player* (get-feature-by-id (nth cur-sel feature-list)) ability-type-id)
                                                                                                                      (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      (make-output *current-window*)
@@ -7066,7 +7066,7 @@
                                                                 (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
                                                                 (= (length features) 1))
                                                            (progn
-                                                             (clear-message-list *small-message-box*)
+                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                              (mob-invoke-ability *player* (get-feature-by-id (first features)) ability-type-id)
                                                              t))
                                                           (t
@@ -7161,7 +7161,7 @@
                                                                  (find (id mob) (visible-mobs *player*))
                                                                  (mob-ability-p mob +mob-abil-undead+))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -7233,7 +7233,7 @@
                                                                  (not (eq *player* mob))
                                                                  (find (id mob) (visible-mobs *player*)))
                                                           (progn
-                                                            (clear-message-list *small-message-box*)
+                                                            (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* mob ability-type-id)
                                                             t)
                                                           (progn
@@ -7643,7 +7643,7 @@
                                                                (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
                                                                (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
                                                         (progn
-                                                          (clear-message-list *small-message-box*)
+                                                          (clear-message-list (level/small-message-box (level *world*)))
                                                           (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
                                                           t)
                                                         (progn
@@ -8201,7 +8201,7 @@
                                                                                                          :return-to *current-window* 
                                                                                                          :header-line "Choose a body to explode:"
                                                                                                          :enter-func #'(lambda (cur-sel)
-                                                                                                                         (clear-message-list *small-message-box*)
+                                                                                                                         (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                          (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
                                                                                                                          (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      ;(set-idle-calcing win)
@@ -8214,7 +8214,7 @@
                                                                    (run-window *current-window*))
                                                                  exit-result)
                                                               (progn
-                                                                 (clear-message-list *small-message-box*)
+                                                                 (clear-message-list (level/small-message-box (level *world*)))
                                                                  (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
                                                                  t))
                                                             t)
@@ -8382,7 +8382,7 @@
                                                                                                          :return-to *current-window* 
                                                                                                          :header-line "Choose a body to poison:"
                                                                                                          :enter-func #'(lambda (cur-sel)
-                                                                                                                         (clear-message-list *small-message-box*)
+                                                                                                                         (clear-message-list (level/small-message-box (level *world*)))
                                                                                                                          (mob-invoke-ability *player* (get-inv-item-by-pos item-list cur-sel) ability-type-id)
                                                                                                                          (setf *current-window* (return-to (return-to (return-to *current-window*))))
                                                                                                                      ;(set-idle-calcing win)
@@ -8395,7 +8395,7 @@
                                                                    (run-window *current-window*))
                                                                  exit-result)
                                                               (progn
-                                                                 (clear-message-list *small-message-box*)
+                                                                 (clear-message-list (level/small-message-box (level *world*)))
                                                                  (mob-invoke-ability *player* (get-item-by-id (first items)) ability-type-id)
                                                                  t))
                                                             t)

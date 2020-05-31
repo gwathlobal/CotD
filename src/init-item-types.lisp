@@ -331,7 +331,7 @@
                                                                              t
                                                                              nil)))
                                                                   (progn
-                                                                    (clear-message-list *small-message-box*)
+                                                                    (clear-message-list (level/small-message-box (level *world*)))
                                                                     (mob-use-item *player* mob item)
                                                                     t)
                                                                   (progn
@@ -439,7 +439,7 @@
                                                                                   (loop-finish)
                                                                              finally (return clear-path)))
                                                                 (progn
-                                                                  (clear-message-list *small-message-box*)
+                                                                  (clear-message-list (level/small-message-box (level *world*)))
                                                                   (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
                                                                   t)
                                                                 (progn
@@ -512,7 +512,7 @@
                                                                          (find (id mob) (visible-mobs *player*))
                                                                          (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x mob) (y mob) (z mob)) 7))
                                                                   (progn
-                                                                    (clear-message-list *small-message-box*)
+                                                                    (clear-message-list (level/small-message-box (level *world*)))
                                                                     (mob-use-item *player* mob item)
                                                                     t)
                                                                   (progn
@@ -585,7 +585,7 @@
                                                                        (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
                                                                 (progn
-                                                                  (clear-message-list *small-message-box*)
+                                                                  (clear-message-list (level/small-message-box (level *world*)))
                                                                   (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
                                                                   t)
                                                                 (progn
@@ -651,7 +651,7 @@
                                                                        (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
                                                                 (progn
-                                                                  (clear-message-list *small-message-box*)
+                                                                  (clear-message-list (level/small-message-box (level *world*)))
                                                                   (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
                                                                   t)
                                                                 (progn
@@ -723,7 +723,7 @@
                                                                        (< (get-distance-3d (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)) 2)
                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) +terrain-trait-blocks-move+)))
                                                                 (progn
-                                                                  (clear-message-list *small-message-box*)
+                                                                  (clear-message-list (level/small-message-box (level *world*)))
                                                                   (mob-use-item *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) item)
                                                                   t)
                                                                 (progn

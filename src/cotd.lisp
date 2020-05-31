@@ -179,9 +179,6 @@
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
   
-  (clear-message-list *full-message-box*)
-  (clear-message-list *small-message-box*)
-  
   (setf *cur-angel-names* (copy-list *init-angel-names*))
   (setf *cur-demon-names* (copy-list *init-demon-names*))
   (setf *cur-human-names* (copy-list *init-human-names*))
@@ -275,6 +272,9 @@
   (when (player-specific-faction mission)
     (setf *previous-scenario* (list (mission-type-id mission) (player-specific-faction mission))))
 
+  (clear-message-list (level/full-message-box (level *world*)))
+  (clear-message-list (level/small-message-box (level *world*)))
+  
   ;;(format t "FACTION-LIST ~A~%" faction-list)
   
   (setf (name *player*) "Player")

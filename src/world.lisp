@@ -62,6 +62,9 @@
    (turns-for-delayed-angels :initform 220 :accessor turns-for-delayed-angels)
    (turns-for-delayed-demons :initform 220 :accessor turns-for-delayed-demons)
    (turns-for-delayed-military :initform 220 :accessor turns-for-delayed-military)
+
+   (full-message-box :initform (make-message-box) :accessor level/full-message-box :type message-box)
+   (small-message-box :initform (make-message-box) :accessor level/small-message-box :type message-box)
    ))
    
 (defun add-mob-to-level-list (level mob &optional (apply-gravity t))

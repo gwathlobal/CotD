@@ -60,7 +60,7 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* max-lines (sdl:get-font-height))))
       (write-text str a-rect))
 
-    (show-message-box 6 (+ 40 (* max-lines (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* (1+ max-lines) (sdl:get-font-height))) *full-message-box*)
+    (show-message-box 6 (+ 40 (* max-lines (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* (1+ max-lines) (sdl:get-font-height))) (level/full-message-box (level *world*)))
 
     
     (case (game-manager/game-state *game-manager*)

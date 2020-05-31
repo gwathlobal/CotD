@@ -199,9 +199,9 @@
                                                    :y y
                                                    :w w
                                                    :h h))
-            (let ((max-lines (write-text (get-msg-str-list *full-message-box*) rect :count-only t)))
+            (let ((max-lines (write-text (get-msg-str-list (level/full-message-box (level *world*))) rect :count-only t)))
               (when (> (message-list-length) 0)
-                (multiple-value-bind (max-lines final-txt) (write-text (get-msg-str-list *full-message-box*) rect :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
+                (multiple-value-bind (max-lines final-txt) (write-text (get-msg-str-list (level/full-message-box (level *world*))) rect :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
                                                                                                                                 (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
                                                                                                                                 0)
                                                                                                                   :count-only t)

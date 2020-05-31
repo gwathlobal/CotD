@@ -175,7 +175,7 @@
     (show-time-label idle-calcing x (+ (- *window-height* *msg-box-window-height* 20) (* -3 (sdl:char-height sdl:*default-font*))))
     ))
 
-(defun show-message-box (x y w &optional (h *msg-box-window-height*) (message-box *small-message-box*))
+(defun show-message-box (x y w &optional (h *msg-box-window-height*) (message-box (level/small-message-box (level *world*))))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
     (sdl:fill-surface sdl:*black* :template a-rect))
   (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
@@ -381,7 +381,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 9)
@@ -391,7 +391,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 8)
@@ -401,7 +401,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 7)
@@ -411,7 +411,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 6)
@@ -420,7 +420,7 @@
                         (when (or (sdl:key= key :sdl-key-kp5)
                                   (and (sdl:key= key :sdl-key-period)
                                        (= mod 0)))
-                          (clear-message-list *small-message-box*)
+                          (clear-message-list (level/small-message-box (level *world*)))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 5)
@@ -430,7 +430,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 4)
@@ -440,7 +440,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 3)
@@ -450,7 +450,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 2)
@@ -460,7 +460,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 1)
@@ -481,7 +481,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 5 :dir-z -1)
@@ -509,7 +509,7 @@
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (if (can-move-if-possessed *player*)
                                 (setf (can-move-if-possessed *player*) nil)
                                 (move-mob *player* 5 :dir-z 1)
@@ -630,7 +630,7 @@
                                                                                              (make-output *current-window*)))
                                                                                           (t
                                                                                            (progn
-                                                                                             (clear-message-list *small-message-box*)
+                                                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                                                              (mob-invoke-ability *player* *player* (nth cur-sel mob-abilities))
                                                                                              (setf *current-window* win)
                                                                                              (set-idle-calcing win))))
@@ -677,7 +677,7 @@
                                                                         :exec-func #'(lambda ()
                                                                                        (if (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
                                                                                          (progn
-                                                                                           (clear-message-list *small-message-box*)
+                                                                                           (clear-message-list (level/small-message-box (level *world*)))
                                                                                            (mob-shoot-target *player* (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                                            (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*))
                                                                                            (setf *current-window* (return-to *current-window*))
@@ -694,7 +694,7 @@
 			;; reload - r
 			(when (or (and (sdl:key= key :sdl-key-r) (= mod 0))
                                   (eq unicode +cotd-unicode-latin-r-small+))
-                          (clear-message-list *small-message-box*)
+                          (clear-message-list (level/small-message-box (level *world*)))
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (go exit-loop))
@@ -742,7 +742,7 @@
                             ;; a single item - just pick it up
 			    (when (= (length item-list) 1)
 			      (logger (format nil "PLAYER-ITEM-PICK: On item on the tile, pick it right away~%"))
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
 			      (mob-pick-item *player* (get-inv-item-by-pos item-list 0)))
 			    ;; a several items - show selection window
 			    (when (> (length item-list) 1)
@@ -750,7 +750,7 @@
 								    :return-to *current-window* 
 								    :header-line "Choose an item to pick up:"
 								    :enter-func #'(lambda (cur-sel)
-                                                                                    (clear-message-list *small-message-box*)
+                                                                                    (clear-message-list (level/small-message-box (level *world*)))
 										    (mob-pick-item *player* (get-inv-item-by-pos item-list cur-sel))
 										    (setf *current-window* win)
                                                                                     (set-idle-calcing win)

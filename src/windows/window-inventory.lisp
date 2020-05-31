@@ -124,7 +124,7 @@
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                        ;; d - drop all items
                        ((and (sdl:key= key :sdl-key-d) (= mod 0))
-                        (clear-message-list *small-message-box*)
+                        (clear-message-list (level/small-message-box (level *world*)))
                         (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                         (setf *current-window* (return-to win))
                         (make-output *current-window*)
@@ -156,7 +156,7 @@
                           (make-output *current-window*)
                           (let ((qty (run-window *current-window*)))
                             (when qty
-                              (clear-message-list *small-message-box*)
+                              (clear-message-list (level/small-message-box (level *world*)))
                               (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)) :qty (parse-integer qty :junk-allowed nil))
                               (setf *current-window* (return-to win))
                               (make-output *current-window*)
@@ -190,7 +190,7 @@
                                  (return-from run-window nil))))
                             (t
                              (progn
-                               (clear-message-list *small-message-box*)
+                               (clear-message-list (level/small-message-box (level *world*)))
                                (mob-use-item *player* nil (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                                (setf *current-window* (return-to win))
                                (make-output *current-window*)
