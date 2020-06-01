@@ -1,20 +1,20 @@
 (in-package :cotd)
 
 (defenum:defenum campaign-window-tab-type (:campaign-window-map-mode
-                                           :campaign-window-mission-mode))
+                                           :campaign-window-mission-mode
+                                           ))
 
 (defclass campaign-window (window)
   ((cur-sector :initform (cons 0 0) :initarg :cur-sector :accessor campaign-window/cur-sector :type cons)
    (cur-mode :initform :campaign-window-map-mode :initarg :cur-mode :accessor campaign-window/cur-mode :type campaign-window-tab-type)
    (cur-sel :initform 0 :accessor campaign-window/cur-sel :type fixnum)
    (avail-missions :initform () :accessor campaign-window/avail-missions :type list)
-   (is-cur-mission-avail :initform nil :accessor campaign-window/is-cur-mission-avail)
    (test-map-func :initform nil :initarg :test-map-func :accessor campaign-window/test-map-func)))
 
 (defmethod initialize-instance :after ((win campaign-window) &key)
   (with-slots (cur-mode) win
     (campaign-win-calculate-avail-missions win)
-    
+
     (when (eq cur-mode :campaign-window-mission-mode)
       (campaign-win-move-select-to-mission win))))
 
@@ -44,6 +44,7 @@
 
 (defmethod make-output ((win campaign-window))
   (with-slots (cur-mode cur-sector cur-sel avail-missions) win
+
     (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
       (sdl:fill-surface sdl:*black* :template a-rect))
 
@@ -66,7 +67,7 @@
                                        (sdl:draw-string-solid-* init-campaign-str (- (truncate *window-width* 2) (truncate (* (length init-campaign-str) (sdl:char-width sdl:*default-font*)) 2)) y1 :justify :left :color sdl:*white*)))
           (:game-state-campaign-map (progn
                                       (setf header-str "CAMPAIGN MAP")
-                                      (setf prompt-str (format nil "~A[Arrows/Numpad] Move selection  [Tab] Change mode  [Esc] Exit"
+                                      (setf prompt-str (format nil "~A[Arrows/Numpad] Move selection  [Tab] Change mode  [s] Situation report  [Esc] Exit"
                                                                (if (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                         (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                                    (specific-belongs-to-general-faction (world/player-specific-faction *world*))))
@@ -221,8 +222,17 @@
                                                                                               (specific-belongs-to-general-faction (world/player-specific-faction *world*))))
                                                           (return-from run-window (values (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                           (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))))))
-                            )
-                          
-                          ))
+                            )))
+                       
+                       ;;------------------
+                       ;; view situation report - s
+                       (when (or (and (sdl:key= key :sdl-key-s) (= mod 0))
+                                 (eq unicode +cotd-unicode-latin-s-small+))
+                         (setf *current-window* (make-instance 'message-window 
+                                                               :return-to *current-window*
+                                                               :message-box (world/sitrep-message-box *world*)
+                                                               :header-str "SITUATION REPORT"))
+                         (make-output *current-window*)
+                         (run-window *current-window*))
                        (make-output *current-window*)))
     (:video-expose-event () (make-output *current-window*))))

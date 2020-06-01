@@ -6,11 +6,10 @@
   (had-message-this-turn nil :type boolean)
   (strings (make-colored-txt) :type colored-txt))
 
-(defun add-message (str &optional (color sdl:*white*))
+(defun add-message (str &optional (color sdl:*white*) (message-box-list (list (level/full-message-box (level *world*)) (level/small-message-box (level *world*)))))
   (logger (format nil "ADD-MESSAGE: ~A~%" str))
-  (with-slots (full-message-box small-message-box) (level *world*)
-    (add-colored-str (message-box-strings full-message-box) str color)
-    (add-colored-str (message-box-strings small-message-box) str color)))
+  (loop for message-box in message-box-list do
+    (add-colored-str (message-box-strings message-box) str color)))
 
 (defun get-message-str (n &optional (message-box (level/full-message-box (level *world*))))
   (first (nth n (colored-txt-list (message-box-strings message-box)))))

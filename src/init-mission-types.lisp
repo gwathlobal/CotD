@@ -411,7 +411,7 @@
                                          (list :game-over-military-won nil)
                                          (list :game-over-church-won nil)
                                          (list :game-over-satanists-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted))
-                                         (list :game-over-eater-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted)))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
                   )
 
 (set-mission-type :id :mission-type-demonic-thievery

@@ -764,7 +764,9 @@
                         (when (or (and (sdl:key= key :sdl-key-m) (= mod 0))
                                   (eq unicode +cotd-unicode-latin-m-small+))
 			  (setf *current-window* (make-instance 'message-window 
-								:return-to *current-window*))
+								:return-to *current-window*
+                                                                :message-box (level/full-message-box (level *world*))
+                                                                :header-str "MESSAGES"))
                           (make-output *current-window*))
                         ;;------------------
 			;; view journal - j
