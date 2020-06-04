@@ -10,6 +10,7 @@
 (defconstant +cotd-unicode-latin-j-small+ 106)
 (defconstant +cotd-unicode-latin-l-small+ 108)
 (defconstant +cotd-unicode-latin-m-small+ 109)
+(defconstant +cotd-unicode-latin-n-small+ 110)
 (defconstant +cotd-unicode-latin-r-small+ 114)
 (defconstant +cotd-unicode-latin-s-small+ 115)
 (defconstant +cotd-unicode-greater-than-sign+ 62)

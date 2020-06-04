@@ -1,3 +1,4 @@
+
 (in-package :cotd)
 
 (defenum:defenum campaign-window-tab-type (:campaign-window-map-mode
@@ -67,7 +68,7 @@
                                        (sdl:draw-string-solid-* init-campaign-str (- (truncate *window-width* 2) (truncate (* (length init-campaign-str) (sdl:char-width sdl:*default-font*)) 2)) y1 :justify :left :color sdl:*white*)))
           (:game-state-campaign-map (progn
                                       (setf header-str "CAMPAIGN MAP")
-                                      (setf prompt-str (format nil "~A[Arrows/Numpad] Move selection  [Tab] Change mode  [s] Situation report  [Esc] Exit"
+                                      (setf prompt-str (format nil "~A[Tab] Change mode  [s] Situation report  [n] Next day  [Esc] Exit"
                                                                (if (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                         (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                                    (specific-belongs-to-general-faction (world/player-specific-faction *world*))))
@@ -197,8 +198,13 @@
                           )
                          ;; r - random map
                          ((sdl:key= key :sdl-key-r)
-                          (setf (world-map *world*) (generate-normal-world-map *world*))
-                          (setf cur-mode :campaign-window-map-mode))
+                          (with-slots (game-state) *game-manager*
+                            (case game-state
+                              (:game-state-campaign-init (progn
+                                                           (setf (world-map *world*) (generate-normal-world-map *world*))
+                                                           (setf cur-mode :campaign-window-map-mode))))
+                            )
+                         )
                          ;; tab - change mode
                          ((sdl:key= key :sdl-key-tab)
                           (if (eq cur-mode :campaign-window-mission-mode)
@@ -228,11 +234,18 @@
                        ;; view situation report - s
                        (when (or (and (sdl:key= key :sdl-key-s) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-s-small+))
+                         ()
                          (setf *current-window* (make-instance 'message-window 
                                                                :return-to *current-window*
                                                                :message-box (world/sitrep-message-box *world*)
                                                                :header-str "SITUATION REPORT"))
                          (make-output *current-window*)
                          (run-window *current-window*))
+                       ;;------------------
+                       ;; next day - n
+                       (when (or (and (sdl:key= key :sdl-key-n) (= mod 0))
+                                 (eq unicode +cotd-unicode-latin-n-small+))
+                         (game-state-campaign-map->post-scenario)
+                         (return-from run-window nil))
                        (make-output *current-window*)))
     (:video-expose-event () (make-output *current-window*))))

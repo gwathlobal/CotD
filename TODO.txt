@@ -1,4 +1,3 @@
-- Ability to pass a day
 - Refactor mission consequences for the world map: better text delivery, etc.
 - Situation report on the campaign map as a campaign map mode
 - Stealing/returning relics on the campaign map
