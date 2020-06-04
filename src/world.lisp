@@ -491,6 +491,8 @@
    (player-specific-faction :initform nil :accessor world/player-specific-faction)
 
    (sitrep-message-box :initform (make-message-box) :accessor world/sitrep-message-box :type message-box)
+
+   (flesh-points :initform 0 :accessor world/flesh-points :type fixnum)
    ))
 
 ;;----------------------

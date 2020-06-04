@@ -56,7 +56,8 @@
            (date-str (format nil "~A" (show-date-time-YMD (world-game-time *world*))))
            (init-campaign-str "Generate a campaign map, press [r] to create a new one")
            (prompt-str nil)
-           (header-str nil))
+           (header-str nil)
+           (flesh-points-str nil))
       
       (with-slots (game-state) *game-manager*
         (case game-state
@@ -76,6 +77,10 @@
                                                                  "")
                                                                ))
 
+                                      ;; draw flesh points
+                                      (setf flesh-points-str (format nil "Flesh points gathered: ~A" (world/flesh-points *world*)))
+                                      (sdl:draw-string-solid-* flesh-points-str (+ x1 0) (+ y1 map-h 50) :justify :left :color sdl:*white*)
+                                      
                                       ;; draw subheader
                                       (if (eq cur-mode :campaign-window-map-mode)
                                         (sdl:draw-string-solid-* select-mission-sector-str (+ x1 (truncate map-w 2)) y1 :justify :center :color sdl:*white*)
