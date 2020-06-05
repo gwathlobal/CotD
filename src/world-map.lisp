@@ -276,24 +276,28 @@
     world-map))
 
 (defun generate-feats-for-world-sector (world-sector world-map)
-  (let ((x (x world-sector))
-        (y (y world-sector))
-        (river-feat (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))
-        (sea-feat (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))
-        (barricade-feat (find +lm-feat-barricade+ (feats world-sector) :key #'(lambda (a) (first a))))
-        (can-barricade-func #'(lambda (sx sy tx ty)
-                                (if (and (or (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-forest)
-                                             (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-lake)
-                                             (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-port)
-                                             (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-residential)
-                                             (= (controlled-by (aref (cells world-map) sx sy)) +lm-controlled-by-military+))
-                                         (or (= (controlled-by (aref (cells world-map) tx ty)) +lm-controlled-by-demons+)
-                                             (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-forest)
-                                             (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-lake)
-                                             (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-port)
-                                             (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-residential)))
-                                  t
-                                  nil))))
+  (let* ((x (x world-sector))
+         (y (y world-sector))
+         (river-feat (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))
+         (sea-feat (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))
+         (barricade-func #'(lambda ()
+                             (find +lm-feat-barricade+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))
+         (can-barricade-func #'(lambda (sx sy tx ty)
+                                 (if (and (or (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-forest)
+                                              (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-lake)
+                                              (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-port)
+                                              (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-residential)
+                                              (= (controlled-by (aref (cells world-map) sx sy)) +lm-controlled-by-military+))
+                                          (or (= (controlled-by (aref (cells world-map) tx ty)) +lm-controlled-by-demons+)
+                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-forest)
+                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-lake)
+                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-port)
+                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-residential)))
+                                   t
+                                   nil))))
+    ;; reset barricades
+    (setf (feats world-sector) (remove +lm-feat-barricade+ (feats world-sector) :key #'(lambda (a) (first a))))
+        
     ;; add river features
     (when river-feat
       (when (and (>= (1- x) 0)
@@ -371,32 +375,24 @@
     ;; add barricade features
     (when (and (>= (1- x) 0)
                (funcall can-barricade-func x y (1- x) y))
-      (if barricade-feat
-        (push :w (second barricade-feat))
-        (progn
-          (push (list +lm-feat-barricade+ (list :w)) (feats (aref (cells world-map) x y)))
-          (setf barricade-feat (find +lm-feat-barricade+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
+      (if (funcall barricade-func)
+        (push :w (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :w)) (feats (aref (cells world-map) x y)))))
     (when (and (>= (1- y) 0)
                (funcall can-barricade-func x y x (1- y)))
-      (if barricade-feat
-        (push :n (second barricade-feat))
-        (progn
-          (push (list +lm-feat-barricade+ (list :n)) (feats (aref (cells world-map) x y)))
-          (setf barricade-feat (find +lm-feat-barricade+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
+      (if (funcall barricade-func)
+        (push :n (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :n)) (feats (aref (cells world-map) x y)))))
     (when (and (< (1+ x) *max-x-world-map*)
                (funcall can-barricade-func x y (1+ x) y))
-      (if barricade-feat
-        (push :e (second barricade-feat))
-        (progn
-          (push (list +lm-feat-barricade+ (list :e)) (feats (aref (cells world-map) x y)))
-          (setf barricade-feat (find +lm-feat-barricade+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
+      (if (funcall barricade-func)
+        (push :e (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :e)) (feats (aref (cells world-map) x y)))))
     (when (and (< (1+ y) *max-y-world-map*)
                (funcall can-barricade-func x y x (1+ y)))
-      (if barricade-feat
-        (push :s (second barricade-feat))
-        (progn
-          (push (list +lm-feat-barricade+ (list :s)) (feats (aref (cells world-map) x y)))
-          (setf barricade-feat (find +lm-feat-barricade+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
+      (if (funcall barricade-func)
+        (push :s (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :s)) (feats (aref (cells world-map) x y)))))
     
     world-sector))
 

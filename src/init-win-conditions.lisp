@@ -38,3 +38,19 @@
                                  ;; do not do anything
                                  nil)
                    )
+
+(set-win-condition :id :win-cond-demon-campaign
+                   :win-formula 2000
+                   :win-func #'(lambda (world win-condition)
+                                 (declare (ignore win-condition))
+                                 (let ((cells (cells (world-map world)))
+                                       (world-sector nil)
+                                       (normal-sum 0))
+                                   (loop for x from 0 below (array-dimension cells 0) do
+                                     (loop for y from 0 below (array-dimension cells 1) do
+                                       (setf world-sector (aref cells x y))
+                                       (case (wtype world-sector)
+                                         ((:world-sector-normal-lake :world-sector-normal-forest :world-sector-normal-residential :world-sector-normal-island :world-sector-normal-port) (incf normal-sum)))))
+                                   normal-sum)
+                                 )
+                   )

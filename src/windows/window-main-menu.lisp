@@ -67,6 +67,8 @@
                                        (setf *world* (make-instance 'world))
                                        (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))
                                        (setf (world-map *world*) (generate-normal-world-map *world*))
+
+                                       (push +game-event-campaign-demon-win+ (game-events *world*))
                                                                               
                                        (multiple-value-bind (campaign-items campaign-funcs campaign-descrs) (new-campaign-menu-items)
                                          (setf *current-window* (make-instance 'select-faction-window :menu-items campaign-items :menu-descrs campaign-descrs))

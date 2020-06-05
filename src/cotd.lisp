@@ -596,6 +596,12 @@
 
       ;; reset all missions and regenerate them
       (reset-all-missions-on-world-map world-map)
+
+      (loop for x from 0 below (array-dimension (cells (world-map *world*)) 0) do
+        (loop for y from 0 below (array-dimension (cells (world-map *world*)) 1) do
+          (let ((world-sector (aref (cells (world-map *world*)) x y)))
+            (generate-feats-for-world-sector world-sector (world-map *world*)))))
+      
       (generate-missions-on-world-map *world*)))
   (game-state-post-scenario->campaign-map))
 

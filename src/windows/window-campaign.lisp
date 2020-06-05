@@ -56,8 +56,7 @@
            (date-str (format nil "~A" (show-date-time-YMD (world-game-time *world*))))
            (init-campaign-str "Generate a campaign map, press [r] to create a new one")
            (prompt-str nil)
-           (header-str nil)
-           (flesh-points-str nil))
+           (header-str nil))
       
       (with-slots (game-state) *game-manager*
         (case game-state
@@ -78,8 +77,14 @@
                                                                ))
 
                                       ;; draw flesh points
-                                      (setf flesh-points-str (format nil "Flesh points gathered: ~A" (world/flesh-points *world*)))
-                                      (sdl:draw-string-solid-* flesh-points-str (+ x1 0) (+ y1 map-h 50) :justify :left :color sdl:*white*)
+                                      (when (find +game-event-campaign-demon-win+ (game-events *world*))
+                                        (let* ((demon-win-cond (get-win-condition-by-id :win-cond-demon-campaign))
+                                               (max-flesh-points (win-condition/win-formula demon-win-cond))
+                                               (normal-sectors-left (funcall (win-condition/win-func demon-win-cond) *world* demon-win-cond))
+                                               (flesh-points-str nil))
+                                          (setf flesh-points-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A" (world/flesh-points *world*) max-flesh-points normal-sectors-left))
+                                          (sdl:draw-string-solid-* flesh-points-str (+ x1 0) (+ y1 map-h 50) :justify :left :color sdl:*white*)))
+                                      
                                       
                                       ;; draw subheader
                                       (if (eq cur-mode :campaign-window-map-mode)
@@ -194,7 +199,10 @@
                        (cond
                          ;; escape - quit
                          ((sdl:key= key :sdl-key-escape)
-                          (show-escape-menu)
+                          (with-slots (game-state) *game-manager*
+                           (case game-state
+                             (:game-state-campaign-map (show-escape-menu))))
+                          
                           )
                          ;; r - random map
                          ((sdl:key= key :sdl-key-r)
@@ -237,7 +245,6 @@
                        ;; view situation report - s
                        (when (or (and (sdl:key= key :sdl-key-s) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-s-small+))
-                         ()
                          (setf *current-window* (make-instance 'message-window 
                                                                :return-to *current-window*
                                                                :message-box (world/sitrep-message-box *world*)
@@ -248,8 +255,11 @@
                        ;; next day - n
                        (when (or (and (sdl:key= key :sdl-key-n) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-n-small+))
-                         (game-state-campaign-map->post-scenario)
-                         (return-from run-window nil))
+                         (with-slots (game-state) *game-manager*
+                           (case game-state
+                             (:game-state-campaign-map (progn
+                                                         (game-state-campaign-map->post-scenario)
+                                                         (return-from run-window nil))))))
                        (make-output *current-window*)))
     (:idle () #+swank
               (update-swank)

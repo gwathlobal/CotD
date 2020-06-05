@@ -2,15 +2,15 @@
 
 (defparameter *win-conditions* (make-hash-table))
 
-(deftype win-cond-type () '(member
-                            :win-cond-demonic-attack
-                            :win-cond-demonic-raid
-                            :win-cond-thief
-                            :win-cond-demonic-conquest
-                            :win-cond-military-conquest))
+(defenum:defenum win-cond-enum (:win-cond-demonic-attack
+                                :win-cond-demonic-raid
+                                :win-cond-thief
+                                :win-cond-demonic-conquest
+                                :win-cond-military-conquest
+                                :win-cond-demon-campaign))
 
 (defclass win-condition ()
-  ((id :initarg :id :accessor win-condition/id :type win-cond-type)
+  ((id :initarg :id :accessor win-condition/id :type win-cond-enum)
    (win-formula :initarg :win-formula :accessor win-condition/win-formula)
    (win-func :initarg :win-func :accessor win-condition/win-func)))
 
