@@ -309,8 +309,8 @@
               (loop for s-expr = (read file nil) 
                     while s-expr do
                       (read-options s-expr *options*))
-            (t ()
-              (logger "OPTIONS.CFG: Error occured while reading the options.cfg. Overwriting with defaults.~%")
+            (t (c)
+              (logger "OPTIONS.CFG: Error occured while reading the options.cfg: ~A. Overwriting with defaults.~%" c)
               (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
                 (format file "~A" (create-options-file-string *options*)))))))   
       (progn 
@@ -341,8 +341,8 @@
               (loop for s-expr = (read file nil) 
                     while s-expr do
                       (add-highscore-record (read-highscore-record s-expr) *highscores*))
-            (t ()
-              (logger "OPTIONS.CFG: Error occured while reading the scenario-highscores. Overwriting with defaults.~%")
+            (t (c)
+              (logger "OPTIONS.CFG: Error occured while reading the scenario-highscores: ~A. Overwriting with defaults.~%" c)
               (write-highscores-to-file *highscores*)
               ))))   
       (progn 
@@ -430,8 +430,8 @@
    ;; initialize thread, that will calculate random-movement paths while the system waits for player input
   (let ((out *standard-output*))
     (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
-      (t ()
-        (logger "MAIN: This system does not support multithreading!~%"))))
+      (t (c)
+        (logger "MAIN: This system does not support multithreading! Error: ~A~%" c))))
   
   (bt:condition-notify (path-cv *world*))
   (bt:condition-notify (fov-cv *world*))

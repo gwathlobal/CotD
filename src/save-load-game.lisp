@@ -54,8 +54,8 @@
           do
              (handler-case
                  (setf final-num (parse-integer (string-left-trim *save-final-base-dirname* last-dir)))
-               (t ()
-                 (logger (format nil "SAVE-GAME-TO-DISK: ~A in ~A does not end with an integer - ignored.~%" last-dir pathname))))
+               (t (c)
+                 (logger (format nil "SAVE-GAME-TO-DISK: ~A in ~A does not end with an integer - ignored. Error: ~A~%" last-dir pathname c))))
              (when final-num
                (push final-num save-slots))
           finally
@@ -73,15 +73,21 @@
              (serialized-game (make-instance 'serialized-game))
              (serialized-save-descr (make-instance 'serialized-save-descr
                                                    :id (game-manager/game-slot-id *game-manager*)
-                                                   :player-name (get-qualified-name *player*)
-                                                   :sector-name (name (world-sector (level *world*)))
-                                                   :mission-name (name (mission (level *world*)))
+                                                   :player-name (if *player*
+                                                                  (get-qualified-name *player*)
+                                                                  (format nil "~A [T: ~A]" (options-player-name *options*) (show-date-time-ymd (world-game-time *world*)) ))
+                                                   :sector-name (if (level *world*)
+                                                                  (name (world-sector (level *world*)))
+                                                                  nil)
+                                                   :mission-name (if (level *world*)
+                                                                   (name (mission (level *world*)))
+                                                                   nil)
                                                    :save-date (get-universal-time))))
         (ensure-directories-exist dir-pathname)
         (cl-store:store serialized-save-descr descr-file-pathname)
         (cl-store:store serialized-game game-file-pathname))
-    (t ()
-      (logger (format nil "~%SAVE-GAME-TO-DISK: Error occured while saving to file.~%~%"))))
+    (t (c)
+      (logger (format nil "~%SAVE-GAME-TO-DISK: Error occured while saving to file: ~A.~%~%" c))))
   nil
   )
 
@@ -98,7 +104,7 @@
           (progn
             (logger (format nil "~%LOAD-DESCR-FROM-DISK: No file ~A to read the save description from.~%~%" descr-pathname))
             nil))
-      (t ()
+      (t (c)
         (logger (format nil "~%LOAD-DESCR-FROM-DISK: Error occured while reading the save description from file ~A.~%~%" descr-pathname))
         nil))
     saved-descr))
@@ -116,8 +122,8 @@
           (progn
             (logger (format nil "~%LOAD-GAME-FROM-DISK: No file ~A to read the saved game from.~%~%" game-pathname))
             nil))
-      (t ()
-        (logger (format nil "~%LOAD-GAME-FROM-DISK: Error occured while reading the saved game from file ~A.~%~%" game-pathname))
+      (t (c)
+        (logger (format nil "~%LOAD-GAME-FROM-DISK: Error occured while reading the saved game from file ~A: ~A.~%~%" game-pathname c))
         nil))
     (when saved-game
       (with-slots (world mobs items lvl-features effects) saved-game
@@ -142,8 +148,8 @@
         (progn
           (logger (format nil "~%DELETE-DESCR-FROM-DISK: No file ~A to remove the saved description.~%~%" descr-pathname))
           nil))
-    (t ()
-      (logger (format nil "~%DELETE-DESCR-FROM-DISK: Error occured while deleting the saved description from file ~A.~%~%" descr-pathname))
+    (t (c)
+      (logger (format nil "~%DELETE-DESCR-FROM-DISK: Error occured while deleting the saved description from file ~A: ~A.~%~%" descr-pathname c))
       nil)))
 
 (declaim (ftype (function (pathname)
@@ -158,8 +164,8 @@
         (progn
           (logger (format nil "~%DELETE-GAME-FROM-DISK: No file ~A to remove the saved game.~%~%" game-pathname))
           nil))
-    (t ()
-      (logger (format nil "~%DELETE-GAME-FROM-DISK: Error occured while deleting the saved game from file ~A.~%~%" game-pathname))
+    (t (c)
+      (logger (format nil "~%DELETE-GAME-FROM-DISK: Error occured while deleting the saved game from file ~A: ~A.~%~%" game-pathname c))
       nil)))
 
 (declaim (ftype (function (pathname)
@@ -174,6 +180,6 @@
         (progn
           (logger (format nil "~%DELETE-DIR-FROM-DISK: No directory ~A to remove.~%~%" dir-pathname))
           nil))
-    (t ()
-      (logger (format nil "~%DELETE-DIR-FROM-DISK: Error occured while deleting the directory ~A.~%~%" dir-pathname))
+    (t (c)
+      (logger (format nil "~%DELETE-DIR-FROM-DISK: Error occured while deleting the directory ~A: ~A.~%~%" dir-pathname c))
       nil)))

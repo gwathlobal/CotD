@@ -23,7 +23,13 @@
                (with-slots (id player-name sector-name mission-name save-date) serialized-save-descr
                  (multiple-value-bind (second minute hour date month year day-of-week dst-p tz) (decode-universal-time save-date)
                    (declare (ignore day-of-week dst-p tz))
-                   (push (format nil "~40@<~A~> ~40@<~A~>~30@<~A~>~%~A" player-name sector-name mission-name
+                   (push (format nil "~40@<~A~> ~40@<~A~>~30@<~A~>~%~A" player-name
+                                 (if sector-name
+                                   sector-name
+                                   "")
+                                 (if mission-name
+                                   mission-name
+                                   "")
                                  (show-date-time-short (set-current-date-time year (1- month) (1- date) hour minute second)))
                          display-str-list))
                  (push id game-slot-list))

@@ -451,9 +451,11 @@
 (defun show-escape-menu ()
   (let ((menu-items ())
         (prompt-list ())
-        (enter-func nil))
+        (enter-func nil)
+        (header-str nil))
     (case (game-manager/game-state *game-manager*)
       (:game-state-campaign-scenario (progn
+                                       (setf header-str "Scenario Menu")
                                        (setf menu-items (list "Save game & quit" "Abandon mission" "Close"))
                                        (setf prompt-list (list #'(lambda (cur-sel)
                                                                    (declare (ignore cur-sel))
@@ -479,6 +481,7 @@
                                                                    (setf *current-window* (return-to *current-window*)))))
                                                             ))))
       (:game-state-custom-scenario (progn
+                                     (setf header-str "Scenario Menu")
                                      (setf menu-items (list "Save game & quit" "Quit without saving" "Close"))
                                      (setf prompt-list (list #'(lambda (cur-sel)
                                                                  (declare (ignore cur-sel))
@@ -502,10 +505,36 @@
                                                                  ))
                                                             (t (progn
                                                                  (setf *current-window* (return-to *current-window*)))))
-                                                          )))))
+                                                          ))))
+      (:game-state-campaign-map (progn
+                                  (setf header-str "Campaign Menu")
+                                  (setf menu-items (list "Save campaign & quit" "Quit without saving" "Close"))
+                                  (setf prompt-list (list #'(lambda (cur-sel)
+                                                              (declare (ignore cur-sel))
+                                                              "[Enter] Select  [Esc] Exit")
+                                                          #'(lambda (cur-sel)
+                                                              (declare (ignore cur-sel))
+                                                              "[Enter] Select  [Esc] Exit")
+                                                          #'(lambda (cur-sel)
+                                                              (declare (ignore cur-sel))
+                                                              "[Enter] Select  [Esc] Exit")))
+                                  (setf enter-func #'(lambda (cur-sel)
+                                                       (case cur-sel
+                                                         (0 (progn
+                                                              (save-game-to-disk :save-game-campaign)
+                                                              (game-state-campaign-map->menu)
+                                                              (go-to-start-game)
+                                                              ))
+                                                         (1 (progn
+                                                              (game-state-campaign-map->menu)
+                                                              (go-to-start-game)
+                                                              ))
+                                                         (t (progn
+                                                              (setf *current-window* (return-to *current-window*)))))
+                                                       )))))
     (setf *current-window* (make-instance 'select-obj-window 
                                           :return-to *current-window*
-                                          :header-line "Scenario Menu"
+                                          :header-line header-str
                                           :line-list menu-items
                                           :prompt-list prompt-list
                                           :enter-func enter-func

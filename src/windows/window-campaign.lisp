@@ -194,12 +194,7 @@
                        (cond
                          ;; escape - quit
                          ((sdl:key= key :sdl-key-escape)
-                          (with-slots (game-state) *game-manager*
-                            (case game-state
-                              (:game-state-campaign-map (progn
-                                                          (game-state-campaign-map->menu)
-                                                          (go-to-start-game))))
-                            )
+                          (show-escape-menu)
                           )
                          ;; r - random map
                          ((sdl:key= key :sdl-key-r)
@@ -253,4 +248,7 @@
                          (game-state-campaign-map->post-scenario)
                          (return-from run-window nil))
                        (make-output *current-window*)))
+    (:idle () #+swank
+              (update-swank)
+              )
     (:video-expose-event () (make-output *current-window*))))
