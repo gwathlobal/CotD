@@ -15,10 +15,11 @@
                                  (:score fixnum)
                                  (:if-player-won boolean)
                                  (:player-msg string)
-                                 (:game-over-type game-over-enum))
+                                 (:game-over-type game-over-enum)
+                                 (:mission-result list))
                           null)
                 trigger-game-over))
-(defun trigger-game-over (world &key final-str score if-player-won player-msg game-over-type)
+(defun trigger-game-over (world &key final-str score if-player-won player-msg game-over-type mission-result)
     
   (let* ((tmp-world world)
          (tmp-final-str final-str)
@@ -27,7 +28,8 @@
          (tmp-player-msg player-msg)
          (tmp-game-over-type game-over-type)
          (highscores-place)
-         (player-died (player-check-dead)))
+         (player-died (player-check-dead))
+         (tmp-mission-result (copy-list mission-result)))
     (declare (type string tmp-final-str player-msg) (type boolean tmp-if-player-won) (type fixnum tmp-score) (type game-over-enum game-over-type))
     
     (when player-died
@@ -47,6 +49,21 @@
     (dump-character-on-game-over (name *player*) tmp-score (player-game-time tmp-world) (name (world-sector (level tmp-world)))
                                  tmp-final-str (return-scenario-stats nil))
 
+    ;; increase world flesh points
+    (when (or (eq tmp-game-over-type :game-over-demons-won)
+              (eq tmp-game-over-type :game-over-satanists-won))
+      (when (null (getf tmp-mission-result :flesh-points))
+        (loop with sum = 0
+              for item-id in (item-id-list (level tmp-world))
+              for item = (get-item-by-id item-id)
+              when (item-ability-p item +item-abil-corpse+) do 
+                (incf sum (item-ability-p item +item-abil-corpse+))
+              finally (setf (getf tmp-mission-result :flesh-points) (truncate sum 40)))))
+
+    (setf (getf tmp-mission-result :mission-result) tmp-game-over-type)
+    
+    (setf (level/mission-result (level tmp-world)) tmp-mission-result)
+
     (add-message (format nil "~%"))
     (add-message tmp-player-msg)
     (add-message (format nil "~%Press any key...~%"))
@@ -62,8 +79,7 @@
                        (make-output *current-window*)
                        (run-window *current-window*))
       (:video-expose-event () (make-output *current-window*)))
-    
-    (setf (level/mission-result (level tmp-world)) tmp-game-over-type))
+    )
   nil)
 
 ;;===========================

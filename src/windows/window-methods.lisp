@@ -565,7 +565,15 @@
          (satanists-feat (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a))))
          (church-feat (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a))))
          (library-feat (find +lm-feat-library+ (feats world-sector) :key #'(lambda (a) (first a))))
-         (displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*))))
+         (displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*)))
+         (water-color nil))
+
+    (when *world*
+      (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time *world*))
+        (declare (ignore year day hour min sec))
+        (if (or (= month 11) (= month 0) (= month 1))
+          (setf water-color (sdl:color :r 0 :g 150 :b 255))
+          (setf water-color sdl:*blue*))))
     
     ;; display sea sector 
     (when (eq (wtype world-sector) :world-sector-normal-sea)
@@ -610,17 +618,17 @@
     ;; display rivers
     (when river-feat
       (when (find :n (second river-feat))
-        (setf (aref displayed-cells 2 0) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*))
-        (setf (aref displayed-cells 2 1) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*)))
+        (setf (aref displayed-cells 2 0) (list +glyph-id-vertical-river+ water-color sdl:*black*))
+        (setf (aref displayed-cells 2 1) (list +glyph-id-vertical-river+ water-color sdl:*black*)))
       (when (find :s (second river-feat))
-        (setf (aref displayed-cells 2 3) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*))
-        (setf (aref displayed-cells 2 4) (list +glyph-id-vertical-river+ sdl:*blue* sdl:*black*)))
+        (setf (aref displayed-cells 2 3) (list +glyph-id-vertical-river+ water-color sdl:*black*))
+        (setf (aref displayed-cells 2 4) (list +glyph-id-vertical-river+ water-color sdl:*black*)))
       (when (find :w (second river-feat))
-        (setf (aref displayed-cells 0 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*))
-        (setf (aref displayed-cells 1 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*)))
+        (setf (aref displayed-cells 0 2) (list +glyph-id-horizontal-river+ water-color sdl:*black*))
+        (setf (aref displayed-cells 1 2) (list +glyph-id-horizontal-river+ water-color sdl:*black*)))
       (when (find :e (second river-feat))
-        (setf (aref displayed-cells 3 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*))
-        (setf (aref displayed-cells 4 2) (list +glyph-id-horizontal-river+ sdl:*blue* sdl:*black*))))
+        (setf (aref displayed-cells 3 2) (list +glyph-id-horizontal-river+ water-color sdl:*black*))
+        (setf (aref displayed-cells 4 2) (list +glyph-id-horizontal-river+ water-color sdl:*black*))))
 
      ;; display seas for ports
     (when sea-feat
@@ -653,14 +661,14 @@
     (when (or (eq (wtype world-sector) :world-sector-normal-lake)
               (eq (wtype world-sector) :world-sector-abandoned-lake)
               (eq (wtype world-sector) :world-sector-corrupted-lake))
-      (setf (aref displayed-cells 1 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
-      (setf (aref displayed-cells 1 2) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
-      (setf (aref displayed-cells 1 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
-      (setf (aref displayed-cells 2 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
-      (setf (aref displayed-cells 2 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
-      (setf (aref displayed-cells 3 1) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
-      (setf (aref displayed-cells 3 2) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
-      (setf (aref displayed-cells 3 3) (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
+      (setf (aref displayed-cells 1 1) (list +glyph-id-wall+ water-color sdl:*black*))
+      (setf (aref displayed-cells 1 2) (list +glyph-id-wall+ water-color sdl:*black*))
+      (setf (aref displayed-cells 1 3) (list +glyph-id-wall+ water-color sdl:*black*))
+      (setf (aref displayed-cells 2 1) (list +glyph-id-wall+ water-color sdl:*black*))
+      (setf (aref displayed-cells 2 3) (list +glyph-id-wall+ water-color sdl:*black*))
+      (setf (aref displayed-cells 3 1) (list +glyph-id-wall+ water-color sdl:*black*))
+      (setf (aref displayed-cells 3 2) (list +glyph-id-wall+ water-color sdl:*black*))
+      (setf (aref displayed-cells 3 3) (list +glyph-id-wall+ water-color sdl:*black*)))
 
     ;; display controlled status
     (cond

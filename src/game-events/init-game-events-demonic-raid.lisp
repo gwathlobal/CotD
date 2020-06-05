@@ -64,7 +64,8 @@
                                                                                 :player-msg (if if-player-won
                                                                                               (format nil "Congratulations! Your faction has won!~%")
                                                                                               (format nil "Curses! Your faction has lost!~%"))
-                                                                                :game-over-type :game-over-demons-won))
+                                                                                :game-over-type :game-over-demons-won
+                                                                                :mission-result (list :flesh-points (truncate (get-demon-raid-overall-points world) 40))))
                                                            )))
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-raid-win-for-military+
@@ -150,5 +151,6 @@
                                                                                 :player-msg (if if-player-won
                                                                                               (format nil "Congratulations! Your faction has won!~%")
                                                                                               (format nil "Curses! Your faction has lost!~%"))
-                                                                                :game-over-type :game-over-satanists-won))
+                                                                                :game-over-type :game-over-satanists-won
+                                                                                :mission-result (list :flesh-points (get-demon-raid-overall-points world))))
                                                            )))

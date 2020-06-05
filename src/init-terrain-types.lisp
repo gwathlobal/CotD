@@ -409,7 +409,7 @@
                                                             (set-mob-effect mob :effect-type-id +mob-effect-wet+ :actor-id (id mob) :cd 4))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-ice+ :name "ice"
-                                               :glyph-idx 94 :glyph-color (sdl:color :r 0 :g 100 :b 255) :back-color sdl:*black*
+                                               :glyph-idx 94 :glyph-color (sdl:color :r 0 :g 150 :b 255) :back-color sdl:*black*
                                                :trait-opaque-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid-nofreeze+ :name "water"

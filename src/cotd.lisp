@@ -490,119 +490,110 @@
       ;; clear the situation report
       (clear-message-list (world/sitrep-message-box *world*))
 
-      ;; process the previous mission which the player took personally (or when the player abandoned a mission) 
-      (when (and level (level/mission-result level))
-        (with-slots (mission world-sector mission-result) level
-          (case mission-result
-            (:game-over-angels-won (progn
-                                     (add-message (format nil "The angels were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-            (:game-over-church-won (progn
-                                     (add-message (format nil "The priests were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-            (:game-over-military-won (progn
-                                       (add-message (format nil "The military were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-            (:game-over-demons-won (progn
-                                     (add-message (format nil "The demons were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-            (:game-over-satanists-won (progn
-                                        (add-message (format nil "The satanists were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-            (:game-over-eater-won (progn
-                                    (add-message (format nil "The primordials were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*))))))
-          
-          (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-          (add-message (format nil " in ") sdl:*white* `(,(world/sitrep-message-box *world*)))
-          (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-          (add-message (format nil ".") sdl:*white* `(,(world/sitrep-message-box *world*)))
-
-          (setf prev-world-sector-type (wtype world-sector))
-          
-          (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission))) :key #'(lambda (a)
-                                                                                                                                                     (first a)))
-                for transform-sector-func in (second campaign-mission-result) do
-                  (funcall transform-sector-func world-map (x mission) (y mission)))
-
-          (if (eq prev-world-sector-type (wtype world-sector))
-            (progn
-              (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*))))
-            (progn
-              (add-message (format nil " The sector has become ") sdl:*white* `(,(world/sitrep-message-box *world*)))
-              (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-              (add-message (format nil ".~%") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-          
-          (setf present-missions (remove mission present-missions))))
-
-      ;; process missions where the player was absent
-      (loop for mission in present-missions do
-        (loop with avail-results = ()
-              with mission-result = nil
-              for (faction-id faction-present) in (faction-list mission)
-              for world-sector = (aref (cells (world-map *world*)) (x mission) (y mission))
-              when (not (eq faction-present :mission-faction-absent))
-              do
-                 (cond
-                   ((= faction-id +faction-type-angels+) (progn
-                                                           (push :game-over-angels-won avail-results)
-                                                           (when (eq faction-present :mission-faction-present)
-                                                             (push :game-over-angels-won avail-results))))
-                   ((= faction-id +faction-type-demons+) (progn
-                                                           (push :game-over-demons-won avail-results)
-                                                           (when (eq faction-present :mission-faction-present)
-                                                             (push :game-over-demons-won avail-results))))
-                   ((= faction-id +faction-type-military+) (progn
-                                                             (push :game-over-military-won avail-results)
-                                                             (when (eq faction-present :mission-faction-present)
-                                                               (push :game-over-demons-won avail-results))))
-                   ((= faction-id +faction-type-church+) (progn
-                                                           (push :game-over-church-won avail-results)
-                                                           (when (eq faction-present :mission-faction-present)
-                                                             (push :game-over-church-won avail-results))))
-                   ((= faction-id +faction-type-satanists+) (progn
-                                                              (push :game-over-demons-won avail-results)
-                                                              (when (eq faction-present :mission-faction-present)
-                                                                (push :game-over-demons-won avail-results))))
-                   ((= faction-id +faction-type-eater+) (progn
-                                                          (push :game-over-eater-won avail-results)
-                                                          (when (eq faction-present :mission-faction-present)
-                                                            (push :game-over-eater-won avail-results)))))
-              finally
-                 (setf mission-result (nth (random (length avail-results)) avail-results))
-
-                 (case mission-result
-                   (:game-over-angels-won (progn
-                                            (add-message (format nil "The angels were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-                   (:game-over-church-won (progn
-                                            (add-message (format nil "The priests were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-                   (:game-over-military-won (progn
-                                              (add-message (format nil "The military were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-                   (:game-over-demons-won (progn
-                                            (add-message (format nil "The demons were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-                   (:game-over-satanists-won (progn
-                                               (add-message (format nil "The satanists were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
-                   (:game-over-eater-won (progn
-                                           (add-message (format nil "The primordials were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*))))))
-
-                 (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-                 (add-message (format nil " in ") sdl:*white* `(,(world/sitrep-message-box *world*)))
-                 (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-                 (add-message (format nil ".") sdl:*white* `(,(world/sitrep-message-box *world*)))
-                 
-                 (setf prev-world-sector-type (wtype world-sector))
-                 
-                 (loop with campaign-mission-result = (find mission-result (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission))) :key #'(lambda (a)
-                                                                                                                                                            (first a)))
-                       for transform-sector-func in (second campaign-mission-result) do
-                         (funcall transform-sector-func world-map (x mission) (y mission)))
-
-                 (if (eq prev-world-sector-type (wtype world-sector))
-                   (progn
-                     (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*))))
-                   (progn
-                     (add-message (format nil " The sector has become ") sdl:*white* `(,(world/sitrep-message-box *world*)))
-                     (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-                     (add-message (format nil ".~%") sdl:*white* `(,(world/sitrep-message-box *world*)))))))
-
       ;; advance one day forward
       (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time *world*))
         (setf (world-game-time *world*) (set-current-date-time year month (1+ day) hour min sec)))
       
+      ;; add date to the top
+      (add-message (format nil " === ~A ===~%~%" (show-date-time-ymd (world-game-time *world*))) sdl:*white* `(,(world/sitrep-message-box *world*)))
+      
+      ;; process missions 
+      (loop with mission-result = nil
+            with flesh-points = 0
+            for mission in present-missions
+            for world-sector = (aref (cells (world-map *world*)) (x mission) (y mission))
+            do
+               (if (and level (level/mission-result level) (mission level)
+                        (eq mission (mission level)))
+                 ;; where the player was present...
+                 (progn
+                   (setf mission-result (level/mission-result level)))
+                 ;; ...and where the player was absent
+                 (progn
+                   (loop with avail-results-won = ()
+                         for (faction-id faction-present) in (faction-list mission)
+                         when (not (eq faction-present :mission-faction-absent))
+                           do
+                              (cond
+                                ((= faction-id +faction-type-angels+) (progn
+                                                                        (push :game-over-angels-won avail-results-won)
+                                                                        (when (eq faction-present :mission-faction-present)
+                                                                          (push :game-over-angels-won avail-results-won))))
+                                ((= faction-id +faction-type-demons+) (progn
+                                                                        (push :game-over-demons-won avail-results-won)
+                                                                        (when (eq faction-present :mission-faction-present)
+                                                                          (push :game-over-demons-won avail-results-won))))
+                                ((= faction-id +faction-type-military+) (progn
+                                                                          (push :game-over-military-won avail-results-won)
+                                                                          (when (eq faction-present :mission-faction-present)
+                                                                            (push :game-over-military-won avail-results-won))))
+                                ((= faction-id +faction-type-church+) (progn
+                                                                        (push :game-over-church-won avail-results-won)
+                                                                        (when (eq faction-present :mission-faction-present)
+                                                                          (push :game-over-church-won avail-results-won))))
+                                ((= faction-id +faction-type-satanists+) (progn
+                                                                           (push :game-over-satanists-won avail-results-won)
+                                                                           (when (eq faction-present :mission-faction-present)
+                                                                             (push :game-over-satanists-won avail-results-won))))
+                                ((= faction-id +faction-type-eater+) (progn
+                                                                       (push :game-over-eater-won avail-results-won)
+                                                                       (when (eq faction-present :mission-faction-present)
+                                                                         (push :game-over-eater-won avail-results-won)))))
+                         finally
+                            (setf (getf mission-result :mission-result) (nth (random (length avail-results-won)) avail-results-won))
+                            
+                            ;; increase world flesh points
+                            (when (or (eq (getf mission-result :mission-result) :game-over-demons-won)
+                                      (eq (getf mission-result :mission-result) :game-over-satanists-won))
+                              (setf (getf mission-result :flesh-points) (truncate (+ 75 (random 50)) 10))))))
+               
+               (case (getf mission-result :mission-result)
+                 (:game-over-angels-won (progn
+                                          (add-message (format nil "The angels were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                 (:game-over-church-won (progn
+                                          (add-message (format nil "The priests were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                 (:game-over-military-won (progn
+                                            (add-message (format nil "The military were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                 (:game-over-demons-won (progn
+                                          (add-message (format nil "The demons were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                 (:game-over-satanists-won (progn
+                                             (add-message (format nil "The satanists were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                 (:game-over-eater-won (progn
+                                         (add-message (format nil "The primordials were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*))))))
+               
+               (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
+               (add-message (format nil " in ") sdl:*white* `(,(world/sitrep-message-box *world*)))
+               (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
+               (add-message (format nil ".") sdl:*white* `(,(world/sitrep-message-box *world*)))
+               
+               (setf prev-world-sector-type (wtype world-sector))
+               
+               (loop with campaign-mission-result = (find (getf mission-result :mission-result) (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission)))
+                                                          :key #'(lambda (a) (first a)))
+                     for transform-sector-func in (second campaign-mission-result) do
+                       (funcall transform-sector-func world-map (x mission) (y mission)))
+               
+               (if (eq prev-world-sector-type (wtype world-sector))
+                 (progn
+                   (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*))))
+                 (progn
+                   (add-message (format nil " The sector has become ") sdl:*white* `(,(world/sitrep-message-box *world*)))
+                   (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
+                   (add-message (format nil ".~%") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+
+               ;; sum all flesh points
+               (when (getf mission-result :flesh-points)
+                 (incf flesh-points (getf mission-result :flesh-points)))
+
+            finally
+               (when (> flesh-points 0)
+                 (add-message (format nil "~%Demons managed to gather ") sdl:*white* `(,(world/sitrep-message-box *world*)))
+                 (add-message (format nil "~A flesh ~A" flesh-points (if (= flesh-points 1) "point" "points")) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
+                 (add-message (format nil " recently.~%") sdl:*white* `(,(world/sitrep-message-box *world*))))
+
+               (incf (world/flesh-points *world*) flesh-points)
+            )
+
       ;; reset all missions and regenerate them
       (reset-all-missions-on-world-map world-map)
       (generate-missions-on-world-map *world*)))

@@ -201,6 +201,9 @@
                           (with-slots (game-state) *game-manager*
                             (case game-state
                               (:game-state-campaign-init (progn
+                                                           (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time *world*))
+                                                             (declare (ignore month))
+                                                             (setf (world-game-time *world*) (set-current-date-time year (random 12) day hour min sec)))
                                                            (setf (world-map *world*) (generate-normal-world-map *world*))
                                                            (setf cur-mode :campaign-window-map-mode))))
                             )

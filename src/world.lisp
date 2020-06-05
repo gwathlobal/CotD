@@ -42,7 +42,7 @@
    (world-sector :initform nil :accessor world-sector)
    (mission :initform nil :accessor mission)
 
-   (mission-result :initform nil :accessor level/mission-result :type '(or null campaign-scenario-game-result))
+   (mission-result :initform nil :accessor level/mission-result :type list)
    
    (lost-civilians :initform 0 :accessor lost-civilians)
    (initial-civilians :initform 0 :accessor initial-civilians)
