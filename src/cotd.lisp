@@ -594,6 +594,14 @@
                (incf (world/flesh-points *world*) flesh-points)
             )
 
+      ;; go through all game events
+      (loop for game-event-id in (game-events *world*)
+            for game-event = (get-game-event-by-id game-event-id)
+            when (and (not (disabled game-event))
+                      (funcall (on-check game-event) *world*))
+              do
+                 (funcall (on-trigger game-event) *world*))
+      
       ;; reset all missions and regenerate them
       (reset-all-missions-on-world-map world-map)
 

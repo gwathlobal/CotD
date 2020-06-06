@@ -368,7 +368,7 @@
                         ;(format t "KEY = ~A~%" key)
                         ;(format t "MOD BEFORE NORMALIZE = ~A~%" mod)
                         
-                         ;; normalize mod
+                        ;; normalize mod
                         (loop while (>= mod sdl-key-mod-num) do
                           (decf mod sdl-key-mod-num))
 

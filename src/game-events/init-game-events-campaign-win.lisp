@@ -14,5 +14,8 @@
                                                              t
                                                              nil)))
                                            :on-trigger #'(lambda (world)
-                                                           
+                                                           (setf *current-window* (make-instance 'campaign-over-window :campaign-over-type :game-over-demons-won
+                                                                                                                       :player-won (eq (get-general-faction-from-specific (world/player-specific-faction world)) +faction-type-demons+)))
+                                                           (make-output *current-window*)
+                                                           (run-window *current-window*)
                                                            )))

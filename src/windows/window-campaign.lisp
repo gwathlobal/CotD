@@ -71,7 +71,7 @@
                                       (setf prompt-str (format nil "~A[Tab] Change mode  [s] Situation report  [n] Next day  [Esc] Exit"
                                                                (if (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                         (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
-                                                                                                   (specific-belongs-to-general-faction (world/player-specific-faction *world*))))
+                                                                                                   (get-general-faction-from-specific (world/player-specific-faction *world*))))
                                                                  "[Enter] Start mission  "
                                                                  "")
                                                                ))
@@ -109,7 +109,7 @@
                                          (let ((color-list nil)
                                                (mission-names-list ())
                                                (str-per-page 10))
-                                           (loop with general-player-faction = (specific-belongs-to-general-faction (world/player-specific-faction *world*))
+                                           (loop with general-player-faction = (get-general-faction-from-specific (world/player-specific-faction *world*))
                                                  for i from 0 below (length avail-missions)
                                                  for mission = (nth i avail-missions)
                                                  for faction-present = (calc-is-mission-available mission general-player-faction)
@@ -215,7 +215,40 @@
                                                            (setf (world-map *world*) (generate-normal-world-map *world*))
                                                            (setf cur-mode :campaign-window-map-mode))))
                             )
-                         )
+                          )
+                         ;; Shift + D - debug menu, for debug purposes only
+                         ((and (sdl:key= key :sdl-key-d) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)
+                               (null *cotd-release*))
+                          (let ((menu-items ())
+                                (prompt-list ())
+                                (enter-func nil)
+                                (header-str nil))
+                            (setf header-str "Debug Menu")
+                            (setf menu-items (list "Add 500 flesh points" "Close"))
+                            (setf prompt-list (list #'(lambda (cur-sel)
+                                                        (declare (ignore cur-sel))
+                                                        "[Enter] Select  [Esc] Exit")
+                                                    #'(lambda (cur-sel)
+                                                        (declare (ignore cur-sel))
+                                                        "[Enter] Select  [Esc] Exit")))
+                            (setf enter-func #'(lambda (cur-sel)
+                                                 (case cur-sel
+                                                   (0 (progn
+                                                        (incf (world/flesh-points *world*) 500)
+                                                        (setf *current-window* (return-to *current-window*))))
+                                                   (t (progn
+                                                        (setf *current-window* (return-to *current-window*)))))
+                                                 ))
+                            (setf *current-window* (make-instance 'select-obj-window 
+                                                                  :return-to *current-window*
+                                                                  :header-line header-str
+                                                                  :line-list menu-items
+                                                                  :prompt-list prompt-list
+                                                                  :enter-func enter-func
+                                                                  ))
+                            (make-output *current-window*)
+                            (run-window *current-window*))
+                          )
                          ;; tab - change mode
                          ((sdl:key= key :sdl-key-tab)
                           (if (eq cur-mode :campaign-window-mission-mode)
@@ -236,7 +269,7 @@
                                                            ))
                               (:game-state-campaign-map (when (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                    (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
-                                                                                              (specific-belongs-to-general-faction (world/player-specific-faction *world*))))
+                                                                                              (get-general-faction-from-specific (world/player-specific-faction *world*))))
                                                           (return-from run-window (values (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                           (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))))))
                             )))

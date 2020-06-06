@@ -103,3 +103,9 @@
     (when (not (eq game-state :game-state-post-scenario))
       (error (format nil "GAME-STATE-POST-SCENARIO->CAMPAIGN-MAP: Game state is ~A, not GAME-STATE-POST-SCENARIO" game-state)))
     (setf game-state :game-state-campaign-map)))
+
+(defun game-state-post-scenario->menu ()
+  (with-slots (game-state) *game-manager*
+    (when (not (eq game-state :game-state-post-scenario))
+      (error (format nil "GAME-STATE-POST-SCENARIO->MENU: Game state is ~A, not GAME-STATE-POST-SCENARIO" game-state)))
+    (setf game-state :game-state-main-menu)))

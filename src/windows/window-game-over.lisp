@@ -1,16 +1,5 @@
 (in-package :cotd)
 
-(defconstant +game-over-player-dead+ 0)
-(defconstant +game-over-demons-won+ 1)
-(defconstant +game-over-angels-won+ 2)
-(defconstant +game-over-military-won+ 3)
-(defconstant +game-over-player-possessed+ 4)
-(defconstant +game-over-thief-won+ 5)
-(defconstant +game-over-eater-won+ 6)
-(defconstant +game-over-ghost-won+ 7)
-(defconstant +game-over-church-won+ 8)
-(defconstant +game-over-satanists-won+ 9)
-
 (defclass final-stats-window (window)
   ((game-over-type :initarg :game-over-type :accessor game-over-type :type game-over-enum)
    (highscores-place :initform nil :initarg :highscores-place :accessor highscores-place)
@@ -72,37 +61,35 @@
   (sdl:update-display))
 
 (defmethod run-window ((win final-stats-window))
-  (tagbody
-     (sdl:with-events ()
-       (:quit-event () (funcall (quit-func win)) t)
-       (:key-down-event (:key key :mod mod :unicode unicode)
-                        (declare (ignore mod unicode))
-                        (cond
-			  ;; escape - high scores
-			  ((sdl:key= key :sdl-key-escape) 
-                           (setf *current-window* (make-instance 'highscores-window :highscores-place (highscores-place win)))
-                           (make-output *current-window*)
-                           (run-window *current-window*)
-                           (case (game-manager/game-state *game-manager*)
-                             (:game-state-campaign-scenario (progn
-                                                              (game-state-campaign-scenario->post-scenario)
-                                                              (go-to-start-game)))
-                             (:game-state-custom-scenario (progn
-                                                            (game-state-custom-scenario->menu)
-                                                            (go-to-start-game))))
-                           )
-                          ;; m - return to main menu/campaign map
-                          ((sdl:key= key :sdl-key-m)
-                           (case (game-manager/game-state *game-manager*)
-                             (:game-state-campaign-scenario (progn
-                                                              (game-state-campaign-scenario->post-scenario)
-                                                              (go-to-start-game)))
-                             (:game-state-custom-scenario (progn
-                                                            (game-state-custom-scenario->menu)
-                                                            (go-to-start-game))))
-                           )
-                          )
+  (sdl:with-events ()
+    (:quit-event () (funcall (quit-func win)) t)
+    (:key-down-event (:key key :mod mod :unicode unicode)
+                     (declare (ignore mod unicode))
+                     (cond
+                       ;; escape - high scores
+                       ((sdl:key= key :sdl-key-escape) 
+                        (setf *current-window* (make-instance 'highscores-window :highscores-place (highscores-place win)))
+                        (make-output *current-window*)
+                        (run-window *current-window*)
+                        (case (game-manager/game-state *game-manager*)
+                          (:game-state-campaign-scenario (progn
+                                                           (game-state-campaign-scenario->post-scenario)
+                                                           (go-to-start-game)))
+                          (:game-state-custom-scenario (progn
+                                                         (game-state-custom-scenario->menu)
+                                                         (go-to-start-game))))
                         )
-       (:video-expose-event () (make-output *current-window*)))
-     exit-func (make-output *current-window*)))
+                       ;; m - return to main menu/campaign map
+                       ((sdl:key= key :sdl-key-m)
+                        (case (game-manager/game-state *game-manager*)
+                          (:game-state-campaign-scenario (progn
+                                                           (game-state-campaign-scenario->post-scenario)
+                                                           (go-to-start-game)))
+                          (:game-state-custom-scenario (progn
+                                                         (game-state-custom-scenario->menu)
+                                                         (go-to-start-game))))
+                        )
+                       )
+                     )
+    (:video-expose-event () (make-output *current-window*))))
 

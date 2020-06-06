@@ -41,10 +41,10 @@
     (gethash faction-type-id-2 (faction-relations (get-faction-type-by-id faction-type-id-1))))
   )
 
-(defun specific-belongs-to-general-faction (specific-faction-id)
+(defun get-general-faction-from-specific (specific-faction-id)
   (loop for faction-type across *faction-types*
         when (and faction-type
                   (find specific-faction-id (specific-faction-list faction-type)))
           do
-             (return-from specific-belongs-to-general-faction (id faction-type)))
+             (return-from get-general-faction-from-specific (id faction-type)))
   nil)
