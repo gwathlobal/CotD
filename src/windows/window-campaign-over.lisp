@@ -1,7 +1,7 @@
 (in-package :cotd)
 
 (defclass campaign-over-window (window)
-  ((campaign-over-type :initarg :campaign-over-type :accessor campaign-over-window/campaign-over-type :type game-over-enum)
+  ((campaign-over-type :initarg :campaign-over-type :accessor campaign-over-window/campaign-over-type :type campaign-over-enum)
    (player-won :initform nil :initarg :player-won :accessor campaign-over-window/player-won)))
 
 (defmethod make-output ((win campaign-over-window))
@@ -26,15 +26,18 @@
           (setf color sdl:*red*)))
       
       (case campaign-over-type
-        (:game-over-demons-won (progn
+        (:campaign-over-demons-conquer (progn
+                                         (format header-str "THE PANDEMONIUM HIERARCHY WON")
+                                         (setf long-text (format nil "The Firstborn have conquered the entire city and reshaped it into their own bastion on Earth. The human armies are crushed and the Thirdborn do not dare to attack any more. For now the hostilities are over as no one is left to oppose the forces of Hell but for how long..."))))
+        (:campaign-over-demons-gather (progn
                                  (format header-str "THE PANDEMONIUM HIERARCHY WON")
-                                 (setf long-text (format nil "The demons have gathered enough flesh for their nefarious purposes and have withdrawn into their own hellish dimension. But the portals to our world are not completely shut and may open one day again..."))))
-        (:game-over-angels-won (progn
+                                 (setf long-text (format nil "The Firstborn have gathered enough flesh for their nefarious purposes and have withdrawn into their own hellish dimension. The humankind can now reclaim the City back and try to forget the horrors that transpired there. But the portals to our world are not completely shut and may open one day again..."))))
+        (:campaign-over-angels-won (progn
                                  (format header-str "THE CELESTIAL COMMUNION WON")
-                                 (setf long-text (format nil "The angels were able to destroy the hellish machines of the Pandemonium Hierarchy and close the Prison Dimension. The Communion once again stands vigil to keep the malformed Firstborn inside the confines designated by the One."))))
-        (:game-over-military-won (progn
+                                 (setf long-text (format nil "The Thirdborn were able to destroy the hellish machines of the Pandemonium Hierarchy and close the Prison Dimension. Those forces of Hell left on Earth were eventually slain by the humans. The Communion once again stands vigil to keep the malformed Firstborn inside the confines designated by the One."))))
+        (:campaign-over-military-won (progn
                                    (format header-str "THE MILITARY WON")
-                                   (setf long-text (format nil "The humans managed to fend off the hellish invaders and hunt down the traitor who aided them into our world. The scars of the Otherworldly War run deep and the humankind is shaken by cosmic truth that was revealed to it..."))))
+                                   (setf long-text (format nil "The humans managed to fend off the hellish invaders and hunt down the traitors who aided them into our world. The scars of the Otherworldly War run deep and the humankind is shaken by cosmic truth that was revealed to it..."))))
         )
       (setf prompt-str (format nil "[Esc] Main menu"))
 

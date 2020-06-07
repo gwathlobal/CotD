@@ -76,14 +76,24 @@
                                                                  "")
                                                                ))
 
-                                      ;; draw flesh points
-                                      (when (find +game-event-campaign-demon-win+ (game-events *world*))
-                                        (let* ((demon-win-cond (get-win-condition-by-id :win-cond-demon-campaign))
-                                               (max-flesh-points (win-condition/win-formula demon-win-cond))
-                                               (normal-sectors-left (funcall (win-condition/win-func demon-win-cond) *world* demon-win-cond))
-                                               (flesh-points-str nil))
-                                          (setf flesh-points-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A" (world/flesh-points *world*) max-flesh-points normal-sectors-left))
-                                          (sdl:draw-string-solid-* flesh-points-str (+ x1 0) (+ y1 map-h 50) :justify :left :color sdl:*white*)))
+                                      ;; draw win conditions 
+                                      (let* ((demon-win-cond (get-win-condition-by-id :win-cond-demon-campaign))
+                                             (military-win-cond (get-win-condition-by-id :win-cond-military-campaign))
+                                             (angels-win-cond (get-win-condition-by-id :win-cond-angels-campaign))
+                                             (max-flesh-points (win-condition/win-formula demon-win-cond))
+                                             (normal-sectors-left (funcall (win-condition/win-func demon-win-cond) *world* demon-win-cond))
+                                             (machines-left (funcall (win-condition/win-func angels-win-cond) *world* angels-win-cond))
+                                             (demon-str nil)
+                                             (max-lines 0))
+                                        (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
+                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional machines left: ~A"
+                                                                  (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left)))
+                                        
+                                        (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* 1 (sdl:get-font-height))))
+                                          (setf max-lines (write-text demon-str a-rect :count-only t)))
+                                        (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* max-lines (sdl:get-font-height))))
+                                          (write-text demon-str a-rect))
+                                        )
                                       
                                       
                                       ;; draw subheader

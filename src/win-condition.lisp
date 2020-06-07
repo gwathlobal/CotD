@@ -7,7 +7,9 @@
                                 :win-cond-thief
                                 :win-cond-demonic-conquest
                                 :win-cond-military-conquest
-                                :win-cond-demon-campaign))
+                                :win-cond-demon-campaign
+                                :win-cond-military-campaign
+                                :win-cond-angels-campaign))
 
 (defclass win-condition ()
   ((id :initarg :id :accessor win-condition/id :type win-cond-enum)

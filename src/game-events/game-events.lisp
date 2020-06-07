@@ -52,6 +52,8 @@
 (defconstant +game-event-delayed-arrival-demons+ 47)
 
 (defconstant +game-event-campaign-demon-win+ 48)
+(defconstant +game-event-campaign-military-win+ 49)
+(defconstant +game-event-campaign-angel-win+ 50)
 
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won
@@ -63,6 +65,12 @@
                                  :game-over-thief-won
                                  :game-over-eater-won
                                  :game-over-ghost-won))
+
+(defenum:defenum campaign-over-enum (:campaign-over-demons-conquer
+                                     :campaign-over-demons-gather
+                                     :campaign-over-angels-won
+                                     :campaign-over-military-won
+                                     ))
 
 (defclass game-event ()
   ((id :initarg :id :accessor id)
