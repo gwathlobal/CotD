@@ -60,8 +60,9 @@
    (mission :initform nil :initarg :mission :accessor mission)
    ))
 
-(defmethod descr ((sector world-sector))
-  (let ((feats-str (create-string))
+(defun descr (sector &key (reveal-lair nil))
+  (let ((feats-list (copy-list (feats sector)))
+        (feats-str (create-string))
         (feats-str-comma nil)
         (controlled-str (create-string))
         (items-str (create-string))
@@ -70,15 +71,23 @@
         (faction-str (create-string))
         (level-mod-str (create-string)))
 
-    (loop for l in (feats sector)
+    (setf feats-list (remove +lm-feat-sea+ feats-list :key #'(lambda (a) (first a))))
+    (setf feats-list (remove-if #'(lambda (a)
+                                    (if (and (= (first a) +lm-feat-lair+)
+                                             (null reveal-lair)
+                                             (not (mission sector)))
+                                      t
+                                      nil))
+                                feats-list))
+    
+    (loop for l in feats-list 
           for lm-modifier-id = (first l)
           for name = (name (get-level-modifier-by-id lm-modifier-id))
           do
-             (unless (= lm-modifier-id +lm-feat-sea+)
-               (format feats-str "~A~A" (if feats-str-comma ", " (format nil "~%~%")) name)
-               (setf feats-str-comma t))
+             (format feats-str "~A~A" (if feats-str-comma ", " (format nil "~%~%")) name)
+             (setf feats-str-comma t)
           finally (when feats-str-comma (format feats-str ".")))
-
+    
     (loop for lm-modifier-id in (items sector)
           for name = (name (get-level-modifier-by-id lm-modifier-id))
           do

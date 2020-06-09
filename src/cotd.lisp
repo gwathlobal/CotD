@@ -434,8 +434,7 @@
         (logger "MAIN: This system does not support multithreading! Error: ~A~%" c))))
   
   (bt:condition-notify (path-cv *world*))
-  (bt:condition-notify (fov-cv *world*))
-
+  
   ;; set the same name for mimics if any
   (setf (name *player*) (options-player-name *options*))
   (setf (alive-name *player*) (name *player*))

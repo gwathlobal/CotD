@@ -10,7 +10,11 @@
    (cur-mode :initform :campaign-window-map-mode :initarg :cur-mode :accessor campaign-window/cur-mode :type campaign-window-tab-type)
    (cur-sel :initform 0 :accessor campaign-window/cur-sel :type fixnum)
    (avail-missions :initform () :accessor campaign-window/avail-missions :type list)
-   (test-map-func :initform nil :initarg :test-map-func :accessor campaign-window/test-map-func)))
+   (test-map-func :initform nil :initarg :test-map-func :accessor campaign-window/test-map-func)
+   (reveal-lair :initform (if (eq (get-general-faction-from-specific (world/player-specific-faction *world*)) +faction-type-demons+)
+                            t
+                            nil)
+                :accessor campaign-window/reveal-lair :type boolean)))
 
 (defmethod initialize-instance :after ((win campaign-window) &key)
   (with-slots (cur-mode) win
@@ -44,7 +48,7 @@
     faction-present))
 
 (defmethod make-output ((win campaign-window))
-  (with-slots (cur-mode cur-sector cur-sel avail-missions) win
+  (with-slots (cur-mode cur-sector cur-sel avail-missions reveal-lair) win
 
     (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
       (sdl:fill-surface sdl:*black* :template a-rect))
@@ -83,11 +87,12 @@
                                              (max-flesh-points (win-condition/win-formula demon-win-cond))
                                              (normal-sectors-left (funcall (win-condition/win-func demon-win-cond) *world* demon-win-cond))
                                              (machines-left (funcall (win-condition/win-func angels-win-cond) *world* angels-win-cond))
+                                             (military-alarmed (world/military-alarm *world*))
                                              (demon-str nil)
                                              (max-lines 0))
                                         (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
-                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional machines left: ~A"
-                                                                  (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left)))
+                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional machines left: ~A~%Military alarmed: ~A"
+                                                                  (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left military-alarmed)))
                                         
                                         (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* 1 (sdl:get-font-height))))
                                           (setf max-lines (write-text demon-str a-rect :count-only t)))
@@ -103,7 +108,7 @@
         )
 
       ;; draw map
-      (draw-world-map (world-map *world*) x1 y2)
+      (draw-world-map (world-map *world*) x1 y2 :reveal-lairs reveal-lair)
       (highlight-world-map-tile (+ x1 (* (car cur-sector) (* *glyph-w* 5))) (+ y2 (* (cdr cur-sector) (* *glyph-h* 5))))
 
       ;; draw date
@@ -113,7 +118,7 @@
       (case cur-mode
         (:campaign-window-map-mode (progn
                                      (sdl:with-rectangle (rect (sdl:rectangle :x x2 :y y2 :w (- *window-width* x2 20) :h map-h))
-                                       (write-text (descr (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
+                                       (write-text (descr (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
                                                    rect))))
         (:campaign-window-mission-mode (progn
                                          (let ((color-list nil)
@@ -140,7 +145,7 @@
                                                                                     :y (+ y2 10 (* (sdl:char-height sdl:*default-font*) str-per-page))
                                                                                     :w (- *window-width* x2 20)
                                                                                     :h (- *window-height* 40 (+ 10 10 (* (sdl:char-height sdl:*default-font*) str-per-page)))))
-                                             (write-text (descr (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
+                                             (write-text (descr (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
                                                          rect))))))
       
       ;; draw header
@@ -160,7 +165,7 @@
                      (loop while (>= mod sdl-key-mod-num) do
                        (decf mod sdl-key-mod-num))
 
-                     (with-slots (test-map-func cur-mode cur-sector cur-sel avail-missions return-to) win
+                     (with-slots (test-map-func cur-mode cur-sector cur-sel avail-missions return-to reveal-lair) win
                        ;;------------------
                        ;; moving - arrows
                        (case cur-mode
@@ -234,8 +239,15 @@
                                 (enter-func nil)
                                 (header-str nil))
                             (setf header-str "Debug Menu")
-                            (setf menu-items (list "Add 500 flesh points" "Close"))
+                            (setf menu-items (list "Add 500 flesh points"
+                                                   (if reveal-lair
+                                                     "Hide satanists' lairs"
+                                                     "Show satanists' lairs")
+                                                   "Close"))
                             (setf prompt-list (list #'(lambda (cur-sel)
+                                                        (declare (ignore cur-sel))
+                                                        "[Enter] Select  [Esc] Exit")
+                                                    #'(lambda (cur-sel)
                                                         (declare (ignore cur-sel))
                                                         "[Enter] Select  [Esc] Exit")
                                                     #'(lambda (cur-sel)
@@ -245,6 +257,9 @@
                                                  (case cur-sel
                                                    (0 (progn
                                                         (incf (world/flesh-points *world*) 500)
+                                                        (setf *current-window* (return-to *current-window*))))
+                                                   (1 (progn
+                                                        (setf reveal-lair (not reveal-lair))
                                                         (setf *current-window* (return-to *current-window*))))
                                                    (t (progn
                                                         (setf *current-window* (return-to *current-window*)))))

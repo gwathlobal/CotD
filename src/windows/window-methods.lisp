@@ -556,7 +556,7 @@
     (:video-expose-event () (make-output *current-window*))
     (:idle () (return-from pause-for-poll))))
 
-(defun draw-world-map-cell (world-sector scr-x scr-y)
+(defun draw-world-map-cell (world-sector scr-x scr-y &key (reveal-lair nil))
   (let* ((max-disp-w 5)
          (max-disp-h 5)
          (river-feat (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))
@@ -681,18 +681,25 @@
       )
 
     ;; display satanists, church, library, etc
-    (cond
-      ((loop for n in (list satanists-feat church-feat library-feat)
-             count n into sum
-             finally (return (if (> sum 1) t nil)))
-       (progn
-         (setf (aref displayed-cells 1 3) (list +glyph-id-three-dots+ sdl:*white* sdl:*black*))))
-      (satanists-feat (progn
-                        (setf (aref displayed-cells 1 3) (list +glyph-id-sacrificial-circle+ sdl:*magenta* sdl:*black*))))
-      (church-feat (progn
-                     (setf (aref displayed-cells 1 3) (list +glyph-id-church+ sdl:*white* sdl:*black*))))
-      (library-feat (progn
-                      (setf (aref displayed-cells 1 3) (list +glyph-id-book+ sdl:*white* sdl:*black*)))))
+    ;; do not show satanists lairs if they are hidden (the faction does not see them) and there is no mission there
+    (let ((feat-list (remove nil (list (if (or reveal-lair (mission world-sector))
+                                         satanists-feat
+                                         nil)
+                                       church-feat
+                                       library-feat))))
+      (if (> (length feat-list) 1)
+        (progn
+          (setf (aref displayed-cells 1 3) (list +glyph-id-three-dots+ sdl:*white* sdl:*black*)))
+        (progn
+          (when (= (length feat-list) 1)
+            (cond
+              ((eq (first feat-list) satanists-feat) (progn
+                                                       (setf (aref displayed-cells 1 3) (list +glyph-id-sacrificial-circle+ sdl:*magenta* sdl:*black*))))
+              ((eq (first feat-list) church-feat) (progn
+                                                    (setf (aref displayed-cells 1 3) (list +glyph-id-church+ sdl:*white* sdl:*black*))))
+              ((eq (first feat-list) library-feat) (progn
+                                                     (setf (aref displayed-cells 1 3) (list +glyph-id-book+ sdl:*white* sdl:*black*))))))))
+      )
     
     (setf (aref displayed-cells 2 2) (list (glyph-idx (get-world-sector-type-by-id (wtype world-sector)))
                                            (glyph-color (get-world-sector-type-by-id (wtype world-sector)))
@@ -720,7 +727,7 @@
                     :back-color (third (aref displayed-cells dx dy)))))
     ))
 
-(defun draw-world-map (world-map scr-x scr-y)
+(defun draw-world-map (world-map scr-x scr-y &key (reveal-lairs nil))
   (loop with max-disp-w = 5
         with max-disp-h = 5
         for y from 0 below *max-y-world-map* do
@@ -729,5 +736,5 @@
           for y1 = (+ scr-y (* y *glyph-h* max-disp-h))
           for sector = (aref (cells world-map) x y)
           do
-             (draw-world-map-cell sector x1 y1)))
+             (draw-world-map-cell sector x1 y1 :reveal-lair reveal-lairs)))
   )

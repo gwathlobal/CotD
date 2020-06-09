@@ -482,10 +482,6 @@
    (path-lock :initform (bt:make-lock) :accessor path-lock)
    (path-cv :initform (bt:make-condition-variable) :accessor path-cv)
 
-   (cur-mob-fov :initform 0 :accessor cur-mob-fov)
-   (fov-lock :initform (bt:make-lock) :accessor fov-lock)
-   (fov-cv :initform (bt:make-condition-variable) :accessor fov-cv)
-
    (animation-queue :initform () :accessor animation-queue)
 
    (world-map :initform nil :accessor world-map)
@@ -495,6 +491,7 @@
 
    (flesh-points :initform 0 :accessor world/flesh-points :type fixnum)
    (machine-destroyed :initform 0 :accessor world/machine-destroyed :type fixnum)
+   (military-alarm :initform 0 :accessor world/military-alarm :type fixnum)
    ))
 
 ;;----------------------
