@@ -571,15 +571,9 @@
                                                           :key #'(lambda (a) (first a)))
                      for transform-sector-func in (second campaign-mission-result) do
                        (funcall transform-sector-func world-map (x mission) (y mission)))
-               
-               (if (eq prev-world-sector-type (wtype world-sector))
-                 (progn
-                   (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*))))
-                 (progn
-                   (add-message (format nil " The sector has become ") sdl:*white* `(,(world/sitrep-message-box *world*)))
-                   (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-                   (add-message (format nil ".~%") sdl:*white* `(,(world/sitrep-message-box *world*)))))
 
+               (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
+               
                ;; sum all flesh points
                (when (getf mission-result :flesh-points)
                  (incf flesh-points (getf mission-result :flesh-points)))

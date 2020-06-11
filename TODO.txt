@@ -1,6 +1,6 @@
+- Eliminate satanists mission reveals the lair
 - Special mission in Hell where angels attack demons to destroy the dimensional machines
 - Special mission in Hell where the military attack demons to destroy gathered flesh
-- Special mission for eliminating satanits lairs where the military attack satanists and the demons are delayed. 
 - Refactor mission consequences for the world map: better text delivery, etc.
 - Situation report on the campaign map as a campaign map mode
 - Stealing/returning relics on the campaign map

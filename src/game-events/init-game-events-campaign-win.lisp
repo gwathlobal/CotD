@@ -33,8 +33,8 @@
                                            :on-check #'(lambda (world)
                                                          (let* ((win-condition (get-win-condition-by-id :win-cond-military-campaign)))
                                                            (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func win-condition) world win-condition)
-                                                             (if (or (<= corrupted-sectors-left 0)
-                                                                     (<= satanist-lairs-left 0))
+                                                             (if (and (<= corrupted-sectors-left 0)
+                                                                      (<= satanist-lairs-left 0))
                                                              t
                                                              nil))
                                                            ))

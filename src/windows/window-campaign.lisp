@@ -118,7 +118,7 @@
       (case cur-mode
         (:campaign-window-map-mode (progn
                                      (sdl:with-rectangle (rect (sdl:rectangle :x x2 :y y2 :w (- *window-width* x2 20) :h map-h))
-                                       (write-text (descr (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
+                                       (write-text (description (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
                                                    rect))))
         (:campaign-window-mission-mode (progn
                                          (let ((color-list nil)
@@ -145,7 +145,7 @@
                                                                                     :y (+ y2 10 (* (sdl:char-height sdl:*default-font*) str-per-page))
                                                                                     :w (- *window-width* x2 20)
                                                                                     :h (- *window-height* 40 (+ 10 10 (* (sdl:char-height sdl:*default-font*) str-per-page)))))
-                                             (write-text (descr (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
+                                             (write-text (description (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
                                                          rect))))))
       
       ;; draw header

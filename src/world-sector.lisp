@@ -60,7 +60,7 @@
    (mission :initform nil :initarg :mission :accessor mission)
    ))
 
-(defun descr (sector &key (reveal-lair nil))
+(defun description (sector &key (reveal-lair nil))
   (let ((feats-list (copy-list (feats sector)))
         (feats-str (create-string))
         (feats-str-comma nil)

@@ -55,6 +55,14 @@
 (defconstant +game-event-campaign-military-win+ 49)
 (defconstant +game-event-campaign-angel-win+ 50)
 
+(defconstant +game-event-eliminate-satanists-win-for-angels+ 51)
+(defconstant +game-event-eliminate-satanists-win-for-demons+ 52)
+(defconstant +game-event-eliminate-satanists-win-for-military+ 53)
+(defconstant +game-event-eliminate-satanists-win-for-church+ 54)
+(defconstant +game-event-eliminate-satanists-win-for-satanists+ 55)
+
+(defconstant +game-event-campaign-satanists-move+ 56)
+
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won
                                  :game-over-angels-won

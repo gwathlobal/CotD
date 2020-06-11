@@ -28,7 +28,8 @@
                                     :mission-type-military-raid
                                     :mission-type-military-conquest
                                     :mission-type-celestial-purge
-                                    :mission-type-celestial-retrieval))
+                                    :mission-type-celestial-retrieval
+                                    :mission-type-eliminate-satanists))
 
 (defenum:defenum mission-faction-presence-enum (:mission-faction-absent
                                                 :mission-faction-present

@@ -464,4 +464,9 @@
                                                           (push #'place-demonic-runes-on-level
                                                                 func-list)
                                                           func-list))
+                    :always-present-func #'(lambda (world-sector mission world-time)
+                                             (declare (ignore world-sector world-time))
+                                             (if (eq (mission-type-id mission) :mission-type-eliminate-satanists)
+                                               t
+                                               nil))
                     )
