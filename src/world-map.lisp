@@ -538,3 +538,142 @@
     (add-message (format nil " The ") sdl:*white* message-box-list)
     (add-message (format nil "satanist lair") sdl:*yellow* message-box-list)
     (add-message (format nil " has been destroyed.") sdl:*white* message-box-list)))
+
+(defun move-relic-to-corrupted-district (world-map x y)
+  (when (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
+    (return-from move-relic-to-corrupted-district nil))
+  
+  (let ((corrupted-sector (loop with corrupted-district-list = ()
+                                for dx from 0 below (array-dimension (cells world-map) 0) do
+                                  (loop for dy from 0 below (array-dimension (cells world-map) 1) do
+                                    (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
+                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)
+                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
+                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-island)
+                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port))
+                                               (not (and (= x dx) (= y dy)))
+                                               (not (find +lm-item-holy-relic+ (items (aref (cells world-map) dx dy)))))
+                                      (push (aref (cells world-map) dx dy) corrupted-district-list)))
+                                finally (when corrupted-district-list
+                                          (return (nth (random (length corrupted-district-list)) corrupted-district-list)))))
+        (message-box-list `(,(world/sitrep-message-box *world*))))
+    (when corrupted-sector
+      (setf (items (aref (cells world-map) x y)) (remove +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
+      (push +lm-item-holy-relic+ (items corrupted-sector))
+
+      (add-message (format nil " The ") sdl:*white* message-box-list)
+      (add-message (format nil "relic") sdl:*yellow* message-box-list)
+      (add-message (format nil " was taken and moved to ") sdl:*white* message-box-list)
+      (add-message (format nil "~(~A~)" (name corrupted-sector)) sdl:*yellow* message-box-list)
+      (add-message (format nil ".") sdl:*white* message-box-list))))
+
+(defun move-relic-to-church (world-map x y)
+  (when (or (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
+            (and (find +lm-item-holy-relic+ (items (aref (cells world-map) x y)))
+                 (find +lm-feat-church+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+                 (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
+                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)
+                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
+                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
+                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port))))
+    (return-from move-relic-to-church nil))
+  
+  (let ((church-sector (loop with church-sector-list = ()
+                             for dx from 0 below (array-dimension (cells world-map) 0) do
+                               (loop for dy from 0 below (array-dimension (cells world-map) 1) do
+                                 (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
+                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-lake)
+                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-residential)
+                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-island)
+                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-port))
+                                            (not (and (= x dx) (= y dy)))
+                                            (find +lm-feat-church+ (feats (aref (cells world-map) dx dy)) :key #'(lambda (a) (first a)))
+                                            (not (find +lm-item-holy-relic+ (items (aref (cells world-map) dx dy)))))
+                                   (push (aref (cells world-map) dx dy) church-sector-list)))
+                             finally (when church-sector-list
+                                       (return (nth (random (length church-sector-list)) church-sector-list)))))
+        (message-box-list `(,(world/sitrep-message-box *world*))))
+    (when church-sector
+      (setf (items (aref (cells world-map) x y)) (remove +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
+      (push +lm-item-holy-relic+ (items church-sector))
+
+      (add-message (format nil " The ") sdl:*white* message-box-list)
+      (add-message (format nil "relic") sdl:*yellow* message-box-list)
+      (add-message (format nil " was moved back into the church in ") sdl:*white* message-box-list)
+      (add-message (format nil "~(~A~)" (name church-sector)) sdl:*yellow* message-box-list)
+      (add-message (format nil ".") sdl:*white* message-box-list))))
+
+(defun move-military-to-free-sector (world-map x y)
+  (when (not (eq (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-military+))
+    (return-from move-military-to-free-sector nil))
+
+  (let ((free-sector (let ((free-sector-list ()))
+                       (check-surroundings x y nil #'(lambda (dx dy)
+                                                       (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-lake)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-residential)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-island)
+                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-port))
+                                                                  (not (and (= x dx) (= y dy)))
+                                                                  (eq (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-none+))
+                                                         (push (aref (cells world-map) dx dy) free-sector-list))))
+                       (if free-sector-list
+                         (nth (random (length free-sector-list)) free-sector-list)
+                         nil)))
+        (message-box-list `(,(world/sitrep-message-box *world*))))
+
+    (if free-sector
+      (progn
+        (setf (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-none+)
+        (setf (controlled-by free-sector) +lm-controlled-by-military+)
+        
+        (add-message (format nil " The ") sdl:*white* message-box-list)
+        (add-message (format nil "military") sdl:*yellow* message-box-list)
+        (add-message (format nil " were pushed away into ") sdl:*white* message-box-list)
+        (add-message (format nil "~(~A~)" (name free-sector)) sdl:*yellow* message-box-list)
+        (add-message (format nil ".") sdl:*white* message-box-list))
+      (progn
+        (setf (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-none+)
+        
+        (add-message (format nil " The ") sdl:*white* message-box-list)
+        (add-message (format nil "military army") sdl:*yellow* message-box-list)
+        (add-message (format nil " was ") sdl:*white* message-box-list)
+        (add-message (format nil "slaughtered") sdl:*yellow* message-box-list)
+        (add-message (format nil ".") sdl:*white* message-box-list)))))
+
+(defun move-demons-to-free-sector (world-map x y)
+  (when (not (eq (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-demons+))
+    (return-from move-demons-to-free-sector nil))
+  
+  (let ((corrupted-sector (let ((corrupted-sector-list ()))
+                            (check-surroundings x y nil #'(lambda (dx dy)
+                                                            (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-island)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port))
+                                                                       (not (and (= x dx) (= y dy)))
+                                                                       (eq (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-none+))
+                                                              (push (aref (cells world-map) dx dy) corrupted-sector-list))))
+                            (if corrupted-sector-list
+                              (nth (random (length corrupted-sector-list)) corrupted-sector-list)
+                              nil)))
+        (message-box-list `(,(world/sitrep-message-box *world*))))
+    (if corrupted-sector
+      (progn
+        (setf (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-none+)
+        (setf (controlled-by corrupted-sector) +lm-controlled-by-demons+)
+        
+        (add-message (format nil " The ") sdl:*white* message-box-list)
+        (add-message (format nil "demons") sdl:*yellow* message-box-list)
+        (add-message (format nil " were pushed away into ") sdl:*white* message-box-list)
+        (add-message (format nil "~(~A~)" (name corrupted-sector)) sdl:*yellow* message-box-list)
+        (add-message (format nil ".") sdl:*white* message-box-list))
+      (progn
+        (setf (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-none+)
+                
+        (add-message (format nil " The ") sdl:*white* message-box-list)
+        (add-message (format nil "demon army") sdl:*yellow* message-box-list)
+        (add-message (format nil " was ") sdl:*white* message-box-list)
+        (add-message (format nil "slaughtered") sdl:*yellow* message-box-list)
+        (add-message (format nil ".") sdl:*white* message-box-list)))))

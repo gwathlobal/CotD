@@ -52,6 +52,25 @@
                                                                (push lair (feats world-sector))))
                                                            )))
 
+(set-game-event (make-instance 'game-event :id +game-event-campaign-flesh-gathered+
+                                           :descr-func #'(lambda ()
+                                                           (format nil "Each day, gather the flesh from missions."))
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (getf (world/post-mission-results world) :flesh-points)
+                                                                  (> (getf (world/post-mission-results world) :flesh-points) 0))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (let ((flesh-points (getf (world/post-mission-results world) :flesh-points)))
+                                                             (add-message (format nil "Demons managed to gather ") sdl:*white* `(,(world/sitrep-message-box world)))
+                                                             (add-message (format nil "~A flesh ~A" flesh-points (if (= flesh-points 1) "point" "points")) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
+                                                             (add-message (format nil " recently.~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
+                                                             
+                                                             (incf (world/flesh-points *world*) flesh-points)
+                                                           
+                                                           ))))
+
 
 
 

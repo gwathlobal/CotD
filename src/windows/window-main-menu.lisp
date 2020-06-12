@@ -71,6 +71,7 @@
                                        (push +game-event-campaign-demon-win+ (game-events *world*))
                                        (push +game-event-campaign-military-win+ (game-events *world*))
                                        (push +game-event-campaign-angel-win+ (game-events *world*))
+                                       (push +game-event-campaign-flesh-gathered+ (game-events *world*))
                                        (push +game-event-campaign-satanists-move+ (game-events *world*))
                                                                               
                                        (multiple-value-bind (campaign-items campaign-funcs campaign-descrs) (new-campaign-menu-items)

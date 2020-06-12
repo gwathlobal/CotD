@@ -485,7 +485,11 @@
                                           do
                                              (push mission result))
                                   finally (return result)))
-          (prev-world-sector-type nil))
+          )
+
+      ;; clear results
+      (setf (world/post-mission-results *world*) ())
+      
       ;; clear the situation report
       (clear-message-list (world/sitrep-message-box *world*))
 
@@ -498,7 +502,6 @@
       
       ;; process missions 
       (loop with mission-result = nil
-            with flesh-points = 0
             for mission in present-missions
             for world-sector = (aref (cells (world-map *world*)) (x mission) (y mission))
             do
@@ -565,8 +568,6 @@
                (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
                (add-message (format nil ".") sdl:*white* `(,(world/sitrep-message-box *world*)))
                
-               (setf prev-world-sector-type (wtype world-sector))
-               
                (loop with campaign-mission-result = (find (getf mission-result :mission-result) (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission)))
                                                           :key #'(lambda (a) (first a)))
                      for transform-sector-func in (second campaign-mission-result) do
@@ -575,17 +576,13 @@
                (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
                
                ;; sum all flesh points
+               (unless (getf (world/post-mission-results *world*) :flesh-points)
+                 (setf (getf (world/post-mission-results *world*) :flesh-points) 0))
                (when (getf mission-result :flesh-points)
-                 (incf flesh-points (getf mission-result :flesh-points)))
-
-            finally
-               (when (> flesh-points 0)
-                 (add-message (format nil "~%Demons managed to gather ") sdl:*white* `(,(world/sitrep-message-box *world*)))
-                 (add-message (format nil "~A flesh ~A" flesh-points (if (= flesh-points 1) "point" "points")) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-                 (add-message (format nil " recently.~%") sdl:*white* `(,(world/sitrep-message-box *world*))))
-
-               (incf (world/flesh-points *world*) flesh-points)
+                 (incf (getf (world/post-mission-results *world*) :flesh-points) (getf mission-result :flesh-points)))
             )
+
+      (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
 
       ;; go through all game events
       (loop for game-event-id in (game-events *world*)

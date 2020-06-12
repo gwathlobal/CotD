@@ -150,11 +150,11 @@
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )
                   :campaign-result (list (list :game-over-angels-won nil)
-                                         (list :game-over-demons-won (list #'transform-residential-sector-to-abandoned))
+                                         (list :game-over-demons-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector))
                                          (list :game-over-military-won nil)
                                          (list :game-over-church-won nil)
-                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-abandoned))
-                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
+                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector)))
                   )
 
 (set-mission-type :id :mission-type-demonic-raid
@@ -274,11 +274,11 @@
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )
                   :campaign-result (list (list :game-over-angels-won nil)
-                                         (list :game-over-demons-won (list #'transform-residential-sector-to-abandoned))
+                                         (list :game-over-demons-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector))
                                          (list :game-over-military-won nil)
                                          (list :game-over-church-won nil)
-                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-abandoned))
-                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
+                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector)))
                   )
 
 (set-mission-type :id :mission-type-demonic-conquest
@@ -407,16 +407,20 @@
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )
                   :campaign-result (list (list :game-over-angels-won nil)
-                                         (list :game-over-demons-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted))
+                                         (list :game-over-demons-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted #'move-relic-to-corrupted-district #'move-military-to-free-sector))
                                          (list :game-over-military-won nil)
                                          (list :game-over-church-won nil)
-                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted))
-                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
+                                         (list :game-over-satanists-won (list #'transform-residential-sector-to-corrupted #'transform-abandoned-sector-to-corrupted #'move-relic-to-corrupted-district #'move-military-to-free-sector))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector)))
                   )
 
 (set-mission-type :id :mission-type-demonic-thievery
                   :name "Demonic thievery"
                   :is-available-func #'(lambda (world-map x y)
+                                         ;; mission available only if
+                                         ;; - there is a corrupted district on the map
+                                         ;; - this sector has a church and a relic in it
+                                         ;; - the sector is not corrupted
                                          (if (and (loop with corrupted-district-present = nil
                                                         for dx from 0 below (array-dimension (cells world-map) 0) do
                                                           (loop for dy from 0 below (array-dimension (cells world-map) 1) do
@@ -428,17 +432,12 @@
                                                               (setf corrupted-district-present t)))
                                                         finally (return corrupted-district-present))
                                                   (find +lm-feat-church+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
-                                                  (find +item-type-church-reliс+ (items (aref (cells world-map) x y)))
-                                                  (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake)))
+                                                  (find +lm-item-holy-relic+ (items (aref (cells world-map) x y)))
+                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest))
+                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake))
+                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential))
+                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island))
+                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -551,6 +550,12 @@
                                             (list +faction-type-criminals+ +game-event-win-for-thief+)
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )
+                  :campaign-result (list (list :game-over-angels-won nil)
+                                         (list :game-over-demons-won (list #'move-relic-to-corrupted-district))
+                                         (list :game-over-military-won nil)
+                                         (list :game-over-church-won nil)
+                                         (list :game-over-satanists-won (list #'move-relic-to-corrupted-district))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
                   )
 
 (set-mission-type :id :mission-type-military-conquest
@@ -667,12 +672,12 @@
                                             (list +faction-type-satanists+ +game-event-military-conquest-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             )
-                  :campaign-result (list (list :game-over-angels-won (list #'transform-corrupted-sector-to-residential))
+                  :campaign-result (list (list :game-over-angels-won (list #'transform-corrupted-sector-to-residential #'move-relic-to-church #'move-demons-to-free-sector))
                                          (list :game-over-demons-won nil)
-                                         (list :game-over-military-won (list #'transform-corrupted-sector-to-residential))
-                                         (list :game-over-church-won (list #'transform-corrupted-sector-to-residential))
+                                         (list :game-over-military-won (list #'transform-corrupted-sector-to-residential #'move-relic-to-church #'move-demons-to-free-sector))
+                                         (list :game-over-church-won (list #'transform-corrupted-sector-to-residential #'move-relic-to-church #'move-demons-to-free-sector))
                                          (list :game-over-satanists-won nil)
-                                         (list :game-over-eater-won nil))
+                                         (list :game-over-eater-won (list #'move-demons-to-free-sector)))
                   )
 
 (set-mission-type :id :mission-type-military-raid
@@ -789,10 +794,10 @@
                                             (list +faction-type-satanists+ +game-event-military-raid-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             )
-                  :campaign-result (list (list :game-over-angels-won (list #'transform-abandoned-sector-to-residential))
+                  :campaign-result (list (list :game-over-angels-won (list #'transform-abandoned-sector-to-residential #'move-demons-to-free-sector))
                                          (list :game-over-demons-won nil)
-                                         (list :game-over-military-won (list #'transform-abandoned-sector-to-residential))
-                                         (list :game-over-church-won (list #'transform-abandoned-sector-to-residential))
+                                         (list :game-over-military-won (list #'transform-abandoned-sector-to-residential #'move-demons-to-free-sector))
+                                         (list :game-over-church-won (list #'transform-abandoned-sector-to-residential #'move-demons-to-free-sector))
                                          (list :game-over-satanists-won nil)
                                          (list :game-over-eater-won nil))
                   )
@@ -903,19 +908,18 @@
                                             (list +faction-type-satanists+ +game-event-military-conquest-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             )
-                  :campaign-result (list (list :game-over-angels-won (list #'transform-corrupted-sector-to-abandoned))
+                  :campaign-result (list (list :game-over-angels-won (list #'transform-corrupted-sector-to-abandoned #'move-demons-to-free-sector))
                                          (list :game-over-demons-won nil)
-                                         (list :game-over-military-won (list #'transform-corrupted-sector-to-abandoned))
-                                         (list :game-over-church-won (list #'transform-corrupted-sector-to-abandoned))
+                                         (list :game-over-military-won (list #'transform-corrupted-sector-to-abandoned #'move-demons-to-free-sector))
+                                         (list :game-over-church-won (list #'transform-corrupted-sector-to-abandoned #'move-demons-to-free-sector))
                                          (list :game-over-satanists-won nil)
-                                         (list :game-over-eater-won nil))
+                                         (list :game-over-eater-won (list #'move-demons-to-free-sector)))
                   )
 
 (set-mission-type :id :mission-type-celestial-retrieval
                   :name "Celestial retrieval"
                   :is-available-func #'(lambda (world-map x y)
-                                         (if (and (not (find +lm-feat-church+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a))))
-                                                  (find +item-type-church-reliс+ (items (aref (cells world-map) x y)))
+                                         (if (and (find +lm-item-holy-relic+ (items (aref (cells world-map) x y)))
                                                   (or (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest)
                                                       (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)
                                                       (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island)
@@ -925,7 +929,18 @@
                                                       (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
                                                       (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
                                                       (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake)))
+                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake))
+                                                  (loop with free-church-present = nil
+                                                        for dx from 0 below (array-dimension (cells world-map) 0) do
+                                                          (loop for dy from 0 below (array-dimension (cells world-map) 1) do
+                                                            (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-lake)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-residential)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-island)
+                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-port))
+                                                                       (find +lm-feat-church+ (feats (aref (cells world-map) dx dy)) :key #'(lambda (a) (first a))))
+                                                              (setf free-church-present t)))
+                                                        finally (return free-church-present)))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -1029,6 +1044,12 @@
                                             (list +faction-type-satanists+ +game-event-angelic-steal-win-for-satanists+)
                                             (list +faction-type-eater+ +game-event-win-for-eater+)
                                             )
+                  :campaign-result (list (list :game-over-angels-won (list #'move-relic-to-church))
+                                         (list :game-over-demons-won nil)
+                                         (list :game-over-military-won (list #'move-relic-to-church))
+                                         (list :game-over-church-won (list #'move-relic-to-church))
+                                         (list :game-over-satanists-won nil)
+                                         (list :game-over-eater-won nil))
                   )
 
 (set-mission-type :id :mission-type-eliminate-satanists
