@@ -410,10 +410,7 @@
 
     ;; if available mission-types are not supplied, take all of them
     (when (not avail-mission-type-list)
-      (setf avail-mission-type-list (get-all-mission-types-list))
-      (setf avail-mission-type-list (list (get-mission-type-by-id :mission-type-demonic-attack)
-                                          (get-mission-type-by-id :mission-type-demonic-raid)
-                                          (get-mission-type-by-id :mission-type-military-conquest))))
+      (setf avail-mission-type-list (get-all-mission-types-list)))
     
     ;; if available sector types are not supplied, find all possible sectors in game
     (when (not avail-world-sector-type-list)

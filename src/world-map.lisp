@@ -609,7 +609,8 @@
 
   (let ((free-sector (let ((free-sector-list ()))
                        (check-surroundings x y nil #'(lambda (dx dy)
-                                                       (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
+                                                       (when (and (>= dx 0) (>= dy 0) (< dx (array-dimension (cells world-map) 0)) (< dy (array-dimension (cells world-map) 1))
+                                                                  (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
                                                                       (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-lake)
                                                                       (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-residential)
                                                                       (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-island)
@@ -647,7 +648,8 @@
   
   (let ((corrupted-sector (let ((corrupted-sector-list ()))
                             (check-surroundings x y nil #'(lambda (dx dy)
-                                                            (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
+                                                            (when (and (>= dx 0) (>= dy 0) (< dx (array-dimension (cells world-map) 0)) (< dy (array-dimension (cells world-map) 1))
+                                                                       (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
                                                                            (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)
                                                                            (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
                                                                            (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-island)
@@ -677,3 +679,13 @@
         (add-message (format nil " was ") sdl:*white* message-box-list)
         (add-message (format nil "slaughtered") sdl:*yellow* message-box-list)
         (add-message (format nil ".") sdl:*white* message-box-list)))))
+
+(defun calc-all-military-on-world-map (world-map)
+  (let ((military-sum 0)
+        (military-sectors ()))
+    (loop for x from 0 below (array-dimension (cells world-map) 0) do
+      (loop for y from 0 below (array-dimension (cells world-map) 1) do
+        (when (eq (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-military+)
+          (push (aref (cells world-map) x y) military-sectors)
+          (incf military-sum))))
+    (values military-sum military-sectors)))

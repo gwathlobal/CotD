@@ -492,6 +492,7 @@
    (flesh-points :initform 0 :accessor world/flesh-points :type fixnum)
    (machine-destroyed :initform 0 :accessor world/machine-destroyed :type fixnum)
    (military-alarm :initform 0 :accessor world/military-alarm :type fixnum)
+   (cur-military-num :initform 0 :accessor world/cur-military-num :type fixnum)
 
    (post-mission-results :initform () :accessor world/post-mission-results :type list)
    ))

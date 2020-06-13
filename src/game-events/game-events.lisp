@@ -63,6 +63,7 @@
 
 (defconstant +game-event-campaign-satanists-move+ 56)
 (defconstant +game-event-campaign-flesh-gathered+ 57)
+(defconstant +game-event-campaign-move-military+ 58)
 
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won
