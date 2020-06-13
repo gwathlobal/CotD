@@ -4,7 +4,7 @@
   ((id :initform :mission-type-none :initarg :id :accessor id :type mission-type-enum)
    (name :initform "Mission type name" :initarg :name :accessor name)
    (enabled :initform t :initarg :enabled :accessor enabled)
-   (is-available-func :initform #'(lambda (world-map x y) (declare (ignore world-map x y)) nil) :initarg :is-available-func :accessor is-available-func)
+   (is-available-func :initform #'(lambda (world-sector world) (declare (ignore world-sector world)) nil) :initarg :is-available-func :accessor is-available-func)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector-type-id and returns a list of faction-ids
    (world-sector-for-custom-scenario :initform () :initarg :world-sector-for-custom-scenario :accessor world-sector-for-custom-scenario) ;; the list of world-sectors available for this mission, specifically for custom scenario
    (always-lvl-mods-func :initform nil :initarg :always-lvl-mods-func :accessor always-lvl-mods-func)

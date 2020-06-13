@@ -131,7 +131,8 @@
                                                   ;; is not available for islands
                                                   (if (or (eq world-sector-type-id :world-sector-normal-island)
                                                           (eq world-sector-type-id :world-sector-abandoned-island)
-                                                          (eq world-sector-type-id :world-sector-corrupted-island))
+                                                          (eq world-sector-type-id :world-sector-corrupted-island)
+                                                          (eq world-sector-type-id :world-sector-hell-plain))
                                                     nil
                                                     t))
                     :scenario-disabled-func #'(lambda (world-map x y)
@@ -364,7 +365,13 @@
                                                        until (level-city-can-place-build-on-grid selected-library-type x y 2 template-level)
                                                        finally
                                                           (level-city-reserve-build-on-grid selected-library-type x y 2 template-level))
-                                                 ))
+                                                 )
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for hell districts
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                    nil
+                                                    t)))
 
 (set-level-modifier :id +lm-feat-church+ :type +level-mod-sector-feat+
                     :name "Church"
@@ -428,13 +435,14 @@
                      :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore world-time))
                                                   ;; is not available for celestial retrieval
-                                                   (if (or (not (eq mission-type-id :mission-type-celestial-retrieval))
-                                                           (and (eq mission-type-id :mission-type-celestial-retrieval)
-                                                                (or (eq world-sector-type-id :world-sector-abandoned-forest)
-                                                                    (eq world-sector-type-id :world-sector-abandoned-port)
-                                                                    (eq world-sector-type-id :world-sector-abandoned-residential)
-                                                                    (eq world-sector-type-id :world-sector-abandoned-lake)
-                                                                    (eq world-sector-type-id :world-sector-abandoned-island))))
+                                                   (if (and (or (not (eq mission-type-id :mission-type-celestial-retrieval))
+                                                                (and (eq mission-type-id :mission-type-celestial-retrieval)
+                                                                     (or (eq world-sector-type-id :world-sector-abandoned-forest)
+                                                                         (eq world-sector-type-id :world-sector-abandoned-port)
+                                                                         (eq world-sector-type-id :world-sector-abandoned-residential)
+                                                                         (eq world-sector-type-id :world-sector-abandoned-lake)
+                                                                         (eq world-sector-type-id :world-sector-abandoned-island))))
+                                                            (not (eq world-sector-type-id :world-sector-hell-plain)))
                                                      t
                                                      nil))
                     )
@@ -464,6 +472,12 @@
                                                           (push #'place-demonic-runes-on-level
                                                                 func-list)
                                                           func-list))
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for hell districts
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                    nil
+                                                    t))
                     :always-present-func #'(lambda (world-sector mission world-time)
                                              (declare (ignore world-sector world-time))
                                              (if (eq (mission-type-id mission) :mission-type-eliminate-satanists)

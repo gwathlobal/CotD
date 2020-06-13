@@ -486,6 +486,7 @@
 
    (world-map :initform nil :accessor world-map)
    (player-specific-faction :initform nil :accessor world/player-specific-faction)
+   (present-missions :initform () :accessor world/present-missions)
 
    (sitrep-message-box :initform (make-message-box) :accessor world/sitrep-message-box :type message-box)
 

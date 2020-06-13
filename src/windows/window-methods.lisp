@@ -716,9 +716,11 @@
                                               (setf (aref displayed-cells 3 3) (list +glyph-id-book+ sdl:*magenta* sdl:*black*)))
                                              (t (setf (aref displayed-cells 3 3) (list +glyph-id-exclamation-mark+ sdl:*yellow* sdl:*black*))))))
 
-     ;; display available mission
+    ;; display available mission
     (when (mission world-sector)
-      (setf (aref displayed-cells 3 1) (list +glyph-id-crossed-swords+ sdl:*yellow* sdl:*black*)))
+      (if (eq world-sector (world-sector (mission world-sector)))
+        (setf (aref displayed-cells 3 1) (list +glyph-id-crossed-swords+ sdl:*yellow* sdl:*black*))
+        (setf (aref displayed-cells 3 1) (list +glyph-id-portal+ sdl:*yellow* sdl:*black*))))
     
     (loop for dy from 0 below max-disp-h do
       (loop for dx from 0 below max-disp-w do

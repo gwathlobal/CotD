@@ -477,14 +477,7 @@
 
 (defun process-post-scenario ()
   (with-slots (level world-map) *world*
-    (let ((present-missions (loop with result = ()
-                                for x from 0 below *max-x-world-map* do
-                                  (loop for y from 0 below *max-y-world-map*
-                                        for mission = (mission (aref (cells world-map) x y))
-                                        when mission
-                                          do
-                                             (push mission result))
-                                  finally (return result)))
+    (let ((present-missions (world/present-missions *world*))
           )
 
       ;; clear results
@@ -593,7 +586,7 @@
                  (funcall (on-trigger game-event) *world*))
       
       ;; reset all missions and regenerate them
-      (reset-all-missions-on-world-map world-map)
+      (reset-all-missions-on-world-map *world*)
 
       (loop for x from 0 below (array-dimension (cells (world-map *world*)) 0) do
         (loop for y from 0 below (array-dimension (cells (world-map *world*)) 1) do

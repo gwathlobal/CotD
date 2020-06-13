@@ -31,19 +31,21 @@
 
 (set-mission-type :id :mission-type-demonic-attack
                   :name "Demonic attack"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (let ((near-demons nil))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (let ((near-demons nil)
+                                               (x (x world-sector))
+                                               (y (y world-sector)))
                                            (check-surroundings x y nil #'(lambda (dx dy)
                                                                            (when (and (>= dx 0) (>= dy 0)
-                                                                                      (< dx (array-dimension (cells world-map) 0))
-                                                                                      (< dy (array-dimension (cells world-map) 1))
-                                                                                      (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-demons+))
+                                                                                      (< dx (array-dimension (cells (world-map world)) 0))
+                                                                                      (< dy (array-dimension (cells (world-map world)) 1))
+                                                                                      (= (controlled-by (aref (cells (world-map world)) dx dy)) +lm-controlled-by-demons+))
                                                                              (setf near-demons t))))
                                            (if (and near-demons
-                                                    (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)))
+                                                    (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                        (eq (wtype world-sector) :world-sector-normal-port)
+                                                        (eq (wtype world-sector) :world-sector-normal-residential)
+                                                        (eq (wtype world-sector) :world-sector-normal-lake)))
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
@@ -155,12 +157,13 @@
 
 (set-mission-type :id :mission-type-demonic-raid
                   :name "Demonic raid"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (if (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (declare (ignore world))
+                                         (if (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                 (eq (wtype world-sector) :world-sector-normal-port)
+                                                 (eq (wtype world-sector) :world-sector-normal-island)
+                                                 (eq (wtype world-sector) :world-sector-normal-residential)
+                                                 (eq (wtype world-sector) :world-sector-normal-lake))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -279,17 +282,18 @@
 
 (set-mission-type :id :mission-type-demonic-conquest
                   :name "Demonic conquest"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (if (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (declare (ignore world))
+                                         (if (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                 (eq (wtype world-sector) :world-sector-normal-port)
+                                                 (eq (wtype world-sector) :world-sector-normal-island)
+                                                 (eq (wtype world-sector) :world-sector-normal-residential)
+                                                 (eq (wtype world-sector) :world-sector-normal-lake)
+                                                 (eq (wtype world-sector) :world-sector-abandoned-forest)
+                                                 (eq (wtype world-sector) :world-sector-abandoned-port)
+                                                 (eq (wtype world-sector) :world-sector-abandoned-island)
+                                                 (eq (wtype world-sector) :world-sector-abandoned-residential)
+                                                 (eq (wtype world-sector) :world-sector-abandoned-lake))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -412,30 +416,32 @@
 
 (set-mission-type :id :mission-type-demonic-thievery
                   :name "Demonic thievery"
-                  :is-available-func #'(lambda (world-map x y)
+                  :is-available-func #'(lambda (world-sector world)
                                          ;; mission available only if
                                          ;; - there is a corrupted district on the map
                                          ;; - this sector has a church and a relic in it
                                          ;; - the sector is not corrupted
-                                         (if (and (loop with corrupted-district-present = nil
-                                                        for dx from 0 below (array-dimension (cells world-map) 0) do
-                                                          (loop for dy from 0 below (array-dimension (cells world-map) 1) do
-                                                            (when (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-island)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port))
-                                                              (setf corrupted-district-present t)))
-                                                        finally (return corrupted-district-present))
-                                                  (find +lm-feat-church+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
-                                                  (find +lm-item-holy-relic+ (items (aref (cells world-map) x y)))
-                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest))
-                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake))
-                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential))
-                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island))
-                                                  (not (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)))
-                                           t
-                                           nil))
+                                         (let ((x (x world-sector))
+                                               (y (y world-sector)))
+                                           (if (and (loop with corrupted-district-present = nil
+                                                          for dx from 0 below (array-dimension (cells (world-map world)) 0) do
+                                                            (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
+                                                              (when (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-forest)
+                                                                        (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-lake)
+                                                                        (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-residential)
+                                                                        (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-island)
+                                                                        (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-port))
+                                                                (setf corrupted-district-present t)))
+                                                          finally (return corrupted-district-present))
+                                                    (find +lm-feat-church+ (feats (aref (cells (world-map world)) x y)) :key #'(lambda (a) (first a)))
+                                                    (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) x y)))
+                                                    (not (eq (wtype world-sector) :world-sector-corrupted-forest))
+                                                    (not (eq (wtype world-sector) :world-sector-corrupted-lake))
+                                                    (not (eq (wtype world-sector) :world-sector-corrupted-residential))
+                                                    (not (eq (wtype world-sector) :world-sector-corrupted-island))
+                                                    (not (eq (wtype world-sector) :world-sector-corrupted-port)))
+                                             t
+                                             nil)))
                   :faction-list-func #'(lambda (world-sector)
                                          (let ((faction-list (list (list +faction-type-demons+ :mission-faction-present)
                                                                    (list +faction-type-angels+ :mission-faction-present)
@@ -556,20 +562,22 @@
 
 (set-mission-type :id :mission-type-military-conquest
                   :name "Military conquest"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (let ((near-military nil))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (let ((near-military nil)
+                                               (x (x world-sector))
+                                               (y (y world-sector)))
                                            (check-surroundings x y nil #'(lambda (dx dy)
                                                                            (when (and (>= dx 0) (>= dy 0)
-                                                                                      (< dx (array-dimension (cells world-map) 0))
-                                                                                      (< dy (array-dimension (cells world-map) 1))
-                                                                                      (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-military+))
+                                                                                      (< dx (array-dimension (cells (world-map world)) 0))
+                                                                                      (< dy (array-dimension (cells (world-map world)) 1))
+                                                                                      (= (controlled-by (aref (cells (world-map world)) dx dy)) +lm-controlled-by-military+))
                                                                              (setf near-military t))))
                                            (if (and near-military
-                                                    (or (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake)))
+                                                    (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                                        (eq (wtype world-sector) :world-sector-corrupted-port)
+                                                        (eq (wtype world-sector) :world-sector-corrupted-island)
+                                                        (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                                        (eq (wtype world-sector) :world-sector-corrupted-lake)))
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
@@ -678,20 +686,22 @@
 
 (set-mission-type :id :mission-type-military-raid
                   :name "Military raid"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (let ((near-military nil))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (let ((near-military nil)
+                                               (x (x world-sector))
+                                               (y (y world-sector)))
                                            (check-surroundings x y nil #'(lambda (dx dy)
                                                                            (when (and (>= dx 0) (>= dy 0)
-                                                                                      (< dx (array-dimension (cells world-map) 0))
-                                                                                      (< dy (array-dimension (cells world-map) 1))
-                                                                                      (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-military+))
+                                                                                      (< dx (array-dimension (cells (world-map world)) 0))
+                                                                                      (< dy (array-dimension (cells (world-map world)) 1))
+                                                                                      (= (controlled-by (aref (cells (world-map world)) dx dy)) +lm-controlled-by-military+))
                                                                              (setf near-military t))))
                                            (if (and near-military
-                                                    (or (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
-                                                        (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake)))
+                                                    (or (eq (wtype world-sector) :world-sector-abandoned-forest)
+                                                        (eq (wtype world-sector) :world-sector-abandoned-port)
+                                                        (eq (wtype world-sector) :world-sector-abandoned-island)
+                                                        (eq (wtype world-sector) :world-sector-abandoned-residential)
+                                                        (eq (wtype world-sector) :world-sector-abandoned-lake)))
                                              t
                                              nil)))
                   :faction-list-func #'(lambda (world-sector)
@@ -800,12 +810,13 @@
 
 (set-mission-type :id :mission-type-celestial-purge
                   :name "Celestial purge"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (if (or (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential)
-                                                 (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (declare (ignore world))
+                                         (if (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                                 (eq (wtype world-sector) :world-sector-corrupted-port)
+                                                 (eq (wtype world-sector) :world-sector-corrupted-island)
+                                                 (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                                 (eq (wtype world-sector) :world-sector-corrupted-lake))
                                            t
                                            nil))
                   :faction-list-func #'(lambda (world-sector)
@@ -914,27 +925,27 @@
 
 (set-mission-type :id :mission-type-celestial-retrieval
                   :name "Celestial retrieval"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (if (and (find +lm-item-holy-relic+ (items (aref (cells world-map) x y)))
-                                                  (or (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-forest)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-port)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-island)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-residential)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-corrupted-lake)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-forest)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-port)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-island)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-residential)
-                                                      (eq (wtype (aref (cells world-map) x y)) :world-sector-abandoned-lake))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (if (and (find +lm-item-holy-relic+ (items world-sector))
+                                                  (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                                      (eq (wtype world-sector) :world-sector-corrupted-port)
+                                                      (eq (wtype world-sector) :world-sector-corrupted-island)
+                                                      (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                                      (eq (wtype world-sector) :world-sector-corrupted-lake)
+                                                      (eq (wtype world-sector) :world-sector-abandoned-forest)
+                                                      (eq (wtype world-sector) :world-sector-abandoned-port)
+                                                      (eq (wtype world-sector) :world-sector-abandoned-island)
+                                                      (eq (wtype world-sector) :world-sector-abandoned-residential)
+                                                      (eq (wtype world-sector) :world-sector-abandoned-lake))
                                                   (loop with free-church-present = nil
-                                                        for dx from 0 below (array-dimension (cells world-map) 0) do
-                                                          (loop for dy from 0 below (array-dimension (cells world-map) 1) do
-                                                            (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-lake)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-residential)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-island)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-port))
-                                                                       (find +lm-feat-church+ (feats (aref (cells world-map) dx dy)) :key #'(lambda (a) (first a))))
+                                                        for dx from 0 below (array-dimension (cells (world-map world)) 0) do
+                                                          (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
+                                                            (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-forest)
+                                                                           (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-lake)
+                                                                           (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-residential)
+                                                                           (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-island)
+                                                                           (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-port))
+                                                                       (find +lm-feat-church+ (feats (aref (cells (world-map world)) dx dy)) :key #'(lambda (a) (first a))))
                                                               (setf free-church-present t)))
                                                         finally (return free-church-present)))
                                            t
@@ -1050,8 +1061,9 @@
 
 (set-mission-type :id :mission-type-eliminate-satanists
                   :name "Satanist elimination"
-                  :is-available-func #'(lambda (world-map x y)
-                                         (if (find +lm-feat-lair+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
+                  :is-available-func #'(lambda (world-sector world)
+                                         (declare (ignore world))
+                                         (if (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
                                            t
                                            nil)
                                          )
@@ -1173,4 +1185,92 @@
                                          (list :game-over-church-won (list #'remove-satanist-lair-from-map))
                                          (list :game-over-satanists-won nil)
                                          (list :game-over-eater-won (list #'remove-satanist-lair-from-map)))
+                  )
+
+(set-mission-type :id :mission-type-celestial-sabotage
+                  :name "Celestial sabotage"
+                  :is-available-func #'(lambda (world-sector world)
+                                         (declare (ignore world))
+                                         (if (or (eq (wtype world-sector) :world-sector-hell-plain))
+                                           t
+                                           nil))
+                  :faction-list-func #'(lambda (world-sector)
+                                         (let ((faction-list (list (list +faction-type-angels+ :mission-faction-present))))
+                                           (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
+                                             (push (list +faction-type-demons+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
+                                             )
+                                           faction-list))
+                  :world-sector-for-custom-scenario (list :world-sector-hell-plain
+                                                          )
+                  :overall-post-process-func-list #'(lambda ()
+                                                       (let ((func-list ()))
+                                                         
+                                                         ;; add lose condition on death & all other win conditions
+                                                         (push #'add-lose-and-win-coditions-to-level
+                                                               func-list)
+                                                         
+                                                         ;; update visibility for all added mobs
+                                                         (push #'update-visibility-after-creation
+                                                               func-list)
+                                                         
+                                                         ;; remove all starting features
+                                                         (push #'remove-dungeon-gen-functions
+                                                               func-list)
+                                                         
+                                                         ;; set up turns for delayed arrival for all parties
+                                                         (push #'setup-turns-for-delayed-arrival
+                                                               func-list)
+                                                         
+                                                         ;; create delayed points from respective features
+                                                         (push #'place-delayed-arrival-points-on-level
+                                                               func-list)    
+                                                         
+                                                         ;; place angels
+                                                         (push #'place-ai-angels-on-level
+                                                               func-list)
+                                                         
+                                                         ;; place demons
+                                                         (push #'place-ai-demons-on-level
+                                                               func-list)
+                                                         
+                                                         ;; place player
+                                                         (push #'place-player-on-level
+                                                               func-list)
+                                                         
+                                                         func-list))
+                   :scenario-faction-list (list (list +specific-faction-type-player+ +lm-placement-player+)
+                                                (list +specific-faction-type-dead-player+ +lm-placement-dead-player+)
+                                                (list +specific-faction-type-angel-chrome+ +lm-placement-angel-chrome+)
+                                                (list +specific-faction-type-angel-trinity+ +lm-placement-angel-trinity+)
+                                                (list +specific-faction-type-demon-crimson+ +lm-placement-demon-crimson+)
+                                                (list +specific-faction-type-demon-shadow+ +lm-placement-demon-shadow+)
+                                                (list +specific-faction-type-demon-malseraph+ +lm-placement-demon-malseraph+)
+                                                (list +specific-faction-type-military-chaplain+ +lm-placement-military-chaplain+)
+                                                (list +specific-faction-type-military-scout+ +lm-placement-military-scout+)
+                                                (list +specific-faction-type-priest+ +lm-placement-priest+)
+                                                (list +specific-faction-type-satanist+ +lm-placement-satanist+)
+                                                (list +specific-faction-type-eater+ +lm-placement-eater+)
+                                                (list +specific-faction-type-skinchanger+ +lm-placement-skinchanger+)
+                                                (list +specific-faction-type-thief+ +lm-placement-thief+)
+                                                (list +specific-faction-type-ghost+ +lm-placement-ghost+)
+                                                )
+                  :ai-package-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-angels+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
+                                         (list +faction-type-military+ (list +ai-package-patrol-district+ +ai-package-find-sigil+))
+                                         (list +faction-type-satanists+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-eater+ (list +ai-package-patrol-district+))
+                                         )
+                  :win-condition-list (list (list +faction-type-demons+ +game-event-military-conquest-win-for-demons+)
+                                            (list +faction-type-angels+ +game-event-military-conquest-win-for-angels+)
+                                            (list +faction-type-military+ +game-event-military-conquest-win-for-military+)
+                                            (list +faction-type-satanists+ +game-event-military-conquest-win-for-satanists+)
+                                            (list +faction-type-eater+ +game-event-win-for-eater+)
+                                            )
+                  :campaign-result (list (list :game-over-angels-won (list #'transform-corrupted-sector-to-abandoned #'move-demons-to-free-sector))
+                                         (list :game-over-demons-won nil)
+                                         (list :game-over-military-won (list #'transform-corrupted-sector-to-abandoned #'move-demons-to-free-sector))
+                                         (list :game-over-church-won (list #'transform-corrupted-sector-to-abandoned #'move-demons-to-free-sector))
+                                         (list :game-over-satanists-won nil)
+                                         (list :game-over-eater-won (list #'move-demons-to-free-sector)))
                   )

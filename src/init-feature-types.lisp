@@ -459,7 +459,7 @@
 (set-feature-type (make-instance 'feature-type :id +feature-demonic-rune-decay+ :glyph-idx 123 :glyph-color sdl:*magenta* :back-color nil :name "Demonic rune Drux"
                                                :trait-demonic-rune +item-type-scroll-demonic-rune-decay+))
 
-(set-feature-type (make-instance 'feature-type :id +feature-demonic-portal+ :glyph-idx 126 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color nil :name "Demonic portal"
+(set-feature-type (make-instance 'feature-type :id +feature-demonic-portal+ :glyph-idx +glyph-id-portal+ :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color nil :name "Demonic portal"
                                  ))
 
 (set-feature-type (make-instance 'feature-type :id +feature-corrupted-spores+ :glyph-idx 98 :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* :name "Spores"

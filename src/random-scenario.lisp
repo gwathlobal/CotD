@@ -124,6 +124,7 @@
                                                     :x 1 :y 1))
     (setf (aref (cells (world-map world)) 1 1) world-sector)
     (setf (mission world-sector) mission)
+    (setf (world-sector mission) world-sector)
     (setf (level-modifier-list mission) ())
     (setf (faction-list mission) ())
     
@@ -213,6 +214,8 @@
     (let ((prev-lvl-mod (find +level-mod-time-of-day+ (level-modifier-list mission)
                               :key #'(lambda (a)
                                        (lm-type (get-level-modifier-by-id a))))))
+      (when prev-lvl-mod
+        (setf prev-lvl-mod (get-level-modifier-by-id prev-lvl-mod)))
       ;; remove previous tod from sector
       (when (and prev-lvl-mod
                  apply-scenario-func

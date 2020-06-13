@@ -213,7 +213,7 @@
                                             (world-sector nil))
                                         (flet ((test-map-func ()
                                                  (setf (world-map *world*) (generate-test-world-map *world*))
-                                                 (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 :mission-type-military-conquest))
+                                                 (setf (mission (aref (cells (world-map *world*)) 1 2)) (generate-mission-on-world-map *world* 1 2 :mission-type-military-conquest :off-map nil))
                                                  (world-map *world*)))
                                           (setf *world* (make-instance 'world))
                                           (setf (world-game-time *world*) (set-current-date-time 1915 3 12 0 0 0))

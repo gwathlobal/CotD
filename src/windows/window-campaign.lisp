@@ -25,14 +25,7 @@
 
 (defmethod campaign-win-calculate-avail-missions ((win campaign-window))
   (with-slots (avail-missions) win
-    (setf avail-missions (loop with result = ()
-                               for x from 0 below *max-x-world-map* do
-                                 (loop for y from 0 below *max-y-world-map*
-                                       for mission = (mission (aref (cells (world-map *world*)) x y))
-                                       when mission
-                                         do
-                                            (push mission result))
-                               finally (return result)))))
+    (setf avail-missions (world/present-missions *world*))))
 
 (defmethod campaign-win-move-select-to-mission ((win campaign-window))
   (with-slots (cur-sector cur-sel avail-missions) win
@@ -296,7 +289,7 @@
                                                                    (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                               (get-general-faction-from-specific (world/player-specific-faction *world*))))
                                                           (return-from run-window (values (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
-                                                                                          (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))))))
+                                                                                          (world-sector (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))))))))
                             )))
                        
                        ;;------------------

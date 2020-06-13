@@ -9,6 +9,7 @@
 (defconstant +glyph-id-wall+ 96)
 (defconstant +glyph-id-sacrificial-circle+ 124)
 (defconstant +glyph-id-book+ 125)
+(defconstant +glyph-id-portal+ 126)
 (defconstant +glyph-id-christ-cross+ 127)
 (defconstant +glyph-id-horizontal-river+ 131)
 (defconstant +glyph-id-vertical-river+ 132)

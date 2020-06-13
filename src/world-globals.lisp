@@ -17,6 +17,7 @@
                                          :world-sector-corrupted-port
                                          :world-sector-corrupted-lake
                                          :world-sector-corrupted-forest
+                                         :world-sector-hell-plain
                                          ))
 
 (defenum:defenum mission-type-enum (:mission-type-none
@@ -29,7 +30,8 @@
                                     :mission-type-military-conquest
                                     :mission-type-celestial-purge
                                     :mission-type-celestial-retrieval
-                                    :mission-type-eliminate-satanists))
+                                    :mission-type-eliminate-satanists
+                                    :mission-type-celestial-sabotage))
 
 (defenum:defenum mission-faction-presence-enum (:mission-faction-absent
                                                 :mission-faction-present

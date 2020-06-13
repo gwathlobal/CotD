@@ -24,6 +24,12 @@
                     :depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)
                                                  (declare (ignore world-sector mission-type-id world-time))
                                                  (list +lm-feat-library+))
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for hell districts
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                    nil
+                                                    t))
                     )
 
 (set-level-modifier :id +lm-item-holy-relic+ :type +level-mod-sector-item+
@@ -72,6 +78,12 @@
                                                               (eq (wtype world-sector) :world-sector-corrupted-forest)))
                                                    (list +lm-feat-church+)
                                                    nil))
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for hell districts
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                    nil
+                                                    t))
                     :always-present-func #'(lambda (world-sector mission world-time)
                                              (declare (ignore world-sector world-time))
                                              (if (or (eq (mission-type-id mission) :mission-type-demonic-thievery)

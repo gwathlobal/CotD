@@ -830,3 +830,70 @@
                                                                    func-list)
                                                              
                                                              func-list)))
+
+;;============
+;; HELL
+;;============
+
+(set-world-sector-type :wtype :world-sector-hell-plain
+                       :glyph-idx 40
+                       :glyph-color sdl:*magenta*
+                       :name "A hell plain"
+                       :faction-list-func #'(lambda ()
+                                              (list (list +faction-type-demons+ :mission-faction-present)))
+                       :angel-disguised-mob-type-id +mob-type-soldier+
+                       :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
+                                                  (create-template-city template-level max-x max-y max-z
+                                                                        #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
+                                                                        (list +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                              +level-city-terrain-border+ #'(lambda ()
+                                                                                                              +terrain-border-creep+)
+                                                                               +level-city-terrain-dirt+ #'(lambda ()
+                                                                                                            (let ((r (random 100)))
+                                                                                                              (cond
+                                                                                                                ((< r 3) +terrain-floor-creep-dreadtubes+)
+                                                                                                                ((< r 6) +terrain-floor-creep-spores+)
+                                                                                                                ((< r 10) +terrain-wall-razorthorns+)
+                                                                                                                ((< r 13) +terrain-floor-creep-glowshroom+)
+                                                                                                                ((< r 20) +terrain-floor-creep+)
+                                                                                                                (t +terrain-floor-creep-bright+)
+                                                                                                                )))
+                                                                              +level-city-terrain-grass+ #'(lambda ()
+                                                                                                             +terrain-floor-creep+)
+                                                                              +level-city-terrain-tree+ #'(lambda ()
+                                                                                                            +terrain-tree-twintube+)
+                                                                              +level-city-terrain-bush+ #'(lambda ()
+                                                                                                            +terrain-wall-gloomtwigs+))))
+                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                 (declare (ignore world-sector mission world))
+
+                                                 (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Hell Plain~%"))
+
+                                                 (place-demonic-sigils-on-template-level template-level)
+                                                 )
+                       :terrain-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+                                                             ;; add arrival points for angels, demons & military
+                                                             (push #'add-arrival-points-on-level
+                                                                   func-list)
+                                                             func-list))
+                       :overall-post-process-func-list #'(lambda ()
+                                                           (let ((func-list ()))
+
+                                                             ;; add demonic sigils
+                                                             (push #'place-demonic-sigils-on-level
+                                                                   func-list)
+                                                             
+                                                             ;; place outsider beasts
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+
+                                                             ;; place irradiated spots
+                                                             (push #'place-irradation-on-level
+                                                                   func-list)
+
+                                                             ;; add demonic runes
+                                                             (push #'place-demonic-runes-on-level
+                                                                   func-list)
+                                                             
+                                                             func-list)))

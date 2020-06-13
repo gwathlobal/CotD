@@ -408,7 +408,7 @@
           for ry = (random *max-y-world-map*)
           for avail-missions = (loop for mission-type being the hash-values in *mission-types*
                                      when (and (is-available-func mission-type)
-                                               (funcall (is-available-func mission-type) (world-map world) rx ry))
+                                               (funcall (is-available-func mission-type) (aref (cells (world-map world)) rx ry) world))
                                        collect (id mission-type))
           for world-sector = (aref (cells (world-map world)) rx ry)
           until (and (not (mission world-sector))
@@ -417,18 +417,37 @@
              (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
 
                (setf (mission world-sector)
-                     (generate-mission-on-world-map world rx ry mission-type-id))
-               ))))
+                     (generate-mission-on-world-map world rx ry mission-type-id :off-map nil))
+               (push (mission world-sector) (world/present-missions world)))))
+  (dotimes (i 1)
+    (loop with avail-missions = (list :mission-type-celestial-sabotage)
+          for rx = (random *max-x-world-map*)
+          for ry = (random *max-y-world-map*)
+          for world-sector = (aref (cells (world-map world)) rx ry)
+          until (and (not (mission world-sector))
+                     avail-missions)
+          finally
+             (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
 
-(defun generate-mission-on-world-map (world-param x y mission-type-id)
+               (setf (mission world-sector)
+                     (generate-mission-on-world-map world rx ry mission-type-id :off-map t))
+               (push (mission world-sector) (world/present-missions world))))))
+
+(defun generate-mission-on-world-map (world-param x y mission-type-id &key (off-map nil))
   (let ((scenario (make-instance 'scenario-gen-class)))
-    (with-slots (world mission world-sector avail-tod-list avail-weather-list) scenario
+    (with-slots (world mission world-sector avail-tod-list avail-weather-list avail-world-sector-type-list) scenario
       (setf world world-param)
-      
-      (setf world-sector (aref (cells (world-map world)) x y))
 
       (scenario-create-mission scenario mission-type-id :x x :y y)
-
+      
+      (if off-map
+        (progn
+          (scenario-set-avail-world-sector-types scenario)
+          (setf world-sector (make-instance 'world-sector :wtype (wtype (nth (random (length avail-world-sector-type-list)) avail-world-sector-type-list))
+                                                          :x x :y y)))
+        (progn
+          (setf world-sector (aref (cells (world-map world)) x y))))
+      
       ;; set up random factions
       (scenario-adjust-factions scenario)
 
@@ -443,14 +462,17 @@
                      (funcall (random-available-for-mission lvl-mod)))
               do
                  (scenario-add/remove-lvl-mod scenario lvl-mod :apply-scenario-func nil))
+
+      (setf (world-sector mission) world-sector)
       
       mission)))
 
-(defun reset-all-missions-on-world-map (world-map)
+(defun reset-all-missions-on-world-map (world)
   (loop for x from 0 below *max-x-world-map* do
     (loop for y from 0 below *max-y-world-map* do
-      (setf (mission (aref (cells world-map) x y)) nil)))
-  world-map)
+      (setf (mission (aref (cells (world-map world)) x y)) nil)))
+  (setf (world/present-missions world) ())
+  (world-map world))
 
 (defun message-box-add-transform-message (prev-wtype world-sector &key (message-box-list `(,(world/sitrep-message-box *world*))))
   (when (not (eq prev-wtype (wtype world-sector)))
