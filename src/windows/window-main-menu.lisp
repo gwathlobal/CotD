@@ -74,6 +74,7 @@
                                        (push +game-event-campaign-flesh-gathered+ (game-events *world*))
                                        (push +game-event-campaign-satanists-move+ (game-events *world*))
                                        (push +game-event-campaign-move-military+ (game-events *world*))
+                                       (push +game-event-campaign-move-demons+ (game-events *world*))
                                                                               
                                        (multiple-value-bind (campaign-items campaign-funcs campaign-descrs) (new-campaign-menu-items)
                                          (setf *current-window* (make-instance 'select-faction-window :window-title "SELECT FACTION FOR CAMPAIGN" :menu-items campaign-items :menu-descrs campaign-descrs))

@@ -689,3 +689,13 @@
           (push (aref (cells world-map) x y) military-sectors)
           (incf military-sum))))
     (values military-sum military-sectors)))
+
+(defun calc-all-demons-on-world-map (world-map)
+  (let ((demons-sum 0)
+        (demons-sectors ()))
+    (loop for x from 0 below (array-dimension (cells world-map) 0) do
+      (loop for y from 0 below (array-dimension (cells world-map) 1) do
+        (when (eq (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-demons+)
+          (push (aref (cells world-map) x y) demons-sectors)
+          (incf demons-sum))))
+    (values demons-sum demons-sectors)))

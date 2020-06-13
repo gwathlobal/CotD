@@ -136,7 +136,51 @@
                                                                                      (add-message (format nil "~(~A~)" (name (aref (cells (world-map world)) (+ dx x) (+ dy y)))) sdl:*yellow* message-box-list)
                                                                                      (add-message (format nil ".~%") sdl:*white* message-box-list))))))
                                                                    )))
-                                                           ))
+                               ))
+
+(set-game-event (make-instance 'game-event :id +game-event-campaign-move-demons+
+                                           :descr-func #'(lambda ()
+                                                           (format nil "Each day, move demons around corrupted districts."))
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (> (calc-all-demons-on-world-map (world-map world)) 0)
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (multiple-value-bind (demons-num demon-sectors) (calc-all-demons-on-world-map (world-map world))
+                                                             (declare (ignore demons-num))
+                                                             (loop for demon-sector in demon-sectors do
+                                                               (let ((avail-sectors ())
+                                                                     (world-sector nil)
+                                                                     (message-box-list `(,(world/sitrep-message-box *world*))))
+
+                                                                 (check-surroundings (x demon-sector) (y demon-sector) nil
+                                                                                     #'(lambda (dx dy)
+                                                                                         (when (and (>= dx 0) (>= dy 0) (< dx (array-dimension (cells (world-map world)) 0)) (< dy (array-dimension (cells (world-map world)) 1))
+                                                                                                    (setf world-sector (aref (cells (world-map world)) dx dy))
+                                                                                                    (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-lake)
+                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-island)
+                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-port))
+                                                                                                    (eq (controlled-by world-sector) +lm-controlled-by-none+))
+                                                                                           (push world-sector avail-sectors))))
+
+                                                                 (when avail-sectors
+                                                                   (setf world-sector (nth (random (length avail-sectors)) avail-sectors))
+                                                                   
+                                                                   (setf (controlled-by demon-sector) +lm-controlled-by-none+)
+                                                                   (setf (controlled-by world-sector) +lm-controlled-by-demons+)
+                                                                   
+                                                                   (add-message (format nil "The ") sdl:*white* message-box-list)
+                                                                   (add-message (format nil "military") sdl:*yellow* message-box-list)
+                                                                   (add-message (format nil " moved from ") sdl:*white* message-box-list)
+                                                                   (add-message (format nil "~(~A~)" (name demon-sector)) sdl:*yellow* message-box-list)
+                                                                   (add-message (format nil " to ") sdl:*white* message-box-list)
+                                                                   (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* message-box-list)
+                                                                   (add-message (format nil ".~%") sdl:*white* message-box-list))
+                                                                 ))))
+                               ))
 
 
 

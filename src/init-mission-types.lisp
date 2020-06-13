@@ -37,11 +37,7 @@
                                                                            (when (and (>= dx 0) (>= dy 0)
                                                                                       (< dx (array-dimension (cells world-map) 0))
                                                                                       (< dy (array-dimension (cells world-map) 1))
-                                                                                      (or (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-demons+)
-                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
-                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port)
-                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
-                                                                                          (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)))
+                                                                                      (= (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-demons+))
                                                                              (setf near-demons t))))
                                            (if (and near-demons
                                                     (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
