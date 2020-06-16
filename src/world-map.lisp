@@ -6,6 +6,7 @@
 
 (defclass world-map ()
   ((cells :initform nil :accessor cells :type simple-array) ;; array of world-sector
+   (random-state :initform (make-random-state t) :accessor world-map/random-state)
    ))
 
 (defun generate-empty-world-map (world-map)
@@ -131,7 +132,8 @@
       (labels ((make-river (sx sy)
                  (let ((dirs)
                        (r (random 5)))
-                   (push (list +lm-feat-river+ nil) (feats (aref (cells world-map) sx sy)))
+                   (when (not (find +lm-feat-river+ (feats (aref (cells world-map) sx sy)) :key #'(lambda (a) (first a))))
+                     (push (list +lm-feat-river+ nil) (feats (aref (cells world-map) sx sy))))
                    (setf dirs (loop for (dx dy) in '((1 0) (-1 0) (0 1) (0 -1))
                                     when (and (> (+ sx dx) 0) (> (+ sy dy) 0)
                                               (< (+ sx dx) (array-dimension (cells world-map) 0))
@@ -275,11 +277,9 @@
     
     world-map))
 
-(defun generate-feats-for-world-sector (world-sector world-map)
+(defun regenerate-transient-feats-for-world-sector (world-sector world-map)
   (let* ((x (x world-sector))
          (y (y world-sector))
-         (river-feat (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))
-         (sea-feat (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))
          (barricade-func #'(lambda ()
                              (find +lm-feat-barricade+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))
          (can-barricade-func #'(lambda (sx sy tx ty)
@@ -295,9 +295,39 @@
                                               (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-residential)))
                                    t
                                    nil))))
-    ;; reset barricades
-    (setf (feats world-sector) (remove +lm-feat-barricade+ (feats world-sector) :key #'(lambda (a) (first a))))
-        
+  ;; reset barricades
+  (setf (feats world-sector) (remove +lm-feat-barricade+ (feats world-sector) :key #'(lambda (a) (first a))))
+  
+  ;; add barricade features
+    (when (and (>= (1- x) 0)
+               (funcall can-barricade-func x y (1- x) y))
+      (if (funcall barricade-func)
+        (push :w (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :w)) (feats (aref (cells world-map) x y)))))
+    (when (and (>= (1- y) 0)
+               (funcall can-barricade-func x y x (1- y)))
+      (if (funcall barricade-func)
+        (push :n (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :n)) (feats (aref (cells world-map) x y)))))
+    (when (and (< (1+ x) *max-x-world-map*)
+               (funcall can-barricade-func x y (1+ x) y))
+      (if (funcall barricade-func)
+        (push :e (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :e)) (feats (aref (cells world-map) x y)))))
+    (when (and (< (1+ y) *max-y-world-map*)
+               (funcall can-barricade-func x y x (1+ y)))
+      (if (funcall barricade-func)
+        (push :s (second (funcall barricade-func)))
+        (push (list +lm-feat-barricade+ (list :s)) (feats (aref (cells world-map) x y))))))
+
+  world-sector)
+
+(defun generate-feats-for-world-sector (world-sector world-map)
+  (let* ((x (x world-sector))
+         (y (y world-sector))
+         (river-feat (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))
+         (sea-feat (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a)))))
+    
     ;; add river features
     (when river-feat
       (when (and (>= (1- x) 0)
@@ -372,27 +402,7 @@
           (push (list +lm-feat-sea+ (list :s)) (feats (aref (cells world-map) x y)))
           (setf sea-feat (find +lm-feat-sea+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))))
     
-    ;; add barricade features
-    (when (and (>= (1- x) 0)
-               (funcall can-barricade-func x y (1- x) y))
-      (if (funcall barricade-func)
-        (push :w (second (funcall barricade-func)))
-        (push (list +lm-feat-barricade+ (list :w)) (feats (aref (cells world-map) x y)))))
-    (when (and (>= (1- y) 0)
-               (funcall can-barricade-func x y x (1- y)))
-      (if (funcall barricade-func)
-        (push :n (second (funcall barricade-func)))
-        (push (list +lm-feat-barricade+ (list :n)) (feats (aref (cells world-map) x y)))))
-    (when (and (< (1+ x) *max-x-world-map*)
-               (funcall can-barricade-func x y (1+ x) y))
-      (if (funcall barricade-func)
-        (push :e (second (funcall barricade-func)))
-        (push (list +lm-feat-barricade+ (list :e)) (feats (aref (cells world-map) x y)))))
-    (when (and (< (1+ y) *max-y-world-map*)
-               (funcall can-barricade-func x y x (1+ y)))
-      (if (funcall barricade-func)
-        (push :s (second (funcall barricade-func)))
-        (push (list +lm-feat-barricade+ (list :s)) (feats (aref (cells world-map) x y)))))
+    (regenerate-transient-feats-for-world-sector world-sector world-map)
     
     world-sector))
 
@@ -421,17 +431,19 @@
                (push (mission world-sector) (world/present-missions world)))))
   (dotimes (i 1)
     (loop with avail-missions = (list :mission-type-celestial-sabotage)
-          for rx = (random *max-x-world-map*)
-          for ry = (random *max-y-world-map*)
-          for world-sector = (aref (cells (world-map world)) rx ry)
-          until (and (not (mission world-sector))
-                     avail-missions)
-          finally
-             (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
-
-               (setf (mission world-sector)
-                     (generate-mission-on-world-map world rx ry mission-type-id :off-map t))
-               (push (mission world-sector) (world/present-missions world))))))
+              for rx = (random *max-x-world-map*)
+              for ry = (random *max-y-world-map*)
+              for world-sector = (aref (cells (world-map world)) rx ry)
+              until (and (not (mission world-sector))
+                         
+                         avail-missions)
+              finally
+                 (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
+                   
+                   (setf (mission world-sector)
+                         (generate-mission-on-world-map world rx ry mission-type-id :off-map t))
+                   (push (mission world-sector) (world/present-missions world))))
+    ))
 
 (defun generate-mission-on-world-map (world-param x y mission-type-id &key (off-map nil))
   (let ((scenario (make-instance 'scenario-gen-class)))

@@ -1,3 +1,4 @@
+- BUG: Fix the bug with military movement on campaign map
 - Eliminate satanists mission reveals the lair
 - Special mission in Hell where angels attack demons to destroy the dimensional machines
 - Special mission in Hell where the military attack demons to destroy gathered flesh

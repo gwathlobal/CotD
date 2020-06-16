@@ -566,7 +566,11 @@
          (church-feat (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a))))
          (library-feat (find +lm-feat-library+ (feats world-sector) :key #'(lambda (a) (first a))))
          (displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*)))
-         (water-color nil))
+         (water-color nil)
+         (gray-color (sdl:color :r 25 :g 25 :b 25))
+         (purple-color (sdl:color :r 25 :g 0 :b 25))
+         (brown-color (sdl:color :r 25 :g 13 :b 0))
+         (green-color (sdl:color :r 0 :g 25 :b 0)))
 
     (when *world*
       (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time *world*))
@@ -574,20 +578,131 @@
         (if (or (= month 11) (= month 0) (= month 1))
           (setf water-color (sdl:color :r 0 :g 150 :b 255))
           (setf water-color sdl:*blue*))))
+
+    (case (wtype world-sector)
+      ;; display sea sector
+      ((:world-sector-normal-sea)
+       (progn
+         (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))))
+      ;; display island sector
+      ((:world-sector-normal-island :world-sector-abandoned-island :world-sector-corrupted-island)
+       (progn
+         (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
+         (let ((r)
+               (color (case (wtype world-sector)
+                            (:world-sector-normal-island brown-color)
+                            (:world-sector-abandoned-island gray-color)
+                            (:world-sector-corrupted-island purple-color)))
+               (glyph (case (wtype world-sector)
+                            (:world-sector-normal-island +glyph-id-normal-house+)
+                            (:world-sector-abandoned-island +glyph-id-abandoned-house+)
+                            (:world-sector-corrupted-island +glyph-id-corrupted-house+))))
+           (loop for x from 1 to 3 do
+             (loop for y from 1 to 3 do
+               (setf r (random 8))
+               (case r
+                 (0 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-1+ color sdl:*black*)))
+                 (1 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-2+ color sdl:*black*)))
+                 (2 (setf (aref displayed-cells x y) (list glyph color sdl:*black*)))
+                 (t (setf (aref displayed-cells x y) (list 0 sdl:*black* sdl:*black*)))))))))
+      ;; display outskirts sector
+      ((:world-sector-normal-forest :world-sector-abandoned-forest :world-sector-corrupted-forest)
+       (progn
+         (let ((r)
+                (color-tree (case (wtype world-sector)
+                              (:world-sector-normal-forest green-color)
+                              (:world-sector-abandoned-forest gray-color)
+                              (:world-sector-corrupted-forest purple-color)))
+                (color-house (case (wtype world-sector)
+                               (:world-sector-normal-forest brown-color)
+                               (:world-sector-abandoned-forest gray-color)
+                               (:world-sector-corrupted-forest purple-color)))
+                (glyph (case (wtype world-sector)
+                         (:world-sector-normal-forest +glyph-id-normal-tree+)
+                         (:world-sector-abandoned-forest +glyph-id-abandoned-tree+)
+                         (:world-sector-corrupted-forest +glyph-id-corrupted-tree+))))
+           (loop for x from 0 to 4 do
+             (loop for y from 0 to 4 do
+               (setf r (random 12))
+               (case r
+                 (0 (setf (aref displayed-cells x y) (list +glyph-id-leaf-tree+ color-tree sdl:*black*)))
+                 (1 (setf (aref displayed-cells x y) (list +glyph-id-pine-tree+ color-tree sdl:*black*)))
+                 (2 (setf (aref displayed-cells x y) (list glyph color-tree sdl:*black*)))
+                 (3 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-1+ color-house sdl:*black*)))
+                 (4 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-2+ color-house sdl:*black*)))
+                 (t (setf (aref displayed-cells x y) (list 0 sdl:*black* sdl:*black*)))))))))
+      ;; display residential and seaport district
+      ((:world-sector-normal-residential :world-sector-abandoned-residential :world-sector-corrupted-residential :world-sector-normal-port :world-sector-abandoned-port :world-sector-corrupted-port)
+       (progn
+         (let ((r)
+                (color (case (wtype world-sector)
+                         ((:world-sector-normal-residential :world-sector-normal-port) brown-color)
+                         ((:world-sector-abandoned-residential :world-sector-abandoned-port) gray-color)
+                         ((:world-sector-corrupted-residential :world-sector-corrupted-port) purple-color)))
+                (glyph (case (wtype world-sector)
+                         ((:world-sector-normal-residential :world-sector-normal-port) +glyph-id-normal-house+)
+                         ((:world-sector-abandoned-residential :world-sector-abandoned-port) +glyph-id-abandoned-house+)
+                         ((:world-sector-corrupted-residential :world-sector-corrupted-port) +glyph-id-corrupted-house+))))
+           (loop for x from 0 to 4 do
+             (loop for y from 0 to 4 do
+               (setf r (random 15))
+               (case r
+                 (0 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-1+ color sdl:*black*)))
+                 (1 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-2+ color sdl:*black*)))
+                 (2 (setf (aref displayed-cells x y) (list glyph color sdl:*black*)))
+                 (t (setf (aref displayed-cells x y) (list 0 sdl:*black* sdl:*black*)))))))
+         
+         (when (and sea-feat
+                    (or (eq (wtype world-sector) :world-sector-normal-port)
+                        (eq (wtype world-sector) :world-sector-abandoned-port)
+                        (eq (wtype world-sector) :world-sector-corrupted-port)))
+           (when (find :n (second sea-feat))
+             (setf (aref displayed-cells 0 1) (list 0 sdl:*black* sdl:*black*))
+             (setf (aref displayed-cells 1 1) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 2 1) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 3 1) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 4 1) (list 0 sdl:*black* sdl:*black*)))
+           (when (find :s (second sea-feat))
+             (setf (aref displayed-cells 0 3) (list 0 sdl:*black* sdl:*black*))
+             (setf (aref displayed-cells 1 3) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 2 3) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 3 3) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 4 3) (list 0 sdl:*black* sdl:*black*))
+             )
+           (when (find :w (second sea-feat))
+             (setf (aref displayed-cells 1 0) (list 0 sdl:*black* sdl:*black*))
+             (setf (aref displayed-cells 1 1) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 1 2) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 1 3) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 1 4) (list 0 sdl:*black* sdl:*black*)))
+           (when (find :e (second sea-feat))
+             (setf (aref displayed-cells 3 0) (list 0 sdl:*black* sdl:*black*))
+             (setf (aref displayed-cells 3 1) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 3 2) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 3 3) (list +glyph-id-factory-icon+ gray-color sdl:*black*))
+             (setf (aref displayed-cells 3 4) (list 0 sdl:*black* sdl:*black*))))))
+      ;; display lake
+      ((:world-sector-normal-lake :world-sector-abandoned-lake :world-sector-corrupted-lake)
+       (progn
+         (let ((r (random 12))
+               (color (case (wtype world-sector)
+                        (:world-sector-normal-lake brown-color)
+                        (:world-sector-abandoned-lake gray-color)
+                        (:world-sector-corrupted-lake purple-color)))
+               (glyph (case (wtype world-sector)
+                        (:world-sector-normal-lake +glyph-id-normal-house+)
+                        (:world-sector-abandoned-lake +glyph-id-abandoned-house+)
+                        (:world-sector-corrupted-lake +glyph-id-corrupted-house+))))
+           (loop for x from 0 to 4 do
+             (loop for y from 0 to 4 do
+               (setf r (random 12))
+               (case r
+                 (0 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-1+ color sdl:*black*)))
+                 (1 (setf (aref displayed-cells x y) (list +glyph-id-campaign-house-2+ color sdl:*black*)))
+                 (2 (setf (aref displayed-cells x y) (list glyph color sdl:*black*)))
+                 (t (setf (aref displayed-cells x y) (list 0 sdl:*black* sdl:*black*)))))))))
+      )
     
-    ;; display sea sector 
-    (when (eq (wtype world-sector) :world-sector-normal-sea)
-      (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*))))
-
-    ;; display island sector
-    (when (or (eq (wtype world-sector) :world-sector-normal-island)
-              (eq (wtype world-sector) :world-sector-abandoned-island)
-              (eq (wtype world-sector) :world-sector-corrupted-island))
-      (setf displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list +glyph-id-wall+ sdl:*blue* sdl:*black*)))
-      (loop for x from 1 to 3 do
-        (loop for y from 1 to 3 do
-          (setf (aref displayed-cells x y) (list 0 sdl:*black* sdl:*black*)))))
-
     ;; display barricades
     (when barricade-feat
       (when (find :n (second barricade-feat))
@@ -631,7 +746,10 @@
         (setf (aref displayed-cells 4 2) (list +glyph-id-horizontal-river+ water-color sdl:*black*))))
 
      ;; display seas for ports
-    (when sea-feat
+    (when (and sea-feat
+               (or (eq (wtype world-sector) :world-sector-normal-port)
+                   (eq (wtype world-sector) :world-sector-abandoned-port)
+                   (eq (wtype world-sector) :world-sector-corrupted-port)))
       (when (find :n (second sea-feat))
         (setf (aref displayed-cells 0 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
         (setf (aref displayed-cells 1 0) (list +glyph-id-wall+ sdl:*blue* sdl:*black*))
@@ -720,7 +838,7 @@
     (when (mission world-sector)
       (if (eq world-sector (world-sector (mission world-sector)))
         (setf (aref displayed-cells 3 1) (list +glyph-id-crossed-swords+ sdl:*yellow* sdl:*black*))
-        (setf (aref displayed-cells 3 1) (list +glyph-id-portal+ sdl:*yellow* sdl:*black*))))
+        (setf (aref displayed-cells 3 1) (list +glyph-id-portal+ (sdl:color :r 255 :g 75 :b 0) sdl:*black*))))
     
     (loop for dy from 0 below max-disp-h do
       (loop for dx from 0 below max-disp-w do
@@ -730,13 +848,14 @@
     ))
 
 (defun draw-world-map (world-map scr-x scr-y &key (reveal-lairs nil))
-  (loop with max-disp-w = 5
-        with max-disp-h = 5
-        for y from 0 below *max-y-world-map* do
-    (loop for x from 0 below *max-y-world-map*
-          for x1 = (+ scr-x (* x *glyph-w* max-disp-w))
-          for y1 = (+ scr-y (* y *glyph-h* max-disp-h))
-          for sector = (aref (cells world-map) x y)
-          do
-             (draw-world-map-cell sector x1 y1 :reveal-lair reveal-lairs)))
+  (let ((*random-state* (make-random-state (world-map/random-state world-map))))
+    (loop with max-disp-w = 5
+          with max-disp-h = 5
+          for y from 0 below *max-y-world-map* do
+            (loop for x from 0 below *max-y-world-map*
+                  for x1 = (+ scr-x (* x *glyph-w* max-disp-w))
+                  for y1 = (+ scr-y (* y *glyph-h* max-disp-h))
+                  for sector = (aref (cells world-map) x y)
+                  do
+                     (draw-world-map-cell sector x1 y1 :reveal-lair reveal-lairs))))
   )

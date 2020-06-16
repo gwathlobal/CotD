@@ -557,7 +557,7 @@
                                          (list :game-over-military-won nil)
                                          (list :game-over-church-won nil)
                                          (list :game-over-satanists-won (list #'move-relic-to-corrupted-district))
-                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned)))
+                                         (list :game-over-eater-won (list #'transform-residential-sector-to-abandoned #'move-military-to-free-sector)))
                   )
 
 (set-mission-type :id :mission-type-military-conquest
@@ -1184,7 +1184,7 @@
                                          (list :game-over-military-won (list #'remove-satanist-lair-from-map))
                                          (list :game-over-church-won (list #'remove-satanist-lair-from-map))
                                          (list :game-over-satanists-won nil)
-                                         (list :game-over-eater-won (list #'remove-satanist-lair-from-map)))
+                                         (list :game-over-eater-won (list #'remove-satanist-lair-from-map #'move-military-to-free-sector #'move-demons-to-free-sector)))
                   )
 
 (set-mission-type :id :mission-type-celestial-sabotage
