@@ -456,7 +456,7 @@
                                                 ((= r 4) (level-place-twintube-corrupted-4 template-level (+ dx x) (+ dy y) z))
                                                 ((= r 3) (level-place-twintube-corrupted-3 template-level (+ dx x) (+ dy y) z))
                                                 ((= r 2) (level-place-twintube-corrupted-2 template-level (+ dx x) (+ dy y) z))
-                                                ((= r 2) (level-place-twintube-corrupted-1 template-level (+ dx x) (+ dy y) z))
+                                                ((= r 1) (level-place-twintube-corrupted-1 template-level (+ dx x) (+ dy y) z))
                                                 (t nil))
                                               )
                                             

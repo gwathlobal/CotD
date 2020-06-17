@@ -844,8 +844,8 @@
                        :angel-disguised-mob-type-id +mob-type-soldier+
                        :sector-level-gen-func #'(lambda (template-level max-x max-y max-z)
                                                   (create-template-city template-level max-x max-y max-z
-                                                                        #'get-max-buildings-corrupted-normal #'get-reserved-buildings-corrupted-normal
-                                                                        (list +level-city-park+ +building-city-corrupted-park-tiny+
+                                                                        #'get-max-buildings-hell-normal #'get-reserved-buildings-hell-normal
+                                                                        (list +level-city-park+ +building-city-hell-border+
                                                                               +level-city-terrain-border+ #'(lambda ()
                                                                                                               +terrain-border-creep+)
                                                                                +level-city-terrain-dirt+ #'(lambda ()

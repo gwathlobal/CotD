@@ -234,7 +234,8 @@
             (x-title (+ 10 10 (* *glyph-w* 5)))
             (y-title (+ 10 (sdl:char-height sdl:*default-font*))))
         ;; draw the sector image
-        (draw-world-map-cell world-sector 10 (+ 10 y-title))
+        (let ((*random-state* (make-random-state (world-map/random-state (world-map world)))))
+          (draw-world-map-cell world-sector 10 (+ 10 y-title)))
         ;; draw the current scenario info
         (sdl:with-rectangle (rect (sdl:rectangle :x x-title :y (+ 10 (sdl:char-height sdl:*default-font*)) :w (- *window-width* x-title 10) :h (- (truncate *window-height* 2) 20)))
           (setf text-str-num (write-text (format nil "Date&Time: ~A~%Mission: ~A~%Sector: ~A~%Feats: ~A~%Factions: ~A~%Player faction: ~A"

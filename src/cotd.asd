@@ -47,7 +47,8 @@
                    (:file "init-common-building-types" :depends-on ("buildings"))
                    (:file "init-normal-building-types" :depends-on ("buildings"))
                    (:file "init-ruined-building-types" :depends-on ("buildings"))
-                   (:file "init-corrupted-building-types" :depends-on ("buildings"))))
+                   (:file "init-corrupted-building-types" :depends-on ("buildings"))
+                   (:file "init-hell-building-types" :depends-on ("buildings"))))
      (:file "level-city" :depends-on ("buildings"))
      (:file "level-test" :depends-on ("base-methods"))
      (:module "level-modifiers"

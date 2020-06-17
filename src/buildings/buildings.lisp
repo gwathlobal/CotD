@@ -42,6 +42,9 @@
 (defconstant +building-type-crater+ 32)
 (defconstant +building-type-crater-large+ 33)
 
+(defconstant +building-type-hell-structure+ 34)
+(defconstant +building-type-hell-growth+ 35)
+
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
 ;;--------------------------------------
@@ -145,6 +148,16 @@
 (defconstant +building-city-pier-south+ 93)
 (defconstant +building-city-pier-west+ 94)
 (defconstant +building-city-pier-east+ 95)
+
+(defconstant +building-city-hell-border+ 96)
+(defconstant +building-city-hell-outgrowth-1+ 97)
+(defconstant +building-city-hell-outgrowth-2+ 98)
+(defconstant +building-city-hell-outgrowth-3+ 99)
+(defconstant +building-city-hell-outgrowth-4+ 100)
+(defconstant +building-city-hell-structure-1+ 101)
+(defconstant +building-city-hell-structure-2+ 102)
+(defconstant +building-city-hell-structure-3+ 103)
+(defconstant +building-city-hell-structure-4+ 104)
 
 (defparameter *level-grid-size* 5)
 

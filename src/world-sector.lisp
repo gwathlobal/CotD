@@ -957,10 +957,23 @@
     (setf (gethash +building-type-crater-large+ max-building-types) 1)
     max-building-types))
 
+(defun get-max-buildings-hell-normal ()
+  (let ((max-building-types (make-hash-table)))
+    (setf (gethash +building-type-hell-structure+ max-building-types) t)
+    (setf (gethash +building-type-hell-growth+ max-building-types) t)
+    
+    (setf (gethash +building-type-crater+ max-building-types) 4)
+    (setf (gethash +building-type-crater-large+ max-building-types) 1)
+    max-building-types))
+
 (defun get-reserved-buildings-corrupted-normal ()
   (let ((reserved-building-types (make-hash-table)))
     reserved-building-types))
 
 (defun get-reserved-buildings-corrupted-port ()
+  (let ((reserved-building-types (make-hash-table)))
+    reserved-building-types))
+
+(defun get-reserved-buildings-hell-normal ()
   (let ((reserved-building-types (make-hash-table)))
     reserved-building-types))

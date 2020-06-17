@@ -567,10 +567,10 @@
          (library-feat (find +lm-feat-library+ (feats world-sector) :key #'(lambda (a) (first a))))
          (displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*)))
          (water-color nil)
-         (gray-color (sdl:color :r 25 :g 25 :b 25))
-         (purple-color (sdl:color :r 25 :g 0 :b 25))
-         (brown-color (sdl:color :r 25 :g 13 :b 0))
-         (green-color (sdl:color :r 0 :g 25 :b 0)))
+         (gray-color (sdl:color :r 40 :g 40 :b 40))
+         (purple-color (sdl:color :r 40 :g 0 :b 40))
+         (brown-color (sdl:color :r 40 :g 20 :b 0))
+         (green-color (sdl:color :r 0 :g 40 :b 0)))
 
     (when *world*
       (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time *world*))
