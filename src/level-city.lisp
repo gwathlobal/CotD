@@ -14,7 +14,9 @@
                                                        +level-city-terrain-tree+ #'(lambda ()
                                                                                      +terrain-tree-birch+)
                                                        +level-city-terrain-bush+ #'(lambda ()
-                                                                                     +terrain-wall-bush+))))
+                                                                                     +terrain-wall-bush+)
+                                                       +level-city-terrain-earth+ #'(lambda ()
+                                                                                      +terrain-wall-earth+))))
   
   (logger (format nil "CREATE-TEMPLATE-CITY~%"))
 
@@ -140,7 +142,9 @@
     (loop for y from 0 below max-y do
       (loop for x from 0 below max-x do
         (loop for z from 0 below 2 do
-          (setf (aref terrain-level x y z)  +terrain-wall-earth+))))
+          (setf (aref terrain-level x y z) (if (getf terrains +level-city-terrain-earth+)
+                                             (funcall (getf terrains +level-city-terrain-earth+))
+                                             +terrain-wall-earth+)))))
     
     (loop for y from 1 below (1- max-y) do
       (loop for x from 1 below (1- max-x) do

@@ -1,3 +1,5 @@
+- Celestial sabotage, add guidance for angels that points to machines
+- Slime pools in hell that reduce all resitances
 - Worm-like multitile creatures in hell that devour you while you are inside
 - BUG: Fix the bug with military movement on campaign map
 - Eliminate satanists mission reveals the lair

@@ -24,7 +24,7 @@
                    )
 
 (set-win-condition :id :win-cond-demonic-conquest
-                   :win-formula (values 4 100)
+                   :win-formula (list 4 100)
                    :win-func #'(lambda (world win-condition)
                                  (declare (ignore world win-condition))
                                  ;; do not do anything
@@ -32,6 +32,14 @@
                    )
 
 (set-win-condition :id :win-cond-military-conquest
+                   :win-formula 4
+                   :win-func #'(lambda (world win-condition)
+                                 (declare (ignore world win-condition))
+                                 ;; do not do anything
+                                 nil)
+                   )
+
+(set-win-condition :id :win-cond-celestial-sabotage
                    :win-formula 4
                    :win-func #'(lambda (world win-condition)
                                  (declare (ignore world win-condition))

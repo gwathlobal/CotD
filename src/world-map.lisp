@@ -447,7 +447,7 @@
 
 (defun generate-mission-on-world-map (world-param x y mission-type-id &key (off-map nil))
   (let ((scenario (make-instance 'scenario-gen-class)))
-    (with-slots (world mission world-sector avail-tod-list avail-weather-list avail-world-sector-type-list) scenario
+    (with-slots (world mission world-sector avail-feats-list avail-items-list avail-controlled-list avail-tod-list avail-weather-list avail-world-sector-type-list) scenario
       (setf world world-param)
 
       (scenario-create-mission scenario mission-type-id :x x :y y)
@@ -465,6 +465,27 @@
 
       (scenario-set-avail-lvl-mods scenario)
 
+      (when off-map
+        (loop for lvl-mod in avail-controlled-list do
+          (format t "LVL-MOD ~A~%" (name lvl-mod)))
+        ;; set a random controlled-by lvl-mod
+        (scenario-add/remove-lvl-mod scenario (nth (random (length avail-controlled-list)) avail-controlled-list) :apply-scenario-func nil)
+
+        ;; add random feats lvl-mods
+        (loop for lvl-mod in avail-feats-list
+              when (zerop (random 4)) do
+                (scenario-add/remove-lvl-mod scenario lvl-mod :apply-scenario-func nil))
+
+        ;; add random items lvl-mods
+        (loop for lvl-mod in avail-items-list
+            when (zerop (random 4)) do
+              (scenario-add/remove-lvl-mod scenario lvl-mod :apply-scenario-func nil))
+
+        (scenario-adjust-lvl-mods-after-sector-regeneration scenario)
+
+        (scenario-adjust-factions scenario)
+        )
+
       ;; a time of day
       (scenario-add/remove-lvl-mod scenario (nth (random (length avail-tod-list)) avail-tod-list) :apply-scenario-func nil)
 
@@ -476,6 +497,7 @@
                  (scenario-add/remove-lvl-mod scenario lvl-mod :apply-scenario-func nil))
 
       (setf (world-sector mission) world-sector)
+      (setf (mission (world-sector mission)) mission)
       
       mission)))
 

@@ -21,6 +21,7 @@
    ;; :trait-slope-down - +terrain-trait-slope-down+
    ;; :trait-not-climable - +terrain-trait-not-climable+
    ;; :trait-light-source - +terrain-trait-light-source+
+   ;; :trait-can-switch-light - +terrain-trait-can-switch-light+
    ;; :trait-blocks-sound - +terrain-trait-blocks-sound+
    ;; :trait-blocks-sound-floor - +terrain-trait-blocks-sound-floor+
    ;; :trait-water - +terrain-trait-water+
@@ -43,7 +44,7 @@
 
 (defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor trait-slope-up trait-slope-down trait-not-climable trait-light-source
                                                                         trait-blocks-sound trait-blocks-sound-floor trait-water (trait-move-cost-factor 1) trait-openable-door trait-openable-window trait-flammable trait-can-jump-over
-                                                                        trait-can-have-rune)
+                                                                        trait-can-have-rune trait-can-switch-light)
   
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
@@ -79,6 +80,8 @@
     (setf (gethash +terrain-trait-can-jump-over+ (trait terrain-type)) trait-can-jump-over))
   (when trait-can-have-rune
     (setf (gethash +terrain-trait-can-have-rune+ (trait terrain-type)) trait-can-have-rune))
+  (when trait-can-switch-light
+    (setf (gethash +terrain-trait-can-switch-light+ (trait terrain-type)) trait-can-switch-light))
   )
 
 (defun get-terrain-type-trait (terrain-type-id key)

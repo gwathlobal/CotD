@@ -95,7 +95,7 @@
                          (= (loyal-faction *player*) +faction-type-satanists+))
                      (eq (mission-type-id (mission (level *world*))) :mission-type-demonic-conquest))
                 (eq (mission-type-id (mission (level *world*))) :mission-type-test))
-        (multiple-value-bind (max-sigils max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+        (multiple-value-bind (max-sigils max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
           (format str "~%Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) max-sigils
                   (if (>= (length (demonic-sigils (level *world*))) max-sigils)
                     (format nil "~D turn~:P left" (- max-turns (get-demon-conquest-turns-left *world*)))
@@ -111,6 +111,26 @@
                 (eq (mission-type-id (mission (level *world*))) :mission-type-test))
         (let ((max-sigils (win-condition/win-formula (get-win-condition-by-id :win-cond-military-conquest))))
           (format str "~%Demonic sigils: ~A/~A~%" (length (demonic-sigils (level *world*))) max-sigils))
+        )
+      
+      ;; win condition for satanist elimination
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                         (= (loyal-faction *player*) +faction-type-angels+)
+                         (= (loyal-faction *player*) +faction-type-military+)
+                         (= (loyal-faction *player*) +faction-type-church+)
+                         (= (loyal-faction *player*) +faction-type-satanists+))
+                     (eq (mission-type-id (mission (level *world*))) :mission-type-eliminate-satanists))
+                (eq (mission-type-id (mission (level *world*))) :mission-type-test))
+        (format str "~%Satanists left: ~A~%" (nth +faction-type-satanists+ (total-faction-list (level *world*))))
+        )
+      
+      ;; win condition for celestial sabotage
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                         (= (loyal-faction *player*) +faction-type-angels+))
+                     (eq (mission-type-id (mission (level *world*))) :mission-type-celestial-sabotage))
+                (eq (mission-type-id (mission (level *world*))) :mission-type-test))
+        (let ((max-machines (win-condition/win-formula (get-win-condition-by-id :win-cond-celestial-sabotage))))
+          (format str "~%Demonic machines: ~A/~A~%" (length (demonic-machines (level *world*))) max-machines))
         )
       
       

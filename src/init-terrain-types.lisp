@@ -201,6 +201,10 @@
                                                :glyph-idx 96 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color (sdl:color :r 185 :g 83 :b 43)
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t :trait-blocks-sound 40 :trait-blocks-sound-floor 40))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-compressed-flesh+ :name "compressed flesh"
+                                               :glyph-idx 96 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color (sdl:color :r 100 :g 0 :b 100)
+                                               :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-opaque-floor t :trait-blocks-sound 40 :trait-blocks-sound-floor 40))
+
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-bush+ :name "bush"
                                                :glyph-idx +glyph-id-hash+ :glyph-color sdl:*green* :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-opaque-floor t :trait-blocks-sound-floor 20 :trait-flammable 3 :trait-can-jump-over t))
@@ -445,7 +449,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern+ :name "lantern"
                                                :glyph-idx 92 :glyph-color sdl:*yellow* :back-color sdl:*black*
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 6 :trait-blocks-sound 20 :trait-blocks-sound-floor 20
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 6 :trait-can-switch-light t :trait-blocks-sound 20 :trait-blocks-sound-floor 20
                                                :on-use #'(lambda (mob x y z)
                                                            (declare (ignore mob))
                                                            (set-terrain-* (level *world*) x y z +terrain-wall-lantern-off+)
@@ -469,7 +473,7 @@
 ;; light sources that are off, but can be toggled on - should have the +terrain-trait-light-source+ set to 0, as opposed to non-light-sources, where it is set to nil
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern-off+ :name "lantern (off)"
                                                :glyph-idx 92 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black*
-                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 0 :trait-blocks-sound 20 :trait-blocks-sound-floor 20
+                                               :trait-blocks-move t :trait-opaque-floor t :trait-light-source 0 :trait-can-switch-light t :trait-blocks-sound 20 :trait-blocks-sound-floor 20
                                                :on-use #'(lambda (mob x y z)
                                                            (declare (ignore mob))
                                                            (set-terrain-* (level *world*) x y z +terrain-wall-lantern+)
@@ -491,4 +495,4 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-glowshroom+ :name "glowshroom"
                                                :glyph-idx 130 :glyph-color sdl:*yellow* :back-color sdl:*black*
-                                               :trait-blocks-move nil :trait-opaque-floor t :trait-light-source 4 :trait-blocks-sound-floor 20))
+                                               :trait-blocks-move nil :trait-opaque-floor t :trait-light-source 4 :trait-can-switch-light nil :trait-blocks-sound-floor 20))

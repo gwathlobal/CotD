@@ -66,6 +66,9 @@
 (defconstant +game-event-campaign-move-military+ 58)
 (defconstant +game-event-campaign-move-demons+ 59)
 
+(defconstant +game-event-angelic-sabotage-win-for-angels+ 60)
+(defconstant +game-event-angelic-sabotage-win-for-demons+ 61)
+
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won
                                  :game-over-angels-won

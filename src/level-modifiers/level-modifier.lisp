@@ -49,6 +49,7 @@
 (defconstant +lm-placement-ghost+ 31)
 (defconstant +lm-placement-test+ 32)
 (defconstant +lm-tod-hell+ 33)
+(defconstant +lm-feat-hell-engine+ 34)
 
 (defparameter *level-modifiers* (make-array (list 0) :adjustable t))
 

@@ -484,3 +484,42 @@
                                                t
                                                nil))
                     )
+
+(set-level-modifier :id +lm-feat-hell-engine+ :type +level-mod-sector-feat+
+                    :name "Hell engine"
+                    :priority 30
+                    :faction-list-func #'(lambda (sector-type-id)
+                                           (declare (ignore sector-type-id))
+                                           nil
+                                           )
+                    :template-level-gen-func #'(lambda (template-level world-sector mission world)
+                                                 (declare (ignore world-sector mission world))
+
+                                                 (logger (format nil "TEMPLATE LEVEL FUNC: Lvl Mod Hell Engine~%"))
+                                                 
+                                                 (place-demonic-machines-on-template-level template-level)
+                                                 )
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+                                                          
+                                                          ;; add demonic machines
+                                                          (push #'place-demonic-machines-on-level
+                                                                func-list)
+                                                          
+                                                          ;; add demonic sigils
+                                                          (push #'place-demonic-sigils-on-level
+                                                                func-list)
+                                                          
+                                                          func-list))
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  ;; is not available for everybody other than hell plain
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                    t
+                                                    nil))
+                    :always-present-func #'(lambda (world-sector mission world-time)
+                                             (declare (ignore world-sector world-time))
+                                             (if (eq (mission-type-id mission) :mission-type-celestial-sabotage)
+                                               t
+                                               nil))
+                    )

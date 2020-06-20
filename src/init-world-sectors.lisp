@@ -863,13 +863,14 @@
                                                                               +level-city-terrain-tree+ #'(lambda ()
                                                                                                             +terrain-tree-twintube+)
                                                                               +level-city-terrain-bush+ #'(lambda ()
-                                                                                                            +terrain-wall-gloomtwigs+))))
+                                                                                                            +terrain-wall-gloomtwigs+)
+                                                                              +level-city-terrain-earth+ #'(lambda ()
+                                                                                                             +terrain-wall-compressed-flesh+))))
                         :template-level-gen-func #'(lambda (template-level world-sector mission world)
-                                                 (declare (ignore world-sector mission world))
+                                                 (declare (ignore template-level world-sector mission world))
 
                                                  (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Hell Plain~%"))
 
-                                                 (place-demonic-sigils-on-template-level template-level)
                                                  )
                        :terrain-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
@@ -880,10 +881,6 @@
                        :overall-post-process-func-list #'(lambda ()
                                                            (let ((func-list ()))
 
-                                                             ;; add demonic sigils
-                                                             (push #'place-demonic-sigils-on-level
-                                                                   func-list)
-                                                             
                                                              ;; place outsider beasts
                                                              (push #'place-outsider-beasts-on-level
                                                                    func-list)

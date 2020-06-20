@@ -222,6 +222,8 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-sigil-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Sigil Starting Position" :trait-remove-on-dungeon-generation t))
 
+(set-feature-type (make-instance 'feature-type :id +feature-start-machine-point+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Machine Starting Position" :trait-remove-on-dungeon-generation t))
+
 (set-feature-type (make-instance 'feature-type :id +feature-start-place-angels+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Angel Starting Position" :trait-remove-on-dungeon-generation t))
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-place-church-priest+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Priest Starting Position" :trait-remove-on-dungeon-generation t :trait-no-gravity t))

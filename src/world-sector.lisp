@@ -656,6 +656,22 @@
              (set-mob-effect sigil :effect-type-id +mob-effect-demonic-sigil+ :actor-id (id sigil) :cd t))
   )
 
+(defun place-demonic-machines-on-level (level world-sector mission world)
+  (declare (ignore world-sector world mission))
+  
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon machines~%~%"))
+  
+  (loop with machine = nil
+        for feature-id in (feature-id-list level)
+        for lvl-feature = (get-feature-by-id feature-id)
+        when (= (feature-type lvl-feature) +feature-start-machine-point+)
+          do
+             (setf machine (make-instance 'mob :mob-type +mob-type-demon-machine+))
+             (setf (x machine) (x lvl-feature) (y machine) (y lvl-feature) (z machine) (z lvl-feature))
+             (add-mob-to-level-list level machine)
+             (set-mob-effect machine :effect-type-id +mob-effect-demonic-machine+ :actor-id (id machine) :cd t))
+  )
+
 (defun place-blood-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
   
@@ -846,6 +862,37 @@
     
     ))
 
+(defun place-demonic-machines-on-template-level (template-level)
+  (let ((building-id-list (loop for building being the hash-values in *building-types*
+                                when (eq (building-type building) +building-type-hell-machine+)
+                                  collect (building-id building)))
+        (x-w 4)
+        (y-n 4)
+        (x-e (- (array-dimension template-level 0) 5))
+        (y-s (- (array-dimension template-level 1) 5))
+        (building-id))
+    ;; place nw post
+    (setf building-id (nth (random (length building-id-list)) building-id-list))
+    (when (level-city-can-place-build-on-grid building-id x-w y-n 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-w y-n 2 template-level))
+    
+    ;; place ne post
+    (setf building-id (nth (random (length building-id-list)) building-id-list))
+    (when (level-city-can-place-build-on-grid building-id x-e y-n 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-e y-n 2 template-level))
+    
+    ;; place sw post
+    (setf building-id (nth (random (length building-id-list)) building-id-list))
+    (when (level-city-can-place-build-on-grid building-id x-w y-s 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-w y-s 2 template-level))
+    
+    ;; place se post
+    (setf building-id (nth (random (length building-id-list)) building-id-list))
+    (when (level-city-can-place-build-on-grid building-id x-e y-s 2 template-level)
+      (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level))
+    
+    ))
+
 (defun get-max-buildings-normal ()
   (let ((max-building-types (make-hash-table)))
     (setf (gethash +building-type-house+ max-building-types) t)
@@ -961,6 +1008,7 @@
   (let ((max-building-types (make-hash-table)))
     (setf (gethash +building-type-hell-structure+ max-building-types) t)
     (setf (gethash +building-type-hell-growth+ max-building-types) t)
+    (setf (gethash +building-type-hell-struct-growth+ max-building-types) t)
     
     (setf (gethash +building-type-crater+ max-building-types) 4)
     (setf (gethash +building-type-crater-large+ max-building-types) 1)

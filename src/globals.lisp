@@ -112,6 +112,7 @@
 (defconstant +mob-type-skinchanger-ranged+ 55)
 (defconstant +mob-type-skinchanger-flyer+ 56)
 (defconstant +mob-type-skinchanger-turret+ 57)
+(defconstant +mob-type-demon-machine+ 58)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-civilians+ 1)
@@ -173,6 +174,7 @@
 (defconstant +ai-package-find-sigil+ 26)
 (defconstant +ai-package-escape-with-relic+ 27)
 (defconstant +ai-package-swim-up+ 28)
+(defconstant +ai-package-find-machine+ 29)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)
@@ -410,6 +412,7 @@
 (defconstant +mob-effect-demonic-power+ 55)
 (defconstant +mob-effect-demonic-sigil+ 56)
 (defconstant +mob-effect-deep-breath+ 57)
+(defconstant +mob-effect-demonic-machine+ 58)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)
@@ -510,6 +513,7 @@
 (defconstant +feature-delayed-demons-arrival-point+ 40)
 (defconstant +feature-delayed-angels-arrival-point+ 41)
 (defconstant +feature-delayed-military-arrival-point+ 42)
+(defconstant +feature-start-machine-point+ 43)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -521,6 +525,7 @@
 (defconstant +level-city-terrain-grass+ 3)
 (defconstant +level-city-terrain-tree+ 4)
 (defconstant +level-city-terrain-bush+ 5)
+(defconstant +level-city-terrain-earth+ 6)
 
 (defconstant +terrain-trait-blocks-move+ 0)
 (defconstant +terrain-trait-blocks-vision+ 1)
@@ -539,6 +544,7 @@
 (defconstant +terrain-trait-flammable+ 14)
 (defconstant +terrain-trait-can-jump-over+ 15)
 (defconstant +terrain-trait-can-have-rune+ 16)
+(defconstant +terrain-trait-can-switch-light+ 17)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -605,6 +611,7 @@
 (defconstant +terrain-wall-razorthorns+ 62)
 (defconstant +terrain-floor-creep-glowshroom+ 63)
 (defconstant +terrain-floor-creep-irradiated+ 64)
+(defconstant +terrain-wall-compressed-flesh+ 65)
 
 ;;--------------------
 ;; GOD Constants
@@ -694,9 +701,6 @@
 (defparameter *mob-sound-pick-drop* 40)
 
 (defparameter *thief-win-value* 1500)
-(defparameter *demonic-raid-win-value* 0)
-(defparameter *demonic-conquest-win-sigils-num* 4)
-(defparameter *demonic-conquest-win-sigils-turns* 100)
 (defparameter *demonic-conquest-win-sigils-dist* 35)
 
 (defparameter *max-oxygen-level* 5)

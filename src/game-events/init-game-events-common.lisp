@@ -82,6 +82,57 @@
     )
   nil)
 
+(defun get-demon-raid-overall-points (world)
+  (loop for feature-id in (demonic-portals (level world))
+        for feature = (get-feature-by-id feature-id)
+        when (= (feature-type feature) +feature-demonic-portal+)
+          sum (if (param1 feature)
+                (param1 feature)
+                0)))
+
+(defun get-demon-steal-check-relic-captured (world)
+  (loop for feature-id in (feature-id-list (level world))
+        for feature = (get-feature-by-id feature-id)
+        when (= (feature-type feature) +feature-demonic-portal+)
+          do
+             (when (param1 feature)
+               (return-from get-demon-steal-check-relic-captured t))
+        )
+  nil)
+
+(defun get-demon-conquest-turns-left (world)
+  (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
+    (declare (ignore max-turns))
+    (loop for sigil-id in (stable-sort (demonic-sigils (level world)) #'(lambda (a b)
+                                                                          (if (> (param1 (get-effect-by-id (mob-effect-p (get-mob-by-id a) +mob-effect-demonic-sigil+)))
+                                                                                 (param1 (get-effect-by-id (mob-effect-p (get-mob-by-id b) +mob-effect-demonic-sigil+))))
+                                                                            t
+                                                                            nil)))
+          repeat sigils-num
+          for sigil = (get-mob-by-id sigil-id)
+          for effect = (get-effect-by-id (mob-effect-p sigil +mob-effect-demonic-sigil+))
+          minimize (param1 effect))))
+
+(defun get-military-conquest-check-alive-sigils (level)
+  (if (> (length (demonic-sigils level)) 0)
+    t
+    nil))
+
+(defun get-angel-steal-angel-with-relic (world)
+  (let ((relic-item (if (level/relic-id (level world))
+                      (get-item-by-id (level/relic-id (level world)))
+                      nil)))
+    (when (and relic-item
+               (inv-id relic-item)
+               (mob-ability-p (get-mob-by-id (inv-id relic-item)) +mob-type-angel+))
+      (return-from get-angel-steal-angel-with-relic (get-mob-by-id (inv-id relic-item)))))
+  nil)
+
+(defun get-angel-sabotage-check-alive-machines (level)
+  (if (> (length (demonic-machines level)) 0)
+    t
+    nil))
+
 ;;===========================
 ;; WIN EVENTS
 ;;===========================

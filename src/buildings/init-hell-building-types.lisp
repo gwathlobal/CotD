@@ -41,7 +41,7 @@
                                               
                                               (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
                                               (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
-                                              (translate-build-to-template x y (+ z 1) build-template-z-4 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
                                               )
                                             (values nil
                                                     nil
@@ -367,3 +367,448 @@
                                                 
                                                 (values nil nil nil))))
                                   ))
+
+;;=====================
+;; Structure-Growth
+;;=====================
+
+(set-building-type (make-building :id +building-city-hell-struct-growth-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-struct-growth+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-2 (list "`,,,,`````"
+                                                                            ",,``,,````"
+                                                                            ",,`,X,,,,`"
+                                                                            ",,,X,,X`,,"
+                                                                            "````X,,,`,"
+                                                                            "```X,```,,"
+                                                                            "``,,,,,,,`"
+                                                                            "`T,``,T`,`"
+                                                                            "`,`,T``,,`"
+                                                                            "`,,,,,,,``"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            "          "
+                                                                            "    ,     "
+                                                                            "   ,  ,   "
+                                                                            "    ,     "
+                                                                            "   ,      "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          "))
+                                                   
+                                                  )
+                                              
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-struct-growth-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-struct-growth+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-2 (list "`,,,,`````"
+                                                                            ",,``,,````"
+                                                                            ",,`,X,,,,`"
+                                                                            ",,,X,,X`,,"
+                                                                            "````X,,,`,"
+                                                                            "```X,```,,"
+                                                                            "``,,,,,,,`"
+                                                                            "`T,``,T`,`"
+                                                                            "`,`,T``,,`"
+                                                                            "`,,,,,,,``"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            "          "
+                                                                            "    ,     "
+                                                                            "   ,  ,   "
+                                                                            "    ,     "
+                                                                            "   ,      "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          "))
+                                                   
+                                                  )
+                                              
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-struct-growth-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-struct-growth+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-2 (list "`,,,,`````"
+                                                                            ",,``,,T```"
+                                                                            ",,`T`,,,,`"
+                                                                            ",,,`,,``T,"
+                                                                            "`````,,,`,"
+                                                                            "````X```,,"
+                                                                            "``,XX,,,,`"
+                                                                            "``X``XX`,`"
+                                                                            "`,`,```X,`"
+                                                                            "`,,,,,,,``"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "    ,     "
+                                                                            "   ,,     "
+                                                                            "  ,  ,,   "
+                                                                            "       ,  "
+                                                                            "          "))
+                                                   
+                                                  )
+                                              
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-struct-growth-3+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-struct-growth+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-2 (list "`,,,,`````"
+                                                                            ",,`T,,````"
+                                                                            ",,```,,,,`"
+                                                                            ",,,`,,`X`,"
+                                                                            "`T```,X,X,"
+                                                                            "````````X,"
+                                                                            "``,T`,,,,`"
+                                                                            "``````X`,`"
+                                                                            "`T`,````,`"
+                                                                            "`,,,,,,,``"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "       ,  "
+                                                                            "      , , "
+                                                                            "        , "
+                                                                            "          "
+                                                                            "      ,   "
+                                                                            "          "
+                                                                            "          "))
+                                                   
+                                                  )
+                                              
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-struct-growth-4+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-struct-growth+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-2 (list "`,,,,`````"
+                                                                            ",,``,,````"
+                                                                            ",X`X`,,T,`"
+                                                                            ",,X`,,```,"
+                                                                            "``X``,`,T,"
+                                                                            "`````````,"
+                                                                            "``X``,T,,`"
+                                                                            "````````,`"
+                                                                            "```X````,`"
+                                                                            "`,,,,,,,``"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            "          "
+                                                                            " , ,      "
+                                                                            "  ,       "
+                                                                            "  ,       "
+                                                                            "          "
+                                                                            "  ,       "
+                                                                            "          "
+                                                                            "   ,      "
+                                                                            "          "))
+                                                   
+                                                  )
+                                              
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+;;=====================
+;; Machine
+;;=====================
+
+(set-building-type (make-building :id +building-city-hell-machine-1+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-machine+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-1 (list "0000000000"
+                                                                            "0XXXXXXXX0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0X..uu..X0"
+                                                                            "0X..XX..X0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0XXXXXXXX0"
+                                                                            "0000000000"))
+                                                  
+                                                  (build-template-z-2 (list "```````,,,"
+                                                                            "`XXXXXXXX,"
+                                                                            ",X......X,"
+                                                                            ",X......X`"
+                                                                            ",X..dd..X`"
+                                                                            ",XX....XX,"
+                                                                            ",X......X,"
+                                                                            "`X......X,"
+                                                                            "`XXX..XXX`"
+                                                                            "``````,,,`"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            " ........ "
+                                                                            " .XXXXXX. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .XXXXXX. "
+                                                                            " ........ "
+                                                                            "          "))
+
+                                                  (build-template-z-4 (list "          "
+                                                                            "          "
+                                                                            "  ......  "
+                                                                            "  .XXXX.  "
+                                                                            "  .X  X.  "
+                                                                            "  .X  X.  "
+                                                                            "  .XXXX.  "
+                                                                            "  ......  "
+                                                                            "          "
+                                                                            "          "))
+
+                                                  (build-template-z-5 (list "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          ")))
+
+                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level terrains)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
+                                              (translate-build-to-template x y (+ z 3) build-template-z-5 template-level terrains)
+                                              )
+                                            (values nil
+                                                    (list (list +feature-start-machine-point+ 4 7 (- z 1))
+                                                          (list +feature-start-sigil-point+ 4 2 (- z 1)))
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-machine-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-machine+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-1 (list "0000000000,"
+                                                                            "0XXXXXXXX0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0X..XX..X0"
+                                                                            "0X..uu..X0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0XXXXXXXX0"
+                                                                            "0000000000"))
+                                                  
+                                                  (build-template-z-2 (list "```````,,,"
+                                                                            "`XXX..XXX,"
+                                                                            ",X......X,"
+                                                                            ",X......X`"
+                                                                            ",XX....XX`"
+                                                                            ",X..dd..X,"
+                                                                            ",X......X,"
+                                                                            "`X......X,"
+                                                                            "`XXXXXXXX`"
+                                                                            "``````,,,`"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            " ........ "
+                                                                            " .XXXXXX. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .XXXXXX. "
+                                                                            " ........ "
+                                                                            "          "))
+
+                                                  (build-template-z-4 (list "          "
+                                                                            "          "
+                                                                            "  ......  "
+                                                                            "  .XXXX.  "
+                                                                            "  .X  X.  "
+                                                                            "  .X  X.  "
+                                                                            "  .XXXX.  "
+                                                                            "  ......  "
+                                                                            "          "
+                                                                            "          "))
+
+                                                  (build-template-z-5 (list "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          ")))
+
+                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level terrains)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
+                                              (translate-build-to-template x y (+ z 3) build-template-z-5 template-level terrains)
+                                              )
+                                            (values nil
+                                                    (list (list +feature-start-machine-point+ 4 2 (- z 1))
+                                                          (list +feature-start-sigil-point+ 4 7 (- z 1)))
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-machine-3+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-machine+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-1 (list "0000000000,"
+                                                                            "0XXXXXXXX0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0X..uX..X0"
+                                                                            "0X..uX..X0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0XXXXXXXX0"
+                                                                            "0000000000"))
+                                                  
+                                                  (build-template-z-2 (list "```````,,,"
+                                                                            "`XXXXXXXX,"
+                                                                            ",X......X,"
+                                                                            ",X......X`"
+                                                                            ",X..d....`"
+                                                                            ",X..d....,"
+                                                                            ",X......X,"
+                                                                            "`X......X,"
+                                                                            "`XXXXXXXX`"
+                                                                            "``````,,,`"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            " ........ "
+                                                                            " .XXXXXX. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .XXXXXX. "
+                                                                            " ........ "
+                                                                            "          "))
+
+                                                  (build-template-z-4 (list "          "
+                                                                            "          "
+                                                                            "  ......  "
+                                                                            "  .XXXX.  "
+                                                                            "  .X  X.  "
+                                                                            "  .X  X.  "
+                                                                            "  .XXXX.  "
+                                                                            "  ......  "
+                                                                            "          "
+                                                                            "          "))
+
+                                                  (build-template-z-5 (list "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          ")))
+
+                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level terrains)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
+                                              (translate-build-to-template x y (+ z 3) build-template-z-5 template-level terrains)
+                                              )
+                                            (values nil
+                                                    (list (list +feature-start-machine-point+ 7 4 (- z 1))
+                                                          (list +feature-start-sigil-point+ 2 4 (- z 1)))
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-machine-4+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-machine+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-1 (list "0000000000,"
+                                                                            "0XXXXXXXX0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0X..Xu..X0"
+                                                                            "0X..Xu..X0"
+                                                                            "0X......X0"
+                                                                            "0X......X0"
+                                                                            "0XXXXXXXX0"
+                                                                            "0000000000"))
+                                                  
+                                                  (build-template-z-2 (list "```````,,,"
+                                                                            "`XXXXXXXX,"
+                                                                            ",X......X,"
+                                                                            ",X......X`"
+                                                                            ",....d..X`"
+                                                                            ",....d..X,"
+                                                                            ",X......X,"
+                                                                            "`X......X,"
+                                                                            "`XXXXXXXX`"
+                                                                            "``````,,,`"))
+                                                  
+                                                  (build-template-z-3 (list "          "
+                                                                            " ........ "
+                                                                            " .XXXXXX. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .X    X. "
+                                                                            " .XXXXXX. "
+                                                                            " ........ "
+                                                                            "          "))
+
+                                                  (build-template-z-4 (list "          "
+                                                                            "          "
+                                                                            "  ......  "
+                                                                            "  .XXXX.  "
+                                                                            "  .X  X.  "
+                                                                            "  .X  X.  "
+                                                                            "  .XXXX.  "
+                                                                            "  ......  "
+                                                                            "          "
+                                                                            "          "))
+
+                                                  (build-template-z-5 (list "          "
+                                                                            "          "
+                                                                            "          "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "   ....   "
+                                                                            "          "
+                                                                            "          "
+                                                                            "          ")))
+
+                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level terrains)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
+                                              (translate-build-to-template x y (+ z 3) build-template-z-5 template-level terrains)
+                                              )
+                                            (values nil
+                                                    (list (list +feature-start-machine-point+ 2 4 (- z 1))
+                                                          (list +feature-start-sigil-point+ 7 4 (- z 1)))
+                                                    nil))))

@@ -44,6 +44,8 @@
 
 (defconstant +building-type-hell-structure+ 34)
 (defconstant +building-type-hell-growth+ 35)
+(defconstant +building-type-hell-struct-growth+ 36)
+(defconstant +building-type-hell-machine+ 37)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -158,6 +160,14 @@
 (defconstant +building-city-hell-structure-2+ 102)
 (defconstant +building-city-hell-structure-3+ 103)
 (defconstant +building-city-hell-structure-4+ 104)
+(defconstant +building-city-hell-struct-growth-1+ 105)
+(defconstant +building-city-hell-struct-growth-2+ 106)
+(defconstant +building-city-hell-struct-growth-3+ 107)
+(defconstant +building-city-hell-struct-growth-4+ 108)
+(defconstant +building-city-hell-machine-1+ 109)
+(defconstant +building-city-hell-machine-2+ 110)
+(defconstant +building-city-hell-machine-3+ 111)
+(defconstant +building-city-hell-machine-4+ 112)
 
 (defparameter *level-grid-size* 5)
 
@@ -219,7 +229,9 @@
                      (#\B +terrain-floor-bookshelf+)
                      (#\+ +terrain-door-closed+)
                      (#\' +terrain-door-open+)
-                     (#\0 +terrain-wall-earth+)
+                     (#\0 (if (getf terrains +level-city-terrain-earth+)
+                            (funcall (getf terrains +level-city-terrain-earth+))
+                            +terrain-wall-earth+))
                      (#\X +terrain-wall-corrupted+)
                      (#\Space +terrain-floor-air+)
                      (#\u +terrain-slope-stone-up+)

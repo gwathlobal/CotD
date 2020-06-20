@@ -2168,6 +2168,7 @@
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                     (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and terrain
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-can-switch-light+)
                                                                                                                  (or (and (<= (cur-light actor) 0)
                                                                                                                           (get-terrain-type-trait terrain +terrain-trait-light-source+)
                                                                                                                           (not (zerop (get-terrain-type-trait terrain +terrain-trait-light-source+))))
@@ -2193,7 +2194,8 @@
                                                         (if (and (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                                  (= (view-z *player*) (z *player*))
                                                                  (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
-                                                                 (get-terrain-type-trait terrain +terrain-trait-light-source+))
+                                                                 (get-terrain-type-trait terrain +terrain-trait-light-source+)
+                                                                 (get-terrain-type-trait terrain +terrain-trait-can-switch-light+))
                                                           (progn
                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)

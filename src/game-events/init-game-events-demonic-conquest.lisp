@@ -6,7 +6,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-angels+
                                            :descr-func #'(lambda ()
-                                                           (multiple-value-bind (sigils-num max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+                                                           (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
                                                              (format nil "To win, destroy all demons in the district. To lose, have all angels killed or let the demons create ~A demonic sigils and let them charge for ~A turns." sigils-num max-turns)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
@@ -44,11 +44,11 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-demons+
                                            :descr-func #'(lambda ()
-                                                           (multiple-value-bind (sigils-num max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+                                                           (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
                                                              (format nil "To win, create at least ~A demonic sigils (using your ability) and let them charge for ~A turns. To lose, have all demons killed." sigils-num max-turns)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (multiple-value-bind (sigils-num max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+                                                         (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
                                                            (if (and (> (total-demons (level world)) 0)
                                                                     (get-demon-conquest-turns-left world)
                                                                     (>= (length (demonic-sigils (level world))) sigils-num)
@@ -72,7 +72,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-military+
                                            :descr-func #'(lambda ()
-                                                           (multiple-value-bind (sigils-num max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+                                                           (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
                                                              (format nil "To win, destroy all demons in the district. To lose, have all military killed or let the demons create ~A demonic sigils and let them charge for ~A turns." sigils-num max-turns)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
@@ -96,7 +96,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-church+
                                            :descr-func #'(lambda ()
-                                                           (multiple-value-bind (sigils-num max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+                                                           (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
                                                              (format nil "To win, destroy all demons in the district. To lose, get all priests and angels killed or let the demons create ~A demonic sigils and let them charge for ~A turns." sigils-num max-turns)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
@@ -130,11 +130,11 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-demon-conquest-win-for-satanists+
                                            :descr-func #'(lambda ()
-                                                           (multiple-value-bind (sigils-num max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+                                                           (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
                                                              (format nil "To win, create at least ~A demonic sigils (using your ability) and let them charge for ~A turns. To lose, get all satanists and demons killed." sigils-num max-turns)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (multiple-value-bind (sigils-num max-turns) (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest))
+                                                         (multiple-value-bind (sigils-num max-turns) (values-list (win-condition/win-formula (get-win-condition-by-id :win-cond-demonic-conquest)))
                                                            (if (and (= (loyal-faction *player*) +faction-type-satanists+)
                                                                     (> (nth +faction-type-satanists+ (total-faction-list (level world))) 0)
                                                                     (get-demon-conquest-turns-left world)

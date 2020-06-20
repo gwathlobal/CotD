@@ -483,6 +483,17 @@
                                        :ai-use-ability t
                              ))
 
+(set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon-machine+
+                                       :name "demonic machine"
+                                       :glyph-idx +glyph-id-machine+ :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 25 :max-fp 12
+                                       :faction +faction-type-demons+
+                                       :weapon (list "None" nil nil) :base-dodge 0
+                                       :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 100) (list +weapon-dmg-mind+ 0 100))
+                                       :strength 0
+                                       :base-light-radius 0
+                                       :abil-unholy t :abil-demon t :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t
+                             ))
+
 ;;--------------------
 ;; UNDEAD
 ;;--------------------

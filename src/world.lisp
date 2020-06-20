@@ -35,6 +35,7 @@
    (relic-id :initform nil :initarg :relic-id :accessor level/relic-id)
    (book-id :initform nil :initarg :book-id :accessor level/book-id)
    (demonic-sigils :initform () :initarg :demonic-sigils :accessor demonic-sigils)
+   (demonic-machines :initform () :initarg :demonic-sigils :accessor demonic-machines)
    (mob-quadrant-map :initform nil :initarg :mob-quadrant-map :accessor mob-quadrant-map)
    (item-quadrant-map :initform nil :initarg :item-quadrant-map :accessor item-quadrant-map)
    (light-quadrant-map :initform nil :initarg :light-quadrant-map :accessor light-quadrant-map)

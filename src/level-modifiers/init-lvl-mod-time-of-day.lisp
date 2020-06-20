@@ -125,7 +125,7 @@
                                                           (reverse func-list)))
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
-                                                  ;; is not available for hell districts
+                                                  ;; is only available for hell districts
                                                   (if (or (eq world-sector-type-id :world-sector-hell-plain))
                                                     t
                                                     nil)))

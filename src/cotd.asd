@@ -116,6 +116,7 @@
      (:file "game-events/init-game-events-military-raid" :depends-on ("game-events/game-events" "windows"))
      (:file "game-events/init-game-events-angelic-steal" :depends-on ("game-events/game-events" "windows"))
      (:file "game-events/init-game-events-eliminate-satanists" :depends-on ("game-events/game-events" "windows"))
+     (:file "game-events/init-game-events-angelic-sabotage" :depends-on ("game-events/game-events" "windows"))
      (:file "game-events/init-game-events-campaign-win" :depends-on ("game-events/game-events" "windows"))
      (:file "game-events/init-game-events-campaign" :depends-on ("game-events/game-events" "windows"))
      (:file "init-animation-types" :depends-on ("animations" "windows"))
