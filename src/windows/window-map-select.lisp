@@ -26,167 +26,167 @@
     (funcall (start-map-select win))))
 
 (defun map-select-update (win)
-  (update-map-area :rel-x (view-x *player*) :rel-y (view-y *player*) :rel-z (view-z *player*)
-                   :post-func #'(lambda (x y x1 y1)
-                                  (loop for sound in (heard-sounds *player*) 
-                                        when (and (= (sound-x sound) x)
-                                                  (= (sound-y sound) y)
-                                                  (= (sound-z sound) (view-z *player*)))
-                                          do
-                                             (draw-glyph x1
-                                                         y1
-                                                         31
-                                                         :front-color sdl:*white*
-                                                         :back-color sdl:*black*))))
-
-  ;; drawing the highlighting rectangle around the viewed grid-cell
-  (let ((lof-blocked t))
-    (let ((x1 0) (y1 0) (color) (tx (view-x *player*)) (ty (view-y *player*)) (tz (view-z *player*)))
-      (declare (type fixnum x1 y1))
-      (multiple-value-bind (sx sy max-x max-y) (calculate-start-coord (view-x *player*) (view-y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
-        (setf (max-x win) max-x (max-y win) max-y)
-        ;; calculate the coordinates where to draw the rectangle
-        (setf x1 (+ (* (- (view-x *player*) sx) *glyph-w*) *glyph-w*))
-        (setf y1 (+ (* (- (view-y *player*) sy) *glyph-h*) *glyph-h*))
-        ;;(format t "VIEW X,Y = (~A, ~A); sx, sy = (~A, ~A); x1 , y1 = (~A, ~A)~%" (view-x *player*) (view-y *player*) sx sy x1 y1)
-
-        (when (check-lof win)
-          (line-of-sight (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
-                         #'(lambda (dx dy dz prev-cell)
-                             (declare (type fixnum dx dy))
-                             (let ((exit-result t))
-                               (block nil
-                                 (setf tx dx ty dy tz dz)
-
-                                 (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
-                                   (setf exit-result 'exit)
-                                   (return))
-                                 )
-                               exit-result))))
-
-        (when (and (= tx (view-x *player*)) (= ty (view-y *player*)) (= tz (view-z *player*)))
-          (setf lof-blocked nil))
-                   
-        ;; adjust color depending on the target
-        (if (and (not lof-blocked)
-                 (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) 
-                 (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                 (check-mob-visible (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) :observer *player*))
-          (setf color sdl:*red*)
-          (setf color sdl:*yellow*))
-        
-       
-        ;; draw the rectangle
-        (sdl:with-rectangle (l-rect (sdl:rectangle :x x1 :y y1 :w 1 :h *glyph-h*))
-          (sdl:fill-surface color :template l-rect))
-        (sdl:with-rectangle (r-rect (sdl:rectangle :x (+ x1 (1- *glyph-w*)) :y y1 :w 1 :h *glyph-h*))
-          (sdl:fill-surface color :template r-rect))
-        (sdl:with-rectangle (t-rect (sdl:rectangle :x x1 :y y1 :w *glyph-w* :h 1))
-          (sdl:fill-surface color :template t-rect))
-        (sdl:with-rectangle (b-rect (sdl:rectangle :x x1 :y (+ y1 (1- *glyph-h*)) :w *glyph-w* :h 1))
-          (sdl:fill-surface color :template b-rect))))
+  (update-map-area *start-map-x* 0 :rel-x (view-x *player*) :rel-y (view-y *player*) :rel-z (view-z *player*)
+                                   :post-func #'(lambda (x y x1 y1)
+                                                  (loop for sound in (heard-sounds *player*) 
+                                                        when (and (= (sound-x sound) x)
+                                                                  (= (sound-y sound) y)
+                                                                  (= (sound-z sound) (view-z *player*)))
+                                                          do
+                                                             (draw-glyph x1
+                                                                         y1
+                                                                         31
+                                                                         :front-color sdl:*white*
+                                                                         :back-color sdl:*black*))))
     
-    ;; drawing a list of objects in the grid-cell instead of a message box
-    (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 10) :w (- *window-width* 260 10) :h *msg-box-window-height*))
-      (sdl:fill-surface sdl:*black* :template obj-list-rect))
-    (let ((str (create-string))
-          (feature-list)
-          (mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
-      (when (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-        ;;(format t "HERE~%")
-        (when lof-blocked
-          (format str "Line of fire blocked!~%"))
-        (format str "~A (~A, ~A, ~A)~A~A~A~A" (capitalize-name (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))) (view-x *player*) (view-y *player*) (view-z *player*)
-                (if *cotd-release* "" (format nil " Light: ~A-~A"
-                                              (get-single-memo-light (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                              (get-outdoor-light-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
-                (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))))
-                (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*))))
-                (if *cotd-release* "" (format nil " ~A" (level-cells-connected-p (level *world*) (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
-                                                                                 (if (riding-mob-id *player*)
-                                                                                   (map-size (get-mob-by-id (riding-mob-id *player*)))
-                                                                                   (map-size *player*))
-                                                                                 (get-mob-move-mode *player*))))
-                )
-        (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-        (dolist (feature feature-list)
-          (format str ", ~A~A"
-                  (capitalize-name (name (get-feature-by-id feature)))
-                  (if *cotd-release* "" (format nil " (~A)" (counter (get-feature-by-id feature))))))
-        (when (and mob
-                   (check-mob-visible mob :observer *player*))
-          (format str "~%~A~A~A"
-                  (capitalize-name (visible-name mob))
-                  (if (riding-mob-id mob)
-                    (format nil ", riding ~A" (prepend-article +article-a+ (visible-name (get-mob-by-id (riding-mob-id mob)))))
-                    "")
-                  (if (and (check-lof win) (not lof-blocked))
-                    (format nil " (hit: ~D%)" (if (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
-                                                100
-                                                (truncate (- (r-acc *player*) (* (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) *acc-loss-per-tile*)))))
-                    "")))
-        (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
-              for item = (get-item-by-id item-id)
-              do
-                 (format str "~%~A"
-                         (capitalize-name (prepend-article +article-a+ (visible-name item)))
-                         ))
-                         
-                         
-        )
-      (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 20) :w (- *window-width* 260 10) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height)))))
-        (write-text str rect)))
-  
-    ;; drawing the propmt line
-    (let ((x 10) (y (- *window-height* 5 (sdl:char-height sdl:*default-font*))) (w (- *window-width* 260 10)) (h (sdl:get-font-height)))
-      (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
-        (sdl:fill-surface sdl:*black* :template a-rect)
-        (cond
-          ((= (cur-tab win) +map-select-win-mobs+) (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Ctrl+l] Map select  [Esc] Quit") x y :color sdl:*white*))
-          ((and (= (cur-tab win) +map-select-win-map+) (sel-list win)) (sdl:draw-string-solid-* (format nil "~A[Ctrl+l] Mob select  [Esc] Quit" (nth +map-select-win-map+ (cmd-str win))) x y :color sdl:*white*))
-          (t (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (first (cmd-str win))) x y :color sdl:*white*)))
-        
-        ))))
+    ;; drawing the highlighting rectangle around the viewed grid-cell
+    (let ((lof-blocked t))
+      (let ((x1 0) (y1 0) (color) (tx (view-x *player*)) (ty (view-y *player*)) (tz (view-z *player*)))
+        (declare (type fixnum x1 y1))
+        (multiple-value-bind (sx sy max-x max-y) (calculate-start-coord (view-x *player*) (view-y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
+          (setf (max-x win) max-x (max-y win) max-y)
+          ;; calculate the coordinates where to draw the rectangle
+          (setf x1 (+ (* (- (view-x *player*) sx) *glyph-w*) *start-map-x*))
+          (setf y1 (+ (* (- (view-y *player*) sy) *glyph-h*) ))
+          ;;(format t "VIEW X,Y = (~A, ~A); sx, sy = (~A, ~A); x1 , y1 = (~A, ~A)~%" (view-x *player*) (view-y *player*) sx sy x1 y1)
+          
+          (when (check-lof win)
+            (line-of-sight (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
+                           #'(lambda (dx dy dz prev-cell)
+                               (declare (type fixnum dx dy))
+                               (let ((exit-result t))
+                                 (block nil
+                                   (setf tx dx ty dy tz dz)
+                                   
+                                   (unless (check-LOS-propagate dx dy dz prev-cell :check-projectile t)
+                                     (setf exit-result 'exit)
+                                     (return))
+                                   )
+                                 exit-result))))
+          
+          (when (and (= tx (view-x *player*)) (= ty (view-y *player*)) (= tz (view-z *player*)))
+            (setf lof-blocked nil))
+          
+          ;; adjust color depending on the target
+          (if (and (not lof-blocked)
+                   (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) 
+                   (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                   (check-mob-visible (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) :observer *player*))
+            (setf color sdl:*red*)
+            (setf color sdl:*yellow*))
+          
+          
+          ;; draw the rectangle
+          (sdl:with-rectangle (l-rect (sdl:rectangle :x x1 :y y1 :w 1 :h *glyph-h*))
+            (sdl:fill-surface color :template l-rect))
+          (sdl:with-rectangle (r-rect (sdl:rectangle :x (+ x1 (1- *glyph-w*)) :y y1 :w 1 :h *glyph-h*))
+            (sdl:fill-surface color :template r-rect))
+          (sdl:with-rectangle (t-rect (sdl:rectangle :x x1 :y y1 :w *glyph-w* :h 1))
+            (sdl:fill-surface color :template t-rect))
+          (sdl:with-rectangle (b-rect (sdl:rectangle :x x1 :y (+ y1 (1- *glyph-h*)) :w *glyph-w* :h 1))
+            (sdl:fill-surface color :template b-rect))))
+      
+      ;; drawing a list of objects in the grid-cell instead of a message box
+      (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 10) :w (- *window-width* 260 10) :h *msg-box-window-height*))
+        (sdl:fill-surface sdl:*black* :template obj-list-rect))
+      (let ((str (create-string))
+            (feature-list)
+            (mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+        (when (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+          ;;(format t "HERE~%")
+          (when lof-blocked
+            (format str "Line of fire blocked!~%"))
+          (format str "~A (~A, ~A, ~A)~A~A~A~A" (capitalize-name (get-terrain-name (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))) (view-x *player*) (view-y *player*) (view-z *player*)
+                  (if *cotd-release* "" (format nil " Light: ~A-~A"
+                                                (get-single-memo-light (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+                                                (get-outdoor-light-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
+                  (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))))
+                  (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*))))
+                  (if *cotd-release* "" (format nil " ~A" (level-cells-connected-p (level *world*) (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
+                                                                                   (if (riding-mob-id *player*)
+                                                                                     (map-size (get-mob-by-id (riding-mob-id *player*)))
+                                                                                     (map-size *player*))
+                                                                                   (get-mob-move-mode *player*))))
+                  )
+          (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
+          (dolist (feature feature-list)
+            (format str ", ~A~A"
+                    (capitalize-name (name (get-feature-by-id feature)))
+                    (if *cotd-release* "" (format nil " (~A)" (counter (get-feature-by-id feature))))))
+          (when (and mob
+                     (check-mob-visible mob :observer *player*))
+            (format str "~%~A~A~A"
+                    (capitalize-name (visible-name mob))
+                    (if (riding-mob-id mob)
+                      (format nil ", riding ~A" (prepend-article +article-a+ (visible-name (get-mob-by-id (riding-mob-id mob)))))
+                      "")
+                    (if (and (check-lof win) (not lof-blocked))
+                      (format nil " (hit: ~D%)" (if (< (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) 2)
+                                                  100
+                                                  (truncate (- (r-acc *player*) (* (get-distance (x *player*) (y *player*) (view-x *player*) (view-y *player*)) *acc-loss-per-tile*)))))
+                      "")))
+          (loop for item-id in (get-items-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
+                for item = (get-item-by-id item-id)
+                do
+                   (format str "~%~A"
+                           (capitalize-name (prepend-article +article-a+ (visible-name item)))
+                           ))
+          
+          
+          )
+        (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 20) :w (- *window-width* 260 10) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height)))))
+          (write-text str rect)))
+      
+      ;; drawing the propmt line
+      (let ((x 10) (y (- *window-height* 5 (sdl:char-height sdl:*default-font*))) (w (- *window-width* 260 10)) (h (sdl:get-font-height)))
+        (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
+          (sdl:fill-surface sdl:*black* :template a-rect)
+          (cond
+            ((= (cur-tab win) +map-select-win-mobs+) (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Ctrl+l] Map select  [Esc] Quit") x y :color sdl:*white*))
+            ((and (= (cur-tab win) +map-select-win-map+) (sel-list win)) (sdl:draw-string-solid-* (format nil "~A[Ctrl+l] Mob select  [Esc] Quit" (nth +map-select-win-map+ (cmd-str win))) x y :color sdl:*white*))
+            (t (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (first (cmd-str win))) x y :color sdl:*white*)))
+          
+          ))))
 
 (defmethod make-output ((win map-select-window))
   (fill-background-tiles)
-  
-  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
+
+  (show-char-properties (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   ;(show-small-message-box *glyph-w* (- *window-height* *msg-box-window-height* 10) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
-  (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
-  (cond
-    ((and (= (cur-tab win) +map-select-win-mobs+) (sel-list win))
-     (progn
-       (let ((color-list)
-             )
-         (dotimes (i (length (sel-list win)))
-           
-           (if (= i (cur-sel win)) 
-             (setf color-list (append color-list (list sdl:*yellow*)))
-             (setf color-list (append color-list (list sdl:*white*)))))
-         (draw-selection-list (sel-list win) (cur-sel win) 6 (- *window-width* 260) (- *window-height* *msg-box-window-height* 20)
-                              :color-list color-list
-                              :char-height (if (> *glyph-h* (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
-                                                  *glyph-h*
-                                                  (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
-                              :str-func #'(lambda (x y color str use-letters)
-                                            ;; the list of strings to display is basically a list of visible mob IDs, so 'str' param is a mob ID here
-                                            ;; use-letters here can be
-                                            ;;   nil
-                                            ;;   (list i str-per-page)
-                                            (if use-letters
-                                              (progn
-                                                (sdl:draw-string-solid-* (if (< (first use-letters) (second use-letters))
-                                                                           (format nil "[~A]  " (nth (first use-letters) *char-list*))
-                                                                           (format nil "     "))
-                                                                         x y :color color)
-                                                (draw-visible-mob-func (+ x (* 5 (sdl:char-width sdl:*default-font*))) y (get-mob-by-id str) *player* color))
-                                              (progn
-                                                (draw-visible-mob-func x y (get-mob-by-id str) *player* color))))
-                              :use-letters t))))
-    (t (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height* :mob *player* :visible-mobs (sel-list win))))
-  
-  (map-select-update win)
+    (show-level-weather (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
+    (cond
+      ((and (= (cur-tab win) +map-select-win-mobs+) (sel-list win))
+       (progn
+         (let ((color-list)
+               )
+           (dotimes (i (length (sel-list win)))
+             
+             (if (= i (cur-sel win)) 
+               (setf color-list (append color-list (list sdl:*yellow*)))
+               (setf color-list (append color-list (list sdl:*white*)))))
+           (draw-selection-list (sel-list win) (cur-sel win) 6 (- *window-width* 260) (- *window-height* *msg-box-window-height* 20)
+                                :color-list color-list
+                                :char-height (if (> *glyph-h* (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
+                                               *glyph-h*
+                                               (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
+                                :str-func #'(lambda (x y color str use-letters)
+                                              ;; the list of strings to display is basically a list of visible mob IDs, so 'str' param is a mob ID here
+                                              ;; use-letters here can be
+                                              ;;   nil
+                                              ;;   (list i str-per-page)
+                                              (if use-letters
+                                                (progn
+                                                  (sdl:draw-string-solid-* (if (< (first use-letters) (second use-letters))
+                                                                             (format nil "[~A]  " (nth (first use-letters) *char-list*))
+                                                                             (format nil "     "))
+                                                                           x y :color color)
+                                                  (draw-visible-mob-func (+ x (* 5 (sdl:char-width sdl:*default-font*))) y (get-mob-by-id str) *player* color))
+                                                (progn
+                                                  (draw-visible-mob-func x y (get-mob-by-id str) *player* color))))
+                                :use-letters t))))
+      (t (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height* :mob *player* :visible-mobs (sel-list win))))
+    
+    (map-select-update win)
   
   (sdl:update-display))
 

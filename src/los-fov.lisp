@@ -42,6 +42,10 @@
       )
 
     (when player-reveal-cell
+      (when (and (<= (abs (- (x *player*) dx)) 5)
+                 (<= (abs (- (y *player*) dy)) 5)
+                 (/= (z *player*) dz))
+        (pushnew dz (visible-z-list *player*)))
       (reveal-cell-on-map (level *world*) dx dy dz :reveal-mob (if (or (null (get-mob-* (level *world*) dx dy dz))
                                                                        (eq (get-mob-* (level *world*) dx dy dz) *player*))
                                                                  t
@@ -690,6 +694,7 @@
 (defun update-visible-area-normal (level x y z &key (no-z nil))
   (let ((vision-power (1+ (cur-sight *player*)))
         (vision-pwr (1+ (cur-sight *player*))))
+    (setf (visible-z-list *player*) ())
     (draw-fov x y z (cur-sight *player*)
               #'(lambda (dx dy dz prev-cell)
                   (let ((exit-result t) (pwr-decrease))

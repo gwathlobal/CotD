@@ -5,6 +5,7 @@
    (idle-calcing :initform :done :accessor idle-calcing) ; :done - background pathfinding calculation finished
                                                          ; :in-progress - background pathfinding calculation in progress
                                                          ; :npc-turn - it is not players turn
+   (max-glyphs :initform 11 :accessor max-glyphs)
    ))
 
 (defun show-char-effects (mob x y h)
@@ -24,6 +25,29 @@
                                                          mob))
            
            (incf y1 (sdl:get-font-height))))
+
+(defun show-part-of-level (win win-x win-y x y z)
+  (with-slots (max-glyphs) win
+
+    ;; draw a rectangle
+    (sdl:with-rectangle (rect (sdl:rectangle :x win-x :y win-y :w (* *glyph-w* (+ 1 max-glyphs)) :h (* *glyph-h* (+ 1 max-glyphs))))
+      (sdl:fill-surface sdl:*black* :template rect)
+      (sdl:draw-rectangle rect :color sdl:*white*))
+    
+    ;; draw relative level
+    (let ((str (format nil "~@D" (- z (z *player*))))
+          (sx (+ 10 win-x))
+          (sy (- win-y 5)))
+      (sdl:with-rectangle (rect (sdl:rectangle :x sx :y sy :w (* (sdl:char-width sdl:*default-font*) (length str)) :h (sdl:char-height sdl:*default-font*)))
+        (sdl:fill-surface sdl:*black* :template rect))
+      (sdl:draw-string-solid-* str
+                               sx sy :color sdl:*white*))
+
+    ;; draw map
+    (update-map-area (+ win-x (truncate *glyph-w* 2)) (+ win-y (truncate *glyph-h* 2)) :rel-x x :rel-y y :rel-z z :max-x-view max-glyphs :max-y-view max-glyphs)
+    (highlight-map-tile (+ win-x (truncate *glyph-w* 2) (* *glyph-w* (truncate max-glyphs 2))) (+ win-y (truncate *glyph-h* 2) (* *glyph-h* (truncate max-glyphs 2))))
+    
+    ))
 
 (defun show-char-properties (x y idle-calcing)
   (let* ((str (create-string))
@@ -332,7 +356,7 @@
          (str (format nil "Turns before arrival: ~A/~A" (player-game-time *world*) turns-before-arrival))
          (w (* (sdl:char-width sdl:*default-font*) (length str)))
          (h (sdl:char-height sdl:*default-font*))
-         (x (- (truncate (* *max-x-view* *glyph-w*) 2) (truncate w 2)))
+         (x (+ *start-map-x* (- (truncate (* *max-x-view* *glyph-w*) 2) (truncate w 2))))
          (y (- (truncate (* *max-y-view* *glyph-h*) 2) (truncate h 2))))
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       (sdl:fill-surface sdl:*black* :template a-rect)
@@ -345,28 +369,74 @@
   ;; filling the background with black rectangle
     
   (fill-background-tiles)
-   
-  (update-map-area :post-func #'(lambda (x y x1 y1)
-                                  (loop for sound in (heard-sounds *player*) 
-                                        when (and (= (sound-x sound) x)
-                                                  (= (sound-y sound) y)
-                                                  (= (sound-z sound) (z *player*)))
-                                          do
-                                             (draw-glyph x1
-                                                         y1
-                                                         31
-                                                         :front-color sdl:*white*
-                                                         :back-color sdl:*black*))
-                                  ))
 
-  (show-abilities-on-cooldown 10 (- *window-height* *msg-box-window-height* 20 (* (sdl:char-height sdl:*default-font*) 2)))
-  (show-char-properties (+ 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
-  (show-message-box 10 (- *window-height* *msg-box-window-height* 20) (- *window-width* 260 10))
-  (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height*)
-  (show-level-weather (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
+  (with-slots (max-glyphs) win
+    (update-map-area *start-map-x* 0 :post-func #'(lambda (x y x1 y1)
+                                                            (loop for sound in (heard-sounds *player*) 
+                                                                  when (and (= (sound-x sound) x)
+                                                                            (= (sound-y sound) y)
+                                                                            (= (sound-z sound) (z *player*)))
+                                                                    do
+                                                                       (draw-glyph x1
+                                                                                   y1
+                                                                                   31
+                                                                                   :front-color sdl:*white*
+                                                                                   :back-color sdl:*black*))
+                                                            ))
+    
+    (show-abilities-on-cooldown 10 (- *window-height* *msg-box-window-height* 20 (* (sdl:char-height sdl:*default-font*) 2)))
+    (show-char-properties (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
+    (show-message-box 10 (- *window-height* *msg-box-window-height* 20) (- *window-width* 260 10))
+    (show-visible-mobs (- *window-width* 260) (- *window-height* *msg-box-window-height* 20) 260 *msg-box-window-height*)
+    (show-level-weather (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
 
-  (when (player-outside-level *player*)
-    (show-delayed-arrival))
+    ;; display up to two parts of the level
+    (format t "Before (visible-z-list *player*) = ~A~%" (visible-z-list *player*))
+    ;; sort the list of visible z levels
+    ;; if there is an enemy in range - 
+    (loop with result = (remove-duplicates (loop for mob-id in (visible-mobs *player*)
+                                                 for mob = (get-mob-by-id mob-id)
+                                                 when (and (<= (abs (- (x *player*) (x mob))) 5)
+                                                           (<= (abs (- (y *player*) (y mob))) 5)
+                                                           (/= (z *player*) (z mob))
+                                                           (find (z mob) (visible-z-list *player*)))
+                                                   collect (z mob)))
+          for off-z from 1 below (array-dimension (terrain (level *world*)) 2) do
+            (when (find (- (z *player*) off-z) (visible-z-list *player*))
+              (pushnew (- (z *player*) off-z) result))
+            (when (find (+ (z *player*) off-z) (visible-z-list *player*))
+              (pushnew (+ (z *player*) off-z) result))
+          finally (setf (visible-z-list *player*) (reverse result)))
+    (format t "After (after-z-list *player*) = ~A~%" (visible-z-list *player*))
+    (loop with accepted-z-levels = ()
+          with offset = (truncate max-glyphs 2)
+          for z in (visible-z-list *player*) do
+            (let ((non-air-found nil))
+              (block outer
+                (loop for x from (- (x *player*) offset) to (+ (x *player*) offset) do
+                  (loop for y from (- (y *player*) offset) to (+ (y *player*) offset) do
+                    (when (and (>= x 0) (>= y 0) (< x (array-dimension (terrain (level *world*)) 0)) (< y (array-dimension (terrain (level *world*)) 1))
+                               (or (and (not (eq (get-terrain-* (level *world*) x y z) +terrain-border-air+))
+                                        (not (eq (get-terrain-* (level *world*) x y z) +terrain-floor-air+)))
+                                   (get-mob-* (level *world*) x y z)))
+                      (setf non-air-found t)
+                      (return-from outer nil))))) 
+              (when non-air-found
+                (push z accepted-z-levels)))
+            (format t "accepted-z-levels = ~A~%" accepted-z-levels)
+            (when (>= (length accepted-z-levels) 2)
+              (loop-finish))
+          finally
+             (when accepted-z-levels
+               (show-part-of-level win 5 10 (x *player*) (y *player*) (first accepted-z-levels)))
+             (when (> (length accepted-z-levels) 1)
+               (show-part-of-level win 5 (+ 10 10 (* *glyph-h* (+ 1 max-glyphs))) (x *player*) (y *player*) (second accepted-z-levels))))
+    
+    
+    
+  
+    (when (player-outside-level *player*)
+      (show-delayed-arrival)))
     
   (sdl:update-display)
   
@@ -813,7 +883,7 @@
                  (set-idle-calcing win)
 
                  
-                 (show-time-label (idle-calcing win) (+ 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -3 (sdl:char-height sdl:*default-font*))) t)
+                 (show-time-label (idle-calcing win) (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -3 (sdl:char-height sdl:*default-font*))) t)
               )
               
        (:video-expose-event () (make-output *current-window*)))

@@ -85,7 +85,7 @@
                ;;(format t "~%TIME-ELAPSED AI ~A [~A] after UPDATE-VISIBLE-MOBS: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                (when (eq mob *player*)
                  (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
-                 (update-map-area)
+                 (update-map-area *start-map-x* 0)
                  )
                ;;(format t "~%TIME-ELAPSED AI ~A [~A] after players' UPDATE-VISIBLE-MOBS (if any): ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                
@@ -98,7 +98,7 @@
                  (sdl:update-display)
                  (sdl-cffi::sdl-delay 100)
                  (setf (animation-queue *world*) nil)
-                 (update-map-area)
+                 (update-map-area *start-map-x* 0)
                  ;;(format t "~%TIME-ELAPSED AI ~A [~A] after all animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
 				 )
                

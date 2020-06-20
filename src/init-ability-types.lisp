@@ -1600,7 +1600,7 @@
                                                                                          :singlemind))))
                                                   (progn
                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
-                                                                           (format nil "~A tries to reveal the true form of ~A. But ~A does not conseal anything. "
+                                                                           (format nil "~A tries to reveal the true form of ~A. But ~A does not conceal anything. "
                                                                                    (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                    (prepend-article +article-the+ (visible-name target))
                                                                                    (prepend-article +article-the+ (visible-name target)))

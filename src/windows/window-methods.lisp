@@ -47,7 +47,7 @@
      ;;(format t "rel = (~A, ~A), s = (~A, ~A)~%" rel-x rel-y sx sy)
      (values sx sy max-x max-y)))
 
-(defun update-map-area (&key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*)
+(defun update-map-area (start-x start-y &key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*)
                              (post-func #'(lambda (x y x1 y1) (declare (ignore x y x1 y1)) nil)))
   (declare (optimize (speed 3)))
   ;; draw the level
@@ -61,8 +61,8 @@
 	 (dotimes (y max-y)
 	   (declare (type fixnum y))
 	   ;; calculate the coordinates where to draw the glyph
-	   (setf x1 (+ (* x glyph-w) glyph-w))
-	   (setf y1 (+ (* y glyph-h) glyph-h))
+	   (setf x1 (+ (* x glyph-w) start-x))
+	   (setf y1 (+ (* y glyph-h) start-y))
 	   ;; select the object, the glyph of which shall be drawn
 	   (setf single-memo (aref array (+ sx x) (+ sy y) rel-z))
 	   ;;(when (and (eql (get-single-memo-visible single-memo) nil) 
@@ -146,8 +146,8 @@
     (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
       ;; calculate the coordinates where to draw the animation
       
-      (setf scr-x (+ (* (- map-x sx) *glyph-w*) *glyph-w*))
-      (setf scr-y (+ (* (- map-y sy) *glyph-h*) *glyph-h*))
+      (setf scr-x (+ (* (- map-x sx) *glyph-w*) *start-map-x*))
+      (setf scr-y (+ (* (- map-y sy) *glyph-h*)))
       ;(format t "MAP-X ~A MAP-Y ~A; SX ~A SY ~A; SCR-X ~A SCR-Y ~A~%" map-x map-y sx sy scr-x scr-y)
       
       ;; drawing glyph

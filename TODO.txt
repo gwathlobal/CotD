@@ -39,4 +39,3 @@
 - Optimize connectivity map creation
 - Recalculate connectivity after terrain destruction
 - Scout's artillery strike ignites appropriate affected tiles
-- Better Z level presentation - separate panes with Z nearby levels above/below (ala DF)

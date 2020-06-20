@@ -1450,7 +1450,8 @@
    (nearby-light-mobs :initform () :accessor nearby-light-mobs)
    (nearby-light-sources :initform () :accessor nearby-light-sources)
    (if-cur-mob-seen-through-shared-vision :initform nil :accessor if-cur-mob-seen-through-shared-vision)
-   (player-outside-level :initform nil :accessor player-outside-level)))
+   (player-outside-level :initform nil :accessor player-outside-level)
+   (visible-z-list :initform () :accessor visible-z-list)))
 
 (defmethod name ((mob player))
   (values (slot-value mob 'name) +noun-proper+ +noun-singular+))
