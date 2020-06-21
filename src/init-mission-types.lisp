@@ -1190,10 +1190,12 @@
 (set-mission-type :id :mission-type-celestial-sabotage
                   :name "Celestial sabotage"
                   :is-available-func #'(lambda (world-sector world)
-                                         (declare (ignore world))
-                                         (if (or (eq (wtype world-sector) :world-sector-hell-plain))
-                                           t
-                                           nil))
+                                         (let* ((angels-win-cond (get-win-condition-by-id :win-cond-angels-campaign))
+                                                (machines-left (funcall (win-condition/win-func angels-win-cond) world angels-win-cond)))
+                                           (if (and (or (eq (wtype world-sector) :world-sector-hell-plain))
+                                                    (> machines-left 0))
+                                             t
+                                             nil)))
                   :faction-list-func #'(lambda (world-sector)
                                          (let ((faction-list (list (list +faction-type-angels+ :mission-faction-present))))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
@@ -1261,10 +1263,6 @@
                   :win-condition-list (list (list +faction-type-demons+ +game-event-angelic-sabotage-win-for-demons+)
                                             (list +faction-type-angels+ +game-event-angelic-sabotage-win-for-angels+)
                                             )
-                  :campaign-result (list (list :game-over-angels-won nil)
-                                         (list :game-over-demons-won nil)
-                                         (list :game-over-military-won nil)
-                                         (list :game-over-church-won nil)
-                                         (list :game-over-satanists-won nil)
-                                         (list :game-over-eater-won nil))
+                  :campaign-result (list (list :game-over-angels-won (list #'remove-hell-engine))
+                                         (list :game-over-demons-won nil))
                   )

@@ -736,6 +736,23 @@
         (add-message (format nil "slaughtered") sdl:*yellow* message-box-list)
         (add-message (format nil ".") sdl:*white* message-box-list)))))
 
+(defun remove-hell-engine (world-map x y)
+  (declare (ignore world-map x y)) 
+  (let* ((angels-win-cond (get-win-condition-by-id :win-cond-angels-campaign))
+         (machines-left (funcall (win-condition/win-func angels-win-cond) *world* angels-win-cond)))
+    (when (<= machines-left 0)
+      (return-from remove-hell-engine nil)))
+
+  (incf (world/machine-destroyed *world*))
+
+  (let ((message-box-list `(,(world/sitrep-message-box *world*))))
+    (add-message (format nil " The ") sdl:*white* message-box-list)
+    (add-message (format nil "dimensional engine") sdl:*yellow* message-box-list)
+    (add-message (format nil " was ") sdl:*white* message-box-list)
+    (add-message (format nil "shattered") sdl:*yellow* message-box-list)
+    (add-message (format nil ".") sdl:*white* message-box-list))
+  )
+
 (defun calc-all-military-on-world-map (world-map)
   (let ((military-sum 0)
         (military-sectors ()))

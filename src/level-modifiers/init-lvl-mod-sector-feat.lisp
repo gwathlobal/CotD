@@ -486,7 +486,7 @@
                     )
 
 (set-level-modifier :id +lm-feat-hell-engine+ :type +level-mod-sector-feat+
-                    :name "Hell engine"
+                    :name "Dimensional engine"
                     :priority 30
                     :faction-list-func #'(lambda (sector-type-id)
                                            (declare (ignore sector-type-id))

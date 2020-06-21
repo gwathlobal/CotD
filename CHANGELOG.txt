@@ -1,5 +1,6 @@
 CHANGELOG
 
+- The player shall now see what is hapenning on the upper or lower Z level whenever something interesting is nearby.
 - Added a new terrain tile to the corrupted districts - glowshrooms. Glowshrooms emit faint light and illuminate everything around them.
 - Message log can be now quickly skimmed using Shift+Up/Down.
 - Added craters from artillery fire to abandoned and corrupted districts. 
