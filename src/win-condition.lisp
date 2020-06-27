@@ -8,6 +8,7 @@
                                 :win-cond-demonic-conquest
                                 :win-cond-military-conquest
                                 :win-cond-celestial-sabotage
+                                :win-cond-military-sabotage
                                 :win-cond-demon-campaign
                                 :win-cond-military-campaign
                                 :win-cond-angels-campaign))

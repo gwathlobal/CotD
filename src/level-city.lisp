@@ -242,7 +242,7 @@
   (logger (format nil "RESERVED-LEVEL:~%"))
   (loop for y from 0 below (array-dimension reserved-level 1) do
     (loop for x from 0 below (array-dimension reserved-level 0) do
-      (logger (format nil "~2@A " (cond
+      (logger (format nil "~3@A " (cond
                                     ((null (aref reserved-level x y 2)) "F")
                                     ((eq (aref reserved-level x y 2) t) "R")
                                     (t (first (aref reserved-level x y 2)))

@@ -566,6 +566,7 @@
          (church-feat (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a))))
          (library-feat (find +lm-feat-library+ (feats world-sector) :key #'(lambda (a) (first a))))
          (machine-feat (find +lm-feat-hell-engine+ (feats world-sector) :key #'(lambda (a) (first a))))
+         (flesh-feat (find +lm-feat-hell-flesh-storage+ (feats world-sector) :key #'(lambda (a) (first a))))
          (displayed-cells (make-array (list max-disp-w max-disp-h) :initial-element (list 0 sdl:*black* sdl:*black*)))
          (water-color nil)
          (gray-color (sdl:color :r 40 :g 40 :b 40))
@@ -806,7 +807,8 @@
                                          nil)
                                        church-feat
                                        library-feat
-                                       machine-feat))))
+                                       machine-feat
+                                       flesh-feat))))
       (if (> (length feat-list) 1)
         (progn
           (setf (aref displayed-cells 1 3) (list +glyph-id-three-dots+ sdl:*white* sdl:*black*)))
@@ -820,7 +822,9 @@
               ((eq (first feat-list) library-feat) (progn
                                                      (setf (aref displayed-cells 1 3) (list +glyph-id-book+ sdl:*white* sdl:*black*))))
               ((eq (first feat-list) machine-feat) (progn
-                                                     (setf (aref displayed-cells 1 3) (list +glyph-id-machine+ sdl:*white* sdl:*black*))))))))
+                                                     (setf (aref displayed-cells 1 3) (list +glyph-id-machine+ sdl:*white* sdl:*black*))))
+              ((eq (first feat-list) flesh-feat) (progn
+                                                   (setf (aref displayed-cells 1 3) (list +glyph-id-percent+ sdl:*magenta* sdl:*black*))))))))
       )
     
     (setf (aref displayed-cells 2 2) (list (glyph-idx (get-world-sector-type-by-id (wtype world-sector)))

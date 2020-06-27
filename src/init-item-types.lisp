@@ -3,22 +3,22 @@
 (set-item-type (make-instance 'item-type :id +item-type-body-part-limb+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 1))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 1))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-half+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 2))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 2))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-body+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 3))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 3))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-full+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx 5 :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 4))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 4))
 
 (set-item-type (make-instance 'item-type :id +item-type-coin+
                                          :name "coin" :plural-name "coins"
@@ -92,9 +92,9 @@
                                                                              (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+))
                                                                              (or (= (third cell) 0)
                                                                                  (and (> (third cell) 0)
-                                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+)))
+                                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move-floor+)))
                                                                                  (and (< (third cell) 0)
-                                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y (z actor)) +terrain-trait-opaque-floor+)))))
+                                                                                      (not (get-terrain-type-trait (get-terrain-* (level *world*) x y (z actor)) +terrain-trait-blocks-move-floor+)))))
                                                                     
                                                                     (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-thick+ :x x :y y :z z :counter 4))))
                                                          
@@ -354,13 +354,13 @@
                                                              for z from (1- (array-dimension (terrain (level *world*)) 2)) downto final-z
                                                              when (and (get-terrain-* (level *world*) x y z)
                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+))
-                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+))
+                                                                       (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move-floor+))
                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-projectiles+))
                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-water+)))
                                                                do
                                                                   (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-flare+ :x x :y y :z z :counter 2))
                                                              when (and (get-terrain-* (level *world*) x y z)
-                                                                       (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+)))
+                                                                       (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move-floor+)))
                                                                do
                                                                   (loop-finish)
                                                              when (and (get-terrain-* (level *world*) x y z)
@@ -393,7 +393,7 @@
                                                                              with clear-path = t
                                                                              when (and (get-terrain-* (level *world*) (x actor) (y actor) z)
                                                                                        (or (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+)
-                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move-floor+)
                                                                                            (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-projectiles+)
                                                                                            (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-water+)))
                                                                                do
@@ -412,7 +412,7 @@
                                                                              with clear-path = t
                                                                              when (and (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z)
                                                                                        (or (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-move+)
-                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-move-floor+)
                                                                                            (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-projectiles+)
                                                                                            (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-water+)))
                                                                                do
@@ -431,7 +431,7 @@
                                                                              with clear-path = t
                                                                              when (and (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
                                                                                        (or (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-move+)
-                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-move-floor+)
                                                                                            (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-projectiles+)
                                                                                            (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-water+)))
                                                                                do
@@ -466,7 +466,7 @@
                                                        (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                        (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                          (when (and terrain
-                                                                                                                    (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                    (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                     (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                     (not (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                            (when (null final-cell)
@@ -480,7 +480,9 @@
                                                            (setf scarab-mob (make-instance 'mob :mob-type +mob-type-fast-scarab+ :x (first final-cell) :y (second final-cell) :z (third final-cell)))
                                                            (setf scarab-mob (make-instance 'mob :mob-type +mob-type-scarab+ :x (first final-cell) :y (second final-cell) :z (third final-cell))))
                                                          (setf (order scarab-mob) (list +mob-order-target+ (id target)))
-                                                         (add-mob-to-level-list (level *world*) scarab-mob)))
+                                                         (add-mob-to-level-list (level *world*) scarab-mob)
+                                                         (set-mob-location scarab-mob (x scarab-mob) (y scarab-mob) (z scarab-mob) :apply-gravity t)
+                                                         (update-visible-mobs scarab-mob)))
                                                      ;; always remove 1 item
                                                      t)
                                          :on-check-applic #'(lambda (actor item)
@@ -489,7 +491,7 @@
                                                                 (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                                 (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                                   (when (and terrain
-                                                                                                                             (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                             (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                              (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                              (not (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                                     (setf empty-cell t)))))
@@ -550,7 +552,9 @@
                                                            (setf (max-hp locust-mob) 14)
                                                            (set-mob-effect locust-mob :effect-type-id +mob-effect-mortality+ :actor-id (id locust-mob) :cd 15))
                                                          (set-mob-effect locust-mob :effect-type-id +mob-effect-mortality+ :actor-id (id locust-mob) :cd 10))
-                                                       (add-mob-to-level-list (level *world*) locust-mob))
+                                                       (add-mob-to-level-list (level *world*) locust-mob)
+                                                       (set-mob-location locust-mob (x locust-mob) (y locust-mob) (z locust-mob) :apply-gravity t)
+                                                       (update-visible-mobs locust-mob))
                                                      ;; always remove 1 item
                                                      t)
                                          :on-check-applic #'(lambda (actor item)
@@ -564,7 +568,7 @@
                                                             (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                             (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                               (when (and terrain
-                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                          (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                          (not (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                                 (when (null final-cell)
@@ -616,7 +620,9 @@
                                                      (let ((larva-mob))
                                                        (setf larva-mob (make-instance 'mob :mob-type +mob-type-seeker-larva+ :x (first target) :y (second target) :z (third target)))
                                                        (set-mob-effect larva-mob :effect-type-id +mob-effect-primordial-transfer+ :actor-id (id actor) :cd t)
-                                                       (add-mob-to-level-list (level *world*) larva-mob))
+                                                       (add-mob-to-level-list (level *world*) larva-mob)
+                                                       (set-mob-location larva-mob (x larva-mob) (y larva-mob) (z larva-mob) :apply-gravity t)
+                                                       (update-visible-mobs larva-mob))
                                                      ;; always remove 1 item
                                                      t)
                                          :on-check-applic #'(lambda (actor item)
@@ -630,7 +636,7 @@
                                                             (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                             (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                               (when (and terrain
-                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                          (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                          (not (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                                 (when (null final-cell)
@@ -681,7 +687,9 @@
                                                                                                                 (format nil "You hear some burping~A. " str)))
                                                      (let ((larva-mob))
                                                        (setf larva-mob (make-instance 'mob :mob-type +mob-type-spore-colony+ :x (first target) :y (second target) :z (third target)))
-                                                       (add-mob-to-level-list (level *world*) larva-mob))
+                                                       (add-mob-to-level-list (level *world*) larva-mob)
+                                                       (set-mob-location larva-mob (x larva-mob) (y larva-mob) (z larva-mob) :apply-gravity t)
+                                                       (update-visible-mobs larva-mob))
                                                      ;; always remove 1 item
                                                      t)
                                          :on-check-applic #'(lambda (actor item)
@@ -695,7 +703,7 @@
                                                             (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                             (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                               (when (and terrain
-                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                         (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                          (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                          (not (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                                 (when (null final-cell)
@@ -818,5 +826,58 @@
 (set-item-type (make-instance 'item-type :id +item-type-church-reliс+
                                          :name "relic" :plural-name "relics"
                                          :glyph-idx +glyph-id-christ-cross+ :glyph-color sdl:*cyan* :back-color sdl:*black* :max-stack-num 1 :value 50
-                                         :descr "A holy relic. Demons seek it to capture and place under the wards in their world."
+                                         :descr "A holy relic. Demons seek it to capture and place under the wards."
                                          :flavor-quote (format nil "\"Our sacred ideals persist not because of their utility but because of our faith in them. We will even refuse to defend any sacred ideals in which we no longer beleove, unlike the ancient priests who, in the twilight of paganism, defended the idols which they had long ceased to consider as gods. Not a single of our sacred ideals is threatened by free inquiry, but this is precisely because they are strong in reality.\"~%Fyodor Dostoevsky. A Writer's Diary.")))
+
+(set-item-type (make-instance 'item-type :id +item-type-bomb+
+                                         :name "bomb" :plural-name "bombs"
+                                         :glyph-idx +glyph-id-bomb+ :glyph-color sdl:*white* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :descr "A bomb. Use it while standing next to the Target bomb location (but not on it). Then run at least 4 tiles away. The bomb will tick for 6 turns and explode, destroying the demonic raw flesh storage. Only humans can use bombs."
+                                         :flavor-quote (format nil "\"But perhaps it will not burst,\" he thought, and, with the decision of despair, he tried to open his eyes. But at that instant, through the crevice of his eyelids, his eyes were smitten with a red fire, and something struck him in the centre of the breast, with a frightful crash; he ran off, he knew not whither, stumbled over his sword, which had got between his legs, and fell over on his side.\"~%Leo Tolstoy. Sevastopol in May.")
+                                         :on-use #'(lambda (actor target item)
+                                                     (declare (ignore item))
+
+                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                     (when (and (find +feature-bomb-plant-target+ (get-features-* (level *world*) dx dy (z actor))
+                                                                                                                      :key #'(lambda (a)
+                                                                                                                               (feature-type (get-feature-by-id a))))
+                                                                                                                (not (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                       (setf target (list dx dy (z actor))))))
+                                                     
+                                                     (logger (format nil "ITEM-SPAWN-BOMB: ~A [~A] spawns a bomb at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+
+                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                            (format nil "~A plants a bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
+                                                                            :observed-mob actor
+                                                                            :color sdl:*white*
+                                                                            :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                          :singlemind)))
+                                                     (generate-sound actor (x actor) (y actor) (z actor) 20 #'(lambda (str)
+                                                                                                                (format nil "You hear a ticking clock~A. " str)))
+                                                     (let ((bomb-mob))
+                                                       (setf bomb-mob (make-instance 'mob :mob-type +mob-type-military-bomb-1+ :x (first target) :y (second target) :z (third target)))
+                                                       (add-mob-to-level-list (level *world*) bomb-mob)
+                                                       (set-mob-effect bomb-mob :effect-type-id +mob-effect-bomb-ticking+ :actor-id (id actor) :cd t)
+                                                       (set-mob-location bomb-mob (x bomb-mob) (y bomb-mob) (z bomb-mob) :apply-gravity t)
+                                                       (update-visible-mobs bomb-mob))
+                                                     ;; always remove 1 item
+                                                     t)
+                                         :on-check-applic #'(lambda (actor item)
+                                                              (declare (ignore item))
+                                                              (let ((target-cell nil))
+                                                                (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
+                                                                                                                (when (and (find +feature-bomb-plant-target+ (get-features-* (level *world*) dx dy (z actor))
+                                                                                                                                 :key #'(lambda (a)
+                                                                                                                                          (feature-type (get-feature-by-id a))))
+                                                                                                                           (not (get-mob-* (level *world*) dx dy (z actor))))
+                                                                                                                  (setf target-cell (list dx dy (z actor))))))
+                                                                (if (and target-cell
+                                                                         (mob-ability-p actor +mob-abil-human+))
+                                                                  target-cell
+                                                                  nil)))
+                                         :on-check-ai #'(lambda (actor item nearest-enemy nearest-ally)
+                                                          (declare (ignore nearest-enemy nearest-ally))
+                                                          (funcall (on-check-applic item) actor item))
+                                         :ai-invoke-func #'(lambda (actor item nearest-enemy nearest-ally check-result)
+                                                             (declare (ignore nearest-ally nearest-enemy))
+                                                             (mob-use-item actor check-result item))))

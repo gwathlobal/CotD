@@ -213,17 +213,17 @@
         for z = (z lvl-feature)
         when (= (feature-type lvl-feature) +feature-delayed-military-arrival-point+)
           do
-             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                         (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
                (push (list x y z) (delayed-military-arrival-points level)))
         when (= (feature-type lvl-feature) +feature-delayed-angels-arrival-point+)
           do
-             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                         (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
                (push (list x y z) (delayed-angels-arrival-points level)))
         when (= (feature-type lvl-feature) +feature-delayed-demons-arrival-point+)
           do
-             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+             (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                         (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)))
                (push (list x y z) (delayed-demons-arrival-points level)))))
 
@@ -275,7 +275,7 @@
           while (< (length portals) max-portals) do
             (check-surroundings x y t #'(lambda (dx dy)
                                           (when (or (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-blocks-move+)
-                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-opaque-floor+))
+                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-blocks-move-floor+))
                                                     (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-water+))
                                             (setf free-place nil))))
             (when (and free-place
@@ -407,7 +407,7 @@
                             (setf is-free t)
                             (check-surroundings x y t #'(lambda (dx dy)
                                                           (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
-                                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+)))
+                                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move-floor+)))
                                                             (setf is-free nil))))
                             (when is-free
                               
@@ -607,3 +607,32 @@
   (when (/= (player-lvl-mod-placement-id mission) +specific-faction-type-player+)
     (setup-win-conditions mission level)))
 
+
+
+(defun remove-signal-flares-from-military (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  (logger (format nil "REMOVE-SIGNAL-FLARES-FROM-MILITARY: Remove flares~%"))
+  (loop for mob-id in (mob-id-list level)
+        for mob = (get-mob-by-id mob-id)
+        when (eq (faction mob) +faction-type-military+)
+          do
+             (loop for item in (get-inv-items-by-type (inv mob) +item-type-signal-flare+) do
+               (setf (inv mob) (remove-from-inv item (inv mob))))
+        )
+  )
+
+(defun add-bombs-to-military (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  (logger (format nil "ADD-BOMBS-TO-MILITARY: Add bombs~%"))
+  (loop for mob-id in (mob-id-list level)
+        for mob = (get-mob-by-id mob-id)
+        when (eq (faction mob) +faction-type-military+)
+          do
+             (mob-pick-item mob (make-instance 'item :item-type +item-type-bomb+ :x (x mob) :y (y mob) :z (z mob) :qty 1)
+                            :spd nil :silent t)
+             (mob-pick-item mob (make-instance 'item :item-type +item-type-bomb+ :x (x mob) :y (y mob) :z (z mob) :qty 1)
+                            :spd nil :silent t)
+             (mob-pick-item mob (make-instance 'item :item-type +item-type-bomb+ :x (x mob) :y (y mob) :z (z mob) :qty 1)
+                            :spd nil :silent t)
+        )
+  )

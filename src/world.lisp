@@ -36,6 +36,7 @@
    (book-id :initform nil :initarg :book-id :accessor level/book-id)
    (demonic-sigils :initform () :initarg :demonic-sigils :accessor demonic-sigils)
    (demonic-machines :initform () :initarg :demonic-sigils :accessor demonic-machines)
+   (bomb-plant-locations :initform () :initarg :bomb-plant-locations :accessor bomb-plant-locations)
    (mob-quadrant-map :initform nil :initarg :mob-quadrant-map :accessor mob-quadrant-map)
    (item-quadrant-map :initform nil :initarg :item-quadrant-map :accessor item-quadrant-map)
    (light-quadrant-map :initform nil :initarg :light-quadrant-map :accessor light-quadrant-map)
@@ -174,9 +175,10 @@
            (funcall (can-merge-func feature) level feature)
            (merge-func feature))
     (progn
-        ;(format t "~A [~A] vs ~A [~A] ~A~%" (feature-type feature-old) (id feature-old) (feature-type feature) (id feature) (merge-func))
+      ;;(format t "MERGE: ~A [~A] (~A ~A ~A)~%" (name feature) (id feature) (x feature) (y feature) (z feature))
       (funcall (merge-func feature) level feature))
     (progn
+      ;;(format t "~A [~A] (~A ~A ~A)~%" (name feature) (id feature) (x feature) (y feature) (z feature))
       
       (pushnew (id feature) (feature-id-list level))
       (push (id feature) (aref (features level) (x feature) (y feature) (z feature)))

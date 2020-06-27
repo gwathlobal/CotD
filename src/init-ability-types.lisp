@@ -2989,7 +2989,7 @@
                                                                           #'(lambda (dx dy)
                                                                               (let ((terrain (get-terrain-* (level *world*) dx dy (z nearest-enemy))))
                                                                                 (when (and terrain
-                                                                                           (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                            (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                            (not (get-mob-* (level *world*) dx dy (z nearest-enemy)))
                                                                                            (< (calculate-single-tile-brightness (level *world*) dx dy (z nearest-enemy)) *mob-visibility-threshold*))
@@ -3183,7 +3183,7 @@
                                                                                      (find (id mob) (mimic-id-list actor))
                                                                                      (not (mob-effect-p mob +mob-effect-possessed+))
                                                                                      (not (riding-mob-id mob))
-                                                                                     (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-opaque-floor+))
+                                                                                     (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-blocks-move-floor+))
                                                                               mob
                                                                               nil))))
                                                         (setf ally (block nil
@@ -3221,7 +3221,7 @@
                                                            (find (id nearest-ally) (mimic-id-list actor))
                                                            (not (mob-effect-p nearest-ally +mob-effect-possessed+))
                                                            (not (riding-mob-id nearest-ally))
-                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-ally) (y nearest-ally) (z nearest-ally)) +terrain-trait-opaque-floor+)
+                                                           (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-ally) (y nearest-ally) (z nearest-ally)) +terrain-trait-blocks-move-floor+)
                                                            (< (get-distance-3d (x actor) (y actor) (z actor) (x nearest-ally) (y nearest-ally) (z nearest-ally))
                                                               2))
                                                       t
@@ -3238,7 +3238,7 @@
                                                                  (find (id target) (mimic-id-list *player*))
                                                                  (not (mob-effect-p target +mob-effect-possessed+))
                                                                  (not (riding-mob-id target))
-                                                                 (get-terrain-type-trait (get-terrain-* (level *world*) (x target) (y target) (z target)) +terrain-trait-opaque-floor+))
+                                                                 (get-terrain-type-trait (get-terrain-* (level *world*) (x target) (y target) (z target)) +terrain-trait-blocks-move-floor+))
                                                           (progn
                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* target ability-type-id)
@@ -3280,7 +3280,7 @@
                                                   (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                   (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and terrain
-                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                  (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                  (not (get-mob-* (level *world*) dx dy (z actor)))
                                                                                                                  )
@@ -3309,7 +3309,7 @@
                                                         (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                   (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and terrain
-                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                  (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                  (not (get-mob-* (level *world*) dx dy (z actor)))
                                                                                                                  )
@@ -3736,7 +3736,7 @@
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                     (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and terrain
-                                                                                                                 (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (or (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                      (get-terrain-type-trait terrain +terrain-trait-water+))
                                                                                                                  (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                  (not (get-mob-* (level *world*) dx dy (z actor)))
@@ -3763,7 +3763,7 @@
                                                                  (= (view-z *player*) (z *player*))
                                                                  (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
                                                                  (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                 (or (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                 (or (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                      (get-terrain-type-trait terrain +terrain-trait-water+))
                                                                  (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+)))
                                                           (progn
@@ -4908,7 +4908,7 @@
                                                   (loop with final-z = (third target)
                                                         for z from (1- (array-dimension (terrain (level *world*)) 2)) downto final-z
                                                         when (and (get-terrain-* (level *world*) x y z)
-                                                                  (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-opaque-floor+)))
+                                                                  (or (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move-floor+)))
                                                           do
                                                              (loop-finish)
                                                         when (and (get-terrain-* (level *world*) x y z)
@@ -4940,7 +4940,7 @@
                                                                      with clear-path = t
                                                                      when (and (get-terrain-* (level *world*) (x actor) (y actor) z)
                                                                                (or (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+)
-                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move-floor+)
                                                                                    (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-projectiles+)
                                                                                    (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-water+)))
                                                                        do
@@ -4958,7 +4958,7 @@
                                                                  with clear-path = t
                                                                  when (and (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z)
                                                                            (or (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-move+)
-                                                                               (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-opaque-floor+)
+                                                                               (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-move-floor+)
                                                                                (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-blocks-projectiles+)
                                                                                (get-terrain-type-trait (get-terrain-* (level *world*) (x nearest-enemy) (y nearest-enemy) z) +terrain-trait-water+)))
                                                                    do
@@ -4977,7 +4977,7 @@
                                                                      with clear-path = t
                                                                      when (and (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))
                                                                                (or (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-move+)
-                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-opaque-floor+)
+                                                                                   (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-move-floor+)
                                                                                    (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-blocks-projectiles+)
                                                                                    (get-terrain-type-trait (get-terrain-* (level *world*) (view-x *player*) (view-y *player*) z) +terrain-trait-water+)))
                                                                        do
@@ -6882,7 +6882,7 @@
                                                                  terrain
                                                                  (or (get-terrain-type-trait terrain +terrain-trait-blocks-move+)
                                                                      (and (/= (- (view-z *player*) (z *player*)) 0)
-                                                                          (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)))
+                                                                          (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)))
                                                                  (mob-move-passwall *player* (- (view-x *player*) (x *player*)) (- (view-y *player*) (y *player*)) (- (view-z *player*) (z *player*))))
                                                           (progn
                                                             (clear-message-list (level/small-message-box (level *world*)))
@@ -7620,7 +7620,7 @@
                                                     (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                     (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                       (when (and terrain
-                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                 (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                  (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                  (not (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                         (when (null final-cell)

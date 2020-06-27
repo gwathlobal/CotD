@@ -38,7 +38,7 @@
            (setf (x mob) x (y mob) y (z mob) z)
            (setf nz (apply-gravity mob)) 
         until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
-                   (get-terrain-type-trait (get-terrain-* level x y nz) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* level x y nz) +terrain-trait-blocks-move-floor+)
                    nz
                    (> nz 2)
                    (not (get-mob-* level x y nz))
@@ -96,7 +96,7 @@
         until (and (not (and (> x 7) (< x (- max-x 7)) (> y 7) (< y (- max-y 7))))
                    (eq (check-move-on-level mob x y z) t)
                    (not (get-mob-* level x y z))
-                   (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                    (/= (get-level-connect-map-value level x y z (if (riding-mob-id mob)
                                                                   (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                   (map-size mob))
@@ -130,7 +130,7 @@
         until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
                    (eq (check-move-on-level mob x y z) t)
                    (not (get-mob-* level x y z))
-                   (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                    (/= (get-level-connect-map-value level x y z (if (riding-mob-id mob)
                                                                   (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                   (map-size mob))
@@ -194,7 +194,7 @@
            (loop for (x . y) in cell-list
                  when (and (>= x 0) (< x max-x-level) (>= y 0) (< y max-y-level)
                            (eq (check-move-on-level mob x y sz) t)
-                           (get-terrain-type-trait (get-terrain-* level x y sz) +terrain-trait-opaque-floor+)
+                           (get-terrain-type-trait (get-terrain-* level x y sz) +terrain-trait-blocks-move-floor+)
                            (/= (get-level-connect-map-value level x y sz (if (riding-mob-id mob)
                                                                            (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                            (map-size mob))
@@ -231,9 +231,9 @@
                    (not (get-mob-* level (1+ x) (1- y) z))
                    (not (get-mob-* level x (1+ y) z))
 
-                   (get-terrain-type-trait (get-terrain-* level (1- x) (1- y) z) +terrain-trait-opaque-floor+)
-                   (get-terrain-type-trait (get-terrain-* level (1+ x) (1- y) z) +terrain-trait-opaque-floor+)
-                   (get-terrain-type-trait (get-terrain-* level x (1+ y) z) +terrain-trait-opaque-floor+)
+                   (get-terrain-type-trait (get-terrain-* level (1- x) (1- y) z) +terrain-trait-blocks-move-floor+)
+                   (get-terrain-type-trait (get-terrain-* level (1+ x) (1- y) z) +terrain-trait-blocks-move-floor+)
+                   (get-terrain-type-trait (get-terrain-* level x (1+ y) z) +terrain-trait-blocks-move-floor+)
 
                    (/= (get-level-connect-map-value level (1- x) (1- y) z (if (riding-mob-id mob1)
                                                                             (map-size (get-mob-by-id (riding-mob-id mob1)))
@@ -280,7 +280,7 @@
              (loop for z from (1- (array-dimension (light-map level) 2)) downto 0
                    do
                       (setf (aref (light-map level) x y z) light-pwr)
-                      (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                      (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                         (setf light-pwr 0))
                       (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-light-source+)
                         (add-light-source level (make-light-source x y z (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-light-source+))))

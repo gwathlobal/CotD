@@ -25,8 +25,6 @@
 (defparameter *rects-to-update* ())
 (defvar *msg-box-window-height*)
 
-(defparameter *start-map-x* 190)
-
 (defenum:defenum menu-command-enum (:menu-stop-loop
                                     :menu-continue
                                     :menu-load-scenario

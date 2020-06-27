@@ -29,7 +29,7 @@
                                                                   (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                                   (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                                     (when (and terrain
-                                                                                                                               (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                               (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                                (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                                (not (get-mob-* (level *world*) dx dy (z actor)))
                                                                                                                                (>= (get-distance dx dy (x nearest-enemy) (y nearest-enemy)) 2))
@@ -62,7 +62,7 @@
                                                                   (check-surroundings (x actor) (y actor) nil #'(lambda (dx dy)
                                                                                                                   (let ((terrain (get-terrain-* (level *world*) dx dy (z actor))))
                                                                                                                     (when (and terrain
-                                                                                                                               (get-terrain-type-trait terrain +terrain-trait-opaque-floor+)
+                                                                                                                               (get-terrain-type-trait terrain +terrain-trait-blocks-move-floor+)
                                                                                                                                (not (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
                                                                                                                                (not (get-mob-* (level *world*) dx dy (z actor)))
                                                                                                                                (>= (get-distance dx dy (x nearest-enemy) (y nearest-enemy)) 2))
@@ -90,11 +90,11 @@
                                                                        (not (mob-ability-p actor +mob-abil-no-breathe+))
                                                                        (<= (cur-oxygen actor) 1)
                                                                        (loop for z from (z actor) upto (array-dimension (terrain (level *world*)) 2)
-                                                                             when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+)
+                                                                             when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move-floor+)
                                                                                       (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+))
                                                                                do
                                                                                   (return nil)
-                                                                             when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-opaque-floor+))
+                                                                             when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move-floor+))
                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-blocks-move+))
                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) z) +terrain-trait-water+)))
                                                                                do
@@ -842,6 +842,81 @@
                                                                         (loop-finish))))
                                                              )))
 
+(set-ai-package (make-instance 'ai-package :id +ai-package-find-bomb-plant-location+
+                                           :priority 5
+                                           :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                            (let ((target-feature))
+                                                              (if (and (null nearest-enemy)
+                                                                       (setf target-feature (loop with target = nil
+                                                                                                  for feature-id in (bomb-plant-locations (level *world*))
+                                                                                                  for feature = (get-feature-by-id feature-id)
+                                                                                                  when (= (feature-type feature) +feature-bomb-plant-target+)
+                                                                                                     do
+                                                                                                        (unless target (setf target feature))
+                                                                                                        (when (< (get-distance (x actor) (y actor) (x feature) (y feature))
+                                                                                                                 (get-distance (x actor) (y actor) (x target) (y target)))
+                                                                                                          (setf target feature))
+                                                                                                   finally (return target)))
+                                                                       (or (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor)
+                                                                                                    (x target-feature)
+                                                                                                    (y target-feature)
+                                                                                                    (z target-feature)
+                                                                                                    (if (riding-mob-id actor)
+                                                                                                      (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                                      (map-size actor))
+                                                                                                    (get-mob-move-mode actor))
+                                                                           (and (> (map-size actor) 1)
+                                                                                (ai-find-move-around actor (x target-feature) (y target-feature))))
+                                                                       )
+                                                                target-feature
+                                                                nil)))
+                                           :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
+                                                             (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
+
+                                                             ;; when mob is a cannibal go to the nearest visible item and try to eat it
+                                                             (loop with target-feature = check-result
+                                                                   with move-failed-once = nil
+                                                                   with move-result = nil
+                                                                   while t do
+                                                                     (logger (format nil "AI-PACKAGE-FIND-BOMB-PLANT-LOCATION: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)~%"
+                                                                                     (x actor) (y actor) (z actor) (name target-feature) (id target-feature) (x target-feature) (y target-feature) (z target-feature)))
+                                                                     ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
+                                                                     (when (or (null (path-dst actor))
+                                                                               (/= (first (path-dst actor)) (x target-feature))
+                                                                               (/= (second (path-dst actor)) (y target-feature))
+                                                                               (/= (third (path-dst actor)) (z target-feature)))
+                                                                       (ai-set-path-dst actor (x target-feature) (y target-feature) (z target-feature)))
+                                                                     
+                                                                     ;; exit (and move randomly) if the path-dst is still null after the previous set attempt
+                                                                     (when (null (path-dst actor))
+                                                                       (ai-mob-random-dir actor)
+                                                                       (loop-finish))
+                                                                     
+                                                                     ;; make a path to the destination target if there is no path plotted
+                                                                     (when (or (null (path actor))
+                                                                               (mob-ability-p actor +mob-abil-momentum+))
+                                                                       (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
+                                                                     
+                                                                     ;; make a step along the path to the path-dst
+                                                                     (setf move-result (ai-move-along-path actor))
+                                                                     (cond
+                                                                       ;; if the move failed twice - move in a random direction
+                                                                       ((and move-failed-once
+                                                                             (null move-result))
+                                                                        (ai-mob-random-dir actor)
+                                                                        (loop-finish))
+                                                                       ;; if the move failed - reset path-dst and start anew
+                                                                       ((and (null move-failed-once)
+                                                                             (null move-result))
+                                                                        (setf (path-dst actor) nil)
+                                                                        (setf move-failed-once t)
+                                                                        )
+                                                                       ;; success
+                                                                       (t
+                                                                        (loop-finish))))
+                                                             )))
+
 (set-ai-package (make-instance 'ai-package :id +ai-package-use-ability+
                                            :priority 8
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
@@ -1219,7 +1294,7 @@
                                                                          while (or (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                                                                    (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
-                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move-floor+))
                                                                                         (not (mob-effect-p actor +mob-effect-flying+)))
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
@@ -1315,7 +1390,7 @@
                                                                          while (or (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                                                                    (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
-                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move-floor+))
                                                                                         (not (mob-effect-p actor +mob-effect-flying+)))
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
@@ -1412,7 +1487,7 @@
                                                                          while (or (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                                                                    (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
-                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move-floor+))
                                                                                         (not (mob-effect-p actor +mob-effect-flying+)))
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
@@ -1538,7 +1613,7 @@
                                                                                    (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                                                                    (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
-                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move-floor+))
                                                                                         (not (mob-effect-p actor +mob-effect-flying+)))
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
@@ -1631,7 +1706,7 @@
                                                                                    (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
                                                                                    (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
-                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-opaque-floor+))
+                                                                                        (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move-floor+))
                                                                                         (not (mob-effect-p actor +mob-effect-flying+)))
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))

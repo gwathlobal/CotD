@@ -1260,10 +1260,89 @@
                                                              (declare (ignore effect actor))
                                                              sdl:*green*)
                                              :on-add #'(lambda (effect actor)
-                                                         (declare (ignore ))
+                                                         (declare (ignore effect))
                                                          (push (id actor) (demonic-machines (level *world*))))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (setf (demonic-machines (level *world*)) (remove (id actor) (demonic-machines (level *world*))))                                                            
                                                             )
-                                             ))
+                                ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-bomb-ticking+ :name "Bomb ticking"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*green*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore actor))
+                                                         (unless (param1 effect)
+                                                           (setf (param1 effect) 0))
+                                                         )
+                                             :on-remove #'(lambda (effect actor)
+                                                            (declare (ignore actor effect))
+                                                                                                                        
+                                                            )
+                                             :on-tick #'(lambda (effect actor)
+                                                          (with-slots (param1) effect
+                                                            (incf param1)
+
+                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                                   (format nil "The bomb ticks... ~A! " param1)
+                                                                                   :observed-mob actor
+                                                                                   :color sdl:*white*
+                                                                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                 :singlemind)))
+
+                                                            (generate-sound actor (x actor) (y actor) (z actor) 20 #'(lambda (str)
+                                                                                                                (format nil "You hear a clock ticking~A. " str)))
+                                                            
+                                                            (when (= param1 2)
+                                                              (remove-mob-from-level-list (level *world*) actor)
+                                                              (let ((bomb-mob))
+                                                                (setf bomb-mob (make-instance 'mob :mob-type +mob-type-military-bomb-2+ :x (x actor) :y (y actor) :z (z actor)))
+                                                                (add-mob-to-level-list (level *world*) bomb-mob)
+                                                                (set-mob-effect bomb-mob :effect-type-id +mob-effect-bomb-ticking+ :actor-id (actor-id effect) :cd t :param1 param1)
+                                                                (set-mob-location bomb-mob (x bomb-mob) (y bomb-mob) (z bomb-mob) :apply-gravity t)
+                                                                (update-visible-mobs bomb-mob)
+                                                                ;; a hack to stop the new bomb from ticking on the same turn
+                                                                (setf (cur-ap bomb-mob) 0)))
+                                                            
+                                                            (when (= param1 4)
+                                                              (remove-mob-from-level-list (level *world*) actor)
+                                                              (let ((bomb-mob))
+                                                                (setf bomb-mob (make-instance 'mob :mob-type +mob-type-military-bomb-3+ :x (x actor) :y (y actor) :z (z actor)))
+                                                                (add-mob-to-level-list (level *world*) bomb-mob)
+                                                                (set-mob-effect bomb-mob :effect-type-id +mob-effect-bomb-ticking+ :actor-id (actor-id effect) :cd t :param1 param1)
+                                                                (set-mob-location bomb-mob (x bomb-mob) (y bomb-mob) (z bomb-mob) :apply-gravity t)
+                                                                (update-visible-mobs bomb-mob)
+                                                                ;; a hack to stop the new bomb from ticking on the same turn
+                                                                (setf (cur-ap bomb-mob) 0)))
+
+                                                            (when (> param1 5)
+                                                              (remove-mob-from-level-list (level *world*) actor)
+                                                              
+                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*)
+                                                                                     (format nil "KABOOM! ")
+                                                                                     :observed-mob actor
+                                                                                     :color sdl:*white*
+                                                                                     :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                   :singlemind)))
+
+                                                              (generate-sound actor (x actor) (y actor) (z actor) 150 #'(lambda (str)
+                                                                                                                         (format nil "You hear a huge explosion~A. " str)))
+
+                                                              (let ((bomb-plant-target-feature (get-feature-by-id (find +feature-bomb-plant-target+ (get-features-* (level *world*) (x actor) (y actor) (z actor))
+                                                                                                                        :key #'(lambda (a)
+                                                                                                                                 (feature-type (get-feature-by-id a)))))))
+                                                                (loop for (x y z) in (param1 bomb-plant-target-feature) do
+                                                                  (set-terrain-* (level *world*) x y z +terrain-floor-air+))
+                                                                
+                                                                (remove-feature-from-level-list (level *world*) bomb-plant-target-feature)
+                                                                (remove-feature-from-world bomb-plant-target-feature)
+                                                                (setf (bomb-plant-locations (level *world*)) (remove (id bomb-plant-target-feature) (bomb-plant-locations (level *world*)))))
+                                                          
+                                                              (make-explosion-at-xyz (level *world*) (x actor) (y actor) (z actor) 3 (get-mob-by-id (actor-id effect))
+                                                                                     :dmg-list `((:min-dmg 6 :max-dmg 10 :dmg-type ,+weapon-dmg-fire+ :weapon-aux (:is-fire))
+                                                                                                 (:min-dmg 6 :max-dmg 10 :dmg-type ,+weapon-dmg-iron+ :weapon-aux (:is-fire))))
+                                                          
+                                                            )))
+                                ))

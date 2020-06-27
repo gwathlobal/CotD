@@ -156,6 +156,14 @@
         (let ((max-machines (win-condition/win-formula (get-win-condition-by-id :win-cond-celestial-sabotage))))
           (format str "~%Demonic machines: ~A/~A~%" (length (demonic-machines (level *world*))) max-machines))
         )
+
+      ;; win condition for military sabotage
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-military+)
+                         (= (loyal-faction *player*) +faction-type-angels+))
+                     (eq (mission-type-id (mission (level *world*))) :mission-type-military-sabotage))
+                (eq (mission-type-id (mission (level *world*))) :mission-type-test))
+        (format str "~%Raw storages left: ~A~%" (length (bomb-plant-locations (level *world*))))
+        )
       
       
       (setf str (format nil "~A~%~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
@@ -391,7 +399,6 @@
     (show-level-weather (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
 
     ;; display up to two parts of the level
-    (format t "Before (visible-z-list *player*) = ~A~%" (visible-z-list *player*))
     ;; sort the list of visible z levels
     ;; if there is an enemy in range - 
     (loop with result = (remove-duplicates (loop for mob-id in (visible-mobs *player*)
@@ -407,7 +414,6 @@
             (when (find (+ (z *player*) off-z) (visible-z-list *player*))
               (pushnew (+ (z *player*) off-z) result))
           finally (setf (visible-z-list *player*) (reverse result)))
-    (format t "After (after-z-list *player*) = ~A~%" (visible-z-list *player*))
     (loop with accepted-z-levels = ()
           with offset = (truncate max-glyphs 2)
           for z in (visible-z-list *player*) do
@@ -423,7 +429,6 @@
                       (return-from outer nil))))) 
               (when non-air-found
                 (push z accepted-z-levels)))
-            (format t "accepted-z-levels = ~A~%" accepted-z-levels)
             (when (>= (length accepted-z-levels) 2)
               (loop-finish))
           finally
@@ -561,7 +566,7 @@
                         (when (and (or (and (sdl:key= key :sdl-key-period) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
                                        (eq unicode +cotd-unicode-greater-than-sign+))
                                    (> (z *player*) 0)
-                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-opaque-floor+))
+                                   (not (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-blocks-move-floor+))
                                    (not (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (1- (z *player*))) +terrain-trait-blocks-move+))
                                    (or (mob-effect-p *player* +mob-effect-climbing-mode+)
                                        (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-water+)

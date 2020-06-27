@@ -210,6 +210,8 @@
                                                          (player-check-dead))
                                            :on-trigger #'(lambda (world)
                                                            (trigger-game-over world
+                                                                              :final-str "Player died."
+                                                                              :score 0
                                                                               :if-player-won nil
                                                                               :player-msg (format nil "You are dead.~%")
                                                                               :game-over-type :game-over-player-dead)
@@ -304,7 +306,7 @@
                                                                  for y of-type fixnum = (random (array-dimension (terrain (level world)) 1))
                                                                  do
                                                                     (loop for z from (1- (array-dimension (terrain (level world)) 2)) downto 0
-                                                                          when (or (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-opaque-floor+)
+                                                                          when (or (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-blocks-move-floor+)
                                                                                    (and (> z 0)
                                                                                         (get-terrain-type-trait (get-terrain-* (level world) x y (1- z)) +terrain-trait-water+))
                                                                                    (and (> z 0)
@@ -507,7 +509,7 @@
                                                                               (setf is-free t)
                                                                               (check-surroundings x y t #'(lambda (dx dy)
                                                                                                             (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
-                                                                                                                      (not (get-terrain-type-trait (get-terrain-* (level world) dx dy z) +terrain-trait-opaque-floor+)))
+                                                                                                                      (not (get-terrain-type-trait (get-terrain-* (level world) dx dy z) +terrain-trait-blocks-move-floor+)))
                                                                                                               (setf is-free nil))))
                                                                               (when is-free
                                                                                 

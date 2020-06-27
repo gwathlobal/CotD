@@ -47,6 +47,14 @@
                                  nil)
                    )
 
+(set-win-condition :id :win-cond-military-sabotage
+                   :win-formula 0
+                   :win-func #'(lambda (world win-condition)
+                                 (declare (ignore world win-condition))
+                                 ;; do not do anything
+                                 nil)
+                   )
+
 (set-win-condition :id :win-cond-demon-campaign
                    :win-formula 2000
                    :win-func #'(lambda (world win-condition)

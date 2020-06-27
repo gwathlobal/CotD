@@ -78,7 +78,7 @@
                                                                (update-visible-mobs mob)
                                                                (when (eq mob *player*)
                                                                  (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
-                                                                 (update-map-area)))
+                                                                 (update-map-area *start-map-x* 0)))
                                                              (loop for mob-id in (visible-mobs mob)
                                                                    for vmob = (get-mob-by-id mob-id)
                                                                    with enemy-strength = 0

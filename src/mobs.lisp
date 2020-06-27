@@ -1313,7 +1313,10 @@
              (not (= (mob-type mob) +mob-type-ghost+))
              (not (= (mob-type mob) +mob-type-angel-image+))
              (not (= (mob-type mob) +mob-type-demon-sigil+))
-             (not (= (mob-type mob) +mob-type-demon-machine+)))
+             (not (= (mob-type mob) +mob-type-demon-machine+))
+             (not (= (mob-type mob) +mob-type-military-bomb-1+))
+             (not (= (mob-type mob) +mob-type-military-bomb-2+))
+             (not (= (mob-type mob) +mob-type-military-bomb-3+)))
     (let ((name-pick-n))
       (if (mob-ability-p mob +mob-abil-angel+)
         (progn

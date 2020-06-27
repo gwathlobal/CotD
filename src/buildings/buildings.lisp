@@ -46,6 +46,7 @@
 (defconstant +building-type-hell-growth+ 35)
 (defconstant +building-type-hell-struct-growth+ 36)
 (defconstant +building-type-hell-machine+ 37)
+(defconstant +building-type-hell-storage+ 38)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -168,6 +169,7 @@
 (defconstant +building-city-hell-machine-2+ 110)
 (defconstant +building-city-hell-machine-3+ 111)
 (defconstant +building-city-hell-machine-4+ 112)
+(defconstant +building-city-hell-storage-1+ 113)
 
 (defparameter *level-grid-size* 5)
 
@@ -202,6 +204,11 @@
 
 (defun get-building-type (building-type-id)
   (gethash building-type-id *building-types*))
+
+(defun get-all-building-ids-by-type (building-type-id)
+  (loop for building being the hash-values in *building-types*
+        when (eq (building-type building) building-type-id)
+          collect (building-id building)))
 
 (defun translate-build-to-template (x y z build-template template-level terrains)
   (loop for y1 from 0 below (length build-template) do
@@ -240,7 +247,9 @@
                             (funcall (getf terrains +level-city-terrain-bush+))
                             +terrain-wall-bush+))
                      (#\| +terrain-wall-lantern+)
-                     (#\G +terrain-wall-grave+))
+                     (#\G +terrain-wall-grave+)
+                     (#\g +terrain-floor-glass+)
+                     (#\% +terrain-wall-raw-flesh+))
           when tt
             do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
 

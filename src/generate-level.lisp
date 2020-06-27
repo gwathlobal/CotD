@@ -345,7 +345,7 @@
                                                                      ;;    x - current cell
                                                                      (when (and (not result)
                                                                                 (< (- z cz) 0)
-                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move-floor+))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move+))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
                                                                                 (and (= cx nx)
@@ -369,7 +369,7 @@
                                                                                 (not (and (= cx nx)
                                                                                           (= cy ny)))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
-                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)
+                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+)
                                                                                     (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)))
                                                                        ;(format t "FLOOD FILL HERE~%")
                                                                        (setf result t))
@@ -386,11 +386,11 @@
                                                                      ;;    p - starting cell
                                                                      ;;    x - current cell
                                                                      (when (and (> (- z cz) 0)
-                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move-floor+)
                                                                                 (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-slope-up+)
                                                                                 (not (and (= cx nx)
                                                                                           (= cy ny)))
-                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+))
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+))
                                                                        ;(format t "FLOOD FILL HERE~%")
                                                                        (setf result t))
 
@@ -410,7 +410,7 @@
                                                                                 (and (= cx nx)
                                                                                      (= cy ny))
                                                                                 (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-slope-up+)
-                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+))
+                                                                                (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+))
                                                                        (setf result t))
 
                                                                      ;; the following case is connected
@@ -423,15 +423,15 @@
                                                                      ;;    x - current cell
                                                                      (when (and (not result)
                                                                                 (= (- z cz) 0)
-                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+)
-                                                                                ;(not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+))
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move-floor+)
+                                                                                ;(not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+))
                                                                                 )
                                                                        (setf result t))
 
                                                                      ;; if you are large, you can move only if all you tiles have opaque floor
                                                                      (when (and (> mob-size 1)
                                                                                 (= (- z cz) 0)
-                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+)))
                                                                        (setf result nil))
 
                                                                      ;; all other cases are disconnected 
@@ -509,7 +509,7 @@
                                                                      ;;    x - current cell
                                                                      (when (and (not result)
                                                                                 (< (- z cz) 0)
-                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move-floor+))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move+))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
                                                                                 (and (= cx nx)
@@ -533,7 +533,7 @@
                                                                                 (not (and (= cx nx)
                                                                                           (= cy ny)))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
-                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)
+                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+)
                                                                                     (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)))
                                                                        ;(format t "FLOOD FILL HERE~%")
                                                                        (setf result t))
@@ -547,7 +547,7 @@
                                                                      ;;    p - starting cell
                                                                      ;;    x - current cell
                                                                      (when (and (= (- z cz) 0)
-                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move-floor+)
                                                                                 )
                                                                        (setf result t))
 
@@ -564,7 +564,7 @@
                                                                                                                      #'(lambda (mx my)
                                                                                                                          (when (and (get-terrain-* (level *world*) mx my z)
                                                                                                                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) mx my z) +terrain-trait-not-climable+))
-                                                                                                                                    (or (get-terrain-type-trait (get-terrain-* (level *world*) mx my z) +terrain-trait-opaque-floor+)
+                                                                                                                                    (or (get-terrain-type-trait (get-terrain-* (level *world*) mx my z) +terrain-trait-blocks-move-floor+)
                                                                                                                                         (get-terrain-type-trait (get-terrain-* (level *world*) mx my z) +terrain-trait-blocks-move+)))
                                                                                                                            
                                                                                                                            (setf result t)
@@ -575,7 +575,7 @@
                                                                      ;; if you are large, you can move only if all you tiles have opaque floor
                                                                      (when (and (> mob-size 1)
                                                                                 (= (- z cz) 0)
-                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+)))
                                                                        (setf result nil))
                                                                      
                                                                      ;; all other cases are disconnected 
@@ -653,7 +653,7 @@
                                                                      ;;    x - current cell
                                                                      (when (and (not result)
                                                                                 (< (- z cz) 0)
-                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+))
+                                                                                (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move-floor+))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move+))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-water+))
                                                                                 (and (= cx nx)
@@ -677,7 +677,7 @@
                                                                                 (not (and (= cx nx)
                                                                                           (= cy ny)))
                                                                                 (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move+))
-                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)
+                                                                                (or (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+)
                                                                                     (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-water+)))
                                                                        ;(format t "FLOOD FILL HERE~%")
                                                                        (setf result t))
@@ -691,7 +691,7 @@
                                                                      ;;    p - starting cell
                                                                      ;;    x - current cell
                                                                      (when (and (= (- z cz) 0)
-                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-opaque-floor+)
+                                                                                (get-terrain-type-trait (get-terrain-* level cx cy cz) +terrain-trait-blocks-move-floor+)
                                                                                 )
                                                                        (setf result t))
 
@@ -716,7 +716,7 @@
                                                                      ;; if you are large, you can move only if all you tiles have opaque floor
                                                                      ;(when (and (> mob-size 1)
                                                                      ;           (= (- z cz) 0)
-                                                                     ;           (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-opaque-floor+)))
+                                                                     ;           (not (get-terrain-type-trait (get-terrain-* level nx ny z) +terrain-trait-blocks-move-floor+)))
                                                                      ;  (setf result nil))
                                                                      
                                                                      ;; all other cases are disconnected 

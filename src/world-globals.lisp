@@ -31,7 +31,8 @@
                                     :mission-type-celestial-purge
                                     :mission-type-celestial-retrieval
                                     :mission-type-eliminate-satanists
-                                    :mission-type-celestial-sabotage))
+                                    :mission-type-celestial-sabotage
+                                    :mission-type-military-sabotage))
 
 (defenum:defenum mission-faction-presence-enum (:mission-faction-absent
                                                 :mission-faction-present

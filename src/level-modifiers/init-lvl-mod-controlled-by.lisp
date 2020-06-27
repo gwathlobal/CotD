@@ -39,7 +39,7 @@
                                                                                 until (and (and (> x 10) (< x (- max-x 10)) (> y 10) (< y (- max-y 10)))
                                                                                            (not (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-blocks-move+))
                                                                                            (not (get-mob-* level x y z))
-                                                                                           (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+                                                                                           (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                                                                                            (/= (get-level-connect-map-value level x y z 1 +connect-map-move-walk+)
                                                                                                +connect-room-none+)
                                                                                            (loop for feature-id in (feature-id-list level)

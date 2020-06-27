@@ -17,30 +17,28 @@
               (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
       (return-from check-LOS-propagate nil))
     
-    ;; LOS does not propagate vertically through floors
+    ;; check if LOS propagates vertically through floors (depending on the type of LOS)
     (when (and prev-cell
-               (/= (- (third prev-cell) dz) 0)
-               (or check-move
-                   check-vision
-                   check-projectile))
-      (if (> (- (third prev-cell) dz) 0)
-        ;; prev is up, the tile above current has opaque floor & the prev tile has opaque floor
-        (when (and (get-terrain-* (level *world*) dx dy (third prev-cell))
-                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+) t)
-                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) +terrain-trait-opaque-floor+) 100))
-                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) +terrain-trait-opaque-floor+) t)
-                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) +terrain-trait-opaque-floor+) 100)))
-          (return-from check-LOS-propagate nil))
-        ;; prev is down
-        (when (and (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz)
-                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) +terrain-trait-opaque-floor+) t)
-                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) +terrain-trait-opaque-floor+) 100))
-                   (get-terrain-* (level *world*) dx dy dz)
-                   (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+) t)
-                       (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+) 100)))
-          (return-from check-LOS-propagate nil)))
-      )
-
+               (/= (- (third prev-cell) dz) 0))
+      (loop for (check trait) in `((,check-move ,+terrain-trait-blocks-move-floor+) (,check-vision ,+terrain-trait-blocks-vision-floor+) (,check-projectile ,+terrain-trait-blocks-projectiles-floor+))
+            when check do
+              (if (> (- (third prev-cell) dz) 0)
+                ;; prev is up, the tile above current has trait & the prev tile has trait
+                (when (and (get-terrain-* (level *world*) dx dy (third prev-cell))
+                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) trait) t)
+                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) trait) 100))
+                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) trait) t)
+                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) trait) 100)))
+                  (return-from check-LOS-propagate nil))
+                ;; prev is down
+                (when (and (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz)
+                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) trait) t)
+                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) trait) 100))
+                           (get-terrain-* (level *world*) dx dy dz)
+                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-move-floor+) t)
+                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-move-floor+) 100)))
+                  (return-from check-LOS-propagate nil)))))
+    
     (when player-reveal-cell
       (when (and (<= (abs (- (x *player*) dx)) 5)
                  (<= (abs (- (y *player*) dy)) 5)
@@ -284,7 +282,7 @@
                       (< (get-distance-3d x y z (x mob) (y mob) (z mob)) (+ light-radius (cur-sight mob))))
              (push (list x y z light-radius) (nearby-light-sources *player*)))
         )
-  
+
     (loop with nearest-evil = nil
           with nearest-good = nil
           for mob-id of-type fixnum in (if (mob-ability-p mob +mob-abil-shared-minds+)
@@ -350,38 +348,7 @@
                (pushnew mob-id (shared-visible-mobs mob))
                
                (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
-             
-             ;; set up visible mobs
-             (when (and (not (eq mob tmob))
-                        (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob)))
-               (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
-                              #'(lambda (dx dy dz prev-cell)
-                                  (declare (type fixnum dx dy dz))
-                                  (let* ((exit-result t) (mob-id 0) (pwr-decrease 0)) 
-                                    (declare (type fixnum mob-id))
-                                    
-                                    (block nil
-                                      
-                                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
-                                      (unless pwr-decrease
-                                        (setf exit-result 'exit)
-                                        (return))
-                                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
-                                      (decf vision-pwr)
-                                      
-                                      (when (and (get-mob-* (level *world*) dx dy dz) 
-                                                 (not (eq (get-mob-* (level *world*) dx dy dz) mob))
-                                                 (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer mob))
-                                        ;(format t "VISIBILITY ~A ~A" (name (get-mob-* (level *world*) dx dy dz)) (get-mob-visibility (get-mob-* (level *world*) dx dy dz)))
-                                        (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
-                                        (pushnew mob-id (proper-visible-mobs mob)))
-                                      
-                                      (when (<= vision-pwr 0)
-                                        (setf exit-result 'exit)
-                                        (return))
-                                      
-                                      )
-                                    exit-result))))
+
              ;; set up mob brightness
              (when (and (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (abs (cur-light tmob)))
                       ;(not (eq mob tmob))
@@ -419,6 +386,38 @@
                                         (setf exit-result 'exit)
                                         (return)))
                                     
+                                    exit-result))))
+             
+             ;; set up visible mobs
+             (when (and (not (eq mob tmob))
+                        (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob)))
+               (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
+                              #'(lambda (dx dy dz prev-cell)
+                                  (declare (type fixnum dx dy dz))
+                                  (let* ((exit-result t) (mob-id 0) (pwr-decrease 0)) 
+                                    (declare (type fixnum mob-id))
+                                    
+                                    (block nil
+                                      
+                                      (setf pwr-decrease (check-LOS-propagate dx dy dz prev-cell :check-vision t))
+                                      (unless pwr-decrease
+                                        (setf exit-result 'exit)
+                                        (return))
+                                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                      (decf vision-pwr)
+
+                                      (when (and (get-mob-* (level *world*) dx dy dz) 
+                                                 (not (eq (get-mob-* (level *world*) dx dy dz) mob))
+                                                 (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer mob))
+                                        ;;(format t "VISIBILITY ~A ~A" (name (get-mob-* (level *world*) dx dy dz)) (get-mob-visibility (get-mob-* (level *world*) dx dy dz)))
+                                        (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
+                                        (pushnew mob-id (proper-visible-mobs mob)))
+                                      
+                                      (when (<= vision-pwr 0)
+                                        (setf exit-result 'exit)
+                                        (return))
+                                      
+                                      )
                                     exit-result))))
              
              ;; set up nearby mobs that are light sources for player
@@ -741,7 +740,7 @@
            (when (and (< (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
                       (get-single-memo-visibility (get-memo-* level (x mob) (y mob) (1+ (z mob))))
                       (get-single-memo-revealed (get-memo-* level (x mob) (y mob) (1+ (z mob))))
-                      (not (get-terrain-type-trait (get-terrain-* level (x mob) (y mob) (1+ (z mob))) +terrain-trait-opaque-floor+))
+                      (not (get-terrain-type-trait (get-terrain-* level (x mob) (y mob) (1+ (z mob))) +terrain-trait-blocks-move-floor+))
                       )
              (if (get-faction-relation (faction *player*) (get-visible-faction mob))
                (set-single-memo-* (level *world*) (x mob) (y mob) (1+ (z mob)) :back-color sdl:*blue*)

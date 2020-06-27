@@ -611,7 +611,7 @@
 
 (set-building-type (make-building :id +building-city-hell-machine-2+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-machine+
                                   :func #'(lambda (x y z template-level terrains)
-                                            (let ((build-template-z-1 (list "0000000000,"
+                                            (let ((build-template-z-1 (list "0000000000"
                                                                             "0XXXXXXXX0"
                                                                             "0X......X0"
                                                                             "0X......X0"
@@ -679,7 +679,7 @@
 
 (set-building-type (make-building :id +building-city-hell-machine-3+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-machine+
                                   :func #'(lambda (x y z template-level terrains)
-                                            (let ((build-template-z-1 (list "0000000000,"
+                                            (let ((build-template-z-1 (list "0000000000"
                                                                             "0XXXXXXXX0"
                                                                             "0X......X0"
                                                                             "0X......X0"
@@ -747,7 +747,7 @@
 
 (set-building-type (make-building :id +building-city-hell-machine-4+ :grid-dim '(2 . 2) :act-dim '(10 . 10) :type +building-type-hell-machine+
                                   :func #'(lambda (x y z template-level terrains)
-                                            (let ((build-template-z-1 (list "0000000000,"
+                                            (let ((build-template-z-1 (list "0000000000"
                                                                             "0XXXXXXXX0"
                                                                             "0X......X0"
                                                                             "0X......X0"
@@ -812,3 +812,154 @@
                                                     (list (list +feature-start-machine-point+ 2 4 (- z 1))
                                                           (list +feature-start-sigil-point+ 7 4 (- z 1)))
                                                     nil))))
+
+;;=====================
+;; Flesh Storage
+;;=====================
+
+(set-building-type (make-building :id +building-city-hell-storage-1+ :grid-dim '(3 . 3) :act-dim '(15 . 15) :type +building-type-hell-storage+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-0 (list "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "0000XXXXXXX0000"
+                                                                            "000XX%%%%%XX000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000XX%%%%%XX000"
+                                                                            "0000XXXXXXX0000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"))
+
+                                                  (build-template-z-1 (list "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "0000XXXXXXX0000"
+                                                                            "000XX%%%%%XX000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000X%%%%%%%X000"
+                                                                            "000XX%%%%%XX000"
+                                                                            "0000XXXXXXX0000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"
+                                                                            "000000000000000"))
+                                                  
+                                                  (build-template-z-2 (list ",,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,"
+                                                                            ",,,,XXXXXXX,,,,"
+                                                                            ",,,XX%%%%%XX,,,"
+                                                                            ",,,X%%%%%%%X,,,"
+                                                                            ",uuX%%%%%%%X,,,"
+                                                                            ",XXX%%%%%%%X,,,"
+                                                                            ",,,X%%%%%%%X,,,"
+                                                                            ",,,X%%%%%%%X,,,"
+                                                                            ",,,XX%%%%%XX,,,"
+                                                                            ",,,,XXXXXXX,,,,"
+                                                                            ",,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,"
+                                                                            ",,,,,,,,,,,,,,,"))
+                                                  
+                                                  (build-template-z-3 (list "               "
+                                                                            "               "
+                                                                            "               "
+                                                                            "    XXXXXXX    "
+                                                                            "   XX%%%%%XX   "
+                                                                            "   X%%%%%%%X   "
+                                                                            " ddX%%%%%%%X   "
+                                                                            " ..X%%%%%%%X   "
+                                                                            " ..X%%%%%%%X   "
+                                                                            " ..X%%%%%%%X   "
+                                                                            " ..XX%%%%%XX   "
+                                                                            "  ..XXXXXXX    "
+                                                                            "   ....uX      "
+                                                                            "    ...uX      "
+                                                                            "               "))
+
+                                                  (build-template-z-4 (list "               "
+                                                                            "               "
+                                                                            "               "
+                                                                            "    XXXXXXX    "
+                                                                            "   XX%%%%%XX   "
+                                                                            "   X%%%%%%%X   "
+                                                                            "   X%%%%%%%XXX "
+                                                                            "   X%%%%%%%Xuu "
+                                                                            "   X%%%%%%%X.. "
+                                                                            "   X%%%%%%%X.. "
+                                                                            "   XX%%%%%XX.. "
+                                                                            "    XXXXXXX..  "
+                                                                            "       d....   "
+                                                                            "       d...    "
+                                                                            "               "))
+
+                                                  (build-template-z-5 (list "               "
+                                                                            "      Xu...    "
+                                                                            "      Xu....   "
+                                                                            "    XXXXXXX..  "
+                                                                            "   XX%%%%%XX.. "
+                                                                            "   X%%%%%%%X.. "
+                                                                            "   X%%%%%%%X.. "
+                                                                            "   X%%%%%%%Xdd "
+                                                                            "   X%%%%%%%X   "
+                                                                            "   X%%%%%%%X   "
+                                                                            "   XX%%%%%XX   "
+                                                                            "    XXXXXXX    "
+                                                                            "               "
+                                                                            "               "
+                                                                            "               "))
+
+                                                  (build-template-z-6 (list "               "
+                                                                            "    ...d       "
+                                                                            "   ....d       "
+                                                                            "  ..XXXXXXX    "
+                                                                            " ..XX%%%%%XX   "
+                                                                            " ..X%%%%%%%X   "
+                                                                            " ..X%%%%%%%X   "
+                                                                            " uuX%%%%%%%X   "
+                                                                            " XXX%%%%%%%X   "
+                                                                            "   X%%%%%%%X   "
+                                                                            "   XX%%%%%XX   "
+                                                                            "    XXXXXXX    "
+                                                                            "               "
+                                                                            "               "
+                                                                            "               "))
+
+                                                  (build-template-z-7 (list "               "
+                                                                            "    .......    "
+                                                                            "   .........   "
+                                                                            "  ...........  "
+                                                                            " ....ggggg.... "
+                                                                            " ...ggggggg... "
+                                                                            " ...ggggggg... "
+                                                                            " dd.ggggggg... "
+                                                                            " ...ggggggg... "
+                                                                            " ...ggggggg... "
+                                                                            " ....ggggg.... "
+                                                                            "  ...........  "
+                                                                            "   .........   "
+                                                                            "    .......    "
+                                                                            "               ")))
+
+                                              (translate-build-to-template x y (- z 2) build-template-z-0 template-level terrains)
+                                              (translate-build-to-template x y (- z 1) build-template-z-1 template-level terrains)
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              (translate-build-to-template x y (+ z 1) build-template-z-3 template-level terrains)
+                                              (translate-build-to-template x y (+ z 2) build-template-z-4 template-level terrains)
+                                              (translate-build-to-template x y (+ z 3) build-template-z-5 template-level terrains)
+                                              (translate-build-to-template x y (+ z 4) build-template-z-6 template-level terrains)
+                                              (translate-build-to-template x y (+ z 5) build-template-z-7 template-level terrains)
+
+                                              )
+                                            (values nil
+                                                    (list (list +feature-bomb-plant-target+ 7 7 7)
+                                                          (list +feature-start-sigil-point+ 7 2 7)
+                                                          (list +feature-start-sigil-point+ 7 12 7))
+                                                    nil)
+                                            )))

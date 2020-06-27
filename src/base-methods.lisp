@@ -154,14 +154,14 @@
     ;; move down
     ((< (- dz sz) 0) (progn
                             (if (and (>= dz 0)
-                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (1+ dz)) +terrain-trait-opaque-floor+))
+                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (1+ dz)) +terrain-trait-blocks-move-floor+))
                                      )
                               t
                               nil)))
     ;; move up
     ((> (- dz sz) 0) (progn
                             (if (and (< dz (array-dimension (terrain (level *world*)) 2))
-                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) sx sy dz) +terrain-trait-opaque-floor+))
+                                     (not (get-terrain-type-trait (get-terrain-* (level *world*) sx sy dz) +terrain-trait-blocks-move-floor+))
                                      )
                               t
                               nil)))
@@ -177,7 +177,7 @@
       (loop for z from (z mob) downto 0 
             for check-result = (check-move-on-level mob (x mob) (y mob) z)
             do
-             ;(format t "Z ~A FLOOR ~A~%" z (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
+             ;(format t "Z ~A FLOOR ~A~%" z (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-blocks-move-floor+))
                (when (eq check-result t)
                  (setf result z))
                
@@ -190,15 +190,15 @@
                               (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-water+)
                               )
                          ;; there is floor on this tile
-                         (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+)
+                         (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-blocks-move-floor+)
                          ;; there is no floor on this tile, but the mob is in climbing mode and there is a wall or a floor nearby
-                         (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-opaque-floor+))
+                         (and (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) z) +terrain-trait-blocks-move-floor+))
                               (mob-effect-p mob +mob-effect-climbing-mode+)
                               (funcall #'(lambda ()
                                            (let ((result nil))
                                              (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
                                                                                          (when (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-not-climable+))
-                                                                                                    (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-opaque-floor+)
+                                                                                                    (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-blocks-move-floor+)
                                                                                                         (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-blocks-move+)))
                                                                                            (setf result t))))
                                              result))))
@@ -213,7 +213,7 @@
   (let ((result 0))
     (loop for z from (z feature) downto 0 
           do
-             (when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-opaque-floor+)
+             (when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-blocks-move-floor+)
                        (get-terrain-type-trait (get-terrain-* (level *world*) (x feature) (y feature) z) +terrain-trait-water+))
                (setf result z)
                (loop-finish)))
@@ -225,7 +225,7 @@
   (let ((result 0))
     (loop for z from (z item) downto 0 
           do
-             (when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) z) +terrain-trait-opaque-floor+)
+             (when (or (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) z) +terrain-trait-blocks-move-floor+)
                        (and (>= (1- z) 0)
                             (get-terrain-type-trait (get-terrain-* (level *world*) (x item) (y item) (1- z)) +terrain-trait-blocks-move+)))
                (setf result z)
@@ -456,7 +456,7 @@
     
     ;; apply gravity to the mob, standing on your head, if any
     (when (and (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z))
-               (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-opaque-floor+))
+               (not (get-terrain-type-trait (get-terrain-* (level *world*) orig-x orig-y (1+ orig-z)) +terrain-trait-blocks-move-floor+))
                (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))
                (not (eq mob (get-mob-* (level *world*) orig-x orig-y (1+ orig-z))))
                (and (mounted-by-mob-id mob)
@@ -1934,7 +1934,7 @@
           (not (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (z mob)) +terrain-trait-water+))
           (and (< (z mob) (1- (array-dimension (terrain (level *world*)) 2)))
                (not (or (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (1+ (z mob))) +terrain-trait-water+)
-                        (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (1+ (z mob))) +terrain-trait-opaque-floor+)
+                        (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (1+ (z mob))) +terrain-trait-blocks-move-floor+)
                         (get-terrain-type-trait (get-terrain-* (level *world*) (x mob) (y mob) (1+ (z mob))) +terrain-trait-blocks-move+)))))
     (progn
       (setf (cur-oxygen mob) *max-oxygen-level*))
@@ -2245,16 +2245,16 @@
 (defun ignite-tile (level x y z src-x src-y src-z)
   (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-flammable+)
     (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-fire+ :x x :y y :z z :counter (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-flammable+)))
-    (if (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+    (if (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
       (progn
         (set-terrain-* level x y z +terrain-floor-ash+)
         ;(check-surroundings x y nil #'(lambda (dx dy)
         ;                                (when (and (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-walk+)
-        ;                                           (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+))
+        ;                                           (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move-floor+))
         ;                                  (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-walk+
         ;                                                         (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-walk+)))
         ;                                (when (and (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-climb+)
-        ;                                           (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+))
+        ;                                           (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move-floor+))
         ;                                  (set-connect-map-value (aref (connect-map level) 1) x y z +connect-map-move-climb+
         ;                                                         (get-connect-map-value (aref (connect-map level) 1) dx dy z +connect-map-move-climb+)))))
        
@@ -2334,7 +2334,7 @@
                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                           (map-size actor))
                                                  (get-mob-move-mode actor))
-                        (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-opaque-floor+)
+                        (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-move-floor+)
                             (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-water+)))
                 do
                    (push (list dx dy dz) applicable-tiles))))
@@ -2376,7 +2376,7 @@
     ;; 2000 hundred tries to find a suitable place for teleport
     (loop while (or (< rx 0) (< ry 0) (>= rx max-x) (>= ry max-y)
                     (< (get-distance (x actor) (y actor) rx ry) min-distance)
-                    (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry z) +terrain-trait-opaque-floor+))
+                    (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry z) +terrain-trait-blocks-move-floor+))
                     (not (eq (check-move-on-level actor rx ry z) t))
                     (= (get-level-connect-map-value (level *world*) rx ry z (if (riding-mob-id actor)
                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
@@ -2954,3 +2954,92 @@
                      finally (return (= dead (length (mimic-id-list *player*)))))))
     t
     nil))
+
+(defun make-explosion-at-xyz (level x y z radius actor &key (dmg-list `((:min-dmg 3 :max-dmg 6 :dmg-type ,+weapon-dmg-fire+ :weapon-aux (:is-fire))
+                                                                        (:min-dmg 5 :max-dmg 7 :dmg-type ,+weapon-dmg-iron+ :weapon-aux (:is-fire))))
+                                                            (animation-dot-id +anim-type-fire-dot+))
+  (let ((targets nil)
+        (fire-on-death (loop for single-dmg-cmd in dmg-list
+                             when (find :is-fire (getf single-dmg-cmd :weapon-aux)) do
+                               (return t))))
+    (draw-fov x y z radius
+              #'(lambda (dx dy dz prev-cell)
+                  (let ((exit-result t))
+                    (block nil
+                      (when (> (get-distance-3d x y z dx dy dz) (1+ radius))
+                        (setf exit-result 'exit)
+                        (return))
+                      
+                      (when (eq (check-LOS-propagate dx dy dz prev-cell :check-move t) nil)
+                        (setf exit-result 'exit)
+                        (return))
+                      
+                      (place-animation dx dy dz animation-dot-id :params ())
+                      
+                      ;;(when (and (get-terrain-* level dx dy dz)
+                      ;;           (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-flammable+))
+                      ;;  (push (list dx dy dz) cell-targets))
+                      
+                      (when (and (get-mob-* level dx dy dz) 
+                                 )
+                        (pushnew (get-mob-* level dx dy dz) targets)
+                        )
+                      )
+                    exit-result)))
+    
+    ;; inflict damage to mobs
+    (loop for target in targets
+          for cur-dmg = 0
+          do
+             (loop for single-dmg-cmd in dmg-list do
+               (incf cur-dmg (inflict-damage target :min-dmg (getf single-dmg-cmd :min-dmg) :max-dmg (getf single-dmg-cmd :max-dmg) :dmg-type (getf single-dmg-cmd :dmg-type)
+                                                    :att-spd nil :weapon-aux (getf single-dmg-cmd :weapon-aux) :acc 100 :add-blood t :no-dodge t :no-hit-message t :no-check-dead t
+                                                    :actor actor)))
+             (if (zerop cur-dmg)
+               (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                      (format nil "~A is not hurt. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
+                                      :color sdl:*white*
+                                      :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
+                                                             (not (find (id target) (proper-visible-mobs *player*))))
+                                                    :singlemind)))
+               (print-visible-message (x target) (y target) (z target) (level *world*) 
+                                      (format nil "~A takes ~A damage. " (capitalize-name (prepend-article +article-the+ (visible-name target))) cur-dmg)
+                                      :color sdl:*white*
+                                      :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
+                                                             (not (find (id target) (proper-visible-mobs *player*))))
+                                                    :singlemind))))
+             (when (check-dead target)
+               (make-dead target :splatter t :msg t :msg-newline nil :killer actor :corpse t :aux-params (if fire-on-death
+                                                                                                           (list :is-fire)
+                                                                                                           ()))
+               
+               (when (mob-effect-p target +mob-effect-possessed+)
+                 (setf (cur-hp (get-mob-by-id (slave-mob-id target))) 0)
+                 (setf (x (get-mob-by-id (slave-mob-id target))) (x target)
+                       (y (get-mob-by-id (slave-mob-id target))) (y target)
+                       (z (get-mob-by-id (slave-mob-id target))) (z target))
+                 (make-dead (get-mob-by-id (slave-mob-id target)) :splatter nil :msg nil :msg-newline nil :corpse nil :aux-params ()))))
+    
+    ;; place fires
+    ;; TODO: should not be implemented until ignite-tile properly sets ignited tile connectivity
+    ;;(loop for (dx dy dz) in cell-targets
+    ;;      when (and (zerop (random 5))
+    ;;                (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-flammable+))
+    ;;        do
+    ;;           (ignite-tile level dx dy dz dx dy dz)
+    ;;      )
+    
+    
+    
+    ;; process animations for this turn if any
+    (when (animation-queue *world*)
+      
+      (loop for animation in (animation-queue *world*)
+            do
+               (play-animation animation))
+      (sdl:update-display)
+      (sdl-cffi::sdl-delay 100)
+      (setf (animation-queue *world*) nil)
+      (update-map-area *start-map-x* 0))
+    
+    ))

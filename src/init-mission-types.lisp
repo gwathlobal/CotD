@@ -1266,3 +1266,89 @@
                   :campaign-result (list (list :game-over-angels-won (list #'remove-hell-engine))
                                          (list :game-over-demons-won nil))
                   )
+
+(set-mission-type :id :mission-type-military-sabotage
+                  :name "Military sabotage"
+                  :is-available-func #'(lambda (world-sector world)
+                                         (if (and (or (eq (wtype world-sector) :world-sector-hell-plain))
+                                                  (> (world/flesh-points world) 0))
+                                           t
+                                           nil))
+                  :faction-list-func #'(lambda (world-sector)
+                                         (let ((faction-list (list (list +faction-type-military+ :mission-faction-present))))
+                                           (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
+                                             (push (list +faction-type-demons+ :mission-faction-present) faction-list)
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
+                                             )
+                                           faction-list))
+                  :world-sector-for-custom-scenario (list :world-sector-hell-plain
+                                                          )
+                  :overall-post-process-func-list #'(lambda ()
+                                                       (let ((func-list ()))
+                                                         
+                                                         ;; add lose condition on death & all other win conditions
+                                                         (push #'add-lose-and-win-coditions-to-level
+                                                               func-list)
+
+                                                         ;; remove signal flares from military
+                                                         (push #'remove-signal-flares-from-military
+                                                               func-list)
+
+                                                         ;; add bombs to military
+                                                         (push #'add-bombs-to-military
+                                                               func-list)
+                                                         
+                                                         ;; update visibility for all added mobs
+                                                         (push #'update-visibility-after-creation
+                                                               func-list)
+                                                         
+                                                         ;; remove all starting features
+                                                         (push #'remove-dungeon-gen-functions
+                                                               func-list)
+                                                         
+                                                         ;; set up turns for delayed arrival for all parties
+                                                         (push #'setup-turns-for-delayed-arrival
+                                                               func-list)
+                                                         
+                                                         ;; create delayed points from respective features
+                                                         (push #'place-delayed-arrival-points-on-level
+                                                               func-list)    
+                                                         
+                                                         ;; add military
+                                                         (push #'place-ai-military-on-level
+                                                               func-list)
+                                                         
+                                                         ;; place demons
+                                                         (push #'place-ai-demons-on-level
+                                                               func-list)
+                                                         
+                                                         ;; place player
+                                                         (push #'place-player-on-level
+                                                               func-list)
+                                                         
+                                                         func-list))
+                   :scenario-faction-list (list (list +specific-faction-type-player+ +lm-placement-player+)
+                                                (list +specific-faction-type-dead-player+ +lm-placement-dead-player+)
+                                                (list +specific-faction-type-angel-chrome+ +lm-placement-angel-chrome+)
+                                                (list +specific-faction-type-angel-trinity+ +lm-placement-angel-trinity+)
+                                                (list +specific-faction-type-demon-crimson+ +lm-placement-demon-crimson+)
+                                                (list +specific-faction-type-demon-shadow+ +lm-placement-demon-shadow+)
+                                                (list +specific-faction-type-demon-malseraph+ +lm-placement-demon-malseraph+)
+                                                (list +specific-faction-type-military-chaplain+ +lm-placement-military-chaplain+)
+                                                (list +specific-faction-type-military-scout+ +lm-placement-military-scout+)
+                                                (list +specific-faction-type-priest+ +lm-placement-priest+)
+                                                (list +specific-faction-type-satanist+ +lm-placement-satanist+)
+                                                (list +specific-faction-type-eater+ +lm-placement-eater+)
+                                                (list +specific-faction-type-skinchanger+ +lm-placement-skinchanger+)
+                                                (list +specific-faction-type-thief+ +lm-placement-thief+)
+                                                (list +specific-faction-type-ghost+ +lm-placement-ghost+)
+                                                )
+                  :ai-package-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-military+ (list +ai-package-patrol-district+ +ai-package-find-bomb-plant-location+))
+                                         )
+                  :win-condition-list (list (list +faction-type-demons+ +game-event-military-sabotage-win-for-demons+)
+                                            (list +faction-type-military+ +game-event-military-sabotage-win-for-military+)
+                                            )
+                  :campaign-result (list (list :game-over-military-won nil)
+                                         (list :game-over-demons-won nil))
+                  )

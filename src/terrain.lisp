@@ -14,9 +14,11 @@
    (on-bump-terrain :initform nil :initarg :on-bump-terrain :accessor on-bump-terrain) ;; a function that takes (mob x y z)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; :trait-blocks-move - +terrain-trait-blocks-move+
+   ;; :trait-blocks-move-floor - +terrain-trait-blocks-move-floor+
    ;; :trait-blocks-vision - +terrain-trait-blocks-vision+
+   ;; :trait-blocks-vision-floor - +terrain-trait-blocks-vision-floor+
    ;; :trait-blocks-projectiles - +terrain-trait-blocks-projectiles+
-   ;; :trait-opaque-floor - +terrain-trait-opaque-floor+
+   ;; :trait-blocks-projectiles-floor - +terrain-trait-blocks-projectiles-floor+
    ;; :trait-slope-up - +terrain-trait-slope-up+
    ;; :trait-slope-down - +terrain-trait-slope-down+
    ;; :trait-not-climable - +terrain-trait-not-climable+
@@ -42,18 +44,22 @@
 (defun get-terrain-type-by-id (terrain-type-id)
   (aref *terrain-types* terrain-type-id))
 
-(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-vision trait-blocks-projectiles trait-opaque-floor trait-slope-up trait-slope-down trait-not-climable trait-light-source
-                                                                        trait-blocks-sound trait-blocks-sound-floor trait-water (trait-move-cost-factor 1) trait-openable-door trait-openable-window trait-flammable trait-can-jump-over
-                                                                        trait-can-have-rune trait-can-switch-light)
+(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-move-floor trait-blocks-vision trait-blocks-vision-floor trait-blocks-projectiles trait-blocks-projectiles-floor
+                                                                        trait-slope-up trait-slope-down trait-not-climable trait-light-source trait-blocks-sound trait-blocks-sound-floor trait-water (trait-move-cost-factor 1)
+                                                                        trait-openable-door trait-openable-window trait-flammable trait-can-jump-over trait-can-have-rune trait-can-switch-light)
   
   (when trait-blocks-move
     (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
+  (when trait-blocks-move-floor
+    (setf (gethash +terrain-trait-blocks-move-floor+ (trait terrain-type)) trait-blocks-move-floor))
   (when trait-blocks-vision
     (setf (gethash +terrain-trait-blocks-vision+ (trait terrain-type)) trait-blocks-vision))
+  (when trait-blocks-vision-floor
+    (setf (gethash +terrain-trait-blocks-vision-floor+ (trait terrain-type)) trait-blocks-vision-floor))
   (when trait-blocks-projectiles
     (setf (gethash +terrain-trait-blocks-projectiles+ (trait terrain-type)) t))
-  (when trait-opaque-floor
-    (setf (gethash +terrain-trait-opaque-floor+ (trait terrain-type)) trait-opaque-floor))
+  (when trait-blocks-projectiles-floor
+    (setf (gethash +terrain-trait-blocks-projectiles-floor+ (trait terrain-type)) t))
   (when trait-slope-up
     (setf (gethash +terrain-trait-slope-up+ (trait terrain-type)) t))
   (when trait-slope-down

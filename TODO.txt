@@ -1,9 +1,9 @@
+- Initial power for angels and demons depend on the state of the relic, demons always get 2 initial power in Hell
 - Celestial sabotage, add guidance for angels that points to machines
 - Slime pools in hell that reduce all resitances
 - Worm-like multitile creatures in hell that devour you while you are inside
 - BUG: Fix the bug with military movement on campaign map
 - Eliminate satanists mission reveals the lair
-- Special mission in Hell where angels attack demons to destroy the dimensional machines
 - Special mission in Hell where the military attack demons to destroy gathered flesh
 - Refactor mission consequences for the world map: better text delivery, etc.
 - Situation report on the campaign map as a campaign map mode

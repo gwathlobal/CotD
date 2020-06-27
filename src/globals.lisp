@@ -113,6 +113,9 @@
 (defconstant +mob-type-skinchanger-flyer+ 56)
 (defconstant +mob-type-skinchanger-turret+ 57)
 (defconstant +mob-type-demon-machine+ 58)
+(defconstant +mob-type-military-bomb-1+ 59)
+(defconstant +mob-type-military-bomb-2+ 60)
+(defconstant +mob-type-military-bomb-3+ 61)
 
 (defconstant +faction-type-none+ 0)
 (defconstant +faction-type-civilians+ 1)
@@ -175,6 +178,7 @@
 (defconstant +ai-package-escape-with-relic+ 27)
 (defconstant +ai-package-swim-up+ 28)
 (defconstant +ai-package-find-machine+ 29)
+(defconstant +ai-package-find-bomb-plant-location+ 30)
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)
@@ -413,6 +417,7 @@
 (defconstant +mob-effect-demonic-sigil+ 56)
 (defconstant +mob-effect-deep-breath+ 57)
 (defconstant +mob-effect-demonic-machine+ 58)
+(defconstant +mob-effect-bomb-ticking+ 59)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)
@@ -458,6 +463,7 @@
 (defconstant +item-type-scroll-demonic-rune-all+ 23)
 (defconstant +item-type-scroll-demonic-rune-decay+ 24)
 (defconstant +item-type-church-reliс+ 25)
+(defconstant +item-type-bomb+ 26)
  
 ;;--------------------
 ;; FEATURE-TYPE Constants
@@ -514,6 +520,7 @@
 (defconstant +feature-delayed-angels-arrival-point+ 41)
 (defconstant +feature-delayed-military-arrival-point+ 42)
 (defconstant +feature-start-machine-point+ 43)
+(defconstant +feature-bomb-plant-target+ 44)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
@@ -530,7 +537,7 @@
 (defconstant +terrain-trait-blocks-move+ 0)
 (defconstant +terrain-trait-blocks-vision+ 1)
 (defconstant +terrain-trait-blocks-projectiles+ 2)
-(defconstant +terrain-trait-opaque-floor+ 3)
+(defconstant +terrain-trait-blocks-move-floor+ 3)
 (defconstant +terrain-trait-slope-up+ 4)
 (defconstant +terrain-trait-slope-down+ 5)
 (defconstant +terrain-trait-not-climable+ 6)
@@ -545,6 +552,8 @@
 (defconstant +terrain-trait-can-jump-over+ 15)
 (defconstant +terrain-trait-can-have-rune+ 16)
 (defconstant +terrain-trait-can-switch-light+ 17)
+(defconstant +terrain-trait-blocks-projectiles-floor+ 18)
+(defconstant +terrain-trait-blocks-vision-floor+ 19)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
@@ -611,7 +620,9 @@
 (defconstant +terrain-wall-razorthorns+ 62)
 (defconstant +terrain-floor-creep-glowshroom+ 63)
 (defconstant +terrain-floor-creep-irradiated+ 64)
-(defconstant +terrain-wall-compressed-flesh+ 65)
+(defconstant +terrain-wall-compressed-bones+ 65)
+(defconstant +terrain-floor-glass+ 66)
+(defconstant +terrain-wall-raw-flesh+ 67)
 
 ;;--------------------
 ;; GOD Constants
@@ -744,3 +755,5 @@
   (if on-screen
     ""
     #\return))
+
+(defparameter *start-map-x* 190)

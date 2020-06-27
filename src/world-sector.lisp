@@ -411,7 +411,7 @@
                   with z = 2
                   for x from 0 below (array-dimension (terrain level) 0) by (+ 5 (random 3))
                   when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+))
                     do
                        (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
             
@@ -427,7 +427,7 @@
                   with z = 2
                   for x from 0 below (array-dimension (terrain level) 0) by (+ 5 (random 3))
                   when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+))
                     do
                        (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
             ;; west
@@ -442,7 +442,7 @@
                   with z = 2
                   for y from 0 below (array-dimension (terrain level) 1) by (+ 5 (random 3))
                   when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+))
                     do
                        (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
             ;; east
@@ -457,7 +457,7 @@
                   with z = 2
                   for y from 0 below (array-dimension (terrain level) 1) by (+ 5 (random 3))
                   when (and (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
-                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+))
+                            (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+))
                     do
                        (add-feature-to-level-list level (make-instance 'feature :feature-type arrival-point-feature-type-id :x x :y y :z z)))
           )
@@ -643,7 +643,7 @@
 (defun place-demonic-sigils-on-level (level world-sector mission world)
   (declare (ignore world-sector world mission))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%~%"))
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%"))
   
   (loop with sigil = nil
         for feature-id in (feature-id-list level)
@@ -659,7 +659,7 @@
 (defun place-demonic-machines-on-level (level world-sector mission world)
   (declare (ignore world-sector world mission))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon machines~%~%"))
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon machines~%"))
   
   (loop with machine = nil
         for feature-id in (feature-id-list level)
@@ -670,6 +670,25 @@
              (setf (x machine) (x lvl-feature) (y machine) (y lvl-feature) (z machine) (z lvl-feature))
              (add-mob-to-level-list level machine)
              (set-mob-effect machine :effect-type-id +mob-effect-demonic-machine+ :actor-id (id machine) :cd t))
+  )
+
+(defun place-flesh-storages-on-level (level world-sector mission world)
+  (declare (ignore world-sector world mission))
+  
+  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add flesh storages~%"))
+  
+  (loop for feature-id in (feature-id-list level)
+        for lvl-feature = (get-feature-by-id feature-id)
+        when (= (feature-type lvl-feature) +feature-bomb-plant-target+)
+          do
+             (push feature-id (bomb-plant-locations level))
+             ;; accumulate raw flesh terrain inside the feature parameter
+             (loop for x from (+ (x lvl-feature) -5) to (+ (x lvl-feature) 5) do
+               (loop for y from (+ (y lvl-feature) -5) to (+ (y lvl-feature) 5) do
+                 (loop for z from (z lvl-feature) downto 0 do
+                   (when (and (> x 0) (> y 0) (< x (array-dimension (terrain level) 0)) (< y (array-dimension (terrain level) 1))
+                              (eq (get-terrain-* level x y z) +terrain-wall-raw-flesh+))
+                     (push (list x y z) (param1 lvl-feature)))))))
   )
 
 (defun place-blood-on-level (level world-sector mission world)
@@ -687,7 +706,7 @@
           for y = (1+ (random max-y))
           for z = (1+ (random max-z))
           while (< cur-blood max-blood) do
-            (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-opaque-floor+)
+            (when (and (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move-floor+)
                        (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+))
                        (not (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-water+)))
               (if (zerop (random 2))
@@ -695,7 +714,7 @@
                 (push (list x y z +feature-blood-old+) blood))
               (incf cur-blood)
               (check-surroundings x y nil #'(lambda (dx dy)
-                                              (when (and (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-opaque-floor+)
+                                              (when (and (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move-floor+)
                                                          (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-water+)))
                                                 (when (zerop (random 4))
                                                   (push (list dx dy z +feature-blood-old+) blood))))))
@@ -740,7 +759,7 @@
 (defun place-island-on-template-level (template-level world-sector mission world)
   (declare (ignore mission world mission world-sector))
   
-  (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR ISLAND~%")
+  (logger (format nil "TEMPLATE LEVEL FUNC: WORLD SECTOR ISLAND~%"))
   
   (let ((max-x (array-dimension template-level 0))
         (max-y (array-dimension template-level 1)))
@@ -863,9 +882,7 @@
     ))
 
 (defun place-demonic-machines-on-template-level (template-level)
-  (let ((building-id-list (loop for building being the hash-values in *building-types*
-                                when (eq (building-type building) +building-type-hell-machine+)
-                                  collect (building-id building)))
+  (let ((building-id-list (get-all-building-ids-by-type +building-type-hell-machine+))
         (x-w 4)
         (y-n 4)
         (x-e (- (array-dimension template-level 0) 5))
@@ -891,6 +908,30 @@
     (when (level-city-can-place-build-on-grid building-id x-e y-s 2 template-level)
       (level-city-reserve-build-on-grid building-id x-e y-s 2 template-level))
     
+    ))
+
+(defun place-flesh-storages-on-template-level (template-level)
+  (let* ((building-id-list (get-all-building-ids-by-type +building-type-hell-storage+))
+         (x-step (truncate (array-dimension template-level 0) 4))
+         (y-step (truncate (array-dimension template-level 1) 4))
+         (x1 (1- (* x-step 1)))
+         (x2 (1- (* x-step 2)))
+         (x3 (1- (* x-step 3)))
+         (y1 (1- (* y-step 1)))
+         (y2 (1- (* y-step 2)))
+         (y3 (1- (* y-step 3)))
+         (variant1 `((,x1 ,y1) (,x1 ,y3) (,x3 ,y2)))
+         (variant2 `((,x1 ,y2) (,x3 ,y1) (,x3 ,y3)))
+         (variant3 `((,x2 ,y1) (,x1 ,y3) (,x3 ,y3)))
+         (variant4 `((,x1 ,y1) (,x3 ,y1) (,x2 ,y3)))
+         (variants (list variant1 variant2 variant3 variant4))
+         (building-id))
+
+    (loop for (x y) in (nth (random (length variants)) variants)
+          do
+             (setf building-id (nth (random (length building-id-list)) building-id-list))
+             (when (level-city-can-place-build-on-grid building-id x y 2 template-level)
+               (level-city-reserve-build-on-grid building-id x y 2 template-level)))
     ))
 
 (defun get-max-buildings-normal ()

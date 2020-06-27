@@ -865,7 +865,7 @@
                                                                               +level-city-terrain-bush+ #'(lambda ()
                                                                                                             +terrain-wall-gloomtwigs+)
                                                                               +level-city-terrain-earth+ #'(lambda ()
-                                                                                                             +terrain-wall-compressed-flesh+))))
+                                                                                                             +terrain-wall-compressed-bones+))))
                         :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore template-level world-sector mission world))
 
