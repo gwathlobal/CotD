@@ -1,9 +1,16 @@
 (in-package :cotd)
 
+(defenum:defenum mission-slot-enum (:mission-slot-demons-city
+                                    :mission-slot-angels-city
+                                    :mission-slot-military-city
+                                    :mission-slot-military-offworld
+                                    :mission-slot-angels-offworld))
+
 (defclass mission-type ()
   ((id :initform :mission-type-none :initarg :id :accessor id :type mission-type-enum)
    (name :initform "Mission type name" :initarg :name :accessor name)
    (enabled :initform t :initarg :enabled :accessor enabled)
+   (mission-slot-type :initform :mission-slot-demons-city :initarg :mission-slot-type :accessor mission-slot-type :type mission-slot-enum)
    (is-available-func :initform #'(lambda (world-sector world) (declare (ignore world-sector world)) nil) :initarg :is-available-func :accessor is-available-func)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; the func that takes world-sector-type-id and returns a list of faction-ids
    (world-sector-for-custom-scenario :initform () :initarg :world-sector-for-custom-scenario :accessor world-sector-for-custom-scenario) ;; the list of world-sectors available for this mission, specifically for custom scenario
@@ -20,17 +27,20 @@
 
 (defparameter *mission-types* (make-hash-table))
 
-(defun set-mission-type (&key id name (enabled t) is-available-func faction-list-func template-level-gen-func overall-post-process-func-list terrain-post-process-func-list
-                              scenario-faction-list ai-package-list win-condition-list world-sector-for-custom-scenario
+(defun set-mission-type (&key id name (enabled t) mission-slot-type is-available-func faction-list-func template-level-gen-func
+                              overall-post-process-func-list terrain-post-process-func-list scenario-faction-list ai-package-list
+                              win-condition-list world-sector-for-custom-scenario
                               (always-lvl-mods-func #'(lambda (world-sector mission world-time)
                                                         (declare (ignore world-sector mission world-time))
                                                         nil))
                               campaign-result)
   (unless id (error ":ID is an obligatory parameter!"))
   (unless name (error ":NAME is an obligatory parameter!"))
+  (unless mission-slot-type (error ":MISSION-SLOT-TYPE is an obligatory parameter!"))
   
   (setf (gethash id *mission-types*) (make-instance 'mission-type :id id :name name :enabled enabled
                                                                   :is-available-func is-available-func
+                                                                  :mission-slot-type mission-slot-type
                                                                   :faction-list-func faction-list-func
                                                                   :template-level-gen-func template-level-gen-func
                                                                   :overall-post-process-func-list overall-post-process-func-list

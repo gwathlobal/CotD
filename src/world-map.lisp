@@ -413,37 +413,122 @@
   )
 
 (defun generate-missions-on-world-map (world)
-  (dotimes (i (+ 3 (random 3)))
-    (loop for rx = (random *max-x-world-map*)
-          for ry = (random *max-y-world-map*)
-          for avail-missions = (loop for mission-type being the hash-values in *mission-types*
-                                     when (and (is-available-func mission-type)
-                                               (funcall (is-available-func mission-type) (aref (cells (world-map world)) rx ry) world))
-                                       collect (id mission-type))
-          for world-sector = (aref (cells (world-map world)) rx ry)
-          until (and (not (mission world-sector))
-                     avail-missions)
-          finally
-             (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
+  (recalculate-present-forces world)
+  (recalculate-mission-limits world)
 
-               (setf (mission world-sector)
-                     (generate-mission-on-world-map world rx ry mission-type-id :off-map nil))
-               (push (mission world-sector) (world/present-missions world)))))
-  (dotimes (i 1)
-    (loop with avail-missions = (list :mission-type-celestial-sabotage)
-              for rx = (random *max-x-world-map*)
-              for ry = (random *max-y-world-map*)
-              for world-sector = (aref (cells (world-map world)) rx ry)
-              until (and (not (mission world-sector))
-                         
-                         avail-missions)
-              finally
-                 (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
-                   
-                   (setf (mission world-sector)
-                         (generate-mission-on-world-map world rx ry mission-type-id :off-map t))
-                   (push (mission world-sector) (world/present-missions world))))
-    ))
+  
+  ;; check what kind of missions are available on the map
+  (let ((avail-mission-slots ())
+        (demons-mission-limit (world/demons-mission-limit world))
+        (military-mission-limit (world/military-mission-limit world))
+        (angels-mission-limit (world/angels-mission-limit world)))
+    (flet ((calc-avail-mission-slots ()
+             (setf avail-mission-slots ())
+             (loop for mission-slot-type in (list :mission-slot-demons-city :mission-slot-angels-city :mission-slot-military-city :mission-slot-angels-offworld :mission-slot-military-offworld) do
+               (setf (getf avail-mission-slots mission-slot-type) 0))
+             
+             (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+               (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                 (let ((world-sector (aref (cells (world-map world)) x y)))
+                   ;; calculate how many mission-slots can missions fill for city missions 
+                   (loop for mission-slot-type in (list :mission-slot-demons-city :mission-slot-angels-city :mission-slot-military-city) do
+                     (loop for mission-type-id in (getf (world/missions-by-slot-type world) mission-slot-type)
+                           for mission-type = (get-mission-type-by-id mission-type-id)
+                           when (and (null (mission world-sector))
+                                     (is-available-func mission-type)
+                                     (funcall (is-available-func mission-type) world-sector world))
+                             do
+                                (incf (getf avail-mission-slots (mission-slot-type mission-type)))
+                                (loop-finish)))
+                   ;; calculate available number of mission slots for offworld mission 
+                   (loop for mission-slot-type in (list :mission-slot-angels-offworld :mission-slot-military-offworld) do
+                     (loop for mission-type-id in (getf (world/missions-by-slot-type world) mission-slot-type)
+                           for mission-type = (get-mission-type-by-id mission-type-id)
+                           when (and (null (mission world-sector))
+                                     (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                         (eq (wtype world-sector) :world-sector-corrupted-lake)
+                                         (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                         (eq (wtype world-sector) :world-sector-corrupted-island)
+                                         (eq (wtype world-sector) :world-sector-corrupted-port)))
+                             do
+                                (incf (getf avail-mission-slots (mission-slot-type mission-type)))
+                                (loop-finish)))))))
+           
+           (create-city-mission (mission-slot-type)
+             (loop for rx = (random *max-x-world-map*)
+                   for ry = (random *max-y-world-map*)
+                   for world-sector = (aref (cells (world-map world)) rx ry)
+                   for avail-missions = (loop for mission-type-id in (getf (world/missions-by-slot-type world) mission-slot-type)
+                                              for mission-type = (get-mission-type-by-id mission-type-id)
+                                              when (and (is-available-func mission-type)
+                                                        (funcall (is-available-func mission-type) world-sector world))
+                                                collect (id mission-type))
+                   until (and (null (mission world-sector))
+                              avail-missions)
+                   finally
+                      (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
+                        (setf (mission world-sector)
+                              (generate-mission-on-world-map world rx ry mission-type-id :off-map nil))
+                        (push (mission world-sector) (world/present-missions world)))
+                      (case mission-slot-type
+                        (:mission-slot-demons-city (decf demons-mission-limit))
+                        (:mission-slot-military-city (decf military-mission-limit))
+                        (:mission-slot-angels-city (decf angels-mission-limit))
+                        (t (error "Wrong mission-slot-type supplied: only :MISSION-SLOT-DEMONS-CITY, :MISSION-SLOT-MILITARY-CITY or :MISSION-SLOT-ANGELS-CITY are allowed!")))))
+           
+           (create-offworld-mission (mission-slot-type)
+             (loop with avail-missions = (loop for mission-type-id in (getf (world/missions-by-slot-type world) mission-slot-type)
+                                               for mission-type = (get-mission-type-by-id mission-type-id)
+                                               for off-sector = (make-instance 'world-sector :wtype (first (world-sector-for-custom-scenario mission-type)) :x 0 :y 0)
+                                               when (and (is-available-func mission-type)
+                                                         (funcall (is-available-func mission-type) off-sector world))
+                                                 collect (id mission-type))
+                   for rx = (random *max-x-world-map*)
+                   for ry = (random *max-y-world-map*)
+                   for world-sector = (aref (cells (world-map world)) rx ry)
+                   until (and (null (mission world-sector))
+                              (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                  (eq (wtype world-sector) :world-sector-corrupted-lake)
+                                  (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                  (eq (wtype world-sector) :world-sector-corrupted-island)
+                                  (eq (wtype world-sector) :world-sector-corrupted-port)))
+                   finally
+                      (when avail-missions
+                        (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
+                          (setf (mission world-sector)
+                                (generate-mission-on-world-map world rx ry mission-type-id :off-map t))
+                          (push (mission world-sector) (world/present-missions world)))
+                        (case mission-slot-type
+                          (:mission-slot-military-offworld (decf military-mission-limit))
+                          (:mission-slot-angels-offworld (decf angels-mission-limit))
+                          (t (error "Wrong mission-slot-type supplied: only :MISSION-SLOT-MILITARY-OFFWORLD or :MISSION-SLOT-ANGELS-OFFWORLD are allowed!"))))))
+
+           (fill-slot-quota (mission-slot-type mission-limit-num create-mission-func &key do-once)
+             (loop repeat (if (> (getf avail-mission-slots mission-slot-type)
+                                 mission-limit-num)
+                            mission-limit-num
+                            (getf avail-mission-slots mission-slot-type))
+                   do
+                      (funcall create-mission-func mission-slot-type)
+                      (when do-once (loop-finish)))))
+
+      ;; loop for all mission slot types in the supplied order (order is important)
+      (loop for mission-slot-type in (list :mission-slot-demons-city :mission-slot-military-offworld :mission-slot-military-city :mission-slot-angels-offworld :mission-slot-angels-city)
+            do
+               (calc-avail-mission-slots)
+               (case mission-slot-type
+                 (:mission-slot-demons-city (fill-slot-quota mission-slot-type demons-mission-limit #'create-city-mission))
+                 (:mission-slot-military-city (fill-slot-quota mission-slot-type military-mission-limit #'create-city-mission))
+                 (:mission-slot-angels-city (fill-slot-quota mission-slot-type angels-mission-limit #'create-city-mission))
+                 ;; add 1 offworld military mission - 15% chance
+                 (:mission-slot-military-offworld (when (< (random 100) 15)
+                                                    (fill-slot-quota mission-slot-type military-mission-limit #'create-offworld-mission :do-once t)))
+                 ;; add 1 offworld angel mission - 15% chance
+                 (:mission-slot-angels-offworld (when (< (random 100) 15)
+                                                    (fill-slot-quota mission-slot-type angels-mission-limit #'create-offworld-mission :do-once t)))))
+      )
+    )
+  )
 
 (defun generate-mission-on-world-map (world-param x y mission-type-id &key (off-map nil))
   (let ((scenario (make-instance 'scenario-gen-class)))
@@ -752,6 +837,25 @@
     (add-message (format nil "shattered") sdl:*yellow* message-box-list)
     (add-message (format nil ".") sdl:*white* message-box-list))
   )
+
+(defun remove-raw-flesh-from-demons (world-map x y)
+  (declare (ignore world-map x y)) 
+  (when (<= (world/flesh-points *world*) 0)
+    (return-from remove-raw-flesh-from-demons nil))
+
+  (let ((pts-to-remove (+ (random 100) 100)))
+    (when (< (- (world/flesh-points *world*) pts-to-remove) 0)
+      (setf pts-to-remove (world/flesh-points *world*)))
+    
+    (decf (world/flesh-points *world*) pts-to-remove)
+
+    (let ((message-box-list `(,(world/sitrep-message-box *world*))))
+      (add-message (format nil " The ") sdl:*white* message-box-list)
+      (add-message (format nil "raw flesh stockpiles") sdl:*yellow* message-box-list)
+      (add-message (format nil " were blown up. ") sdl:*white* message-box-list)
+      (add-message (format nil "~A flesh point~:P" pts-to-remove) sdl:*yellow* message-box-list)
+      (add-message (format nil " were destroyed.") sdl:*white* message-box-list))
+  ))
 
 (defun calc-all-military-on-world-map (world-map)
   (let ((military-sum 0)

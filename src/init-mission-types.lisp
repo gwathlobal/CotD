@@ -7,6 +7,7 @@
 (set-mission-type :id :mission-type-test
                   :name "Test"
                   :enabled nil
+                  :mission-slot-type :mission-slot-demons-city
                   :faction-list-func #'(lambda (world-sector)
                                          (declare (ignore world-sector))
                                          (let ((faction-list (list (list +faction-type-none+ :mission-faction-present)
@@ -31,6 +32,7 @@
 
 (set-mission-type :id :mission-type-demonic-attack
                   :name "Demonic attack"
+                  :mission-slot-type :mission-slot-demons-city
                   :is-available-func #'(lambda (world-sector world)
                                          (let ((near-demons nil)
                                                (x (x world-sector))
@@ -157,6 +159,7 @@
 
 (set-mission-type :id :mission-type-demonic-raid
                   :name "Demonic raid"
+                  :mission-slot-type :mission-slot-demons-city
                   :is-available-func #'(lambda (world-sector world)
                                          (declare (ignore world))
                                          (if (or (eq (wtype world-sector) :world-sector-normal-forest)
@@ -282,6 +285,7 @@
 
 (set-mission-type :id :mission-type-demonic-conquest
                   :name "Demonic conquest"
+                  :mission-slot-type :mission-slot-demons-city
                   :is-available-func #'(lambda (world-sector world)
                                          (declare (ignore world))
                                          (if (or (eq (wtype world-sector) :world-sector-normal-forest)
@@ -416,6 +420,7 @@
 
 (set-mission-type :id :mission-type-demonic-thievery
                   :name "Demonic thievery"
+                  :mission-slot-type :mission-slot-demons-city
                   :is-available-func #'(lambda (world-sector world)
                                          ;; mission available only if
                                          ;; - there is a corrupted district on the map
@@ -562,6 +567,7 @@
 
 (set-mission-type :id :mission-type-military-conquest
                   :name "Military conquest"
+                  :mission-slot-type :mission-slot-military-city
                   :is-available-func #'(lambda (world-sector world)
                                          (let ((near-military nil)
                                                (x (x world-sector))
@@ -686,6 +692,7 @@
 
 (set-mission-type :id :mission-type-military-raid
                   :name "Military raid"
+                  :mission-slot-type :mission-slot-military-city
                   :is-available-func #'(lambda (world-sector world)
                                          (let ((near-military nil)
                                                (x (x world-sector))
@@ -810,6 +817,7 @@
 
 (set-mission-type :id :mission-type-celestial-purge
                   :name "Celestial purge"
+                  :mission-slot-type :mission-slot-angels-city
                   :is-available-func #'(lambda (world-sector world)
                                          (declare (ignore world))
                                          (if (or (eq (wtype world-sector) :world-sector-corrupted-forest)
@@ -925,6 +933,7 @@
 
 (set-mission-type :id :mission-type-celestial-retrieval
                   :name "Celestial retrieval"
+                  :mission-slot-type :mission-slot-angels-city
                   :is-available-func #'(lambda (world-sector world)
                                          (if (and (find +lm-item-holy-relic+ (items world-sector))
                                                   (or (eq (wtype world-sector) :world-sector-corrupted-forest)
@@ -1061,6 +1070,7 @@
 
 (set-mission-type :id :mission-type-eliminate-satanists
                   :name "Satanist elimination"
+                  :mission-slot-type :mission-slot-military-city
                   :is-available-func #'(lambda (world-sector world)
                                          (declare (ignore world))
                                          (if (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
@@ -1189,6 +1199,7 @@
 
 (set-mission-type :id :mission-type-celestial-sabotage
                   :name "Celestial sabotage"
+                  :mission-slot-type :mission-slot-angels-offworld
                   :is-available-func #'(lambda (world-sector world)
                                          (let* ((angels-win-cond (get-win-condition-by-id :win-cond-angels-campaign))
                                                 (machines-left (funcall (win-condition/win-func angels-win-cond) world angels-win-cond)))
@@ -1269,6 +1280,7 @@
 
 (set-mission-type :id :mission-type-military-sabotage
                   :name "Military sabotage"
+                  :mission-slot-type :mission-slot-military-offworld
                   :is-available-func #'(lambda (world-sector world)
                                          (if (and (or (eq (wtype world-sector) :world-sector-hell-plain))
                                                   (> (world/flesh-points world) 0))
@@ -1349,6 +1361,6 @@
                   :win-condition-list (list (list +faction-type-demons+ +game-event-military-sabotage-win-for-demons+)
                                             (list +faction-type-military+ +game-event-military-sabotage-win-for-military+)
                                             )
-                  :campaign-result (list (list :game-over-military-won nil)
+                  :campaign-result (list (list :game-over-military-won (list #'remove-raw-flesh-from-demons))
                                          (list :game-over-demons-won nil))
                   )
