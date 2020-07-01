@@ -1072,8 +1072,8 @@
                   :name "Satanist elimination"
                   :mission-slot-type :mission-slot-military-city
                   :is-available-func #'(lambda (world-sector world)
-                                         (declare (ignore world))
-                                         (if (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                         (if (and (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                                  (find-campaign-effects-by-id world :campaign-effect-satanist-lair-visible))
                                            t
                                            nil)
                                          )

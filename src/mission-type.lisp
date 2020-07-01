@@ -25,8 +25,6 @@
    (campaign-result :initform () :initarg :campaign-result :accessor mission-type/campaign-result :type list)
    ))
 
-(defparameter *mission-types* (make-hash-table))
-
 (defun set-mission-type (&key id name (enabled t) mission-slot-type is-available-func faction-list-func template-level-gen-func
                               overall-post-process-func-list terrain-post-process-func-list scenario-faction-list ai-package-list
                               win-condition-list world-sector-for-custom-scenario

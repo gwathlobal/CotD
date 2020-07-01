@@ -505,7 +505,9 @@
    (military-mission-limit :initform 0 :accessor world/military-mission-limit :type fixnum)
    (angels-mission-limit :initform 0 :accessor world/angels-mission-limit :type fixnum)
 
-   (missions-by-slot-type :initform () :accessor world/missions-by-slot-type :type list)
+   (missions-by-slot-type :initform () :accessor world/missions-by-slot-type :type plist) ;; mission-ids arranged into a plist by the mission-slot-type
+
+   (campaign-effects :initform () :accessor world/campaign-effects :type list)
    ))
 
 (defmethod initialize-instance :after ((world world) &key)
@@ -516,58 +518,7 @@
                (unless (getf (world/missions-by-slot-type world) (mission-slot-type mission-type))
                  (setf (getf (world/missions-by-slot-type world) (mission-slot-type mission-type)) ()))
                (push (id mission-type) (getf (world/missions-by-slot-type world) (mission-slot-type mission-type))))
-  ))
-
-(defun recalculate-present-forces (world)
-
-  (setf (world/cur-military-num world) 0)
-  (setf (world/cur-demons-num world) 0)
-  
-  (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
-    (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
-      (let ((world-sector (aref (cells (world-map world)) x y)))
-        (when (= (controlled-by world-sector) +lm-controlled-by-demons+)
-          (incf (world/cur-demons-num world)))
-        (when (= (controlled-by world-sector) +lm-controlled-by-military+)
-          (incf (world/cur-military-num world))))
-      )))
-
-(defun recalculate-mission-limits (world)
-  (with-slots (demons-mission-limit military-mission-limit angels-mission-limit) world
-    ;; demon limits
-    (setf demons-mission-limit 1)
-
-    ;; add the number of demonic forces present in the city
-    (incf demons-mission-limit (world/cur-demons-num world))
-    
-    ;; military limits
-    ;; add the number of military forces present in the city
-    (incf military-mission-limit (world/cur-military-num world))
-
-    ;; angel limits
-    (setf angels-mission-limit 1)
-
-    ;; if the relic is in the residential church - add 1 to angels, if the relic is in the corrupted district - add 1 to demons
-    (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
-      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
-        (let ((world-sector (aref (cells (world-map world)) x y)))
-          (when (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
-                     (find +lm-item-holy-relic+ (items world-sector))
-                     (or (eq (wtype world-sector) :world-sector-normal-forest)
-                         (eq (wtype world-sector) :world-sector-normal-port)
-                         (eq (wtype world-sector) :world-sector-normal-island)
-                         (eq (wtype world-sector) :world-sector-normal-residential)
-                         (eq (wtype world-sector) :world-sector-normal-lake)))
-            (incf angels-mission-limit))
-          
-          (when (and (find +lm-item-holy-relic+ (items world-sector))
-                     (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                         (eq (wtype world-sector) :world-sector-corrupted-port)
-                         (eq (wtype world-sector) :world-sector-corrupted-island)
-                         (eq (wtype world-sector) :world-sector-corrupted-residential)
-                         (eq (wtype world-sector) :world-sector-corrupted-lake)))
-            (incf angels-mission-limit)))))
-  ))
+    ))
 
 ;;----------------------
 ;; DATE

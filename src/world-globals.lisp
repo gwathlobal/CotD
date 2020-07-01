@@ -37,3 +37,6 @@
 (defenum:defenum mission-faction-presence-enum (:mission-faction-absent
                                                 :mission-faction-present
                                                 :mission-faction-delayed))
+
+(defparameter *mission-types* (make-hash-table))
+(defparameter *campaign-effect-types* (make-hash-table))

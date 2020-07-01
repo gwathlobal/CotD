@@ -412,6 +412,64 @@
       (generate-feats-for-world-sector (aref (cells world-map) x y) world-map)))
   )
 
+(defun recalculate-present-forces (world)
+
+  (setf (world/cur-military-num world) 0)
+  (setf (world/cur-demons-num world) 0)
+  
+  (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+    (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+      (let ((world-sector (aref (cells (world-map world)) x y)))
+        (when (= (controlled-by world-sector) +lm-controlled-by-demons+)
+          (incf (world/cur-demons-num world)))
+        (when (= (controlled-by world-sector) +lm-controlled-by-military+)
+          (incf (world/cur-military-num world))))
+          )))
+
+(defun recalculate-mission-limits (world)
+  (with-slots (demons-mission-limit military-mission-limit angels-mission-limit) world
+    ;; demon limits
+    (setf demons-mission-limit 1)
+
+    ;; if satanists are present - add 1 to demons
+    (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+        (let ((world-sector (aref (cells (world-map world)) x y)))
+          (when (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
+            (incf demons-mission-limit)))))
+
+    ;; add the number of demonic forces present in the city
+    (incf demons-mission-limit (world/cur-demons-num world))
+    
+    ;; military limits
+    ;; add the number of military forces present in the city
+    (incf military-mission-limit (world/cur-military-num world))
+
+    ;; angel limits
+    (setf angels-mission-limit 1)
+
+    ;; if the relic is in the residential church - add 1 to angels, if the relic is in the corrupted district - add 1 to demons
+    (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+        (let ((world-sector (aref (cells (world-map world)) x y)))
+          (when (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                     (find +lm-item-holy-relic+ (items world-sector))
+                     (or (eq (wtype world-sector) :world-sector-normal-forest)
+                         (eq (wtype world-sector) :world-sector-normal-port)
+                         (eq (wtype world-sector) :world-sector-normal-island)
+                         (eq (wtype world-sector) :world-sector-normal-residential)
+                         (eq (wtype world-sector) :world-sector-normal-lake)))
+            (incf angels-mission-limit))
+          
+          (when (and (find +lm-item-holy-relic+ (items world-sector))
+                     (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                         (eq (wtype world-sector) :world-sector-corrupted-port)
+                         (eq (wtype world-sector) :world-sector-corrupted-island)
+                         (eq (wtype world-sector) :world-sector-corrupted-residential)
+                         (eq (wtype world-sector) :world-sector-corrupted-lake)))
+            (incf angels-mission-limit)))))
+    ))
+
 (defun generate-missions-on-world-map (world)
   (recalculate-present-forces world)
   (recalculate-mission-limits world)
@@ -876,3 +934,20 @@
           (push (aref (cells world-map) x y) demons-sectors)
           (incf demons-sum))))
     (values demons-sum demons-sectors)))
+
+(defun find-campaign-effects-by-id (world campaign-effect-id)
+  (loop for campaign-effect in (world/campaign-effects world)
+        when (eq (campaign-effect/id campaign-effect) campaign-effect-id)
+          collect campaign-effect))
+
+(defun add-campaign-effect (world &key id cd param)
+  (unless id (error ":ID is an obligatory parameter!"))
+
+  (let ((new-effect (make-instance 'campaign-effect :id id :cd cd :param param))
+        (old-effect (find-campaign-effects-by-id world id)))
+    (if (and old-effect
+             (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)))
+      (funcall (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)) new-effect old-effect)
+      (push (make-instance 'campaign-effect :id id :cd cd :param param)
+        (world/campaign-effects world)))
+  ))
