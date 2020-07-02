@@ -429,8 +429,11 @@
 (defun recalculate-mission-limits (world)
   (with-slots (demons-mission-limit military-mission-limit angels-mission-limit) world
     ;; demon limits
-    (setf demons-mission-limit 1)
+    (setf demons-mission-limit 0)
 
+    ;; if the sacrifice was made - add 2 for each sacrifice for demons
+    (incf demons-mission-limit (* 2 (length (find-campaign-effects-by-id world :campaign-effect-satanist-sacrifice))))
+    
     ;; if satanists are present - add 1 to demons
     (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
       (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
@@ -442,6 +445,8 @@
     (incf demons-mission-limit (world/cur-demons-num world))
     
     ;; military limits
+    (setf military-mission-limit 0)
+    
     ;; add the number of military forces present in the city
     (incf military-mission-limit (world/cur-military-num world))
 
@@ -948,6 +953,14 @@
     (if (and old-effect
              (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)))
       (funcall (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)) new-effect old-effect)
-      (push (make-instance 'campaign-effect :id id :cd cd :param param)
-        (world/campaign-effects world)))
-  ))
+      (progn
+        (push new-effect (world/campaign-effects world))
+        (when (campaign-effect/on-add-func new-effect)
+          (funcall (campaign-effect/on-add-func new-effect) world new-effect))))
+    ))
+
+(defun remove-campaign-effect (world campaign-effect)
+  (with-slots (campaign-effects) world
+    (when (campaign-effect/on-remove-func campaign-effect)
+      (funcall (campaign-effect/on-remove-func campaign-effect) world campaign-effect))
+    (setf campaign-effects (remove campaign-effect campaign-effects))))

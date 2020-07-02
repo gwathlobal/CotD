@@ -457,13 +457,13 @@
 (defun campaign-game-loop ()
   (setf *current-window* (make-instance 'campaign-window :cur-mode (case (game-manager/game-state *game-manager*)
                                                                      (:game-state-campaign-init :campaign-window-map-mode)
-                                                                     (t :campaign-window-mission-mode))))
-  (unless (zerop (message-list-length (world/sitrep-message-box *world*)))
-    (setf *current-window* (make-instance 'message-window 
-                                          :message-box (world/sitrep-message-box *world*)
-                                          :header-str "SITUATION REPORT"))
-    (make-output *current-window*)
-    (run-window *current-window*))
+                                                                     (t (if (zerop (message-list-length (world/sitrep-message-box *world*)))
+                                                                          :campaign-window-mission-mode
+                                                                          :campaign-window-status-mode)))
+                                                         :reveal-lair (if (or (eq (get-general-faction-from-specific (world/player-specific-faction *world*)) +faction-type-demons+)
+                                                                              (find-campaign-effects-by-id *world* :campaign-effect-satanist-lair-visible))
+                                                                        t
+                                                                        nil)))
   (make-output *current-window*)
   (multiple-value-bind (mission world-sector) (run-window *current-window*)
     (when (and mission world-sector)
@@ -577,13 +577,24 @@
 
       (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
 
-      ;; go through all game events
       (loop for game-event-id in (game-events *world*)
             for game-event = (get-game-event-by-id game-event-id)
             when (and (not (disabled game-event))
                       (funcall (on-check game-event) *world*))
               do
                  (funcall (on-trigger game-event) *world*))
+
+      (with-slots (campaign-effects) *world*
+        (loop with once = nil
+              for campaign-effect in campaign-effects
+              when (campaign-effect/cd campaign-effect)
+                do
+                   (decf (campaign-effect/cd campaign-effect))
+                   (when (= (campaign-effect/cd campaign-effect) 0)
+                     (when (not once)
+                       (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
+                       (setf once t))
+                     (remove-campaign-effect *world* campaign-effect))))
       
       ;; reset all missions and regenerate them
       (reset-all-missions-on-world-map *world*)

@@ -182,22 +182,7 @@
                                                                  ))))
                                ))
 
-(set-game-event (make-instance 'game-event :id +game-event-campaign-tick-effects+
-                                           :descr-func #'(lambda ()
-                                                           (format nil "Each day tick campaign effects with cooldowns."))
-                                           :disabled nil
-                                           :on-check #'(lambda (world)
-                                                         (declare (ignore world))
-                                                         t)
-                                           :on-trigger #'(lambda (world)
-                                                           (with-slots (campaign-effects) world
-                                                             (loop for campaign-effect in campaign-effects
-                                                                   when (campaign-effect/cd campaign-effect)
-                                                                     do
-                                                                        (decf (campaign-effect/cd campaign-effect))
-                                                                        (when (= (campaign-effect/cd campaign-effect) 0)
-                                                                          (setf campaign-effects (remove campaign-effect campaign-effects)))))
-                                                           )))
+
 
 
 

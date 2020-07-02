@@ -72,8 +72,6 @@
 (defconstant +game-event-military-sabotage-win-for-demons+ 62)
 (defconstant +game-event-military-sabotage-win-for-military+ 63)
 
-(defconstant +game-event-campaign-tick-effects+ 64)
-
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won
                                  :game-over-angels-won

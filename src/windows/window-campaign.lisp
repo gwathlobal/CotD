@@ -3,25 +3,66 @@
 
 (defenum:defenum campaign-window-tab-type (:campaign-window-map-mode
                                            :campaign-window-mission-mode
-                                           ))
+                                           :campaign-window-status-mode
+                                           :campaign-window-effects-mode))
 
 (defclass campaign-window (window)
   ((cur-sector :initform (cons 0 0) :initarg :cur-sector :accessor campaign-window/cur-sector :type cons)
    (cur-mode :initform :campaign-window-map-mode :initarg :cur-mode :accessor campaign-window/cur-mode :type campaign-window-tab-type)
+   (prev-mode :initform :campaign-window-mission-mode :initarg :prev-mode :accessor campaign-window/prev-mode :type campaign-window-tab-type)
    (cur-sel :initform 0 :accessor campaign-window/cur-sel :type fixnum)
    (avail-missions :initform () :accessor campaign-window/avail-missions :type list)
    (test-map-func :initform nil :initarg :test-map-func :accessor campaign-window/test-map-func)
-   (reveal-lair :initform (if (eq (get-general-faction-from-specific (world/player-specific-faction *world*)) +faction-type-demons+)
-                            t
-                            nil)
-                :accessor campaign-window/reveal-lair :type boolean)))
+   (reveal-lair :initform t :initarg :reveal-lair :accessor campaign-window/reveal-lair :type boolean)))
 
 (defmethod initialize-instance :after ((win campaign-window) &key)
   (with-slots (cur-mode) win
     (campaign-win-calculate-avail-missions win)
+    
+    (when (eq cur-mode :campaign-window-status-mode) 
+      (campaign-win-display-sitrep win))
+
+    (when (eq cur-mode :campaign-window-effects-mode) 
+      (campaign-win-display-effects win))
 
     (when (eq cur-mode :campaign-window-mission-mode)
-      (campaign-win-move-select-to-mission win))))
+      (campaign-win-move-select-to-mission win)))
+  )
+
+(defmethod campaign-win-display-sitrep ((win campaign-window))
+  (when (not (eq (campaign-window/cur-mode win) :campaign-window-status-mode))
+    (setf (campaign-window/prev-mode win) (campaign-window/cur-mode win))
+    (setf (campaign-window/cur-mode win) :campaign-window-status-mode))
+  
+  (setf *current-window* (make-instance 'message-window 
+                                        :return-to win
+                                        :message-box (world/sitrep-message-box *world*)
+                                        :header-str "SITUATION REPORT"))
+  (make-output *current-window*)
+  (run-window *current-window*)
+
+  (setf (campaign-window/cur-mode win) (campaign-window/prev-mode win)))
+
+(defmethod campaign-win-display-effects ((win campaign-window))
+  (let* ((effects-message-box (make-message-box))
+         (message-box-list `(,effects-message-box)))
+    (loop for campaign-effect in (world/campaign-effects *world*) do
+      (add-message (format nil "~A" (campaign-effect/name campaign-effect)) sdl:*yellow* message-box-list)
+      (add-message (format nil " [~A turn~:P left]~%" (campaign-effect/cd campaign-effect)) sdl:*white* message-box-list)
+      (add-message (format nil "~A~%~%" (campaign-effect/descr campaign-effect)) sdl:*white* message-box-list))
+    
+    (when (not (eq (campaign-window/cur-mode win) :campaign-window-effects-mode))
+      (setf (campaign-window/prev-mode win) (campaign-window/cur-mode win))
+      (setf (campaign-window/cur-mode win) :campaign-window-effects-mode))
+    
+    (setf *current-window* (make-instance 'message-window 
+                                          :return-to win
+                                          :message-box effects-message-box
+                                          :header-str "CURRENT EFFECTS"))
+    (make-output *current-window*)
+    (run-window *current-window*)
+
+    (setf (campaign-window/cur-mode win) (campaign-window/prev-mode win))))
 
 (defmethod campaign-win-calculate-avail-missions ((win campaign-window))
   (with-slots (avail-missions) win
@@ -65,7 +106,7 @@
                                        (sdl:draw-string-solid-* init-campaign-str (- (truncate *window-width* 2) (truncate (* (length init-campaign-str) (sdl:char-width sdl:*default-font*)) 2)) y1 :justify :left :color sdl:*white*)))
           (:game-state-campaign-map (progn
                                       (setf header-str "CAMPAIGN MAP")
-                                      (setf prompt-str (format nil "~A[Tab] Change mode  [s] Situation report  [n] Next day  [Esc] Exit"
+                                      (setf prompt-str (format nil "~A[Tab] Change mode  [s] Situation report  [e] Effects  [n] Next day  [Esc] Exit"
                                                                (if (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                         (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                                    (get-general-faction-from-specific (world/player-specific-faction *world*))))
@@ -296,12 +337,12 @@
                        ;; view situation report - s
                        (when (or (and (sdl:key= key :sdl-key-s) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-s-small+))
-                         (setf *current-window* (make-instance 'message-window 
-                                                               :return-to *current-window*
-                                                               :message-box (world/sitrep-message-box *world*)
-                                                               :header-str "SITUATION REPORT"))
-                         (make-output *current-window*)
-                         (run-window *current-window*))
+                         (campaign-win-display-sitrep win))
+                       ;;------------------
+                       ;; view situation report - e
+                       (when (or (and (sdl:key= key :sdl-key-e) (= mod 0))
+                                 (eq unicode +cotd-unicode-latin-e-small+))
+                         (campaign-win-display-effects win))
                        ;;------------------
                        ;; next day - n
                        (when (or (and (sdl:key= key :sdl-key-n) (= mod 0))
