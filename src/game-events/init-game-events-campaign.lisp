@@ -182,6 +182,46 @@
                                                                  ))))
                                ))
 
+(set-game-event (make-instance 'game-event :id +game-event-campaign-trigger-commands+
+                                           :descr-func #'(lambda ()
+                                                           (format nil "Each day, trigger commands for all factions."))
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (loop for faction-type in (list +faction-type-demons+ +faction-type-angels+ +faction-type-military+ +faction-type-satanists+ +faction-type-church+) do
+                                                             (if (gethash faction-type (world/commands *world*))
+                                                               
+                                                               (progn
+                                                                 (let* ((world-command (gethash faction-type (world/commands *world*)))
+                                                                        (command (get-campaign-command-by-id (getf world-command :command)))
+                                                                        (cd (getf world-command :cd)))
+                                                                   (when (and (= cd (campaign-command/cd command))
+                                                                              (campaign-command/trigger-on-start command))
+                                                                     (if (funcall (campaign-command/on-check-func command) world command)
+                                                                       (funcall (campaign-command/on-trigger-func command) world command)
+                                                                       (setf (gethash faction-type (world/commands *world*)) nil)))
+
+                                                                   (decf (getf world-command :cd))
+                                                                   
+                                                                   (when (= (getf world-command :cd) 0)
+                                                                     (when (and (null (campaign-command/trigger-on-start command))
+                                                                                (funcall (campaign-command/on-check-func command) world command))
+                                                                       (funcall (campaign-command/on-trigger-func command) world command))
+                                                                     (setf (gethash faction-type (world/commands *world*)) nil))))
+                                                               (progn
+                                                                 (let* ((command-list (loop for command being the hash-values in *campaign-commands*
+                                                                                            when (and (eq (campaign-command/faction-type command) faction-type)
+                                                                                                      (funcall (campaign-command/on-check-func command) world command))
+                                                                                              collect command))
+                                                                        (selected-command (nth (random (length command-list)) command-list)))
+                                                                   (setf (gethash faction-type (world/commands *world*))
+                                                                         (list :command (campaign-command/id selected-command) :cd (1- (campaign-command/cd selected-command)))))
+                                                                 )))
+                                                           )
+                               ))
+
 
 
 

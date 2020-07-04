@@ -14,7 +14,7 @@
                                               (declare (ignore campaign-effect))
                                               (let ((message-box-list `(,(world/sitrep-message-box world))))
                                                 (add-message (format nil "The satanists managed to ") sdl:*white* message-box-list)
-                                                (add-message (format nil "exposed the agents") sdl:*yellow* message-box-list)
+                                                (add-message (format nil "expose the agents") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " who have infiltrated them and are now able lay low.~%") sdl:*white* message-box-list))))
 
 (set-campaign-effect-type :id :campaign-effect-satanist-sacrifice
@@ -33,3 +33,20 @@
                                                 (add-message (format nil "The ") sdl:*white* message-box-list)
                                                 (add-message (format nil "crack of between worlds has closed") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " and the forces of Hell now have less opportunities to invade Earth.~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-satanist-lair-hidden
+                          :name "Satanits' lair hidden"
+                          :descr "The satanists have taken great precautions to make the lair hidden and secure."
+                          :merge-func nil
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/sitrep-message-box world))))
+                                             (add-message (format nil "The satanists ") sdl:*white* message-box-list)
+                                             (add-message (format nil "have hidden their lair") sdl:*yellow* message-box-list)
+                                             (add-message (format nil " to make it impossible to find them.~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/sitrep-message-box world))))
+                                                (add-message (format nil "The satanists ") sdl:*white* message-box-list)
+                                                (add-message (format nil "have relaxed their security") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " and it is now possible to infiltrate it.~%") sdl:*white* message-box-list))))

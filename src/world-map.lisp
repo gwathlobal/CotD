@@ -18,6 +18,16 @@
 
   world-map)
 
+(defun place-satanist-lair-on-map (world-map lair-num)
+  (loop repeat lair-num
+        do
+           (loop for x = (random (array-dimension (cells world-map) 0))
+                 for y = (random (array-dimension (cells world-map) 1))
+                 for world-sector = (aref (cells world-map) x y)
+                 while (or (eq (wtype world-sector) :world-sector-normal-sea)
+                           (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a))))
+                 finally (push (list +lm-feat-lair+ nil) (feats world-sector)))))
+
 (defun generate-normal-world-map (world)
   (with-slots (world-map) world
     (setf world-map (make-instance 'world-map))
@@ -180,16 +190,8 @@
           finally (push +lm-item-holy-relic+ (items (nth (random (length church-sectors)) church-sectors))))
     
     ;; place 1 lair
-    (loop with lair-num = 1
-          repeat lair-num
-          do
-             (loop for x = (random (array-dimension (cells world-map) 0))
-                   for y = (random (array-dimension (cells world-map) 1))
-                   for world-sector = (aref (cells world-map) x y)
-                   while (or (eq (wtype world-sector) :world-sector-normal-sea)
-                             (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a))))
-                   finally (push (list +lm-feat-lair+ nil) (feats world-sector))))
-
+    (place-satanist-lair-on-map world-map 1)
+    
     ;; place 1 library & 1 book in it
     (loop with library-num = 1
           with library-sectors = ()

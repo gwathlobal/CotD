@@ -508,6 +508,8 @@
    (missions-by-slot-type :initform () :accessor world/missions-by-slot-type :type plist) ;; mission-ids arranged into a plist by the mission-slot-type
 
    (campaign-effects :initform () :accessor world/campaign-effects :type list)
+
+   (commands :initform (make-hash-table) :accessor world/commands) ;; keys are faction-type, value is (:command <command id> :cd <cd>)
    ))
 
 (defmethod initialize-instance :after ((world world) &key)

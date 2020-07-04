@@ -1,7 +1,8 @@
 (in-package :cotd)
 
 (defenum:defenum campaign-effect-enum (:campaign-effect-satanist-lair-visible
-                                       :campaign-effect-satanist-sacrifice))
+                                       :campaign-effect-satanist-sacrifice
+                                       :campaign-effect-satanist-lair-hidden))
 
 (defclass campaign-effect-type ()
   ((id :initarg :id :accessor campaign-effect-type/id :type campaign-effect-enum)

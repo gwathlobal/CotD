@@ -105,17 +105,8 @@
                                        ;; draw subheader
                                        (sdl:draw-string-solid-* init-campaign-str (- (truncate *window-width* 2) (truncate (* (length init-campaign-str) (sdl:char-width sdl:*default-font*)) 2)) y1 :justify :left :color sdl:*white*)))
           (:game-state-campaign-map (progn
-                                      (setf header-str "CAMPAIGN MAP")
-                                      (setf prompt-str (format nil "~A[Tab] Change mode  [s] Situation report  [e] Effects  [n] Next day  [Esc] Exit"
-                                                               (if (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
-                                                                        (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
-                                                                                                   (get-general-faction-from-specific (world/player-specific-faction *world*))))
-                                                                 "[Enter] Start mission  "
-                                                                 "")
-                                                               ))
-
-                                      ;; draw win conditions 
-                                      (let* ((demon-win-cond (get-win-condition-by-id :win-cond-demon-campaign))
+                                      (let* ((player-faction (get-general-faction-from-specific (world/player-specific-faction *world*)))
+                                             (demon-win-cond (get-win-condition-by-id :win-cond-demon-campaign))
                                              (military-win-cond (get-win-condition-by-id :win-cond-military-campaign))
                                              (angels-win-cond (get-win-condition-by-id :win-cond-angels-campaign))
                                              (max-flesh-points (win-condition/win-formula demon-win-cond))
@@ -123,10 +114,33 @@
                                              (machines-left (funcall (win-condition/win-func angels-win-cond) *world* angels-win-cond))
                                              (military-alarmed (world/military-alarm *world*))
                                              (demon-str nil)
-                                             (max-lines 0))
+                                             (max-lines 0)
+                                             (command-str "Press [c] to select a new command"))
+
+                                        (setf header-str "CAMPAIGN MAP")
+                                        (setf prompt-str (format nil "~A[Tab] Change mode  ~A[s] Situation report  [e] Effects  [n] Next day  [Esc] Exit"
+                                                                 (if (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
+                                                                          (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
+                                                                                                     (get-general-faction-from-specific (world/player-specific-faction *world*))))
+                                                                   "[Enter] Start mission  "
+                                                                   "")
+                                                                 (if (not (gethash player-faction (world/commands *world*)))
+                                                                   "[c] Select a command  "
+                                                                   "")
+                                                                 ))
+                                        
+                                        (when (gethash player-faction (world/commands *world*))
+                                          (let* ((world-command (gethash player-faction (world/commands *world*)))
+                                                 (command (get-campaign-command-by-id (getf world-command :command)))
+                                                 (cd (getf world-command :cd)))
+                                            (setf command-str (format nil "~A ~A"
+                                                                      (funcall (campaign-command/name-func command) *world*)
+                                                                      (if (campaign-command/trigger-on-start command)
+                                                                        (format nil "[~A day~:P for next]" cd)
+                                                                        (format nil "[complete in ~A day~:P]" cd))))))
                                         (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
-                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%Military alarmed: ~A"
-                                                                  (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left military-alarmed)))
+                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%Military alarmed: ~A~%Command: ~A"
+                                                                  (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left military-alarmed command-str)))
                                         
                                         (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* 1 (sdl:get-font-height))))
                                           (setf max-lines (write-text demon-str a-rect :count-only t)))
@@ -332,6 +346,48 @@
                                                           (return-from run-window (values (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                           (world-sector (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))))))))
                             )))
+                       ;;------------------
+                       ;; select a command - c
+                       (when (or (and (sdl:key= key :sdl-key-c) (= mod 0))
+                                 (eq unicode +cotd-unicode-latin-c-small+))
+                         (let ((player-faction (get-general-faction-from-specific (world/player-specific-faction *world*))))
+                           (when (not (gethash player-faction (world/commands *world*)))
+                             (let ((command-list (loop for command being the hash-values in *campaign-commands*
+                                                       when (and (eq (campaign-command/faction-type command) player-faction)
+                                                                 (funcall (campaign-command/on-check-func command) *world* command))
+                                                         collect command))
+                                   (menu-items ())
+                                   (prompt-list ())
+                                   (enter-func nil)
+                                   (header-str nil))
+                               (setf header-str "Select a command")
+                               (setf menu-items (append (loop for command in command-list
+                                                              collect (funcall (campaign-command/name-func command) *world*))
+                                                        (list "Close")))
+                               (setf prompt-list (loop repeat (length menu-items)
+                                                       collect #'(lambda (cur-sel)
+                                                                   (declare (ignore cur-sel))
+                                                                   "[Enter] Select  [Esc] Exit")))
+                               (setf enter-func #'(lambda (cur-sel)
+                                                    (if (= cur-sel (1- (length menu-items)))
+                                                      ;; close
+                                                      (progn
+                                                        (setf *current-window* (return-to *current-window*)))
+                                                      ;; set up the command
+                                                      (progn
+                                                        (setf (gethash player-faction (world/commands *world*))
+                                                              (list :command (campaign-command/id (nth cur-sel command-list)) :cd (campaign-command/cd (nth cur-sel command-list))))
+                                                        (setf *current-window* (return-to *current-window*))))
+                                                    ))
+                               (setf *current-window* (make-instance 'select-obj-window 
+                                                                     :return-to *current-window*
+                                                                     :header-line header-str
+                                                                     :line-list menu-items
+                                                                     :prompt-list prompt-list
+                                                                     :enter-func enter-func
+                                                                     ))
+                               (make-output *current-window*)
+                               (run-window *current-window*)))))
                        
                        ;;------------------
                        ;; view situation report - s

@@ -1,3 +1,4 @@
+- Prompt for selecting a campaign command if none is selected
 - Initial power for angels and demons depend on the state of the relic, demons always get 2 initial power in Hell
 - Celestial sabotage, add guidance for angels that points to machines
 - Slime pools in hell that reduce all resitances

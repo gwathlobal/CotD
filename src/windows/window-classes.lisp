@@ -4,6 +4,8 @@
 (defconstant +cotd-unicode-at-sign+ 64)
 (defconstant +cotd-unicode-latin-q-captial+ 81)
 (defconstant +cotd-unicode-latin-a-small+ 97)
+(defconstant +cotd-unicode-latin-b-small+ 98)
+(defconstant +cotd-unicode-latin-c-small+ 99)
 (defconstant +cotd-unicode-latin-d-small+ 100)
 (defconstant +cotd-unicode-latin-e-small+ 101)
 (defconstant +cotd-unicode-latin-f-small+ 102)
