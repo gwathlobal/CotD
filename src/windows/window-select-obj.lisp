@@ -9,6 +9,7 @@
    (prompt-list :initarg :prompt-list :accessor prompt-list :type list) ;; each value is (<func if this prompt should apply with 1 arg - cur-sel> <prompt string proper>)
    (enter-func :initarg :enter-func :accessor enter-func) ;; 1 arg - cur-sel
    (select-color-func :initform nil :initarg :select-color-func :accessor select-color-func) ;; 1 arg - cur-sel
+   (can-esc :initform t :initarg :can-esc :accessor can-esc)
    )) 
 
 (defmethod make-output ((win select-obj-window))
@@ -98,7 +99,7 @@
 
                         (cond
 			  ;; escape - quit
-			  ((sdl:key= key :sdl-key-escape) 
+			  ((and (sdl:key= key :sdl-key-escape) (can-esc win)) 
 			   (setf *current-window* (return-to win)) (go exit-func))
 			  ;; enter - select
 			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
