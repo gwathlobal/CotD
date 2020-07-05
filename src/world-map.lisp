@@ -433,15 +433,20 @@
     ;; demon limits
     (setf demons-mission-limit 0)
 
-    ;; if the sacrifice was made - add 2 for each sacrifice for demons
-    (incf demons-mission-limit (* 2 (length (find-campaign-effects-by-id world :campaign-effect-satanist-sacrifice))))
-    
+    ;; if the sacrifice was made - add # of dimensional engines for demons for each sacrifice
+    (let* ((angels-win-cond (get-win-condition-by-id :win-cond-angels-campaign))
+           (machines-left (funcall (win-condition/win-func angels-win-cond) world angels-win-cond)))
+      (incf demons-mission-limit (* machines-left (length (find-campaign-effects-by-id world :campaign-effect-satanist-sacrifice)))))
+        
     ;; if satanists are present - add 1 to demons
     (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
       (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
         (let ((world-sector (aref (cells (world-map world)) x y)))
           (when (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
             (incf demons-mission-limit)))))
+
+    ;; add # of dimensional engines
+    
 
     ;; add the number of demonic forces present in the city
     (incf demons-mission-limit (world/cur-demons-num world))
@@ -474,7 +479,7 @@
                          (eq (wtype world-sector) :world-sector-corrupted-island)
                          (eq (wtype world-sector) :world-sector-corrupted-residential)
                          (eq (wtype world-sector) :world-sector-corrupted-lake)))
-            (incf angels-mission-limit)))))
+            (incf demons-mission-limit)))))
     ))
 
 (defun generate-missions-on-world-map (world)
@@ -552,6 +557,7 @@
                    for ry = (random *max-y-world-map*)
                    for world-sector = (aref (cells (world-map world)) rx ry)
                    until (and (null (mission world-sector))
+                              (eq (controlled-by world-sector) +lm-controlled-by-none+)
                               (or (eq (wtype world-sector) :world-sector-corrupted-forest)
                                   (eq (wtype world-sector) :world-sector-corrupted-lake)
                                   (eq (wtype world-sector) :world-sector-corrupted-residential)
@@ -844,7 +850,7 @@
         
         (add-message (format nil " The ") sdl:*white* message-box-list)
         (add-message (format nil "military army") sdl:*yellow* message-box-list)
-        (add-message (format nil " was ") sdl:*white* message-box-list)
+        (add-message (format nil " present there was ") sdl:*white* message-box-list)
         (add-message (format nil "slaughtered") sdl:*yellow* message-box-list)
         (add-message (format nil ".") sdl:*white* message-box-list)))))
 
@@ -882,7 +888,7 @@
                 
         (add-message (format nil " The ") sdl:*white* message-box-list)
         (add-message (format nil "demon army") sdl:*yellow* message-box-list)
-        (add-message (format nil " was ") sdl:*white* message-box-list)
+        (add-message (format nil " present there was ") sdl:*white* message-box-list)
         (add-message (format nil "slaughtered") sdl:*yellow* message-box-list)
         (add-message (format nil ".") sdl:*white* message-box-list)))))
 

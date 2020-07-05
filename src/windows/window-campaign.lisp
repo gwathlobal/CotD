@@ -179,9 +179,9 @@
                                                  (cd (getf world-command :cd)))
                                             (setf command-str (format nil "~A ~A"
                                                                       (funcall (campaign-command/name-func command) *world*)
-                                                                      (if (campaign-command/trigger-on-start command)
-                                                                        (format nil "[~A day~:P for next]" cd)
-                                                                        (format nil "[complete in ~A day~:P]" cd))))))
+                                                                      (if (campaign-command/on-trigger-end-func command)
+                                                                        (format nil "[complete in ~A day~:P]" cd)
+                                                                        (format nil "[~A day~:P for next]" cd))))))
                                         (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
                                           (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%Military alarmed: ~A~%Command: ~A"
                                                                   (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left military-alarmed command-str)))
