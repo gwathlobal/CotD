@@ -491,11 +491,12 @@
    (player-specific-faction :initform nil :accessor world/player-specific-faction)
    (present-missions :initform () :accessor world/present-missions)
 
-   (sitrep-message-box :initform (make-message-box) :accessor world/sitrep-message-box :type message-box)
+   (mission-message-box :initform (make-message-box) :accessor world/mission-message-box :type message-box)
+   (event-message-box :initform (make-message-box) :accessor world/event-message-box :type message-box)
+   (effect-message-box :initform (make-message-box) :accessor world/effect-message-box :type message-box)
 
    (flesh-points :initform 0 :accessor world/flesh-points :type fixnum)
    (machine-destroyed :initform 0 :accessor world/machine-destroyed :type fixnum)
-   (military-alarm :initform 0 :accessor world/military-alarm :type fixnum)
    (cur-military-num :initform 0 :accessor world/cur-military-num :type fixnum)
    (cur-demons-num :initform 0 :accessor world/cur-demons-num :type fixnum)
 

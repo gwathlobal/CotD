@@ -2,7 +2,8 @@
 
 (defenum:defenum campaign-effect-enum (:campaign-effect-satanist-lair-visible
                                        :campaign-effect-satanist-sacrifice
-                                       :campaign-effect-satanist-lair-hidden))
+                                       :campaign-effect-satanist-lair-hidden
+                                       :campaign-effect-demon-protect-dimension))
 
 (defclass campaign-effect-type ()
   ((id :initarg :id :accessor campaign-effect-type/id :type campaign-effect-enum)

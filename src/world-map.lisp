@@ -591,11 +591,13 @@
                  (:mission-slot-demons-city (fill-slot-quota mission-slot-type demons-mission-limit #'create-city-mission))
                  (:mission-slot-military-city (fill-slot-quota mission-slot-type military-mission-limit #'create-city-mission))
                  (:mission-slot-angels-city (fill-slot-quota mission-slot-type angels-mission-limit #'create-city-mission))
-                 ;; add 1 offworld military mission - 15% chance
-                 (:mission-slot-military-offworld (when (< (random 100) 15)
+                 ;; add 1 offworld military mission - 15% chance & dimension not protected
+                 (:mission-slot-military-offworld (when (and (< (random 100) 15)
+                                                             (not (find-campaign-effects-by-id world :campaign-effect-demon-protect-dimension)))
                                                     (fill-slot-quota mission-slot-type military-mission-limit #'create-offworld-mission :do-once t)))
-                 ;; add 1 offworld angel mission - 15% chance
-                 (:mission-slot-angels-offworld (when (< (random 100) 15)
+                 ;; add 1 offworld angel mission - 15% chance & dimension not protected
+                 (:mission-slot-angels-offworld (when (and (< (random 100) 15)
+                                                           (not (find-campaign-effects-by-id world :campaign-effect-demon-protect-dimension)))
                                                     (fill-slot-quota mission-slot-type angels-mission-limit #'create-offworld-mission :do-once t)))))
       )
     )
@@ -664,7 +666,7 @@
   (setf (world/present-missions world) ())
   (world-map world))
 
-(defun message-box-add-transform-message (prev-wtype world-sector &key (message-box-list `(,(world/sitrep-message-box *world*))))
+(defun message-box-add-transform-message (prev-wtype world-sector &key (message-box-list `(,(world/mission-message-box *world*))))
   (when (not (eq prev-wtype (wtype world-sector)))
     (add-message (format nil " The sector has become ") sdl:*white* message-box-list)
     (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* message-box-list)
@@ -744,7 +746,7 @@
 
 (defun remove-satanist-lair-from-map (world-map x y)
   (let ((world-sector (aref (cells world-map) x y))
-        (message-box-list `(,(world/sitrep-message-box *world*))))
+        (message-box-list `(,(world/mission-message-box *world*))))
     (setf (feats world-sector) (remove +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a))))
     
     (add-message (format nil " The ") sdl:*white* message-box-list)
@@ -768,7 +770,7 @@
                                       (push (aref (cells world-map) dx dy) corrupted-district-list)))
                                 finally (when corrupted-district-list
                                           (return (nth (random (length corrupted-district-list)) corrupted-district-list)))))
-        (message-box-list `(,(world/sitrep-message-box *world*))))
+        (message-box-list `(,(world/mission-message-box *world*))))
     (when corrupted-sector
       (setf (items (aref (cells world-map) x y)) (remove +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
       (push +lm-item-holy-relic+ (items corrupted-sector))
@@ -804,7 +806,7 @@
                                    (push (aref (cells world-map) dx dy) church-sector-list)))
                              finally (when church-sector-list
                                        (return (nth (random (length church-sector-list)) church-sector-list)))))
-        (message-box-list `(,(world/sitrep-message-box *world*))))
+        (message-box-list `(,(world/mission-message-box *world*))))
     (when church-sector
       (setf (items (aref (cells world-map) x y)) (remove +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
       (push +lm-item-holy-relic+ (items church-sector))
@@ -833,7 +835,7 @@
                        (if free-sector-list
                          (nth (random (length free-sector-list)) free-sector-list)
                          nil)))
-        (message-box-list `(,(world/sitrep-message-box *world*))))
+        (message-box-list `(,(world/mission-message-box *world*))))
 
     (if free-sector
       (progn
@@ -872,7 +874,7 @@
                             (if corrupted-sector-list
                               (nth (random (length corrupted-sector-list)) corrupted-sector-list)
                               nil)))
-        (message-box-list `(,(world/sitrep-message-box *world*))))
+        (message-box-list `(,(world/mission-message-box *world*))))
     (if corrupted-sector
       (progn
         (setf (controlled-by (aref (cells world-map) x y)) +lm-controlled-by-none+)
@@ -901,7 +903,7 @@
 
   (incf (world/machine-destroyed *world*))
 
-  (let ((message-box-list `(,(world/sitrep-message-box *world*))))
+  (let ((message-box-list `(,(world/mission-message-box *world*))))
     (add-message (format nil " The ") sdl:*white* message-box-list)
     (add-message (format nil "dimensional engine") sdl:*yellow* message-box-list)
     (add-message (format nil " was ") sdl:*white* message-box-list)
@@ -909,18 +911,60 @@
     (add-message (format nil ".") sdl:*white* message-box-list))
   )
 
+(defun demons-capture-book-of-rituals (world-map x y)
+  (when (not (find +lm-item-book-of-rituals+ (items (aref (cells world-map) x y))))
+    (return-from demons-capture-book-of-rituals nil)) 
+
+  (let ((message-box-list `(,(world/mission-message-box *world*))))
+    (add-message (format nil " Demons have ") sdl:*white* message-box-list)
+    (add-message (format nil "captured") sdl:*yellow* message-box-list)
+    (add-message (format nil " the ") sdl:*white* message-box-list)
+    (add-message (format nil "Book of Rituals") sdl:*yellow* message-box-list)
+    (add-message (format nil ".") sdl:*white* message-box-list))
+  )
+
+(defun humans-capture-book-of-rituals (world-map x y)
+  (when (not (find +lm-item-book-of-rituals+ (items (aref (cells world-map) x y))))
+    (return-from humans-capture-book-of-rituals nil))
+
+  (loop for campaign-effect in (find-campaign-effects-by-id *world* :campaign-effect-demon-protect-dimension) do
+    (remove-campaign-effect *world* campaign-effect))
+
+  (let ((message-box-list `(,(world/mission-message-box *world*))))
+    (add-message (format nil " Humans have ") sdl:*white* message-box-list)
+    (add-message (format nil "captured") sdl:*yellow* message-box-list)
+    (add-message (format nil " the ") sdl:*white* message-box-list)
+    (add-message (format nil "Book of Rituals") sdl:*yellow* message-box-list)
+    (add-message (format nil ".") sdl:*white* message-box-list))
+  )
+
+(defun neutrals-capture-book-of-rituals (world-map x y)
+  (when (not (find +lm-item-book-of-rituals+ (items (aref (cells world-map) x y))))
+    (return-from neutrals-capture-book-of-rituals nil)) 
+
+  (loop for campaign-effect in (find-campaign-effects-by-id *world* :campaign-effect-demon-protect-dimension) do
+    (remove-campaign-effect *world* campaign-effect))
+  
+  (let ((message-box-list `(,(world/mission-message-box *world*))))
+    (add-message (format nil " The ") sdl:*white* message-box-list)
+    (add-message (format nil "Book of Rituals") sdl:*yellow* message-box-list)
+    (add-message (format nil " is ") sdl:*white* message-box-list)
+    (add-message (format nil "not controlled") sdl:*yellow* message-box-list)
+    (add-message (format nil " by any faction.") sdl:*white* message-box-list))
+  )
+
 (defun remove-raw-flesh-from-demons (world-map x y)
   (declare (ignore world-map x y)) 
   (when (<= (world/flesh-points *world*) 0)
     (return-from remove-raw-flesh-from-demons nil))
 
-  (let ((pts-to-remove (+ (random 100) 100)))
+  (let ((pts-to-remove (+ (random 300) 100)))
     (when (< (- (world/flesh-points *world*) pts-to-remove) 0)
       (setf pts-to-remove (world/flesh-points *world*)))
     
     (decf (world/flesh-points *world*) pts-to-remove)
 
-    (let ((message-box-list `(,(world/sitrep-message-box *world*))))
+    (let ((message-box-list `(,(world/mission-message-box *world*))))
       (add-message (format nil " The ") sdl:*white* message-box-list)
       (add-message (format nil "raw flesh stockpiles") sdl:*yellow* message-box-list)
       (add-message (format nil " were blown up. ") sdl:*white* message-box-list)

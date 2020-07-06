@@ -133,14 +133,14 @@
                                                nil))))
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
-                                                 (let ((message-box-list `(,(world/sitrep-message-box world))))
+                                                 (let ((message-box-list `(,(world/event-message-box world))))
                                                    (add-message (format nil "There are whispers about ") sdl:*white* message-box-list)
                                                    (add-message (format nil "satanists reforming their hideout") sdl:*yellow* message-box-list)
                                                    (add-message (format nil ".~%") sdl:*white* message-box-list)))
                       :on-trigger-end-func #'(lambda (world campaign-command)
                                                (declare (ignore campaign-command))
                                                (place-satanist-lair-on-map (world-map world) 1)
-                                               (let ((message-box-list `(,(world/sitrep-message-box world))))
+                                               (let ((message-box-list `(,(world/event-message-box world))))
                                                  (add-message (format nil "The ") sdl:*white* message-box-list)
                                                  (add-message (format nil "satanists' lair") sdl:*yellow* message-box-list)
                                                  (add-message (format nil " has been ") sdl:*white* message-box-list)
@@ -160,13 +160,12 @@
                       :cd 15
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
-                                         (if (and (not (zerop (world/machine-destroyed world)))
-                                                  (>= (world/flesh-points world) 500))
+                                         (if (not (zerop (world/machine-destroyed world)))
                                            t
                                            nil))
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
-                                                 (let ((message-box-list `(,(world/sitrep-message-box world))))
+                                                 (let ((message-box-list `(,(world/event-message-box world))))
                                                    (add-message (format nil "There are whispers about ") sdl:*white* message-box-list)
                                                    (add-message (format nil "demons rebuilding") sdl:*yellow* message-box-list)
                                                    (add-message (format nil " one of their ") sdl:*white* message-box-list)
@@ -175,8 +174,7 @@
                       :on-trigger-end-func #'(lambda (world campaign-command)
                                                (declare (ignore campaign-command))
                                                (decf (world/machine-destroyed world))
-                                               (decf (world/flesh-points world) 500)
-                                               (let ((message-box-list `(,(world/sitrep-message-box world))))
+                                               (let ((message-box-list `(,(world/event-message-box world))))
                                                  (add-message (format nil "Demons have ") sdl:*white* message-box-list)
                                                  (add-message (format nil "rebuilt") sdl:*yellow* message-box-list)
                                                  (add-message (format nil " their ") sdl:*white* message-box-list)
@@ -208,14 +206,13 @@
                                                                 (eq (wtype world-sector) :world-sector-corrupted-lake)))
                                                    (incf corrupted-sectors)))))
                                            
-                                           (if (and (> corrupted-sectors 0)
-                                                    (>= (world/flesh-points world) 100))
+                                           (if (> corrupted-sectors 0)
                                              t
                                              nil))
                                          )
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
-                                                 (let ((message-box-list `(,(world/sitrep-message-box world)))
+                                                 (let ((message-box-list `(,(world/event-message-box world)))
                                                        (corrupted-sector-list ())
                                                        (selected-sector nil))
                                                    (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
@@ -228,7 +225,6 @@
                                                                         (eq (wtype world-sector) :world-sector-corrupted-residential)
                                                                         (eq (wtype world-sector) :world-sector-corrupted-lake)))
                                                            (push (list x y) corrupted-sector-list)))))
-                                                   (decf (world/flesh-points world) 100)
                                                    
                                                    (setf selected-sector (nth (random (length corrupted-sector-list)) corrupted-sector-list))
                                                    
@@ -240,6 +236,40 @@
                                                    (add-message (format nil "~(~A~)" (name (aref (cells (world-map world)) (first selected-sector) (second selected-sector)))) sdl:*yellow* message-box-list)
                                                    (add-message (format nil ".~%") sdl:*white* message-box-list)))
                       )
+
+(set-campaign-command :id :campaign-command-demon-protect-dimension
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Protect the Hell Dimension")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Invoke the rites from the Book of Rituals to prevent anybody from entering the Hell Dimension. The enchantment lasts as long as the demons control the Book of Rituals.")
+                      :faction-type +faction-type-demons+
+                      :disabled nil
+                      :cd 5
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         (let ((book-sector nil))
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (and (find +lm-item-book-of-rituals+ (items world-sector))
+                                                            (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-port)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-island)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-lake)))
+                                                   (setf book-sector t)))))
+                                           
+                                           (if (and book-sector
+                                                    (null (find-campaign-effects-by-id world :campaign-effect-demon-protect-dimension)))
+                                             t
+                                             nil))
+                                         )
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                 (add-campaign-effect world :id :campaign-effect-demon-protect-dimension :cd nil)
+                                                 ))
 
 (set-campaign-command :id :campaign-command-military-reveal-lair
                       :name-func #'(lambda (world)
@@ -275,7 +305,7 @@
                                       "Recruit new soldiers to recreate a previously destroyed army.")
                       :faction-type +faction-type-military+
                       :disabled nil
-                      :cd 8
+                      :cd 6
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let ((residential-sectors 0))
@@ -297,7 +327,7 @@
                                          )
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
-                                                 (let ((message-box-list `(,(world/sitrep-message-box world)))
+                                                 (let ((message-box-list `(,(world/event-message-box world)))
                                                        (residential-sector-list ())
                                                        (selected-sector nil))
                                                    (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
@@ -316,6 +346,68 @@
                                                    (setf (controlled-by (aref (cells (world-map world)) (first selected-sector) (second selected-sector))) +lm-controlled-by-military+)
                                                    
                                                    (add-message (format nil "The military have drafted ") sdl:*white* message-box-list)
+                                                   (add-message (format nil "a new army") sdl:*yellow* message-box-list)
+                                                   (add-message (format nil " in ") sdl:*white* message-box-list)
+                                                   (add-message (format nil "~(~A~)" (name (aref (cells (world-map world)) (first selected-sector) (second selected-sector)))) sdl:*yellow* message-box-list)
+                                                   (add-message (format nil ".~%") sdl:*white* message-box-list)))
+                      )
+
+(set-campaign-command :id :campaign-command-military-add-army
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Call for a new army")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Reinforce the military with an additional army deployed in one of the inhabited districts.")
+                      :faction-type +faction-type-military+
+                      :disabled nil
+                      :cd 7
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         (let* ((residential-sectors 0)
+                                                (demon-win-cond (get-win-condition-by-id :win-cond-demon-campaign))
+                                                (military-win-cond (get-win-condition-by-id :win-cond-military-campaign))
+                                                (normal-sectors-left (funcall (win-condition/win-func demon-win-cond) *world* demon-win-cond)))
+                                                
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
+                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                                (eq (wtype world-sector) :world-sector-normal-port)
+                                                                (eq (wtype world-sector) :world-sector-normal-island)
+                                                                (eq (wtype world-sector) :world-sector-normal-residential)
+                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                   (incf residential-sectors)))))
+                                           (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
+                                             (declare (ignore satanist-lairs-left))
+                                             (if (and (> residential-sectors 0)
+                                                      (not (zerop (world/cur-military-num world)))
+                                                      (> corrupted-sectors-left normal-sectors-left))
+                                               t
+                                               nil)))
+                                         )
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                 (let ((message-box-list `(,(world/event-message-box world)))
+                                                       (residential-sector-list ())
+                                                       (selected-sector nil))
+                                                   (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                                     (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                                       (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                         (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
+                                                                    (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                                (eq (wtype world-sector) :world-sector-normal-port)
+                                                                (eq (wtype world-sector) :world-sector-normal-island)
+                                                                (eq (wtype world-sector) :world-sector-normal-residential)
+                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                           (push (list x y) residential-sector-list)))))
+                                                                                                      
+                                                   (setf selected-sector (nth (random (length residential-sector-list)) residential-sector-list))
+                                                   
+                                                   (setf (controlled-by (aref (cells (world-map world)) (first selected-sector) (second selected-sector))) +lm-controlled-by-military+)
+                                                   
+                                                   (add-message (format nil "The military have deployed ") sdl:*white* message-box-list)
                                                    (add-message (format nil "a new army") sdl:*yellow* message-box-list)
                                                    (add-message (format nil " in ") sdl:*white* message-box-list)
                                                    (add-message (format nil "~(~A~)" (name (aref (cells (world-map world)) (first selected-sector) (second selected-sector)))) sdl:*yellow* message-box-list)

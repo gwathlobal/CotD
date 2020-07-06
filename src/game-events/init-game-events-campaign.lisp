@@ -63,9 +63,9 @@
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            (let ((flesh-points (getf (world/post-mission-results world) :flesh-points)))
-                                                             (add-message (format nil "Demons managed to gather ") sdl:*white* `(,(world/sitrep-message-box world)))
-                                                             (add-message (format nil "~A flesh ~A" flesh-points (if (= flesh-points 1) "point" "points")) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-                                                             (add-message (format nil " recently.~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
+                                                             (add-message (format nil "Demons managed to gather ") sdl:*white* `(,(world/event-message-box world)))
+                                                             (add-message (format nil "~A flesh ~A" flesh-points (if (= flesh-points 1) "point" "points")) sdl:*yellow* `(,(world/event-message-box *world*)))
+                                                             (add-message (format nil " recently.~%") sdl:*white* `(,(world/event-message-box *world*)))
                                                              
                                                              (incf (world/flesh-points *world*) flesh-points)
                                                            
@@ -85,7 +85,7 @@
                                                              (loop for military-sector in military-sectors do
                                                                (let ((world-sector nil)
                                                                      (nearest-sector nil)
-                                                                     (message-box-list `(,(world/sitrep-message-box *world*))))
+                                                                     (message-box-list `(,(world/event-message-box *world*))))
                                                                  ;; find nearest corrupted or abandoned sector
                                                                  (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
                                                                    (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
@@ -152,7 +152,7 @@
                                                              (loop for demon-sector in demon-sectors do
                                                                (let ((avail-sectors ())
                                                                      (world-sector nil)
-                                                                     (message-box-list `(,(world/sitrep-message-box *world*))))
+                                                                     (message-box-list `(,(world/event-message-box *world*))))
 
                                                                  (check-surroundings (x demon-sector) (y demon-sector) nil
                                                                                      #'(lambda (dx dy)
@@ -191,16 +191,9 @@
                                                          t)
                                            :on-trigger #'(lambda (world)
                                                            (loop for faction-type in (list +faction-type-demons+ +faction-type-angels+ +faction-type-military+ +faction-type-satanists+ +faction-type-church+) do
-                                                             (when (not (gethash faction-type (world/commands *world*)))
-                                                               (let* ((command-list (loop for command being the hash-values in *campaign-commands*
-                                                                                          when (and (eq (campaign-command/faction-type command) faction-type)
-                                                                                                    (funcall (campaign-command/on-check-func command) world command))
-                                                                                            collect command))
-                                                                      (selected-command (nth (random (length command-list)) command-list)))
-                                                                 (setf (gethash faction-type (world/commands *world*))
-                                                                       (list :command (campaign-command/id selected-command) :cd (campaign-command/cd selected-command)))))
-
-                                                             (let* ((world-command (gethash faction-type (world/commands *world*)))
+                                                             
+                                                             ;; assume all commands are already present
+                                                             (let* ((world-command (gethash faction-type (world/commands world)))
                                                                     (command (get-campaign-command-by-id (getf world-command :command)))
                                                                     (cd (getf world-command :cd)))
                                                                (when (= cd (campaign-command/cd command))

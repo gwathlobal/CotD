@@ -457,7 +457,9 @@
 (defun campaign-game-loop ()
   (setf *current-window* (make-instance 'campaign-window :cur-mode (case (game-manager/game-state *game-manager*)
                                                                      (:game-state-campaign-init :campaign-window-map-mode)
-                                                                     (t (if (zerop (message-list-length (world/sitrep-message-box *world*)))
+                                                                     (t (if (and (zerop (message-list-length (world/mission-message-box *world*)))
+                                                                                 (zerop (message-list-length (world/event-message-box *world*)))
+                                                                                 (zerop (message-list-length (world/effect-message-box *world*))))
                                                                           :campaign-window-mission-mode
                                                                           :campaign-window-status-mode)))
                                                          :reveal-lair (if (or (eq (get-general-faction-from-specific (world/player-specific-faction *world*)) +faction-type-demons+)
@@ -480,18 +482,31 @@
     (let ((present-missions (world/present-missions *world*))
           )
 
+      ;; add AI commands before mission results are processed
+      (loop for faction-type in (list +faction-type-demons+ +faction-type-angels+ +faction-type-military+ +faction-type-satanists+ +faction-type-church+) do
+        (when (not (gethash faction-type (world/commands *world*)))
+          (let* ((command-list (loop for command being the hash-values in *campaign-commands*
+                                     when (and (eq (campaign-command/faction-type command) faction-type)
+                                               (funcall (campaign-command/on-check-func command) *world* command))
+                                       collect command))
+                 (selected-command (nth (random (length command-list)) command-list)))
+            (setf (gethash faction-type (world/commands *world*))
+                  (list :command (campaign-command/id selected-command) :cd (campaign-command/cd selected-command))))))
+
       ;; clear results
       (setf (world/post-mission-results *world*) ())
       
       ;; clear the situation report
-      (clear-message-list (world/sitrep-message-box *world*))
+      (clear-message-list (world/mission-message-box *world*))
+      (clear-message-list (world/event-message-box *world*))
+      (clear-message-list (world/effect-message-box *world*))
 
       ;; advance one day forward
       (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time *world*))
         (setf (world-game-time *world*) (set-current-date-time year month (1+ day) hour min sec)))
       
       ;; add date to the top
-      (add-message (format nil " === ~A ===~%~%" (show-date-time-ymd (world-game-time *world*))) sdl:*white* `(,(world/sitrep-message-box *world*)))
+      (add-message (format nil " === ~A ===~%~%" (show-date-time-ymd (world-game-time *world*))) sdl:*white* `(,(world/mission-message-box *world*)))
       
       ;; process missions 
       (loop with mission-result = nil
@@ -544,29 +559,29 @@
                
                (case (getf mission-result :mission-result)
                  (:game-over-angels-won (progn
-                                          (add-message (format nil "The angels were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                                          (add-message (format nil " - The angels were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-church-won (progn
-                                          (add-message (format nil "The priests were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                                          (add-message (format nil " - The priests were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-military-won (progn
-                                            (add-message (format nil "The military were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                                            (add-message (format nil " - The military were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-demons-won (progn
-                                          (add-message (format nil "The demons were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                                          (add-message (format nil " - The demons were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-satanists-won (progn
-                                             (add-message (format nil "The satanists were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*)))))
+                                             (add-message (format nil " - The satanists were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-eater-won (progn
-                                         (add-message (format nil "The primordials were victorious during a ") sdl:*white* `(,(world/sitrep-message-box *world*))))))
+                                         (add-message (format nil " - The primordials were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*))))))
                
-               (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-               (add-message (format nil " in ") sdl:*white* `(,(world/sitrep-message-box *world*)))
-               (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/sitrep-message-box *world*)))
-               (add-message (format nil ".") sdl:*white* `(,(world/sitrep-message-box *world*)))
+               (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow* `(,(world/mission-message-box *world*)))
+               (add-message (format nil " in ") sdl:*white* `(,(world/mission-message-box *world*)))
+               (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/mission-message-box *world*)))
+               (add-message (format nil ".") sdl:*white* `(,(world/mission-message-box *world*)))
                
                (loop with campaign-mission-result = (find (getf mission-result :mission-result) (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission)))
                                                           :key #'(lambda (a) (first a)))
                      for transform-sector-func in (second campaign-mission-result) do
                        (funcall transform-sector-func world-map (x mission) (y mission)))
 
-               (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
+               (add-message (format nil "~%") sdl:*white* `(,(world/mission-message-box *world*)))
                
                ;; sum all flesh points
                (unless (getf (world/post-mission-results *world*) :flesh-points)
@@ -575,26 +590,28 @@
                  (incf (getf (world/post-mission-results *world*) :flesh-points) (getf mission-result :flesh-points)))
             )
 
-      (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
-
       (loop for game-event-id in (game-events *world*)
             for game-event = (get-game-event-by-id game-event-id)
             when (and (not (disabled game-event))
                       (funcall (on-check game-event) *world*))
               do
                  (funcall (on-trigger game-event) *world*))
-
+      
       (with-slots (campaign-effects) *world*
-        (loop with once = nil
-              for campaign-effect in campaign-effects
+        (loop for campaign-effect in campaign-effects
               when (campaign-effect/cd campaign-effect)
                 do
                    (decf (campaign-effect/cd campaign-effect))
                    (when (= (campaign-effect/cd campaign-effect) 0)
-                     (when (not once)
-                       (add-message (format nil "~%") sdl:*white* `(,(world/sitrep-message-box *world*)))
-                       (setf once t))
                      (remove-campaign-effect *world* campaign-effect))))
+
+      (when (or (colored-txt-list (message-box-strings (world/event-message-box *world*)))
+                (colored-txt-list (message-box-strings (world/effect-message-box *world*))))
+        (add-message (format nil "~%") sdl:*white* `(,(world/mission-message-box *world*))))
+
+      (when (and (colored-txt-list (message-box-strings (world/event-message-box *world*)))
+                 (colored-txt-list (message-box-strings (world/effect-message-box *world*))))
+        (add-message (format nil "~%") sdl:*white* `(,(world/event-message-box *world*))))
       
       ;; reset all missions and regenerate them
       (reset-all-missions-on-world-map *world*)

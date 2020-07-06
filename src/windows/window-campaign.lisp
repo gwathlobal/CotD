@@ -37,14 +37,19 @@
   (when (not (eq (campaign-window/cur-mode win) :campaign-window-status-mode))
     (setf (campaign-window/prev-mode win) (campaign-window/cur-mode win))
     (setf (campaign-window/cur-mode win) :campaign-window-status-mode))
-  
-  (setf *current-window* (make-instance 'message-window 
-                                        :return-to win
-                                        :message-box (world/sitrep-message-box *world*)
-                                        :header-str "SITUATION REPORT"))
-  (make-output *current-window*)
-  (run-window *current-window*)
 
+  (let ((sitrep-msg-box (make-message-box)))
+    (setf (colored-txt-list (message-box-strings sitrep-msg-box)) (append (colored-txt-list (message-box-strings (world/mission-message-box *world*)))
+                                                                          (colored-txt-list (message-box-strings (world/event-message-box *world*)))
+                                                                          (colored-txt-list (message-box-strings (world/effect-message-box *world*)))))
+    
+    (setf *current-window* (make-instance 'message-window 
+                                          :return-to win
+                                          :message-box sitrep-msg-box
+                                          :header-str "SITUATION REPORT"))
+    (make-output *current-window*)
+    (run-window *current-window*)
+  )
   (setf (campaign-window/cur-mode win) (campaign-window/prev-mode win)))
 
 (defmethod campaign-win-display-effects ((win campaign-window))
@@ -52,7 +57,9 @@
          (message-box-list `(,effects-message-box)))
     (loop for campaign-effect in (world/campaign-effects *world*) do
       (add-message (format nil "~A" (campaign-effect/name campaign-effect)) sdl:*yellow* message-box-list)
-      (add-message (format nil " [~A turn~:P left]~%" (campaign-effect/cd campaign-effect)) sdl:*white* message-box-list)
+      (if (campaign-effect/cd campaign-effect)
+        (add-message (format nil " [~A turn~:P left]~%" (campaign-effect/cd campaign-effect)) sdl:*white* message-box-list)
+        (add-message (format nil "~%") sdl:*white* message-box-list))
       (add-message (format nil "~A~%~%" (campaign-effect/descr campaign-effect)) sdl:*white* message-box-list))
     
     (when (not (eq (campaign-window/cur-mode win) :campaign-window-effects-mode))
@@ -156,7 +163,6 @@
                                              (max-flesh-points (win-condition/win-formula demon-win-cond))
                                              (normal-sectors-left (funcall (win-condition/win-func demon-win-cond) *world* demon-win-cond))
                                              (machines-left (funcall (win-condition/win-func angels-win-cond) *world* angels-win-cond))
-                                             (military-alarmed (world/military-alarm *world*))
                                              (demon-str nil)
                                              (max-lines 0)
                                              (command-str "Press [c] to select a new command"))
@@ -183,8 +189,8 @@
                                                                         (format nil "[complete in ~A day~:P]" cd)
                                                                         (format nil "[~A day~:P for next]" cd))))))
                                         (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
-                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%Military alarmed: ~A~%Command: ~A"
-                                                                  (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left military-alarmed command-str)))
+                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%Command: ~A"
+                                                                  (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left command-str)))
                                         
                                         (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* 1 (sdl:get-font-height))))
                                           (setf max-lines (write-text demon-str a-rect :count-only t)))
