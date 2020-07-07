@@ -74,6 +74,7 @@
                       :faction-type +faction-type-satanists+
                       :disabled nil
                       :cd 10
+                      :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let* ((military-win-cond (get-win-condition-by-id :win-cond-military-campaign)))
@@ -98,6 +99,7 @@
                       :faction-type +faction-type-satanists+
                       :disabled nil
                       :cd 7
+                      :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let* ((military-win-cond (get-win-condition-by-id :win-cond-military-campaign)))
@@ -123,6 +125,7 @@
                       :faction-type +faction-type-satanists+
                       :disabled nil
                       :cd 12
+                      :priority 10
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let* ((military-win-cond (get-win-condition-by-id :win-cond-military-campaign)))
@@ -158,6 +161,7 @@
                       :faction-type +faction-type-demons+
                       :disabled nil
                       :cd 15
+                      :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (if (not (zerop (world/machine-destroyed world)))
@@ -192,6 +196,7 @@
                       :faction-type +faction-type-demons+
                       :disabled nil
                       :cd 6
+                      :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let ((corrupted-sectors 0))
@@ -247,6 +252,7 @@
                       :faction-type +faction-type-demons+
                       :disabled nil
                       :cd 5
+                      :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let ((book-sector nil))
@@ -281,6 +287,7 @@
                       :faction-type +faction-type-military+
                       :disabled nil
                       :cd 6
+                      :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let* ((military-win-cond (get-win-condition-by-id :win-cond-military-campaign)))
@@ -306,6 +313,7 @@
                       :faction-type +faction-type-military+
                       :disabled nil
                       :cd 6
+                      :priority 10
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let ((residential-sectors 0))
@@ -362,6 +370,7 @@
                       :faction-type +faction-type-military+
                       :disabled nil
                       :cd 7
+                      :priority 2
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
                                          (let* ((residential-sectors 0)

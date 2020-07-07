@@ -1,6 +1,5 @@
 - After sucessfull hell missions demons are in turmoil and can not deploy armies
 - Military can not have delayed arrival if no army is present
-- Commands have priorities with wait & see having the lowest
 - Event to move relic to church if both church and relic are in normal districts
 - Initial power for angels and demons depend on the state of the relic, demons always get 2 initial power in Hell
 - Celestial sabotage, add guidance for angels that points to machines

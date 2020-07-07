@@ -485,11 +485,24 @@
       ;; add AI commands before mission results are processed
       (loop for faction-type in (list +faction-type-demons+ +faction-type-angels+ +faction-type-military+ +faction-type-satanists+ +faction-type-church+) do
         (when (not (gethash faction-type (world/commands *world*)))
-          (let* ((command-list (loop for command being the hash-values in *campaign-commands*
-                                     when (and (eq (campaign-command/faction-type command) faction-type)
-                                               (funcall (campaign-command/on-check-func command) *world* command))
-                                       collect command))
-                 (selected-command (nth (random (length command-list)) command-list)))
+          (let ((command-hash (make-hash-table))
+                (selected-command nil))
+
+            ;; sort commands by priority
+            (loop for command being the hash-values in *campaign-commands*
+                  when (and (eq (campaign-command/faction-type command) faction-type)
+                            (funcall (campaign-command/on-check-func command) *world* command))
+                    do
+                       (push command (gethash (campaign-command/priority command) command-hash)))
+
+            ;; select a random command out of the topmost priority list
+            (loop for priority from 10 downto 0
+                  for command-list = (gethash priority command-hash)
+                  when command-list
+                    do
+                       (setf selected-command (nth (random (length command-list)) command-list))
+                       (loop-finish))
+            
             (setf (gethash faction-type (world/commands *world*))
                   (list :command (campaign-command/id selected-command) :cd (campaign-command/cd selected-command))))))
 
