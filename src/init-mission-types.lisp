@@ -1274,7 +1274,7 @@
                   :win-condition-list (list (list +faction-type-demons+ +game-event-angelic-sabotage-win-for-demons+)
                                             (list +faction-type-angels+ +game-event-angelic-sabotage-win-for-angels+)
                                             )
-                  :campaign-result (list (list :game-over-angels-won (list #'remove-hell-engine))
+                  :campaign-result (list (list :game-over-angels-won (list #'remove-hell-engine #'throw-hell-in-turmoil))
                                          (list :game-over-demons-won nil))
                   )
 
@@ -1361,6 +1361,6 @@
                   :win-condition-list (list (list +faction-type-demons+ +game-event-military-sabotage-win-for-demons+)
                                             (list +faction-type-military+ +game-event-military-sabotage-win-for-military+)
                                             )
-                  :campaign-result (list (list :game-over-military-won (list #'remove-raw-flesh-from-demons))
+                  :campaign-result (list (list :game-over-military-won (list #'remove-raw-flesh-from-demons #'throw-hell-in-turmoil))
                                          (list :game-over-demons-won nil))
                   )

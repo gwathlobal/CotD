@@ -911,6 +911,13 @@
     (add-message (format nil ".") sdl:*white* message-box-list))
   )
 
+(defun throw-hell-in-turmoil (world-map x y)
+  (declare (ignore world-map x y)) 
+
+  (add-campaign-effect *world* :id :campaign-effect-demon-turmoil :cd 4)
+
+  )
+
 (defun demons-capture-book-of-rituals (world-map x y)
   (when (not (find +lm-item-book-of-rituals+ (items (aref (cells world-map) x y))))
     (return-from demons-capture-book-of-rituals nil)) 
@@ -1004,7 +1011,7 @@
         (old-effect (find-campaign-effects-by-id world id)))
     (if (and old-effect
              (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)))
-      (funcall (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)) new-effect old-effect)
+      (funcall (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)) world new-effect old-effect)
       (progn
         (push new-effect (world/campaign-effects world))
         (when (campaign-effect/on-add-func new-effect)

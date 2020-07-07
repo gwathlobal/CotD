@@ -69,3 +69,27 @@
                                                 (add-message (format nil " is now available for ") sdl:*white* message-box-list)
                                                 (add-message (format nil "entry") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " again.~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-demon-turmoil
+                          :name "Turmoil in Hell"
+                          :descr "A recent successful strike inside the demonic realm has caused turmoil in Hell. The demons are not able to raise armies until order is restored."
+                          :merge-func #'(lambda (world new-effect old-effect)
+                                          (setf (campaign-effect/cd old-effect) (campaign-effect/cd new-effect))
+                                          (when (campaign-effect/on-add-func new-effect)
+                                            (funcall (campaign-effect/on-add-func new-effect) world new-effect)))
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/effect-message-box world))))
+                                             (add-message (format nil "The demonic hierarchy ") sdl:*white* message-box-list)
+                                             (add-message (format nil "has been disrupted") sdl:*yellow* message-box-list)
+                                             (add-message (format nil ". Demons shall ") sdl:*white* message-box-list)
+                                             (add-message (format nil "not be able to raise armies") sdl:*yellow* message-box-list)
+                                             (add-message (format nil " for a while.~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/effect-message-box world))))
+                                                (add-message (format nil "The demonic hierarchy") sdl:*white* message-box-list)
+                                                (add-message (format nil "has been restored") sdl:*yellow* message-box-list)
+                                                (add-message (format nil ". Demons are ") sdl:*white* message-box-list)
+                                                (add-message (format nil "able to raise armies") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " once again.~%") sdl:*white* message-box-list))))
