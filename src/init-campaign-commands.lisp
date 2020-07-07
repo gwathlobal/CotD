@@ -211,7 +211,8 @@
                                                                 (eq (wtype world-sector) :world-sector-corrupted-lake)))
                                                    (incf corrupted-sectors)))))
                                            
-                                           (if (> corrupted-sectors 0)
+                                           (if (and (> corrupted-sectors 0)
+                                                    (null (find-campaign-effects-by-id world :campaign-effect-demon-turmoil)))
                                              t
                                              nil))
                                          )

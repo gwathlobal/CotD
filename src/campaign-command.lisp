@@ -4,7 +4,7 @@
 
 (defenum:defenum campaign-command-enum (:campaign-command-angel-wait
                                         :campaign-command-demon-wait
-                                        :campagin-command-military-wait
+                                        :campaign-command-military-wait
                                         :campaign-command-church-wait
                                         :campaign-command-satanist-sacrifice
                                         :campaign-command-satanist-hide-lair

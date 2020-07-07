@@ -1011,7 +1011,7 @@
         (old-effect (find-campaign-effects-by-id world id)))
     (if (and old-effect
              (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)))
-      (funcall (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)) world new-effect old-effect)
+      (funcall (campaign-effect-type/merge-func (get-campaign-effect-type-by-id id)) world new-effect (first old-effect))
       (progn
         (push new-effect (world/campaign-effects world))
         (when (campaign-effect/on-add-func new-effect)

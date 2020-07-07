@@ -73,6 +73,7 @@
 (defconstant +game-event-military-sabotage-win-for-military+ 63)
 
 (defconstant +game-event-campaign-trigger-commands+ 64)
+(defconstant +game-event-campaign-move-relic-to-church+ 65)
 
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won

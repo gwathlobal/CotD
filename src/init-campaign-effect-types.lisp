@@ -88,7 +88,7 @@
                           :on-remove-func #'(lambda (world campaign-effect)
                                               (declare (ignore campaign-effect))
                                               (let ((message-box-list `(,(world/effect-message-box world))))
-                                                (add-message (format nil "The demonic hierarchy") sdl:*white* message-box-list)
+                                                (add-message (format nil "The demonic hierarchy ") sdl:*white* message-box-list)
                                                 (add-message (format nil "has been restored") sdl:*yellow* message-box-list)
                                                 (add-message (format nil ". Demons are ") sdl:*white* message-box-list)
                                                 (add-message (format nil "able to raise armies") sdl:*yellow* message-box-list)

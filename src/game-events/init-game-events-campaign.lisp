@@ -213,10 +213,51 @@
                                                            )
                                ))
 
+(set-game-event (make-instance 'game-event :id +game-event-campaign-move-relic-to-church+
+                                           :descr-func #'(lambda ()
+                                                           (format nil "Each day, try to move a relic from inhabited district to a district with a church."))
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
 
-
-
-
-
-
-
+                                                           (let ((free-church-sectors (loop with church-sector-list = ()
+                                                                                            for dx from 0 below (array-dimension (cells (world-map world)) 0) do
+                                                                                              (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
+                                                                                                (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-forest)
+                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-lake)
+                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-residential)
+                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-island)
+                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-port))
+                                                                                                           (find +lm-feat-church+ (feats (aref (cells (world-map world)) dx dy)) :key #'(lambda (a) (first a)))
+                                                                                                           (not (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy)))))
+                                                                                                  (push (aref (cells (world-map world)) dx dy) church-sector-list)))
+                                                                                            finally (return church-sector-list)))
+                                                                 (normal-relic-sectors (loop with relic-sector-list = ()
+                                                                                             for dx from 0 below (array-dimension (cells (world-map world)) 0) do
+                                                                                               (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
+                                                                                                 (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-forest)
+                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-lake)
+                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-residential)
+                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-island)
+                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-port))
+                                                                                                            (not (find +lm-feat-church+ (feats (aref (cells (world-map world)) dx dy)) :key #'(lambda (a) (first a))))
+                                                                                                            (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy))))
+                                                                                                   (push (aref (cells (world-map world)) dx dy) relic-sector-list)))
+                                                                                             finally (return relic-sector-list)))
+                                                                 (message-box-list `(,(world/event-message-box *world*))))
+                                                             (loop for church-sector in free-church-sectors
+                                                                   for relic-sector in normal-relic-sectors
+                                                                   do
+                                                                      (setf (items relic-sector) (remove +lm-item-holy-relic+ (items relic-sector)))
+                                                                      (push +lm-item-holy-relic+ (items church-sector))
+                                                                      
+                                                                      (add-message (format nil "The ") sdl:*white* message-box-list)
+                                                                      (add-message (format nil "relic") sdl:*yellow* message-box-list)
+                                                                      (add-message (format nil " was moved back into the church in ") sdl:*white* message-box-list)
+                                                                      (add-message (format nil "~(~A~)" (name church-sector)) sdl:*yellow* message-box-list)
+                                                                      (add-message (format nil ".~%") sdl:*white* message-box-list))
+                                                             )
+                                                           )
+                               ))
