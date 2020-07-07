@@ -930,6 +930,18 @@
     (add-message (format nil ".") sdl:*white* message-box-list))
   )
 
+(defun demons-capture-relic (world-map x y)
+  (when (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
+    (return-from demons-capture-relic nil)) 
+
+  (let ((message-box-list `(,(world/mission-message-box *world*))))
+    (add-message (format nil " Demons have ") sdl:*white* message-box-list)
+    (add-message (format nil "captured") sdl:*yellow* message-box-list)
+    (add-message (format nil " the ") sdl:*white* message-box-list)
+    (add-message (format nil "holy relic") sdl:*yellow* message-box-list)
+    (add-message (format nil ".") sdl:*white* message-box-list))
+  )
+
 (defun humans-capture-book-of-rituals (world-map x y)
   (when (not (find +lm-item-book-of-rituals+ (items (aref (cells world-map) x y))))
     (return-from humans-capture-book-of-rituals nil))
@@ -945,6 +957,18 @@
     (add-message (format nil ".") sdl:*white* message-box-list))
   )
 
+(defun humans-capture-relic (world-map x y)
+  (when (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
+    (return-from humans-capture-relic nil))
+
+  (let ((message-box-list `(,(world/mission-message-box *world*))))
+    (add-message (format nil " Humans have ") sdl:*white* message-box-list)
+    (add-message (format nil "captured") sdl:*yellow* message-box-list)
+    (add-message (format nil " the ") sdl:*white* message-box-list)
+    (add-message (format nil "holy relic") sdl:*yellow* message-box-list)
+    (add-message (format nil ".") sdl:*white* message-box-list))
+  )
+
 (defun neutrals-capture-book-of-rituals (world-map x y)
   (when (not (find +lm-item-book-of-rituals+ (items (aref (cells world-map) x y))))
     (return-from neutrals-capture-book-of-rituals nil)) 
@@ -955,6 +979,18 @@
   (let ((message-box-list `(,(world/mission-message-box *world*))))
     (add-message (format nil " The ") sdl:*white* message-box-list)
     (add-message (format nil "Book of Rituals") sdl:*yellow* message-box-list)
+    (add-message (format nil " is ") sdl:*white* message-box-list)
+    (add-message (format nil "not controlled") sdl:*yellow* message-box-list)
+    (add-message (format nil " by any faction.") sdl:*white* message-box-list))
+  )
+
+(defun neutrals-capture-relic (world-map x y)
+  (when (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
+    (return-from neutrals-capture-relic nil)) 
+
+  (let ((message-box-list `(,(world/mission-message-box *world*))))
+    (add-message (format nil " The ") sdl:*white* message-box-list)
+    (add-message (format nil "holy relic") sdl:*yellow* message-box-list)
     (add-message (format nil " is ") sdl:*white* message-box-list)
     (add-message (format nil "not controlled") sdl:*yellow* message-box-list)
     (add-message (format nil " by any faction.") sdl:*white* message-box-list))
