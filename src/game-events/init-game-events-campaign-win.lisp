@@ -3,7 +3,7 @@
 (set-game-event (make-instance 'game-event :id +game-event-campaign-demon-win+
                                            :descr-func #'(lambda ()
                                                            (let ((max-flesh-points (win-condition/win-formula (get-win-condition-by-id :win-cond-demon-campaign))))
-                                                             (format nil "To win, collect ~A pts of flesh by winning missions." max-flesh-points)))
+                                                             (format nil "To win:~% - collect ~A pts of flesh, or~% - corrupt all districts in the City.~%To lose:~% - have all dimensional engines shattered, or ~% - let the satanists' lair be destroyed while having no corrupted districts in the City." max-flesh-points)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (let* ((win-condition (get-win-condition-by-id :win-cond-demon-campaign))
@@ -28,7 +28,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-campaign-military-win+
                                            :descr-func #'(lambda ()
-                                                           (format nil "To win, reconquer corrupted districts and destroy all satanists' lairs."))
+                                                            (let ((max-flesh-points (win-condition/win-formula (get-win-condition-by-id :win-cond-demon-campaign))))
+                                                              (format nil "To win, reconquer corrupted districts while all satanists' lairs are destroyed. ~%To lose, let the demons capture all districts in the City or gather ~A pts of flesh." max-flesh-points)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (let* ((win-condition (get-win-condition-by-id :win-cond-military-campaign)))
@@ -47,7 +48,8 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-campaign-angel-win+
                                            :descr-func #'(lambda ()
-                                                           (format nil "To win, destroy all hellish machines that enable the Pandemonium to escape the Prison Dimension."))
+                                                           (let ((max-flesh-points (win-condition/win-formula (get-win-condition-by-id :win-cond-demon-campaign))))
+                                                             (format nil "To win, destroy all dimensional engines that enable the Pandemonium to escape the Prison Dimension.~%To lose, let the demons capture all districts in the City or gather ~A pts of flesh." max-flesh-points)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (let* ((win-condition (get-win-condition-by-id :win-cond-angels-campaign))

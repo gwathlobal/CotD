@@ -5,7 +5,8 @@
                                            :campaign-window-mission-mode
                                            :campaign-window-status-mode
                                            :campaign-window-effects-mode
-                                           :campaign-window-command-mode))
+                                           :campaign-window-command-mode
+                                           :campaign-window-help-mode))
 
 (defclass campaign-window (window)
   ((cur-sector :initform (cons 0 0) :initarg :cur-sector :accessor campaign-window/cur-sector :type cons)
@@ -28,6 +29,9 @@
 
     (when (eq cur-mode :campaign-window-effects-mode) 
       (campaign-win-display-effects win))
+
+    (when (eq cur-mode :campaign-window-help-mode) 
+      (campaign-win-display-help win))
 
     (when (eq cur-mode :campaign-window-mission-mode)
       (campaign-win-move-select-to-mission win)))
@@ -74,6 +78,34 @@
     (run-window *current-window*)
 
     (setf (campaign-window/cur-mode win) (campaign-window/prev-mode win))))
+
+(defmethod campaign-win-display-help ((win campaign-window))
+  (when (not (eq (campaign-window/cur-mode win) :campaign-window-help-mode))
+    (setf (campaign-window/prev-mode win) (campaign-window/cur-mode win))
+    (setf (campaign-window/cur-mode win) :campaign-window-help-mode))
+
+  (let* ((help-msg-box (make-message-box))
+         (msg-box-list `(,help-msg-box))
+         (text-list (list (list +faction-type-angels+ +game-event-campaign-angel-win+)
+                          (list +faction-type-demons+ +game-event-campaign-demon-win+)
+                          (list +faction-type-military+ +game-event-campaign-military-win+)))
+         (keys-txt (get-txt-from-file "help/campaign_keybindings.txt")))
+    (when (find (get-general-faction-from-specific (world/player-specific-faction *world*)) text-list :key #'(lambda (a) (first a)))
+      (let ((objective-text (funcall (descr-func (get-game-event-by-id (second (find (get-general-faction-from-specific (world/player-specific-faction *world*)) text-list :key #'(lambda (a) (first a)))))))))
+        (add-message objective-text sdl:*white* msg-box-list)))
+
+    (when keys-txt
+      (add-message (format nil "~%~%~%") sdl:*white* msg-box-list)
+      (add-message keys-txt sdl:*white* msg-box-list))
+    
+    (setf *current-window* (make-instance 'message-window 
+                                          :return-to win
+                                          :message-box help-msg-box
+                                          :header-str "HELP"))
+    (make-output *current-window*)
+    (run-window *current-window*)
+  )
+  (setf (campaign-window/cur-mode win) (campaign-window/prev-mode win)))
 
 (defmethod campaign-win-display-command ((win campaign-window))
   (when (not (eq (campaign-window/cur-mode win) :campaign-window-command-mode))
@@ -168,7 +200,7 @@
                                              (command-str "Press [c] to select a new command"))
 
                                         (setf header-str "CAMPAIGN MAP")
-                                        (setf prompt-str (format nil "~A[Tab] Change mode  ~A[s] Situation report  [e] Effects  [n] Next day  [Esc] Exit"
+                                        (setf prompt-str (format nil "~A[Tab] Change mode  ~A[s] Situation report  [e] Effects  [n] Next day"
                                                                  (if (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                           (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                                      (get-general-faction-from-specific (world/player-specific-faction *world*))))
@@ -189,7 +221,7 @@
                                                                         (format nil "[complete in ~A day~:P]" cd)
                                                                         (format nil "[~A day~:P for next]" cd))))))
                                         (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
-                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%Command: ~A"
+                                          (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%~%Command: ~A"
                                                                   (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left command-str)))
                                         
                                         (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* 1 (sdl:get-font-height))))
@@ -402,18 +434,28 @@
                        ;; select a command - c
                        (when (or (and (sdl:key= key :sdl-key-c) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-c-small+))
-                         (campaign-win-display-command win))
-                       
+                         (case (game-manager/game-state *game-manager*)
+                           (:game-state-campaign-map (campaign-win-display-command win))))
                        ;;------------------
                        ;; view situation report - s
                        (when (or (and (sdl:key= key :sdl-key-s) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-s-small+))
-                         (campaign-win-display-sitrep win))
+                          (case (game-manager/game-state *game-manager*)
+                            (:game-state-campaign-map (campaign-win-display-sitrep win))))
                        ;;------------------
                        ;; view situation report - e
                        (when (or (and (sdl:key= key :sdl-key-e) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-e-small+))
-                         (campaign-win-display-effects win))
+                          (case (game-manager/game-state *game-manager*)
+                            (:game-state-campaign-map (campaign-win-display-effects win))))
+                       ;;------------------
+                       ;; help screen - ?
+                       (when (or (sdl:key= key :sdl-key-question)
+                                 (eq unicode +cotd-unicode-question-mark+)
+                                 (and (sdl:key= key :sdl-key-slash) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                                 (and (sdl:key= key :sdl-key-7) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)))
+                          (case (game-manager/game-state *game-manager*)
+                            (:game-state-campaign-map (campaign-win-display-help win))))
                        ;;------------------
                        ;; next day - n
                        (when (or (and (sdl:key= key :sdl-key-n) (= mod 0))
