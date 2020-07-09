@@ -3,7 +3,7 @@ Arrow keys, Numpad keys,         - Move selection
 [Home], [End]
 
 [Enter]                          - Start mission (if possible)
-[n]                              - Skip to the next day without taking part in mission
+[n]                              - Skip to the next day without taking part in any mission
 
 [Tab]                            - Switch between mission selection and map selection
 [c]                              - Select a command

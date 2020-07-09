@@ -147,6 +147,28 @@
   
   (setf (campaign-window/cur-mode win) (campaign-window/prev-mode win)))
 
+(defmethod campaign-win-display-init-hint ((win campaign-window))
+
+  (let* ((msg-str nil)
+         (text-list (list (list +faction-type-angels+ +game-event-campaign-angel-win+)
+                          (list +faction-type-demons+ +game-event-campaign-demon-win+)
+                          (list +faction-type-military+ +game-event-campaign-military-win+))))
+
+    (setf msg-str (format nil "Welcome to the campaign of the City of the Damned!"))
+    
+    (when (find (get-general-faction-from-specific (world/player-specific-faction *world*)) text-list :key #'(lambda (a) (first a)))
+      (let ((objective-text (funcall (descr-func (get-game-event-by-id (second (find (get-general-faction-from-specific (world/player-specific-faction *world*)) text-list :key #'(lambda (a) (first a)))))))))
+        (setf msg-str (format nil "~A~%~%" msg-str))
+        (setf msg-str (format nil "~A~A" msg-str objective-text))))
+    
+    (setf msg-str (format nil "~A~%~%To display help, press '?'." msg-str))
+    
+    (setf *current-window* (make-instance 'display-msg-window
+                                          :msg-line msg-str))
+    (make-output *current-window*)
+    (run-window *current-window*))
+  )
+
 (defmethod campaign-win-calculate-avail-missions ((win campaign-window))
   (with-slots (avail-missions) win
     (setf avail-missions (world/present-missions *world*))))
@@ -421,6 +443,8 @@
                                                            (setf cur-mode :campaign-window-mission-mode)
                                                            (campaign-win-move-select-to-mission win)
                                                            (game-state-campaign-init->campaign-map)
+                                                           (make-output *current-window*)
+                                                           (campaign-win-display-init-hint win)
                                                            ))
                               (:game-state-campaign-map (when (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                    (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))

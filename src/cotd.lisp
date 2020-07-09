@@ -279,7 +279,7 @@
   
   (setf (name *player*) "Player")
 
-  (add-message (format nil "Welcome to City of the Damned.~%This is a "))
+  (add-message (format nil "This is a "))
   (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow*)
   (add-message (format nil " in "))
   (add-message (format nil "~(~A~)" (name (get-world-sector-type-by-id (wtype world-sector)))) sdl:*yellow*)
