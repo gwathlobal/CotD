@@ -1,4 +1,3 @@
-- Mission info before the mission confirm
 - Military can not have delayed arrival if no army is present
 - Initial power for angels and demons depend on the state of the relic, demons always get 2 initial power in Hell
 - Celestial sabotage, add guidance for angels that points to machines

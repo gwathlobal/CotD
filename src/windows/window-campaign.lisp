@@ -169,6 +169,27 @@
     (run-window *current-window*))
   )
 
+(defmethod campaign-win-display-mission-details ((win campaign-window))
+  (with-accessors ((cur-sector campaign-window/cur-sector)
+                   (reveal-lair campaign-window/reveal-lair))
+      win
+    (let* ((world-sector (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
+           (mission-type (get-mission-type-by-id (mission-type-id (mission world-sector))))
+           (msg-str nil))
+      (setf msg-str (format nil "~A~%~%" (name (mission world-sector))))
+      (setf msg-str (format nil "~A~A~%" msg-str (description world-sector :reveal-lair reveal-lair)))
+      (when (find (get-general-faction-from-specific (world/player-specific-faction *world*)) (win-condition-list mission-type) :key #'(lambda (a) (first a)))
+        (let ((objective-text (funcall (descr-func (get-game-event-by-id (second (find (get-general-faction-from-specific (world/player-specific-faction *world*)) (win-condition-list mission-type) :key #'(lambda (a) (first a)))))))))
+          (setf msg-str (format nil "~A~A~%~%" msg-str objective-text))))
+    
+    (setf *current-window* (make-instance 'display-msg-window
+                                          :msg-line msg-str
+                                          :w (truncate (* *window-width* 2/3))
+                                          :prompt-line "[Enter] Start mission  [Esc] Cancel"))
+    (make-output *current-window*)
+    (run-window *current-window*)))
+  )
+
 (defmethod campaign-win-calculate-avail-missions ((win campaign-window))
   (with-slots (avail-missions) win
     (setf avail-missions (world/present-missions *world*))))
@@ -449,10 +470,10 @@
                               (:game-state-campaign-map (when (and (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                    (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                               (get-general-faction-from-specific (world/player-specific-faction *world*))))
-                                                          (campaign-win-display-command win)
-                                                          
-                                                          (return-from run-window (values (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
-                                                                                          (world-sector (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))))))))
+                                                          (when (campaign-win-display-mission-details win)
+                                                            (campaign-win-display-command win)
+                                                            (return-from run-window (values (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
+                                                                                            (world-sector (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector))))))))))
                             )))
                        ;;------------------
                        ;; select a command - c

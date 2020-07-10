@@ -6,7 +6,7 @@
    (y :initform nil :initarg :y :accessor display-msg-window/y)
    (w :initform nil :initarg :w :accessor display-msg-window/w)
    (h-txt :initform nil :accessor display-msg-window/h-txt)
-   (prompt-line :initform "[Space] Ok" :accessor display-msg-window/prompt-line :type string)
+   (prompt-line :initform "[Space] Ok" :initarg :prompt-line :accessor display-msg-window/prompt-line :type string)
    (cur-str :initform 0 :accessor display-msg-window/cur-str)
    (margin :initform 4 :accessor display-msg-window/margin :type fixnum)
    ))
@@ -90,16 +90,21 @@
     (sdl:update-display))
 
 (defmethod run-window ((win display-msg-window))
-  (tagbody
-     (sdl:with-events ()
-       (:quit-event () (funcall (quit-func win)) t)
-       (:key-down-event (:key key :mod mod :unicode unicode)
-			(declare (ignore mod unicode))
-                        (cond
-			  ;; escape, space, enter - quit
-			  ((or (sdl:key= key :sdl-key-escape) (sdl:key= key :sdl-key-space) (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-			   (setf *current-window* (return-to win)) (go exit-func)))
-                        (make-output *current-window*)
-			)
-       (:video-expose-event () (make-output *current-window*)))
-     exit-func (make-output *current-window*)))
+  (sdl:with-events ()
+    (:quit-event () (funcall (quit-func win)) t)
+    (:key-down-event (:key key :mod mod :unicode unicode)
+                     (declare (ignore mod unicode))
+                     (cond
+                       ;; escape - quit with nil
+                       ((sdl:key= key :sdl-key-escape) (progn
+                                                         (setf *current-window* (return-to win))
+                                                         (make-output *current-window*)
+                                                         (return-from run-window nil)))
+                       ;; space, enter - quit with t
+                       ((or (sdl:key= key :sdl-key-space) (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter)) (progn
+                                                                                                                             (setf *current-window* (return-to win))
+                                                                                                                             (make-output *current-window*)
+                                                                                                                             (return-from run-window t))))
+                     (make-output *current-window*)
+                     )
+    (:video-expose-event () (make-output *current-window*))))
