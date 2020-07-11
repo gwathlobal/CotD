@@ -66,6 +66,10 @@
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
+                                                        ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
+                                                        
                                                         ;; add lose condition on death & all other win conditions
                                                         (push #'add-lose-and-win-coditions-to-level
                                                               func-list)
@@ -186,6 +190,10 @@
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
+                                                        ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
+                                                        
                                                         ;; add lose condition on death & all other win conditions
                                                         (push #'add-lose-and-win-coditions-to-level
                                                               func-list)
@@ -323,6 +331,10 @@
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
+                                                        ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
+                                                        
                                                         ;; add lose condition on death & all other win conditions
                                                         (push #'add-lose-and-win-coditions-to-level
                                                               func-list)
@@ -472,6 +484,10 @@
                    :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
+                                                        ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
+                                                        
                                                         ;; add lose condition on death & all other win conditions
                                                         (push #'add-lose-and-win-coditions-to-level
                                                               func-list)
@@ -607,6 +623,10 @@
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
+                                                        ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
+                                                        
                                                         ;; add lose condition on death & all other win conditions
                                                         (push #'add-lose-and-win-coditions-to-level
                                                               func-list)
@@ -731,6 +751,10 @@
                                                           :world-sector-abandoned-lake)
                    :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
+
+                                                         ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
                                                          
                                                          ;; add lose condition on death & all other win conditions
                                                          (push #'add-lose-and-win-coditions-to-level
@@ -847,6 +871,10 @@
                                                           :world-sector-corrupted-lake)
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
+
+                                                         ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
                                                          
                                                          ;; add lose condition on death & all other win conditions
                                                          (push #'add-lose-and-win-coditions-to-level
@@ -984,6 +1012,10 @@
                                                           :world-sector-abandoned-lake)
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
+
+                                                         ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
                                                          
                                                          ;; add lose condition on death & all other win conditions
                                                          (push #'add-lose-and-win-coditions-to-level
@@ -1108,6 +1140,10 @@
                   :overall-post-process-func-list #'(lambda ()
                                                       (let ((func-list ()))
 
+                                                        ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
+                                                        
                                                         ;; add lose condition on death & all other win conditions
                                                         (push #'add-lose-and-win-coditions-to-level
                                                               func-list)
@@ -1220,6 +1256,10 @@
                                                           )
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
+
+                                                         ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
                                                          
                                                          ;; add lose condition on death & all other win conditions
                                                          (push #'add-lose-and-win-coditions-to-level
@@ -1299,6 +1339,10 @@
                                                           )
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
+
+                                                         ;; set up initial power
+                                                        (push #'set-up-inital-power
+                                                              func-list)
                                                          
                                                          ;; add lose condition on death & all other win conditions
                                                          (push #'add-lose-and-win-coditions-to-level

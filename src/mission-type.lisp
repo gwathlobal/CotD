@@ -609,13 +609,57 @@
 (defun add-lose-and-win-coditions-to-level (level world-sector mission world)
   (declare (ignore world-sector world))
   
-  ;; make the game continue even after the game dies
+  ;; make the game continue even after the players dies
   (push +game-event-player-died+ (game-events level))
 
   (when (/= (player-lvl-mod-placement-id mission) +specific-faction-type-player+)
     (setup-win-conditions mission level)))
 
+(defun set-up-inital-power (level world-sector mission world)
+  (declare (ignore mission))
+  (logger (format nil "SET-UP-INITIAL-POWER: Set up power for demons and angels~%"))
+  
+  (let ((demon-power 0)
+        (angel-power 0))
+    ;; in hell, demon always start with at least 2
+    (when (or (eql (wtype world-sector) :world-sector-hell-plain))
+      (incf demon-power 2))
 
+    ;; if the relic is captured, add 1 to demons
+    ;; if the relic is in church, add 1 to angels
+    (loop for dx from 0 below (array-dimension (cells (world-map world)) 0) do
+            (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
+              (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-forest)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-lake)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-residential)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-island)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-port))
+                         (find +lm-feat-church+ (feats (aref (cells (world-map world)) dx dy)) :key #'(lambda (a) (first a)))
+                         (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy))))
+                (incf angel-power 1))
+              
+              (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-forest)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-lake)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-residential)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-island)
+                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-port))
+                         (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy))))
+                (incf demon-power 1))))
+
+    (loop for mob-id in (mob-id-list level)
+          for mob = (get-mob-by-id mob-id)
+          when (and (mob-ability-p mob +mob-abil-demon+)
+                    (eql (faction mob) +faction-type-demons+))
+            do
+               (setf (cur-fp mob) demon-power)
+               (when (> (cur-fp mob) (max-fp mob))
+                 (setf (cur-fp mob) (max-fp mob)))
+          when (and (mob-ability-p mob +mob-abil-angel+)
+                    (eql (faction mob) +faction-type-angels+))
+            do
+               (setf (cur-fp mob) angel-power)
+               (when (> (cur-fp mob) (max-fp mob))
+                 (setf (cur-fp mob) (max-fp mob))))))
 
 (defun remove-signal-flares-from-military (level world-sector mission world)
   (declare (ignore world-sector mission world))
