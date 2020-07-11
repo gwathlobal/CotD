@@ -1082,6 +1082,14 @@
     (when (mob-effect-p mob +mob-effect-corroded+)
       (set-armor-d-resist mob +weapon-dmg-flesh+ (- (get-armor-d-resist mob +weapon-dmg-flesh+) 1))
       (set-armor-d-resist mob +weapon-dmg-acid+ (- (get-armor-d-resist mob +weapon-dmg-acid+) 1)))
+
+    (when (mob-effect-p mob +mob-effect-reduce-resitances+)
+      (loop for dmg-type in (list +weapon-dmg-flesh+ +weapon-dmg-iron+ +weapon-dmg-fire+ +weapon-dmg-vorpal+ +weapon-dmg-mind+ +weapon-dmg-radiation+ +weapon-dmg-acid+)
+            when (> (get-armor-d-resist mob dmg-type) 0) do
+              (set-armor-d-resist mob dmg-type 0)
+            when (> (get-armor-%-resist mob dmg-type) -50) do
+              (set-armor-%-resist mob dmg-type -50))
+      )
     ))
 
 (defun adjust-m-acc (mob)

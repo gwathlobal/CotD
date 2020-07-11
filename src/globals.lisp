@@ -418,6 +418,7 @@
 (defconstant +mob-effect-deep-breath+ 57)
 (defconstant +mob-effect-demonic-machine+ 58)
 (defconstant +mob-effect-bomb-ticking+ 59)
+(defconstant +mob-effect-reduce-resitances+ 60)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)
@@ -623,6 +624,7 @@
 (defconstant +terrain-wall-compressed-bones+ 65)
 (defconstant +terrain-floor-glass+ 66)
 (defconstant +terrain-wall-raw-flesh+ 67)
+(defconstant +terrain-floor-slime+ 68)
 
 ;;--------------------
 ;; GOD Constants

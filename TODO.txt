@@ -1,6 +1,5 @@
 - Military can not have delayed arrival if no army is present
 - Celestial sabotage, add guidance for angels that points to machines
-- Slime pools in hell that reduce all resitances
 - Worm-like multitile creatures in hell that devour you while you are inside
 - BUG: Fix the bug with military movement on campaign map
 - Refactor mission consequences for the world map: better text delivery, etc.

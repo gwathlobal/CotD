@@ -1050,7 +1050,8 @@
     (setf (gethash +building-type-hell-structure+ max-building-types) t)
     (setf (gethash +building-type-hell-growth+ max-building-types) t)
     (setf (gethash +building-type-hell-struct-growth+ max-building-types) t)
-    
+
+    (setf (gethash +building-type-hell-slime-pool+ max-building-types) 4)
     (setf (gethash +building-type-crater+ max-building-types) 4)
     (setf (gethash +building-type-crater-large+ max-building-types) 1)
     max-building-types))

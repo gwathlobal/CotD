@@ -963,3 +963,53 @@
                                                           (list +feature-start-sigil-point+ 7 12 7))
                                                     nil)
                                             )))
+
+;;=====================
+;; Slime Pool
+;;=====================
+
+(set-building-type (make-building :id +building-city-hell-slime-pool-1+ :grid-dim '(2 . 3) :act-dim '(10 . 15) :type +building-type-hell-slime-pool+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-2 (list "``````````"
+                                                                            "```~~``~~`"
+                                                                            "`~~~~~~~``"
+                                                                            "`~~~~~~~~`"
+                                                                            "`~~~~~~~~`"
+                                                                            "``~~~~~~``"
+                                                                            "`~~~~~~~``"
+                                                                            "``~~~~~~~`"
+                                                                            "`~~~~~~~~`"
+                                                                            "``~~~~~~~`"
+                                                                            "`~~~~~~~``"
+                                                                            "`~~~~~~~``"
+                                                                            "``~~~~~~~`"
+                                                                            "``~~`~~~``"
+                                                                            "``````````"))
+                                                  )
+                                              
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))
+
+(set-building-type (make-building :id +building-city-hell-slime-pool-2+ :grid-dim '(3 . 2) :act-dim '(15 . 10) :type +building-type-hell-slime-pool+
+                                  :func #'(lambda (x y z template-level terrains)
+                                            (let ((build-template-z-2 (list "```````````````"
+                                                                            "```~~``~~~`~~``"
+                                                                            "`~~~~~~~~~~~~~`"
+                                                                            "`~~~~~~~~~~~~~`"
+                                                                            "``~~~~~~~~~~~~`"
+                                                                            "```~~~~~~~~~~``"
+                                                                            "`~~~~~~~~~~~~``"
+                                                                            "``~~~~~~~~~~~~`"
+                                                                            "```~~~``~~~````"
+                                                                            "```````````````"
+                                                                            ))
+                                                  )
+                                              
+                                              (translate-build-to-template x y (+ z 0) build-template-z-2 template-level terrains)
+                                              )
+                                            (values nil
+                                                    nil
+                                                    nil))))

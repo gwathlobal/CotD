@@ -47,6 +47,7 @@
 (defconstant +building-type-hell-struct-growth+ 36)
 (defconstant +building-type-hell-machine+ 37)
 (defconstant +building-type-hell-storage+ 38)
+(defconstant +building-type-hell-slime-pool+ 39)
 
 ;;--------------------------------------
 ;; SPECIFIC BUILDING TYPES
@@ -170,6 +171,8 @@
 (defconstant +building-city-hell-machine-3+ 111)
 (defconstant +building-city-hell-machine-4+ 112)
 (defconstant +building-city-hell-storage-1+ 113)
+(defconstant +building-city-hell-slime-pool-1+ 114)
+(defconstant +building-city-hell-slime-pool-2+ 115)
 
 (defparameter *level-grid-size* 5)
 
@@ -249,84 +252,8 @@
                      (#\| +terrain-wall-lantern+)
                      (#\G +terrain-wall-grave+)
                      (#\g +terrain-floor-glass+)
-                     (#\% +terrain-wall-raw-flesh+))
-          when tt
-            do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
-
-(defun translate-build-to-corrupted-template (x y z build-template template-level)
-  (loop for y1 from 0 below (length build-template) do
-    (loop for c across (nth y1 build-template) 
-          and x1 from 0
-          for tt = (case c
-                     (#\. +terrain-floor-stone+)
-                     (#\# +terrain-wall-stone+)
-                     (#\T +terrain-tree-twintube+)
-                     (#\, (let ((r (random 100)))
-                            (cond
-                              ((< r 3) +terrain-floor-creep-dreadtubes+)
-                              ((< r 6) +terrain-floor-creep-spores+)
-                              ((< r 10) +terrain-wall-razorthorns+)
-                              ((< r 13) +terrain-floor-creep-glowshroom+)
-                              ((< r 20) +terrain-floor-creep+)
-                              (t +terrain-floor-creep-bright+)
-                              )))
-                     (#\_ +terrain-water-liquid+)
-                     (#\` +terrain-floor-creep+)
-                     (#\- +terrain-wall-window+)
-                     (#\h +terrain-floor-chair+)
-                     (#\t +terrain-floor-table+)
-                     (#\b +terrain-floor-bed+)
-                     (#\c +terrain-floor-cabinet+)
-                     (#\C +terrain-floor-crate+)
-                     (#\B +terrain-floor-bookshelf+)
-                     (#\+ +terrain-door-closed+)
-                     (#\' +terrain-door-open+)
-                     (#\0 +terrain-wall-earth+)
-                     (#\Space +terrain-floor-air+)
-                     (#\u +terrain-slope-stone-up+)
-                     (#\d +terrain-slope-stone-down+)
-                     (#\* +terrain-wall-gloomtwigs+)
-                     (#\| +terrain-wall-lantern+)
-                     (#\G +terrain-wall-grave+))
-          when tt
-            do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
-
-(defun translate-build-to-corrupted-step-2-template (x y z build-template template-level)
-  (loop for y1 from 0 below (length build-template) do
-    (loop for c across (nth y1 build-template) 
-          and x1 from 0
-          for tt = (case c
-                     (#\. (if (< (random 100) 20)
-                            +terrain-floor-creep-bright+
-                            +terrain-floor-creep+))
-                     (#\# +terrain-wall-corrupted+)
-                     (#\T +terrain-tree-twintube+)
-                     (#\, (let ((r (random 100)))
-                            (cond
-                              ((< r 3) +terrain-floor-creep-dreadtubes+)
-                              ((< r 6) +terrain-floor-creep-spores+)
-                              ((< r 10) +terrain-wall-razorthorns+)
-                              ((< r 20) +terrain-floor-creep+)
-                              (t +terrain-floor-creep-bright+)
-                              )))
-                     (#\_ +terrain-water-liquid+)
-                     (#\` +terrain-floor-creep+)
-                     (#\- +terrain-wall-window+)
-                     (#\h +terrain-floor-chair+)
-                     (#\t +terrain-floor-table+)
-                     (#\b +terrain-floor-bed+)
-                     (#\c +terrain-floor-cabinet+)
-                     (#\C +terrain-floor-crate+)
-                     (#\B +terrain-floor-bookshelf+)
-                     (#\+ +terrain-door-closed+)
-                     (#\' +terrain-door-open+)
-                     (#\0 +terrain-wall-earth+)
-                     (#\Space +terrain-floor-air+)
-                     (#\u +terrain-slope-stone-up+)
-                     (#\d +terrain-slope-stone-down+)
-                     (#\* +terrain-wall-gloomtwigs+)
-                     (#\| +terrain-wall-lantern+)
-                     (#\G +terrain-wall-grave+))
+                     (#\% +terrain-wall-raw-flesh+)
+                     (#\~ +terrain-floor-slime+))
           when tt
             do (setf (aref template-level (+ x x1) (+ y y1) z) tt))))
 

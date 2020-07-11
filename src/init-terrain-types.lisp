@@ -19,7 +19,7 @@
                                                :trait-not-climable t :trait-blocks-sound t :trait-blocks-sound-floor t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-water+ :name "water"
-                                               :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*blue* :back-color sdl:*black* 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 10 :trait-blocks-sound-floor 10 :trait-not-climable t :trait-water t))
 
@@ -194,6 +194,18 @@
                                                                     (incf (param1 effect) (+ 2 (random 2))))))
                                                               (progn
                                                                 (set-mob-effect mob :effect-type-id +mob-effect-irradiated+ :actor-id nil :cd t :param1 (+ 2 (random 3))))))))
+
+(set-terrain-type (make-instance 'terrain-type :id +terrain-floor-slime+ :name "slime"
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*yellow* :back-color sdl:*black* 
+                                               :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20
+                                               :on-step #'(lambda (mob x y z)
+                                                            (declare (ignore x y z))
+                                                            (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                   (format nil "Slime envelops ~A. " (prepend-article +article-the+ (visible-name mob)))
+                                                                                   :color sdl:*white*
+                                                                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                                 :singlemind)))
+                                                            (set-mob-effect mob :effect-type-id +mob-effect-reduce-resitances+ :actor-id nil :cd 6))))
 
 ;;--------------------
 ;; Walls
@@ -436,18 +448,18 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid+ :name "water"
-                                               :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*blue* :back-color sdl:*black* 
                                                :trait-not-climable t :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))
                                                             (set-mob-effect mob :effect-type-id +mob-effect-wet+ :actor-id (id mob) :cd 4))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-ice+ :name "ice"
-                                               :glyph-idx 94 :glyph-color (sdl:color :r 0 :g 150 :b 255) :back-color sdl:*black*
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color (sdl:color :r 0 :g 150 :b 255) :back-color sdl:*black*
                                                :trait-blocks-move-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid-nofreeze+ :name "water"
-                                               :glyph-idx 94 :glyph-color sdl:*blue* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*blue* :back-color sdl:*black* 
                                                :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))

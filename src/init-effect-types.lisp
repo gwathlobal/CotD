@@ -1346,3 +1346,14 @@
                                                           
                                                             )))
                                 ))
+
+(set-effect-type (make-instance 'effect-type :id +mob-effect-reduce-resitances+ :name "Reduce resistances"
+                                             :color-func #'(lambda (effect actor)
+                                                             (declare (ignore effect actor))
+                                                             sdl:*yellow*)
+                                             :on-add #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor))
+                                             :on-remove #'(lambda (effect actor)
+                                                         (declare (ignore effect))
+                                                         (adjust-armor actor))))
