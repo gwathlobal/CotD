@@ -2,7 +2,6 @@
 - Celestial sabotage, add guidance for angels that points to machines
 - Worm-like multitile creatures in hell that devour you while you are inside
 - BUG: Fix the bug with military movement on campaign map
-- Refactor mission consequences for the world map: better text delivery, etc.
 - A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints
 - Demons/angels arrive delayed through portals
 - Display time remaning before military/angel/demon arrival
