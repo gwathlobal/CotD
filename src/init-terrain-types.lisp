@@ -369,7 +369,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-window+ :name "window"
                                                :glyph-idx 13 :glyph-color (sdl:color :r 0 :g 0 :b 200) :back-color sdl:*black* 
-                                               :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-vision 30 :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
+                                               :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t :trait-blocks-vision 30 :trait-blocks-vision-floor t 
                                                :trait-blocks-sound 20 :trait-blocks-sound-floor 20 :trait-openable-window t
                                                :on-use #'(lambda (mob x y z)
                                                            ;; TODO: add connections change for size 3 
@@ -407,7 +407,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-open+ :name "open door"
                                                :glyph-idx 7 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black*
-                                              :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 10 :trait-openable-door t
+                                               :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 10 :trait-openable-door t
                                                :on-use #'(lambda (mob x y z)
                                                            (declare (ignore mob))
                                                            (set-terrain-* (level *world*) x y z +terrain-door-closed+)
@@ -422,7 +422,7 @@
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-closed+ :name "closed door"
                                                :glyph-idx 11 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
-                                               :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-projectiles t :trait-blocks-vision t :trait-blocks-move-floor t
+                                               :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-vision t :trait-blocks-projectiles-floor t :trait-blocks-projectiles t
                                                :trait-blocks-sound 15 :trait-blocks-sound-floor 20 :trait-openable-door t
                                                :on-use #'(lambda (mob x y z)
                                                            ;; TODO: add connections change for size 3 

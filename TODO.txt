@@ -4,7 +4,6 @@
 - BUG: Fix the bug with military movement on campaign map
 - A mission type in the corrupted district not controlled by demons where the military need to capture a number of checkpoints
 - Demons/angels arrive delayed through portals
-- Display time remaning before military/angel/demon arrival
 - Level modifier that makes all angels/demons arrive earlier/later
 - BUG: when a creature moves, steps on damage inflicting terrain (on the original time) and dies, the mob object gets removed from the level due to death, but then finishes the movement as usual. Maybe it is better to create a queue of events where death is checked and inflicted as the last event when necessary (instead of in the middle of an event, like movement)
 - Make the system show normal-looking highscores after the upgrade

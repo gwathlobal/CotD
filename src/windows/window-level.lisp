@@ -156,7 +156,7 @@
         (let ((max-machines (win-condition/win-formula (get-win-condition-by-id :win-cond-celestial-sabotage))))
           (format str "~%Demonic machines: ~A/~A~%" (length (demonic-machines (level *world*))) max-machines))
         )
-
+     
       ;; win condition for military sabotage
       (when (or (and (or (= (loyal-faction *player*) +faction-type-military+)
                          (= (loyal-faction *player*) +faction-type-angels+))
@@ -164,11 +164,29 @@
                 (eq (mission-type-id (mission (level *world*))) :mission-type-test))
         (format str "~%Raw storages left: ~A~%" (length (bomb-plant-locations (level *world*))))
         )
-      
-      
-      (setf str (format nil "~A~%~A~%~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
+
+      ;; weapon description
+      (format str "~%~A~%" (get-weapon-descr-line *player*))
+
+      ;; delayed arrival
+      (loop with do-once = nil
+            for (game-event-id turns-left init-str) in `((,+game-event-delayed-arrival-demons+ ,(- (turns-for-delayed-demons (level *world*)) (player-game-time *world*)) "Demons arrive")
+                                                         (,+game-event-delayed-arrival-angels+ ,(- (turns-for-delayed-angels (level *world*)) (player-game-time *world*)) "Angels arrive")
+                                                         (,+game-event-delayed-arrival-military+ ,(- (turns-for-delayed-military (level *world*)) (player-game-time *world*)) "Military arrive"))
+            when (and (find game-event-id (game-events (level *world*)))
+                      (>= turns-left 0))
+              do
+                 (unless do-once
+                   (setf do-once t)
+                   (format str "~%"))
+                 (format str "~A: ~A~%"
+                         init-str
+                         (if (zerop turns-left)
+                           "now!"
+                           (format nil "in ~A turn~:P" turns-left))))
+            
+      (setf str (format nil "~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         str
-                        (get-weapon-descr-line *player*)
                         (total-humans (level *world*))
                         (total-blessed (level *world*))
                         (total-angels (level *world*))
