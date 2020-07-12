@@ -33,6 +33,8 @@
            ;; we need this for events to get triggered only once  
            (setf (turn-finished *world*) nil)
 
+           (process-animations-on-level (level *world*))
+
            (when (or (check-dead *player*)
                      (master-mob-id *player*)
                      (player-outside-level *player*))
@@ -90,17 +92,7 @@
                ;;(format t "~%TIME-ELAPSED AI ~A [~A] after players' UPDATE-VISIBLE-MOBS (if any): ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
                
                ;; process animations for this turn if any
-               (when (animation-queue *world*)
-                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] before animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
-                 (loop for animation in (animation-queue *world*)
-                       do
-                          (play-animation animation))
-                 (sdl:update-display)
-                 (sdl-cffi::sdl-delay 100)
-                 (setf (animation-queue *world*) nil)
-                 (update-map-area *start-map-x* 0)
-                 ;;(format t "~%TIME-ELAPSED AI ~A [~A] after all animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
-				 )
+               (process-animations-on-level (level *world*))
                
                (when (<= (cur-ap mob) 0)
                  ;;(format t "~%TIME-ELAPSED AI ~A [~A] before ON-TICK: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))

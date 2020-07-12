@@ -120,6 +120,7 @@
                                                                       (setf (world-game-time world) (set-current-date-time year month day hour min sec)))
 
                                                                     (set-up-outdoor-light level 50)
+                                                                    (push +game-event-hellday+ (game-events level))
                                                                     )
                                                                 func-list)
                                                           (reverse func-list)))

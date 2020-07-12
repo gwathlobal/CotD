@@ -32,6 +32,31 @@
                                                                 func-list)
                                                           func-list)))
 
+(set-level-modifier :id +lm-weather-acid-rain+ :type +level-mod-weather+
+                    :name "Acid rain"
+                    :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
+                                                  (declare (ignore mission-type-id world-time))
+                                                  (if (and (eq world-sector-type-id :world-sector-hell-plain))
+                                                    t
+                                                    nil)
+                                                  )
+                    :random-available-for-mission #'(lambda ()
+                                                      (if (< (random 100) 25)
+                                                        t
+                                                        nil))
+                    :overall-post-process-func-list #'(lambda ()
+                                                        (let ((func-list ()))
+                                                          (push #'(lambda (level world-sector mission world)
+                                                                    (declare (ignore world-sector mission world))
+
+                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add poison rain weather~%~%"))
+
+                                                                    (pushnew +game-event-acid-falls+ (game-events level))
+                                                                    
+                                                                    )
+                                                                func-list)
+                                                          func-list)))
+
 (set-level-modifier :id +lm-weather-snow+ :type +level-mod-weather+
                     :name "Snow"
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)

@@ -18,6 +18,8 @@
    (aux-connect-map :initform (make-array '(6) :initial-element nil) :accessor aux-connect-map :type simple-array) ; an array that holds hash maps for all sizes of mobs (same as connect-map)
                                                                                                                    ; hash-maps hold connections between different rooms 
                                                                                                                    ; (so that opening/closing of doors does not require flood fills)
+   (animation-queue :initform () :accessor animation-queue)
+   
    (light-map :accessor light-map)
    (outdoor-light :initform 0 :accessor outdoor-light)
    (light-sources :initform (make-array '(0) :adjustable t) :accessor light-sources)
@@ -484,8 +486,6 @@
    (cur-mob-path :initform 0 :accessor cur-mob-path)
    (path-lock :initform (bt:make-lock) :accessor path-lock)
    (path-cv :initform (bt:make-condition-variable) :accessor path-cv)
-
-   (animation-queue :initform () :accessor animation-queue)
 
    (world-map :initform nil :accessor world-map)
    (player-specific-faction :initform nil :accessor world/player-specific-faction)

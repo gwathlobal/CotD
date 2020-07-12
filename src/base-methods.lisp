@@ -110,7 +110,20 @@
              (< x (+ (x *player*) (truncate *max-x-view* 2)))
              (> y (- (y *player*) (truncate *max-y-view* 2)))
              (< y (+ (y *player*) (truncate *max-y-view* 2))))
-    (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue *world*))))
+    (push (make-animation :id animation-type-id :x x :y y :z z :params params) (animation-queue (level *world*)))))
+
+(defun process-animations-on-level (level)
+  (when (animation-queue level)
+    ;;(format t "~%TIME-ELAPSED AI ~A [~A] before animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+    (loop for animation in (animation-queue (level *world*))
+          do
+             (play-animation animation))
+    (sdl:update-display)
+    (sdl-cffi::sdl-delay 100)
+    (setf (animation-queue (level *world*)) nil)
+    (update-map-area *start-map-x* 0)
+    ;;(format t "~%TIME-ELAPSED AI ~A [~A] after all animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+    ))
 
 (defun check-move-on-level (mob dx dy dz)
   (let ((sx) (sy)
@@ -3032,14 +3045,5 @@
     
     
     ;; process animations for this turn if any
-    (when (animation-queue *world*)
-      
-      (loop for animation in (animation-queue *world*)
-            do
-               (play-animation animation))
-      (sdl:update-display)
-      (sdl-cffi::sdl-delay 100)
-      (setf (animation-queue *world*) nil)
-      (update-map-area *start-map-x* 0))
-    
+    (process-animations-on-level level)
     ))

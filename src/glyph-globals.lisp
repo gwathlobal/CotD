@@ -9,6 +9,7 @@
 (defconstant +glyph-id-large-t+ 52)
 (defconstant +glyph-id-tilda+ 94)
 (defconstant +glyph-id-wall+ 96)
+(defconstant +glyph-id-double-tilda+ 98)
 (defconstant +glyph-id-solid-floor+ 99)
 (defconstant +glyph-id-sacrificial-circle+ 124)
 (defconstant +glyph-id-book+ 125)

@@ -9,7 +9,6 @@
 - Make the system show normal-looking highscores after the upgrade
 - Level modifier when there are numerous primordial creatures on level
 - Campaign for Lost Soul: library and lair in different sectors, player can move between sectors by going to the edge of the local map
-- Acid rain in corrupted districts
 - A style of gameplay where you gain abilities depending on your surroundings
 - Angels get conducts (do not kill allies) they should not break or they will get penalized
 - Angels get wrath management - when they attack or kill, they accamulate wrath. When wrath reaches a threshold, they get a sin (penalty). To reduce wrath, special abilities should be given. Wrath also enables special powerful abilities which produce even more wrath.

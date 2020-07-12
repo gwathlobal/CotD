@@ -102,7 +102,7 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-gold-big+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Big Gold Pile Placeholder"))
 
-(set-feature-type (make-instance 'feature-type :id +feature-smoke-thin+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke"
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-thin+ :glyph-idx +glyph-id-double-tilda+ :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-thin+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)
                                                                    (let ((result nil))
@@ -136,7 +136,7 @@
                                                                )
                                                :on-tick-func #'feature-smoke-on-tick))
 
-(set-feature-type (make-instance 'feature-type :id +feature-smoke-thick+ :glyph-idx 98 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke"
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-thick+ :glyph-idx +glyph-id-double-tilda+ :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 80 :trait-smoke +feature-smoke-thin+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)
                                                                    (let ((result nil))
@@ -234,7 +234,7 @@
 
 (set-feature-type (make-instance 'feature-type :id +feature-start-place-civilian-child+ :glyph-idx 0 :glyph-color sdl:*black* :back-color sdl:*black* :name "Child Starting Position" :trait-remove-on-dungeon-generation t))
 
-(set-feature-type (make-instance 'feature-type :id +feature-smoke-flare+ :glyph-idx 98 :glyph-color sdl:*magenta* :back-color sdl:*black* :name "Smoke"
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-flare+ :glyph-idx +glyph-id-double-tilda+ :glyph-color sdl:*magenta* :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-flare+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)
                                                                    (let ((result nil))
@@ -260,7 +260,7 @@
                                                                )
                                                :on-tick-func #'feature-smoke-on-tick))
 
-(set-feature-type (make-instance 'feature-type :id +feature-smoke-flare-final+ :glyph-idx 98 :glyph-color sdl:*magenta* :back-color sdl:*black* :name "Smoke"
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-flare-final+ :glyph-idx +glyph-id-double-tilda+ :glyph-color sdl:*magenta* :back-color sdl:*black* :name "Smoke"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-flare-final+ :trait-no-gravity t
                                                :on-tick-func #'(lambda (level feature)
                                                                  (decf (counter feature))
@@ -335,7 +335,7 @@
 (set-feature-type (make-instance 'feature-type :id +feature-demonic-portal+ :glyph-idx +glyph-id-portal+ :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color nil :name "Demonic portal"
                                  ))
 
-(set-feature-type (make-instance 'feature-type :id +feature-corrupted-spores+ :glyph-idx 98 :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* :name "Spores"
+(set-feature-type (make-instance 'feature-type :id +feature-corrupted-spores+ :glyph-idx +glyph-id-double-tilda+ :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* :name "Spores"
                                                :trait-blocks-vision 30 :trait-smoke +feature-corrupted-spores+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)
                                                                    (let ((result nil))
@@ -375,7 +375,7 @@
                                                                          (setf (killed-by *player*) "spores")))))
                                                                  (feature-smoke-on-tick level feature))))
 
-(set-feature-type (make-instance 'feature-type :id +feature-smoke-acid-gas+ :glyph-idx 98 :glyph-color (sdl:color :r 0 :g 200 :b 0) :back-color sdl:*black* :name "Poisoned gas"
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-acid-gas+ :glyph-idx +glyph-id-double-tilda+ :glyph-color (sdl:color :r 0 :g 200 :b 0) :back-color sdl:*black* :name "Poisoned gas"
                                                :trait-blocks-vision 60 :trait-smoke +feature-smoke-acid-gas+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)
                                                                    (let ((result nil))
@@ -413,4 +413,43 @@
                                                                      (when (check-dead target)
                                                                        (when (eq target *player*)
                                                                          (setf (killed-by *player*) "poisoned gas")))))
+                                                                 (feature-smoke-on-tick level feature))))
+
+(set-feature-type (make-instance 'feature-type :id +feature-smoke-weak-acid-gas+ :glyph-idx +glyph-id-double-tilda+ :glyph-color sdl:*yellow* :back-color sdl:*black* :name "Acidic gas"
+                                               :trait-blocks-vision 40 :trait-smoke +feature-smoke-weak-acid-gas+ :trait-no-gravity t
+                                               :can-merge-func #'(lambda (level feature-new)
+                                                                   (let ((result nil))
+                                                                     (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                                                           for feature-old = (get-feature-by-id feature-old-id)
+                                                                           when (or (= (feature-type feature-new) (feature-type feature-old)))
+                                                                             do
+                                                                                (setf result t)
+                                                                                (loop-finish)
+                                                                           )
+                                                                     result))
+                                               :merge-func #'(lambda (level feature-new)
+                                                               (loop for feature-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
+                                                                     for feature-old = (get-feature-by-id feature-old-id)
+                                                                     when (= (feature-type feature-new) (feature-type feature-old))
+                                                                       do
+                                                                          (remove-feature-from-level-list level feature-new)
+                                                                          (remove-feature-from-world feature-new)
+                                                                          (incf (counter feature-old))
+                                                                          (loop-finish)
+                                                                     )
+                                                               )
+                                               :on-tick-func #'(lambda (level feature)
+                                                                 (let ((target (get-mob-* level (x feature) (y feature) (z feature))))
+                                                                   (when target
+                                                                     (inflict-damage target :min-dmg 1 :max-dmg 2 :dmg-type +weapon-dmg-acid+
+                                                                                            :att-spd nil :weapon-aux () :acc 100 :add-blood t :no-dodge t
+                                                                                            :actor nil :no-hit-message t
+                                                                                            :specific-hit-string-func #'(lambda (cur-dmg)
+                                                                                                                          (format nil "~A takes ~A damage from acidic gas. " (capitalize-name (name target)) cur-dmg))
+                                                                                            :specific-no-dmg-string-func #'(lambda ()
+                                                                                                                             (format nil "~A takes no damage from acidic gas. " (capitalize-name (name target)))))
+
+                                                                     (when (check-dead target)
+                                                                       (when (eq target *player*)
+                                                                         (setf (killed-by *player*) "acidic gas")))))
                                                                  (feature-smoke-on-tick level feature))))

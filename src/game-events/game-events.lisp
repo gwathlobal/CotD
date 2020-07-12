@@ -15,6 +15,8 @@
 (defconstant +game-event-win-for-ghost+ 10)
 (defconstant +game-event-unnatural-darkness+ 11)
 (defconstant +game-event-constant-reanimation+ 12)
+(defconstant +game-event-hellday+ 13)
+(defconstant +game-event-acid-falls+ 14)
 
 
 (defconstant +game-event-player-died+ 15)

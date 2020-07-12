@@ -258,7 +258,7 @@
                                                          t)
                                            :on-trigger #'(lambda (world)
                                                            (when (zerop (random 10))
-                                                             (setf (game-events world) (remove +game-event-unnatural-darkness+ (game-events world)))
+                                                             (setf (game-events (level world)) (remove +game-event-unnatural-darkness+ (game-events (level world))))
                                                              (add-message (format nil "Unnatural darkness is no longer.~%"))))))
 
 (set-game-event (make-instance 'game-event :id +game-event-constant-reanimation+ :disabled nil
@@ -292,6 +292,14 @@
                                                            
                                                            )))
 
+(set-game-event (make-instance 'game-event :id +game-event-hellday+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         nil)
+                                           :on-trigger #'(lambda (world)
+                                                           (declare (ignore world))
+                                                           nil)))
+
 ;;===========================
 ;; OTHER EVENTS
 ;;===========================
@@ -301,7 +309,7 @@
                                                          (declare (ignore world))
                                                          t)
                                            :on-trigger #'(lambda (world)
-                                                           (loop repeat (sqrt (* (array-dimension (terrain (level world)) 0) (array-dimension (terrain (level world)) 1)))
+                                                           (loop repeat 10
                                                                  for x of-type fixnum = (random (array-dimension (terrain (level world)) 0))
                                                                  for y of-type fixnum = (random (array-dimension (terrain (level world)) 1))
                                                                  do
@@ -360,15 +368,51 @@
                                                          t)
                                            :on-trigger #'(lambda (world)
                                                            (cond
-                                                             ((find +game-event-unnatural-darkness+ (game-events world))
+                                                             ((find +game-event-unnatural-darkness+ (game-events (level world)))
                                                               (progn
                                                                 (setf (outdoor-light (level world))
                                                                       0)))
+                                                             ((find +game-event-hellday+ (game-events (level world)))
+                                                              (progn
+                                                                (setf (outdoor-light (level world))
+                                                                      (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 1 60 10)) (world-game-time world))))))))))
                                                              (t
                                                               (progn
                                                                 (setf (outdoor-light (level world))
                                                                       (round (- 50 (* 50 (sin (+ 8 (* (/ pi (* 12 60 10)) (world-game-time world))))))))))
                                                              ))))
+
+(set-game-event (make-instance 'game-event :id +game-event-acid-falls+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (loop repeat 3
+                                                                 for x of-type fixnum = (random (array-dimension (terrain (level world)) 0))
+                                                                 for y of-type fixnum = (random (array-dimension (terrain (level world)) 1))
+                                                                 do
+                                                                    (loop for z from (1- (array-dimension (terrain (level world)) 2)) downto 0
+                                                                          when (or (get-terrain-type-trait (get-terrain-* (level world) x y z) +terrain-trait-blocks-move-floor+)
+                                                                                   (and (> z 0)
+                                                                                        (get-terrain-type-trait (get-terrain-* (level world) x y (1- z)) +terrain-trait-water+))
+                                                                                   (and (> z 0)
+                                                                                        (get-terrain-type-trait (get-terrain-* (level world) x y (1- z)) +terrain-trait-blocks-move+))
+                                                                                   (get-mob-* (level world) x y z))
+                                                                            do
+                                                                               (logger (format nil "GAME-EVENT: Acid falls at (~A ~A ~A)~%" x y z))
+                                                                               (place-animation x y z +anim-type-acid-dot+)
+                                                                               (check-surroundings x y t #'(lambda (dx dy)
+                                                                                                             (when (and (>= dx 0)
+                                                                                                                        (>= dy 0)
+                                                                                                                        (< dx (array-dimension (terrain (level *world*)) 0))
+                                                                                                                        (< dy (array-dimension (terrain (level *world*)) 1))
+                                                                                                                        (and (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-blocks-move+))
+                                                                                                                             (not (get-terrain-type-trait (get-terrain-* (level *world*) dx dy z) +terrain-trait-blocks-projectiles+))))
+                                                                                                               (add-feature-to-level-list (level *world*) (make-instance 'feature :feature-type +feature-smoke-weak-acid-gas+ :x dx :y dy :z z
+                                                                                                                                                           :counter 1)))))
+                                                                               (loop-finish))
+                                                                )
+                                                           )))
 
 
 ;;===========================

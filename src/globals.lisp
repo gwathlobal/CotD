@@ -522,6 +522,7 @@
 (defconstant +feature-delayed-military-arrival-point+ 42)
 (defconstant +feature-start-machine-point+ 43)
 (defconstant +feature-bomb-plant-target+ 44)
+(defconstant +feature-smoke-weak-acid-gas+ 45)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
