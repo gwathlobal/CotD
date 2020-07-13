@@ -22,6 +22,8 @@
    (select-tod-mod  :initform nil :accessor scenario-gen-class/select-tod-mod :type (or null level-modifier))
    (avail-weather-list :initform () :accessor scenario-gen-class/avail-weather-list :type list)
    (select-weather-list :initform () :accessor scenario-gen-class/select-weather-list :type list)
+   (avail-misc-list :initform () :accessor scenario-gen-class/avail-misc-list :type list)
+   (select-misc-list :initform () :accessor scenario-gen-class/select-misc-list :type list)
 
    (avail-faction-list :initform () :accessor  scenario-gen-class/avil-faction-list :type list)
    (cur-faction-list :initform () :accessor  scenario-gen-class/cur-faction-list :type list)
@@ -51,8 +53,8 @@
     ))
 
 (defun scenario-set-avail-lvl-mods (scenario &optional (new-avail-lvl-mods-list ()))
-  (with-slots (overall-lvl-mods-list select-lvl-mods-list select-controlled-mod select-feats-list select-items-list select-tod-mod select-weather-list
-               avail-lvl-mods-list avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list world-sector mission world)
+  (with-slots (overall-lvl-mods-list select-lvl-mods-list select-controlled-mod select-feats-list select-items-list select-tod-mod select-weather-list select-misc-list
+               avail-lvl-mods-list avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list avail-misc-list world-sector mission world)
       scenario
     ;; set a list of available lvl mods
     (setf avail-lvl-mods-list new-avail-lvl-mods-list)
@@ -72,18 +74,20 @@
                           avail-feats-list ()
                           avail-items-list ()
                           avail-tod-list ()
-                          avail-weather-list ())
+                          avail-weather-list ()
+                          avail-misc-list ())
           for lvl-mod in avail-lvl-mods-list
           when (and (is-available-for-mission lvl-mod)
                     (funcall (is-available-for-mission lvl-mod) (wtype world-sector) (mission-type-id mission) (world-game-time world)))
             do
-               (cond
-                 ((= (lm-type lvl-mod) +level-mod-controlled-by+) (push lvl-mod avail-controlled-list))
-                 ((= (lm-type lvl-mod) +level-mod-sector-feat+) (push lvl-mod avail-feats-list))
-                 ((= (lm-type lvl-mod) +level-mod-sector-item+) (push lvl-mod avail-items-list))
-                 ((= (lm-type lvl-mod) +level-mod-time-of-day+) (push lvl-mod avail-tod-list))
-                 ((= (lm-type lvl-mod) +level-mod-weather+) (push lvl-mod avail-weather-list)))
-          finally (setf overall-lvl-mods-list (append avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list))) 
+               (case (lm-type lvl-mod)
+                 (:level-mod-controlled-by (push lvl-mod avail-controlled-list))
+                 (:level-mod-sector-feat (push lvl-mod avail-feats-list))
+                 (:level-mod-sector-item (push lvl-mod avail-items-list))
+                 (:level-mod-tod (push lvl-mod avail-tod-list))
+                 (:level-mod-weather (push lvl-mod avail-weather-list))
+                 (:level-mod-misc (push lvl-mod avail-misc-list)))
+          finally (setf overall-lvl-mods-list (append avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list avail-misc-list))) 
     ))
 
 (defun scenario-create-world (scenario)
@@ -211,7 +215,7 @@
 
 (defun scenario-set-tod-lvl-mod (scenario lvl-mod &key (add-to-sector t) (apply-scenario-func t))
   (with-slots (world world-sector mission select-lvl-mods-list select-tod-mod) scenario
-    (let ((prev-lvl-mod (find +level-mod-time-of-day+ (level-modifier-list mission)
+    (let ((prev-lvl-mod (find :level-mod-tod (level-modifier-list mission)
                               :key #'(lambda (a)
                                        (lm-type (get-level-modifier-by-id a))))))
       (when prev-lvl-mod
@@ -260,13 +264,39 @@
         (setf select-lvl-mods-list (remove lvl-mod select-lvl-mods-list))
         (setf select-weather-list (remove lvl-mod select-weather-list))))))
 
+(defun scenario-add/remove-misc-lvl-mod (scenario lvl-mod &key (add-general t) (add-to-sector t) (apply-scenario-func t))
+  (with-slots (world world-sector mission select-lvl-mods-list select-misc-list) scenario
+    (if add-general
+      ;; either add...
+      (progn
+        ;; do not add if already added
+        (when (not (find lvl-mod select-lvl-mods-list))
+          (push lvl-mod select-lvl-mods-list)
+          (push lvl-mod select-misc-list)
+          
+          (when add-to-sector
+            (push (id lvl-mod) (level-modifier-list mission)))
+          (when (and apply-scenario-func
+                     (scenario-enabled-func lvl-mod))
+            (funcall (scenario-enabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))))
+      ;; ...or remove
+      (progn
+        (when (and apply-scenario-func
+                   (scenario-disabled-func lvl-mod))
+          (funcall (scenario-disabled-func lvl-mod) (world-map world) (x world-sector) (y world-sector)))
+        (setf (level-modifier-list mission) (remove (id lvl-mod) (level-modifier-list mission)))
+        
+        (setf select-lvl-mods-list (remove lvl-mod select-lvl-mods-list))
+        (setf select-misc-list (remove lvl-mod select-misc-list))))))
+
 (defun scenario-add/remove-lvl-mod (scenario lvl-mod &key (add-general t) (add-to-sector t) (apply-scenario-func t))
-  (cond
-    ((= (lm-type lvl-mod) +level-mod-controlled-by+) (scenario-set-controlled-by-lvl-mod scenario lvl-mod :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
-    ((= (lm-type lvl-mod) +level-mod-sector-feat+) (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
-    ((= (lm-type lvl-mod) +level-mod-sector-item+) (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
-    ((= (lm-type lvl-mod) +level-mod-time-of-day+) (scenario-set-tod-lvl-mod scenario lvl-mod :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
-    ((= (lm-type lvl-mod) +level-mod-weather+) (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))))
+  (case (lm-type lvl-mod)
+    (:level-mod-controlled-by (scenario-set-controlled-by-lvl-mod scenario lvl-mod :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    (:level-mod-sector-feat (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    (:level-mod-sector-item (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    (:level-mod-tod (scenario-set-tod-lvl-mod scenario lvl-mod :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    (:level-mod-weather (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))
+    (:level-mod-misc (scenario-add/remove-misc-lvl-mod scenario lvl-mod :add-general add-general :add-to-sector add-to-sector :apply-scenario-func apply-scenario-func))))
 
 (defun scenario-adjust-lvl-mods-after-sector-regeneration (scenario)
   (with-slots (world world-sector mission overall-lvl-mods-list always-lvl-mods-list select-lvl-mods-list) scenario
@@ -307,7 +337,8 @@
 (defun scenario-sort-select-lvl-mods (scenario)
   (with-slots (select-lvl-mods-list) scenario
     (setf select-lvl-mods-list (stable-sort select-lvl-mods-list #'(lambda (a b)
-                                                                     (if (< (lm-type a) (lm-type b))
+                                                                     (if (< (position (lm-type a) (defenum:tags 'level-mod-type-enum))
+                                                                            (position (lm-type b) (defenum:tags 'level-mod-type-enum)))
                                                                        t
                                                                        nil))))))
 
@@ -514,27 +545,31 @@
         (lvl-mod-feats-set nil)
         (lvl-mod-items-set nil)
         (lvl-mod-tod-set nil)
-        (lvl-mod-weather-set nil))
+        (lvl-mod-weather-set nil)
+        (lvl-mod-misc-set nil))
     
     (flet ((add-lvl-mod (lvl-mod &key (add-to-sector t))
-             (cond
-               ((= (lm-type lvl-mod) +level-mod-controlled-by+) (progn
-                                                                  (setf lvl-mod-controlled-by-set t)
-                                                                  (scenario-set-controlled-by-lvl-mod scenario lvl-mod :add-to-sector add-to-sector)))
-               ((= (lm-type lvl-mod) +level-mod-sector-feat+) (progn
-                                                                (setf lvl-mod-feats-set t)
-                                                                (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
-               ((= (lm-type lvl-mod) +level-mod-sector-item+) (progn
-                                                                (setf lvl-mod-items-set t)
-                                                                (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
-               ((= (lm-type lvl-mod) +level-mod-time-of-day+) (progn
-                                                                (setf lvl-mod-tod-set t)
-                                                                (scenario-set-tod-lvl-mod scenario lvl-mod :add-to-sector add-to-sector)))
-               ((= (lm-type lvl-mod) +level-mod-weather+) (progn
-                                                            (setf lvl-mod-weather-set t)
-                                                            (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector))))))
+             (case (lm-type lvl-mod)
+               (:level-mod-controlled-by (progn
+                                           (setf lvl-mod-controlled-by-set t)
+                                           (scenario-set-controlled-by-lvl-mod scenario lvl-mod :add-to-sector add-to-sector)))
+               (:level-mod-sector-feat (progn
+                                         (setf lvl-mod-feats-set t)
+                                         (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
+               (:level-mod-sector-item (progn
+                                         (setf lvl-mod-items-set t)
+                                         (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
+               (:level-mod-tod (progn
+                                 (setf lvl-mod-tod-set t)
+                                 (scenario-set-tod-lvl-mod scenario lvl-mod :add-to-sector add-to-sector)))
+               (:level-mod-weather (progn
+                                     (setf lvl-mod-weather-set t)
+                                     (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
+               (:level-mod-misc (progn
+                                  (setf lvl-mod-misc-set t)
+                                  (scenario-add/remove-misc-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector))))))
 
-      (with-slots (world world-sector mission avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list) scenario
+      (with-slots (world world-sector mission avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list avail-misc-list) scenario
         ;; create the supporting world
         (scenario-create-world scenario)
         
@@ -579,6 +614,13 @@
 
         ;; add random weather lvl-mods
         (loop for lvl-mod in avail-weather-list
+              when (or (not (random-available-for-mission lvl-mod))
+                       (funcall (random-available-for-mission lvl-mod)))
+                do
+                   (add-lvl-mod lvl-mod))
+
+        ;; add random misc lvl-mods
+        (loop for lvl-mod in avail-misc-list
               when (or (not (random-available-for-mission lvl-mod))
                        (funcall (random-available-for-mission lvl-mod)))
                 do

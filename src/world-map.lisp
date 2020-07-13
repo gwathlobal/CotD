@@ -621,6 +621,17 @@
       ;; set up random factions
       (scenario-adjust-factions scenario)
 
+      ;; make angels delayed if portals are corrupted
+      (when (and (find-campaign-effects-by-id world :campaign-effect-demon-corrupt-portals)
+                 (not (eql mission-type-id :mission-type-celestial-purge))
+                 (not (eql mission-type-id :mission-type-celestial-sabotage))
+                 (not (eql mission-type-id :mission-type-celestial-retrieval)))
+        (loop for faction-obj in (faction-list mission)
+              when (and (eql (first faction-obj) +faction-type-angels+)
+                        (eql (second faction-obj) :mission-faction-present))
+                do
+                   (setf (second faction-obj) :mission-faction-delayed)))
+
       (scenario-set-avail-lvl-mods scenario)
 
       (when off-map
@@ -961,6 +972,9 @@
   (when (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
     (return-from humans-capture-relic nil))
 
+  (loop for campaign-effect in (find-campaign-effects-by-id *world* :campaign-effect-demon-corrupt-portals) do
+    (remove-campaign-effect *world* campaign-effect))
+
   (let ((message-box-list `(,(world/mission-message-box *world*))))
     (add-message (format nil " Humans have ") sdl:*white* message-box-list)
     (add-message (format nil "captured") sdl:*yellow* message-box-list)
@@ -986,7 +1000,10 @@
 
 (defun neutrals-capture-relic (world-map x y)
   (when (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
-    (return-from neutrals-capture-relic nil)) 
+    (return-from neutrals-capture-relic nil))
+
+  (loop for campaign-effect in (find-campaign-effects-by-id *world* :campaign-effect-demon-corrupt-portals) do
+    (remove-campaign-effect *world* campaign-effect))
 
   (let ((message-box-list `(,(world/mission-message-box *world*))))
     (add-message (format nil " The ") sdl:*white* message-box-list)

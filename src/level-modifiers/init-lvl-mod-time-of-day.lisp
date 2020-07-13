@@ -4,7 +4,7 @@
 ;; Time of Day level modifiers
 ;;---------------------------------
 
-(set-level-modifier :id +lm-tod-morning+ :type +level-mod-time-of-day+
+(set-level-modifier :id +lm-tod-morning+ :type :level-mod-tod
                     :name "Morning"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -29,7 +29,7 @@
                                                     nil
                                                     t)))
 
-(set-level-modifier :id +lm-tod-noon+ :type +level-mod-time-of-day+
+(set-level-modifier :id +lm-tod-noon+ :type :level-mod-tod
                     :name "Afternoon"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -55,7 +55,7 @@
                                                     nil
                                                     t)))
 
-(set-level-modifier :id +lm-tod-evening+ :type +level-mod-time-of-day+
+(set-level-modifier :id +lm-tod-evening+ :type :level-mod-tod
                     :name "Evening"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -80,7 +80,7 @@
                                                     nil
                                                     t)))
 
-(set-level-modifier :id +lm-tod-night+ :type +level-mod-time-of-day+
+(set-level-modifier :id +lm-tod-night+ :type :level-mod-tod
                     :name "Midnight"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -105,7 +105,7 @@
                                                     nil
                                                     t)))
 
-(set-level-modifier :id +lm-tod-hell+ :type +level-mod-time-of-day+
+(set-level-modifier :id +lm-tod-hell+ :type :level-mod-tod
                     :name "Hellday"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))

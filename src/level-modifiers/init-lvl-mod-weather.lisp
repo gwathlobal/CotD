@@ -4,7 +4,7 @@
 ;; Weather level modifiers
 ;;---------------------------------
 
-(set-level-modifier :id +lm-weather-rain+ :type +level-mod-weather+
+(set-level-modifier :id +lm-weather-rain+ :type :level-mod-weather
                     :name "Rain"
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id))
@@ -32,7 +32,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-weather-acid-rain+ :type +level-mod-weather+
+(set-level-modifier :id +lm-weather-acid-rain+ :type :level-mod-weather
                     :name "Acid rain"
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
@@ -57,7 +57,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-weather-snow+ :type +level-mod-weather+
+(set-level-modifier :id +lm-weather-snow+ :type :level-mod-weather
                     :name "Snow"
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id))

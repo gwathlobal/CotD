@@ -76,6 +76,9 @@
                 (mob-ability-p *player* +mob-abil-prayer-bless+))
         (format str "Followers: ~A~%" (count-follower-list *player*)))
 
+      ;; weapon description
+      (format str "~%~A~%" (get-weapon-descr-line *player*))
+      
       ;; win condition for demonic attack
       (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
                          (= (loyal-faction *player*) +faction-type-angels+)
@@ -126,6 +129,16 @@
                     "none")))
         )
 
+      ;; win condition for celestial purge
+      (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
+                         (= (loyal-faction *player*) +faction-type-angels+)
+                         (= (loyal-faction *player*) +faction-type-military+)
+                         (= (loyal-faction *player*) +faction-type-church+)
+                         (= (loyal-faction *player*) +faction-type-satanists+))
+                     (eq (mission-type-id (mission (level *world*))) :mission-type-celestial-purge))
+                (eq (mission-type-id (mission (level *world*))) :mission-type-test))
+        (format str "~%Demonic sigils left: ~A~%" (length (demonic-sigils (level *world*)))))
+
       ;; win condition for military conquest
       (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
                          (= (loyal-faction *player*) +faction-type-angels+)
@@ -165,8 +178,7 @@
         (format str "~%Raw storages left: ~A~%" (length (bomb-plant-locations (level *world*))))
         )
 
-      ;; weapon description
-      (format str "~%~A~%" (get-weapon-descr-line *player*))
+      
 
       ;; delayed arrival
       (loop with do-once = nil

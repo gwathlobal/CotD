@@ -101,8 +101,8 @@
                                     (declare (ignore n))
                                     ;; start in the evening
                                     (let ((lvl-mod-list (append (list (get-level-modifier-by-id +lm-tod-evening+))
-                                                                (remove +level-mod-time-of-day+ (get-all-lvl-mods-list) :key #'(lambda (a)
-                                                                                                                                 (lm-type a))))))
+                                                                (remove :level-mod-tod (get-all-lvl-mods-list) :key #'(lambda (a)
+                                                                                                                        (lm-type a))))))
                                       (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-demon-shadow+ :avail-lvl-mods-list lvl-mod-list)
                                         (when (and mission world-sector)
                                           (values world-sector mission))))
@@ -137,8 +137,8 @@
                                    (declare (ignore n))
                                    ;; start in the evening
                                     (let ((lvl-mod-list (append (list (get-level-modifier-by-id +lm-tod-evening+))
-                                                                (remove +level-mod-time-of-day+ (get-all-lvl-mods-list) :key #'(lambda (a)
-                                                                                                                                 (lm-type a))))))
+                                                                (remove :level-mod-tod (get-all-lvl-mods-list) :key #'(lambda (a)
+                                                                                                                        (lm-type a))))))
                                       (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-thief+ :avail-lvl-mods-list lvl-mod-list)
                                         (when (and mission world-sector)
                                           (values world-sector mission))))

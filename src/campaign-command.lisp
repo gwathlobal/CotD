@@ -12,9 +12,12 @@
                                         :campaign-command-demon-rebuild-engine
                                         :campaign-command-demon-add-army
                                         :campaign-command-demon-protect-dimension
+                                        :campaign-command-demon-corrupt-portals
                                         :campaign-command-military-reveal-lair
                                         :campaign-command-military-reform-army
                                         :campaign-command-military-add-army
+                                        :campaign-command-priest-delay-demons
+                                        :campaign-command-priest-hasten-angels
                                         ))
 
 (defclass campaign-command ()

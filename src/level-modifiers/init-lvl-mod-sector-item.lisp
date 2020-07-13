@@ -4,7 +4,7 @@
 ;; Sector Item level modifiers
 ;;---------------------------------
 
-(set-level-modifier :id +lm-item-book-of-rituals+ :type +level-mod-sector-item+
+(set-level-modifier :id +lm-item-book-of-rituals+ :type :level-mod-sector-item
                     :name "Book of Rituals"
                     :priority 100
                     :overall-post-process-func-list #'(lambda ()
@@ -32,7 +32,7 @@
                                                     t))
                     )
 
-(set-level-modifier :id +lm-item-holy-relic+ :type +level-mod-sector-item+
+(set-level-modifier :id +lm-item-holy-relic+ :type :level-mod-sector-item
                     :name "Holy Relic"
                     :priority 100
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)

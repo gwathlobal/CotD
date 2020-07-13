@@ -4,12 +4,21 @@
 ;; LEVEL-MOD-TYPE Constants
 ;;---------------------------------
 
+(defenum:defenum level-mod-type-enum (:level-mod-controlled-by
+                                      :level-mod-sector-feat
+                                      :level-mod-sector-item
+                                      :level-mod-tod
+                                      :level-mod-weather
+                                      :level-mod-player-placement
+                                      :level-mod-misc))
+
 (defconstant +level-mod-controlled-by+ 0)
 (defconstant +level-mod-sector-feat+ 1)
 (defconstant +level-mod-sector-item+ 2)
 (defconstant +level-mod-time-of-day+ 3)
 (defconstant +level-mod-weather+ 4)
 (defconstant +level-mod-player-placement+ 5)
+(defconstant +level-mod-misc+ 6)
 
 ;;---------------------------------
 ;; LEVEL-MODIFIER Constants
@@ -59,7 +68,7 @@
   ((id :initarg :id :accessor id)
    (name :initarg :name :accessor name)
    (priority :initform 0 :initarg :priority :accessor priority)
-   (lm-type :initarg :lm-type :accessor lm-type)
+   (lm-type :initarg :lm-type :accessor lm-type :type level-mod-type-enum)
    (lm-debug :initform nil :initarg :lm-debug :accessor lm-debug :type boolean)
    (disabled :initform nil :initarg :disabled :accessor disabled :type boolean)
    (template-level-gen-func :initform nil :initarg :template-level-gen-func :accessor template-level-gen-func)

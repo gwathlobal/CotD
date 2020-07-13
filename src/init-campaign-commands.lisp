@@ -195,7 +195,7 @@
                                       "March a demonic army onto Earth to control one of the corrupted districts.")
                       :faction-type +faction-type-demons+
                       :disabled nil
-                      :cd 6
+                      :cd 5
                       :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
@@ -276,6 +276,41 @@
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
                                                  (add-campaign-effect world :id :campaign-effect-demon-protect-dimension :cd nil)
+                                                 ))
+
+(set-campaign-command :id :campaign-command-demon-corrupt-portals
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Corrupt divine portals")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Invoke the rites from the Book of Rituals to make angels arrive delayed whenever they are present. The enchantment lasts as long as the demons control the Holy Relic.")
+                      :faction-type +faction-type-demons+
+                      :disabled nil
+                      :cd 5
+                      :priority 1
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         (let ((relic-sector nil))
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (and (find +lm-item-holy-relic+ (items world-sector))
+                                                            (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-port)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-island)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                                                (eq (wtype world-sector) :world-sector-corrupted-lake)))
+                                                   (setf relic-sector t)))))
+                                           
+                                           (if (and relic-sector
+                                                    (null (find-campaign-effects-by-id world :campaign-effect-demon-corrupt-portals)))
+                                             t
+                                             nil))
+                                         )
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                 (add-campaign-effect world :id :campaign-effect-demon-corrupt-portals :cd nil)
                                                  ))
 
 (set-campaign-command :id :campaign-command-military-reveal-lair
@@ -395,8 +430,7 @@
                                                       (not (zerop (world/cur-military-num world)))
                                                       (> corrupted-sectors-left normal-sectors-left))
                                                t
-                                               nil)))
-                                         )
+                                               nil))))
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
                                                  (let ((message-box-list `(,(world/event-message-box world)))
@@ -421,5 +455,70 @@
                                                    (add-message (format nil "a new army") sdl:*yellow* message-box-list)
                                                    (add-message (format nil " in ") sdl:*white* message-box-list)
                                                    (add-message (format nil "~(~A~)" (name (aref (cells (world-map world)) (first selected-sector) (second selected-sector)))) sdl:*yellow* message-box-list)
-                                                   (add-message (format nil ".~%") sdl:*white* message-box-list)))
-                      )
+                                                   (add-message (format nil ".~%") sdl:*white* message-box-list))))
+
+(set-campaign-command :id :campaign-command-priest-delay-demons
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Pray to thicken the Barrier")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Pray to make the Barrier between the Hell and human world thicker for 5 turns. This shall make demons arrive 30 turns later when they arrive delayed.")
+                      :faction-type +faction-type-church+
+                      :disabled nil
+                      :cd 6
+                      :priority 0
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         (let ((church-sector nil))
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                                (eq (wtype world-sector) :world-sector-normal-port)
+                                                                (eq (wtype world-sector) :world-sector-normal-island)
+                                                                (eq (wtype world-sector) :world-sector-normal-residential)
+                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                   (setf church-sector t)))))
+                                           
+                                           (if (and church-sector
+                                                    (null (find-campaign-effects-by-id world :campaign-effect-demons-delayed)))
+                                             t
+                                             nil)))
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                 (add-campaign-effect world :id :campaign-effect-demons-delayed :cd 5)))
+
+(set-campaign-command :id :campaign-command-priest-hasten-angels
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Pray for divine intervention")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Pray to make angels arrive 30 turns earlier when the they arrive delayed. This effect lasts for 5 turns.")
+                      :faction-type +faction-type-church+
+                      :disabled nil
+                      :cd 6
+                      :priority 0
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         (let ((church-sector nil))
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                                (eq (wtype world-sector) :world-sector-normal-port)
+                                                                (eq (wtype world-sector) :world-sector-normal-island)
+                                                                (eq (wtype world-sector) :world-sector-normal-residential)
+                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                   (setf church-sector t)))))
+                                           
+                                           (if (and church-sector
+                                                    (null (find-campaign-effects-by-id world :campaign-effect-angels-hastened)))
+                                             t
+                                             nil)))
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                 (add-campaign-effect world :id :campaign-effect-angels-hastened :cd 5)))

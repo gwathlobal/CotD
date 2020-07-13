@@ -4,7 +4,7 @@
 ;; Controlled By level modifiers
 ;;---------------------------------
 
-(set-level-modifier :id +lm-controlled-by-none+ :type +level-mod-controlled-by+
+(set-level-modifier :id +lm-controlled-by-none+ :type :level-mod-controlled-by
                     :name "Uncontrolled"
                     :priority 25
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
@@ -15,7 +15,7 @@
                                                     nil
                                                     t)))
 
-(set-level-modifier :id +lm-controlled-by-demons+ :type +level-mod-controlled-by+
+(set-level-modifier :id +lm-controlled-by-demons+ :type :level-mod-controlled-by
                     :name "Controlled by demons"
                     :faction-list-func #'(lambda (sector-type-id)
                                            (declare (ignore sector-type-id))
@@ -89,7 +89,7 @@
                                                nil))
                     )
 
-(set-level-modifier :id +lm-controlled-by-military+ :type +level-mod-controlled-by+
+(set-level-modifier :id +lm-controlled-by-military+ :type :level-mod-controlled-by
                     :name "Controlled by the military"
                     :faction-list-func #'(lambda (sector-type-id)
                                            (declare (ignore sector-type-id))

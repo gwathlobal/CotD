@@ -70,6 +70,24 @@
                                                 (add-message (format nil "entry") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " again.~%") sdl:*white* message-box-list))))
 
+(set-campaign-effect-type :id :campaign-effect-demon-corrupt-portals
+                          :name "Divine portals corrupted"
+                          :descr "The demons have invoked obscure rites on the Holy Relic to corrupt the divine portals. Whenever angels are not initiating a mission, they arrive delayed. The enchantment lasts as long as the demons control the Holy Relic."
+                          :merge-func nil
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/effect-message-box world))))
+                                             (add-message (format nil "The demons have ") sdl:*white* message-box-list)
+                                             (add-message (format nil "corrupted divine portals") sdl:*yellow* message-box-list)
+                                             (add-message (format nil ".~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/effect-message-box world))))
+                                                (add-message (format nil "Divine portals") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " are ") sdl:*white* message-box-list)
+                                                (add-message (format nil "no longer corrupted") sdl:*yellow* message-box-list)
+                                                (add-message (format nil ".~%") sdl:*white* message-box-list))))
+
 (set-campaign-effect-type :id :campaign-effect-demon-turmoil
                           :name "Turmoil in Hell"
                           :descr "A recent successful strike inside the demonic realm has caused turmoil in Hell. The demons are not able to raise armies until order is restored."
@@ -93,3 +111,47 @@
                                                 (add-message (format nil ". Demons are ") sdl:*white* message-box-list)
                                                 (add-message (format nil "able to raise armies") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " once again.~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-demons-delayed
+                          :name "The Barrier thickens"
+                          :descr "The Barrier between the Prison Dimension and human world thickens. When the demons arrive delayed, it takes them additional 30 turns to arrive."
+                          :merge-func #'(lambda (world new-effect old-effect)
+                                          (setf (campaign-effect/cd old-effect) (campaign-effect/cd new-effect))
+                                          (when (campaign-effect/on-add-func new-effect)
+                                            (funcall (campaign-effect/on-add-func new-effect) world new-effect)))
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/effect-message-box world))))
+                                             (add-message (format nil "The priests have prayed ") sdl:*white* message-box-list)
+                                             (add-message (format nil "to thicken the Barrier") sdl:*yellow* message-box-list)
+                                             (add-message (format nil " between the worlds.~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/effect-message-box world))))
+                                                (add-message (format nil "The effects of the prayer are over. The ") sdl:*white* message-box-list)
+                                                (add-message (format nil "Barrier") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " can be ") sdl:*white* message-box-list)
+                                                (add-message (format nil "pierced") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " normally again.~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-angels-hastened
+                          :name "Prayer for intervention"
+                          :descr "When the angels arrive delayed, it takes them 30 turns less to arrive."
+                          :merge-func #'(lambda (world new-effect old-effect)
+                                          (setf (campaign-effect/cd old-effect) (campaign-effect/cd new-effect))
+                                          (when (campaign-effect/on-add-func new-effect)
+                                            (funcall (campaign-effect/on-add-func new-effect) world new-effect)))
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/effect-message-box world))))
+                                             (add-message (format nil "The priests have prayed ") sdl:*white* message-box-list)
+                                             (add-message (format nil "for divine intervention") sdl:*yellow* message-box-list)
+                                             (add-message (format nil " and their prayers were answered.~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/effect-message-box world))))
+                                                (add-message (format nil "The effects of the prayer are over. The ") sdl:*white* message-box-list)
+                                                (add-message (format nil "angels") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " shall ") sdl:*white* message-box-list)
+                                                (add-message (format nil "arrive as usual") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " from this time on.~%") sdl:*white* message-box-list))))

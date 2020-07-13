@@ -1,6 +1,6 @@
 (in-package :cotd)
 
-(set-level-modifier :id +lm-placement-player+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-player+ :type :level-mod-player-placement
                     :name "Player"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -15,7 +15,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-dead-player+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-dead-player+ :type :level-mod-player-placement
                     :name "Dead player"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -32,7 +32,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-angel-chrome+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-angel-chrome+ :type :level-mod-player-placement
                     :name "Celestial Communion (as Chrome angel)"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -46,7 +46,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-angel-trinity+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-angel-trinity+ :type :level-mod-player-placement
                     :name "Celestial Communion (as Trinity mimics)"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -60,7 +60,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-demon-crimson+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-demon-crimson+ :type :level-mod-player-placement
                     :name "Pandemonium Hierarchy (as Crimson imp)"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -73,7 +73,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-demon-shadow+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-demon-shadow+ :type :level-mod-player-placement
                     :name "Pandemonium Hierarchy (as Shadow imp)"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -86,7 +86,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-demon-malseraph+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-demon-malseraph+ :type :level-mod-player-placement
                     :name "Pandemonium Hierarchy (as Malseraph's puppet)"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -99,7 +99,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-military-chaplain+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-military-chaplain+ :type :level-mod-player-placement
                     :name "Military (as Chaplain)"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -118,7 +118,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-military-scout+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-military-scout+ :type :level-mod-player-placement
                     :name "Military (as Scout)"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -134,7 +134,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-priest+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-priest+ :type :level-mod-player-placement
                     :name "Church"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -150,7 +150,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-satanist+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-satanist+ :type :level-mod-player-placement
                     :name "Satanists"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -166,7 +166,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-eater+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-eater+ :type :level-mod-player-placement
                     :name "Eater of the dead"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -182,7 +182,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-skinchanger+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-skinchanger+ :type :level-mod-player-placement
                     :name "Skinchanger"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -198,7 +198,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-thief+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-thief+ :type :level-mod-player-placement
                     :name "Thief"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -214,7 +214,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-ghost+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-ghost+ :type :level-mod-player-placement
                     :name "Lost soul"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))
@@ -230,7 +230,7 @@
                                                                 func-list)
                                                           func-list)))
 
-(set-level-modifier :id +lm-placement-test+ :type +level-mod-player-placement+
+(set-level-modifier :id +lm-placement-test+ :type :level-mod-player-placement
                     :name "Test"
                     :overall-post-process-func-list #'(lambda ()
                                                         (let ((func-list ()))

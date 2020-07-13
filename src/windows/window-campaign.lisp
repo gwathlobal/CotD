@@ -164,7 +164,8 @@
     (setf msg-str (format nil "~A~%~%To display help, press '?'." msg-str))
     
     (setf *current-window* (make-instance 'display-msg-window
-                                          :msg-line msg-str))
+                                          :msg-line msg-str
+                                          :w 400))
     (make-output *current-window*)
     (run-window *current-window*))
   )

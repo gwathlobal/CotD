@@ -338,7 +338,7 @@
                      (with-slots (cur-step cur-sel menu-items scenario months-list cur-mission-type cur-sector cur-month cur-feat cur-faction cur-specific-faction) win
                        (with-slots (world world-sector mission
                                     avail-mission-type-list avail-world-sector-type-list
-                                    overall-lvl-mods-list always-lvl-mods-list select-feats-list select-items-list select-weather-list
+                                    overall-lvl-mods-list always-lvl-mods-list select-feats-list select-items-list select-weather-list select-misc-list
                                     avail-faction-list cur-faction-list specific-faction-list)
                            scenario
                          (cond
@@ -367,37 +367,35 @@
                             (progn
                               (let ((lvl-mod (nth cur-sel overall-lvl-mods-list)))
                                 (when (not (find lvl-mod always-lvl-mods-list))
-                                  ;; make a radio button for the controlled-by lvl mods
-                                  (when (= (lm-type lvl-mod) +level-mod-controlled-by+)
-                                    (scenario-add/remove-lvl-mod scenario lvl-mod))
-                                  
-                                  ;; make checkboxes for the feats lvl mods
-                                  (when (= (lm-type lvl-mod) +level-mod-sector-feat+)
-                                    (if (find lvl-mod select-feats-list)
-                                      (progn
-                                        (scenario-add/remove-lvl-mod scenario lvl-mod :add-general nil))
-                                      (progn
-                                        (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t))))
-                                  
-                                  ;; make checkboxes for the items lvl mods
-                                  (when (= (lm-type lvl-mod) +level-mod-sector-item+)
-                                    (if (find lvl-mod select-items-list)
-                                      (progn
-                                        (scenario-add/remove-lvl-mod scenario lvl-mod :add-general nil))
-                                      (progn
-                                        (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t))))
-                                  
-                                  ;; make a radio button for the time of day lvl mods
-                                  (when (= (lm-type lvl-mod) +level-mod-time-of-day+)
-                                    (scenario-add/remove-lvl-mod scenario lvl-mod))
-                                  
-                                  ;; make checkboxes for the weather lvl mods
-                                  (when (= (lm-type lvl-mod) +level-mod-weather+)
-                                    (if (find lvl-mod select-weather-list)
-                                      (progn
-                                        (scenario-add/remove-lvl-mod scenario lvl-mod :add-general nil))
-                                      (progn
-                                        (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t))))
+                                  (case (lm-type lvl-mod)
+                                    ;; make a radio button for the controlled-by lvl mods
+                                    (:level-mod-controlled-by (scenario-add/remove-lvl-mod scenario lvl-mod))
+                                    ;; make checkboxes for the feats lvl mods
+                                    (:level-mod-sector-feat (if (find lvl-mod select-feats-list)
+                                                              (progn
+                                                                (scenario-add/remove-lvl-mod scenario lvl-mod :add-general nil))
+                                                              (progn
+                                                                (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t))))
+                                    ;; make checkboxes for the items lvl mods
+                                    (:level-mod-sector-item (if (find lvl-mod select-items-list)
+                                                              (progn
+                                                                (scenario-add/remove-lvl-mod scenario lvl-mod :add-general nil))
+                                                              (progn
+                                                                (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t))))
+                                    ;; make a radio button for the time of day lvl mods
+                                    (:level-mod-tod (scenario-add/remove-lvl-mod scenario lvl-mod))
+                                    ;; make checkboxes for the weather lvl mods
+                                    (:level-mod-weather (if (find lvl-mod select-weather-list)
+                                                          (progn
+                                                            (scenario-add/remove-lvl-mod scenario lvl-mod :add-general nil))
+                                                          (progn
+                                                            (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t))))
+                                    ;; make checkboxes for misc lvl mods
+                                    (:level-mod-misc (if (find lvl-mod select-misc-list)
+                                                       (progn
+                                                         (scenario-add/remove-lvl-mod scenario lvl-mod :add-general nil))
+                                                       (progn
+                                                         (scenario-add/remove-lvl-mod scenario lvl-mod :add-general t)))))
                                   
                                   (generate-feats-for-world-sector world-sector (world-map world))
                                   (scenario-adjust-lvl-mods-after-sector-regeneration scenario)

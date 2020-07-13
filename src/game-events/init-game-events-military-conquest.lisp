@@ -13,7 +13,6 @@
                                                                       (> (total-angels (level world)) 0)
                                                                       (null (get-military-conquest-check-alive-sigils (level world))))
                                                                  (and (/= (loyal-faction *player*) +faction-type-angels+)
-                                                                      (zerop (nth +faction-type-satanists+ (total-faction-list (level world))))
                                                                       (> (total-angels (level world)) 0)
                                                                       (null (get-military-conquest-check-alive-sigils (level world)))))
                                                            t
@@ -81,7 +80,6 @@
                                                                       (> (nth +faction-type-military+ (total-faction-list (level world))) 0)
                                                                       (null (get-military-conquest-check-alive-sigils (level world))))
                                                                  (and (/= (loyal-faction *player*) +faction-type-military+)
-                                                                      (zerop (nth +faction-type-satanists+ (total-faction-list (level world))))
                                                                       (> (nth +faction-type-military+ (total-faction-list (level world))) 0)
                                                                       (null (get-military-conquest-check-alive-sigils (level world)))))
                                                            t

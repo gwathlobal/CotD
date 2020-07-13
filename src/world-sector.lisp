@@ -54,9 +54,9 @@
    (feats :initform () :initarg :feats :accessor feats) ;; auxiliary features of the sector, like rivers present
    ;; ((+lm-feat-river+ (:n :s :w :e)) (+lm-feat-sea+ (:n :s :w :e)) (+lm-feat-barricade+ (:n :s :w :e)) (+lm-feat-church+) (+lm-feat-lair+) (+lm-feat-library+))
    (items :initform () :initarg :items :accessor items) ;; global items in in this sector
-   ;; (<level modifier id of type +level-mod-sector-item+> ...)
+   ;; (<level modifier id of type :level-mod-sector-item ...)
    (controlled-by :initform +lm-controlled-by-none+ :initarg :controlled-by :accessor controlled-by)
-   ;; <level modifier id of type +level-mod-controlled-by+>
+   ;; <level modifier id of type :level-mod-controlled-by
    (mission :initform nil :initarg :mission :accessor mission)
    ))
 
