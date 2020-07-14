@@ -155,3 +155,27 @@
                                                 (add-message (format nil " shall ") sdl:*white* message-box-list)
                                                 (add-message (format nil "arrive as usual") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " from this time on.~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-eater-agitated
+                          :name "Primordials agitated"
+                          :descr "The Primordials are awakening from their slumber. Whenever eaters of the dead are present in a mission, they are present en mass."
+                          :merge-func #'(lambda (world new-effect old-effect)
+                                          (setf (campaign-effect/cd old-effect) (campaign-effect/cd new-effect))
+                                          (when (campaign-effect/on-add-func new-effect)
+                                            (funcall (campaign-effect/on-add-func new-effect) world new-effect)))
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/effect-message-box world))))
+                                             (add-message (format nil "The ") sdl:*white* message-box-list)
+                                             (add-message (format nil "primordials") sdl:*yellow* message-box-list)
+                                             (add-message (format nil " are ") sdl:*white* message-box-list)
+                                             (add-message (format nil "awakening") sdl:*yellow* message-box-list)
+                                             (add-message (format nil " from their slumber.~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/effect-message-box world))))
+                                                (add-message (format nil "The ") sdl:*white* message-box-list)
+                                                (add-message (format nil "primordials") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " are falling into ") sdl:*white* message-box-list)
+                                                (add-message (format nil "a sleep") sdl:*yellow* message-box-list)
+                                                (add-message (format nil ".~%") sdl:*white* message-box-list))))

@@ -58,6 +58,8 @@
                                                                    )))
                                            (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-normal-forest
                                                           :world-sector-normal-port
@@ -181,6 +183,8 @@
                                                                    )))
                                            (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-normal-forest
                                                           :world-sector-normal-port
@@ -317,6 +321,8 @@
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-present) faction-list)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-normal-forest
                                                           :world-sector-normal-port
@@ -470,6 +476,8 @@
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-present) faction-list)
                                              (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-normal-forest
                                                           :world-sector-normal-port
@@ -612,8 +620,9 @@
                                                                    )))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
                                              (push (list +faction-type-demons+ :mission-faction-present) faction-list)
-                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
-                                             )
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-corrupted-forest
                                                           :world-sector-corrupted-port
@@ -741,8 +750,9 @@
                                                                    )))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
                                              (push (list +faction-type-demons+ :mission-faction-present) faction-list)
-                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
-                                             )
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-abandoned-forest
                                                           :world-sector-abandoned-port
@@ -857,12 +867,12 @@
                                          (let ((faction-list (list (list +faction-type-angels+ :mission-faction-present))))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
                                              (push (list +faction-type-demons+ :mission-faction-present) faction-list)
-                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
-                                             )
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-present) faction-list)
-                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list)
-                                             )
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-corrupted-forest
                                                           :world-sector-corrupted-port
@@ -993,12 +1003,12 @@
                                          (let ((faction-list (list (list +faction-type-angels+ :mission-faction-present))))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
                                              (push (list +faction-type-demons+ :mission-faction-present) faction-list)
-                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
-                                             )
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-military+)
                                              (push (list +faction-type-military+ :mission-faction-present) faction-list)
-                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list)
-                                             )
+                                             (push (list +faction-type-military+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-corrupted-forest
                                                           :world-sector-corrupted-port
@@ -1119,8 +1129,9 @@
                                                                    )))
                                            (if (= (controlled-by world-sector) +lm-controlled-by-demons+)
                                              (push (list +faction-type-demons+ :mission-faction-present) faction-list)
-                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
-                                             )
+                                             (push (list +faction-type-demons+ :mission-faction-delayed) faction-list))
+                                           (unless (find +lm-misc-eater-incursion+ (level-modifier-list (mission world-sector)))
+                                             (push (list +faction-type-eater+ :mission-faction-absent) faction-list))
                                            faction-list))
                   :world-sector-for-custom-scenario (list :world-sector-normal-forest
                                                           :world-sector-normal-port

@@ -18,6 +18,8 @@
                                         :campaign-command-military-add-army
                                         :campaign-command-priest-delay-demons
                                         :campaign-command-priest-hasten-angels
+                                        :campaign-command-eater-wait
+                                        :campaign-command-eater-agitated
                                         ))
 
 (defclass campaign-command ()

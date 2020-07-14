@@ -61,6 +61,7 @@
 (defconstant +lm-feat-hell-engine+ 34)
 (defconstant +lm-feat-hell-flesh-storage+ 35)
 (defconstant +lm-weather-acid-rain+ 36)
+(defconstant +lm-misc-eater-incursion+ 37)
 
 (defparameter *level-modifiers* (make-array (list 0) :adjustable t))
 

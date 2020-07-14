@@ -475,7 +475,7 @@
           )
 
       ;; add AI commands before mission results are processed
-      (loop for faction-type in (list +faction-type-demons+ +faction-type-angels+ +faction-type-military+ +faction-type-satanists+ +faction-type-church+) do
+      (loop for faction-type in (list +faction-type-demons+ +faction-type-angels+ +faction-type-military+ +faction-type-satanists+ +faction-type-church+ +faction-type-eater+) do
         (when (not (gethash faction-type (world/commands *world*)))
           (let ((command-hash (make-hash-table))
                 (selected-command nil))

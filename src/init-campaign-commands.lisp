@@ -64,6 +64,22 @@
                                          )
                       )
 
+(set-campaign-command :id :campaign-command-eater-wait
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Wait & see")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Wait for 7 turns.")
+                      :faction-type +faction-type-eater+
+                      :disabled nil
+                      :cd 7
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore world campaign-command))
+                                         t
+                                         )
+                      )
+
 (set-campaign-command :id :campaign-command-satanist-sacrifice
                       :name-func #'(lambda (world)
                                      (declare (ignore world))
@@ -124,7 +140,7 @@
                                       "Seduce willing undividuals to recreate the once destroyed satanist' lair.")
                       :faction-type +faction-type-satanists+
                       :disabled nil
-                      :cd 12
+                      :cd 6
                       :priority 10
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
@@ -160,7 +176,7 @@
                                       "Rebuild a destroyed dimensional engine.")
                       :faction-type +faction-type-demons+
                       :disabled nil
-                      :cd 15
+                      :cd 12
                       :priority 1
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore campaign-command))
@@ -522,3 +538,49 @@
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
                                                  (add-campaign-effect world :id :campaign-effect-angels-hastened :cd 5)))
+
+(set-campaign-command :id :campaign-command-eater-agitated
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Awaken Primordials")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Awaken Primordials to make the more present during missions.")
+                      :faction-type +faction-type-military+
+                      :disabled nil
+                      :cd 9
+                      :priority 1
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         (let* ((normal-sectors 0)
+                                                (corrupted-sectors 0)
+                                                (abandoned-sectors 0))
+                                                
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                           (eq (wtype world-sector) :world-sector-normal-port)
+                                                           (eq (wtype world-sector) :world-sector-normal-island)
+                                                           (eq (wtype world-sector) :world-sector-normal-residential)
+                                                           (eq (wtype world-sector) :world-sector-normal-lake))
+                                                   (incf normal-sectors))
+                                                 (when (or (eq (wtype world-sector) :world-sector-abandoned-forest)
+                                                           (eq (wtype world-sector) :world-sector-abandoned-port)
+                                                           (eq (wtype world-sector) :world-sector-abandoned-island)
+                                                           (eq (wtype world-sector) :world-sector-abandoned-residential)
+                                                           (eq (wtype world-sector) :world-sector-abandoned-lake))
+                                                   (incf abandoned-sectors))
+                                                 (when (or (eq (wtype world-sector) :world-sector-corrupted-forest)
+                                                           (eq (wtype world-sector) :world-sector-corrupted-port)
+                                                           (eq (wtype world-sector) :world-sector-corrupted-island)
+                                                           (eq (wtype world-sector) :world-sector-corrupted-residential)
+                                                           (eq (wtype world-sector) :world-sector-corrupted-lake))
+                                                   (incf corrupted-sectors)))))
+                                           (if (and (>= abandoned-sectors (+ corrupted-sectors normal-sectors))
+                                                    (not (find-campaign-effects-by-id world :campaign-effect-eater-agitated)))
+                                               t
+                                               nil)))
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                 (add-campaign-effect world :id :campaign-effect-eater-agitated :cd 5)))

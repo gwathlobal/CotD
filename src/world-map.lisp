@@ -515,6 +515,7 @@
                      (loop for mission-type-id in (getf (world/missions-by-slot-type world) mission-slot-type)
                            for mission-type = (get-mission-type-by-id mission-type-id)
                            when (and (null (mission world-sector))
+                                     (eq (controlled-by world-sector) +lm-controlled-by-none+)
                                      (or (eq (wtype world-sector) :world-sector-corrupted-forest)
                                          (eq (wtype world-sector) :world-sector-corrupted-lake)
                                          (eq (wtype world-sector) :world-sector-corrupted-residential)
@@ -618,9 +619,6 @@
         (progn
           (setf world-sector (aref (cells (world-map world)) x y))))
       
-      ;; set up random factions
-      (scenario-adjust-factions scenario)
-
       ;; make angels delayed if portals are corrupted
       (when (and (find-campaign-effects-by-id world :campaign-effect-demon-corrupt-portals)
                  (not (eql mission-type-id :mission-type-celestial-purge))
@@ -635,8 +633,6 @@
       (scenario-set-avail-lvl-mods scenario)
 
       (when off-map
-        (loop for lvl-mod in avail-controlled-list do
-          (format t "LVL-MOD ~A~%" (name lvl-mod)))
         ;; set a random controlled-by lvl-mod
         (scenario-add/remove-lvl-mod scenario (nth (random (length avail-controlled-list)) avail-controlled-list) :apply-scenario-func nil)
 
@@ -651,8 +647,7 @@
               (scenario-add/remove-lvl-mod scenario lvl-mod :apply-scenario-func nil))
 
         (scenario-adjust-lvl-mods-after-sector-regeneration scenario)
-
-        (scenario-adjust-factions scenario)
+        
         )
 
       ;; a time of day
@@ -665,8 +660,18 @@
               do
                  (scenario-add/remove-lvl-mod scenario lvl-mod :apply-scenario-func nil))
 
+      ;; set up special lvl mods
+      (if (find-campaign-effects-by-id world :campaign-effect-eater-agitated)
+        (progn
+          (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id +lm-misc-eater-incursion+) :apply-scenario-func nil))
+        (progn
+          (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id +lm-misc-eater-incursion+) :apply-scenario-func nil :add-general nil)))
+
       (setf (world-sector mission) world-sector)
       (setf (mission (world-sector mission)) mission)
+      
+      ;; set up random functions
+      (scenario-adjust-factions scenario)
       
       mission)))
 

@@ -181,7 +181,7 @@
   )
 
 (defun place-ai-primordial-on-level (level world-sector mission world)
-  (declare (ignore world-sector world))
+  (declare (ignore world world-sector))
   
   (when (and (/= (player-lvl-mod-placement-id mission) +lm-placement-eater+)
              (/= (player-lvl-mod-placement-id mission) +lm-placement-skinchanger+)
@@ -196,6 +196,15 @@
                                       (list (list +mob-type-skinchanger-melee+ 1 nil)))
                               #'find-unoccupied-place-water))
   )
+
+(defun place-mass-primordials-on-level (level world-sector mission world)
+  (declare (ignore world world-sector mission))
+  (loop repeat 20
+        do
+           (populate-level-with-mobs level (if (zerop (random 2))
+                                             (list (list +mob-type-eater-of-the-dead+ 1 nil))
+                                             (list (list +mob-type-skinchanger-melee+ 1 nil)))
+                                     #'find-unoccupied-place-water)))
 
 (defun place-ai-thief-on-level (level world-sector mission world)
   (declare (ignore world-sector world))
