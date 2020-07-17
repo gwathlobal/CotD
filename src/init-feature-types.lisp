@@ -335,6 +335,9 @@
 (set-feature-type (make-instance 'feature-type :id +feature-demonic-portal+ :glyph-idx +glyph-id-portal+ :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color nil :name "Demonic portal"
                                  ))
 
+(set-feature-type (make-instance 'feature-type :id +feature-divine-portal+ :glyph-idx +glyph-id-portal+ :glyph-color sdl:*cyan* :back-color nil :name "Divine portal"
+                                 ))
+
 (set-feature-type (make-instance 'feature-type :id +feature-corrupted-spores+ :glyph-idx +glyph-id-double-tilda+ :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* :name "Spores"
                                                :trait-blocks-vision 30 :trait-smoke +feature-corrupted-spores+ :trait-no-gravity t
                                                :can-merge-func #'(lambda (level feature-new)

@@ -163,7 +163,7 @@
         finally (setf (x mob) x (y mob) y (z mob) z)
                 (add-mob-to-level-list level mob)))
 
-(defun find-unoccupied-place-around (level mob sx sy sz)
+(defun find-unoccupied-place-around (level mob sx sy sz &key (no-center nil))
   (loop with min-x = sx
         with max-x = sx
         with min-y = sy
@@ -199,7 +199,10 @@
                                                                            (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                            (map-size mob))
                                                             (get-mob-move-mode mob))
-                               +connect-room-none+))
+                               +connect-room-none+)
+                           (or (null no-center)
+                               (and no-center
+                                    (or (/= x sx) (/= y sy)))))
                    do
                       (setf (x mob) x (y mob) y (z mob) sz)
                       (add-mob-to-level-list level mob)

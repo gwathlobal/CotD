@@ -828,7 +828,7 @@
                                                                    func-list)
 
                                                              ;; place outsider beasts
-                                                              (push #'place-outsider-beasts-on-level
+                                                             (push #'place-outsider-beasts-on-level
                                                                     func-list)
 
                                                              ;; place irradiated spots

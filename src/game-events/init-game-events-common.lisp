@@ -505,148 +505,114 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-angels+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (player-game-time world) (turns-for-delayed-angels (level world))) (turn-finished world))
+                                                         (if (and (turn-finished world)
+                                                                  (or (= (player-game-time world) (turns-for-delayed-angels (level world)))
+                                                                      (= (player-game-time world) (1- (turns-for-delayed-angels (level world))))
+                                                                      (= (player-game-time world) (1+ (turns-for-delayed-angels (level world))))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (logger (format nil "~%GAME-EVENT: The angels have arrived!~%"))
+                                                           ;; before arrivals
+                                                           ;; find suitable arrival points and place portals
+                                                           (when (= (player-game-time world) (1- (turns-for-delayed-angels (level world))))
+                                                             (logger (format nil "~%GAME-EVENT: The angels are about to arrive!~%"))
+                                                             (let ((portals ()))
+                                                               (setf portals (place-custom-portals (level world) +feature-divine-portal+ :max-portals 10 :map-margin 10 :distance 6 :test-mob-free t :test-repel-demons nil))
 
-                                                           ;; find suitale arrival points to accomodate chrome angels & trinity mimics
-                                                           (let ((angels-list (list (list +mob-type-angel+ *min-angels-number* nil))))
+                                                               (setf (delayed-angels-arrival-points (level world)) portals)))
+                                                           
+                                                           ;; at arrival
+                                                           ;; place chrome angels & trinity mimics to portals
+                                                           (when (= (player-game-time world) (turns-for-delayed-angels (level world)))
+                                                             (logger (format nil "~%GAME-EVENT: The angels are arriving!~%"))
+                                                             (let ((angels-list (list (list +mob-type-angel+ *min-angels-number* nil))))
+                                                               
+                                                               (if (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-angel-trinity+)
+                                                                 (push (list +mob-type-star-singer+ 1 t) angels-list)
+                                                                 (push (list +mob-type-star-singer+ 1 nil)
+                                                                       angels-list))
+                                                               
+                                                               (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-angel-chrome+)
+                                                                 (push (list +mob-type-angel+ 1 t)
+                                                                       angels-list))
+                                                               
+                                                               (place-angels-on-level-immediate (level world)
+                                                                                                :start-point-list (delayed-angels-arrival-points (level world))
+                                                                                                :create-player nil
+                                                                                                :angel-list angels-list)))
 
-                                                             (if (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-angel-trinity+)
-                                                               (push (list +mob-type-star-singer+ 1 t) angels-list)
-                                                               (push (list +mob-type-star-singer+ 1 nil)
-                                                                     angels-list))
-
-                                                             (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-angel-chrome+)
-                                                               (push (list +mob-type-angel+ 1 t)
-                                                                     angels-list))
-
-                                                             (loop for (angel-type angel-number is-player) in angels-list do
-                                                               (loop repeat angel-number do
-                                                                 (if (or (= angel-type +mob-type-star-singer+)
-                                                                         (= angel-type +mob-type-star-gazer+)
-                                                                         (= angel-type +mob-type-star-mender+))
-                                                                   (progn
-                                                                     (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%"))
-                                                                     (loop with arrival-point-list = (copy-list (delayed-angels-arrival-points (level world)))
-                                                                           with is-free = t
-                                                                           with mob1 = (if is-player
-                                                                                         (progn
-                                                                                           (setf (player-outside-level *player*) nil)
-                                                                                           *player*)
-                                                                                         (make-instance 'mob :mob-type +mob-type-star-singer+))
-                                                                           with mob2 = (if is-player
-                                                                                         (get-mob-by-id (second (mimic-id-list *player*)))
-                                                                                         (make-instance 'mob :mob-type +mob-type-star-gazer+))
-                                                                           with mob3 = (if is-player
-                                                                                         (get-mob-by-id(third (mimic-id-list *player*)))
-                                                                                         (make-instance 'mob :mob-type +mob-type-star-mender+))
-                                                                           while (> (length arrival-point-list) 0) 
-                                                                           for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
-                                                                           for x = (first random-arrival-point)
-                                                                           for y = (second random-arrival-point)
-                                                                           for z = (third random-arrival-point)
-                                                                           do
-                                                                              (setf arrival-point-list (remove random-arrival-point arrival-point-list))
-                                                                              (setf is-free t)
-                                                                              (check-surroundings x y t #'(lambda (dx dy)
-                                                                                                            (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
-                                                                                                                      (not (get-terrain-type-trait (get-terrain-* (level world) dx dy z) +terrain-trait-blocks-move-floor+)))
-                                                                                                              (setf is-free nil))))
-                                                                              (when is-free
-                                                                                
-                                                                                (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
-                                                                                (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
-                                                                                (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
-                                                                                (setf (name mob2) (name mob1) (name mob3) (name mob1))
-                                                                                
-                                                                                (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
-                                                                                (add-mob-to-level-list (level world) mob1)
-                                                                                (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
-                                                                                (add-mob-to-level-list (level world) mob2)
-                                                                                (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
-                                                                                (add-mob-to-level-list (level world) mob3)
-                                                                                
-                                                                                (loop-finish))))
-                                                                   (progn
-                                                                     (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place chrome angels~%"))
-                                                                     
-                                                                     (loop with arrival-point-list = (copy-list (delayed-angels-arrival-points (level world)))
-                                                                           with angel = (if is-player
-                                                                                          (progn
-                                                                                            (setf (player-outside-level *player*) nil)
-                                                                                            *player*)
-                                                                                          (make-instance 'mob :mob-type angel-type))
-                                                                           while (> (length arrival-point-list) 0) 
-                                                                           for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
-                                                                           for x = (first random-arrival-point)
-                                                                           for y = (second random-arrival-point)
-                                                                           for z = (third random-arrival-point)
-                                                                           do
-                                                                              (setf arrival-point-list (remove random-arrival-point arrival-point-list))
-                                                                              
-                                                                              (find-unoccupied-place-around (level world) angel x y z)
-                                                                              
-                                                                              (loop-finish))))
-                                                                     ))
-                                                             )
-                                                           )
-                               ))
+                                                           ;; after arrival
+                                                           ;; remove portals
+                                                           (when (= (player-game-time world) (1+ (turns-for-delayed-angels (level world))))
+                                                             (logger (format nil "~%GAME-EVENT: Divine portals removed!~%"))
+                                                             (loop for lvl-feature-id in (feature-id-list (level world))
+                                                                   for lvl-feature = (get-feature-by-id lvl-feature-id)
+                                                                   when (= (feature-type lvl-feature) +feature-divine-portal+) do
+                                                                     (remove-feature-from-level-list (level world) lvl-feature)
+                                                                     (remove-feature-from-world lvl-feature)))
+                                                           
+                                                           )))
 
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-demons+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (player-game-time world) (turns-for-delayed-demons (level world))) (turn-finished world))
+                                                         (if (and (turn-finished world)
+                                                                  (or (= (player-game-time world) (turns-for-delayed-demons (level world)))
+                                                                      (= (player-game-time world) (1- (turns-for-delayed-demons (level world))))
+                                                                      (= (player-game-time world) (1+ (turns-for-delayed-demons (level world))))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (logger (format nil "~%GAME-EVENT: The demons have arrived!~%"))
 
-                                                           ;; find suitale arrival points to accomodate demons
-                                                           (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
-                                                             (declare (ignore year month day min sec))
-                                                             (let ((demon-list (if (and (>= hour 7) (< hour 19))
-                                                                                  (list (list +mob-type-archdemon+ 1 nil)
-                                                                                        (list +mob-type-demon+ 15 nil)
-                                                                                        (list +mob-type-imp+ *min-imps-number* nil))
-                                                                                  (list (if (zerop (random 2))
-                                                                                          (list +mob-type-archdemon+ 1 nil)
-                                                                                          (list +mob-type-shadow-devil+ 1 nil))
-                                                                                        (list +mob-type-demon+ 7 nil)
-                                                                                        (list +mob-type-shadow-demon+ 8 nil)
-                                                                                        (list +mob-type-imp+ (truncate *min-imps-number* 2) nil)
-                                                                                        (list +mob-type-shadow-imp+ (truncate *min-imps-number* 2) nil)))))
-                                                               
-                                                               (if (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-demon-malseraph+)
-                                                                 (push (list +mob-type-malseraph-puppet+ 1 t) demon-list)
-                                                                 (push (list +mob-type-malseraph-puppet+ 1 nil) demon-list))
+                                                           ;; before arrivals
+                                                           ;; find suitable arrival points and place portals
+                                                           (when (= (player-game-time world) (1- (turns-for-delayed-demons (level world))))
+                                                             (logger (format nil "~%GAME-EVENT: The demons are about to arrive!~%"))
+                                                             (let ((portals ()))
+                                                               (setf portals (place-custom-portals (level world) +feature-demonic-portal+ :max-portals 10 :map-margin 10 :distance 6 :test-mob-free t :test-repel-demons t))
 
-                                                               (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-demon-crimson+)
-                                                                 (push (list +mob-type-imp+ 1 t) demon-list))
+                                                               (setf (delayed-demons-arrival-points (level world)) portals)))
+                                                           
+                                                           ;; at arrival
+                                                           ;; place demons
+                                                           (when (= (player-game-time world) (turns-for-delayed-demons (level world)))
+                                                             (logger (format nil "~%GAME-EVENT: The demons are arriving!~%"))
+                                                             (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
+                                                               (declare (ignore year month day min sec))
+                                                               (let ((demon-list (if (and (>= hour 7) (< hour 19))
+                                                                                   (list (list +mob-type-archdemon+ 1 nil)
+                                                                                         (list +mob-type-demon+ 15 nil)
+                                                                                         (list +mob-type-imp+ *min-imps-number* nil))
+                                                                                   (list (if (zerop (random 2))
+                                                                                           (list +mob-type-archdemon+ 1 nil)
+                                                                                           (list +mob-type-shadow-devil+ 1 nil))
+                                                                                         (list +mob-type-demon+ 7 nil)
+                                                                                         (list +mob-type-shadow-demon+ 8 nil)
+                                                                                         (list +mob-type-imp+ (truncate *min-imps-number* 2) nil)
+                                                                                         (list +mob-type-shadow-imp+ (truncate *min-imps-number* 2) nil)))))
+                                                                 
+                                                                 (if (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-demon-malseraph+)
+                                                                   (push (list +mob-type-malseraph-puppet+ 1 t) demon-list)
+                                                                   (push (list +mob-type-malseraph-puppet+ 1 nil) demon-list))
+                                                                 
+                                                                 (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-demon-crimson+)
+                                                                   (push (list +mob-type-imp+ 1 t) demon-list))
+                                                                 
+                                                                 (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-demon-shadow+)
+                                                                   (push (list +mob-type-shadow-imp+ 1 t) demon-list))
+                                                                 
+                                                                 (place-mobs-on-level-immediate (level world)
+                                                                                                :start-point-list (delayed-demons-arrival-points (level world))
+                                                                                                :create-player nil
+                                                                                                :mob-list demon-list
+                                                                                                :no-center t))))
 
-                                                               (when (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-demon-shadow+)
-                                                                 (push (list +mob-type-shadow-imp+ 1 t) demon-list))
-
-                                                               (loop for (demon-type demon-number is-player) in demon-list do
-                                                                 (loop repeat demon-number do
-                                                                   (loop with arrival-point-list = (copy-list (delayed-demons-arrival-points (level world)))
-                                                                         with demon = (if is-player
-                                                                                        (progn
-                                                                                          (setf (player-outside-level *player*) nil)
-                                                                                          *player*)
-                                                                                        (make-instance 'mob :mob-type demon-type))
-                                                                         while (> (length arrival-point-list) 0) 
-                                                                         for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
-                                                                         for x = (first random-arrival-point)
-                                                                         for y = (second random-arrival-point)
-                                                                         for z = (third random-arrival-point)
-                                                                         do
-                                                                            (setf arrival-point-list (remove random-arrival-point arrival-point-list))
-                                                                            
-                                                                            (find-unoccupied-place-around (level world) demon x y z)
-                                                                            
-                                                                            (loop-finish))))
-                                                               ))
-                                                           )
+                                                           ;; after arrival
+                                                           ;; remove portals
+                                                           (when (= (player-game-time world) (1+ (turns-for-delayed-demons (level world))))
+                                                             (logger (format nil "~%GAME-EVENT: Demonic portals removed!~%"))
+                                                             (loop for lvl-feature-id in (feature-id-list (level world))
+                                                                   for lvl-feature = (get-feature-by-id lvl-feature-id)
+                                                                   when (= (feature-type lvl-feature) +feature-demonic-portal+) do
+                                                                     (remove-feature-from-level-list (level world) lvl-feature)
+                                                                     (remove-feature-from-world lvl-feature))))
                                ))

@@ -236,7 +236,8 @@
                                     finally (format t "~%"))))
          (side-party-list (list (list :demons +feature-delayed-demons-arrival-point+)
                                 (list :military +feature-delayed-military-arrival-point+)
-                                (list :angels +feature-delayed-angels-arrival-point+))))
+                                (list :angels +feature-delayed-angels-arrival-point+)
+                                )))
     
     (unless (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
       (push (list :angels +feature-start-place-angels+) side-party-list))
@@ -635,13 +636,13 @@
                                         (list +mob-type-wisp+ 9 nil))
                             #'find-unoccupied-place-inside)
 
-  (populate-level-with-mobs level (list (list +mob-type-fiend+ 9 nil))
+  (populate-level-with-mobs level (list (list +mob-type-fiend+ 16 nil))
                             #'find-unoccupied-place-inside)
   
   )
 
 (defun place-demonic-sigils-on-level (level world-sector mission world)
-  (declare (ignore world-sector world mission))
+  (declare (ignore world-sector mission))
   
   (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%"))
   
@@ -653,7 +654,25 @@
              (setf sigil (make-instance 'mob :mob-type +mob-type-demon-sigil+))
              (setf (x sigil) (x lvl-feature) (y sigil) (y lvl-feature) (z sigil) (z lvl-feature))
              (add-mob-to-level-list level sigil)
-             (set-mob-effect sigil :effect-type-id +mob-effect-demonic-sigil+ :actor-id (id sigil) :cd t))
+             (set-mob-effect sigil :effect-type-id +mob-effect-demonic-sigil+ :actor-id (id sigil) :cd t)
+
+             (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
+               (declare (ignore year month day min sec))
+               (let ((demon-list (if (and (>= hour 7) (< hour 19))
+                                   (list (list +mob-type-demon+ 3 nil)
+                                         (list +mob-type-imp+ 4 nil))
+                                   (list (list +mob-type-demon+ 2 nil)
+                                         (list +mob-type-shadow-demon+ 1 nil)
+                                         (list +mob-type-imp+ 1 nil)
+                                         (list +mob-type-shadow-imp+ 3 nil)))))
+                 (place-mobs-on-level-immediate level
+                                                :start-point-list (list (list (1+ (x sigil)) (1+ (y sigil)) (z sigil))
+                                                                        (list (1- (x sigil)) (1+ (y sigil)) (z sigil))
+                                                                        (list (1+ (x sigil)) (1- (y sigil)) (z sigil))
+                                                                        (list (1- (x sigil)) (1- (y sigil)) (z sigil)))
+                                                :create-player nil
+                                                :mob-list demon-list
+                                                :no-center nil))))
   )
 
 (defun place-demonic-machines-on-level (level world-sector mission world)

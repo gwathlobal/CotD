@@ -250,7 +250,7 @@
   (logger (format nil "OVERALL-POST-PROCESS-FUNC: Set up turns for delayed arrival~%"))
 
   ;; set up delayed arrival for demons
-  (setf (turns-for-delayed-demons level) 160)
+  (setf (turns-for-delayed-demons level) 130)
 
   (when (find-campaign-effects-by-id world :campaign-effect-demons-delayed)
     (incf (turns-for-delayed-demons level) 30))
@@ -279,6 +279,59 @@
       (setf (turns-for-delayed-military level) 220)))
   )
 
+(defun place-custom-portals (level portal-feature-id &key (map-margin 30) (distance 6) (max-portals 1) (test-mob-free t) (test-repel-demons nil) (move-type +connect-map-move-walk+))
+  (let ((portals ()))
+    ;; find place for portals
+    (loop with max-x = (- (array-dimension (terrain level) 0) (* map-margin 2))
+          with max-y = (- (array-dimension (terrain level) 1) (* map-margin 2))
+          for free-place = t
+          with z = 2
+          for x = (+ (random max-x) map-margin)
+          for y = (+ (random max-y) map-margin)
+          while (< (length portals) max-portals) do
+            (check-surroundings x y t #'(lambda (dx dy)
+                                          (when (or (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move+)
+                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move-floor+))
+                                                    (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-water+))
+                                            (setf free-place nil))))
+            (when (and free-place
+                       (/= (get-level-connect-map-value level x y z 1 move-type) +connect-room-none+)
+                       (not (find (list x y 2) portals :test #'(lambda (a b)
+                                                                 (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) distance)
+                                                                   t
+                                                                   nil)
+                                                                 )))
+                       ;; test if the portal dst place has no mob
+                       (if (or (null test-mob-free)
+                               (not (get-mob-* level x y z)))
+                         t
+                         nil)
+                       ;; test if the portal dst place is far from repel-demons feature
+                       (if (or (null test-repel-demons)
+                               (loop for feature-id in (feature-id-list level)
+                                     for feature = (get-feature-by-id feature-id)
+                                     with result = t
+                                     when (and (= (feature-type feature) +feature-start-repel-demons+)
+                                               (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
+                                       do
+                                          (setf result nil)
+                                          (loop-finish)
+                                     when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
+                                               (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
+                                       do
+                                          (setf result nil)
+                                          (loop-finish)
+                                     finally (return result)))
+                         t
+                         nil)
+                       )
+              (push (list x y z) portals)))
+    ;; place portals
+    (loop for (x y z) in portals do
+      ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id portal-feature-id)) x y z)
+      (add-feature-to-level-list level (make-instance 'feature :feature-type portal-feature-id :x x :y y :z z)))
+    portals))
+
 (defun place-demonic-portals (level world-sector mission world)
   (declare (ignore world-sector mission world))
   (logger (format nil "OVERALL-POST-PROCESS-FUNC: Placing demonic portals~%"))
@@ -290,51 +343,35 @@
           (remove-feature-from-level-list level lvl-feature))
   
   ;; add portals
-  (let ((portals ())
-        (max-portals 6))
-    (loop with max-x = (- (array-dimension (terrain level) 0) 60)
-          with max-y = (- (array-dimension (terrain level) 1) 60)
-          with cur-portal = 0
-          for free-place = t
-          for x = (+ (random max-x) 30)
-          for y = (+ (random max-y) 30)
-          while (< (length portals) max-portals) do
-            (check-surroundings x y t #'(lambda (dx dy)
-                                          (when (or (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-blocks-move+)
-                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-blocks-move-floor+))
-                                                    (get-terrain-type-trait (get-terrain-* level dx dy 2) +terrain-trait-water+))
-                                            (setf free-place nil))))
-            (when (and free-place
-                       (not (find (list x y 2) portals :test #'(lambda (a b)
-                                                                 (if (< (get-distance-3d (first a) (second a) (third a) (first b) (second b) (third b)) 10)
-                                                                   t
-                                                                   nil)
-                                                                 )))
-                       (loop for feature-id in (feature-id-list level)
-                             for feature = (get-feature-by-id feature-id)
-                             with result = t
-                             when (and (= (feature-type feature) +feature-start-repel-demons+)
-                                       (< (get-distance x y (x feature) (y feature)) *repel-demons-dist*))
-                               do
-                                  (setf result nil)
-                                  (loop-finish)
-                             when (and (= (feature-type feature) +feature-start-strong-repel-demons+)
-                                       (< (get-distance x y (x feature) (y feature)) *repel-demons-dist-strong*))
-                               do
-                                  (setf result nil)
-                                  (loop-finish)
-                             finally (return result)))
-              (push (list x y 2) portals)
-              (incf cur-portal)))
+  (let ((portals ()))
+    (setf portals (place-custom-portals level +feature-demonic-portal+ :max-portals 6 :distance 10 :test-mob-free t :test-repel-demons t))
+
     (loop for (x y z) in portals do
-      ;;(format t "PLACE PORTAL ~A AT (~A ~A ~A)~%" (name (get-feature-type-by-id +feature-demonic-portal+)) x y z)
-      (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-demonic-portal+ :x x :y y :z z))
-      (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-start-place-demons+ :x x :y y :z z))))
-  )
+      (add-feature-to-level-list level (make-instance 'feature :feature-type +feature-start-place-demons+ :x x :y y :z z)))))
 
 ;;=======================
 ;; Minor Placement funcs
 ;;=======================
+
+(defun place-mobs-on-level-immediate (level &key start-point-list create-player mob-list no-center)
+  (loop for (mob-type mob-number is-player) in mob-list do
+    (loop repeat mob-number do
+      (loop with arrival-point-list = (copy-list start-point-list)
+            with mob = (cond
+                         ((and is-player create-player) (make-instance 'player :mob-type mob-type))
+                         ((and is-player (not create-player)) (progn (setf (player-outside-level *player*) nil) *player*))
+                         (t (make-instance 'mob :mob-type mob-type)))
+            while (> (length arrival-point-list) 0) 
+            for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
+            for x = (first random-arrival-point)
+            for y = (second random-arrival-point)
+            for z = (third random-arrival-point)
+            do
+               (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+               
+               (find-unoccupied-place-around level mob x y z :no-center no-center)
+               
+               (loop-finish)))))
 
 (defun place-demons-on-level (level world-sector mission world demon-list)
   (declare (ignore world world-sector))
@@ -348,28 +385,16 @@
                  (faction-list mission))
     
     (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place present demons~%"))
-    (loop for (demon-type demon-number is-player) in demon-list do
-      (loop repeat demon-number do
-        (loop with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                           (= (feature-type a) +feature-start-place-demons+))
-                                                       (feature-id-list level)
-                                                       :key #'(lambda (b)
-                                                                (get-feature-by-id b)))
-              while (> (length arrival-point-list) 0) 
-              for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
-              for lvl-feature = (get-feature-by-id random-arrival-point-id)
-              for x = (x lvl-feature)
-              for y = (y lvl-feature)
-              for z = (z lvl-feature)
-              do
-                 (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
-                 (if is-player
-                   (progn
-                     (setf *player* (make-instance 'player :mob-type demon-type))
-                     (find-unoccupied-place-around level *player* x y z))
-                   (find-unoccupied-place-around level (make-instance 'mob :mob-type demon-type) x y z))
-                 
-                 (loop-finish)))))
+
+    (place-mobs-on-level-immediate level
+                                   :start-point-list (loop for lvl-feature-id in (remove +feature-start-place-demons+ (feature-id-list level)
+                                                                                         :key #'(lambda (a)
+                                                                                                  (feature-type (get-feature-by-id a))))
+                                                           for lvl-feature = (get-feature-by-id lvl-feature-id)
+                                                           collect (list (x lvl-feature) (y lvl-feature) (z lvl-feature)))
+                                   :create-player t
+                                   :mob-list demon-list
+                                   :no-center t))
 
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-demons+)
@@ -393,6 +418,79 @@
     )
   )
 
+(defun place-angels-on-level-immediate (level &key start-point-list create-player angel-list)
+  (loop for (angel-type angel-number is-player) in angel-list do
+    (loop repeat angel-number do
+      (if (or (= angel-type +mob-type-star-singer+)
+              (= angel-type +mob-type-star-gazer+)
+              (= angel-type +mob-type-star-mender+))
+        (progn
+          (logger (format nil "   PLACE-ANGELS-ON-LEVEL-IMMEDIATE: Place trinity mimics~%"))
+          (loop with is-free = t
+                with mob1 = (cond
+                              ((and is-player create-player) (make-instance 'player :mob-type +mob-type-star-singer+))
+                              ((and is-player (not create-player)) (progn (setf (player-outside-level *player*) nil) *player*))
+                              (t (make-instance 'mob :mob-type +mob-type-star-singer+)))
+                with mob2 = (cond
+                              ((and is-player create-player) (make-instance 'player :mob-type +mob-type-star-gazer+))
+                              ((and is-player (not create-player)) (get-mob-by-id (second (mimic-id-list *player*))))
+                              (t (make-instance 'mob :mob-type +mob-type-star-gazer+)))
+                with mob3 = (cond
+                              ((and is-player create-player) (make-instance 'player :mob-type +mob-type-star-mender+))
+                              ((and is-player (not create-player)) (get-mob-by-id (third (mimic-id-list *player*))))
+                              (t (make-instance 'mob :mob-type +mob-type-star-mender+)))
+                with arrival-point-list = (copy-list start-point-list)
+                while (> (length arrival-point-list) 0) 
+                for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
+                for x = (first random-arrival-point)
+                for y = (second random-arrival-point)
+                for z = (third random-arrival-point)
+                do
+                   (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+                   (setf is-free t)
+                   (check-surroundings x y t #'(lambda (dx dy)
+                                                 (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
+                                                           (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move-floor+)))
+                                                   (setf is-free nil))))
+                   (when is-free
+                     
+                     (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
+                     (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
+                     (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
+                     (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                     
+                     (when is-player
+                       (setf *player* mob1))
+                     
+                     (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
+                     (add-mob-to-level-list level mob1)
+                     (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
+                     (add-mob-to-level-list level mob2)
+                     (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
+                     (add-mob-to-level-list level mob3)
+                     
+                     (loop-finish))))
+        (progn
+          (logger (format nil "   PLACE-ANGELS-ON-LEVEL-IMMEDIATE: Place chrome angels~%"))
+          
+          (loop with arrival-point-list = (copy-list start-point-list)
+                with angel = (cond
+                              ((and is-player create-player) (make-instance 'player :mob-type angel-type))
+                              ((and is-player (not create-player)) (progn (setf (player-outside-level *player*) nil) *player*))
+                              (t (make-instance 'mob :mob-type angel-type)))
+                while (> (length arrival-point-list) 0) 
+                for random-arrival-point = (nth (random (length arrival-point-list)) arrival-point-list)
+                for x = (first random-arrival-point)
+                for y = (second random-arrival-point)
+                for z = (third random-arrival-point)
+                do
+                   (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+                   
+                   (find-unoccupied-place-around level angel x y z :no-center t)
+                   
+                   (loop-finish))))
+          )))
+
 (defun place-angels-on-level (level world-sector mission world angel-list)
   (declare (ignore world-sector world))
   
@@ -405,79 +503,17 @@
                        nil))
                  (faction-list mission))
     (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place present angels~%"))
-    
-    (loop for (angel-type angel-number is-player) in angel-list do
-      (loop repeat angel-number do
-        (if (or (= angel-type +mob-type-star-singer+)
-                (= angel-type +mob-type-star-gazer+)
-                (= angel-type +mob-type-star-mender+))
-          (progn
-            (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place trinity mimics~%"))
-            (loop with is-free = t
-                  with mob1 = (if is-player (make-instance 'player :mob-type +mob-type-star-singer+) (make-instance 'mob :mob-type +mob-type-star-singer+))
-                  with mob2 = (if is-player (make-instance 'player :mob-type +mob-type-star-gazer+) (make-instance 'mob :mob-type +mob-type-star-gazer+))
-                  with mob3 = (if is-player (make-instance 'player :mob-type +mob-type-star-mender+) (make-instance 'mob :mob-type +mob-type-star-mender+))
-                  with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                                      (= (feature-type a) +feature-start-place-angels+))
-                                                                  (feature-id-list level)
-                                                                  :key #'(lambda (b)
-                                                                           (get-feature-by-id b)))
-                         while (> (length arrival-point-list) 0) 
-                         for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
-                         for lvl-feature = (get-feature-by-id random-arrival-point-id)
-                         for x = (x lvl-feature)
-                         for y = (y lvl-feature)
-                         for z = (z lvl-feature)
-                         do
-                            (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
-                            (setf is-free t)
-                            (check-surroundings x y t #'(lambda (dx dy)
-                                                          (when (or (not (eq (check-move-on-level mob1 dx dy z) t))
-                                                                    (not (get-terrain-type-trait (get-terrain-* level dx dy z) +terrain-trait-blocks-move-floor+)))
-                                                            (setf is-free nil))))
-                            (when is-free
-                              
-                              (setf (mimic-id-list mob1) (list (id mob1) (id mob2) (id mob3)))
-                              (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
-                              (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
-                              (setf (name mob2) (name mob1) (name mob3) (name mob1))
 
-                              (when is-player
-                                (setf *player* mob1))
-                              
-                              (setf (x mob1) (1- x) (y mob1) (1- y) (z mob1) z)
-                              (add-mob-to-level-list level mob1)
-                              (setf (x mob2) (1+ x) (y mob2) (1- y) (z mob2) z)
-                              (add-mob-to-level-list level mob2)
-                              (setf (x mob3) x (y mob3) (1+ y) (z mob3) z)
-                              (add-mob-to-level-list level mob3)
-                              
-                              (loop-finish))))
-                 (progn
-                   (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place chrome angels~%"))
-                   
-                   (loop with arrival-point-list = (remove-if-not #'(lambda (a)
-                                                                      (= (feature-type a) +feature-start-place-angels+))
-                                                                  (feature-id-list level)
-                                                                  :key #'(lambda (b)
-                                                                           (get-feature-by-id b)))
-                         while (> (length arrival-point-list) 0) 
-                         for random-arrival-point-id = (nth (random (length arrival-point-list)) arrival-point-list)
-                         for lvl-feature = (get-feature-by-id random-arrival-point-id)
-                         for x = (x lvl-feature)
-                         for y = (y lvl-feature)
-                         for z = (z lvl-feature)
-                         do
-                            (setf arrival-point-list (remove random-arrival-point-id arrival-point-list))
-                            
-                            (if is-player
-                              (progn
-                                (setf *player* (make-instance 'player :mob-type angel-type))
-                                (find-unoccupied-place-around level *player* x y z))
-                              (find-unoccupied-place-around level (make-instance 'mob :mob-type angel-type) x y z))
-                            
-                            (loop-finish))))
-                   )))
+    (place-angels-on-level-immediate level
+                                     :start-point-list (loop for lvl-feature-id in (remove-if-not #'(lambda (a)
+                                                                                                   (= (feature-type a) +feature-start-place-angels+))
+                                                                                               (feature-id-list level)
+                                                                                               :key #'(lambda (b)
+                                                                                                        (get-feature-by-id b)))
+                                                             for lvl-feature = (get-feature-by-id lvl-feature-id)
+                                                             collect (list (x lvl-feature) (y lvl-feature) (z lvl-feature)))
+                                     :create-player t
+                                     :angel-list angel-list))
 
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-angels+)

@@ -683,7 +683,7 @@
                                                         ;; place player
                                                         (push #'place-player-on-level
                                                               func-list)
-
+                                                        
                                                         func-list))
                   :scenario-faction-list (list (list +specific-faction-type-player+ +lm-placement-player+)
                                                (list +specific-faction-type-dead-player+ +lm-placement-dead-player+)

@@ -523,6 +523,7 @@
 (defconstant +feature-start-machine-point+ 43)
 (defconstant +feature-bomb-plant-target+ 44)
 (defconstant +feature-smoke-weak-acid-gas+ 45)
+(defconstant +feature-divine-portal+ 46)
 
 ;;--------------------
 ;; TERRAIN-TEMPLATE Constants
