@@ -152,7 +152,8 @@
                                    (run-window *current-window*)
                                    nil)))
           (highscores-item (list "High scores"
-                                 #'(lambda () 
+                                 #'(lambda ()
+                                     (truncate-highscores *highscores*)
                                      (setf *current-window* (make-instance 'highscores-window))
                                      (make-output *current-window*)
                                      (run-window *current-window*)

@@ -23,7 +23,7 @@
                                                                                   t
                                                                                   nil)))
                                                              (trigger-game-over world
-                                                                                :final-str "Demonic machines successfully destroyed."
+                                                                                :final-str "Dimensional engines successfully destroyed."
                                                                                 :score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
                                                                                                                          0
                                                                                                                          (loop for mimic-id in (mimic-id-list *player*)
@@ -59,7 +59,7 @@
                                                                                   t
                                                                                   nil)))
                                                              (trigger-game-over world
-                                                                                :final-str "Machines successfully defended by demons."
+                                                                                :final-str "Dimensional engines successfully defended by demons."
                                                                                 :score (calculate-player-score 1500)
                                                                                 :if-player-won if-player-won
                                                                                 :player-msg (if if-player-won

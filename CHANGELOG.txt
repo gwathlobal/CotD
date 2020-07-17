@@ -15,6 +15,7 @@ CHANGELOG
 - Malseraph's Puppet get an ability to draw breath and exhale irradiation around them on the next turn.
 - Made an option to hide messages that are visible through Angel's 'Singlemind' ability.
 - Restructured the main menu: moved all quick scenario options into a submenu.
+- Highscores shall be reset in the new version
 - Fixed the bug when merged angels did not merge their power values.
 - Fixed the bug when slowed characters did not have their speed returned to normal.
 

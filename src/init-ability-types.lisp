@@ -3131,7 +3131,7 @@
                                                 (logger (format nil "MOB-MERGE: ~A [~A] merges with ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
-                                                                                                           (format nil "You hear some eerie sounds~A." str)))
+                                                                                                            (format nil "You hear some eerie sounds~A. " str)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A merges with ~A. " (capitalize-name (prepend-article +article-the+ (visible-name target))) (prepend-article +article-the+ (visible-name actor)))

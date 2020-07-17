@@ -35,17 +35,17 @@
     (when player-died
       (multiple-value-setq (tmp-final-str tmp-score) (dump-when-dead)))
     
-    (setf highscores-place (add-highscore-record (make-highscore-record (name *player*)
-                                                                        tmp-score
-                                                                        (if (mimic-id-list *player*)
-                                                                          (faction-name *player*)
-                                                                          (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
-                                                                        (player-game-time tmp-world)
-                                                                        tmp-final-str
-                                                                        (name (world-sector (level tmp-world))))
-                                                 *highscores*))
+    (setf highscores-place (add-highscore-record *highscores*
+                                                 :name-str (name *player*)
+                                                 :score tmp-score
+                                                 :mob-type-str (if (mimic-id-list *player*)
+                                                                 (faction-name *player*)
+                                                                 (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
+                                                 :turns (player-game-time tmp-world)
+                                                 :result-str tmp-final-str
+                                                 :sector-name-str (name (world-sector (level tmp-world)))))
     
-    (write-highscores-to-file *highscores*)
+    (save-highscores-to-disk)
     (dump-character-on-game-over (name *player*) tmp-score (player-game-time tmp-world) (name (world-sector (level tmp-world)))
                                  tmp-final-str (return-scenario-stats nil))
 

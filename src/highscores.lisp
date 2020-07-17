@@ -1,73 +1,75 @@
 (in-package :cotd)
 
-(defstruct highscores
-  (highscore-records ())
-  (additional-record nil))
+(defclass highscores-record ()
+  ((player-name :initarg :player-name :accessor highscore-record/player-name :type string)
+   (score :initarg :score :accessor highscore-record/score :type fixnum)
+   (mob-type :initarg :mob-type :accessor highscore-record/mob-type :type string)
+   (turns-num :initarg :turns-num :accessor highscore-record/turns-num :type fixnum)
+   (result :initarg :result :accessor highscore-record/result :type string)
+   (sector-name :initarg :sector-name :accessor highscore-record/sector-name :type string)
+   (params :initform () :initarg :params :accessor highscore-record/params :type list)))
 
-;; A highscore record is a list (s-expr) with the following content:
-;;    player name - string
-;;    score
-;;    faction - string
-;;    turns
-;;    status
-;;    layout
+(defclass highscores-table ()
+  ((version :initform 1 :initarg :version :accessor highscores-table/version :type fixnum)
+   (records :initform () :initarg :records :accessor highscores-table/records :type list)
+   (params :initform () :initarg :params :accessor highscores-table/params :type list)))
 
-(defun read-highscore-record (s-expr)
-  (logger (format nil "READ-HIGHSCORE-RECORD: S-EXPR = ~A~%" s-expr))
-  (unless (or (typep s-expr 'list)
-              (< (length s-expr) 6))
-    (return-from read-highscore-record nil))
-  
-  s-expr
-  )
+(defun save-highscores-to-disk ()
+  (handler-case
+      (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *current-dir*)))
+        (cl-store:store *highscores* file-pathname))
+    (t (c)
+      (logger (format nil "~%SAVE-HIGHSCORES-TO-DISK: Error occured while saving to file: ~A.~%~%" c))))
+  nil)
 
-(defun add-highscore-record (record highscores)
-  (logger (format nil "ADD-HIGHSCORE-RECORD: S-EXPR = ~A~%" record))
-  (if (and (highscores-highscore-records highscores)
-           (= (length (highscores-highscore-records highscores)) 10)
-           (>= (nth 1 (first (last (highscores-highscore-records highscores))))
-               (nth 1 record)))
-    (progn
-      (setf (highscores-additional-record highscores) record)
-      (return-from add-highscore-record 10))
-    (progn
-      (if (highscores-highscore-records highscores)
-        (progn
-          (loop for elem in (highscores-highscore-records highscores)
-                for n from 1
-                with list = (highscores-highscore-records highscores)
-                when (< (second elem) (second record))
-                  do
-                     (setf (highscores-highscore-records highscores)
-                           (concatenate 'list
-                                        (subseq list 0 (1- n))
-                                        (list record)
-                                        (nthcdr (1- n) list)))
-                     (when (> (length (highscores-highscore-records highscores)) 10)
-                       (setf (highscores-highscore-records highscores) (butlast (highscores-highscore-records highscores))))
-                     (return-from add-highscore-record (1- n)))
-          (setf (highscores-highscore-records highscores) (append (highscores-highscore-records highscores) (list record)))
-          (return-from add-highscore-record (1- (length (highscores-highscore-records highscores)))))
-        (progn
-          (push record (highscores-highscore-records highscores))
-          (return-from add-highscore-record 0)))
-      )))
+(defun load-highscores-from-disk ()
+  (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *current-dir*)))
+    (handler-case
+        (if (probe-file file-pathname)
+          (setf *highscores* (cl-store:restore file-pathname))
+          (progn
+            (logger (format nil "~%LOAD-HIGHSCORES-FROM-DISK: No file ~A to read the highscores from. Overwriting with defaults.~%~%" file-pathname))
+            (save-highscores-to-disk)
+            nil))
+      (t (c)
+        (logger (format nil "~%LOAD-HIGHSCORES-FROM-DISK: Error occured while reading the highscores from file ~A: ~A. Overwriting with defaults.~%~%" file-pathname c))
+        (save-highscores-to-disk)
+        nil)))
+  *highscores*)
 
-(defun make-highscore-record (name score faction turns status layout)
-  (list name score faction turns status layout))
+(defun add-highscore-record (highscores &key name-str score mob-type-str turns result-str sector-name-str params)
+  (let ((record (make-instance 'highscores-record
+                               :player-name name-str
+                               :score score
+                               :mob-type mob-type-str
+                               :turns-num turns
+                               :result result-str
+                               :sector-name sector-name-str
+                               :params params))
+        (pos 0))
+    (push record (highscores-table/records highscores))
 
-(defun write-highscores-to-file (highscores)
-  (with-open-file (file (merge-pathnames "scenario-highscores" *current-dir*) :direction :output :if-exists :supersede)
-    (loop for record in (highscores-highscore-records highscores) do
-      (print record file))))
+    (setf (highscores-table/records highscores) (stable-sort (highscores-table/records highscores) #'> :key #'(lambda (a) (highscore-record/score a))))
 
-(defun write-highscores-to-str (record)
+    (setf pos (position record (highscores-table/records highscores)))
+
+    (when (and (> (length (highscores-table/records highscores)) 10)
+               (< pos 10))
+      (truncate-highscores highscores))
+    
+    pos))
+
+(defun truncate-highscores (highscores)
+  (setf (highscores-table/records highscores) (loop repeat 10
+                                                    for record in (highscores-table/records highscores)
+                                                    collect record)))
+
+(defun write-highscore-record-to-str (highscores-record)
   (format nil "~10@<~D~> ~20@<~A~> ~20@<~A~> ~10@<~A~>  ~20@<~A~>~%      ~A~%"
-          (second record)
-          (first record)
-          (if (third record)
-            (third record)
-            "None")
-          (format nil "~D turn~:P" (fourth record))
-          (sixth record)
-          (fifth record)))
+          (highscore-record/score highscores-record)
+          (highscore-record/player-name highscores-record)
+          (highscore-record/mob-type highscores-record)
+          (format nil "~D turn~:P" (highscore-record/turns-num highscores-record))
+          (highscore-record/sector-name highscores-record)
+          (highscore-record/result highscores-record)))
+

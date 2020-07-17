@@ -167,8 +167,8 @@
     (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
     ;; calculate the coordinates where to draw the animation
     
-      (setf scr-x (+ (* (- map-x sx) *glyph-w*) *glyph-w*))
-      (setf scr-y (+ (* (- map-y sy) *glyph-h*) *glyph-h*))
+      (setf scr-x (+ (* (- map-x sx) *glyph-w*) *start-map-x*))
+      (setf scr-y (+ (* (- map-y sy) *glyph-h*)))
 
       (setf single-memo (aref array map-x map-y map-z))
       

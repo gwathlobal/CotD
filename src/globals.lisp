@@ -678,6 +678,7 @@
 (defparameter *save-final-base-dirname* "save")
 (defparameter *save-descr-filename* "descr")
 (defparameter *save-game-filename* "game")
+(defparameter *highscores-filename* "scenario-highscores")
 
 (defconstant +normal-ap+ 10)
 (defparameter *possessed-revolt-chance* 12)

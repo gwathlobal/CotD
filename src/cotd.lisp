@@ -285,8 +285,7 @@
 (defun main-menu ()
   (setf *current-window* (make-instance 'main-menu-window))
   (make-output *current-window*)
-  (run-window *current-window*)
-  )
+  (run-window *current-window*))
 
 (defun cotd-init ()
   (let ((tiles-path))
@@ -324,25 +323,10 @@
       (t (setf (options-player-name *options*) "Player")))
     
     ;; create default highscores
-    (setf *highscores* (make-highscores))
-    
-    (if (probe-file (merge-pathnames "scenario-highscores" *current-dir*))
-      (progn
-        (with-open-file (file (merge-pathnames "scenario-highscores" *current-dir*) :direction :input)
-          (handler-case
-              (loop for s-expr = (read file nil) 
-                    while s-expr do
-                      (add-highscore-record (read-highscore-record s-expr) *highscores*))
-            (t (c)
-              (logger "OPTIONS.CFG: Error occured while reading the scenario-highscores: ~A. Overwriting with defaults.~%" c)
-              (write-highscores-to-file *highscores*)
-              ))))   
-      (progn 
-        (write-highscores-to-file *highscores*)
-        )
-      )
-    
-    
+    (setf *highscores* (make-instance 'highscores-table))
+    (load-highscores-from-disk)
+    (truncate-highscores *highscores*)
+        
     (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
     (setf *random-state* (make-random-state t))
     
