@@ -690,7 +690,7 @@
   (let ((demon-power 0)
         (angel-power 0))
     ;; in hell, demon always start with at least 2
-    (when (or (eql (wtype world-sector) :world-sector-hell-plain))
+    (when (or (eql (wtype world-sector) :world-sector-hell-jungle))
       (incf demon-power 2))
 
     ;; if the relic is captured, add 1 to demons

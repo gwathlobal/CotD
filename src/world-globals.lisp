@@ -17,7 +17,7 @@
                                          :world-sector-corrupted-port
                                          :world-sector-corrupted-lake
                                          :world-sector-corrupted-forest
-                                         :world-sector-hell-plain
+                                         :world-sector-hell-jungle
                                          ))
 
 (defenum:defenum mission-type-enum (:mission-type-none

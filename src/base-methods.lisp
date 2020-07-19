@@ -2199,6 +2199,35 @@
         
     (setf (sense-sigil-pos *player*) nearest-power)))
 
+(defun sense-machines ()
+  (setf (sense-machine-pos *player*) nil)
+  (let ((nearest-machine nil))
+    ;; search for machine on the map
+    (loop for mob-id in (demonic-machines (level *world*))
+          for mob = (get-mob-by-id mob-id)
+          when (= (mob-type mob) +mob-type-demon-machine+)
+            do
+               (unless nearest-machine (setf nearest-machine (list (x mob) (y mob))))
+               (when (< (get-distance (x *player*) (y *player*) (x mob) (y mob))
+                        (get-distance (x *player*) (y *player*) (first nearest-machine) (second nearest-machine)))
+                 (setf nearest-machine (list (x mob) (y mob)))))
+            
+    (setf (sense-machine-pos *player*) nearest-machine)))
+
+(defun sense-stockpiles ()
+  (setf (sense-stockpile-pos *player*) nil)
+  (let ((nearest-stockpile nil))
+    ;; search for stockpiles on the map
+    (loop for feature-id in (bomb-plant-locations (level *world*))
+          for feature = (get-feature-by-id feature-id)
+          when (= (feature-type feature) +feature-bomb-plant-target+)
+            do
+               (unless nearest-stockpile (setf nearest-stockpile (list (x feature) (y feature))))
+               (when (< (get-distance (x *player*) (y *player*) (x feature) (y feature))
+                        (get-distance (x *player*) (y *player*) (first nearest-stockpile) (second nearest-stockpile)))
+                 (setf nearest-stockpile (list (x feature) (y feature)))))
+    (setf (sense-stockpile-pos *player*) nearest-stockpile)))
+
 (defun mob-pick-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))) (silent nil))
   (logger (format nil "MOB-PICK-ITEM: ~A [~A] picks up ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
   (if (null (inv-id item))

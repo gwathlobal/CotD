@@ -25,7 +25,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                     nil
                                                     t)))
 
@@ -51,7 +51,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                     nil
                                                     t)))
 
@@ -76,7 +76,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                     nil
                                                     t)))
 
@@ -101,7 +101,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                     nil
                                                     t)))
 
@@ -127,6 +127,6 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is only available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                     t
                                                     nil)))

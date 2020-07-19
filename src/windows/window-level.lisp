@@ -288,6 +288,12 @@
                        (>= (get-distance (x *player*) (y *player*) (first (sense-sigil-pos *player*)) (second (sense-sigil-pos *player*))) *demonic-conquest-win-sigils-dist*))
                 " (available)"
                 "")))
+    (when (sense-machine-pos *player*)
+      (when first (format str "~%") (setf first nil))
+      (format str "Sense engine: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-machine-pos *player*)) (second (sense-machine-pos *player*)))))
+    (when (sense-stockpile-pos *player*)
+      (when first (format str "~%") (setf first nil))
+      (format str "Sense storage: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-stockpile-pos *player*)) (second (sense-stockpile-pos *player*)))))
     str))
 
 (defun general-direction-str (sx sy tx ty)

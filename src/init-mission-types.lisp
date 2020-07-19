@@ -1264,7 +1264,7 @@
                   :is-available-func #'(lambda (world-sector world)
                                          (let* ((angels-win-cond (get-win-condition-by-id :win-cond-angels-campaign))
                                                 (machines-left (funcall (win-condition/win-func angels-win-cond) world angels-win-cond)))
-                                           (if (and (or (eq (wtype world-sector) :world-sector-hell-plain))
+                                           (if (and (or (eq (wtype world-sector) :world-sector-hell-jungle))
                                                     (> machines-left 0))
                                              t
                                              nil)))
@@ -1275,7 +1275,7 @@
                                              (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
-                  :world-sector-for-custom-scenario (list :world-sector-hell-plain
+                  :world-sector-for-custom-scenario (list :world-sector-hell-jungle
                                                           )
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))
@@ -1336,6 +1336,7 @@
                   :ai-package-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
                                          (list +faction-type-angels+ (list +ai-package-patrol-district+ +ai-package-find-machine+))
                                          )
+                  :ability-list (list (list +faction-type-angels+ (list +mob-abil-detect-machines+)))
                   :win-condition-list (list (list +faction-type-demons+ +game-event-angelic-sabotage-win-for-demons+)
                                             (list +faction-type-angels+ +game-event-angelic-sabotage-win-for-angels+)
                                             )
@@ -1347,7 +1348,7 @@
                   :name "Military sabotage"
                   :mission-slot-type :mission-slot-military-offworld
                   :is-available-func #'(lambda (world-sector world)
-                                         (if (and (or (eq (wtype world-sector) :world-sector-hell-plain))
+                                         (if (and (or (eq (wtype world-sector) :world-sector-hell-jungle))
                                                   (> (world/flesh-points world) 0))
                                            t
                                            nil))
@@ -1358,7 +1359,7 @@
                                              (push (list +faction-type-demons+ :mission-faction-delayed) faction-list)
                                              )
                                            faction-list))
-                  :world-sector-for-custom-scenario (list :world-sector-hell-plain
+                  :world-sector-for-custom-scenario (list :world-sector-hell-jungle
                                                           )
                   :overall-post-process-func-list #'(lambda ()
                                                        (let ((func-list ()))

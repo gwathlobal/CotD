@@ -10,7 +10,7 @@
                                                   (declare (ignore mission-type-id))
                                                   (multiple-value-bind (year month day hour min sec) (get-current-date-time world-time)
                                                     (declare (ignore year day hour min sec))
-                                                    (if (and (not (eq world-sector-type-id :world-sector-hell-plain))
+                                                    (if (and (not (eq world-sector-type-id :world-sector-hell-jungle))
                                                              (and (> month 1) (< month 11)))
                                                       t
                                                       nil))
@@ -36,7 +36,7 @@
                     :name "Acid rain"
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
-                                                  (if (and (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (and (eq world-sector-type-id :world-sector-hell-jungle))
                                                     t
                                                     nil)
                                                   )
@@ -63,7 +63,7 @@
                                                   (declare (ignore mission-type-id))
                                                   (multiple-value-bind (year month day hour min sec) (get-current-date-time world-time)
                                                     (declare (ignore year day hour min sec))
-                                                    (if (and (not (eq world-sector-type-id :world-sector-hell-plain))
+                                                    (if (and (not (eq world-sector-type-id :world-sector-hell-jungle))
                                                              (or (= month 11) (= month 0) (= month 1)))
                                                       t
                                                       nil)))

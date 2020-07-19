@@ -1468,6 +1468,8 @@
    (sense-unnatural-pos :initform nil :accessor sense-unnatural-pos)
    (sense-relic-pos :initform nil :accessor sense-relic-pos)
    (sense-sigil-pos :initform nil :accessor sense-sigil-pos)
+   (sense-machine-pos :initform nil :accessor sense-machine-pos)
+   (sense-stockpile-pos :initform nil :accessor sense-stockpile-pos)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)
    (killed-by :initform nil :accessor killed-by)
    (faction-name :initform nil :accessor faction-name)

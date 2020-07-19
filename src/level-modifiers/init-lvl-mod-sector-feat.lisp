@@ -132,7 +132,7 @@
                                                   (if (or (eq world-sector-type-id :world-sector-normal-island)
                                                           (eq world-sector-type-id :world-sector-abandoned-island)
                                                           (eq world-sector-type-id :world-sector-corrupted-island)
-                                                          (eq world-sector-type-id :world-sector-hell-plain))
+                                                          (eq world-sector-type-id :world-sector-hell-jungle))
                                                     nil
                                                     t))
                     :scenario-disabled-func #'(lambda (world-map x y)
@@ -369,7 +369,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                     nil
                                                     t)))
 
@@ -442,7 +442,7 @@
                                                                          (eq world-sector-type-id :world-sector-abandoned-residential)
                                                                          (eq world-sector-type-id :world-sector-abandoned-lake)
                                                                          (eq world-sector-type-id :world-sector-abandoned-island))))
-                                                            (not (eq world-sector-type-id :world-sector-hell-plain)))
+                                                            (not (eq world-sector-type-id :world-sector-hell-jungle)))
                                                      t
                                                      nil))
                     )
@@ -513,8 +513,8 @@
                                                           func-list))
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore world-time))
-                                                  ;; is not available for everybody other than hell plain
-                                                  (if (and (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  ;; is not available for everybody other than hell jungle
+                                                  (if (and (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                            (eq mission-type-id :mission-type-celestial-sabotage))
                                                     t
                                                     nil))
@@ -553,8 +553,8 @@
                                                           func-list))
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore world-time))
-                                                  ;; is not available for everybody other than hell plain
-                                                  (if (and (or (eq world-sector-type-id :world-sector-hell-plain))
+                                                  ;; is not available for everybody other than hell jungle
+                                                  (if (and (or (eq world-sector-type-id :world-sector-hell-jungle))
                                                            (eq mission-type-id :mission-type-military-sabotage))
                                                     t
                                                     nil))

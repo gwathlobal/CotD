@@ -121,8 +121,11 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
       
       
-      (write-text (format nil "~A~%~%~A" 
+      (write-text (format nil "~A~%~%~A~A" 
                           (descr ability)
+                          (if (mob-is-ability-mutation *player* (id ability))
+                            "Mutation. "
+                            "")
                           (if (passive ability)
                             "Passive."
                             (format nil "~A~ATime cost: ~A turn~:P"

@@ -7,7 +7,7 @@
                                            (list (list +faction-type-eater+ :mission-faction-present)))
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
-                                                  (if (not (eq world-sector-type-id :world-sector-hell-plain))
+                                                  (if (not (eql world-sector-type-id :world-sector-hell-jungle))
                                                     t
                                                     nil))
                     :random-available-for-mission #'(lambda ()

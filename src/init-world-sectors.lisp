@@ -845,10 +845,10 @@
 ;; HELL
 ;;============
 
-(set-world-sector-type :wtype :world-sector-hell-plain
+(set-world-sector-type :wtype :world-sector-hell-jungle
                        :glyph-idx 40
                        :glyph-color sdl:*magenta*
-                       :name "A hell plain"
+                       :name "A hell jungle"
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-demons+ :mission-faction-present)))
                        :angel-disguised-mob-type-id +mob-type-soldier+
