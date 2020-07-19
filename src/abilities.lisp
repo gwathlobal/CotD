@@ -97,18 +97,24 @@
 (defun abil-motion-p (ability-type-id)
   (motion (get-ability-type-by-id ability-type-id)))
 
-(defun get-mob-all-abilities (mob)
-  (loop
-    for ability-type-id being the hash-key in (abilities mob)
-    when (gethash ability-type-id (abilities mob))
-      collect ability-type-id))
+(defun get-mob-all-abilities (mob &key (include-mission-abilities t))
+  (let ((abilities nil))
+    (setf abilities (loop for ability-type-id being the hash-key in (abilities mob)
+                          when (gethash ability-type-id (abilities mob))
+                            collect ability-type-id))
+    ;; add mission-type abilities
+    (when (and include-mission-abilities
+               *world*
+               (level *world*)
+               (mission (level *world*)))
+      (setf abilities (append abilities (get-abilities-based-on-faction (faction mob) (mission-type-id (mission (level *world*)))))))
+    abilities))
 
-(defun get-mob-applic-abilities (actor target)
-  (loop
-    for ability-type-id being the hash-key in (abilities actor)
-    when (and (gethash ability-type-id (abilities actor))
-              (abil-applicable-p (get-ability-type-by-id ability-type-id) actor target))
-      collect ability-type-id))
+(defun get-mob-applic-abilities (actor target &key (include-mission-abilities t))
+  (let ((abilities (get-mob-all-abilities actor :include-mission-abilities include-mission-abilities)))
+    (loop for ability-type-id in abilities
+          when (abil-applicable-p (get-ability-type-by-id ability-type-id) actor target)
+            collect ability-type-id)))
 
 (defun copy-hash-table (hash-table)
   (let ((new-table (make-hash-table)))

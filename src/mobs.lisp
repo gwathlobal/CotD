@@ -853,7 +853,7 @@
   (set-name mob)
 
   ;; set up current abilities cooldowns
-  (loop for ability-id being the hash-key in (abilities mob) do
+  (loop for ability-id in (get-mob-all-abilities mob) do
     (setf (gethash ability-id (abilities-cd mob)) 0))
 
   ;; if the mob has climbing ability - start with it turned on
@@ -903,11 +903,25 @@
   (gethash effect-type-id (effects mob)))
 
 (defun mob-ability-p (mob ability-type-id)
-  (gethash ability-type-id (abilities mob)))
+  (if (or (gethash ability-type-id (abilities mob))
+          (and *world*
+               (level *world*)
+               (mission (level *world*))
+               (find ability-type-id (get-abilities-based-on-faction (faction mob) (mission-type-id (mission (level *world*)))))))
+    t
+    nil))
 
 (defun mob-is-ability-mutation (mob ability-type-id)
   (if (and (gethash ability-type-id (abilities mob))
            (first (gethash ability-type-id (abilities mob))))
+    t
+    nil))
+
+(defun mob-is-ability-mission (mob ability-type-id)
+  (if (and *world*
+           (level *world*)
+           (mission (level *world*))
+           (find ability-type-id (get-abilities-based-on-faction (faction mob) (mission-type-id (mission (level *world*))))))
     t
     nil))
 
@@ -998,7 +1012,7 @@
 
 (defun adjust-abilities (mob)
   ;; clear all previous non-mutation abilities
-  (loop for ability-type-id being the hash-key in (abilities mob)
+  (loop for ability-type-id in (get-mob-all-abilities mob)
         when (not (mob-is-ability-mutation mob ability-type-id))
           do
              (setf (gethash ability-type-id (abilities mob)) nil))

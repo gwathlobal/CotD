@@ -921,7 +921,7 @@
                                            :priority 8
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
                                                             (declare (ignore hostile-mobs allied-mobs))
-                                                            (let ((ability-list (loop for ability-id being the hash-key in (abilities actor)
+                                                            (let ((ability-list (loop for ability-id in (get-mob-all-abilities actor)
                                                                                       for ability = (get-ability-type-by-id ability-id)
                                                                                       for func of-type function = (on-check-ai ability)
                                                                                       with check-result = nil 

@@ -22,12 +22,13 @@
    (scenario-faction-list :initform nil :initarg :scenario-faction-list :accessor scenario-faction-list)
    (ai-package-list :initform nil :initarg :ai-package-list :accessor ai-package-list)
    (win-condition-list :initform nil :initarg :win-condition-list :accessor win-condition-list)
+   (ability-list :initform () :initarg :ability-list :accessor ability-list)
    (campaign-result :initform () :initarg :campaign-result :accessor mission-type/campaign-result :type list)
    ))
 
 (defun set-mission-type (&key id name (enabled t) mission-slot-type is-available-func faction-list-func template-level-gen-func
                               overall-post-process-func-list terrain-post-process-func-list scenario-faction-list ai-package-list
-                              win-condition-list world-sector-for-custom-scenario
+                              win-condition-list world-sector-for-custom-scenario ability-list
                               (always-lvl-mods-func #'(lambda (world-sector mission world-time)
                                                         (declare (ignore world-sector mission world-time))
                                                         nil))
@@ -47,6 +48,7 @@
                                                                   :scenario-faction-list scenario-faction-list
                                                                   :ai-package-list ai-package-list
                                                                   :win-condition-list win-condition-list
+                                                                  :ability-list ability-list
                                                                   :world-sector-for-custom-scenario world-sector-for-custom-scenario
                                                                   :always-lvl-mods-func always-lvl-mods-func
                                                                   :campaign-result campaign-result
@@ -68,6 +70,12 @@
     (progn
       (second (find faction-id (ai-package-list (get-mission-type-by-id mission-type-id)) :key #'(lambda (a) (first a)))))
     nil))
+
+(defun get-abilities-based-on-faction (faction-id mission-type-id)
+  (let ((faction-abilities (find faction-id (ability-list (get-mission-type-by-id mission-type-id)) :key #'(lambda (a) (first a)))))
+    (if faction-abilities
+      (second faction-abilities)
+      nil)))
 
 (defun setup-win-conditions (mission level)
   (loop for (faction-id game-event-id) in (win-condition-list (get-mission-type-by-id (mission-type-id mission)))
@@ -368,6 +376,9 @@
             for z = (third random-arrival-point)
             do
                (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+
+               (when is-player
+                 (setf *player* mob))
                
                (find-unoccupied-place-around level mob x y z :no-center no-center)
                
@@ -387,9 +398,9 @@
     (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place present demons~%"))
 
     (place-mobs-on-level-immediate level
-                                   :start-point-list (loop for lvl-feature-id in (remove +feature-start-place-demons+ (feature-id-list level)
-                                                                                         :key #'(lambda (a)
-                                                                                                  (feature-type (get-feature-by-id a))))
+                                   :start-point-list (loop for lvl-feature-id in (remove-if-not #'(lambda (a)
+                                                                                                    (eql (feature-type (get-feature-by-id a)) +feature-start-place-demons+))
+                                                                                                (feature-id-list level))
                                                            for lvl-feature = (get-feature-by-id lvl-feature-id)
                                                            collect (list (x lvl-feature) (y lvl-feature) (z lvl-feature)))
                                    :create-player t
@@ -485,6 +496,9 @@
                 for z = (third random-arrival-point)
                 do
                    (setf arrival-point-list (remove random-arrival-point arrival-point-list))
+
+                   (when is-player
+                     (setf *player* angel))
                    
                    (find-unoccupied-place-around level angel x y z :no-center t)
                    

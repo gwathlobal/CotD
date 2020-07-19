@@ -5836,7 +5836,7 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (loop for ability-type-id being the hash-key in (abilities actor)
+                                                      (loop for ability-type-id in (get-mob-all-abilities actor)
                                                             with has-mutation = nil
                                                             when (mob-is-ability-mutation actor ability-type-id)
                                                               do
@@ -7486,7 +7486,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
-                                                               (eq (mission-type-id (mission (level *world*))) :mission-type-demonic-raid)
+                                                               (eql (mission-type-id (mission (level *world*))) :mission-type-demonic-raid)
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)
                                                                      when (item-ability-p item +item-abil-corpse+)
@@ -7554,7 +7554,7 @@
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
                                                       (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
-                                                               (eq (mission-type-id (mission (level *world*))) :mission-type-demonic-thievery)
+                                                               (eql (mission-type-id (mission (level *world*))) :mission-type-demonic-thievery)
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)
                                                                      when (= (item-type item) +item-type-church-reliс+)
@@ -7602,7 +7602,7 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (eq (mission-type-id (mission (level *world*))) :mission-type-demonic-conquest)
+                                                      (if (and (eql (mission-type-id (mission (level *world*))) :mission-type-demonic-conquest)
                                                                (mob-ability-p actor +mob-abil-create-demon-sigil+)
                                                                (loop with result = t
                                                                      for sigil-id in (demonic-sigils (level *world*))
@@ -7678,7 +7678,7 @@
                                                   (adjust-sight actor)
                                                   
                                                   ;; set up current abilities cooldowns
-                                                  (loop for ability-id being the hash-key in (abilities actor)
+                                                  (loop for ability-id in (get-mob-all-abilities actor)
                                                         when (null (gethash ability-id (abilities-cd actor)))
                                                           do
                                                              (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -7747,7 +7747,7 @@
                                                   (adjust-sight actor)
                                                   
                                                   ;; set up current abilities cooldowns
-                                                  (loop for ability-id being the hash-key in (abilities actor)
+                                                  (loop for ability-id in (get-mob-all-abilities actor)
                                                         when (null (gethash ability-id (abilities-cd actor)))
                                                           do
                                                              (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -7814,7 +7814,7 @@
                                                 (adjust-sight actor)
                                                                                                 
                                                 ;; set up current abilities cooldowns
-                                                (loop for ability-id being the hash-key in (abilities actor)
+                                                (loop for ability-id in (get-mob-all-abilities actor)
                                                       when (null (gethash ability-id (abilities-cd actor)))
                                                         do
                                                            (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -7909,7 +7909,7 @@
                                                 (adjust-sight actor)
                                                                                                 
                                                 ;; set up current abilities cooldowns
-                                                (loop for ability-id being the hash-key in (abilities actor)
+                                                (loop for ability-id in (get-mob-all-abilities actor)
                                                       when (null (gethash ability-id (abilities-cd actor)))
                                                         do
                                                            (setf (gethash ability-id (abilities-cd actor)) 0))

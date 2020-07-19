@@ -136,7 +136,7 @@
                                                          (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor))
 
                                                          ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                         (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -171,7 +171,7 @@
                                                             (adjust-sight actor)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                            (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -223,7 +223,7 @@
                                                          ;(set-name actor)
 
                                                           ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                         (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -269,7 +269,7 @@
                                                             (rem-mob-effect (get-mob-by-id (actor-id effect)) +mob-effect-necrolink+)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                            (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -385,7 +385,7 @@
                                                            (adjust-sight actor)
                                                            
                                                            ;; set up current abilities cooldowns
-                                                           (loop for ability-id being the hash-key in (abilities actor)
+                                                           (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -403,7 +403,7 @@
                                                             (adjust-sight actor)
 
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                            (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0)))
@@ -724,7 +724,7 @@
                                                          (setf (face-mob-type-id actor) (mob-type actor))
 
                                                          ;; polymorph block mutations
-                                                         (loop for ability-type-id being the hash-key in (abilities actor)
+                                                         (loop for ability-type-id in (get-mob-all-abilities actor)
                                                                with mutation-list = ()
                                                                when (and (mob-is-ability-mutation actor ability-type-id)
                                                                          (on-remove-mutation (get-ability-type-by-id ability-type-id)))
@@ -743,7 +743,7 @@
                                                          (adjust-sight actor)
                                                          
                                                          ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                         (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -788,7 +788,7 @@
                                                             (adjust-sight actor)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                            (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -985,7 +985,7 @@
                                                          (setf (face-mob-type-id actor) (mob-type actor))
 
                                                          ;; polymorph block mutations
-                                                         (loop for ability-type-id being the hash-key in (abilities actor)
+                                                         (loop for ability-type-id in (get-mob-all-abilities actor)
                                                                with mutation-list = ()
                                                                when (and (mob-is-ability-mutation actor ability-type-id)
                                                                          (on-remove-mutation (get-ability-type-by-id ability-type-id)))
@@ -1004,7 +1004,7 @@
                                                          (adjust-sight actor)
                                                          
                                                          ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                         (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -1049,7 +1049,7 @@
                                                             (adjust-sight actor)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                            (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -1088,7 +1088,7 @@
                                                          (mob-remove-ability actor +mob-abil-possessable+)
                                                          
                                                          ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                         (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -1111,7 +1111,7 @@
                                                             (adjust-sight actor)
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                            (loop for ability-id in (get-mob-all-abilities actor)
                                                                   when (null (gethash ability-id (abilities-cd actor)))
                                                                     do
                                                                        (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -1183,7 +1183,7 @@
                                                          (incf (total-demons (level *world*)))
                                                          
                                                          ;; set up current abilities cooldowns
-                                                         (loop for ability-id being the hash-key in (abilities actor)
+                                                         (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -1219,7 +1219,7 @@
                                                             (decf (total-demons (level *world*)))
                                                             
                                                             ;; set up current abilities cooldowns
-                                                            (loop for ability-id being the hash-key in (abilities actor)
+                                                            (loop for ability-id in (get-mob-all-abilities actor)
                                                                when (null (gethash ability-id (abilities-cd actor)))
                                                                  do
                                                                     (setf (gethash ability-id (abilities-cd actor)) 0))
@@ -1302,6 +1302,7 @@
                                                                 (add-mob-to-level-list (level *world*) bomb-mob)
                                                                 (set-mob-effect bomb-mob :effect-type-id +mob-effect-bomb-ticking+ :actor-id (actor-id effect) :cd t :param1 param1)
                                                                 (set-mob-location bomb-mob (x bomb-mob) (y bomb-mob) (z bomb-mob) :apply-gravity t)
+                                                                (setf (cur-hp bomb-mob) (cur-hp actor))
                                                                 (update-visible-mobs bomb-mob)
                                                                 ;; a hack to stop the new bomb from ticking on the same turn
                                                                 (setf (cur-ap bomb-mob) 0)))
@@ -1314,6 +1315,7 @@
                                                                 (set-mob-effect bomb-mob :effect-type-id +mob-effect-bomb-ticking+ :actor-id (actor-id effect) :cd t :param1 param1)
                                                                 (set-mob-location bomb-mob (x bomb-mob) (y bomb-mob) (z bomb-mob) :apply-gravity t)
                                                                 (update-visible-mobs bomb-mob)
+                                                                (setf (cur-hp bomb-mob) (cur-hp actor))
                                                                 ;; a hack to stop the new bomb from ticking on the same turn
                                                                 (setf (cur-ap bomb-mob) 0)))
 

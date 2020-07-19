@@ -92,9 +92,10 @@
       (setf color-list (loop for i from 0 below (length (get-mob-all-abilities *player*))
                              collect (if (= i cur-str) 
                                        sdl:*yellow*
-                                       (if (mob-is-ability-mutation *player* (nth i abilities-list))
-                                         sdl:*magenta*
-                                         sdl:*white*))))
+                                       (cond
+                                         ((mob-is-ability-mutation *player* (nth i abilities-list)) sdl:*magenta*)
+                                         ((mob-is-ability-mission *player* (nth i abilities-list)) (sdl:color :r 153 :g 0 :b 76))
+                                         (t sdl:*white*)))))
      
       (draw-selection-list str-list cur-str (truncate h (sdl:get-font-height)) x y :color-list color-list))
     )
