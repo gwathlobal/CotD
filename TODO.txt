@@ -1,3 +1,4 @@
+- Save when game is quit
 - More realistic auto win chance calculations for campaign mode missions
 - Military can not have delayed arrival if no army is present
 - Worm-like multitile creatures in hell that devour you while you are inside

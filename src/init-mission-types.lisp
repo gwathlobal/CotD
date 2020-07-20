@@ -1336,7 +1336,6 @@
                   :ai-package-list (list (list +faction-type-demons+ (list +ai-package-patrol-district+))
                                          (list +faction-type-angels+ (list +ai-package-patrol-district+ +ai-package-find-machine+))
                                          )
-                  :ability-list (list (list +faction-type-angels+ (list +mob-abil-detect-machines+)))
                   :win-condition-list (list (list +faction-type-demons+ +game-event-angelic-sabotage-win-for-demons+)
                                             (list +faction-type-angels+ +game-event-angelic-sabotage-win-for-angels+)
                                             )
