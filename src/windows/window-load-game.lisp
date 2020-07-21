@@ -127,12 +127,23 @@
                          ;; enter - load selected game
                          ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
                           (when (and game-pathname-list (nth cur-sel game-pathname-list))
-                            (let ((result nil))
-                              (setf result (load-game-from-disk (nth cur-sel game-pathname-list)))
-                              (when result
-                                (setf (game-manager/game-slot-id *game-manager*) (nth cur-sel game-slot-list))
-                                ;(funcall *game-func*)
-                                (return-from run-window :menu-load-scenario)
+                            (let ((saved-game nil))
+                              (setf saved-game (load-game-from-disk (nth cur-sel game-pathname-list)))
+                              (if saved-game
+                                (progn
+                                  (setf *current-window* (make-instance 'display-msg-window
+                                                                        :msg-line (format nil "Save game loaded successfully!" )
+                                                                        :w (- *window-width* 400)))
+                                  (make-output *current-window*)
+                                  (run-window *current-window*)
+                                  (setf (game-manager/game-slot-id *game-manager*) (nth cur-sel game-slot-list))
+                                  (return-from run-window (serialized-game/save-type saved-game)))
+                                (progn
+                                  (setf *current-window* (make-instance 'display-msg-window
+                                                                        :msg-line (format nil "Failed to load the game!~%The save file is corrupted and it is recommended to remove it." )
+                                                                        :w (- *window-width* 400)))
+                                  (make-output *current-window*)
+                                  (run-window *current-window*))
                                 )))
                            )
                          )

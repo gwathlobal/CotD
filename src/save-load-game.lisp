@@ -3,8 +3,12 @@
 (defenum:defenum save-game-type-enum (:save-game-campaign
                                       :save-game-scenario))
 
+(defenum:defenum save-type-enum (:save-campaign
+                                 :save-scenario))
+
 (defclass serialized-game ()
-  ((world :initform *world* :initarg :world :accessor serialized-game/world :type world)
+  ((save-type :initform :save-scenario :initarg :save-type :accessor serialized-game/save-type :type save-type-enum)
+   (world :initform *world* :initarg :world :accessor serialized-game/world :type world)
    (mobs :initform *mobs* :initarg :mobs :accessor serialized-game/mobs :type array)
    (items :initform *items* :initarg :items :accessor serialized-game/items :type array)
    (lvl-features :initform *lvl-features* :initarg :lvl-features :accessor serialized-game/lvl-features :type array)
@@ -39,12 +43,13 @@
   (directory (merge-pathnames (make-pathname :directory '(:relative :wild)) (find-save-game-path save-game-type)))
   )
 
-(declaim (ftype (function (save-game-type-enum)
+(declaim (ftype (function (save-game-type-enum save-type-enum)
                           null)
                 save-game-to-disk))
 
-(defun save-game-to-disk (save-game-type)
-  (declare (type save-game-type-enum save-game-type))
+(defun save-game-to-disk (save-game-type save-type)
+  (declare (type save-game-type-enum save-game-type)
+           (type save-type-enum save-type))
 
   ;; if the save slot is not set, find all saves to determine the id of the next save slot
   (when (not (game-manager/game-slot-id *game-manager*))
@@ -71,12 +76,12 @@
              (dir-pathname (merge-pathnames (make-pathname :directory `(:relative ,final-save-name)) (find-save-game-path save-game-type)))
              (descr-file-pathname (merge-pathnames (make-pathname :name *save-descr-filename*) dir-pathname))
              (game-file-pathname (merge-pathnames (make-pathname :name *save-game-filename*) dir-pathname))
-             (serialized-game (make-instance 'serialized-game))
+             (serialized-game (make-instance 'serialized-game :save-type save-type))
              (serialized-save-descr (make-instance 'serialized-save-descr
                                                    :id (game-manager/game-slot-id *game-manager*)
                                                    :player-name (if *player*
                                                                   (get-qualified-name *player*)
-                                                                  (format nil "~A [T: ~A]" (options-player-name *options*) (show-date-time-ymd (world-game-time *world*)) ))
+                                                                  (format nil "~A [~A]" (options-player-name *options*) (show-date-time-ymd (world-game-time *world*)) ))
                                                    :sector-name (if (level *world*)
                                                                   (name (world-sector (level *world*)))
                                                                   nil)
@@ -127,6 +132,12 @@
       (t (c)
         (logger (format nil "~%LOAD-GAME-FROM-DISK: Error occured while reading the saved game from file ~A: ~A.~%~%" game-pathname c))
         nil))
+    (when saved-game
+      (loop for slot-name in '(save-type world mobs items lvl-features effects)
+            when (null (slot-boundp saved-game slot-name)) do
+              (logger (format nil "~%LOAD-GAME-FROM-DISK: Invalid saved game loaded from file ~A.~%~%" game-pathname))
+              (setf saved-game nil)
+              (loop-finish)))
     (when saved-game
       (with-slots (world mobs items lvl-features effects) saved-game
         (setf *world* world)

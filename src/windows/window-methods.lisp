@@ -469,7 +469,7 @@
                                        (setf enter-func #'(lambda (cur-sel)
                                                             (case cur-sel
                                                               (0 (progn
-                                                                   (save-game-to-disk :save-game-campaign)
+                                                                   (save-game-to-disk :save-game-campaign :save-scenario)
                                                                    (game-state-campaign-scenario->menu)
                                                                    (go-to-start-game)
                                                                    ))
@@ -495,7 +495,7 @@
                                      (setf enter-func #'(lambda (cur-sel)
                                                           (case cur-sel
                                                             (0 (progn
-                                                                 (save-game-to-disk :save-game-scenario)
+                                                                 (save-game-to-disk :save-game-scenario :save-scenario)
                                                                  (game-state-custom-scenario->menu)
                                                                  (go-to-start-game)
                                                                  ))
@@ -521,7 +521,7 @@
                                   (setf enter-func #'(lambda (cur-sel)
                                                        (case cur-sel
                                                          (0 (progn
-                                                              (save-game-to-disk :save-game-campaign)
+                                                              (save-game-to-disk :save-game-campaign :save-campaign)
                                                               (game-state-campaign-map->menu)
                                                               (go-to-start-game)
                                                               ))

@@ -96,13 +96,16 @@
                                     #'(lambda ()
                                         (setf *current-window* (make-instance 'load-game-window :save-game-type :save-game-campaign))
                                         (make-output *current-window*)
-                                        (if (eq :menu-load-scenario (run-window *current-window*))
-                                          (progn
-                                            (game-state-menu->campaign-scenario)
-                                            :menu-stop-loop)
-                                          (progn
-                                            (populate-main-menu win)
-                                            nil)))))
+                                        (case (run-window *current-window*)
+                                          (:save-campaign (progn
+                                                            (game-state-menu->campaign-map)
+                                                            :menu-stop-loop))
+                                          (:save-scenario (progn
+                                                            (game-state-menu->campaign-scenario)
+                                                            :menu-stop-loop))
+                                          (t (progn
+                                               (populate-main-menu win)
+                                               nil))))))
           (quick-scenario-item (list "Quick scenario"
                                      #'(lambda () 
                                          (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs) (quick-scenario-menu-items)
@@ -137,13 +140,13 @@
                                     #'(lambda ()
                                         (setf *current-window* (make-instance 'load-game-window :save-game-type :save-game-scenario))
                                         (make-output *current-window*)
-                                        (if (eq :menu-load-scenario (run-window *current-window*))
-                                          (progn
-                                            (game-state-menu->custom-scenario)
-                                            :menu-stop-loop)
-                                          (progn
-                                            (populate-main-menu win)
-                                            nil))
+                                        (case (run-window *current-window*)
+                                          (:save-scenario (progn
+                                                            (game-state-menu->custom-scenario)
+                                                            :menu-stop-loop))
+                                          (t (progn
+                                               (populate-main-menu win)
+                                               nil)))
                                         )))
           (settings-item (list "Settings"
                                #'(lambda ()
