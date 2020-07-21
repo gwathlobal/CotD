@@ -20,6 +20,7 @@
    (sector-name :initarg :sector-name :accessor serialized-save-descr/sector-name :type string)
    (mission-name :initarg :mission-name :accessor serialized-save-descr/mission-name :type string)
    (save-date :initarg :save-date :accessor serialized-save-descr/save-date :type fixnum)
+   (world-date-str :initarg :world-date-str :accessor serialized-save-descr/world-date-str :type fixnum)
    (params :initarg :params :accessor serialized-save-descr/params :type list)))
 
 (declaim (ftype (function (save-game-type-enum)
@@ -79,9 +80,9 @@
              (serialized-game (make-instance 'serialized-game :save-type save-type))
              (serialized-save-descr (make-instance 'serialized-save-descr
                                                    :id (game-manager/game-slot-id *game-manager*)
-                                                   :player-name (if *player*
+                                                   :player-name (if (eql save-type :save-scenario)
                                                                   (get-qualified-name *player*)
-                                                                  (format nil "~A [~A]" (options-player-name *options*) (show-date-time-ymd (world-game-time *world*)) ))
+                                                                  (options-player-name *options*))
                                                    :sector-name (if (level *world*)
                                                                   (name (world-sector (level *world*)))
                                                                   nil)
@@ -89,6 +90,11 @@
                                                                    (name (mission (level *world*)))
                                                                    nil)
                                                    :save-date (get-universal-time)
+                                                   :world-date-str (format nil "Game Time: ~A~A"
+                                                                           (show-date-time-ymd (world-game-time *world*))
+                                                                           (if (eql save-type :save-scenario)
+                                                                             (format nil ", T: ~A" (player-game-time *world*))
+                                                                             ""))
                                                    :params ())))
         (ensure-directories-exist dir-pathname)
         (cl-store:store serialized-save-descr descr-file-pathname)
