@@ -511,6 +511,8 @@
    (campaign-effects :initform () :accessor world/campaign-effects :type list)
 
    (commands :initform (make-hash-table) :accessor world/commands) ;; keys are faction-type, value is (:command <command id> :cd <cd>)
+
+   (random-number :initform (random 100) :accessor world/random-number)
    ))
 
 (defmethod initialize-instance :after ((world world) &key)

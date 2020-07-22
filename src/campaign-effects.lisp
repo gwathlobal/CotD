@@ -8,7 +8,8 @@
                                        :campaign-effect-demons-delayed
                                        :campaign-effect-angels-hastened
                                        :campaign-effect-demon-corrupt-portals
-                                       :campaign-effect-eater-agitated))
+                                       :campaign-effect-eater-agitated
+                                       :campaign-effect-angel-crusade))
 
 (defclass campaign-effect-type ()
   ((id :initarg :id :accessor campaign-effect-type/id :type campaign-effect-enum)

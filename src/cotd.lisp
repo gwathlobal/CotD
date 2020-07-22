@@ -454,10 +454,9 @@
       (return-from campaign-game-loop (values world-sector mission)))))
 
 (defun process-post-scenario ()
-  (with-slots (level world-map) *world*
-    (let ((present-missions (world/present-missions *world*))
-          )
-
+  (with-slots (level world-map random-number) *world*
+    (let ((present-missions (world/present-missions *world*)))
+           
       ;; add AI commands before mission results are processed
       (loop for faction-type in (list +faction-type-demons+ +faction-type-angels+ +faction-type-military+ +faction-type-satanists+ +faction-type-church+ +faction-type-eater+) do
         (when (not (gethash faction-type (world/commands *world*)))
@@ -611,7 +610,8 @@
           (let ((world-sector (aref (cells (world-map *world*)) x y)))
             (regenerate-transient-feats-for-world-sector world-sector (world-map *world*)))))
       
-      (generate-missions-on-world-map *world*)))
+      (generate-missions-on-world-map *world*))
+    (setf random-number (random 100)))
   (game-state-post-scenario->campaign-map))
 
 (defun cotd-main () 

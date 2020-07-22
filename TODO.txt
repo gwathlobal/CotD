@@ -1,3 +1,4 @@
+- BUG: it is possible to create a quick mission Satanist elimination for primordials where they attack automatically because there are no demons
 - More realistic auto win chance calculations for campaign mode missions
 - Military can not have delayed arrival if no army is present
 - Worm-like multitile creatures in hell that devour you while you are inside
@@ -13,6 +14,7 @@
 - Unstable pocket dimensions - complete the goal before the time expires
 - Collapsing pocket dimensions - complete the goal while the map becomes smaller and smaller
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)
+- Machine do not transform, Crimson can evolve but need to maintain control over their body otherwise they can busrt into raw biomass
 - A mission for satanists where there are no demons or angels, and they need to kill a certain npc and avoid police (or put a certain number of leaflets/runes on the walls)
 - Chain Lightning attack
 - Beam & Sweep arrack

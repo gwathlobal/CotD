@@ -107,7 +107,7 @@
   )
   (setf (campaign-window/cur-mode win) (campaign-window/prev-mode win)))
 
-(defmethod campaign-win-display-command ((win campaign-window))
+(defun campaign-win-display-command (win &key (can-esc nil))
   (when (not (eq (campaign-window/cur-mode win) :campaign-window-command-mode))
     (setf (campaign-window/prev-mode win) (campaign-window/cur-mode win))
     (setf (campaign-window/cur-mode win) :campaign-window-command-mode))
@@ -116,31 +116,41 @@
     (when (not (gethash player-faction (world/commands *world*)))
       (let ((command-list (loop for command being the hash-values in *campaign-commands*
                                 when (and (eq (campaign-command/faction-type command) player-faction)
+                                          (not (campaign-command/disabled command))
                                           (funcall (campaign-command/on-check-func command) *world* command))
                                   collect command))
             (menu-items ())
             (prompt-list ())
             (enter-func nil)
-            (header-str nil))
+            (header-str nil)
+            (descr-list ()))
         (setf header-str "Select a command")
         (setf menu-items (loop for command in command-list
-                                       collect (funcall (campaign-command/name-func command) *world*)))
+                               collect (format nil "~A ~A"
+                                               (funcall (campaign-command/name-func command) *world*)
+                                               (if (campaign-command/on-trigger-end-func command)
+                                                 (format nil "(effect in ~A turn~:P)" (campaign-command/cd command))
+                                                 (format nil "(immediate effect, cooldown ~A turn~:P)" (campaign-command/cd command))))))
         (setf prompt-list (loop repeat (length menu-items)
                                 collect #'(lambda (cur-sel)
                                             (declare (ignore cur-sel))
-                                            "[Enter] Select")))
+                                            (format nil "[Enter] Select~A" (if can-esc "  [Esc] Cancel" ""))
+                                            )))
         (setf enter-func #'(lambda (cur-sel)
                              (setf (gethash player-faction (world/commands *world*))
                                    (list :command (campaign-command/id (nth cur-sel command-list)) :cd (campaign-command/cd (nth cur-sel command-list))))
                              (setf *current-window* (return-to *current-window*))
                              ))
+        (setf descr-list (loop for command in command-list
+                               collect (funcall (campaign-command/descr-func command) *world*)))
         (setf *current-window* (make-instance 'select-obj-window 
                                               :return-to *current-window*
                                               :header-line header-str
                                               :line-list menu-items
                                               :prompt-list prompt-list
+                                              :descr-list descr-list
                                               :enter-func enter-func
-                                              :can-esc nil
+                                              :can-esc can-esc
                                               ))
         (make-output *current-window*)
         (run-window *current-window*))))
@@ -472,7 +482,7 @@
                                                                    (calc-is-mission-available (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                               (get-general-faction-from-specific (world/player-specific-faction *world*))))
                                                           (when (campaign-win-display-mission-details win)
-                                                            (campaign-win-display-command win)
+                                                            (campaign-win-display-command win :can-esc nil)
                                                             (return-from run-window (values (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)))
                                                                                             (world-sector (mission (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector))))))))))
                             )))
@@ -481,7 +491,7 @@
                        (when (or (and (sdl:key= key :sdl-key-c) (= mod 0))
                                  (eq unicode +cotd-unicode-latin-c-small+))
                          (case (game-manager/game-state *game-manager*)
-                           (:game-state-campaign-map (campaign-win-display-command win))))
+                           (:game-state-campaign-map (campaign-win-display-command win :can-esc t))))
                        ;;------------------
                        ;; view situation report - s
                        (when (or (and (sdl:key= key :sdl-key-s) (= mod 0))

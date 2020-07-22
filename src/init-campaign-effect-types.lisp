@@ -179,3 +179,21 @@
                                                 (add-message (format nil " are falling into ") sdl:*white* message-box-list)
                                                 (add-message (format nil "a sleep") sdl:*yellow* message-box-list)
                                                 (add-message (format nil ".~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-angel-crusade
+                          :name "Divine crusade"
+                          :descr "The angels have declared a divine crusade and are able to initiate 1 more mission for the duration of this effect."
+                          :merge-func nil
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/effect-message-box world))))
+                                             (add-message (format nil "The angels have ") sdl:*white* message-box-list)
+                                             (add-message (format nil "declared divine crusade") sdl:*yellow* message-box-list)
+                                             (add-message (format nil ".~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/effect-message-box world))))
+                                                (add-message (format nil "Divine crusade") sdl:*yellow* message-box-list)
+                                                (add-message (format nil " has ") sdl:*white* message-box-list)
+                                                (add-message (format nil "ended") sdl:*yellow* message-box-list)
+                                                (add-message (format nil ".~%") sdl:*white* message-box-list))))

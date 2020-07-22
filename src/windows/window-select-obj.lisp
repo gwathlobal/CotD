@@ -15,7 +15,7 @@
 (defmethod make-output ((win select-obj-window))
   (let* ((w (loop with max = 330
                   for str in (append (list (header-line win)) (line-list win))
-                  for try-max = (+ 10 (* (sdl:char-width sdl:*default-font*) (length str)))
+                  for try-max = (+ 10 (* (sdl:char-width sdl:*default-font*) (+ 10 (length str))))
                   when (> try-max max) do
                     (setf max try-max)
                   finally (return-from nil max)))
@@ -72,7 +72,7 @@
             (setf color-list (append color-list (list (nth i (color-list win)))))
             (setf color-list (append color-list (list sdl:*white*)))))
         )
-      (draw-selection-list (line-list win) cur-str (length (line-list win)) (- (truncate *window-width* 2) 150) (1+ y) :color-list color-list :use-letters t))
+      (draw-selection-list (line-list win) cur-str (length (line-list win)) (+ x 10) (1+ y) :color-list color-list :use-letters t))
 
     ;; drawing descriptions
     (when (descr-list win)

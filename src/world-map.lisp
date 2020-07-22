@@ -445,9 +445,6 @@
           (when (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
             (incf demons-mission-limit)))))
 
-    ;; add # of dimensional engines
-    
-
     ;; add the number of demonic forces present in the city
     (incf demons-mission-limit (world/cur-demons-num world))
     
@@ -930,7 +927,7 @@
 (defun throw-hell-in-turmoil (world-map x y)
   (declare (ignore world-map x y)) 
 
-  (add-campaign-effect *world* :id :campaign-effect-demon-turmoil :cd 4)
+  (add-campaign-effect *world* :id :campaign-effect-demon-turmoil :cd 3)
 
   )
 

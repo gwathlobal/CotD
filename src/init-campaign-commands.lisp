@@ -6,7 +6,7 @@
                                      "Wait & see")
                       :descr-func #'(lambda (world)
                                       (declare (ignore world))
-                                      "Wait for 5 turns.")
+                                      "Do nothing and wait.")
                       :faction-type +faction-type-angels+
                       :disabled nil
                       :cd 5
@@ -22,10 +22,10 @@
                                      "Wait & see")
                       :descr-func #'(lambda (world)
                                       (declare (ignore world))
-                                      "Wait for 5 turns.")
+                                      "Do nothing and wait.")
                       :faction-type +faction-type-demons+
                       :disabled nil
-                      :cd 5
+                      :cd 4
                       :on-check-func #'(lambda (world campaign-command)
                                          (declare (ignore world campaign-command))
                                          t
@@ -38,7 +38,7 @@
                                      "Wait & see")
                       :descr-func #'(lambda (world)
                                       (declare (ignore world))
-                                      "Wait for 5 turns.")
+                                      "Do nothing and wait.")
                       :faction-type +faction-type-military+
                       :disabled nil
                       :cd 5
@@ -54,7 +54,7 @@
                                      "Wait & see")
                       :descr-func #'(lambda (world)
                                       (declare (ignore world))
-                                      "Wait for 5 turns.")
+                                      "Do nothing and wait.")
                       :faction-type +faction-type-church+
                       :disabled nil
                       :cd 5
@@ -70,7 +70,7 @@
                                      "Wait & see")
                       :descr-func #'(lambda (world)
                                       (declare (ignore world))
-                                      "Wait for 7 turns.")
+                                      "Do nothing and wait.")
                       :faction-type +faction-type-eater+
                       :disabled nil
                       :cd 7
@@ -164,7 +164,7 @@
                                                  (add-message (format nil "satanists' lair") sdl:*yellow* message-box-list)
                                                  (add-message (format nil " has been ") sdl:*white* message-box-list)
                                                  (add-message (format nil "reformed") sdl:*yellow* message-box-list)
-                                                 (add-message (format nil ".~%") sdl:*yellow* message-box-list))
+                                                 (add-message (format nil ".~%") sdl:*white* message-box-list))
                                                ))
 
 (set-campaign-command :id :campaign-command-demon-rebuild-engine
@@ -199,7 +199,7 @@
                                                  (add-message (format nil "rebuilt") sdl:*yellow* message-box-list)
                                                  (add-message (format nil " their ") sdl:*white* message-box-list)
                                                  (add-message (format nil "dimensional engine") sdl:*yellow* message-box-list)
-                                                 (add-message (format nil ".~%") sdl:*yellow* message-box-list))
+                                                 (add-message (format nil ".~%") sdl:*white* message-box-list))
                                                ))
 
 (set-campaign-command :id :campaign-command-demon-add-army
@@ -332,7 +332,7 @@
 (set-campaign-command :id :campaign-command-military-reveal-lair
                       :name-func #'(lambda (world)
                                      (declare (ignore world))
-                                     "Reveal a satanist' lair")
+                                     "Reveal a satanists' lair")
                       :descr-func #'(lambda (world)
                                       (declare (ignore world))
                                       "Infiltrate the satanists' lair and make it vulnerable for attack.")
@@ -584,3 +584,91 @@
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
                                                  (add-campaign-effect world :id :campaign-effect-eater-agitated :cd 5)))
+
+(set-campaign-command :id :campaign-command-angel-reveal-lair
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Reveal a satanists' lair")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Shed divine light to allow humans instantly reveal the satanists' lair and make it vulnerable for attack.")
+                      :faction-type +faction-type-angels+
+                      :disabled nil
+                      :cd 7
+                      :priority 1
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         
+                                         (let ((military-win-cond (get-win-condition-by-id :win-cond-military-campaign))
+                                               (relic-sector nil))
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (and (find +lm-item-holy-relic+ (items world-sector))
+                                                            (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                                (eq (wtype world-sector) :world-sector-normal-port)
+                                                                (eq (wtype world-sector) :world-sector-normal-island)
+                                                                (eq (wtype world-sector) :world-sector-normal-residential)
+                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                   (setf relic-sector t)))))
+                                           
+                                           (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) world military-win-cond)
+                                             (declare (ignore corrupted-sectors-left))
+                                             (if (and relic-sector
+                                                      (not (zerop satanist-lairs-left))
+                                                      (not (find-campaign-effects-by-id world :campaign-effect-satanist-lair-visible))
+                                                      (< (world/random-number world) 15))
+                                               t
+                                               nil))))
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                 (let ((message-box-list `(,(world/event-message-box world))))
+                                                   (add-message (format nil "Angels have ") sdl:*white* message-box-list)
+                                                   (add-message (format nil "revealed") sdl:*yellow* message-box-list)
+                                                   (add-message (format nil " the place where the ") sdl:*white* message-box-list)
+                                                   (add-message (format nil "satanists") sdl:*yellow* message-box-list)
+                                                   (add-message (format nil "hide.~%") sdl:*white* message-box-list))
+                                                 
+                                                 (add-campaign-effect world :id :campaign-effect-satanist-lair-visible :cd 5)
+                                                 (loop for campaign-effect in (find-campaign-effects-by-id world :campaign-effect-satanist-lair-hidden) do
+                                                   (remove-campaign-effect world campaign-effect))
+                                                 ))
+
+(set-campaign-command :id :campaign-command-angel-divine-crusade
+                      :name-func #'(lambda (world)
+                                     (declare (ignore world))
+                                     "Declare divine crusade")
+                      :descr-func #'(lambda (world)
+                                      (declare (ignore world))
+                                      "Declare divine crusade to be able to initiate 1 more mission for 5 turns.")
+                      :faction-type +faction-type-angels+
+                      :disabled nil
+                      :cd 9
+                      :priority 1
+                      :on-check-func #'(lambda (world campaign-command)
+                                         (declare (ignore campaign-command))
+                                         
+                                         (let ((relic-sector nil))
+                                           (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
+                                             (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
+                                               (let ((world-sector (aref (cells (world-map world)) x y)))
+                                                 (when (and (find +lm-item-holy-relic+ (items world-sector))
+                                                            (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
+                                                                (eq (wtype world-sector) :world-sector-normal-port)
+                                                                (eq (wtype world-sector) :world-sector-normal-island)
+                                                                (eq (wtype world-sector) :world-sector-normal-residential)
+                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                   (setf relic-sector t)))))
+                                           
+                                           (if (and relic-sector
+                                                    (not (find-campaign-effects-by-id world :campaign-effect-angel-crusade))
+                                                    (> (world/random-number world) 85))
+                                               t
+                                               nil)))
+                      :on-trigger-start-func #'(lambda (world campaign-command)
+                                                 (declare (ignore campaign-command))
+                                                                                                  
+                                                 (add-campaign-effect world :id :campaign-effect-angel-crusade :cd 5)  
+                                                 ))

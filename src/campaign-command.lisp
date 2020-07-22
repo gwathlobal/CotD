@@ -20,6 +20,8 @@
                                         :campaign-command-priest-hasten-angels
                                         :campaign-command-eater-wait
                                         :campaign-command-eater-agitated
+                                        :campaign-command-angel-reveal-lair
+                                        :campaign-command-angel-divine-crusade
                                         ))
 
 (defclass campaign-command ()
