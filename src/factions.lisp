@@ -48,3 +48,9 @@
           do
              (return-from get-general-faction-from-specific (id faction-type)))
   nil)
+
+(defun set-specific-faction-name (specific-faction-id name-string)
+  (setf (gethash specific-faction-id *specific-faction-names*) name-string))
+
+(defun get-specific-faction-name (specific-faction-id)
+  (gethash specific-faction-id *specific-faction-names*))

@@ -38,11 +38,7 @@
                                                         (let ((func-list ()))
 
                                                           (push #'(lambda (level world-sector mission world)
-                                                                    
-                                                                    (place-angels-on-level level world-sector mission world (list (list +mob-type-angel+ 1 t)))
-                                                                    (setf (faction-name *player*) "Chrome Angel")
-                                                                    
-                                                                    )
+                                                                    (place-angels-on-level level world-sector mission world (list (list +mob-type-angel+ 1 t))))
                                                                 func-list)
                                                           func-list)))
 
@@ -52,11 +48,7 @@
                                                         (let ((func-list ()))
 
                                                           (push #'(lambda (level world-sector mission world)
-                                                                    
-                                                                    (place-angels-on-level level world-sector mission world (list (list +mob-type-star-singer+ 1 t)))
-                                                                    (setf (faction-name *player*) "Trinity mimic")
-                                                                    
-                                                                    )
+                                                                    (place-angels-on-level level world-sector mission world (list (list +mob-type-star-singer+ 1 t))))
                                                                 func-list)
                                                           func-list)))
 
@@ -66,10 +58,7 @@
                                                         (let ((func-list ()))
 
                                                           (push #'(lambda (level world-sector mission world)
-                                                                    
-                                                                    (place-demons-on-level level world-sector mission world (list (list +mob-type-imp+ 1 t)))
-                                                                    (setf (faction-name *player*) "Crimson Imp")
-                                                                    )
+                                                                    (place-demons-on-level level world-sector mission world (list (list +mob-type-imp+ 1 t))))
                                                                 func-list)
                                                           func-list)))
 
@@ -79,10 +68,7 @@
                                                         (let ((func-list ()))
 
                                                           (push #'(lambda (level world-sector mission world)
-                                                                    
-                                                                    (place-demons-on-level level world-sector mission world (list (list +mob-type-shadow-imp+ 1 t)))
-                                                                    (setf (faction-name *player*) "Shadow Imp")
-                                                                    )
+                                                                    (place-demons-on-level level world-sector mission world (list (list +mob-type-shadow-imp+ 1 t))))
                                                                 func-list)
                                                           func-list)))
 
@@ -92,10 +78,7 @@
                                                         (let ((func-list ()))
 
                                                           (push #'(lambda (level world-sector mission world)
-                                                                    
-                                                                    (place-demons-on-level level world-sector mission world (list (list +mob-type-malseraph-puppet+ 1 t)))
-                                                                    (setf (faction-name *player*) "Malseraph's puppet")
-                                                                    )
+                                                                    (place-demons-on-level level world-sector mission world (list (list +mob-type-malseraph-puppet+ 1 t))))
                                                                 func-list)
                                                           func-list)))
 
@@ -105,16 +88,13 @@
                                                         (let ((func-list ()))
 
                                                           (push #'(lambda (level world-sector mission world)
-                                                                    
                                                                     (place-military-on-level level world-sector mission world
                                                                                              (list (list (list +mob-type-chaplain+ 1 t)
                                                                                                          (list +mob-type-sergeant+ 1 nil)
                                                                                                          (list +mob-type-scout+ 1 nil)
                                                                                                          (list +mob-type-soldier+ 3 nil)
                                                                                                          (list +mob-type-gunner+ 1 nil)))
-                                                                                             t)
-                                                                    (setf (faction-name *player*) "Military Chaplain")
-                                                                    )
+                                                                                             t))
                                                                 func-list)
                                                           func-list)))
 
@@ -124,13 +104,9 @@
                                                         (let ((func-list ()))
 
                                                           (push #'(lambda (level world-sector mission world)
-                                                                    
                                                                     (place-military-on-level level world-sector mission world
                                                                                              (list (list (list +mob-type-scout+ 1 t)))
-                                                                                             nil)
-                                                                    (setf (faction-name *player*) "Military Chaplain")
-
-                                                                    )
+                                                                                             nil))
                                                                 func-list)
                                                           func-list)))
 
@@ -143,10 +119,7 @@
                                                                     (declare (ignore world-sector mission world))
                                                                     
                                                                     (setf *player* (make-instance 'player :mob-type +mob-type-priest+))
-                                                                    (find-player-start-position level *player* +feature-start-church-player+)
-                                                                    (setf (faction-name *player*) "Church")
-
-                                                                    )
+                                                                    (find-player-start-position level *player* +feature-start-church-player+))
                                                                 func-list)
                                                           func-list)))
 
@@ -159,10 +132,7 @@
                                                                     (declare (ignore world-sector mission world))
                                                                     
                                                                     (setf *player* (make-instance 'player :mob-type +mob-type-satanist+))
-                                                                    (find-player-start-position level *player* +feature-start-satanist-player+)
-                                                                    (setf (faction-name *player*) "Satanists")
-
-                                                                    )
+                                                                    (find-player-start-position level *player* +feature-start-satanist-player+))
                                                                 func-list)
                                                           func-list)))
 
@@ -175,10 +145,7 @@
                                                                     (declare (ignore world-sector mission world))
                                                                     
                                                                     (setf *player* (make-instance 'player :mob-type +mob-type-eater-of-the-dead+))
-                                                                    (find-unoccupied-place-water level *player*)
-                                                                    (setf (faction-name *player*) "Eater of the dead")
-
-                                                                    )
+                                                                    (find-unoccupied-place-water level *player*))
                                                                 func-list)
                                                           func-list)))
 
@@ -191,10 +158,7 @@
                                                                     (declare (ignore world-sector mission world))
                                                                     
                                                                     (setf *player* (make-instance 'player :mob-type +mob-type-skinchanger-melee+))
-                                                                    (find-unoccupied-place-water level *player*)
-                                                                    (setf (faction-name *player*) "Skinchanger")
-
-                                                                    )
+                                                                    (find-unoccupied-place-water level *player*))
                                                                 func-list)
                                                           func-list)))
 
@@ -207,10 +171,7 @@
                                                                     (declare (ignore world-sector mission world))
                                                                     
                                                                     (setf *player* (make-instance 'player :mob-type +mob-type-thief+))
-                                                                    (find-unoccupied-place-on-top level *player*)
-                                                                    (setf (faction-name *player*) "Thief")
-
-                                                                    )
+                                                                    (find-unoccupied-place-on-top level *player*))
                                                                 func-list)
                                                           func-list)))
 
@@ -223,10 +184,7 @@
                                                                     (declare (ignore world-sector mission world))
                                                                     
                                                                     (setf *player* (make-instance 'player :mob-type +mob-type-ghost+))
-                                                                    (find-unoccupied-place-inside level *player*)
-                                                                    (setf (faction-name *player*) "Lost soul")
-
-                                                                    )
+                                                                    (find-unoccupied-place-inside level *player*))
                                                                 func-list)
                                                           func-list)))
 

@@ -36,11 +36,9 @@
       (multiple-value-setq (tmp-final-str tmp-score) (dump-when-dead)))
     
     (setf highscores-place (add-highscore-record *highscores*
-                                                 :name-str (name *player*)
+                                                 :name-str *player-name*
                                                  :score tmp-score
-                                                 :mob-type-str (if (mimic-id-list *player*)
-                                                                 (faction-name *player*)
-                                                                 (capitalize-name (name (get-mob-type-by-id (mob-type *player*)))))
+                                                 :mob-type-str *player-title*
                                                  :turns (player-game-time tmp-world)
                                                  :result-str tmp-final-str
                                                  :sector-name-str (name (world-sector (level tmp-world)))))

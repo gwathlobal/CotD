@@ -12,7 +12,9 @@
    (mobs :initform *mobs* :initarg :mobs :accessor serialized-game/mobs :type array)
    (items :initform *items* :initarg :items :accessor serialized-game/items :type array)
    (lvl-features :initform *lvl-features* :initarg :lvl-features :accessor serialized-game/lvl-features :type array)
-   (effects :initform *effects* :initarg :effects :accessor serialized-game/effects :type array)))
+   (effects :initform *effects* :initarg :effects :accessor serialized-game/effects :type array)
+   (player-name :initform *player-name* :initarg :player-name :accessor serialized-game/player-name :type string)
+   (player-title :initform *player-title* :initarg :player-title :accessor serialized-game/player-title :type string)))
 
 (defclass serialized-save-descr ()
   ((id :initarg :id :accessor serialized-save-descr/id :type fixnum)
@@ -22,6 +24,20 @@
    (save-date :initarg :save-date :accessor serialized-save-descr/save-date :type fixnum)
    (world-date-str :initarg :world-date-str :accessor serialized-save-descr/world-date-str :type fixnum)
    (params :initarg :params :accessor serialized-save-descr/params :type list)))
+
+(defun validate-serialized-game (serialized-game &optional pathname)
+  (loop for slot-name in '(save-type world mobs items lvl-features effects player-name player-title)
+        when (null (slot-boundp serialized-game slot-name)) do
+          (logger (format nil "VALIDATE-SERIALIZED-GAME: Invalid saved game loaded, pathname: ~A.~%" pathname))
+          (return-from validate-serialized-game nil))
+  t)
+
+(defun validate-serialized-descr (serialized-descr &optional pathname)
+  (loop for slot-name in '(id player-name sector-name mission-name save-date world-date-str params)
+        when (null (slot-boundp serialized-descr slot-name)) do
+          (logger (format nil "VALIDATE-SERIALIZED-DESCR: Invalid save description loaded, pathname: ~A.~%" pathname))
+          (return-from validate-serialized-descr nil))
+  t)
 
 (declaim (ftype (function (save-game-type-enum)
                           pathname)
@@ -80,8 +96,8 @@
              (serialized-game (make-instance 'serialized-game :save-type save-type))
              (serialized-save-descr (make-instance 'serialized-save-descr
                                                    :id (game-manager/game-slot-id *game-manager*)
-                                                   :player-name (if (eql save-type :save-scenario)
-                                                                  (get-qualified-name *player*)
+                                                   :player-name (if (and *player-name* *player-title*)
+                                                                  (format nil "~A the ~A" *player-name* *player-title*)
                                                                   (options-player-name *options*))
                                                    :sector-name (if (level *world*)
                                                                   (name (world-sector (level *world*)))
@@ -118,8 +134,11 @@
             (logger (format nil "~%LOAD-DESCR-FROM-DISK: No file ~A to read the save description from.~%~%" descr-pathname))
             nil))
       (t (c)
-        (logger (format nil "~%LOAD-DESCR-FROM-DISK: Error occured while reading the save description from file ~A.~%~%" descr-pathname))
+        (logger (format nil "~%LOAD-DESCR-FROM-DISK: Error occured while reading the save description from file ~A: ~A.~%~%" descr-pathname c))
         nil))
+    (when saved-descr
+      (unless (validate-serialized-descr saved-descr descr-pathname)
+        (setf saved-descr nil)))
     saved-descr))
 
 (declaim (ftype (function (pathname)
@@ -139,18 +158,17 @@
         (logger (format nil "~%LOAD-GAME-FROM-DISK: Error occured while reading the saved game from file ~A: ~A.~%~%" game-pathname c))
         nil))
     (when saved-game
-      (loop for slot-name in '(save-type world mobs items lvl-features effects)
-            when (null (slot-boundp saved-game slot-name)) do
-              (logger (format nil "~%LOAD-GAME-FROM-DISK: Invalid saved game loaded from file ~A.~%~%" game-pathname))
-              (setf saved-game nil)
-              (loop-finish)))
+      (unless (validate-serialized-game saved-game game-pathname)
+        (setf saved-game nil)))
     (when saved-game
-      (with-slots (world mobs items lvl-features effects) saved-game
+      (with-slots (world mobs items lvl-features effects player-name player-title) saved-game
         (setf *world* world)
         (setf *mobs* mobs)
         (setf *items* items)
         (setf *lvl-features* lvl-features)
         (setf *effects* effects)
+        (setf *player-name* player-name)
+        (setf *player-title* player-title)
         (setf *player* (find 'player *mobs* :key #'(lambda (a)
                                                      (type-of a))))))
     saved-game))

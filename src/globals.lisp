@@ -654,8 +654,12 @@
 (defconstant +objective-demon-attack-ghost+ 4)
 (defconstant +objective-demon-attack-scout+ 5)
 
-(defparameter *faction-table* (make-hash-table))
+;;--------------------
+;; Template Globals
+;;--------------------
 
+(defparameter *faction-table* (make-hash-table))
+(defparameter *specific-faction-names* (make-hash-table))
 (defparameter *ability-types* (make-array (list 0) :adjustable t))
 (defparameter *feature-types* (make-array (list 0) :adjustable t))
 (defparameter *terrain-types* (make-array (list 0) :adjustable t))
@@ -668,14 +672,19 @@
 (defparameter *faction-types* (make-array (list 0) :initial-element nil :adjustable t))
 (defparameter *objective-types* (make-array (list 0) :adjustable t))
 
+;;--------------------
+;; Actual Game Globals
+;;--------------------
+
 (defparameter *lvl-features* (make-array (list 0) :adjustable t))
 (defparameter *mobs* (make-array (list 0) :adjustable t))
 (defparameter *items* (make-array (list 0) :adjustable t))
 (defparameter *effects* (make-array (list 0) :adjustable t))
-
 (defparameter *world* nil)
 (defparameter *player* nil)
 (defparameter *game-manager* nil)
+(defparameter *player-name* nil)
+(defparameter *player-title* nil)
 
 (defvar *update-screen-closure*)
 (defvar *cur-progress-bar*)

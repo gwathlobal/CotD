@@ -14,13 +14,20 @@
     (loop with filename-descr = (make-pathname :name *save-descr-filename*)
           with filename-game = (make-pathname :name *save-game-filename*)
           with serialized-save-descr = nil
+          with save-descr-list = ()
           for pathname in (find-all-save-game-paths save-game-type)
           for descr-pathname = (merge-pathnames filename-descr pathname)
           for game-pathname = (merge-pathnames filename-game pathname)
           do
              (setf serialized-save-descr (load-descr-from-disk descr-pathname))
              (when serialized-save-descr
-               (with-slots (id player-name sector-name mission-name world-date-str save-date) serialized-save-descr
+               (push (list serialized-save-descr game-pathname descr-pathname) save-descr-list))
+          finally
+             (setf save-descr-list (stable-sort save-descr-list #'<
+                                                :key #'(lambda (a)
+                                                         (serialized-save-descr/save-date (first a)))))
+             (loop for (save-descr game-pathname descr-pathname) in save-descr-list do
+               (with-slots (id player-name sector-name mission-name world-date-str save-date) save-descr
                  (multiple-value-bind (second minute hour date month year day-of-week dst-p tz) (decode-universal-time save-date)
                    (declare (ignore day-of-week dst-p tz))
                    (push (format nil "~40@<~A~> ~40@<~A~>~30@<~A~>~%~A [~A]" player-name

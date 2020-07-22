@@ -1472,7 +1472,6 @@
    (sense-stockpile-pos :initform nil :accessor sense-stockpile-pos)
    (can-move-if-possessed :initform t :accessor can-move-if-possessed)
    (killed-by :initform nil :accessor killed-by)
-   (faction-name :initform nil :accessor faction-name)
    (cur-score :initform 0 :accessor cur-score)
    (nearby-light-mobs :initform () :accessor nearby-light-mobs)
    (nearby-light-sources :initform () :accessor nearby-light-sources)

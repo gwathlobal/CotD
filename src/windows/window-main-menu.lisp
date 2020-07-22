@@ -88,6 +88,7 @@
                                              (progn
                                                (enter-player-name)
                                                (setf (world/player-specific-faction *world*) (funcall (nth select-n campaign-funcs) select-n))
+                                               (setf *player-title* (get-specific-faction-name (world/player-specific-faction *world*)))
                                                (game-state-menu->campaign-init)
                                                :menu-stop-loop)
                                              nil)))
@@ -115,8 +116,8 @@
                                              (when select-n
                                                (multiple-value-bind (world-sector mission) (funcall (nth select-n quick-scenario-funcs) select-n)
                                                  (when (and mission world-sector)
-                                                   ;(setf *current-window* (return-to *current-window*))
                                                    (enter-player-name)
+                                                   (setf *player-title* (get-specific-faction-name (player-specific-faction mission)))
                                                    (prepare-game-scenario mission world-sector)
                                                    (game-state-menu->custom-scenario)
                                                    :menu-stop-loop
@@ -129,8 +130,8 @@
                                           (make-output *current-window*)
                                           (multiple-value-bind (world-sector mission) (run-window *current-window*)
                                             (when (and world-sector mission)
-                                              ;(setf *current-window* (return-to *current-window*))
                                               (enter-player-name)
+                                              (setf *player-title* (get-specific-faction-name (player-specific-faction mission)))
                                               (prepare-game-scenario mission world-sector)
                                               (game-state-menu->custom-scenario)
                                               :menu-stop-loop

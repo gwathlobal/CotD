@@ -387,7 +387,8 @@
                                                                 nil))
                                         ))
   (make-output *current-window*)
-  (setf (options-player-name *options*) (run-window *current-window*)))
+  (setf (options-player-name *options*) (run-window *current-window*))
+  (setf *player-name* (options-player-name *options*)))
 
 (defun prepare-game-scenario (mission world-sector)
   (setf *current-window* (make-instance 'loading-window 
@@ -412,13 +413,12 @@
   (bt:condition-notify (path-cv *world*))
   
   ;; set the same name for mimics if any
-  (setf (name *player*) (options-player-name *options*))
+  (setf (name *player*) *player-name*)
   (setf (alive-name *player*) (name *player*))
   (when (mob-ability-p *player* +mob-abil-trinity-mimic+)
     (loop for mob-id in (mimic-id-list *player*)
           for mob = (get-mob-by-id mob-id)
           do
-             (setf (faction-name mob) (faction-name *player*))
              (setf (name mob) (name *player*))))
   
   (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
