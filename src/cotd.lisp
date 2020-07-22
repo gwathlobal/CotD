@@ -508,42 +508,12 @@
                    (setf mission-result (level/mission-result level)))
                  ;; ...and where the player was absent
                  (progn
-                   (loop with avail-results-won = ()
-                         for (faction-id faction-present) in (faction-list mission)
-                         when (not (eq faction-present :mission-faction-absent))
-                           do
-                              (cond
-                                ((= faction-id +faction-type-angels+) (progn
-                                                                        (push :game-over-angels-won avail-results-won)
-                                                                        (when (eq faction-present :mission-faction-present)
-                                                                          (push :game-over-angels-won avail-results-won))))
-                                ((= faction-id +faction-type-demons+) (progn
-                                                                        (push :game-over-demons-won avail-results-won)
-                                                                        (when (eq faction-present :mission-faction-present)
-                                                                          (push :game-over-demons-won avail-results-won))))
-                                ((= faction-id +faction-type-military+) (progn
-                                                                          (push :game-over-military-won avail-results-won)
-                                                                          (when (eq faction-present :mission-faction-present)
-                                                                            (push :game-over-military-won avail-results-won))))
-                                ((= faction-id +faction-type-church+) (progn
-                                                                        (push :game-over-church-won avail-results-won)
-                                                                        (when (eq faction-present :mission-faction-present)
-                                                                          (push :game-over-church-won avail-results-won))))
-                                ((= faction-id +faction-type-satanists+) (progn
-                                                                           (push :game-over-satanists-won avail-results-won)
-                                                                           (when (eq faction-present :mission-faction-present)
-                                                                             (push :game-over-satanists-won avail-results-won))))
-                                ((= faction-id +faction-type-eater+) (progn
-                                                                       (push :game-over-eater-won avail-results-won)
-                                                                       (when (eq faction-present :mission-faction-present)
-                                                                         (push :game-over-eater-won avail-results-won)))))
-                         finally
-                            (setf (getf mission-result :mission-result) (nth (random (length avail-results-won)) avail-results-won))
-                            
-                            ;; increase world flesh points
-                            (when (or (eq (getf mission-result :mission-result) :game-over-demons-won)
-                                      (eq (getf mission-result :mission-result) :game-over-satanists-won))
-                              (setf (getf mission-result :flesh-points) (truncate (+ 75 (random 50)) 10))))))
+                   (setf mission-result (auto-resolve-mission *world* mission))
+                   
+                   ;; increase world flesh points
+                   (when (or (eq (getf mission-result :mission-result) :game-over-demons-won)
+                             (eq (getf mission-result :mission-result) :game-over-satanists-won))
+                     (setf (getf mission-result :flesh-points) (truncate (+ 75 (random 50)) 10)))))
                
                (case (getf mission-result :mission-result)
                  (:game-over-angels-won (progn
