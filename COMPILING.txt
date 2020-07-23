@@ -128,6 +128,8 @@ Enter the following command to load Cl-STORE
 (ql:quickload "cl-store")
 Enter the following command to load UIOP
 (ql:quickload "uiop")
+Enter the following command to load LOG4CL
+(ql:quickload "log4cl")
 
 6. Fetch CotD source files
 

@@ -586,7 +586,9 @@
 
 (defun cotd-main () 
   (in-package :cotd)
-    
+  (setup-log)
+  (log:info "Start program")
+  
   (sdl:with-init ()
 
     (cotd-init)
@@ -617,8 +619,14 @@
            (:game-state-post-scenario (process-post-scenario))))
      quit-menu-tag
        (stop-path-thread))
-    nil)
-)
+    (log:info "End program~%")
+    nil))
+
+(defun setup-log ()
+  (case *cotd-logging*
+    (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" :info))
+    (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" :info))
+    (t (log:config :off))))
 
 #+clisp
 (defun cotd-exec ()
@@ -635,6 +643,7 @@
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
+  (setf *cotd-logging* :log-option-none)
 
   (sdl:with-init ()  
     (cotd-main))
@@ -655,6 +664,7 @@
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
+  (setf *cotd-logging* :log-option-none)
   
   (sdl:with-init ()  
     (cotd-main))
