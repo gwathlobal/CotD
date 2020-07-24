@@ -106,7 +106,7 @@
                                                                                    (if (riding-mob-id *player*)
                                                                                      (map-size (get-mob-by-id (riding-mob-id *player*)))
                                                                                      (map-size *player*))
-                                                                                   (get-mob-move-mode *player*))))
+                                                                                   (get-mob-move-mode *player*) :can-open-doors (can-open-doors *player*))))
                   )
           (setf feature-list (get-features-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
           (dolist (feature feature-list)

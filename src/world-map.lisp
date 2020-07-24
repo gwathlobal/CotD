@@ -720,6 +720,16 @@
                              (second (find faction-id str-table
                                            :key (lambda (a) (first a))))
                              base-chance))
+
+    ;; it is harder for non-demons in hell districts -60%
+    (when (and (world-sector mission)
+               (or (eq (wtype (world-sector mission)) :world-sector-hell-jungle)))
+      (loop for faction-id in (list +faction-type-angels+ +faction-type-military+ +faction-type-church+)
+            do
+               (log:info "   Corrupted district -60% to non-demons")
+               (when (find faction-id faction-chances :key #'(lambda (a) (first a)))
+                 (decf (second (find faction-id faction-multipliers :key #'(lambda (a) (first a))))
+                       60))))
     
     ;; it is harder for non-demons in corrupted districts -30%
     (when (and (world-sector mission)

@@ -541,6 +541,10 @@
                                                              (push #'place-outsider-beasts-on-level
                                                                    func-list)
 
+                                                             ;; place outsider beasts twice
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
                                                                    func-list)
@@ -624,6 +628,10 @@
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
 
+                                                              ;; place outsider beasts twice
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+
                                                               ;; place irradiated spots
                                                               (push #'place-irradation-on-level
                                                                     func-list)
@@ -701,6 +709,10 @@
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
 
+                                                             ;; place outsider beasts twice
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+                                                             
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
                                                                    func-list)
@@ -766,6 +778,10 @@
                                                               (push #'place-outsider-beasts-on-level
                                                                     func-list)
 
+                                                             ;; place outsider beasts twice
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+                                                             
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
                                                                    func-list)
@@ -829,7 +845,11 @@
 
                                                              ;; place outsider beasts
                                                              (push #'place-outsider-beasts-on-level
-                                                                    func-list)
+                                                                   func-list)
+
+                                                             ;; place outsider beasts twice
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
 
                                                              ;; place irradiated spots
                                                              (push #'place-irradation-on-level
@@ -892,6 +912,10 @@
                                                            (let ((func-list ()))
 
                                                              ;; place outsider beasts
+                                                             (push #'place-outsider-beasts-on-level
+                                                                   func-list)
+
+                                                             ;; place outsider beasts twice
                                                              (push #'place-outsider-beasts-on-level
                                                                    func-list)
 

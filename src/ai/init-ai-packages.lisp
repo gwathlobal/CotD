@@ -110,7 +110,7 @@
                                                                                                    (if (riding-mob-id actor)
                                                                                                      (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                      (map-size actor))
-                                                                                                   (get-mob-move-mode actor))
+                                                                                                   (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
                                                                           (and (> (map-size actor) 1)
                                                                                (ai-find-move-around actor (first target-cell) (second target-cell))))
                                                                     target-cell
@@ -408,7 +408,7 @@
                                                                                                                                          (if (riding-mob-id actor)
                                                                                                                                            (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                            (map-size actor))
-                                                                                                                                         (get-mob-move-mode actor))
+                                                                                                                                         (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
                                                                                                                 (and (> (map-size actor) 1)
                                                                                                                      (ai-find-move-around actor (x item) (y item)))))
                                                                                                     collect item)))
@@ -480,7 +480,7 @@
                                                                                                                                        (if (riding-mob-id actor)
                                                                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                          (map-size actor))
-                                                                                                                                       (get-mob-move-mode actor))
+                                                                                                                                       (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
                                                                                                               (and (> (map-size actor) 1)
                                                                                                                    (ai-find-move-around actor (sound-x sound) (sound-y sound)))))
                                                                                                   collect sound))
@@ -554,7 +554,7 @@
                                                                                                                                        (if (riding-mob-id actor)
                                                                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                          (map-size actor))
-                                                                                                                                       (get-mob-move-mode actor))
+                                                                                                                                       (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
                                                                                                               (and (> (map-size actor) 1)
                                                                                                                    (ai-find-move-around actor (x item) (y item)))))
                                                                                                   collect item)))
@@ -630,7 +630,8 @@
                                                                                                     (if (riding-mob-id actor)
                                                                                                       (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                       (map-size actor))
-                                                                                                    (get-mob-move-mode actor))
+                                                                                                    (get-mob-move-mode actor)
+																									:can-open-doors (can-open-doors actor))
                                                                            (and (> (map-size actor) 1)
                                                                                 (ai-find-move-around actor (x relic-item) (y relic-item))))
                                                                        )
@@ -705,7 +706,8 @@
                                                                                                     (if (riding-mob-id actor)
                                                                                                       (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                       (map-size actor))
-                                                                                                    (get-mob-move-mode actor))
+                                                                                                    (get-mob-move-mode actor)
+																									:can-open-doors (can-open-doors actor))
                                                                            (and (> (map-size actor) 1)
                                                                                 (ai-find-move-around actor (x sigil-mob) (y sigil-mob))))
                                                                        )
@@ -780,7 +782,8 @@
                                                                                                     (if (riding-mob-id actor)
                                                                                                       (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                       (map-size actor))
-                                                                                                    (get-mob-move-mode actor))
+                                                                                                    (get-mob-move-mode actor)
+																									:can-open-doors (can-open-doors actor))
                                                                            (and (> (map-size actor) 1)
                                                                                 (ai-find-move-around actor (x machine-mob) (y machine-mob))))
                                                                        )
@@ -855,7 +858,8 @@
                                                                                                     (if (riding-mob-id actor)
                                                                                                       (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                       (map-size actor))
-                                                                                                    (get-mob-move-mode actor))
+                                                                                                    (get-mob-move-mode actor)
+																									:can-open-doors (can-open-doors actor))
                                                                            (and (> (map-size actor) 1)
                                                                                 (ai-find-move-around actor (x target-feature) (y target-feature))))
                                                                        )
@@ -1053,7 +1057,8 @@
                                                                                                             (if (riding-mob-id actor)
                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                               (map-size actor))
-                                                                                                            (get-mob-move-mode actor))
+                                                                                                            (get-mob-move-mode actor)
+																											:can-open-doors (can-open-doors actor))
                                                                                    (and (> (map-size actor) 1)
                                                                                         (ai-find-move-around actor (x leader) (y leader)))))
                                                                         leader
@@ -1126,7 +1131,8 @@
                                                                                                             (if (riding-mob-id actor)
                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                               (map-size actor))
-                                                                                                            (get-mob-move-mode actor))
+                                                                                                            (get-mob-move-mode actor)
+																											:can-open-doors (can-open-doors actor))
                                                                                    (and (> (map-size actor) 1)
                                                                                         (ai-find-move-around actor (x target) (y target)))))
                                                                         target
@@ -1192,7 +1198,8 @@
                                                                                                   (if (riding-mob-id actor)
                                                                                                     (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                     (map-size actor))
-                                                                                                  (get-mob-move-mode actor))
+                                                                                                  (get-mob-move-mode actor)
+																								  :can-open-doors (can-open-doors actor))
                                                                          (and (> (map-size actor) 1)
                                                                               (ai-find-move-around actor (x nearest-enemy) (y nearest-enemy)))))
                                                               t
@@ -1289,7 +1296,7 @@
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                           (map-size actor))
-                                                                                                                 (get-mob-move-mode actor))))
+                                                                                                                 (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))))
                                                                          do
                                                                             (log:debug "AI-PACKAGE-RETURN-TO-PORTAL: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
@@ -1300,7 +1307,7 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor)))
+                                                                                                                     (get-mob-move-mode actor) :can-open-doors (can-open-doors actor)))
                                                                             (setf rx (x (nth portal-num portal-list)) ry (y (nth portal-num portal-list)) rz (z (nth portal-num portal-list)))
                                                                             (incf portal-num)
                                                                             (log:debug "AI-PACKAGE-RETURN-TO-PORTAL: NEW R (~A ~A ~A)" rx ry rz)
@@ -1385,7 +1392,7 @@
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                           (map-size actor))
-                                                                                                                 (get-mob-move-mode actor))))
+                                                                                                                 (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))))
                                                                          do
                                                                             (log:debug  "AI-PACKAGE-RETURN-TO-PORTAL: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
@@ -1396,7 +1403,7 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor)))
+                                                                                                                     (get-mob-move-mode actor) :can-open-doors (can-open-doors actor)))
                                                                             (setf rx (x (nth portal-num portal-list)) ry (y (nth portal-num portal-list)) rz (z (nth portal-num portal-list)))
                                                                             (incf portal-num)
                                                                             (log:debug "AI-PACKAGE-RETURN-TO-PORTAL: NEW R (~A ~A ~A)" rx ry rz)
@@ -1482,7 +1489,7 @@
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                           (map-size actor))
-                                                                                                                 (get-mob-move-mode actor))))
+                                                                                                                 (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))))
                                                                          do
                                                                             (log:debug "AI-PACKAGE-ESCAPE-WITH-RELIC: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
@@ -1493,7 +1500,7 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor)))
+                                                                                                                     (get-mob-move-mode actor) :can-open-doors (can-open-doors actor)))
                                                                             (setf rx (first (nth edge-num edge-list)) ry (second (nth edge-num edge-list)) rz (third (nth edge-num edge-list)))
                                                                             (incf edge-num)
                                                                             (log:debug "AI-PACKAGE-ESCAPE-WITH-RELIC: NEW R (~A ~A ~A)" rx ry rz)
@@ -1608,7 +1615,7 @@
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                           (map-size actor))
-                                                                                                                 (get-mob-move-mode actor))))
+                                                                                                                 (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))))
                                                                          do
                                                                             (log:debug "AI-PACKAGE-PATROL-DISTRICT: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
@@ -1619,7 +1626,7 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor)))
+                                                                                                                     (get-mob-move-mode actor) :can-open-doors (can-open-doors actor)))
                                                                             (setf rx (+ (* (first nearest-sector) 10) (random 10)))
                                                                             (setf ry (+ (* (second nearest-sector) 10) (random 10)))
                                                                             (setf rz (- (+ 5 (z actor)) (1+ (random 10))))
@@ -1701,7 +1708,7 @@
                                                                                    (not (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                           (map-size actor))
-                                                                                                                 (get-mob-move-mode actor)))
+                                                                                                                 (get-mob-move-mode actor) :can-open-doors (can-open-doors actor)))
                                                                                    )
                                                                          do
                                                                             (log:debug "AI-PACKAGE-FIND-RANDOM-LOCATION: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
@@ -1713,7 +1720,7 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor)))
+                                                                                                                     (get-mob-move-mode actor) :can-open-doors (can-open-doors actor)))
                                                                             (setf rx (- (+ 10 (x actor))
                                                                                         (1+ (random 20))))
                                                                             (setf ry (- (+ 10 (y actor))

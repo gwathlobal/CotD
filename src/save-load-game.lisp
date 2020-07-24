@@ -109,7 +109,7 @@
                                                    :world-date-str (format nil "Game Time: ~A~A"
                                                                            (show-date-time-ymd (world-game-time *world*))
                                                                            (if (eql save-type :save-scenario)
-                                                                             (format nil ", T: ~A" (player-game-time *world*))
+                                                                             (format nil ", T: ~A" (player-game-time (level *world*)))
                                                                              ""))
                                                    :params ())))
         (ensure-directories-exist dir-pathname)

@@ -2314,9 +2314,9 @@
     ))
 
 (defun calculate-player-score (bonus)
-  (let ((score (+ (cur-score *player*) bonus (- (if (> (player-game-time *world*) 200)
-                                                  (- (player-game-time *world*) 200)
-                                                  (* 2 (- (player-game-time *world*) 200))))
+  (let ((score (+ (cur-score *player*) bonus (- (if (> (player-game-time (level *world*)) 200)
+                                                  (- (player-game-time (level *world*)) 200)
+                                                  (* 2 (- (player-game-time (level *world*)) 200))))
                   (if (= (mob-type *player*) +mob-type-thief+)
                     (calculate-total-value *player*)
                     0)
@@ -2376,7 +2376,7 @@
                         (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) dx dy dz (if (riding-mob-id actor)
                                                                                                           (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                           (map-size actor))
-                                                 (get-mob-move-mode actor))
+                                                 (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
                         (or (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-move-floor+)
                             (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-water+)))
                 do
@@ -3077,3 +3077,8 @@
     ;; process animations for this turn if any
     (process-animations-on-level level)
     ))
+
+(defun can-open-doors (mob)
+  (if (mob-ability-p mob +mob-abil-open-close-door+)
+    t
+    nil))

@@ -213,7 +213,7 @@
     
     ;; check each cell for passability
     (loop for (dx . dy) in cell-list
-          when (and (level-cells-connected-p (level *world*) dx dy (z mob) (x mob) (y mob) (z mob) map-size (get-mob-move-mode mob))
+          when (and (level-cells-connected-p (level *world*) dx dy (z mob) (x mob) (y mob) (z mob) map-size (get-mob-move-mode mob) :can-open-doors (can-open-doors mob))
                     (check-move-for-ai mob dx dy (z mob) dx dy (z mob)))
             do
                ;;(format t "AI-FIND-MOVE-AROUND: Return value ~A~%" (cons dx dy))
@@ -293,7 +293,7 @@
                                 (not (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) rx ry rz (if (riding-mob-id mob)
                                                                                                                  (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                                                                  (map-size mob))
-                                                              (get-mob-move-mode mob)))
+                                                              (get-mob-move-mode mob) :can-open-doors (can-open-doors mob)))
                                 )
                       do
                          (setf rx (- (+ 10 (x mob))
@@ -307,7 +307,7 @@
               (when (level-cells-connected-p (level *world*) (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)) (if (riding-mob-id mob)
                                                                                                                                                              (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                                                                                                              (map-size mob))
-                                             (get-mob-move-mode mob))
+                                             (get-mob-move-mode mob) :can-open-doors (can-open-doors mob))
                 (log:debug "Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)))
                 (ai-plot-path-to-dst mob (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)))
                 ))
@@ -322,11 +322,11 @@
         ))))
 
 (defun ai-set-path-dst (actor tx ty tz)
-  (log:info "level-connected-p = ~A, level-connected actor = ~A, level-connected target = ~A"
+  (log:debug "level-connected-p = ~A, level-connected actor = ~A, level-connected target = ~A"
             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                               (map-size actor))
-                                     (get-mob-move-mode actor))
+                                     (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
             (get-level-connect-map-value (level *world*) (x actor) (y actor) (z actor) (if (riding-mob-id actor)
                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                          (map-size actor))
@@ -346,7 +346,7 @@
     ((level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
                                                                                        (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                        (map-size actor))
-                              (get-mob-move-mode actor))
+                              (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
      (setf (path-dst actor) (list tx ty tz))
      (setf (path actor) nil))
     ((and (> (map-size actor) 1)
@@ -362,7 +362,7 @@
     (when (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
                                                                                             (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                             (map-size actor))
-                                   (get-mob-move-mode actor))
+                                   (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
       (log:info "Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)" (x actor) (y actor) (z actor) tx ty tz)
       ;;(format t "~%TIME-ELAPSED AI ~A [~A] before AI-PLOT-PATH-TO-DST:: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (setf path (a-star (list (x actor) (y actor) (z actor)) (list tx ty tz) 

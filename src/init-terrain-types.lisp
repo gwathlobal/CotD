@@ -418,6 +418,21 @@
                                                                                   +connect-room-none+)
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-fly+
                                                                                   +connect-room-none+)
+
+                                                           (let ((func #'(lambda (&key map-size move-mode)
+                                                                           (let ((room-id-list nil))
+                                                                             (check-surroundings x y nil #'(lambda (dx dy)
+                                                                                                             (when (/= (get-level-connect-map-value (level *world*) dx dy z map-size move-mode) +connect-room-none+)
+                                                                                                               (pushnew (get-level-connect-map-value (level *world*) dx dy z map-size move-mode)
+                                                                                                                        room-id-list))))
+                                                                             (loop for room-id-start in room-id-list do
+                                                                               (loop for room-id-end in room-id-list do
+                                                                                 (when (/= room-id-start room-id-end)
+                                                                                   (set-aux-map-connection (level *world*) room-id-start room-id-end map-size move-mode :delta-potential 0 :delta-actual -1))))))))
+                                                             (funcall func :map-size 1 :move-mode +connect-map-move-walk+)
+                                                             (funcall func :map-size 1 :move-mode +connect-map-move-climb+)
+                                                             (funcall func :map-size 1 :move-mode +connect-map-move-fly+)
+              )
                                                            )))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-closed+ :name "closed door"
@@ -433,6 +448,21 @@
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-climb+))
                                                            (set-connect-map-value (aref (connect-map (level *world*)) 1) x y z +connect-map-move-fly+
                                                                                   (get-connect-map-value (aref (connect-map (level *world*)) 1) (x mob) (y mob) (z mob) +connect-map-move-fly+))
+
+                                                           (let ((func #'(lambda (&key map-size move-mode)
+                                                                           (let ((room-id-list nil))
+                                                                             (check-surroundings x y nil #'(lambda (dx dy)
+                                                                                                             (when (/= (get-level-connect-map-value (level *world*) dx dy z map-size move-mode) +connect-room-none+)
+                                                                                                               (pushnew (get-level-connect-map-value (level *world*) dx dy z map-size move-mode)
+                                                                                                                        room-id-list))))
+                                                                             (loop for room-id-start in room-id-list do
+                                                                               (loop for room-id-end in room-id-list do
+                                                                                 (when (/= room-id-start room-id-end)
+                                                                                   (set-aux-map-connection (level *world*) room-id-start room-id-end map-size move-mode :delta-potential 0 :delta-actual 1))))))))
+                                                             (funcall func :map-size 1 :move-mode +connect-map-move-walk+)
+                                                             (funcall func :map-size 1 :move-mode +connect-map-move-climb+)
+                                                             (funcall func :map-size 1 :move-mode +connect-map-move-fly+)
+                                                             )
                                                            )
                                                :on-bump-terrain #'(lambda (mob x y z)
                                                                     (if (and (mob-ability-p mob +mob-abil-open-close-door+)

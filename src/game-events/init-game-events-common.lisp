@@ -39,12 +39,12 @@
                                                  :name-str *player-name*
                                                  :score tmp-score
                                                  :mob-type-str *player-title*
-                                                 :turns (player-game-time tmp-world)
+                                                 :turns (player-game-time (level tmp-world))
                                                  :result-str tmp-final-str
                                                  :sector-name-str (name (world-sector (level tmp-world)))))
     
     (save-highscores-to-disk)
-    (dump-character-on-game-over (name *player*) tmp-score (player-game-time tmp-world) (name (world-sector (level tmp-world)))
+    (dump-character-on-game-over (name *player*) tmp-score (player-game-time (level tmp-world)) (name (world-sector (level tmp-world)))
                                  tmp-final-str (return-scenario-stats nil))
 
     ;; increase world flesh points
@@ -419,7 +419,7 @@
 
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-military+ :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (and (= (player-game-time world) (turns-for-delayed-military (level world))) (turn-finished world))
+                                                         (if (and (= (player-game-time (level world)) (turns-for-delayed-military (level world))) (turn-finished world))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
@@ -504,15 +504,15 @@
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-angels+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (turn-finished world)
-                                                                  (or (= (player-game-time world) (turns-for-delayed-angels (level world)))
-                                                                      (= (player-game-time world) (1- (turns-for-delayed-angels (level world))))
-                                                                      (= (player-game-time world) (1+ (turns-for-delayed-angels (level world))))))
+                                                                  (or (= (player-game-time (level world)) (turns-for-delayed-angels (level world)))
+                                                                      (= (player-game-time (level world)) (1- (turns-for-delayed-angels (level world))))
+                                                                      (= (player-game-time (level world)) (1+ (turns-for-delayed-angels (level world))))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
                                                            ;; before arrivals
                                                            ;; find suitable arrival points and place portals
-                                                           (when (= (player-game-time world) (1- (turns-for-delayed-angels (level world))))
+                                                           (when (= (player-game-time (level world)) (1- (turns-for-delayed-angels (level world))))
                                                              (log:info "GAME-EVENT: The angels are about to arrive!")
                                                              (let ((portals ()))
                                                                (setf portals (place-custom-portals (level world) +feature-divine-portal+ :max-portals 10 :map-margin 10 :distance 6 :test-mob-free t :test-repel-demons nil))
@@ -521,7 +521,7 @@
                                                            
                                                            ;; at arrival
                                                            ;; place chrome angels & trinity mimics to portals
-                                                           (when (= (player-game-time world) (turns-for-delayed-angels (level world)))
+                                                           (when (= (player-game-time (level world)) (turns-for-delayed-angels (level world)))
                                                              (log:info "GAME-EVENT: The angels are arriving!")
                                                              (let ((angels-list (list (list +mob-type-angel+ *min-angels-number* nil))))
                                                                
@@ -541,7 +541,7 @@
 
                                                            ;; after arrival
                                                            ;; remove portals
-                                                           (when (= (player-game-time world) (1+ (turns-for-delayed-angels (level world))))
+                                                           (when (= (player-game-time (level world)) (1+ (turns-for-delayed-angels (level world))))
                                                              (log:info "GAME-EVENT: Divine portals removed!")
                                                              (loop for lvl-feature-id in (feature-id-list (level world))
                                                                    for lvl-feature = (get-feature-by-id lvl-feature-id)
@@ -554,16 +554,16 @@
 (set-game-event (make-instance 'game-event :id +game-event-delayed-arrival-demons+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (turn-finished world)
-                                                                  (or (= (player-game-time world) (turns-for-delayed-demons (level world)))
-                                                                      (= (player-game-time world) (1- (turns-for-delayed-demons (level world))))
-                                                                      (= (player-game-time world) (1+ (turns-for-delayed-demons (level world))))))
+                                                                  (or (= (player-game-time (level world)) (turns-for-delayed-demons (level world)))
+                                                                      (= (player-game-time (level world)) (1- (turns-for-delayed-demons (level world))))
+                                                                      (= (player-game-time (level world)) (1+ (turns-for-delayed-demons (level world))))))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
 
                                                            ;; before arrivals
                                                            ;; find suitable arrival points and place portals
-                                                           (when (= (player-game-time world) (1- (turns-for-delayed-demons (level world))))
+                                                           (when (= (player-game-time (level world)) (1- (turns-for-delayed-demons (level world))))
                                                              (log:info "GAME-EVENT: The demons are about to arrive!")
                                                              (let ((portals ()))
                                                                (setf portals (place-custom-portals (level world) +feature-demonic-portal+ :max-portals 10 :map-margin 10 :distance 6 :test-mob-free t :test-repel-demons t))
@@ -572,21 +572,20 @@
                                                            
                                                            ;; at arrival
                                                            ;; place demons
-                                                           (when (= (player-game-time world) (turns-for-delayed-demons (level world)))
+                                                           (when (= (player-game-time (level world)) (turns-for-delayed-demons (level world)))
                                                              (log:info "GAME-EVENT: The demons are arriving!")
                                                              (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
                                                                (declare (ignore year month day min sec))
                                                                (let ((demon-list (if (and (>= hour 7) (< hour 19))
-                                                                                   (list (list +mob-type-archdemon+ 1 nil)
+                                                                                   (list (list +mob-type-archdemon+ 2 nil)
                                                                                          (list +mob-type-demon+ 15 nil)
-                                                                                         (list +mob-type-imp+ *min-imps-number* nil))
-                                                                                   (list (if (zerop (random 2))
-                                                                                           (list +mob-type-archdemon+ 1 nil)
-                                                                                           (list +mob-type-shadow-devil+ 1 nil))
+                                                                                         (list +mob-type-imp+ (+ (random (- *max-imps-number* *min-imps-number*)) *min-imps-number*) nil))
+                                                                                   (list (list +mob-type-archdemon+ 1 nil)
+                                                                                         (list +mob-type-shadow-devil+ 1 nil)
                                                                                          (list +mob-type-demon+ 7 nil)
                                                                                          (list +mob-type-shadow-demon+ 8 nil)
-                                                                                         (list +mob-type-imp+ (truncate *min-imps-number* 2) nil)
-                                                                                         (list +mob-type-shadow-imp+ (truncate *min-imps-number* 2) nil)))))
+                                                                                         (list +mob-type-imp+ (truncate (+ (random (- *max-imps-number* *min-imps-number*)) *min-imps-number*) 2) nil)
+                                                                                         (list +mob-type-shadow-imp+ (truncate (+ (random (- *max-imps-number* *min-imps-number*)) *min-imps-number*) 2) nil)))))
                                                                  
                                                                  (if (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-demon-malseraph+)
                                                                    (push (list +mob-type-malseraph-puppet+ 1 t) demon-list)
@@ -606,7 +605,7 @@
 
                                                            ;; after arrival
                                                            ;; remove portals
-                                                           (when (= (player-game-time world) (1+ (turns-for-delayed-demons (level world))))
+                                                           (when (= (player-game-time (level world)) (1+ (turns-for-delayed-demons (level world))))
                                                              (log:info "GAME-EVENT: Demonic portals removed!")
                                                              (loop for lvl-feature-id in (feature-id-list (level world))
                                                                    for lvl-feature = (get-feature-by-id lvl-feature-id)

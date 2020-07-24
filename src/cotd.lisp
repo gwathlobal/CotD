@@ -6,7 +6,7 @@
         do
            ;;(format t "GAME-LOOP: Start loop~%")
            (setf turn-finished t)
-           (log:info "~%REAL-GAME-TURN: ~A~%" (player-game-time *world*))
+           (log:info "~%REAL-GAME-TURN: ~A~%" (player-game-time (level *world*)))
 
            ;; check for the player's win conditions first
            (when (and *player*
@@ -136,7 +136,7 @@
                (bt:destroy-thread *path-thread*)))
            
            (when turn-finished
-             (incf (player-game-time *world*))
+             (incf (player-game-time (level *world*)))
              (when (check-dead *player*)
                (incf (world-game-time *world*) +normal-ap+))
              (setf (turn-finished *world*) t)

@@ -178,13 +178,11 @@
         (format str "~%Raw storages left: ~A~%" (length (bomb-plant-locations (level *world*))))
         )
 
-      
-
       ;; delayed arrival
       (loop with do-once = nil
-            for (game-event-id turns-left init-str) in `((,+game-event-delayed-arrival-demons+ ,(- (turns-for-delayed-demons (level *world*)) (player-game-time *world*)) "Demons arrive")
-                                                         (,+game-event-delayed-arrival-angels+ ,(- (turns-for-delayed-angels (level *world*)) (player-game-time *world*)) "Angels arrive")
-                                                         (,+game-event-delayed-arrival-military+ ,(- (turns-for-delayed-military (level *world*)) (player-game-time *world*)) "Military arrive"))
+            for (game-event-id turns-left init-str) in `((,+game-event-delayed-arrival-demons+ ,(- (turns-for-delayed-demons (level *world*)) (player-game-time (level *world*))) "Demons arrive")
+                                                         (,+game-event-delayed-arrival-angels+ ,(- (turns-for-delayed-angels (level *world*)) (player-game-time (level *world*))) "Angels arrive")
+                                                         (,+game-event-delayed-arrival-military+ ,(- (turns-for-delayed-military (level *world*)) (player-game-time (level *world*))) "Military arrive"))
             when (and (find game-event-id (game-events (level *world*)))
                       (>= turns-left 0))
               do
@@ -197,7 +195,7 @@
                            "now!"
                            (format nil "in ~A turn~:P" turns-left))))
             
-      (setf str (format nil "~A~%~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
+      (setf str (format nil "~A~%Humans ~A~%Blessed ~A~%Angels ~A~%Demons ~A~%Undead ~A~%~A~A~A~A~%~%Visibility: ~A~A"
                         str
                         (total-humans (level *world*))
                         (total-blessed (level *world*))
@@ -397,7 +395,7 @@
                                  ((= (loyal-faction *player*) +faction-type-angels+) (turns-for-delayed-angels (level *world*)))
                                  ((= (loyal-faction *player*) +faction-type-military+) (turns-for-delayed-military (level *world*)))
                                  (t 220)))
-         (str (format nil "Turns before arrival: ~A/~A" (player-game-time *world*) turns-before-arrival))
+         (str (format nil "Turns before arrival: ~A/~A" (player-game-time (level *world*)) turns-before-arrival))
          (w (* (sdl:char-width sdl:*default-font*) (length str)))
          (h (sdl:char-height sdl:*default-font*))
          (x (+ *start-map-x* (- (truncate (* *max-x-view* *glyph-w*) 2) (truncate w 2))))
@@ -932,7 +930,7 @@
   nil)
 
 (defun show-time-label (idle-calcing x y &optional (update nil))
-  (sdl:draw-string-solid-* (format nil "~A [T: ~A]"  (show-date-time-short (world-game-time *world*)) (player-game-time *world*))
+  (sdl:draw-string-solid-* (format nil "~A [T: ~A]"  (show-date-time-short (world-game-time *world*)) (player-game-time (level *world*)))
                            x y :color (cond ((eql idle-calcing :done) sdl:*white*)
                                             ((eql idle-calcing :in-progress) sdl:*yellow*)
                                             ((eql idle-calcing :npc-turn) sdl:*red*)))

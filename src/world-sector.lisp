@@ -239,14 +239,25 @@
                                 (list :angels +feature-delayed-angels-arrival-point+)
                                 )))
     
-    (unless (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+    (when (or (not (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a))))
+              (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
+                   (or (eql (wtype world-sector) :world-sector-abandoned-residential)
+                       (eql (wtype world-sector) :world-sector-abandoned-island)
+                       (eql (wtype world-sector) :world-sector-abandoned-port)
+                       (eql (wtype world-sector) :world-sector-abandoned-lake)
+                       (eql (wtype world-sector) :world-sector-abandoned-forest)
+                       (eql (wtype world-sector) :world-sector-corrupted-residential)
+                       (eql (wtype world-sector) :world-sector-corrupted-island)
+                       (eql (wtype world-sector) :world-sector-corrupted-port)
+                       (eql (wtype world-sector) :world-sector-corrupted-lake)
+                       (eql (wtype world-sector) :world-sector-corrupted-forest))))
       (push (list :angels +feature-start-place-angels+) side-party-list))
     
     (unless (= (controlled-by world-sector) +lm-controlled-by-military+)
       (push (list :military +feature-start-place-military+) side-party-list))
 	  
     (unless (= (controlled-by world-sector) +lm-controlled-by-demons+)
-      (push (list :military +feature-start-place-demons+) side-party-list))
+      (push (list :demons +feature-start-place-demons+) side-party-list))
 
     (setf (gethash :n sides-hash) ())
     (setf (gethash :s sides-hash) ())

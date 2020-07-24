@@ -49,7 +49,7 @@
            ;;   list of (+building-type-<id>+ x y z)
            )
 
-      (setf *max-progress-bar* 10)
+      (setf *max-progress-bar* 11)
       (setf *cur-progress-bar* 0)
 
       (funcall *update-screen-closure* "Generating map")
@@ -145,6 +145,14 @@
                                                 (funcall *update-screen-closure* nil)
                                                 (log:info "TIME-ELAPSED AFTER FLY 1: ~A" (- (get-internal-real-time) start-time))
                                                 )
+                                              
+                                              (let ((start-time (get-internal-real-time)))
+                                                (create-connect-map-aux level)
+                                                (incf *cur-progress-bar*)
+                                                (funcall *update-screen-closure* nil)
+                                                (log:info "TIME-ELAPSED AFTER CLIMB 1: ~A" (- (get-internal-real-time) start-time))
+                                                )
+                                              
                                               )
                                         :name "Connectivity map (size 1) thread"))
            (size-3-thread (bt:make-thread #'(lambda ()
@@ -746,7 +754,11 @@
         (loop for z of-type fixnum from 0 below max-z do
           (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-openable-door+)
             (let ((func #'(lambda (&key map-size move-mode)
-                            (let ((room-id-list nil))
+                            (let ((room-id-list nil)
+                                  ;; increase actual connection depending on door being open/close
+                                  (delta-actual (if (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-blocks-move+)
+                                                  0
+                                                  1)))
                               (check-surroundings x y nil #'(lambda (dx dy)
                                                               (when (/= (get-level-connect-map-value level dx dy z map-size move-mode) +connect-room-none+)
                                                                 (pushnew (get-level-connect-map-value level dx dy z map-size move-mode)
@@ -754,7 +766,7 @@
                               (loop for room-id-start in room-id-list do
                                 (loop for room-id-end in room-id-list do
                                   (when (/= room-id-start room-id-end)
-                                    (set-aux-map-connection level room-id-start room-id-end map-size move-mode))))))))
+                                    (set-aux-map-connection level room-id-start room-id-end map-size move-mode :delta-potential 1 :delta-actual delta-actual))))))))
               (funcall func :map-size 1 :move-mode +connect-map-move-walk+)
               (funcall func :map-size 1 :move-mode +connect-map-move-climb+)
               (funcall func :map-size 1 :move-mode +connect-map-move-fly+)

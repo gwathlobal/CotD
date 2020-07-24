@@ -5,7 +5,9 @@
 ;;----------------------
 
 (defclass level ()
-  ((terrain :initform nil :accessor terrain :type simple-array) ; of type int, which is a idx of terrain-type
+  ((player-game-time :initform 0 :accessor player-game-time)
+
+   (terrain :initform nil :accessor terrain :type simple-array) ; of type int, which is a idx of terrain-type
    (memo :initform nil :accessor memo :type simple-array) ; of type list containing (idx of glyph, color of glyph, color of background, visibility flag, revealed flag)
    (mobs :initform nil :accessor mobs :type simple-array) ; of type fixnum, which is the id of a mob
    (items :initform nil :accessor items :type simple-array) ; of type (<item id> ...)
@@ -348,31 +350,36 @@
     )
   )
 
-(defun level-cells-connected-p (level sx sy sz tx ty tz map-size move-mode)
+(defun level-cells-connected-p (level sx sy sz tx ty tz map-size move-mode &key (can-open-doors t))
   (when (or (< sx 0) (< sy 0) (< sz 0) (>= sx (array-dimension (terrain level) 0)) (>= sy (array-dimension (terrain level) 1)) (>= sz (array-dimension (terrain level) 2))
             (< tx 0) (< ty 0) (< tz 0) (>= tx (array-dimension (terrain level) 0)) (>= ty (array-dimension (terrain level) 1)) (>= tz (array-dimension (terrain level) 2)))
     (return-from level-cells-connected-p nil))
   (let ((connect-map-value-start (get-level-connect-map-value level sx sy sz map-size move-mode))
         (connect-map-value-end (get-level-connect-map-value level tx ty tz map-size move-mode)))
     (if (or (= connect-map-value-start connect-map-value-end)
-            (level-aux-map-connect-p level connect-map-value-start connect-map-value-end map-size move-mode))
+            (level-aux-map-connect-p level connect-map-value-start connect-map-value-end map-size move-mode :can-open-doors can-open-doors))
       t
       nil))
   )
 
-(defun level-aux-map-connect-p (level room-id-start room-id-end map-size move-mode)
+(defun level-aux-map-connect-p (level room-id-start room-id-end map-size move-mode &key (can-open-doors t))
   (unless (aref (aux-connect-map level) map-size)
     (return-from level-aux-map-connect-p nil))
   (unless (aref (aref (aux-connect-map level) map-size) move-mode)
     (return-from level-aux-map-connect-p nil))
   
-  (let ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode)))
-    (when (find-if #'(lambda (a)
-                     (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
-                             (and (= (first a) room-id-end) (= (second a) room-id-start)))
-                       t
-                       nil))
-                 connect-list)
+  (let ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode))
+        (connection nil))
+    (setf connection (find-if #'(lambda (a)
+                                  (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
+                                          (and (= (first a) room-id-end) (= (second a) room-id-start)))
+                                    t
+                                    nil))
+                              connect-list))
+    (when (and connection
+               (or can-open-doors
+                   (and (not can-open-doors)
+                        (plusp (get-aux-map-connection-actual connection)))))
       (return-from level-aux-map-connect-p t))
 
     ;; if no direct connection found - try to find connected rooms through intermediate connections
@@ -385,15 +392,21 @@
           (loop for node = (first open-nodes)
                 while (and node (/= node room-id-end)) do
                   (pop open-nodes)
-                  (loop for (start end connection) in connect-list
+                  (loop for (start end potential actual) in connect-list
                         for is-closed = (or (find start closed-nodes)
                                             (find end closed-nodes))
                         when (and (= start node)
-                                  (not is-closed))
+                                  (not is-closed)
+                                  (or can-open-doors
+                                      (and (not can-open-doors)
+                                           (plusp actual))))
                           do
                                  (push end open-nodes)
                         when (and (= end node)
-                                  (not is-closed))
+                                  (not is-closed)
+                                  (or can-open-doors
+                                      (and (not can-open-doors)
+                                           (plusp actual))))
                           do
                              (push start open-nodes))
                   (push node closed-nodes)
@@ -403,13 +416,18 @@
             nil)))
       nil)))
 
-(defun set-aux-map-connection (level room-id-start room-id-end map-size move-mode)
+(defun get-aux-map-connection-potential (connection)
+  (third connection))
+
+(defun get-aux-map-connection-actual (connection)
+  (fourth connection))
+
+(defun set-aux-map-connection (level room-id-start room-id-end map-size move-mode &key (delta-potential 1) (delta-actual 1))
   (unless (aref (aux-connect-map level) map-size)
     (setf (aref (aux-connect-map level) map-size) (make-array (list (1+ move-mode)) :initial-element nil :adjustable t)))
   (when (>= move-mode (length (aref (aux-connect-map level) map-size)))
     (adjust-array (aref (aux-connect-map level) map-size) (list (1+ move-mode)) :initial-element nil))
-  ;(unless (aref (aref (aux-connect-map level) map-size) move-mode)
-  ;  (setf (aref (aref (aux-connect-map level) map-size) move-mode) (make-hash-table)))
+
   (let* ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode))
          (connection (find-if #'(lambda (a)
                                   (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
@@ -417,33 +435,26 @@
                                     t
                                     nil))
                               connect-list)))
-    ;; connection is (<room-id-start> <room-id-end> <number of links between rooms>)
+    ;; connection is (<room-id-start> <room-id-end> <number of potential links between rooms> <number of actual links between rooms>)
     (if connection
       (progn
-        (incf (third connection)))
-      (progn
-        (push (list room-id-start room-id-end 1) (aref (aref (aux-connect-map level) map-size) move-mode))))
-    ))
+        (incf (third connection) delta-potential)
+        (incf (fourth connection) delta-actual)
 
-(defun delete-aux-map-connection (level room-id-start room-id-end map-size move-mode)
-  (unless (aref (aux-connect-map level) map-size)
-    (setf (aref (aux-connect-map level) map-size) (make-array (list (1+ move-mode)) :initial-element nil :adjustable t)))
-  (when (>= move-mode (length (aref (aux-connect-map level) map-size)))
-    (adjust-array (aref (aux-connect-map level) map-size) (list (1+ move-mode))))
-  ;(unless (aref (aref (aux-connect-map level) map-size) move-mode)
-  ;  (setf (aref (aref (aux-connect-map level) map-size) move-mode) (make-hash-table)))
-  (let* ((connect-list (aref (aref (aux-connect-map level) map-size) move-mode))
-         (connection (find-if #'(lambda (a)
-                                  (if (or (and (= (first a) room-id-start) (= (second a) room-id-end))
-                                          (and (= (first a) room-id-end) (= (second a) room-id-start)))
-                                    t
-                                    nil))
-                              connect-list)))
-    (when connection
-      (decf (third connection))
-      (when (zerop (third connection))
-        (setf (aref (aref (aux-connect-map level) map-size) move-mode)
-              (remove connection connect-list))))
+        (when (minusp (third connection))
+          (setf (third connection) 0))
+
+        (when (minusp (fourth connection))
+          (setf (fourth connection) 0))
+        
+        (when (zerop (third connection))
+          (setf (aref (aref (aux-connect-map level) map-size) move-mode)
+                (remove connection connect-list))))
+      (progn
+        (when (and (plusp delta-potential)
+                   (or (plusp delta-actual)
+                       (zerop delta-actual)))
+          (push (list room-id-start room-id-end delta-potential delta-actual) (aref (aref (aux-connect-map level) map-size) move-mode)))))
     ))
 
 (defun get-outdoor-light-* (level x y z)
@@ -476,7 +487,6 @@
 
 (defclass world ()
   ((world-game-time :initform 0 :accessor world-game-time)
-   (player-game-time :initform 0 :accessor player-game-time)
    (turn-finished :initform nil :accessor turn-finished)
    
    (level :initform nil :accessor level :type level)
