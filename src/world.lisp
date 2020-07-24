@@ -170,7 +170,7 @@
   (setf (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10))
         (remove (id mob) (aref (mob-quadrant-map level) (truncate (x mob) 10) (truncate (y mob) 10))))
   
-  (logger (format nil "REMOVE-MOB-FROM-LEVEL-LIST: ~A [~A] (~A ~A ~A) = ~A~%" (name mob) (id mob) (x mob) (y mob) (z mob) (get-mob-* level (x mob) (y mob) (z mob)))))
+  (log:info (format nil "REMOVE-MOB-FROM-LEVEL-LIST: ~A [~A] (~A ~A ~A) = ~A~%" (name mob) (id mob) (x mob) (y mob) (z mob) (get-mob-* level (x mob) (y mob) (z mob)))))
 
 (defun add-feature-to-level-list (level feature)
   (if (and (can-merge-func feature)

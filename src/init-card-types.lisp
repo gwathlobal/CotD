@@ -3,43 +3,43 @@
 (set-card-type (make-instance 'card-type :id +item-card-blink+
                                          :name "Card of Bend Space"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (invoke-bend-space actor))))
 
 (set-card-type (make-instance 'card-type :id +item-card-teleport+
                                          :name "Card of Teleporting"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (invoke-teleport-self actor 30 (z actor)))))
 
 (set-card-type (make-instance 'card-type :id +item-card-disguise+
                                          :name "Card of Disguises"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (invoke-disguise actor))))
 
 (set-card-type (make-instance 'card-type :id +item-card-sprint+
                                          :name "Card of Sprinting"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (set-mob-effect actor :effect-type-id +mob-effect-sprint+ :actor-id (id actor) :cd 5))))
 
 (set-card-type (make-instance 'card-type :id +item-card-flying+
                                          :name "Card of Flying"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (set-mob-effect actor :effect-type-id +mob-effect-flying+ :actor-id (id actor) :cd 5))))
 
 (set-card-type (make-instance 'card-type :id +item-card-curse-other+
                                          :name "Card of Curses"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (invoke-curse actor))))
 
 (set-card-type (make-instance 'card-type :id +item-card-blindness-other+
                                          :name "Card of Blindness"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      ;; blind nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for mob = (get-mob-by-id (nth i (visible-mobs actor)))
@@ -59,13 +59,13 @@
 (set-card-type (make-instance 'card-type :id +item-card-fear-other+
                                          :name "Card of Fear"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (invoke-fear actor 3))))
 
 (set-card-type (make-instance 'card-type :id +item-card-slow-other+
                                          :name "Card of Slowness"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      ;; slow nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
@@ -83,7 +83,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-silence-other+
                                          :name "Card of Silence"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      ;; silence nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
@@ -100,7 +100,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-confuse-other+
                                          :name "Card of Confusion"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      ;; confuse nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
@@ -129,7 +129,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-polymorph-other+
                                          :name "Card of the Sheep"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      ;; polymorph nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
@@ -155,7 +155,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-polymorph-self+
                                          :name "Card of the Sheep"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (if (> (1+ (random 6)) (strength actor))
                                                        (progn
                                                          (set-mob-effect actor :effect-type-id +mob-effect-polymorph-sheep+ :actor-id (id actor) :cd 5 :param1 (list (mob-type actor) (max-hp actor))))
@@ -171,7 +171,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-irradiate-other+
                                          :name "Card of Radiation"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
                                                            do
@@ -191,7 +191,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-irradiate-self+
                                          :name "Card of Radiation"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (if (mob-effect-p actor +mob-effect-irradiated+)
                                                        (progn
                                                          (let ((effect (get-effect-by-id (mob-effect-p actor +mob-effect-irradiated+))))
@@ -203,7 +203,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-confuse-self+
                                          :name "Card of Confusion"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      ;; confuse nearby mobs
                                                      (if (> (1+ (random 6)) (strength actor))
                                                        (progn
@@ -224,7 +224,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-silence-self+
                                          :name "Card of Silence"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (set-mob-effect actor :effect-type-id +mob-effect-silence+ :actor-id (id actor) :cd 5)
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -236,7 +236,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-slow-self+
                                          :name "Card of Slowness"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (set-mob-effect actor :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 5)
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -248,7 +248,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-fear-self+
                                          :name "Card of Fear"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (if (> (random (+ (strength actor) 3)) (strength actor))
                                                        (progn
                                                          (set-mob-effect actor :effect-type-id +mob-effect-fear+ :actor-id (id actor) :cd 3)
@@ -269,7 +269,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-blindness-self+
                                          :name "Card of Blindness"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (set-mob-effect actor :effect-type-id +mob-effect-blind+ :actor-id (id actor) :cd 2)
                                                      (if (eq *player* actor)
                                                        (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
@@ -284,7 +284,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-curse-self+
                                          :name "Card of Curses"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (let ((protected nil))
                                                        ;; divine shield and blessings also grant one-time protection from curses
                                                        (when (and (not protected) (mob-effect-p actor +mob-effect-blessed+))
@@ -297,7 +297,7 @@
                                                        
                                                        (if protected
                                                          (progn
-                                                           (logger (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name actor) (id actor)))
+                                                           (log:info (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name actor) (id actor)))
                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                   (format nil "Malseraph's curse removed divine protection from ~A. "
                                                                                           (prepend-article +article-the+ (visible-name actor)))
@@ -306,7 +306,7 @@
                                                                                                 :singlemind)))
                                                            )
                                                          (progn
-                                                           (logger (format nil "MOB-CURSE: Malseraph affects ~A [~A] with a curse~%" (name actor) (id actor)))
+                                                           (log:info (format nil "MOB-CURSE: Malseraph affects ~A [~A] with a curse~%" (name actor) (id actor)))
                                                            (set-mob-effect actor :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                   (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -318,7 +318,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-give-deck+
                                          :name "Card of Gifts"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (let* ((deck-types (list +item-type-deck-of-war+ +item-type-deck-of-escape+))
                                                             (r (random (length deck-types)))
                                                             (deck-item (make-instance 'item :item-type (nth r deck-types) :x (x actor) :y (y actor) :z (z actor) :qty 1)))
@@ -335,7 +335,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-glowing-all+
                                          :name "Card of Glowing"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (let ((targets nil))
                                                        (loop for x from (- (x actor) 6) to (+ (x actor) 6) do
                                                          (loop for y from (- (y actor) 6) to (+ (y actor) 6) do
@@ -361,7 +361,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-cure-mutation+
                                          :name "Card of Cure Mutation"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (let ((was-cured nil))
                                                        (when (mob-ability-p actor +mob-abil-casts-light+)
                                                          (mob-remove-mutation actor +mob-abil-casts-light+)
@@ -383,7 +383,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-lignify-other+
                                          :name "Card of the Tree"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      ;; polymorph nearby mobs
                                                      (loop for i from 0 below (length (visible-mobs actor))
                                                            for target = (get-mob-by-id (nth i (visible-mobs actor)))
@@ -408,7 +408,7 @@
 (set-card-type (make-instance 'card-type :id +item-card-lignify-self+
                                          :name "Card of the Tree"
                                          :on-use #'(lambda (card-type actor)
-                                                     (logger (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
+                                                     (log:info (format nil "INVOKE-CARD: ~A [~A] invokes card: ~A.~%" (name actor) (id actor) (name card-type)))
                                                      (if (> (1+ (random 6)) (strength actor))
                                                        (progn
                                                          (set-mob-effect actor :effect-type-id +mob-effect-polymorph-tree+ :actor-id (id actor) :cd 5 :param1 (list (mob-type actor) (max-hp actor))))

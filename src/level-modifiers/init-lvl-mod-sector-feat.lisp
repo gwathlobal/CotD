@@ -11,7 +11,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore mission world))
 
-                                                 (format t "TEMPLATE LEVEL FUNC: LM FEAT RIVER~%")
+                                                 (log:info "TEMPLATE LEVEL FUNC: LM FEAT RIVER")
                                                  
                                                  (let ((river-params (second (find +lm-feat-river+ (feats world-sector) :key #'(lambda (a) (first a))))))
                                                    (when (find :n river-params)
@@ -193,7 +193,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore mission world))
 
-                                                 (format t "TEMPLATE LEVEL FUNC: LM FEAT BARRICADE~%")
+                                                 (log:info "TEMPLATE LEVEL FUNC: LM FEAT BARRICADE")
                                                  
                                                  (let ((x1 1)
                                                        (x2 (- (array-dimension template-level 0) 2))
@@ -338,7 +338,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore mission world))
 
-                                                 (format t "TEMPLATE LEVEL FUNC: LM FEAT LIBRARY~%")
+                                                 (log:info "TEMPLATE LEVEL FUNC: LM FEAT LIBRARY")
                                                                                                   
                                                  (loop with library-types = (prepare-spec-build-id-list (cond
                                                                                                           ((or (eq (wtype world-sector) :world-sector-normal-residential)
@@ -389,7 +389,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 
-                                                 (logger (format nil "TEMPLATE LEVEL FUNC: Lvl Mod Church~%"))
+                                                 (log:info "TEMPLATE LEVEL FUNC: Lvl Mod Church")
                                                  
                                                  (loop with church-types = (prepare-spec-build-id-list +building-type-church+)
                                                        for x = (random (array-dimension template-level 0))
@@ -405,7 +405,7 @@
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector world))
 
-                                                                    (format t "OVERALL-POST-PROCESS-FUNC: Add priests~%~%")
+                                                                    (log:info "OVERALL-POST-PROCESS-FUNC: Add priests")
                                                                     
                                                                     (loop with church-present = nil
                                                                           for (faction-type faction-presence) in (faction-list mission)
@@ -456,7 +456,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 
-                                                 (format t "TEMPLATE LEVEL FUNC: LM FEAT SATANISTS LAIR~%")
+                                                 (log:info "TEMPLATE LEVEL FUNC: LM FEAT SATANISTS LAIR")
                                                  
                                                  (loop with lair-types = (prepare-spec-build-id-list +building-type-satanists+)
                                                        for x = (random (array-dimension template-level 0))
@@ -495,7 +495,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 
-                                                 (logger (format nil "TEMPLATE LEVEL FUNC: Lvl Mod Hell Engine~%"))
+                                                 (log:info "TEMPLATE LEVEL FUNC: Lvl Mod Hell Engine")
                                                  
                                                  (place-demonic-machines-on-template-level template-level)
                                                  )
@@ -535,7 +535,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 
-                                                 (logger (format nil "TEMPLATE LEVEL FUNC: Lvl Mod Flesh Storage~%"))
+                                                 (log:info "TEMPLATE LEVEL FUNC: Lvl Mod Flesh Storage")
                                                  
                                                  (place-flesh-storages-on-template-level template-level)
                                                  )

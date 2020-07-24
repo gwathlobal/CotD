@@ -532,7 +532,7 @@
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item))
                                                      ;; target is (x y z)
-                                                     (logger (format nil "ITEM-SPAWN-LOCUST: ~A [~A] spawns a locust at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                     (log:info (format nil "ITEM-SPAWN-LOCUST: ~A [~A] spawns a locust at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
                                                      ;; target here is the item to be reanimated
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (prepend-article +article-the+ (visible-name actor)))
@@ -607,7 +607,7 @@
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item))
                                                      ;; target is (x y z)
-                                                     (logger (format nil "ITEM-SPAWN-LARVA: ~A [~A] spawns a larva at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                     (log:info (format nil "ITEM-SPAWN-LARVA: ~A [~A] spawns a larva at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
                                                      ;; target here is the item to be reanimated
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a small harmless creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -675,7 +675,7 @@
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item))
                                                      ;; target is (x y z)
-                                                     (logger (format nil "ITEM-SPAWN-COLONY: ~A [~A] spawns a larva at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                     (log:info (format nil "ITEM-SPAWN-COLONY: ~A [~A] spawns a larva at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
                                                      ;; target here is the item to be reanimated
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a huge hideous creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -844,7 +844,7 @@
                                                                                                                 (not (get-mob-* (level *world*) dx dy (z actor))))
                                                                                                        (setf target (list dx dy (z actor))))))
                                                      
-                                                     (logger (format nil "ITEM-SPAWN-BOMB: ~A [~A] spawns a bomb at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                     (log:info (format nil "ITEM-SPAWN-BOMB: ~A [~A] spawns a bomb at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
 
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "~A plants a bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))

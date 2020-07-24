@@ -7,7 +7,7 @@
   (strings (make-colored-txt) :type colored-txt))
 
 (defun add-message (str &optional (color sdl:*white*) (message-box-list (list (level/full-message-box (level *world*)) (level/small-message-box (level *world*)))))
-  (logger (format nil "ADD-MESSAGE: ~A~%" str))
+  (log:info "~A" str)
   (loop for message-box in message-box-list do
     (add-colored-str (message-box-strings message-box) str color)))
 

@@ -226,7 +226,7 @@
   (unless nearest-enemy
     (return-from ai-mob-flee nil))
   
-  (logger (format nil "AI-FUNCTION: ~A [~A] tries to flee away from ~A [~A].~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy)))
+  (log:info "~A [~A] tries to flee away from ~A [~A]." (name mob) (id mob) (name nearest-enemy) (id nearest-enemy))
   
   (let ((step-x 0) 
         (step-y 0))
@@ -251,18 +251,18 @@
       (move-mob mob 5)
     ;; if can't move away - try any random direction
       (unless (move-mob mob (x-y-into-dir step-x step-y))
-        (logger (format nil "AI-FUNCTION: ~A [~A] could not flee. Try to move randomly.~%" (name mob) (id mob)))
+        (log:info "~A [~A] could not flee. Try to move randomly." (name mob) (id mob))
         (ai-mob-random-dir mob)))
     ))
 
 (defun ai-mob-random-dir (mob)
-  (logger (format nil "AI-FUNCTION: ~A [~A] tries to move randomly.~%" (name mob) (id mob)))
+  (log:info "~A [~A] tries to move randomly." (name mob) (id mob))
   (if (mob-ability-p mob +mob-abil-immobile+)
     (move-mob mob 5)
     (loop for dir = (+ (random 9) 1)
           until (move-mob mob dir))))
 
-(defun thread-path-loop (stream)
+(defun thread-path-loop ()
   (loop while t do
     (bt:with-lock-held ((path-lock *world*))      
       (if (and (< (cur-mob-path *world*) (length (mob-id-list (level *world*)))) (not (made-turn *player*)))
@@ -270,7 +270,7 @@
           (when (and (not (eq *player* (get-mob-by-id (cur-mob-path *world*))))
                      (not (dead= (get-mob-by-id (cur-mob-path *world*))))
                      (not (path (get-mob-by-id (cur-mob-path *world*)))))
-            (logger (format nil "~%THREAD: Mob ~A [~A] calculates paths~%" (name (get-mob-by-id (cur-mob-path *world*))) (id (get-mob-by-id (cur-mob-path *world*)))) stream)
+            (log:debug "Mob ~A [~A] calculates paths" (name (get-mob-by-id (cur-mob-path *world*))) (id (get-mob-by-id (cur-mob-path *world*))))
             (let* ((mob (get-mob-by-id (cur-mob-path *world*)))
                    (rx (- (+ 10 (x mob))
                           (1+ (random 20)))) 
@@ -308,39 +308,39 @@
                                                                                                                                                              (map-size (get-mob-by-id (riding-mob-id mob)))
                                                                                                                                                              (map-size mob))
                                              (get-mob-move-mode mob))
-                (logger (format nil "THREAD: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob))) stream)
+                (log:debug "Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)" (x mob) (y mob) (z mob) (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)))
                 (ai-plot-path-to-dst mob (first (path-dst mob)) (second (path-dst mob)) (third (path-dst mob)))
                 ))
             )
           (incf (cur-mob-path *world*))
-          (logger (format nil "THREAD: cur-mob-path - ~A~%" (cur-mob-path *world*)) stream))
+          (log:debug "cur-mob-path - ~A" (cur-mob-path *world*)))
         (progn
-          (logger (format nil "THREAD: Done calculating paths~%~%") stream)
+          (log:debug "Done calculating paths")
           (setf (cur-mob-path *world*) (length (mob-id-list (level *world*))))
           (bt:condition-wait (path-cv *world*) (path-lock *world*)))
         
         ))))
 
 (defun ai-set-path-dst (actor tx ty tz)
-  (logger (format nil "AI-SET-PATH-DST: level-connected-p = ~A, level-connected actor = ~A, level-connected target = ~A~%"
-                  (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
-                                                                                                    (map-size (get-mob-by-id (riding-mob-id actor)))
-                                                                                                    (map-size actor))
-                                           (get-mob-move-mode actor))
-                  (get-level-connect-map-value (level *world*) (x actor) (y actor) (z actor) (if (riding-mob-id actor)
-                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
-                                                                                               (map-size actor))
-                                               (get-mob-move-mode actor))
-                  (get-level-connect-map-value (level *world*) tx ty tz (if (riding-mob-id actor)
-                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
-                                                                          (map-size actor))
-                                               (get-mob-move-mode actor))))
+  (log:info "level-connected-p = ~A, level-connected actor = ~A, level-connected target = ~A"
+            (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
+                                                                                              (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                              (map-size actor))
+                                     (get-mob-move-mode actor))
+            (get-level-connect-map-value (level *world*) (x actor) (y actor) (z actor) (if (riding-mob-id actor)
+                                                                                         (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                                         (map-size actor))
+                                         (get-mob-move-mode actor))
+            (get-level-connect-map-value (level *world*) tx ty tz (if (riding-mob-id actor)
+                                                                    (map-size (get-mob-by-id (riding-mob-id actor)))
+                                                                    (map-size actor))
+                                         (get-mob-move-mode actor)))
   (cond
     ((= +connect-room-none+ (get-level-connect-map-value (level *world*) (x actor) (y actor) (z actor) (if (riding-mob-id actor)
                                                                                                          (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                          (map-size actor))
                                                          (get-mob-move-mode actor)))
-     (logger (format nil "AI-SET-PATH-DST: level-connected actor = ~A, need to move randomly~%" +connect-room-none+))
+     (log:info "level-connected actor = ~A, need to move randomly" +connect-room-none+)
      (setf (path-dst actor) nil)
      (setf (path actor) nil))
     ((level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) tx ty tz (if (riding-mob-id actor)
@@ -363,7 +363,7 @@
                                                                                             (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                             (map-size actor))
                                    (get-mob-move-mode actor))
-      (logger (format nil "AI-PLOT-PATH-TO-DST: Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)~%" (x actor) (y actor) (z actor) tx ty tz))
+      (log:info "Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)" (x actor) (y actor) (z actor) tx ty tz)
       ;;(format t "~%TIME-ELAPSED AI ~A [~A] before AI-PLOT-PATH-TO-DST:: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (setf path (a-star (list (x actor) (y actor) (z actor)) (list tx ty tz) 
                          #'(lambda (dx dy dz cx cy cz) 
@@ -377,7 +377,7 @@
                                 1/10))))
       
       (pop path)
-      (logger (format nil "AI-PLOT-PATH-TO-DST: Set mob path - ~A~%" path))
+      (log:info "Set mob path - ~A" path)
       ;;(format t "~%TIME-ELAPSED AI ~A [~A] after AI-PLOT-PATH-TO-DST:: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (setf (path actor) path)
       )))
@@ -386,7 +386,7 @@
   (when (path actor)
     (let ((step) (step-x) (step-y) (step-z) (move-result nil))
       
-      (logger (format nil "AI-MOVE-AlONG-PATH: Move mob along the path - ~A~%" (path actor)))
+      (log:info "Mob path - ~A" (path actor))
       (setf step (pop (path actor)))
       
       (setf step-x (- (first step) (x actor)))
@@ -396,38 +396,37 @@
       (setf move-result (check-move-on-level actor (first step) (second step) (third step)))
       
       (unless move-result
-        (logger (format nil "AI-MOVE-AlONG-PATH: Can't move to target - (~A ~A ~A)~%" (first step) (second step) (third step)))
+        (log:info "Can't move to target - (~A ~A ~A)" (first step) (second step) (third step))
         (setf (path actor) nil)
         (setf (path-dst actor) nil)
         (return-from ai-move-along-path nil))
       
       (unless (x-y-into-dir step-x step-y)
-        (logger (format nil "AI-MOVE-AlONG-PATH: Wrong direction supplied (~A ~A)~%" (first step) (second step)))
+        (log:info "Wrong direction supplied (~A ~A)" (first step) (second step))
         (setf (path actor) nil)
         (setf (path-dst actor) nil)
         (return-from ai-move-along-path nil))
       
       ;; check if there is somebody on the target square
-      (logger (format nil
-                      "AI-MOVE-AlONG-PATH: MOVE-RESULT = ~A, NOT T = ~A, FACTION-RELATION = ~A, NOT LOVES-INFIGHTING = ~A, BLESS+BLESSED = ~A~%"
-                      move-result
-                      (not (eq move-result t))
-                      (if (and move-result
-                               (not (eq move-result t))
-                               (eq (first move-result) :mobs))
-                        (get-faction-relation (faction actor) (get-visible-faction (first (second move-result))))
-                        nil)
-                      (not (mob-ability-p actor +mob-abil-loves-infighting+))
-                      (if (and move-result
-                               (not (eq move-result t))
-                               (eq (first move-result) :mobs))
-                        (or (not (mob-ability-p actor +mob-abil-blessing-touch+))
-                            (and (mob-ability-p actor +mob-abil-blessing-touch+)
-                                 (mob-effect-p (first (second move-result)) +mob-effect-blessed+)
-                                 (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))
-                            (and (mob-ability-p actor +mob-abil-blessing-touch+)
-                                 (not (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))))
-                        nil)))
+      (log:debug "MOVE-RESULT = ~A, NOT T = ~A, FACTION-RELATION = ~A, NOT LOVES-INFIGHTING = ~A, BLESS+BLESSED = ~A"
+                move-result
+                (not (eq move-result t))
+                (if (and move-result
+                         (not (eq move-result t))
+                         (eq (first move-result) :mobs))
+                  (get-faction-relation (faction actor) (get-visible-faction (first (second move-result))))
+                  nil)
+                (not (mob-ability-p actor +mob-abil-loves-infighting+))
+                (if (and move-result
+                         (not (eq move-result t))
+                         (eq (first move-result) :mobs))
+                  (or (not (mob-ability-p actor +mob-abil-blessing-touch+))
+                      (and (mob-ability-p actor +mob-abil-blessing-touch+)
+                           (mob-effect-p (first (second move-result)) +mob-effect-blessed+)
+                           (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))
+                      (and (mob-ability-p actor +mob-abil-blessing-touch+)
+                           (not (mob-ability-p (first (second move-result)) +mob-abil-can-be-blessed+))))
+                  nil))
       
       ;;(format t "~%TIME-ELAPSED AI ~A [~A] before AI-MOVE-AlONG-PATH: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (when (and move-result
@@ -464,7 +463,7 @@
       
       (setf move-result (move-mob actor (x-y-into-dir step-x step-y) :dir-z step-z))
       
-      (logger (format nil "AI-FUNCTION: PATH-DST ~A, MOB (~A ~A ~A), MOVE-RESULT ~A~%" (path-dst actor) (x actor) (y actor) (z actor) move-result))
+      (log:info "PATH-DST ~A, MOB (~A ~A ~A), MOVE-RESULT ~A" (path-dst actor) (x actor) (y actor) (z actor) move-result)
       ;;(format t "~%TIME-ELAPSED AI ~A [~A] after AI-MOVE-AlONG-PATH: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
       (if move-result
         (progn
@@ -475,7 +474,7 @@
             (setf (path-dst actor) nil))
           (return-from ai-move-along-path t))
         (progn
-          (logger (format nil "AI-FUNCTION: Move failed ~A~%" move-result))
+          (log:info "Move failed ~A" move-result)
           (setf (path-dst actor) nil)
           (setf (path actor) nil)
           (return-from ai-move-along-path nil)))

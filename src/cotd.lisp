@@ -6,7 +6,7 @@
         do
            ;;(format t "GAME-LOOP: Start loop~%")
            (setf turn-finished t)
-           (logger (format nil "REAL-GAME-TURN: ~A~%~%" (player-game-time *world*)))
+           (log:info "~%REAL-GAME-TURN: ~A~%" (player-game-time *world*))
 
            ;; check for the player's win conditions first
            (when (and *player*
@@ -301,7 +301,7 @@
                     while s-expr do
                       (read-options s-expr *options*))
             (t (c)
-              (logger "OPTIONS.CFG: Error occured while reading the options.cfg: ~A. Overwriting with defaults.~%" c)
+              (log:error "OPTIONS.CFG: Error occured while reading the options.cfg: ~A. Overwriting with defaults.~%" c)
               (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
                 (format file "~A" (create-options-file-string *options*)))))))   
       (progn 
@@ -345,8 +345,8 @@
     (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
     
     
-    (logger (format nil "current-dir = ~A~%" *current-dir*))
-    (logger (format nil "path = ~A~%" (sdl:create-path tiles-path *current-dir*)))
+    (log:info "current-dir = ~A" *current-dir*)
+    (log:info "path = ~A" (sdl:create-path tiles-path *current-dir*))
     
     (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
                                         :color-key sdl:*white*))
@@ -405,10 +405,9 @@
   (init-game mission world-sector)
 
    ;; initialize thread, that will calculate random-movement paths while the system waits for player input
-  (let ((out *standard-output*))
-    (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop out)) :name "Pathing thread"))
-      (t (c)
-        (logger "MAIN: This system does not support multithreading! Error: ~A~%" c))))
+  (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop)) :name "Pathing thread"))
+    (t (c)
+      (log:error "MAIN: This system does not support multithreading! Error: ~A~%" c)))
   
   (bt:condition-notify (path-cv *world*))
   
@@ -624,8 +623,8 @@
 
 (defun setup-log ()
   (case *cotd-logging*
-    (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" :info))
-    (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" :info))
+    (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" *cotd-log-level*))
+    (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" *cotd-log-level*))
     (t (log:config :off))))
 
 #+clisp
@@ -644,6 +643,7 @@
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
   (setf *cotd-logging* :log-option-none)
+  (setf *cotd-log-level* :info)
 
   (sdl:with-init ()  
     (cotd-main))
@@ -665,6 +665,7 @@
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
   (setf *cotd-logging* :log-option-none)
+  (setf *cotd-log-level* :info)
   
   (sdl:with-init ()  
     (cotd-main))

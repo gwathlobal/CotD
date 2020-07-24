@@ -80,7 +80,7 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world mission))
                                                     
-                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR SEAPORT~%")
+                                                    (log:info "TEMPLATE LEVEL FUNC: World Sector Normal Seaport")
                                                     
                                                     (let ((seaport-params (second (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))))
                                                       
@@ -145,7 +145,7 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
 
-                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR OUTSKIRTS~%")
+                                                    (log:info "TEMPLATE LEVEL FUNC: World Sector Outskirts")
 
                                                     (place-outskirts-on-template-level template-level +building-city-normal-forest-border+ +building-city-park-3+)
                                                     )
@@ -178,7 +178,7 @@
                                                                         #'get-max-buildings-normal #'get-reserved-buildings-normal))
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
-                                                    (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR LAKE~%")
+                                                    (log:info "TEMPLATE LEVEL FUNC: World Sector Lake")
 
                                                     (place-lake-on-template-level template-level +building-city-central-lake+))
                        :terrain-post-process-func-list #'(lambda ()
@@ -302,7 +302,7 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world mission))
 
-                                                     (format t "TEMPLATE LEVEL FUNC: WORLD SECTOR SEAPORT~%")
+                                                     (log:info "TEMPLATE LEVEL FUNC: World Sector Abandonded Seaport")
 
                                                      (let ((seaport-params (second (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))))
 
@@ -520,7 +520,7 @@
                         :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 
-                                                 (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Residential~%"))
+                                                 (log:info (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Residential~%"))
 
                                                  (place-demonic-sigils-on-template-level template-level)
                                                  )
@@ -591,7 +591,7 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world mission))
 
-                                                     (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Seaport~%"))
+                                                     (log:info (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Seaport~%"))
 
                                                      (let ((seaport-params (second (find +lm-feat-sea+ (feats world-sector) :key #'(lambda (a) (first a))))))
 
@@ -684,7 +684,7 @@
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
 
-                                                    (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Outskirts~%"))
+                                                    (log:info (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Outskirts~%"))
 
                                                     (place-outskirts-on-template-level template-level +building-city-corrupted-forest-border+ +building-city-corrupted-park-3+)
 
@@ -744,7 +744,7 @@
                                                                                                             +terrain-wall-gloomtwigs+))))
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                     (declare (ignore mission world world-sector))
-                                                    (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Lake~%"))
+                                                    (log:info (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Lake~%"))
 
                                                     (place-lake-on-template-level template-level +building-city-central-lake+)
 
@@ -814,7 +814,7 @@
                                                                    func-list)
                                                              func-list))
                        :template-level-gen-func #'(lambda (template-level world-sector mission world)
-                                                    (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Corrupted Island~%"))
+                                                    (log:info "TEMPLATE LEVEL FUNC: World Sector Corrupted Island")
 
                                                     (place-island-on-template-level template-level world-sector mission world)
                                                     
@@ -879,7 +879,7 @@
                         :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore template-level world-sector mission world))
 
-                                                 (logger (format nil "TEMPLATE LEVEL FUNC: World Sector Hell Plain~%"))
+                                                 (log:info (format nil "TEMPLATE LEVEL FUNC: World Sector Hell Plain~%"))
 
                                                  )
                        :terrain-post-process-func-list #'(lambda ()

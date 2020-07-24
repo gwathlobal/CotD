@@ -9,7 +9,7 @@
                                                               nil))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-ally hostile-mobs allied-mobs check-result))
-                                                             (logger (format nil "AI-PACKAGE-COWARD: ~A [~A] is in fear with an enemy ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
+                                                             (log:info "AI-PACKAGE-COWARD: ~A [~A] is in fear with an enemy ~A [~A]." (name actor) (id actor) (name nearest-enemy) (id nearest-enemy))
                                                              (ai-mob-flee actor nearest-enemy)
                                                              )))
 
@@ -41,7 +41,7 @@
                                                                 nil)))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-ally hostile-mobs allied-mobs))
-                                                             (logger (format nil "AI-PACKAGE-AVOID-POSSESSION: ~A [~A] does not want to be possessed by ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
+                                                             (log:info "AI-PACKAGE-AVOID-POSSESSION: ~A [~A] does not want to be possessed by ~A [~A]." (name actor) (id actor) (name nearest-enemy) (id nearest-enemy))
                                                              (let ((cell (first check-result)))
                                                                (setf (path-dst actor) nil)
                                                                (setf (path actor) (list (list (first cell) (second cell) (z actor)))))
@@ -74,7 +74,7 @@
                                                                 nil)))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-ally hostile-mobs allied-mobs))
-                                                             (logger (format nil "AI-PACKAGE-AVOID-MELEE: ~A [~A] does not want to have melee combat with by ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
+                                                             (log:info "AI-PACKAGE-AVOID-MELEE: ~A [~A] does not want to have melee combat with by ~A [~A]." (name actor) (id actor) (name nearest-enemy) (id nearest-enemy))
                                                              (let ((cell (first check-result)))
                                                                (setf (path-dst actor) nil)
                                                                (setf (path actor) (list (list (first cell) (second cell) (z actor)))))
@@ -118,7 +118,7 @@
                                                                 nil)))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-ally hostile-mobs allied-mobs nearest-enemy))
-                                                             (logger (format nil "AI-PACKAGE-SWIM-UP: ~A [~A] wants to swim up to ~A.~%" (name actor) (id actor) check-result))
+                                                             (log:info "AI-PACKAGE-SWIM-UP: ~A [~A] wants to swim up to ~A." (name actor) (id actor) check-result)
                                                              
                                                              (loop with x-terrain = (first check-result)
                                                                    with y-terrain = (second check-result)
@@ -175,7 +175,7 @@
                                                               (dolist (enemy-id hostile-mobs)
                                                                  (incf enemy-str (strength (get-mob-type-by-id (face-mob-type-id (get-mob-by-id enemy-id))))))
                                                               
-                                                              (logger (format nil "AI-PACKAGE-HORDE: ~A [~A] has horde behavior. Ally vs. Enemy strength is ~A vs ~A.~%" (name actor) (id actor) ally-str enemy-str))
+                                                              (log:info "AI-PACKAGE-HORDE: ~A [~A] has horde behavior. Ally vs. Enemy strength is ~A vs ~A." (name actor) (id actor) ally-str enemy-str)
                                                               (if (< ally-str enemy-str)
                                                                 t
                                                                 nil))
@@ -213,8 +213,8 @@
                                                                                   (get-distance (x nearest-ally) (y nearest-ally) (x actor) (y actor)))
                                                                            (setf nearest-ally target-mob)))
                                                                     )
-                                                              (logger (format nil "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] thinks of giving blessings. Nearest unblessed ally ~A [~A]~%"
-                                                                              (name actor) (id actor) (if nearest-ally (name nearest-ally) nil) (if nearest-ally (id nearest-ally) nil)))
+                                                              (log:info "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] thinks of giving blessings. Nearest unblessed ally ~A [~A]"
+                                                                              (name actor) (id actor) (if nearest-ally (name nearest-ally) nil) (if nearest-ally (id nearest-ally) nil))
                                                               (if (or (and nearest-ally
                                                                            (not nearest-enemy))
                                                                       (and nearest-ally
@@ -227,8 +227,8 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-ally nearest-enemy hostile-mobs allied-mobs))
 
-                                                             (logger (format nil "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] decided to give blessings to ~A [~A]~%"
-                                                                             (name actor) (id actor) (if check-result (name check-result) nil) (if check-result (id check-result) nil)))
+                                                             (log:info "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] decided to give blessings to ~A [~A]"
+                                                                       (name actor) (id actor) (if check-result (name check-result) nil) (if check-result (id check-result) nil))
                                                              (loop with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
@@ -248,16 +248,6 @@
                                                                      (when (or (null (path actor))
                                                                            (mob-ability-p actor +mob-abil-momentum+))
                                                                        (ai-plot-path-to-dst actor (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))
-                                                                     
-                                                                     ;; if the target is close enough and the actor has divinity concealed - transform
-                                                                     ;; angels no longer need to transform to bless
-                                                                     ;(let ((check-result)
-                                                                     ;      (ability (get-ability-type-by-id +mob-abil-reveal-divine+)))
-                                                                     ;  (setf check-result (funcall (on-check-ai ability) ability actor nearest-enemy nearest-ally))
-                                                                     ;  (when check-result
-                                                                     ;    (logger (format nil "AI-PACKAGE-WANTS-TO-BLESS: ~A [~A] decides to invoke ability ~A~%" (name actor) (id actor) (name ability)))
-                                                                     ;    (funcall (on-invoke-ai ability) ability actor nearest-enemy nearest-ally check-result)
-                                                                     ;    (loop-finish)))
                                                                      
                                                                      ;; make a step along the path to the path-dst
                                                                      (setf move-result (ai-move-along-path actor))
@@ -299,8 +289,8 @@
                                                                              (not (is-merged mimic)))
                                                                      do
                                                                         (setf (order actor) (list +mob-order-follow+ mimic-id))
-                                                                        (logger (format nil "AI-PACKAGE-TRINITY-MIMIC: ~A [~A] has to follow ~A [~A].~%"
-                                                                                        (name actor) (id actor) (name mimic) (id mimic)))
+                                                                        (log:info "AI-PACKAGE-TRINITY-MIMIC: ~A [~A] has to follow ~A [~A]."
+                                                                                  (name actor) (id actor) (name mimic) (id mimic))
                                                                         (loop-finish))
                                                              
                                                              )))
@@ -320,8 +310,8 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
-                                                             (logger (format nil "AI-PACKAGE-TAKES-ITEMS: ~A [~A] decided to take item ~A [~A].~%"
-                                                                             (name actor) (id actor) (name (first check-result)) (id (first check-result))))
+                                                             (log:info "AI-PACKAGE-TAKES-ITEMS: ~A [~A] decided to take item ~A [~A]."
+                                                                       (name actor) (id actor) (name (first check-result)) (id (first check-result)))
                                                              (mob-pick-item actor (first check-result))
                                                              
                                                              )))
@@ -341,8 +331,8 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
-                                                             (logger (format nil "AI-PACKAGE-TAKES-CORPSES: ~A [~A] decided to take item ~A [~A].~%"
-                                                                             (name actor) (id actor) (name (first check-result)) (id (first check-result))))
+                                                             (log:info "AI-PACKAGE-TAKES-CORPSES: ~A [~A] decided to take item ~A [~A]."
+                                                                       (name actor) (id actor) (name (first check-result)) (id (first check-result)))
                                                              (mob-pick-item actor (first check-result))
                                                              
                                                              )))
@@ -362,8 +352,8 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
-                                                             (logger (format nil "AI-PACKAGE-TAKES-RELIC: ~A [~A] decided to take item ~A [~A].~%"
-                                                                             (name actor) (id actor) (name (first check-result)) (id (first check-result))))
+                                                             (log:info "AI-PACKAGE-TAKES-RELIC: ~A [~A] decided to take item ~A [~A]."
+                                                                       (name actor) (id actor) (name (first check-result)) (id (first check-result)))
                                                              (mob-pick-item actor (first check-result))
                                                              
                                                              )))
@@ -377,7 +367,7 @@
                                                               nil))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-ally hostile-mobs allied-mobs check-result))
-                                                             (logger (format nil "AI-PACKAGE-SPLIT-SOUL: ~A [~A] is trying to move away from the enemy ~A [~A].~%" (name actor) (id actor) (name nearest-enemy) (id nearest-enemy)))
+                                                             (log:info "AI-PACKAGE-SPLIT-SOUL: ~A [~A] is trying to move away from the enemy ~A [~A]." (name actor) (id actor) (name nearest-enemy) (id nearest-enemy))
 
                                                              (if (mob-ability-p actor +mob-abil-immobile+)
                                                                (move-mob actor 5)
@@ -438,8 +428,8 @@
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-KLEPTOMANIAC: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item)))
+                                                                     (log:info "AI-PACKAGE-KLEPTOMANIAC: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)"
+                                                                               (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item))
                                                                      ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x item))
@@ -510,8 +500,8 @@
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-CURIOUS: Mob (~A ~A ~A) wants to investigate sound at (~A, ~A, ~A)~%"
-                                                                                     (x actor) (y actor) (z actor) (sound-x sound) (sound-y sound) (sound-z sound)))
+                                                                     (log:info "AI-PACKAGE-CURIOUS: Mob (~A ~A ~A) wants to investigate sound at (~A, ~A, ~A)"
+                                                                               (x actor) (y actor) (z actor) (sound-x sound) (sound-y sound) (sound-z sound))
                                                                      ;; set path-dst to the nearest sound if there is no path-dst or it is different from the sound position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (sound-x sound))
@@ -583,8 +573,8 @@
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-SEARCH-CORPSES: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item)))
+                                                                     (log:info "AI-PACKAGE-SEARCH-CORPSES: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)"
+                                                                               (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item))
                                                                      ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x item))
@@ -649,13 +639,13 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
-                                                             ;; when mob is a cannibal go to the nearest visible item and try to eat it
+                                                             ;; go to the nearest visible relic and try to pick it
                                                              (loop with item = check-result
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-SEARCH-RELIC: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item)))
+                                                                     (log:info "AI-PACKAGE-SEARCH-RELIC: Mob (~A ~A ~A) wants to get item ~A [~A] at (~A, ~A, ~A)"
+                                                                               (x actor) (y actor) (z actor) (name item) (id item) (x item) (y item) (z item))
                                                                      ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x item))
@@ -724,13 +714,13 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
-                                                             ;; when mob is a cannibal go to the nearest visible item and try to eat it
+                                                             ;; go to the nearest visible sigil
                                                              (loop with sigil = check-result
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-FIND-SIGIL: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (x actor) (y actor) (z actor) (name sigil) (id sigil) (x sigil) (y sigil) (z sigil)))
+                                                                     (log:info "AI-PACKAGE-FIND-SIGIL: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)"
+                                                                               (x actor) (y actor) (z actor) (name sigil) (id sigil) (x sigil) (y sigil) (z sigil))
                                                                      ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x sigil))
@@ -799,13 +789,13 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
-                                                             ;; when mob is a cannibal go to the nearest visible item and try to eat it
+                                                             ;; go to the nearest visible machine
                                                              (loop with machine = check-result
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-FIND-MACHINE: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (x actor) (y actor) (z actor) (name machine) (id machine) (x machine) (y machine) (z machine)))
+                                                                     (log:info "AI-PACKAGE-FIND-MACHINE: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)"
+                                                                               (x actor) (y actor) (z actor) (name machine) (id machine) (x machine) (y machine) (z machine))
                                                                      ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x machine))
@@ -874,13 +864,13 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs nearest-ally allied-mobs))
 
-                                                             ;; when mob is a cannibal go to the nearest visible item and try to eat it
+                                                             ;;go to the nearest visible bomb location
                                                              (loop with target-feature = check-result
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-FIND-BOMB-PLANT-LOCATION: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (x actor) (y actor) (z actor) (name target-feature) (id target-feature) (x target-feature) (y target-feature) (z target-feature)))
+                                                                     (log:info "AI-PACKAGE-FIND-BOMB-PLANT-LOCATION: Mob (~A ~A ~A) wants to go to ~A [~A] at (~A, ~A, ~A)"
+                                                                               (x actor) (y actor) (z actor) (name target-feature) (id target-feature) (x target-feature) (y target-feature) (z target-feature))
                                                                      ;; set path-dst to the nearest item if there is no path-dst or it is different from the item position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x target-feature))
@@ -943,7 +933,7 @@
                                                                (setf r (random (length ability-list)))
                                                                (let ((ai-invoke-func (on-invoke-ai (first (nth r ability-list)))))
                                                                  (declare (type function ai-invoke-func))
-                                                                 (logger (format nil "AI-PACKAGE-USE-ABILITY: ~A [~A] decides to invoke ability ~A~%" (name actor) (id actor) (name (first (nth r ability-list)))))
+                                                                 (log:info "AI-PACKAGE-USE-ABILITY: ~A [~A] decides to invoke ability ~A" (name actor) (id actor) (name (first (nth r ability-list))))
                                                                  (funcall ai-invoke-func (first (nth r ability-list)) actor nearest-enemy nearest-ally (second (nth r ability-list))))
                                                                )
                                                              )))
@@ -975,8 +965,8 @@
                                                                         (type list item-list))
                                                                (setf r (random (length item-list)))
                                                                (let ((ai-invoke-func (ai-invoke-func (first (nth r item-list)))))
-                                                                 (logger (format nil "AI-PACKAGE-USE-ITEM: ~A [~A] decides to use item ~A [~A]~%"
-                                                                                 (name actor) (id actor) (name (first (nth r item-list))) (id (first (nth r item-list)))))
+                                                                 (log:info "AI-PACKAGE-USE-ITEM: ~A [~A] decides to use item ~A [~A]~%"
+                                                                           (name actor) (id actor) (name (first (nth r item-list))) (id (first (nth r item-list))))
                                                                  (funcall ai-invoke-func actor (first (nth r item-list)) nearest-enemy nearest-ally (second (nth r item-list))))
                                                                )
                                                              )))
@@ -1078,8 +1068,8 @@
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-FOLLOW-LEADER: ~A [~A] (~A, ~A, ~A) wants to follow ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (name actor) (id actor) (x actor) (y actor) (z actor) (name leader) (id leader) (x leader) (y leader) (z leader)))
+                                                                     (log:info "AI-PACKAGE-FOLLOW-LEADER: ~A [~A] (~A, ~A, ~A) wants to follow ~A [~A] at (~A, ~A, ~A)"
+                                                                               (name actor) (id actor) (x actor) (y actor) (z actor) (name leader) (id leader) (x leader) (y leader) (z leader))
                                                                      ;; set path-dst to the leader if there is no path-dst or it is different from the leader position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x leader))
@@ -1151,8 +1141,8 @@
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-APPROACH-TARGET: ~A [~A] (~A, ~A, ~A) wants to go to ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (name actor) (id actor) (x actor) (y actor) (z actor) (name target) (id target) (x target) (y target) (z target)))
+                                                                     (log:info "AI-PACKAGE-APPROACH-TARGET: ~A [~A] (~A, ~A, ~A) wants to go to ~A [~A] at (~A, ~A, ~A)"
+                                                                               (name actor) (id actor) (x actor) (y actor) (z actor) (name target) (id target) (x target) (y target) (z target))
                                                                      ;; set path-dst to the target if there is no path-dst or it is different from the target position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x target))
@@ -1215,8 +1205,8 @@
                                                                    with move-failed-once = nil
                                                                    with move-result = nil
                                                                    while t do
-                                                                     (logger (format nil "AI-PACKAGE-ATTACK-NEAREST-ENEMY: ~A [~A] (~A, ~A, ~A) wants to attack ~A [~A] at (~A, ~A, ~A)~%"
-                                                                                     (name actor) (id actor) (x actor) (y actor) (z actor) (name target) (id target) (x target) (y target) (z target)))
+                                                                     (log:info "AI-PACKAGE-ATTACK-NEAREST-ENEMY: ~A [~A] (~A, ~A, ~A) wants to attack ~A [~A] at (~A, ~A, ~A)"
+                                                                               (name actor) (id actor) (x actor) (y actor) (z actor) (name target) (id target) (x target) (y target) (z target))
                                                                      ;; set path-dst to the target if there is no path-dst or it is different from the target position
                                                                      (when (or (null (path-dst actor))
                                                                                (/= (first (path-dst actor)) (x target))
@@ -1271,7 +1261,7 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
 
-                                                             (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob (~A, ~A, ~A) wants to return to the nearest portal~%" (x actor) (y actor) (z actor)))
+                                                             (log:info "AI-PACKAGE-RETURN-TO-PORTAL: Mob (~A, ~A, ~A) wants to return to the nearest portal" (x actor) (y actor) (z actor))
                                                              (block ai-function
                                                                ;; iterate through all the portals to get to the nearest one
                                                                (when (null (path-dst actor))
@@ -1301,7 +1291,7 @@
                                                                                                                                                                           (map-size actor))
                                                                                                                  (get-mob-move-mode actor))))
                                                                          do
-                                                                            (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                            (log:debug "AI-PACKAGE-RETURN-TO-PORTAL: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
                                                                                             (get-terrain-* (level *world*) rx ry rz)
                                                                                             (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
@@ -1310,20 +1300,20 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor))))
+                                                                                                                     (get-mob-move-mode actor)))
                                                                             (setf rx (x (nth portal-num portal-list)) ry (y (nth portal-num portal-list)) rz (z (nth portal-num portal-list)))
                                                                             (incf portal-num)
-                                                                            (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: NEW R (~A ~A ~A)~%" rx ry rz))
+                                                                            (log:debug "AI-PACKAGE-RETURN-TO-PORTAL: NEW R (~A ~A ~A)" rx ry rz)
                                                                             (when (>= portal-num (length portal-list))
                                                                               (loop-finish))
                                                                          finally (if (>= portal-num (length portal-list))
                                                                                    (progn
                                                                                      (setf (path-dst actor) nil)
-                                                                                     (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob cannot set the destination after exhausting all portals~%")))
+                                                                                     (log:info "AI-PACKAGE-RETURN-TO-PORTAL: Mob cannot set the destination after exhausting all portals"))
                                                                                    (progn
                                                                                      (ai-set-path-dst actor rx ry rz)
-                                                                                     (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob's destination is set to (~A, ~A, ~A)~%"
-                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))))
+                                                                                     (log:info "AI-PACKAGE-RETURN-TO-PORTAL: Mob's destination is set to (~A, ~A, ~A)"
+                                                                                               (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))))
                                                                    
                                                                    ))
                                                                
@@ -1367,7 +1357,7 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
 
-                                                             (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob (~A, ~A, ~A) wants to return to the nearest portal~%" (x actor) (y actor) (z actor)))
+                                                             (log:info "AI-PACKAGE-RETURN-TO-PORTAL: Mob (~A, ~A, ~A) wants to return to the nearest portal" (x actor) (y actor) (z actor))
                                                              (block ai-function
                                                                ;; iterate through all the portals to get to the nearest one
                                                                (when (null (path-dst actor))
@@ -1397,7 +1387,7 @@
                                                                                                                                                                           (map-size actor))
                                                                                                                  (get-mob-move-mode actor))))
                                                                          do
-                                                                            (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                            (log:debug  "AI-PACKAGE-RETURN-TO-PORTAL: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
                                                                                             (get-terrain-* (level *world*) rx ry rz)
                                                                                             (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
@@ -1406,20 +1396,20 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor))))
+                                                                                                                     (get-mob-move-mode actor)))
                                                                             (setf rx (x (nth portal-num portal-list)) ry (y (nth portal-num portal-list)) rz (z (nth portal-num portal-list)))
                                                                             (incf portal-num)
-                                                                            (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: NEW R (~A ~A ~A)~%" rx ry rz))
+                                                                            (log:debug "AI-PACKAGE-RETURN-TO-PORTAL: NEW R (~A ~A ~A)" rx ry rz)
                                                                             (when (>= portal-num (length portal-list))
                                                                               (loop-finish))
                                                                          finally (if (>= portal-num (length portal-list))
                                                                                    (progn
                                                                                      (setf (path-dst actor) nil)
-                                                                                     (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob cannot set the destination after exhausting all portals~%")))
+                                                                                     (log:info "AI-PACKAGE-RETURN-TO-PORTAL: Mob cannot set the destination after exhausting all portals"))
                                                                                    (progn
                                                                                      (ai-set-path-dst actor rx ry rz)
-                                                                                     (logger (format nil "AI-PACKAGE-RETURN-TO-PORTAL: Mob's destination is set to (~A, ~A, ~A)~%"
-                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))))
+                                                                                     (log:info "AI-PACKAGE-RETURN-TO-PORTAL: Mob's destination is set to (~A, ~A, ~A)"
+                                                                                               (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))))
                                                                    
                                                                    ))
                                                                
@@ -1463,7 +1453,7 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
 
-                                                             (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob (~A, ~A, ~A) wants to return to the nearest map edge~%" (x actor) (y actor) (z actor)))
+                                                             (log:info "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob (~A, ~A, ~A) wants to return to the nearest map edge" (x actor) (y actor) (z actor))
                                                              (block ai-function
                                                                ;; iterate through all the edges to get to the nearest one
                                                                (when (null (path-dst actor))
@@ -1494,7 +1484,7 @@
                                                                                                                                                                           (map-size actor))
                                                                                                                  (get-mob-move-mode actor))))
                                                                          do
-                                                                            (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                            (log:debug "AI-PACKAGE-ESCAPE-WITH-RELIC: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
                                                                                             (get-terrain-* (level *world*) rx ry rz)
                                                                                             (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
@@ -1503,20 +1493,20 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor))))
+                                                                                                                     (get-mob-move-mode actor)))
                                                                             (setf rx (first (nth edge-num edge-list)) ry (second (nth edge-num edge-list)) rz (third (nth edge-num edge-list)))
                                                                             (incf edge-num)
-                                                                            (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: NEW R (~A ~A ~A)~%" rx ry rz))
+                                                                            (log:debug "AI-PACKAGE-ESCAPE-WITH-RELIC: NEW R (~A ~A ~A)" rx ry rz)
                                                                             (when (>= edge-num (length edge-list))
                                                                               (loop-finish))
                                                                          finally (if (>= edge-num (length edge-list))
                                                                                    (progn
                                                                                      (setf (path-dst actor) nil)
-                                                                                     (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob cannot set the destination after exhausting all edges~%")))
+                                                                                     (log:info "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob cannot set the destination after exhausting all edges"))
                                                                                    (progn
                                                                                      (ai-set-path-dst actor rx ry rz)
-                                                                                     (logger (format nil "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob's destination is set to (~A, ~A, ~A)~%"
-                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))))
+                                                                                     (log:info "AI-PACKAGE-ESCAPE-WITH-RELIC: Mob's destination is set to (~A, ~A, ~A)"
+                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))))
                                                                    
                                                                    ))
                                                                
@@ -1560,7 +1550,7 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
 
-                                                             (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob (~A, ~A, ~A) wants to patrol the district~%" (x actor) (y actor) (z actor)))
+                                                             (log:info "AI-PACKAGE-PATROL-DISTRICT: Mob (~A, ~A, ~A) wants to patrol the district" (x actor) (y actor) (z actor))
                                                              (block ai-function
                                                                ;; take N attempts to find a random destination spot in the nearest sector that has not been visited recently if no path is set
                                                                (when (null (path-dst actor))
@@ -1598,13 +1588,13 @@
                                                                               ))))
                                                                    
 
-                                                                   (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: NEAREST-SECTOR ~A vs CUR-SECTOR ~A~%" nearest-sector (list (truncate (x actor) 10) (truncate (y actor) 10))))
+                                                                   (log:debug "AI-PACKAGE-PATROL-DISTRICT: NEAREST-SECTOR ~A vs CUR-SECTOR ~A" nearest-sector (list (truncate (x actor) 10) (truncate (y actor) 10)))
                                                                    
                                                                    (setf rx (+ (* (first nearest-sector) 10) (random 10)))
                                                                    (setf ry (+ (* (second nearest-sector) 10) (random 10)))
                                                                    (setf rz (- (+ 5 (z actor)) (1+ (random 10))))
                                                                  
-                                                                   (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: TERRAIN ~A~%" (get-terrain-* (level *world*) (x actor) (y actor) (z actor))))
+                                                                   (log:debug "AI-PACKAGE-PATROL-DISTRICT: TERRAIN ~A" (get-terrain-* (level *world*) (x actor) (y actor) (z actor)))
                                                                    (loop with attempt-num = 0
                                                                          while (or (< rx 0) (< ry 0) (< rz 0)
                                                                                    (>= rx (array-dimension (terrain (level *world*)) 0))
@@ -1620,7 +1610,7 @@
                                                                                                                                                                           (map-size actor))
                                                                                                                  (get-mob-move-mode actor))))
                                                                          do
-                                                                            (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                            (log:debug "AI-PACKAGE-PATROL-DISTRICT: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
                                                                                             (get-terrain-* (level *world*) rx ry rz)
                                                                                             (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
@@ -1629,22 +1619,22 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor))))
+                                                                                                                     (get-mob-move-mode actor)))
                                                                             (setf rx (+ (* (first nearest-sector) 10) (random 10)))
                                                                             (setf ry (+ (* (second nearest-sector) 10) (random 10)))
                                                                             (setf rz (- (+ 5 (z actor)) (1+ (random 10))))
                                                                             (incf attempt-num)
-                                                                            (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: NEW R (~A ~A ~A)~%" rx ry rz))
+                                                                            (log:debug "AI-PACKAGE-PATROL-DISTRICT: NEW R (~A ~A ~A)" rx ry rz)
                                                                             (when (> attempt-num 200)
                                                                               (loop-finish))
                                                                          finally (if (> attempt-num 200)
                                                                                    (progn
                                                                                      (setf (path-dst actor) nil)
-                                                                                     (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob cannot set the destination after 200 attempts~%")))
+                                                                                     (log:info "AI-PACKAGE-PATROL-DISTRICT: Mob cannot set the destination after 200 attempts"))
                                                                                    (progn
                                                                                      (ai-set-path-dst actor rx ry rz)
-                                                                                     (logger (format nil "AI-PACKAGE-PATROL-DISTRICT: Mob's destination is randomly set to (~A, ~A, ~A)~%"
-                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))))
+                                                                                     (log:info "AI-PACKAGE-PATROL-DISTRICT: Mob's destination is randomly set to (~A, ~A, ~A)"
+                                                                                                     (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))))
                                                                    
                                                                    ))
                                                                
@@ -1686,7 +1676,7 @@
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)
                                                              (declare (ignore nearest-enemy hostile-mobs allied-mobs nearest-ally check-result))
 
-                                                             (logger (format nil "AI-PACKAGE-FIND-RANDOM-LOCATION: Mob (~A, ~A, ~A) wants to go to a random nearby place~%" (x actor) (y actor) (z actor)))
+                                                             (log:info "AI-PACKAGE-FIND-RANDOM-LOCATION: Mob (~A, ~A, ~A) wants to go to a random nearby place" (x actor) (y actor) (z actor))
                                                              (block ai-function
                                                                ;; take N attempts to find a random destination spot if no path is set
                                                                (unless (path-dst actor)
@@ -1698,7 +1688,7 @@
                                                                               (1+ (random 10))))
                                                                        )
                                                                    (declare (type fixnum rx ry rz))
-                                                                   (logger (format nil "AI-PACKAGE-FIND-RANDOM-LOCATION: TERRAIN ~A~%" (get-terrain-* (level *world*) (x actor) (y actor) (z actor))))
+                                                                   (log:debug "AI-PACKAGE-FIND-RANDOM-LOCATION: TERRAIN ~A" (get-terrain-* (level *world*) (x actor) (y actor) (z actor)))
                                                                    (loop while (or (< rx 0) (< ry 0) (< rz 0)
                                                                                    (>= rx (array-dimension (terrain (level *world*)) 0))
                                                                                    (>= ry (array-dimension (terrain (level *world*)) 1))
@@ -1714,7 +1704,7 @@
                                                                                                                  (get-mob-move-mode actor)))
                                                                                    )
                                                                          do
-                                                                            (logger (format nil "AI-PACKAGE-FIND-RANDOM-LOCATION: R (~A ~A ~A)~%TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A~%"
+                                                                            (log:debug "AI-PACKAGE-FIND-RANDOM-LOCATION: R (~A ~A ~A) TERRAIN = ~A, MOB ~A [~A], CONNECTED ~A"
                                                                                             rx ry rz
                                                                                             (get-terrain-* (level *world*) rx ry rz)
                                                                                             (get-mob-* (level *world*) rx ry rz) (if (get-mob-* (level *world*) rx ry rz)
@@ -1723,17 +1713,17 @@
                                                                                             (level-cells-connected-p (level *world*) (x actor) (y actor) (z actor) rx ry rz (if (riding-mob-id actor)
                                                                                                                                                                               (map-size (get-mob-by-id (riding-mob-id actor)))
                                                                                                                                                                               (map-size actor))
-                                                                                                                     (get-mob-move-mode actor))))
+                                                                                                                     (get-mob-move-mode actor)))
                                                                             (setf rx (- (+ 10 (x actor))
                                                                                         (1+ (random 20))))
                                                                             (setf ry (- (+ 10 (y actor))
                                                                                         (1+ (random 20))))
                                                                             (setf rz (- (+ 5 (z actor))
                                                                                         (1+ (random 10))))
-                                                                            (logger (format nil "AI-PACKAGE-FIND-RANDOM-LOCATION: NEW R (~A ~A ~A)~%" rx ry rz)))
+                                                                            (log:debug "AI-PACKAGE-FIND-RANDOM-LOCATION: NEW R (~A ~A ~A)~%" rx ry rz))
                                                                    (ai-set-path-dst actor rx ry rz)
-                                                                   (logger (format nil "AI-PACKAGE-FIND-RANDOM-LOCATION: Mob's destination is randomly set to (~A, ~A, ~A)~%"
-                                                                                   (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor))))))
+                                                                   (log:info "AI-PACKAGE-FIND-RANDOM-LOCATION: Mob's destination is randomly set to (~A, ~A, ~A)"
+                                                                             (first (path-dst actor)) (second (path-dst actor)) (third (path-dst actor)))))
                                                                
                                                                (let ((move-result nil))
                                                                  ;; exit (and move randomly) if the path-dst is still null after the previous set attempt

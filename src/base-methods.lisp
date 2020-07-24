@@ -258,7 +258,7 @@
                                           :source source-mob :force-sound force-sound)))
 
 (defun set-mob-location (mob x y z &key (apply-gravity t))
-  (logger (format nil "SET-MOB-LOCATION BEFORE: ~A [~A] (~A ~A ~A) to (~A ~A ~A) gravity = ~A~%" (name mob) (id mob) (x mob) (y mob) (z mob) x y z apply-gravity))
+  (log:debug "BEFORE: ~A [~A] (~A ~A ~A) to (~A ~A ~A) gravity = ~A" (name mob) (id mob) (x mob) (y mob) (z mob) x y z apply-gravity)
   (let ((place-func #'(lambda (nmob)
                         (let ((sx) (sy))
                           ;; calculate the coords of the mob's NE corner
@@ -451,7 +451,8 @@
                                         :color (if (eq *player* mob)
                                                    (sdl:color :r 255 :g 140 :b 0)
                                                  sdl:*yellow*)
-                                        :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))                                                                                                                                  (not (find (id mob) (proper-visible-mobs *player*))))
+                                        :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
+                                                               (not (find (id mob) (proper-visible-mobs *player*))))
                                                       :singlemind))))))
           (when (check-dead mob)
             (make-dead mob :splatter t :msg t :msg-newline nil :killer nil :corpse t :aux-params ())
@@ -491,7 +492,7 @@
                   (/= (third (param1 effect)) (z mob)))
           (rem-mob-effect mob +mob-effect-constriction-target+))))
     )
-  (logger (format nil "SET-MOB-LOCATION AFTER: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob))))
+  (log:debug "AFTER: ~A [~A] (~A ~A ~A)" (name mob) (id mob) (x mob) (y mob) (z mob)))
 
 (defun move-mob (mob dir &key (push nil) (dir-z 0))
   (let ((dx 0)
@@ -523,7 +524,7 @@
 
     ;; if riding somebody, only give an order to your mount but do not move yourself
     (when (riding-mob-id mob)
-      (logger (format nil "MOVE-MOB: ~A [~A] gives orders to mount ~A [~A] to move in the dir ~A~%" (name mob) (id mob) (name (get-mob-by-id (riding-mob-id mob))) (id (get-mob-by-id (riding-mob-id mob))) dir))
+      (log:info "~A [~A] gives orders to mount ~A [~A] to move in the dir ~A" (name mob) (id mob) (name (get-mob-by-id (riding-mob-id mob))) (id (get-mob-by-id (riding-mob-id mob))) dir)
 
       ;; assign the order for the mount for its next turn
       (setf (order-for-next-turn (get-mob-by-id (riding-mob-id mob))) (list dir dir-z))
@@ -543,8 +544,8 @@
         (when (or (eq check-result nil)
                   (and (eq (check-move-on-level (get-mob-by-id (riding-mob-id mob)) (+ (x mob) dx) (+ (y mob) dy) (+ (z mob) dir-z)) nil)
                        (= dir (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob))))))))
-          (logger (format nil "MOVE-MOB: ~A [~A] is unable to move to give order (CHECK = ~A, MOUNT DIR ~A)~%" (name mob) (id mob) check-result
-                          (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob)))))))
+          (log:info "~A [~A] is unable to move to give order (CHECK = ~A, MOUNT DIR ~A)" (name mob) (id mob) check-result
+                    (x-y-into-dir (car (momentum-dir (get-mob-by-id (riding-mob-id mob)))) (cdr (momentum-dir (get-mob-by-id (riding-mob-id mob))))))
           (return-from move-mob nil)))
 
       ;; set motion
@@ -559,7 +560,7 @@
     (when (mob-ability-p mob +mob-abil-momentum+)
       (setf push t))
 
-    (logger (format nil "MOVE-MOB: ~A - spd ~A, c-dir ~A, dir ~A, dir-z ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A~%" (name mob) (momentum-spd mob) c-dir dir dir-z along-dir not-along-dir opposite-dir))
+    (log:debug "~A - spd ~A, c-dir ~A, dir ~A, dir-z ~A, ALONG-DIRS ~A, NOT-ALONG-DIRS ~A, OPPOSITE-DIRS ~A" (name mob) (momentum-spd mob) c-dir dir dir-z along-dir not-along-dir opposite-dir)
     (cond
       ;; NB: all this is necessary to introduce movement with momentum (for horses and the like)
       ;; (-1.-1) ( 0.-1) ( 1.-1)
@@ -582,7 +583,7 @@
          (incf (momentum-spd mob))
          (setf (car (momentum-dir mob)) dx)
          (setf (cdr (momentum-dir mob)) dy)
-         (logger (format nil "MOVE-MOB ALONG - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy))))
+         (log:debug "MOVE-MOB ALONG - SPD ~A DIR ~A DX ~A DY ~A" (momentum-spd mob) (momentum-dir mob) dx dy)))
       ;; if moving in the opposite direction - reduce speed 
       ((find dir opposite-dir)
        (progn
@@ -596,7 +597,7 @@
            (setf (car (momentum-dir mob)) dx)
            (setf (cdr (momentum-dir mob)) dy)
            (setf dx 0 dy 0))
-         (logger (format nil "MOVE-MOB OPPOSITE - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy))))
+         (log:debug "MOVE-MOB OPPOSITE - SPD ~A DIR ~A DX ~A DY ~A" (momentum-spd mob) (momentum-dir mob) dx dy)))
       ;; if moving not along the direction - reduce spead and change the direction
       ((find dir not-along-dir)
        (progn
@@ -609,7 +610,7 @@
          (setf (cdr (momentum-dir mob)) dy)
          (when (mob-ability-p mob +mob-abil-facing+)
            (setf dx 0 dy 0))
-         (logger (format nil "MOVE-MOB NOT ALONG - SPD ~A DIR ~A DX ~A DY ~A~%" (momentum-spd mob) (momentum-dir mob) dx dy))))
+         (log:debug "MOVE-MOB NOT ALONG - SPD ~A DIR ~A DX ~A DY ~A" (momentum-spd mob) (momentum-dir mob) dx dy)))
       )
 
     ;; normalize direction
@@ -687,7 +688,7 @@
                                nil)
           
           do
-             (logger (format nil "MOVE-MOB: CHECK-MOVE ~A, XYZ = (~A ~A ~A)~%" check-result x y z))
+             (log:debug "CHECK-MOVE ~A, XYZ = (~A ~A ~A)" check-result x y z)
              (cond
                ;; all clear - move freely
                ((eq check-result t)
@@ -733,13 +734,13 @@
                 )
                ;; bumped into a mob
                ((eq (first check-result) :mobs) 
-                (logger (format nil "MOVE-MOB: ~A [~A] bumped into mobs (~A)~%" (name mob) (id mob) (loop named nil
-                                                                                                          with str = (create-string)
-                                                                                                          for tmob in (second check-result)
-                                                                                                          do
-                                                                                                             (format str "~A [~A], " (name tmob) (id tmob))
-                                                                                                          finally
-                                                                                                             (return-from nil str))))
+                (log:info "~A [~A] bumped into mobs (~A)" (name mob) (id mob) (loop named nil
+                                                                                    with str = (create-string)
+                                                                                    for tmob in (second check-result)
+                                                                                    do
+                                                                                       (format str "~A [~A], " (name tmob) (id tmob))
+                                                                                    finally
+                                                                                       (return-from nil str)))
 
                 (loop with cur-ap = (cur-ap mob) 
                       for target-mob in (second check-result) do
@@ -808,7 +809,7 @@
   nil)
 
 (defun make-act (mob speed)
-  (logger (format nil "MAKE-ACT: ~A SPD ~A~%" (name mob) speed))
+  (log:info "~A SPD ~A" (name mob) speed)
   (when (zerop speed) (return-from make-act nil))
   (decf (cur-ap mob) (truncate (* speed (cur-speed mob)) 100))
   (setf (made-turn mob) t)
@@ -816,7 +817,7 @@
     (incf (world-game-time *world*) (truncate (* speed +normal-ap+) (max-ap mob)))))
 
 (defun stumble-upon-mob (actor target)
-  (logger (format nil "STUMBLE-UPON-MOB: ~A [~A] stumbled upon ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+  (log:info "~A [~A] stumbled upon ~A [~A]~%" (name actor) (id actor) (name target) (id target))
 
   
   
@@ -849,7 +850,7 @@
     (progn
       (make-act actor (truncate (* (cur-move-speed actor) (move-spd (get-mob-type-by-id (mob-type actor)))) 100)))
       (progn 
-        (logger (format nil "ON-BUMP: ~A [~A] bumped into ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+        (log:info "~A [~A] bumped into ~A [~A]" (name actor) (id actor) (name target) (id target))
         
         ;; if they are of the same faction and do not like infighting - do nothing
         (when (or (and (= (faction actor) (faction target))
@@ -862,7 +863,7 @@
                        (= (first (order actor)) +mob-order-follow+)
                        (= (first (order target)) +mob-order-follow+)
                        (= (second (order actor)) (second (order target)))))
-          (logger (format nil "ON-BUMP: ~A [~A] and ~A [~A] are of the same faction and would not attack each other~%" (name actor) (id actor) (name target) (id target)))
+          (log:info "~A [~A] and ~A [~A] are of the same faction and would not attack each other" (name actor) (id actor) (name target) (id target))
           (when (not (check-mob-visible target :observer actor))
             (stumble-upon-mob actor target))
           (make-act actor (truncate (* (cur-move-speed actor) (move-spd (get-mob-type-by-id (mob-type actor)))) 100))
@@ -951,9 +952,9 @@
     (setf (riding-mob-id target) nil)))
 
 (defun mob-depossess-target (actor)
-  (logger (format nil "MOB-DEPOSSESS-TARGET: Master ~A [~A], slave [~A]~%" (name actor) (id actor) (slave-mob-id actor)))
+  (log:info (format nil "MOB-DEPOSSESS-TARGET: Master ~A [~A], slave [~A]~%" (name actor) (id actor) (slave-mob-id actor)))
   (let ((target (get-mob-by-id (slave-mob-id actor))))
-    (logger (format nil "MOB-DEPOSSESS-TARGET: ~A [~A] releases its possession of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+    (log:info (format nil "MOB-DEPOSSESS-TARGET: ~A [~A] releases its possession of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
     (setf (x target) (x actor) (y target) (y actor) (z target) (z actor))
     (add-mob-to-level-list (level *world*) target)
     
@@ -1020,7 +1021,7 @@
   (unless (is-weapon-ranged actor)
     (return-from mob-reload-ranged-weapon nil))
 
-  (logger (format nil "MOB-RELOAD: ~A [~A] reloads his ~A~%" (name actor) (id actor) (get-weapon-name actor)))
+  (log:info (format nil "MOB-RELOAD: ~A [~A] reloads his ~A~%" (name actor) (id actor) (get-weapon-name actor)))
 
   ;; set motion
   (incf-mob-motion actor *mob-motion-reload*)
@@ -1039,7 +1040,7 @@
   (make-act actor +normal-ap+))
 
 (defun mob-shoot-target (actor target)
-  (logger (format nil "MOB-SHOOT-TARGET: ~A [~A] shoots ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+  (log:info (format nil "MOB-SHOOT-TARGET: ~A [~A] shoots ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   (let ((cur-dmg 0) (bullets-left) (affected-targets nil) (completely-missed t))
     (unless (is-weapon-ranged actor)
       (return-from mob-shoot-target nil))
@@ -1197,7 +1198,7 @@
                                    (specific-hit-string-func nil) (specific-no-dmg-string-func nil) (kill-possessed t))
   ;; specific-hit-string-func is #'(lambda (cur-dmg) (return string))
   ;; specific-no-dmg-string-func is #'(lambda () (return string))
-  (logger (format nil "INFLICT-DAMAGE: target = ~A [~A]~%" (name target) (id target)))
+  (log:info (format nil "INFLICT-DAMAGE: target = ~A [~A]~%" (name target) (id target)))
 
   ;; target under protection of divine shield - consume the shield and quit
   (when (mob-effect-p target +mob-effect-divine-shield+)
@@ -1581,7 +1582,7 @@
   )
 
 (defun melee-target (attacker target &key (kill-possessed t))
-  (logger (format nil "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target)))
+  (log:info (format nil "MELEE-TARGET: ~A attacks ~A~%" (name attacker) (name target)))
   ;; no weapons - no attack
   (when (or (null (weapon attacker))
             (null (is-weapon-melee attacker)))
@@ -1628,7 +1629,7 @@
   nil)
 
 (defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()) (keep-items nil))
-  (logger (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
+  (log:info (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
   (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob)))))
         (ghost-that-cheats-death nil))
     
@@ -1736,7 +1737,7 @@
           (when (= left-body-type +item-type-body-part-full+)
             (setf (dead-mob item) (id mob)))
           (add-item-to-level-list (level *world*) item)
-          (logger (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob) (z mob))))
+          (log:info (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob) (z mob))))
         
         ))
     
@@ -1763,7 +1764,7 @@
                      (mob-ability-p mob +mob-abil-human+))
                 (and (mob-ability-p killer +mob-abil-demon+)
                      (mob-ability-p mob +mob-abil-demon+)))
-        (logger (format nil "MAKE-DEAD: ~A [~A] Real mob strength to be transferred to the killer ~A [~A] is ~A~%" (name mob) (id mob) (name killer) (id killer) (strength (get-mob-type-by-id (mob-type mob)))))
+        (log:info (format nil "MAKE-DEAD: ~A [~A] Real mob strength to be transferred to the killer ~A [~A] is ~A~%" (name mob) (id mob) (name killer) (id killer) (strength (get-mob-type-by-id (mob-type mob)))))
         (incf (cur-fp killer) (1+ (strength (get-mob-type-by-id (mob-type mob)))))
         (when (> (cur-fp killer) (max-fp killer))
           (setf (cur-fp killer) (max-fp killer))))
@@ -2229,7 +2230,7 @@
     (setf (sense-stockpile-pos *player*) nearest-stockpile)))
 
 (defun mob-pick-item (mob item &key (spd (move-spd (get-mob-type-by-id (mob-type mob)))) (silent nil))
-  (logger (format nil "MOB-PICK-ITEM: ~A [~A] picks up ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
+  (log:info "~A [~A] picks up ~A [~A]" (name mob) (id mob) (name item) (id item))
   (if (null (inv-id item))
     (progn
       (unless silent
@@ -2253,10 +2254,10 @@
       (when spd
         (make-act mob spd)))
     (progn
-      (logger (format nil "MOB-PICK-ITEM: Pick up failed, item is not on the ground!~%" )))))
+      (log:info "Pick up failed, item is not on the ground!"))))
 
 (defun mob-drop-item (mob item &key (qty (qty item)) (spd (move-spd (get-mob-type-by-id (mob-type mob)))) silent)
-  (logger (format nil "MOB-DROP-ITEM: ~A [~A] drops ~A [~A]~%" (name mob) (id mob) (name item) (id item)))
+  (log:info "~A [~A] drops ~A [~A]" (name mob) (id mob) (name item) (id item))
   (if (eq (inv-id item) (id mob))
     (progn
       
@@ -2282,7 +2283,7 @@
       (when spd
         (make-act mob spd)))
     (progn
-      (logger (format nil "MOB-DROP-ITEM: Drop failed, item is not in the mob's inventory!~%" )))))
+      (log:info "Drop failed, item is not in the mob's inventory!"))))
 
 (defun ignite-tile (level x y z src-x src-y src-z)
   (when (get-terrain-type-trait (get-terrain-* level x y z) +terrain-trait-flammable+)
@@ -2362,7 +2363,7 @@
 ;;-------------------------------
 
 (defun invoke-bend-space (actor)
-  (logger (format nil "MOB-BEND-SPACE: ~A [~A] invokes bend space.~%" (name actor) (id actor)))
+  (log:info (format nil "MOB-BEND-SPACE: ~A [~A] invokes bend space.~%" (name actor) (id actor)))
   (let ((applicable-tiles ())
         (dx) (dy) (dz) (r))
     (loop for dx of-type fixnum from (- (x actor) 6) to (+ (x actor) 6) do
@@ -2385,7 +2386,7 @@
       (setf dx (first (nth r applicable-tiles))
             dy (second (nth r applicable-tiles))
             dz (third (nth r applicable-tiles))))
-    (logger (format nil "MOB-BEND-SPACE: ~A [~A] teleports to (~A ~A ~A).~%" (name actor) (id actor) dx dy dz))
+    (log:info (format nil "MOB-BEND-SPACE: ~A [~A] teleports to (~A ~A ~A).~%" (name actor) (id actor) dx dy dz))
     (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                (format nil "You hear crackling~A. " str)))
     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -2406,7 +2407,7 @@
     ))
 
 (defun invoke-teleport-self (actor min-distance z)
-  (logger (format nil "MOB-TELEPORT-SELF: ~A [~A] teleports self~%" (name actor) (id actor)))
+  (log:info (format nil "MOB-TELEPORT-SELF: ~A [~A] teleports self~%" (name actor) (id actor)))
 
   (let ((max-x (array-dimension (terrain (level *world*)) 0))
         (max-y (array-dimension (terrain (level *world*)) 1))
@@ -2487,7 +2488,7 @@
                              when (not (get-faction-relation (faction actor) (faction (get-mob-by-id enemy-mob-id))))
                                collect enemy-mob-id))
       
-      (logger (format nil "MOB-CURSE: ~A [~A] affects the following enemies ~A with the curse~%" (name actor) (id actor) enemy-list))
+      (log:info (format nil "MOB-CURSE: ~A [~A] affects the following enemies ~A with the curse~%" (name actor) (id actor) enemy-list))
       
       ;; place a curse on them for 5 turns
       (loop for enemy-mob-id in enemy-list
@@ -2505,7 +2506,7 @@
                
                (if protected
                  (progn
-                   (logger (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name (get-mob-by-id enemy-mob-id)) (id (get-mob-by-id enemy-mob-id))))
+                   (log:info (format nil "MOB-CURSE: ~A [~A] was protected, so the curse removes protection only~%" (name (get-mob-by-id enemy-mob-id)) (id (get-mob-by-id enemy-mob-id))))
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~A's curse removed divine protection from ~A. "
                                                   (capitalize-name (prepend-article +article-the+ (visible-name actor)))
@@ -2515,7 +2516,7 @@
                                                         :singlemind)))
                    )
                  (progn
-                   (logger (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
+                   (log:info (format nil "MOB-CURSE: ~A [~A] affects the enemy ~A with a curse~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
                    (set-mob-effect (get-mob-by-id enemy-mob-id) :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
                    (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                           (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id enemy-mob-id)))))
@@ -2527,7 +2528,7 @@
       )))
 
 (defun invoke-fear (actor fear-strength)
-  (logger (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
+  (log:info (format nil "MOB-INSTILL-FEAR: ~A [~A] casts instill fear.~%" (name actor) (id actor)))
   ;; fear nearby visible enemy mobs
   ;; fear can be resisted depending on the strength of the mob
   (loop for i from 0 below (length (visible-mobs actor))
@@ -2568,7 +2569,7 @@
                            :color sdl:*white*
                            :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                          :singlemind)))
-    (logger (format nil "INVOKE-REANIMATE-BODY: ~A [~A] is reanimated at (~A ~A ~A).~%" (name corpse-item) (id corpse-item) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
+    (log:info (format nil "INVOKE-REANIMATE-BODY: ~A [~A] is reanimated at (~A ~A ~A).~%" (name corpse-item) (id corpse-item) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
     (remove-item-from-world corpse-item)
     ))
 

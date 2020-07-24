@@ -92,7 +92,7 @@
 (defun update-visibility-after-creation (level world-sector mission world)
   (declare (ignore world-sector mission world))
   
-  (format t "OVERALL-POST-PROCESS-FUNC: Update visibility~%~%")
+  (log:info "Update visibility")
   
   (loop for mob-id in (mob-id-list level)
         for mob = (get-mob-by-id mob-id)
@@ -102,7 +102,7 @@
 (defun remove-dungeon-gen-functions (level world-sector mission world)
   (declare (ignore world-sector mission world))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Remove dungeon generation features~%"))
+  (log:info "Remove dungeon generation features")
   
   (loop for feature-id in (feature-id-list level)
         for lvl-feature = (get-feature-by-id feature-id)
@@ -115,7 +115,7 @@
 ;;=======================
 
 (defun place-player-on-level (level world-sector mission world)
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Placing player~%"))
+  (log:info "Placing player")
   (loop for overall-post-process-func in (funcall (overall-post-process-func-list (get-level-modifier-by-id (player-lvl-mod-placement-id mission))))
         do
            (funcall overall-post-process-func level world-sector mission world)))
@@ -255,7 +255,7 @@
 (defun setup-turns-for-delayed-arrival (level world-sector mission world)
   (declare (ignore mission))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Set up turns for delayed arrival~%"))
+  (log:info "Set up turns for delayed arrival")
 
   ;; set up delayed arrival for demons
   (setf (turns-for-delayed-demons level) 130)
@@ -342,7 +342,7 @@
 
 (defun place-demonic-portals (level world-sector mission world)
   (declare (ignore world-sector mission world))
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Placing demonic portals~%"))
+  (log:info "Placing demonic portals")
   
   ;; remove standard demon arrival points
   (loop for feature-id in (feature-id-list level)
@@ -387,7 +387,7 @@
 (defun place-demons-on-level (level world-sector mission world demon-list)
   (declare (ignore world world-sector))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place demons function~%"))
+  (log:info "Place demons function")
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-demons+)
                               (eq (second a) :mission-faction-present))
@@ -395,7 +395,7 @@
                        nil))
                  (faction-list mission))
     
-    (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Place present demons~%"))
+    (log:info "   Place present demons")
 
     (place-mobs-on-level-immediate level
                                    :start-point-list (loop for lvl-feature-id in (remove-if-not #'(lambda (a)
@@ -413,7 +413,7 @@
                        t
                        nil))
                  (faction-list mission))
-    (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Add game event for delayed demons~%"))
+    (log:info "   Add game event for delayed demons")
     
     (pushnew +game-event-delayed-arrival-demons+ (game-events level))
     
@@ -423,7 +423,7 @@
               (= (player-lvl-mod-placement-id mission) +lm-placement-demon-shadow+))
         (loop for (mob-type-id mob-num is-player) in demon-list do
           (when is-player
-            (logger (format nil "   PLACE-DEMONS-ON-LEVEL: Add delayed player to the game~%"))
+            (log:info "   Add delayed player to the game")
             (setf *player* (make-instance 'player :mob-type mob-type-id))
             (setf (player-outside-level *player*) t))))
     )
@@ -436,7 +436,7 @@
               (= angel-type +mob-type-star-gazer+)
               (= angel-type +mob-type-star-mender+))
         (progn
-          (logger (format nil "   PLACE-ANGELS-ON-LEVEL-IMMEDIATE: Place trinity mimics~%"))
+          (log:info "   Place trinity mimics")
           (loop with is-free = t
                 with mob1 = (cond
                               ((and is-player create-player) (make-instance 'player :mob-type +mob-type-star-singer+))
@@ -482,7 +482,7 @@
                      
                      (loop-finish))))
         (progn
-          (logger (format nil "   PLACE-ANGELS-ON-LEVEL-IMMEDIATE: Place chrome angels~%"))
+          (log:info "   Place chrome angels")
           
           (loop with arrival-point-list = (copy-list start-point-list)
                 with angel = (cond
@@ -508,7 +508,7 @@
 (defun place-angels-on-level (level world-sector mission world angel-list)
   (declare (ignore world-sector world))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place angels function~%"))
+  (log:info "Place angels function")
   
   (when (find-if #'(lambda (a)
                      (if (and (= (first a) +faction-type-angels+)
@@ -516,7 +516,7 @@
                        t
                        nil))
                  (faction-list mission))
-    (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Place present angels~%"))
+    (log:info "   Place present angels")
 
     (place-angels-on-level-immediate level
                                      :start-point-list (loop for lvl-feature-id in (remove-if-not #'(lambda (a)
@@ -535,7 +535,7 @@
                        t
                        nil))
                  (faction-list mission))
-    (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add game event for delayed angels~%"))
+    (log:info "   Add game event for delayed angels")
     
     (pushnew +game-event-delayed-arrival-angels+ (game-events level))
     
@@ -558,7 +558,7 @@
                 (setf *player* mob1)))
             (progn
               (setf *player* (make-instance 'player :mob-type mob-type-id))))
-          (logger (format nil "   PLACE-ANGELS-ON-LEVEL: Add delayed player to the game~%"))
+          (log:info "   Add delayed player to the game")
           (setf (player-outside-level *player*) t))))
     )
   )
@@ -567,7 +567,7 @@
 (defun place-military-on-level (level world-sector mission world military-list remove-arrival-points)
   (declare (ignore world-sector world))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place military function~%"))
+  (log:info "Place military function")
 
   ;; if the player is present as a chaplain then we need only three squads
   (when (and (= (player-lvl-mod-placement-id mission) +lm-placement-military-chaplain+)
@@ -580,7 +580,7 @@
                        t
                        nil))
                  (faction-list mission))
-    (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Place present military~%"))
+    (log:info "   Place present military")
     
     (loop for squad-list in military-list do
       (destructuring-bind (mob-type-id mob-num is-player) (first squad-list)
@@ -625,7 +625,7 @@
                        t
                        nil))
                  (faction-list mission))
-    (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Add game event for delayed military~%"))
+    (log:info "   Add game event for delayed military")
     
     (pushnew +game-event-delayed-arrival-military+ (game-events level))
     
@@ -636,7 +636,7 @@
         (destructuring-bind (mob-type-id mob-num is-player) (first squad-list)
           (declare (ignore mob-num))
           (when is-player
-            (logger (format nil "   PLACE-MILITARY-ON-LEVEL: Add delayed player to the game~%"))
+            (log:info "   Add delayed player to the game")
             (setf *player* (make-instance 'player :mob-type mob-type-id))
             (setf (player-outside-level *player*) t)))))
     )
@@ -645,7 +645,7 @@
 
 (defun place-demonic-runes-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place demonic runes~%"))
+  (log:info "Place demonic runes")
   (let ((demonic-runes ())
         (rune-list (list +feature-demonic-rune-flesh+ +feature-demonic-rune-flesh+
                          +feature-demonic-rune-invite+ +feature-demonic-rune-invite+
@@ -685,7 +685,7 @@
 
 (defun set-up-inital-power (level world-sector mission world)
   (declare (ignore mission))
-  (logger (format nil "SET-UP-INITIAL-POWER: Set up power for demons and angels~%"))
+  (log:info "Set up power for demons and angels")
   
   (let ((demon-power 0)
         (angel-power 0))
@@ -731,7 +731,7 @@
 
 (defun remove-signal-flares-from-military (level world-sector mission world)
   (declare (ignore world-sector mission world))
-  (logger (format nil "REMOVE-SIGNAL-FLARES-FROM-MILITARY: Remove flares~%"))
+  (log:info "Remove flares")
   (loop for mob-id in (mob-id-list level)
         for mob = (get-mob-by-id mob-id)
         when (eq (faction mob) +faction-type-military+)
@@ -743,7 +743,7 @@
 
 (defun add-bombs-to-military (level world-sector mission world)
   (declare (ignore world-sector mission world))
-  (logger (format nil "ADD-BOMBS-TO-MILITARY: Add bombs~%"))
+  (log:info "Add bombs")
   (loop for mob-id in (mob-id-list level)
         for mob = (get-mob-by-id mob-id)
         when (eq (faction mob) +faction-type-military+)

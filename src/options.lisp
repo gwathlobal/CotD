@@ -10,7 +10,7 @@
   )
 
 (defun read-options (s-expr options)
-  (logger (format nil "READ-OPTIONS: S-EXPR = ~A~%" s-expr))
+  (log:info "S-EXPR = ~A" s-expr)
   (unless (typep s-expr 'list)
     (return-from read-options nil))
   
@@ -23,15 +23,15 @@
   )
 
 (defun set-options-tiles (s-expr options)
-  (logger (format nil "SET-OPTIONS-TILES: S-EXPR = ~A~%" s-expr))
+  (log:info "S-EXPR = ~A" s-expr)
   (setf (options-tiles options) (second s-expr)))
 
 (defun set-options-font (s-expr options)
-  (logger (format nil "SET-OPTIONS-FONT: S-EXPR = ~A~%" s-expr))
+  (log:info "S-EXPR = ~A" s-expr)
   (setf (options-font options) (second s-expr)))
 
 (defun set-options-name (s-expr options)
-  (logger (format nil "SET-OPTIONS-NAME: S-EXPR = ~A~%" s-expr))
+  (log:info "S-EXPR = ~A" s-expr)
   (loop for c across (second s-expr)
         with str = ""
         when (and (or (find (string-downcase (string c)) *char-list* :test #'string=)
@@ -44,7 +44,7 @@
   )
 
 (defun set-options-ignore-singlemind-messages (s-expr options)
-  (logger (format nil "SET-OPTIONS-IGNORE-SINGLEMIND-MESSAGES: S-EXPR = ~A~%" s-expr))
+  (log:info "S-EXPR = ~A" s-expr)
   (setf (options-ignore-singlemind-messages options) (second s-expr)))
 
 (defun create-options-file-string (options)

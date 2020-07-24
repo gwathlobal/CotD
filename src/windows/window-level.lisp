@@ -872,7 +872,7 @@
 
                             ;; a single item - just pick it up
 			    (when (= (length item-list) 1)
-			      (logger (format nil "PLAYER-ITEM-PICK: On item on the tile, pick it right away~%"))
+			      (log:info (format nil "PLAYER-ITEM-PICK: On item on the tile, pick it right away~%"))
                               (clear-message-list (level/small-message-box (level *world*)))
 			      (mob-pick-item *player* (get-inv-item-by-pos item-list 0)))
 			    ;; a several items - show selection window

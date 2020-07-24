@@ -27,7 +27,7 @@
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector world mission))
                                                                     
-                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add starting points for demons~%~%"))
+                                                                    (log:info "OVERALL-POST-PROCESS-FUNC: Add starting points for demons")
 
                                                                     (loop repeat 50
                                                                           do
@@ -98,7 +98,7 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore world-sector mission world))
 
-                                                 (format t "TEMPLATE LEVEL FUNC: LM CONTROLLED BY MILITARY~%")
+                                                 (log:info "TEMPLATE LEVEL FUNC: LM CONTROLLED BY MILITARY")
 
                                                  (let ((building-id +building-city-army-post+)
                                                        (x-w 4)

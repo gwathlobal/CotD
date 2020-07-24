@@ -207,7 +207,7 @@
 (defun add-arrival-points-on-level (level world-sector mission world)
   (declare (ignore mission))
 
-  (format t "ADD-ARRIVAL-POINTS-ON-LEVEL: Start~%")
+  (log:info "Start")
   
   (let* ((sides-hash (make-hash-table))
          (demon-test-func #'(lambda (x y)
@@ -230,10 +230,10 @@
                                    t
                                    nil)))
          (hash-print-func #'(lambda ()
-                              (loop initially (format t "~%SIDES-HASH:~%")
+                              (loop initially (log:debug "~%SIDES-HASH:")
                                     for side being the hash-keys in sides-hash do
-                                      (format t "   ~A : ~A~%" side (gethash side sides-hash))
-                                    finally (format t "~%"))))
+                                      (log:debug "   ~A : ~A" side (gethash side sides-hash))
+                                    finally (log:debug ""))))
          (side-party-list (list (list :demons +feature-delayed-demons-arrival-point+)
                                 (list :military +feature-delayed-military-arrival-point+)
                                 (list :angels +feature-delayed-angels-arrival-point+)
@@ -315,9 +315,8 @@
                                                      (incf (getf nums party)))
                                              (when (> (length (gethash side sides-hash)) 1)
                                                (setf has-overlapped t))
-                                           finally (format t
-                                                           "Reduce counts:~%   ~A~%   Overlapped: ~A~%"
-                                                           nums has-overlapped)))
+                                           finally (log:debug "Reduce counts:~%   ~A~%   Overlapped: ~A~%"
+                                                              nums has-overlapped)))
             initially (funcall count-nums-func)
           while has-overlapped do
             (loop for party in parties do
@@ -338,7 +337,7 @@
                                  (loop-finish))))
           )
     
-    (format t "After reduce ")
+    (log:debug "After reduce ")
     (funcall hash-print-func)
 
     ;; add parties that are absent at the moment
@@ -371,7 +370,7 @@
                                                      (push :military excess-parties))
                                                    (when (> (length (gethash :angels parties-hash)) 1)
                                                      (push :angels excess-parties))
-                                                   (format t "Counts:~%   Absent parties: ~A, Free sides: ~A, Excess parties: ~A~%" absent-parties free-sides excess-parties)))
+                                                   (log:debug "Counts:~%   Absent parties: ~A, Free sides: ~A, Excess parties: ~A" absent-parties free-sides excess-parties)))
             initially (funcall count-nums-func)
           while absent-parties do
             
@@ -392,7 +391,7 @@
                   (push random-party (gethash random-side sides-hash))
                   ))
               )
-            (format t "After ")
+            (log:debug "After ")
             (funcall count-nums-func)
             (funcall hash-print-func)
           )
@@ -578,7 +577,7 @@
 (defun place-coins-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
 
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place coins~%"))
+  (log:info "Place coins")
   (let ((total-gold-items (loop for feature-id in (feature-id-list level)
                                 for lvl-feature = (get-feature-by-id feature-id)
                                 when (= (feature-type lvl-feature) +feature-start-gold-small+)
@@ -597,7 +596,7 @@
 (defun place-civilians-on-level (level world-sector mission world)
   (declare (ignore world-sector world))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place civilians~%"))
+  (log:info "Place civilians")
   (loop with civilians-present = nil
         for (faction-type faction-presence) in (faction-list mission)
         when (and (= faction-type +faction-type-civilians+)
@@ -630,7 +629,7 @@
 (defun place-outsider-beasts-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
 
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place outsider beasts~%"))
+  (log:info "Place outsider beasts")
   
   (populate-level-with-mobs level (list (list +mob-type-gargantaur+ 1 nil)
                                         (list +mob-type-wisp+ 9 nil))
@@ -644,7 +643,7 @@
 (defun place-demonic-sigils-on-level (level world-sector mission world)
   (declare (ignore world-sector mission))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon sigils~%"))
+  (log:info "Add demon sigils")
   
   (loop with sigil = nil
         for feature-id in (feature-id-list level)
@@ -678,7 +677,7 @@
 (defun place-demonic-machines-on-level (level world-sector mission world)
   (declare (ignore world-sector world mission))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add demon machines~%"))
+  (log:info (format nil "OVERALL-POST-PROCESS-FUNC: Add demon machines~%"))
   
   (loop with machine = nil
         for feature-id in (feature-id-list level)
@@ -694,7 +693,7 @@
 (defun place-flesh-storages-on-level (level world-sector mission world)
   (declare (ignore world-sector world mission))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add flesh storages~%"))
+  (log:info (format nil "OVERALL-POST-PROCESS-FUNC: Add flesh storages~%"))
   
   (loop for feature-id in (feature-id-list level)
         for lvl-feature = (get-feature-by-id feature-id)
@@ -713,7 +712,7 @@
 (defun place-blood-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place blood spatters~%"))
+  (log:info (format nil "OVERALL-POST-PROCESS-FUNC: Place blood spatters~%"))
   (let ((blood ())
         (max-blood (sqrt (* (array-dimension (terrain level) 0)
                             (array-dimension (terrain level) 1)))))
@@ -745,7 +744,7 @@
 (defun place-irradation-on-level (level world-sector mission world)
   (declare (ignore world-sector mission world))
   
-  (logger (format nil "OVERALL-POST-PROCESS-FUNC: Place irradiated spots~%"))
+  (log:info "Place irradiated spots")
   (loop with max-x = (- (array-dimension (terrain level) 0) 2)
         with max-y = (- (array-dimension (terrain level) 1) 2)
         with max-z = (- (array-dimension (terrain level) 2) 2)
@@ -778,7 +777,7 @@
 (defun place-island-on-template-level (template-level world-sector mission world)
   (declare (ignore mission world mission world-sector))
   
-  (logger (format nil "TEMPLATE LEVEL FUNC: WORLD SECTOR ISLAND~%"))
+  (log:info "Start")
   
   (let ((max-x (array-dimension template-level 0))
         (max-y (array-dimension template-level 1)))

@@ -760,6 +760,14 @@
 (defconstant +connect-map-move-climb+ 1)
 (defconstant +connect-map-move-fly+ 2)
 
+(defenum:defenum log-options-enum (:log-option-all
+                                   :log-option-file
+                                   :log-option-none))
+
+(defvar *cotd-release* nil)
+(defparameter *cotd-logging* :log-option-all)
+(defparameter *cotd-log-level* :info)
+
 ;;---------------------------
 ;; Multithreading parameters
 ;;--------------------------- 

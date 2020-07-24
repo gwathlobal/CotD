@@ -22,7 +22,7 @@
     result))
 
 (defun propagate-sound-from-location (target sx sy sz sound-power sound-str-func &key (force-sound nil) (source nil))
-  (logger (format nil "ENTERING PROPAGATE ~A [~A]~%" (name target) (id target)))
+  (log:info "ENTERING PROPAGATE ~A [~A]" (name target) (id target))
   (let ((sound-pwr sound-power))
     (line-of-sight sx sy sz (x target) (y target) (z target)
                    #'(lambda (dx dy dz prev-cell)
@@ -66,11 +66,11 @@
                            )
                          exit-result)))
 
-    (logger (format nil "PROPAGATE-SOUND-FROM-LOCATION: Initial sound power ~A, final sound power ~A, Source ~A [~A] (~A ~A ~A), Target ~A [~A] (~A ~A ~A), Sound string ~A~%"
+    (log:info "Initial sound power ~A, final sound power ~A, Source ~A [~A] (~A ~A ~A), Target ~A [~A] (~A ~A ~A), Sound string ~A"
                     sound-power sound-pwr
                     (if source (name source) nil) (if source (id source) nil) sx sy sz
                     (name target) (id target) (x target) (y target) (z target)
-                    (funcall sound-str-func "")))
+                    (funcall sound-str-func ""))
     
     (when (not (zerop sound-pwr))
       (let ((sound-z (cond ((> sz (z target)) 1)
@@ -127,4 +127,4 @@
                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                  :singlemind)))
             )))))
-  (logger (format nil "LEAVING PROPAGATE~%")))
+  (log:info "LEAVING PROPAGATE"))

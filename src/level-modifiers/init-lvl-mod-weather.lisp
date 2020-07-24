@@ -24,7 +24,7 @@
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector mission world))
 
-                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add rain weather~%~%"))
+                                                                    (log:info "OVERALL-POST-PROCESS-FUNC: Add rain weather")
 
                                                                     (pushnew +game-event-rain-falls+ (game-events level))
                                                                     
@@ -49,7 +49,7 @@
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector mission world))
 
-                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add poison rain weather~%~%"))
+                                                                    (log:info "OVERALL-POST-PROCESS-FUNC: Add poison rain weather")
 
                                                                     (pushnew +game-event-acid-falls+ (game-events level))
                                                                     
@@ -78,7 +78,7 @@
                                                           (push #'(lambda (level world-sector mission world)
                                                                     (declare (ignore world-sector mission world))
 
-                                                                    (logger (format nil "OVERALL-POST-PROCESS-FUNC: Add snow weather~%~%"))
+                                                                    (log:info "OVERALL-POST-PROCESS-FUNC: Add snow weather")
                                                                     
                                                                     (pushnew +game-event-snow-falls+ (game-events level))
                                                                     

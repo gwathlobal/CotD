@@ -7,4 +7,4 @@ scenario-highscores
 morgue
 Missions.xlsx
 saves
-log.txt
+log.*

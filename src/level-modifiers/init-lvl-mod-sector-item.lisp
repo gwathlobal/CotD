@@ -38,14 +38,14 @@
                     :template-level-gen-func #'(lambda (template-level world-sector mission world)
                                                  (declare (ignore mission world))
 
-                                                 (logger (format nil "TEMPLATE LEVEL FUNC: Lvl Mod Relic~%"))
+                                                 (log:info "TEMPLATE LEVEL FUNC: Lvl Mod Relic")
                                                  
                                                  (when (or (eq (wtype world-sector) :world-sector-corrupted-residential)
                                                            (eq (wtype world-sector) :world-sector-corrupted-island)
                                                            (eq (wtype world-sector) :world-sector-corrupted-port)
                                                            (eq (wtype world-sector) :world-sector-corrupted-lake)
                                                            (eq (wtype world-sector) :world-sector-corrupted-forest))
-                                                   (logger (format nil "   TEMPLATE LEVEL FUNC: Lvl Mod Relic in Corrupted District~%"))
+                                                   (log:info "   TEMPLATE LEVEL FUNC: Lvl Mod Relic in Corrupted District")
                                                  
                                                    (loop with shrine-types = (prepare-spec-build-id-list +building-type-corrupted-shrine+)
                                                          for x = (random (array-dimension template-level 0))

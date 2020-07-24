@@ -188,7 +188,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
-                                                (logger (format nil "MOB-POSSESS-TARGET: ~A [~A] possesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-POSSESS-TARGET: ~A [~A] possesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
                                                 
                                                 (rem-mob-effect actor +mob-effect-ready-to-possess+)
                                                 
@@ -223,7 +223,7 @@
                                                 (declare (ignore ability-type))
                                                 
                                                 (melee-target actor target :kill-possessed nil)
-                                                (logger (format nil "INSIDE PURGING TOUCH: ~A, (check-dead target) ~A~%" (name target) (check-dead target)))
+                                                (log:info (format nil "INSIDE PURGING TOUCH: ~A, (check-dead target) ~A~%" (name target) (check-dead target)))
                                                 (when (and (check-dead target)
                                                            (slave-mob-id target))
                                                   (incf (cur-fp actor))
@@ -247,7 +247,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is a feature (demonic rune) to be purged
-                                                (logger (format nil "MOB-PURGE-RUNE: ~A [~A] purges ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor)
+                                                (log:info (format nil "MOB-PURGE-RUNE: ~A [~A] purges ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor)
                                                                 (name target) (id target) (x target) (y target) (z target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A purges ~A and gains power. "
@@ -362,7 +362,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
-                                                (logger (format nil "MOB-BLESS-TARGET: ~A [~A] blesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-BLESS-TARGET: ~A [~A] blesses ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
                                                 (set-mob-effect target :effect-type-id +mob-effect-blessed+ :actor-id (id actor))
                                                 (incf (cur-fp actor))
@@ -403,7 +403,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
-                                                (logger (format nil "MOB-CONSUME-BLESSING-ON-TARGET: ~A [~A] is scorched by blessing of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-CONSUME-BLESSING-ON-TARGET: ~A [~A] is scorched by blessing of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
                                                 (rem-mob-effect target +mob-effect-blessed+)
                                                 
@@ -452,7 +452,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
-                                                (logger (format nil "MOB-LIFESTEAL: ~A [~A] steals life from the dead ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-LIFESTEAL: ~A [~A] steals life from the dead ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
   
                                                 (let ((heal-pwr))
                                                   (setf heal-pwr (* 2 (1+ (strength target))))
@@ -484,7 +484,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
-                                                (logger (format nil "MOB-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor)))
                                                 
                                                 (let ((allies-list))
                                                   ;; collect all allies that are able to answer the call within the 40 cell radius
@@ -498,7 +498,7 @@
                                                   
                                                   ;; remove all allies that are visible to you so that only distant ones could answer 
                                                   (setf allies-list (remove-if #'(lambda (e) (member e (visible-mobs actor))) allies-list))
-                                                  (logger (format nil "MOB-CALL-FOR-HELP: The following allies might answer the call ~A~%" allies-list))
+                                                  (log:info (format nil "MOB-CALL-FOR-HELP: The following allies might answer the call ~A~%" allies-list))
                                                   
                                                   ;; place the effect of "called for help" on the allies in the final list 
                                                   (loop for ally-mob-id in allies-list 
@@ -546,7 +546,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] answers the call~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-ANSWER-THE-CALL: ~A [~A] answers the call~%" (name actor) (id actor)))
                                                 
                                                 (let ((allies-list))
                                                   ;; find all allies that called for help with 40 cell radius
@@ -562,7 +562,7 @@
                                                       (let ((called-ally (get-mob-by-id (first allies-list)))
                                                             (fx nil) (fy nil) (fz nil))
                                                         ;; if anyone found, find a free place around the caller
-                                                        (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the caller ~A [~A]~%" (name actor) (id actor) (name called-ally) (id called-ally)))
+                                                        (log:info (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the caller ~A [~A]~%" (name actor) (id actor) (name called-ally) (id called-ally)))
                                                         (check-surroundings (x called-ally) (y called-ally) nil #'(lambda (x y)
                                                                                                                     (when (and (not (get-mob-* (level *world*) x y (z called-ally)))
                                                                                                                                (not (get-terrain-type-trait (get-terrain-* (level *world*) x y (z called-ally))
@@ -571,7 +571,7 @@
                                                         (if (and fx fy fz)
                                                           ;; free place found
                                                           (progn
-                                                            (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the place to teleport (~A, ~A)~%" (name actor) (id actor) fx fy))
+                                                            (log:info (format nil "MOB-ANSWER-THE-CALL: ~A [~A] finds the place to teleport (~A, ~A)~%" (name actor) (id actor) fx fy))
                                                             (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear crackling~A. " str)))
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -604,7 +604,7 @@
                                                             (incf (stat-calls called-ally))
                                                             )
                                                           (progn
-                                                            (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] unable to the place to teleport~%" (name actor) (id actor)))
+                                                            (log:info (format nil "MOB-ANSWER-THE-CALL: ~A [~A] unable to the place to teleport~%" (name actor) (id actor)))
                                                             (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear crackling~A. " str)))
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -619,7 +619,7 @@
                                                         ))
                                                     (progn
                                                       ;; if none found, simply remove the "answer the call" status
-                                                      (logger (format nil "MOB-ANSWER-THE-CALL: ~A [~A] is unable to find the caller ~%" (name actor) (id actor)))
+                                                      (log:info (format nil "MOB-ANSWER-THE-CALL: ~A [~A] is unable to find the caller ~%" (name actor) (id actor)))
                                                       (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear crackling~A. " str)))
                                                       (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -663,7 +663,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (logger (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] prays for righteousness~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] prays for righteousness~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone praying~A." str)))
@@ -684,12 +684,12 @@
                                                                                      (mob-ability-p (get-mob-by-id enemy-mob-id) +mob-abil-unholy+))
                                                                              collect enemy-mob-id))
                                                     
-                                                    (logger (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the following enemies ~A with the prayer~%" (name actor) (id actor) enemy-list))
+                                                    (log:info (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the following enemies ~A with the prayer~%" (name actor) (id actor) enemy-list))
                                                     
                                                     ;; reveal all enemies and burn them like they are blessed
                                                     (loop for enemy-mob-id in enemy-list
                                                           do
-                                                             (logger (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the enemy ~A~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
+                                                             (log:info (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the enemy ~A~%" (name actor) (id actor) (get-mob-by-id enemy-mob-id)))
                                                              (when (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-possessed+)
                                                                (unless (mob-effect-p (get-mob-by-id enemy-mob-id) +mob-effect-reveal-true-form+)
                                                                  (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -714,13 +714,13 @@
                                                     ;; do not forget self
                                                     (pushnew (id actor) ally-list)
                                                     
-                                                    (logger (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the following allies ~A with the prayer~%" (name actor) (id actor) ally-list))
+                                                    (log:info (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the following allies ~A with the prayer~%" (name actor) (id actor) ally-list))
                                                     
                                                     ;; grant all allies invulnerability for 99 turns
                                                     (loop for ally-mob-id in ally-list
                                                           for mob = (get-mob-by-id ally-mob-id)
                                                           do
-                                                             (logger (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the ally ~A~%" (name actor) (id actor) mob))
+                                                             (log:info (format nil "MOB-PRAYER-RIGHTEOUSNESS: ~A [~A] affects the ally ~A~%" (name actor) (id actor) mob))
                                                              (set-mob-effect mob :effect-type-id +mob-effect-divine-shield+ :actor-id (id actor) :cd 99)
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A is granted divine shield" (capitalize-name (prepend-article +article-the+ (visible-name mob))))
@@ -780,7 +780,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
                                                 
-                                                (logger (format nil "MOB-FREE-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-FREE-CALL-FOR-HELP: ~A [~A] calls for help~%" (name actor) (id actor)))
                                                 
                                                 (let ((allies-list))
                                                   ;; collect all allies that are able to answer the call within the 40 cell radius
@@ -794,7 +794,7 @@
                                                   
                                                   ;; remove all allies that are visible to you so that only distant ones could answer 
                                                   (setf allies-list (remove-if #'(lambda (e) (member e (visible-mobs actor))) allies-list))
-                                                  (logger (format nil "MOB-FREE-CALL-FOR-HELP: The following allies might answer the call ~A~%" allies-list))
+                                                  (log:info (format nil "MOB-FREE-CALL-FOR-HELP: The following allies might answer the call ~A~%" allies-list))
                                                   
                                                   ;; place the effect of "called for help" on the allies in the final list 
                                                   (loop for ally-mob-id in allies-list 
@@ -840,7 +840,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] prays for shielding~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-PRAYER-SHIELD: ~A [~A] prays for shielding~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone praying~A." str)))
@@ -861,12 +861,12 @@
                                                     ;; do not forget self
                                                     (pushnew (id actor) ally-list)
                                                     
-                                                    (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the following allies ~A with the prayer~%" (name actor) (id actor) ally-list))
+                                                    (log:info (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the following allies ~A with the prayer~%" (name actor) (id actor) ally-list))
                                                     
                                                     ;; grant all allies invulnerability for 99 turns
                                                     (loop for ally-mob-id in ally-list
                                                           do
-                                                             (logger (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the ally ~A~%" (name actor) (id actor) (get-mob-by-id ally-mob-id)))
+                                                             (log:info (format nil "MOB-PRAYER-SHIELD: ~A [~A] affects the ally ~A~%" (name actor) (id actor) (get-mob-by-id ally-mob-id)))
                                                              (set-mob-effect (get-mob-by-id ally-mob-id) :effect-type-id +mob-effect-divine-shield+ :actor-id (id actor) :cd 99)
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A is granted divine shield. " (capitalize-name (prepend-article +article-the+ (visible-name (get-mob-by-id ally-mob-id)))))
@@ -902,7 +902,7 @@
                                  :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
-                                                (logger (format nil "MOB-CURSE: ~A [~A] incants the curses~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-CURSE: ~A [~A] incants the curses~%" (name actor) (id actor)))
                                                 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone laughing and cursing~A." str)))
@@ -947,7 +947,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (logger (format nil "MOB-PRAYER-REVEAL: ~A [~A] prays for revealing supernatural beings~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-PRAYER-REVEAL: ~A [~A] prays for revealing supernatural beings~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone praying~A." str)))
@@ -1042,7 +1042,7 @@
                                                            (incf follower-num)
                                                            (when (>= follower-num 5) (loop-finish)))
 
-                                                (logger (format nil "MOB-ORDER-FOLLOW-ME: ~A [~A] orders to follow him. Followers ~A~%" (name actor) (id actor) (get-followers-list actor)))
+                                                (log:info (format nil "MOB-ORDER-FOLLOW-ME: ~A [~A] orders to follow him. Followers ~A~%" (name actor) (id actor) (get-followers-list actor)))
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
@@ -1081,7 +1081,7 @@
                                                                        :color sdl:*white*
                                                                        :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                      :singlemind)))
-                                                (logger (format nil "MOB-BLIND: ~A [~A] casts blindness.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-BLIND: ~A [~A] casts blindness.~%" (name actor) (id actor)))
                                                 ;; blind nearby non-angel mobs
                                                 (loop for i from 0 below (length (proper-visible-mobs actor))
                                                       for mob = (get-mob-by-id (nth i (proper-visible-mobs actor)))
@@ -1190,7 +1190,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; here the target is not a mob, but a (cons x y)
-                                                (logger (format nil "MOB-CHARGE: ~A [~A] charges to ~A.~%" (name actor) (id actor) target))
+                                                (log:info (format nil "MOB-CHARGE: ~A [~A] charges to ~A.~%" (name actor) (id actor) target))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A charges. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -1306,7 +1306,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-ally-next
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-HORSEBACK-RIDING: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (setf (mounted-by-mob-id target) (id actor))
                                                 (setf (riding-mob-id actor) (id target))
@@ -1388,7 +1388,7 @@
                                                 ;; here the target is not a mob, but a (cons x y)
 
                                                 (let ((mount (get-mob-by-id (riding-mob-id actor))))
-                                                  (logger (format nil "MOB-DISMOUNT: ~A [~A] dismounts ~A [~A].~%" (name actor) (id actor) (name mount) (id mount)))
+                                                  (log:info (format nil "MOB-DISMOUNT: ~A [~A] dismounts ~A [~A].~%" (name actor) (id actor) (name mount) (id mount)))
                                                   
                                                   (setf (mounted-by-mob-id mount) nil)
                                                   (setf (riding-mob-id actor) nil)
@@ -1469,7 +1469,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-hostile-next
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+                                                (log:info (format nil "MOB-DOMINATE-FIEND: ~A [~A] mounts ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
 
                                                 (when (or (check-mob-visible actor :observer *player*)
                                                           (check-mob-visible target :observer *player*))
@@ -1577,7 +1577,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-ally
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-EAGLE-EYE: ~A [~A] uses eagle eye to reveal ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-EAGLE-EYE: ~A [~A] uses eagle eye to reveal ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (if (or (mob-effect-p target +mob-effect-divine-concealed+)
                                                           (and (mob-effect-p target +mob-effect-possessed+)
@@ -1668,7 +1668,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A invokes mind burn on ~A. "
@@ -1750,7 +1750,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-hostile-next
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-DOMINATE-GARGANTAUR: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-DOMINATE-GARGANTAUR: ~A [~A] mounts ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (let ((cur-dmg (truncate (max-hp actor) 2)))
                                                   (decf (cur-hp actor) cur-dmg)
@@ -1870,7 +1870,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-GARGANTAURS-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-GARGANTAURS-MIND-BURN: ~A [~A] uses mind burn on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A uses its Gargantaur to burn the mind of ~A. "
@@ -1924,7 +1924,7 @@
                                  :start-map-select-func #'player-start-map-select-death-from-above
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-DEATH-FROM-ABOVE: ~A [~A] uses death from above on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-DEATH-FROM-ABOVE: ~A [~A] uses death from above on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A strikes from above. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -2351,7 +2351,7 @@
                                  :start-map-select-func #'player-start-map-select-corpse
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-REANIMATE-BODY: ~A [~A] reanimates ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+                                                (log:info (format nil "MOB-REANIMATE-BODY: ~A [~A] reanimates ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
                                                 ;; target here is the item to be reanimated
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                        (format nil "~A raises his hands and intones an incantation. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -2647,7 +2647,7 @@
                                  :motion 60
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-GRAVITY-CHAINS: ~A [~A] uses gravity chains on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-GRAVITY-CHAINS: ~A [~A] uses gravity chains on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A invokes gravity chains on ~A. "
@@ -2734,7 +2734,7 @@
                                  :start-map-select-func #'player-start-map-select-hostile-unholy 
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-SMITE: ~A [~A] uses smite on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-SMITE: ~A [~A] uses smite on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone praying~A." str)))
@@ -2848,7 +2848,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-SLOW: ~A [~A] uses slow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-SLOW: ~A [~A] uses slow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone praying~A." str)))
@@ -2902,7 +2902,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
                                                 
-                                                (logger (format nil "MOB-PRAYER-WRATH: ~A [~A] prays for wrath~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-PRAYER-WRATH: ~A [~A] prays for wrath~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone praying~A." str)))
@@ -2919,7 +2919,7 @@
                                                                     (= (first (order mob)) +mob-order-follow+)
                                                                     (= (second (order mob)) (id actor))))
                                                           do
-                                                             (logger (format nil "MOB-PRAYER-WRATH: ~A [~A] affects the ally ~A~%" (name actor) (id actor) mob))
+                                                             (log:info (format nil "MOB-PRAYER-WRATH: ~A [~A] affects the ally ~A~%" (name actor) (id actor) mob))
                                                              (set-mob-effect mob :effect-type-id +mob-effect-holy-touch+ :actor-id (id actor) :cd 3)
                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                     (format nil "~A is granted holy touch. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
@@ -2957,7 +2957,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is list of (x y z) coordinates for the destination tile
-                                                (logger (format nil "MOB-SHADOW-STEP: ~A [~A] shadow steps to ~A~%" (name actor) (id actor) target))
+                                                (log:info (format nil "MOB-SHADOW-STEP: ~A [~A] shadow steps to ~A~%" (name actor) (id actor) target))
                                                 
                                                 (multiple-value-bind (x y z) (values-list target)
                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A steps into the shadows and disappears. "
@@ -3034,13 +3034,13 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 ;; target here is list of (x y z) coordinates for the tile to be toggled
 
-                                                (logger (format nil "MOB-EXTINGUISH-LIGHT: ~A [~A] extinguishes light at ~A~%" (name actor) (id actor) target))
+                                                (log:info (format nil "MOB-EXTINGUISH-LIGHT: ~A [~A] extinguishes light at ~A~%" (name actor) (id actor) target))
                                                 
                                                 (multiple-value-bind (x y z) (values-list target)
                                                   (if (get-mob-* (level *world*) x y z)
                                                     (progn
                                                       (setf target (get-mob-* (level *world*) x y z))
-                                                      (logger (format nil "MOB-EXTINGUISH-LIGHT: ~A [~A] extinguishes light of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+                                                      (log:info (format nil "MOB-EXTINGUISH-LIGHT: ~A [~A] extinguishes light of ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
                                                       
                                                       (set-mob-effect target :effect-type-id +mob-effect-extinguished-light+ :actor-id (id actor) :cd 4)
 
@@ -3128,7 +3128,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
 
-                                                (logger (format nil "MOB-MERGE: ~A [~A] merges with ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-MERGE: ~A [~A] merges with ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 100 #'(lambda (str)
                                                                                                             (format nil "You hear some eerie sounds~A. " str)))
@@ -3255,7 +3255,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type target))
 
-                                                (logger (format nil "MOB-UNMERGE: ~A [~A] unmerges ~A.~%" (name actor) (id actor) (loop for mimic-id in (merged-id-list actor)
+                                                (log:info (format nil "MOB-UNMERGE: ~A [~A] unmerges ~A.~%" (name actor) (id actor) (loop for mimic-id in (merged-id-list actor)
                                                                                                                                       for mimic = (get-mob-by-id mimic-id)
                                                                                                                                       for i from 0
                                                                                                                                       with str = (create-string)
@@ -3339,7 +3339,7 @@
                                  :motion 50
                                  :start-map-select-func #'player-start-map-select-nearest-ally
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-HEAL-OTHER: ~A [~A] heals ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-HEAL-OTHER: ~A [~A] heals ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
                                                 (let ((heal-pwr (+ (* 4 (mob-ability-value actor +mob-abil-heal-other+))
                                                                    (random (* 3 (mob-ability-value actor +mob-abil-heal-other+))))))
                                                   (when (> (+ (cur-hp target) heal-pwr)
@@ -3449,7 +3449,7 @@
                                  :motion 20
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-PAIN-LINK: ~A [~A] uses pain link on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-PAIN-LINK: ~A [~A] uses pain link on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A. " str)))
@@ -3509,7 +3509,7 @@
                                  :motion 30
                                  :start-map-select-func #'player-start-map-select-nearest-ally
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-SOUL-REINFORCEMENT: ~A [~A] reinforces sould of ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-SOUL-REINFORCEMENT: ~A [~A] reinforces sould of ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
                                                                                                            (format nil "You hear some eerie noises~A. " str)))
@@ -3576,7 +3576,7 @@
                                  :motion 30
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-SILENCE: ~A [~A] uses silence on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-SILENCE: ~A [~A] uses silence on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A. " str)))
@@ -3633,7 +3633,7 @@
                                  :motion 40
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-CONFUSE: ~A [~A] uses confuse on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-CONFUSE: ~A [~A] uses confuse on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A. " str)))
@@ -3850,7 +3850,7 @@
                                                   (if (mob-effect-p actor +mob-effect-split-soul-target+)
                                                     (progn
                                                       (let ((source (get-mob-by-id (actor-id (get-effect-by-id (mob-effect-p actor +mob-effect-split-soul-target+))))))
-                                                        (logger (format nil "CHECK-AI-RESTORE-SOUL: ~A [~A], source ~A, cur-hp ~A, ratio ~A, nearest-enemy ~A, can-invoke ~A~%"
+                                                        (log:info (format nil "CHECK-AI-RESTORE-SOUL: ~A [~A], source ~A, cur-hp ~A, ratio ~A, nearest-enemy ~A, can-invoke ~A~%"
                                                                         (name actor) (id actor) (name source) (cur-hp source) (/ (cur-hp source) (max-hp source))
                                                                         (or (null nearest-enemy)
                                                                             (>= (get-distance (x actor) (x actor) (x nearest-enemy) (y nearest-enemy)) 2))
@@ -3878,7 +3878,7 @@
                                  :motion 60
                                  :start-map-select-func #'player-start-map-resurrect
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-RESURRECTION: ~A [~A] resurrects ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+                                                (log:info (format nil "MOB-RESURRECTION: ~A [~A] resurrects ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
                                                 ;; target here is the item to be reanimated
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                        (format nil "~A channels divine energy. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -3920,7 +3920,7 @@
                                                                          :color sdl:*white*
                                                                            :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                          :singlemind)))
-                                                  (logger (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name mob-corpse) (id mob-corpse) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
+                                                  (log:info (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name mob-corpse) (id mob-corpse) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
                                                   (remove-item-from-world target)
                                                   (incf (stat-raised-dead actor))
                                                   (when (and (mob-ability-p mob-corpse +mob-abil-angel+)
@@ -4087,7 +4087,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; here the target is not a mob, but a (cons x y)
-                                                (logger (format nil "MOB-JUMP: ~A [~A] jumps to ~A.~%" (name actor) (id actor) target))
+                                                (log:info (format nil "MOB-JUMP: ~A [~A] jumps to ~A.~%" (name actor) (id actor) target))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A jumps. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -4222,7 +4222,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-CAST-SHADOW: ~A [~A] uses cast shadow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-CAST-SHADOW: ~A [~A] uses cast shadow on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A. " str)))
@@ -4280,7 +4280,7 @@
                                  :motion 100
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-CANNIBALIZE: ~A [~A] invokes cannibalize on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-CANNIBALIZE: ~A [~A] invokes cannibalize on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone munching~A. " str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -4556,7 +4556,7 @@
                                  :motion 40
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target))
-                                                (logger (format nil "MOB-DEEP-BREATH: ~A [~A] uses deep breath.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-DEEP-BREATH: ~A [~A] uses deep breath.~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 40 #'(lambda (str)
                                                                                                            (format nil "You hear someone breathing~A. " str)))
@@ -4595,7 +4595,7 @@
                                  :motion 20
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
-                                                (logger (format nil "MOB-IRRADIATE: ~A [~A] uses irradiate on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-IRRADIATE: ~A [~A] uses irradiate on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A. " str)))
@@ -4670,7 +4670,7 @@
                                                                       when (mob-effect-p mob +mob-effect-irradiated+)
                                                                         collect mob))
                                                 
-                                                  (logger (format nil "MOB-FISSION: ~A [~A] uses fission on ~A.~%" (name actor) (id actor) (loop with str = (create-string)
+                                                  (log:info (format nil "MOB-FISSION: ~A [~A] uses fission on ~A.~%" (name actor) (id actor) (loop with str = (create-string)
                                                                                                                                                  for mob in targets do
                                                                                                                                                    (format str "~A [~A], " (name mob) (id mob))
                                                                                                                                                  finally
@@ -4897,7 +4897,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target is (x y z)
-                                                (logger (format nil "MOB-CORROSIVE-BILE: ~A [~A] uses corrosive bile on ~A.~%" (name actor) (id actor) target))
+                                                (log:info (format nil "MOB-CORROSIVE-BILE: ~A [~A] uses corrosive bile on ~A.~%" (name actor) (id actor) target))
 
                                                 (let ((x (+ (first target) (- (random 3) 1)))
                                                       (y (+ (second target) (- (random 3) 1))))
@@ -5495,7 +5495,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 
-                                                (logger (format nil "MOB-ACID-EXPLOSION: ~A [~A] explodes on ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-ACID-EXPLOSION: ~A [~A] explodes on ~A [~A]~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A explodes. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -5821,7 +5821,7 @@
                                  :motion 100
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 ;; target is ability-type-id
-                                                (logger (format nil "MOB-CURE-MUTATION: ~A [~A] invokes cure mutatation on ~A [~A].~%" (name actor) (id actor) (name (get-ability-type-by-id target)) (id (get-ability-type-by-id target))))
+                                                (log:info (format nil "MOB-CURE-MUTATION: ~A [~A] invokes cure mutatation on ~A [~A].~%" (name actor) (id actor) (name (get-ability-type-by-id target)) (id (get-ability-type-by-id target))))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone bodily sounds~A. " str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
@@ -6528,7 +6528,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 ;; target is either item or mob
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-GHOST-POSSESS: ~A [~A] uses ranged possession on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-GHOST-POSSESS: ~A [~A] uses ranged possession on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (cond
                                                   ;; you failed to possess a blessed target
@@ -6901,7 +6901,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 ;; target is (x y z) coordinates of where the ghost will be placed
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-GHOST-RELEASE: ~A [~A] releases host ~A [~A].~%" (name actor) (id actor)
+                                                (log:info (format nil "MOB-GHOST-RELEASE: ~A [~A] releases host ~A [~A].~%" (name actor) (id actor)
                                                                 (name (get-mob-by-id (slave-mob-id actor))) (id (get-mob-by-id (slave-mob-id actor)))))
 
                                                 ;; you depossess your currently possessed body
@@ -6967,7 +6967,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target here is a feature (demonic rune) to be deciphered
-                                                (logger (format nil "MOB-DECIPHER-RUNE: ~A [~A] deciphers ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor)
+                                                (log:info (format nil "MOB-DECIPHER-RUNE: ~A [~A] deciphers ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor)
                                                                 (name target) (id target) (x target) (y target) (z target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) (format nil "~A deciphers ~A. "
@@ -7086,7 +7086,7 @@
                                  :start-map-select-func #'player-start-map-select-empower-undead
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-DEMON-WORD-FLESH: ~A [~A] uses demon word flesh on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-DEMON-WORD-FLESH: ~A [~A] uses demon word flesh on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A." str)))
@@ -7185,7 +7185,7 @@
                                  :start-map-select-func #'player-start-map-select-nearest-hostile
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-DEMON-WORD-PLAGUE: ~A [~A] uses demon word plague on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info (format nil "MOB-DEMON-WORD-PLAGUE: ~A [~A] uses demon word plague on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A." str)))
@@ -7249,7 +7249,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-DEMON-WORD-POWER: ~A [~A] uses demon word power.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-DEMON-WORD-POWER: ~A [~A] uses demon word power.~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A." str)))
@@ -7297,7 +7297,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-DEMON-WORD-DARKNESS: ~A [~A] uses demon word darkness.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-DEMON-WORD-DARKNESS: ~A [~A] uses demon word darkness.~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A." str)))
@@ -7339,7 +7339,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-DEMON-WORD-INVASION: ~A [~A] uses demon word invasion.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-DEMON-WORD-INVASION: ~A [~A] uses demon word invasion.~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A." str)))
@@ -7381,7 +7381,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-DEMON-WORD-KNOCKBACK: ~A [~A] uses demon word knockback.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-DEMON-WORD-KNOCKBACK: ~A [~A] uses demon word knockback.~%" (name actor) (id actor)))
 
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                            (format nil "You hear someone chanting~A." str)))
@@ -7453,7 +7453,7 @@
                                                                     when (= (feature-type feature) +feature-demonic-portal+)
                                                                       do
                                                                          (return feature))))
-                                                  (logger (format nil "MOB-THROW-CORPSE-INTO-PORTAL: ~A [~A] throws the following corpses ~A into portal ~A [~A].~%" (name actor) (id actor)
+                                                  (log:info (format nil "MOB-THROW-CORPSE-INTO-PORTAL: ~A [~A] throws the following corpses ~A into portal ~A [~A].~%" (name actor) (id actor)
                                                                   (loop for item in corpses-list
                                                                     collect (format nil "[~A] " (id item)))
                                                                   (name portal)
@@ -7525,7 +7525,7 @@
                                                                     when (= (feature-type feature) +feature-demonic-portal+)
                                                                       do
                                                                          (return feature))))
-                                                  (logger (format nil "MOB-THROW-RELIC-INTO-PORTAL: ~A [~A] throws the relic ~A into portal ~A [~A].~%" (name actor) (id actor)
+                                                  (log:info (format nil "MOB-THROW-RELIC-INTO-PORTAL: ~A [~A] throws the relic ~A into portal ~A [~A].~%" (name actor) (id actor)
                                                                   (loop for item in relic-list
                                                                     collect (format nil "[~A] " (id item)))
                                                                   (name portal)
@@ -7585,7 +7585,7 @@
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
                                                 ;; target is (x y z)
-                                                (logger (format nil "MOB-CREATE-DEMON-SIGIL: ~A [~A] spawns a demon sigil at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
+                                                (log:info (format nil "MOB-CREATE-DEMON-SIGIL: ~A [~A] spawns a demon sigil at (~A ~A ~A).~%" (name actor) (id actor) (first target) (second target) (third target)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                        (format nil "~A creates a demonic sigil. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                        :observed-mob actor
@@ -7659,7 +7659,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-SKINCHANGE-TO-MELEE: ~A [~A] uses skinchange to melee.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-SKINCHANGE-TO-MELEE: ~A [~A] uses skinchange to melee.~%" (name actor) (id actor)))
 
                                                 (let ((old-max-hp (max-hp actor))
                                                       (was-flyer (if (= (mob-type actor) +mob-type-skinchanger-flyer+)
@@ -7728,7 +7728,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-SKINCHANGE-TO-RANGED: ~A [~A] uses skinchange to ranged.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-SKINCHANGE-TO-RANGED: ~A [~A] uses skinchange to ranged.~%" (name actor) (id actor)))
 
                                                 (let ((old-max-hp (max-hp actor))
                                                       (was-flyer (if (= (mob-type actor) +mob-type-skinchanger-flyer+)
@@ -7798,7 +7798,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-SKINCHANGE-TO-FLYER: ~A [~A] uses skinchange to flyer.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-SKINCHANGE-TO-FLYER: ~A [~A] uses skinchange to flyer.~%" (name actor) (id actor)))
 
                                                 (let ((old-max-hp (max-hp actor)))
                                                   (setf (mob-type actor) +mob-type-skinchanger-flyer+)
@@ -7893,7 +7893,7 @@
                                  :motion 50
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore target ability-type))
-                                                (logger (format nil "MOB-SKIN-TO-TURRET: ~A [~A] uses skinchange to spore colony.~%" (name actor) (id actor)))
+                                                (log:info (format nil "MOB-SKIN-TO-TURRET: ~A [~A] uses skinchange to spore colony.~%" (name actor) (id actor)))
 
                                                 (let ((old-max-hp (max-hp actor)))
                                                   (setf (mob-type actor) +mob-type-skinchanger-turret+)
@@ -8032,7 +8032,7 @@
                                  :start-map-select-func #'player-start-map-select-corpse
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-SPIT-EXPLOSIVE-PARASITE: ~A [~A] spits parasite at ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+                                                (log:info (format nil "MOB-SPIT-EXPLOSIVE-PARASITE: ~A [~A] spits parasite at ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A spits an explosive parasite. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
@@ -8270,7 +8270,7 @@
                                  :start-map-select-func #'player-start-map-select-corpse
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (logger (format nil "MOB-SPIT-POISONING-PARASITE: ~A [~A] spits parasite at ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
+                                                (log:info (format nil "MOB-SPIT-POISONING-PARASITE: ~A [~A] spits parasite at ~A [~A] at (~A ~A ~A).~%" (name actor) (id actor) (name target) (id target) (x target) (y target) (z target)))
 
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A spits a poisoning parasite. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))

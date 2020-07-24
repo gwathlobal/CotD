@@ -97,13 +97,13 @@
       (setf (world-sector level) world-sector)
 
       ;; populate world with items
-      (format t "GENERATE-LEVEL: Placing standard items~%")
+      (log:info "Placing standard items")
       (loop for (item-type-id x y z qty) in item-template-result 
             do
                (add-item-to-level-list level (make-instance 'item :item-type item-type-id :x x :y y :z z :qty qty)))
       
       ;; populate world with features
-      (format t "GENERATE-LEVEL: Placing standard features~%")
+      (log:info "Placing standard features")
       (loop for (feature-type-id x y z) in feature-template-result 
             do
                (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
@@ -124,27 +124,26 @@
     (setf *time-at-end-of-player-turn* (get-internal-real-time))
     
     ;; generate connectivity maps
-    (let* ((out *standard-output*)
-           (size-1-thread (bt:make-thread #'(lambda ()
+    (let* ((size-1-thread (bt:make-thread #'(lambda ()
                                               (let ((start-time (get-internal-real-time)))
                                                 (create-connect-map-walk level 1)
                                                 (incf *cur-progress-bar*)
                                                 (funcall *update-screen-closure* nil)
-                                                (logger (format nil "TIME-ELAPSED AFTER WALK 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                (log:info "TIME-ELAPSED AFTER WALK 1: ~A" (- (get-internal-real-time) start-time))
                                                 )
 
                                               (let ((start-time (get-internal-real-time)))
                                                 (create-connect-map-climb level 1)
                                                 (incf *cur-progress-bar*)
                                                 (funcall *update-screen-closure* nil)
-                                                (logger (format nil "TIME-ELAPSED AFTER CLIMB 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                (log:info "TIME-ELAPSED AFTER CLIMB 1: ~A" (- (get-internal-real-time) start-time))
                                                 )
 
                                               (let ((start-time (get-internal-real-time)))
                                                 (create-connect-map-fly level 1)
                                                 (incf *cur-progress-bar*)
                                                 (funcall *update-screen-closure* nil)
-                                                (logger (format nil "TIME-ELAPSED AFTER FLY 1: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                (log:info "TIME-ELAPSED AFTER FLY 1: ~A" (- (get-internal-real-time) start-time))
                                                 )
                                               )
                                         :name "Connectivity map (size 1) thread"))
@@ -153,14 +152,14 @@
                                                 (create-connect-map-walk level 3)
                                                 (incf *cur-progress-bar*)
                                                 (funcall *update-screen-closure* nil)
-                                                (logger (format nil "TIME-ELAPSED AFTER WALK 3: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                (log:info "TIME-ELAPSED AFTER WALK 3: ~A" (- (get-internal-real-time) start-time))
                                                 )
                                               
                                               (let ((start-time (get-internal-real-time)))
                                                 (create-connect-map-climb level 3)
                                                 (incf *cur-progress-bar*)
                                                 (funcall *update-screen-closure* nil)
-                                                (logger (format nil "TIME-ELAPSED AFTER CLIMB 3: ~A~%" (- (get-internal-real-time) start-time)) out)
+                                                (log:info "TIME-ELAPSED AFTER CLIMB 3: ~A" (- (get-internal-real-time) start-time))
                                                 )
 
                                               ;;(let ((start-time (get-internal-real-time)))
@@ -173,9 +172,9 @@
                                          :name "Connectivity map (size 3) thread"))
            )
       (bt:join-thread size-1-thread)
-      (logger (format nil "SIZE 1 CREATION FINISHED~%"))
+      (log:info "SIZE 1 CREATION FINISHED")
       (bt:join-thread size-3-thread)
-      (logger (format nil "SIZE 3 CREATION FINISHED~%"))
+      (log:info "SIZE 3 CREATION FINISHED")
       )
 
     ;; adjusting the progress bar : 10
@@ -185,7 +184,7 @@
     (push +game-event-adjust-outdoor-light+ (game-events level))
 
     ;; populate world with standard mobs (from actual level template)
-    (format t "GENERATE-LEVEL: Placing standard mobs~%")
+    (log:info "Placing standard mobs")
     (loop for (mob-type-id x y z) in mob-template-result
           when (null (get-mob-* level x y z))
             do
@@ -202,12 +201,7 @@
           when (= (feature-type feature) +feature-demonic-portal+)
             do
                (push feature-id (demonic-portals level)))
-    
-    ;; add win conditions
-
-    
-    
-   ) 
+    ) 
   )
 
 (defun create-level (&key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*))

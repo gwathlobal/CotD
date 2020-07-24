@@ -18,7 +18,7 @@
                                                        +level-city-terrain-earth+ #'(lambda ()
                                                                                       +terrain-wall-earth+))))
   
-  (logger (format nil "CREATE-TEMPLATE-CITY~%"))
+  (log:info "Start")
 
   ;; make a template level
   ;; and an enlarged grid with scale 1 to 10 cells of template level
@@ -70,7 +70,7 @@
                      do
                         (setf avail-cells-list (remove cell-pick avail-cells-list))
                         (when (null avail-cells-list)
-                          (logger (format nil "~%CREATE-TEMPLATE-CITY: Could not place reserved building ~A~%" build-picked))
+                          (log:info "Could not place reserved building ~A" build-picked)
                           (print-reserved-level template-level)
                           (return-from create-template-city (values nil nil nil nil)))
                      finally (setf x (first cell-pick) y (second cell-pick)))
@@ -187,7 +187,7 @@
                                                                                               terrain-level
                                                                                               terrains)))
 
-             ;(logger (format nil "CREATE-TEMPLATE-CITY: Building type ~A, mob list ~A~%" build-type-id building-mobs))
+             ;(log:info (format nil "CREATE-TEMPLATE-CITY: Building type ~A, mob list ~A~%" build-type-id building-mobs))
              ;; add mobs to the mob-list
              (when building-mobs
                (loop for (mob-id lx ly lz) in building-mobs do
@@ -239,15 +239,16 @@
     ))
 
 (defun print-reserved-level (reserved-level)
-  (logger (format nil "RESERVED-LEVEL:~%"))
-  (loop for y from 0 below (array-dimension reserved-level 1) do
-    (loop for x from 0 below (array-dimension reserved-level 0) do
-      (logger (format nil "~3@A " (cond
-                                    ((null (aref reserved-level x y 2)) "F")
-                                    ((eq (aref reserved-level x y 2) t) "R")
-                                    (t (first (aref reserved-level x y 2)))
-                                    ))))
-    (logger (format nil "~%"))))
+  (let ((str (create-string)))
+    (format str "~%")
+    (loop for y from 0 below (array-dimension reserved-level 1) do
+      (loop for x from 0 below (array-dimension reserved-level 0) do
+        (format str "~3@A " (cond
+                              ((null (aref reserved-level x y 2)) "F")
+                              ((eq (aref reserved-level x y 2) t) "R")
+                              (t (first (aref reserved-level x y 2))))))
+      (format str "~%"))
+    (log:info str)))
 
 (defun pick-building-randomly (build-cur-list)
   (let ((building-picked nil) (type-picked nil))

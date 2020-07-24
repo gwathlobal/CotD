@@ -319,7 +319,7 @@
                                                                                         (get-terrain-type-trait (get-terrain-* (level world) x y (1- z)) +terrain-trait-blocks-move+))
                                                                                    (get-mob-* (level world) x y z))
                                                                             do
-                                                                               (logger (format nil "GAME-EVENT: Rain falls at (~A ~A ~A)~%" x y z))
+                                                                               (log:info "GAME-EVENT: Rain falls at (~A ~A ~A)" x y z)
                                                                                (place-animation x y z +anim-type-rain-dot+)
                                                                                (when (get-mob-* (level world) x y z)
                                                                                  (set-mob-effect (get-mob-* (level world) x y z) :effect-type-id +mob-effect-wet+ :actor-id (id (get-mob-* (level world) x y z)) :cd 2))
@@ -356,7 +356,7 @@
                                                                  for y = (random (array-dimension (terrain (level world)) 1))
                                                                  when (= (get-terrain-* (level world) x y 2) +terrain-floor-snow-prints+)
                                                                    do
-                                                                      (logger (format nil "GAME-EVENT: Snow falls at (~A ~A)~%" x y))
+                                                                      (log:info "GAME-EVENT: Snow falls at (~A ~A)" x y)
                                                                       (set-terrain-* (level world) x y 2 +terrain-floor-snow+))
                                                            )))
 
@@ -397,7 +397,7 @@
                                                                                         (get-terrain-type-trait (get-terrain-* (level world) x y (1- z)) +terrain-trait-blocks-move+))
                                                                                    (get-mob-* (level world) x y z))
                                                                             do
-                                                                               (logger (format nil "GAME-EVENT: Acid falls at (~A ~A ~A)~%" x y z))
+                                                                               (log:info "GAME-EVENT: Acid falls at (~A ~A ~A)" x y z)
                                                                                (place-animation x y z +anim-type-acid-dot+)
                                                                                (check-surroundings x y t #'(lambda (dx dy)
                                                                                                              (when (and (>= dx 0)
@@ -423,7 +423,7 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (logger (format nil "~%GAME-EVENT: The military has arrived!~%"))
+                                                           (log:info "GAME-EVENT: The military has arrived!")
 
                                                            ;; find a suitable arrival point to accomodate 4 groups of military
                                                            (let ((military-list (list (list (list +mob-type-chaplain+ 1 nil)
@@ -513,7 +513,7 @@
                                                            ;; before arrivals
                                                            ;; find suitable arrival points and place portals
                                                            (when (= (player-game-time world) (1- (turns-for-delayed-angels (level world))))
-                                                             (logger (format nil "~%GAME-EVENT: The angels are about to arrive!~%"))
+                                                             (log:info "GAME-EVENT: The angels are about to arrive!")
                                                              (let ((portals ()))
                                                                (setf portals (place-custom-portals (level world) +feature-divine-portal+ :max-portals 10 :map-margin 10 :distance 6 :test-mob-free t :test-repel-demons nil))
 
@@ -522,7 +522,7 @@
                                                            ;; at arrival
                                                            ;; place chrome angels & trinity mimics to portals
                                                            (when (= (player-game-time world) (turns-for-delayed-angels (level world)))
-                                                             (logger (format nil "~%GAME-EVENT: The angels are arriving!~%"))
+                                                             (log:info "GAME-EVENT: The angels are arriving!")
                                                              (let ((angels-list (list (list +mob-type-angel+ *min-angels-number* nil))))
                                                                
                                                                (if (= (player-lvl-mod-placement-id (mission (level world))) +lm-placement-angel-trinity+)
@@ -542,7 +542,7 @@
                                                            ;; after arrival
                                                            ;; remove portals
                                                            (when (= (player-game-time world) (1+ (turns-for-delayed-angels (level world))))
-                                                             (logger (format nil "~%GAME-EVENT: Divine portals removed!~%"))
+                                                             (log:info "GAME-EVENT: Divine portals removed!")
                                                              (loop for lvl-feature-id in (feature-id-list (level world))
                                                                    for lvl-feature = (get-feature-by-id lvl-feature-id)
                                                                    when (= (feature-type lvl-feature) +feature-divine-portal+) do
@@ -564,7 +564,7 @@
                                                            ;; before arrivals
                                                            ;; find suitable arrival points and place portals
                                                            (when (= (player-game-time world) (1- (turns-for-delayed-demons (level world))))
-                                                             (logger (format nil "~%GAME-EVENT: The demons are about to arrive!~%"))
+                                                             (log:info "GAME-EVENT: The demons are about to arrive!")
                                                              (let ((portals ()))
                                                                (setf portals (place-custom-portals (level world) +feature-demonic-portal+ :max-portals 10 :map-margin 10 :distance 6 :test-mob-free t :test-repel-demons t))
 
@@ -573,7 +573,7 @@
                                                            ;; at arrival
                                                            ;; place demons
                                                            (when (= (player-game-time world) (turns-for-delayed-demons (level world)))
-                                                             (logger (format nil "~%GAME-EVENT: The demons are arriving!~%"))
+                                                             (log:info "GAME-EVENT: The demons are arriving!")
                                                              (multiple-value-bind (year month day hour min sec) (get-current-date-time (world-game-time world))
                                                                (declare (ignore year month day min sec))
                                                                (let ((demon-list (if (and (>= hour 7) (< hour 19))
@@ -607,7 +607,7 @@
                                                            ;; after arrival
                                                            ;; remove portals
                                                            (when (= (player-game-time world) (1+ (turns-for-delayed-demons (level world))))
-                                                             (logger (format nil "~%GAME-EVENT: Demonic portals removed!~%"))
+                                                             (log:info "GAME-EVENT: Demonic portals removed!")
                                                              (loop for lvl-feature-id in (feature-id-list (level world))
                                                                    for lvl-feature = (get-feature-by-id lvl-feature-id)
                                                                    when (= (feature-type lvl-feature) +feature-demonic-portal+) do

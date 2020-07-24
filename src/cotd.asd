@@ -16,8 +16,7 @@
   :author "Gwathlobal"    
   :depends-on (lispbuilder-sdl bordeaux-threads defenum cl-store log4cl)
   :components
-    ((:file "logger")
-     (:file "astar")
+    ((:file "astar")
      (:file "glyph-globals")
      (:file "globals")
      (:file "world-globals")

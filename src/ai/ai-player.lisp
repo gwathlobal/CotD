@@ -1,11 +1,11 @@
 (in-package :cotd)
 
 (defmethod ai-function ((player player))
-  (logger (format nil "~%AI-FUnction Player~%"))
-  ;(logger (format nil "~%TIME-ELAPSED BEFORE: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
+  (log:info "~%AI-Function Player")
+  ;(log:info (format nil "~%TIME-ELAPSED BEFORE: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*)))
 
   
-  (format t "~%TIME-ELAPSED BEFORE: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  (log:info "~%TIME-ELAPSED BEFORE: ~A" (- (get-internal-real-time) *time-at-end-of-player-turn*))
 
   ;; this should be done in this order for the lit-unlit tiles to be displayed properly
   ;; because update-visible-area actually sets the glyphs and colors of the player screen
@@ -13,7 +13,7 @@
   (update-visible-mobs player)
   (update-visible-area (level *world*) (x player) (y player) (z player))
 
-  (format t "TIME-ELAPSED AFTER: ~A~%" (- (get-internal-real-time) *time-at-end-of-player-turn*))
+  (log:info "TIME-ELAPSED AFTER: ~A" (- (get-internal-real-time) *time-at-end-of-player-turn*))
   ;(format t "TIME-INSIDE PATH FUNCS: ~A~%" *ms-inside-path*)
   ;(setf *ms-inside-path* 0)
   
@@ -75,7 +75,7 @@
   ;; if player is fearing somebody & there is an enemy nearby
   ;; wait for a meaningful action and move randomly instead
   (when (mob-effect-p *player* +mob-effect-fear+)
-    (logger (format nil "AI-FUNCTION: ~A [~A] is under effects of fear.~%" (name player) (id player)))
+    (log:info "AI-FUNCTION: ~A [~A] is under effects of fear." (name player) (id player))
     (let ((nearest-enemy nil))
       (loop for mob-id of-type fixnum in (visible-mobs *player*)
             for mob = (get-mob-by-id mob-id)
@@ -97,7 +97,7 @@
                  ))
       
       (when nearest-enemy
-        (logger (format nil "AI-FUNCTION: ~A [~A] fears ~A [~A].~%" (name player) (id player) (name nearest-enemy) (id nearest-enemy)))
+        (log:info "AI-FUNCTION: ~A [~A] fears ~A [~A]." (name player) (id player) (name nearest-enemy) (id nearest-enemy))
         (setf (can-move-if-possessed player) t)
         (loop while (can-move-if-possessed player) do
           (get-input-player))
@@ -108,7 +108,7 @@
   ;; wait for a meaningful action and move randomly instead
   (when (and (mob-effect-p player +mob-effect-confuse+)
              (zerop (random 2)))
-    (logger (format nil "AI-FUNCTION: ~A [~A] is under effects of confusion.~%" (name player) (id player)))
+    (log:info "AI-FUNCTION: ~A [~A] is under effects of confusion." (name player) (id player))
     (setf (can-move-if-possessed player) t)
     (loop while (can-move-if-possessed player) do
       (get-input-player))
@@ -121,7 +121,7 @@
   ;; wait for a meaningful action and wait a turn instead
   (when (and (mob-effect-p player +mob-effect-irradiated+)
              (< (random 100) (* 2 (param1 (get-effect-by-id (mob-effect-p player +mob-effect-irradiated+))))))
-    (logger (format nil "AI-FUNCTION: ~A [~A] is under effects of irradiation.~%" (name player) (id player)))
+    (log:info "AI-FUNCTION: ~A [~A] is under effects of irradiation." (name player) (id player))
     (setf (can-move-if-possessed player) t)
     (loop while (can-move-if-possessed player) do
       (get-input-player))
@@ -132,9 +132,9 @@
   
   ;; if possessed & unable to revolt - wait till the player makes a meaningful action
   ;; then skip and invoke the master AI
-  (logger (format nil "AI-FUNCTION: MASTER ID ~A, SLAVE ID ~A~%" (master-mob-id player) (slave-mob-id player)))
+  (log:info "AI-FUNCTION: MASTER ID ~A, SLAVE ID ~A" (master-mob-id player) (slave-mob-id player))
   (when (master-mob-id player)
-    (logger (format nil "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
+    (log:info "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A]." (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player))
     
     (setf (x player) (x (get-mob-by-id (master-mob-id player))) (y player) (y (get-mob-by-id (master-mob-id player))) (z player) (z (get-mob-by-id (master-mob-id player))))
     
@@ -150,7 +150,7 @@
       (if (and (not (zerop rebel-chance-level))
                (zerop (random (* *possessed-revolt-chance* rebel-chance-level))))
         (progn
-          (logger (format nil "AI-FUNCTION: ~A [~A] revolts against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
+          (log:info "AI-FUNCTION: ~A [~A] revolts against ~A [~A]." (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player))
           
           (print-visible-message (x player) (y player) (z player) (level *world*) 
                                  (format nil "~A revolts against ~A. " (capitalize-name (name player)) (name (get-mob-by-id (master-mob-id player))) ))
@@ -160,7 +160,7 @@
           (return-from ai-function nil)
           )
         (progn
-          (logger (format nil "AI-FUNCTION: ~A [~A] was unable to revolt against ~A [~A].~%" (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player)))
+          (log:info "AI-FUNCTION: ~A [~A] was unable to revolt against ~A [~A]." (name player) (id player) (name (get-mob-by-id (master-mob-id player))) (master-mob-id player))
           
           (ai-function (get-mob-by-id (master-mob-id player)))
           
@@ -184,7 +184,7 @@
                               ))
       (when (and (not (zerop rebel-chance-level))
                  (zerop (random (* *possessed-revolt-chance* rebel-chance-level))))
-        (logger (format nil "AI-FUNCTION: ~A [~A] possesses ~A [~A], but the slave revolts.~%" (name player) (id player) (name (get-mob-by-id (slave-mob-id player))) (slave-mob-id player)))
+        (log:info "AI-FUNCTION: ~A [~A] possesses ~A [~A], but the slave revolts." (name player) (id player) (name (get-mob-by-id (slave-mob-id player))) (slave-mob-id player))
         (setf (can-move-if-possessed player) t)
         (loop while (can-move-if-possessed player) do
           (get-input-player))

@@ -199,7 +199,7 @@
     ))
 
 (defun calc-lit-tiles-for-player (mob)
-  (logger (format nil "CALC-LIT-TILES: ~A [~A]~%" (name mob) (id mob)))
+  (log:info "CALC-LIT-TILES: ~A [~A]" (name mob) (id mob))
 
   (dotimes (x1 (array-dimension (memo (level *world*)) 0))
     (declare (type fixnum x1))
@@ -518,7 +518,7 @@
   (when (eq mob *player*)
     (setf (view-x *player*) (x *player*))
     (setf (view-y *player*) (y *player*)))
-  (logger (format nil "UPDATE-VISIBLE-MOBS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-mobs mob)))
+  (log:info "~A [~A] sees ~A" (name mob) (id mob) (visible-mobs mob))
   )
 
 (defun update-visible-items (mob)
@@ -567,7 +567,7 @@
                                       (return))
                                     )
                                   exit-result))))
-  (logger (format nil "UPDATE-VISIBLE-ITEMS: ~A [~A] sees ~A~%" (name mob) (id mob) (visible-items mob))))
+  (log:info "~A [~A] sees ~A" (name mob) (id mob) (visible-items mob)))
 
 (defun update-visible-items-player ()
   (setf (visible-items *player*) nil)
@@ -777,7 +777,7 @@
 
   (setf (view-x *player*) (x *player*) (view-y *player*) (y *player*) (view-z *player*) (z *player*))
   
-  (logger (format nil "PLAYER-VISIBLE-MOBS: ~A~%" (visible-mobs *player*)))  
+  (log:info "PLAYER-VISIBLE-MOBS: ~A" (visible-mobs *player*))  
   )
 
 (defun draw-fov (cx cy cz r func &key (limit-z nil) (no-z nil) (LOS-start-func #'(lambda () nil)))

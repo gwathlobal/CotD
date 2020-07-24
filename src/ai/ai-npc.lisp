@@ -6,11 +6,11 @@
 
   ;;(format t "~%TIME-ELAPSED AI ~A [~A] BEFORE : ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
   
-  (logger (format nil "~%AI-Function Computer ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
+  (log:info "~%AI-Function Computer ~A [~A] (~A ~A ~A)" (name mob) (id mob) (x mob) (y mob) (z mob))
   
   ;; skip and invoke the master AI
   (when (master-mob-id mob)
-    (logger (format nil "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A], skipping its turn.~%" (name mob) (id mob) (name (get-mob-by-id (master-mob-id mob))) (master-mob-id mob)))
+    (log:info "AI-FUNCTION: ~A [~A] is being possessed by ~A [~A], skipping its turn." (name mob) (id mob) (name (get-mob-by-id (master-mob-id mob))) (master-mob-id mob))
     (make-act mob +normal-ap+)
     (return-from ai-function nil))
 
@@ -22,7 +22,7 @@
   
   ;; skip turn if being ridden
   (when (mounted-by-mob-id mob)
-    (logger (format nil "AI-FUNCTION: ~A [~A] is being ridden by ~A [~A], moving according to the direction.~%" (name mob) (id mob) (name (get-mob-by-id (mounted-by-mob-id mob))) (mounted-by-mob-id mob)))
+    (log:info "AI-FUNCTION: ~A [~A] is being ridden by ~A [~A], moving according to the direction." (name mob) (id mob) (name (get-mob-by-id (mounted-by-mob-id mob))) (mounted-by-mob-id mob))
     (move-mob mob (x-y-into-dir 0 0))
     (return-from ai-function nil)
     )
@@ -34,7 +34,7 @@
 
   ;; if the mob is blind - move in random direction
   (when (mob-effect-p mob +mob-effect-blind+)
-    (logger (format nil "AI-FUNCTION: ~A [~A] is blind, moving in random direction.~%" (name mob) (id mob)))
+    (log:info "AI-FUNCTION: ~A [~A] is blind, moving in random direction." (name mob) (id mob))
     (ai-mob-random-dir mob)
     (setf (path mob) nil)
     (return-from ai-function nil))
@@ -42,7 +42,7 @@
   ;; if the mob is confused - 33% chance to move in random direction
   (when (and (mob-effect-p mob +mob-effect-confuse+)
              (zerop (random 2)))
-    (logger (format nil "AI-FUNCTION: ~A [~A] is confused, moving in random direction.~%" (name mob) (id mob)))
+    (log:info "AI-FUNCTION: ~A [~A] is confused, moving in random direction.~%" (name mob) (id mob))
     (ai-mob-random-dir mob)
     (setf (path mob) nil)
     (return-from ai-function nil))
@@ -50,7 +50,7 @@
   ;; if the mob is heavily irradiated - (2% * irradiation power) chance to take no action
   (when (and (mob-effect-p mob +mob-effect-irradiated+)
              (< (random 100) (* 2 (param1 (get-effect-by-id (mob-effect-p mob +mob-effect-irradiated+))))))
-    (logger (format nil "AI-FUNCTION: ~A [~A] is irradiated, loses turn.~%" (name mob) (id mob)))
+    (log:info "AI-FUNCTION: ~A [~A] is irradiated, loses turn.~%" (name mob) (id mob))
     (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                            (format nil "~A is sick. " (capitalize-name (prepend-article +article-the+ (name mob))))
                            :color sdl:*white*
@@ -72,7 +72,7 @@
     (when (and (slave-mob-id mob)
                (not (zerop rebel-chance-level))
                (zerop (random (* *possessed-revolt-chance* rebel-chance-level))))
-      (logger (format nil "AI-FUNCTION: ~A [~A] is revolting against ~A [~A].~%" (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob)))
+      (log:info "AI-FUNCTION: ~A [~A] is revolting against ~A [~A]." (name (get-mob-by-id (slave-mob-id mob))) (slave-mob-id mob) (name mob) (id mob))
       (when (and (check-mob-visible mob :observer *player*)
                  (or (mob-effect-p mob +mob-effect-reveal-true-form+)
                      (get-faction-relation (faction mob) (faction *player*))))
@@ -129,7 +129,7 @@
 
     ;; if the mob is feared, move away from the nearest enemy
     (when (and nearest-enemy (mob-effect-p mob +mob-effect-fear+))
-      (logger (format nil "AI-FUNCTION: ~A [~A] is in fear with an enemy ~A [~A] in sight.~%" (name mob) (id mob) (name nearest-enemy) (id nearest-enemy)))
+      (log:info "AI-FUNCTION: ~A [~A] is in fear with an enemy ~A [~A] in sight." (name mob) (id mob) (name nearest-enemy) (id nearest-enemy))
       (ai-mob-flee mob nearest-enemy)      
       (return-from ai-function))
 
@@ -152,12 +152,12 @@
                 (pushnew (get-ai-package-by-id ai-objective-package-id) (aref ai-package-array (priority (get-ai-package-by-id ai-objective-package-id)))))))
 
       (unless *cotd-release*
-        (logger (format nil "AI-FUNCTION: ai-package-array~%"))
+        (log:info "AI-FUNCTION: ai-package-array")
         (loop for priority from 0 below (length ai-package-array)
               when (aref ai-package-array priority)
                 do
-                   (logger (format nil " Priority ~A. ~A.~%" priority (loop for ai-package in (aref ai-package-array priority)
-                                                                            collect (format nil "~A " (id ai-package)))))))
+                   (log:info " Priority ~A. ~A." priority (loop for ai-package in (aref ai-package-array priority)
+                                                                collect (format nil "~A " (id ai-package))))))
       
 
       ;;(format t "~%TIME-ELAPSED AI ~A [~A] after ai package sort: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))

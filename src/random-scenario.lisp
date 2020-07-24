@@ -518,16 +518,16 @@
                      ))
     
     (loop for (lvl-mod world-sector-type mission-type) in available-variants-list do
-      (format t "Lvl-mod ~A, World Sector: ~A, Mission Type: ~A~%"
-              (if lvl-mod
-                (name lvl-mod)
-                "NIL")
-              (if world-sector-type
-                (name world-sector-type)
-                "NIL")
-              (if mission-type
-                (name mission-type)
-                "NIL")))
+      (log:debug "Lvl-mod ~A, World Sector: ~A, Mission Type: ~A"
+                 (if lvl-mod
+                   (name lvl-mod)
+                   "NIL")
+                 (if world-sector-type
+                   (name world-sector-type)
+                   "NIL")
+                 (if mission-type
+                   (name mission-type)
+                   "NIL")))
 
     (when available-variants-list
       ;; generate a mission with all other parameters & exit

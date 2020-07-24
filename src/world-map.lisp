@@ -696,7 +696,7 @@
         (max-n 0)
         (faction-winner nil)
         (mission-result nil))
-    (logger (format nil "AUTO-RESOLVE-MISSION: start~%"))
+    (log:info "Start")
     ;; base chances depending on faction presence
     (loop for (faction-id faction-present) in (faction-list mission)
           for chance = (second (find faction-id faction-base-chances :key #'(lambda (a) (first a))))
@@ -707,7 +707,7 @@
                  (setf chance (* chance 2)))
                (push (list faction-id chance) faction-chances))
 
-    (loop initially (logger (format nil "   AUTO-RESOLVE-MISSION: Init chances~%"))
+    (loop initially (log:info "   Init chances")
           with str-table = (list (list +faction-type-angels+ :game-over-angels-won)
                                  (list +faction-type-demons+ :game-over-demons-won)
                                  (list +faction-type-military+ :game-over-military-won)
@@ -716,10 +716,10 @@
                                  (list +faction-type-eater+ :game-over-eater-won))
           for (faction-id base-chance) in faction-chances
           do
-             (logger (format nil "      ~A: ~A~%"
+             (log:info "      ~A: ~A"
                              (second (find faction-id str-table
                                            :key (lambda (a) (first a))))
-                             base-chance)))
+                             base-chance))
     
     ;; it is harder for non-demons in corrupted districts -30%
     (when (and (world-sector mission)
@@ -730,7 +730,7 @@
                    (eq (wtype (world-sector mission)) :world-sector-corrupted-lake)))
       (loop for faction-id in (list +faction-type-angels+ +faction-type-military+ +faction-type-church+)
             do
-               (logger (format nil "   AUTO-RESOLVE-MISSION: Corrupted district -30% to non-demons~%"))
+               (log:info "   Corrupted district -30% to non-demons")
                (when (find faction-id faction-chances :key #'(lambda (a) (first a)))
                  (decf (second (find faction-id faction-multipliers :key #'(lambda (a) (first a))))
                        30))))
@@ -744,13 +744,13 @@
                    (eq (wtype (world-sector mission)) :world-sector-abandoned-lake)))
       (loop for faction-id in (list +faction-type-angels+ +faction-type-military+ +faction-type-church+)
             do
-               (logger (format nil "   AUTO-RESOLVE-MISSION: Abandonded district -15% to non-demons~%"))
+               (log:info "   Abandonded district -15% to non-demons")
                (when (find faction-id faction-chances :key #'(lambda (a) (first a)))
                  (decf (second (find faction-id faction-multipliers :key #'(lambda (a) (first a))))
                        15))))
     ;; primordial incursion makes it easier for primordials +100%
     (when (find +lm-misc-eater-incursion+ (level-modifier-list mission))
-      (logger (format nil "   AUTO-RESOLVE-MISSION: Primordial incursion +100% to primordials~%"))
+      (log:info "   Primordial incursion +100% to primordials")
       (incf (second (find +faction-type-eater+ faction-multipliers :key #'(lambda (a) (first a))))
             100))
 
@@ -758,7 +758,7 @@
     (when (and (find-campaign-effects-by-id world :campaign-effect-demons-delayed)
                (find +faction-type-demons+ (faction-list mission) :key #'(lambda (a) (first a)))
                (eql (find +faction-type-demons+ (faction-list mission) :key #'(lambda (a) (first a))) :mission-faction-delayed))
-      (logger (format nil "   AUTO-RESOLVE-MISSION: Demons delayed effect -30% to delayed demons~%"))
+      (log:info "   Demons delayed effect -30% to delayed demons")
       (decf (second (find +faction-type-demons+ faction-multipliers :key #'(lambda (a) (first a))))
             30))
 
@@ -766,7 +766,7 @@
     (when (and (find-campaign-effects-by-id world :campaign-effect-angels-hastened)
                (find +faction-type-angels+ (faction-list mission) :key #'(lambda (a) (first a)))
                (eql (find +faction-type-angels+ (faction-list mission) :key #'(lambda (a) (first a))) :mission-faction-delayed))
-      (logger (format nil "   AUTO-RESOLVE-MISSION: Angels hastened effect +30% to delayed angels~%"))
+      (log:info "   Angels hastened effect +30% to delayed angels")
       (incf (second (find +faction-type-angels+ faction-multipliers :key #'(lambda (a) (first a))))
             30))
 
@@ -787,7 +787,7 @@
              (setf faction-chances chances-multiplied))
 
     
-    (loop initially (logger (format nil "   AUTO-RESOLVE-MISSION: Final chances~%"))
+    (loop initially (log:info "   Final chances")
           with str-table = (list (list +faction-type-angels+ :game-over-angels-won)
                                  (list +faction-type-demons+ :game-over-demons-won)
                                  (list +faction-type-military+ :game-over-military-won)
@@ -796,10 +796,10 @@
                                  (list +faction-type-eater+ :game-over-eater-won))
           for (faction-id base-chance) in faction-chances
           do
-             (logger (format nil "      ~A: ~A~%"
+             (log:info "      ~A: ~A"
                              (second (find faction-id str-table
                                            :key (lambda (a) (first a))))
-                             base-chance)))
+                             base-chance))
 
     ;; calculate winner
     (setf max-n (loop for (faction-id chance) in faction-chances
@@ -820,7 +820,7 @@
                    (loop-finish))
                  (progn
                    (setf lower-border upper-border)))
-            finally (logger (format nil "   AUTO-RESOLVE-MISSION: ~A out of ~A~%" n max-n))))
+            finally (log:info "   Chance is ~A out of ~A" n max-n)))
 
     (when faction-winner
       (setf (getf mission-result :mission-result) (second (find faction-winner (list (list +faction-type-angels+ :game-over-angels-won)

@@ -19,7 +19,7 @@
       (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *current-dir*)))
         (cl-store:store *highscores* file-pathname))
     (t (c)
-      (logger (format nil "~%SAVE-HIGHSCORES-TO-DISK: Error occured while saving to file: ~A.~%~%" c))))
+      (log:info (format nil "~%SAVE-HIGHSCORES-TO-DISK: Error occured while saving to file: ~A.~%~%" c))))
   nil)
 
 (defun load-highscores-from-disk ()
@@ -28,11 +28,11 @@
         (if (probe-file file-pathname)
           (setf *highscores* (cl-store:restore file-pathname))
           (progn
-            (logger (format nil "~%LOAD-HIGHSCORES-FROM-DISK: No file ~A to read the highscores from. Overwriting with defaults.~%~%" file-pathname))
+            (log:info (format nil "~%LOAD-HIGHSCORES-FROM-DISK: No file ~A to read the highscores from. Overwriting with defaults.~%~%" file-pathname))
             (save-highscores-to-disk)
             nil))
       (t (c)
-        (logger (format nil "~%LOAD-HIGHSCORES-FROM-DISK: Error occured while reading the highscores from file ~A: ~A. Overwriting with defaults.~%~%" file-pathname c))
+        (log:info (format nil "~%LOAD-HIGHSCORES-FROM-DISK: Error occured while reading the highscores from file ~A: ~A. Overwriting with defaults.~%~%" file-pathname c))
         (save-highscores-to-disk)
         nil)))
   *highscores*)

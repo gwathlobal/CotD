@@ -65,7 +65,7 @@
                                                              (get-single-memo-visibility (get-memo-* (level *world*) tx ty tz)))
                                                     (reveal-cell-on-map (level *world*) tx ty tz)
                                                     (display-cell-on-map tx ty tz)))
-                                                (logger (format nil "ANIMATION-FUNC: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) tx ty))
+                                                (log:info (format nil "ANIMATION-FUNC: ~A [~A] leaves ~A [~A] at (~A ~A)~%" (name mob) (id mob) (name item) (id item) tx ty))
                                                 )
                                               )
                                                   

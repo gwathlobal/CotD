@@ -2,7 +2,7 @@
 
 (defun create-template-test-city (max-x max-y max-z)
   
-  (logger (format nil "CREATE-TEMPLATE-TEST-CITY~%"))
+  (log:info (format nil "CREATE-TEMPLATE-TEST-CITY~%"))
 
   ;(setf max-x *max-x-level*)
   ;(setf max-y *max-y-level*)
