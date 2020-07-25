@@ -1,4 +1,4 @@
-- BUG: it is possible to create a quick mission Satanist elimination for primordials where they attack automatically because there are no demons
+- TODO: find a better way of handling primordial autowin situation in mission Satanist elimination (right now this mission is hacked not be available for quick missions)
 - Military can not have delayed arrival if no army is present
 - Worm-like multitile creatures in hell that devour you while you are inside
 - BUG: Fix the bug with military movement on campaign map

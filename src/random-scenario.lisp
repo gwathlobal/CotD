@@ -445,6 +445,12 @@
     ;; if available mission-types are not supplied, take all of them
     (when (not avail-mission-type-list)
       (setf avail-mission-type-list (get-all-mission-types-list)))
+
+    ;; TODO: find a better way of handling primordial autowin situation for satanist elimination mission
+    (when (or (eql specific-faction-type +specific-faction-type-eater+)
+              (eql specific-faction-type +specific-faction-type-skinchanger+))
+      (setf avail-mission-type-list (remove :mission-type-eliminate-satanists avail-mission-type-list :key #'(lambda (a)
+                                                                                                               (id a)))))
     
     ;; if available sector types are not supplied, find all possible sectors in game
     (when (not avail-world-sector-type-list)
