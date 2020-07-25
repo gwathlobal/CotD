@@ -72,7 +72,8 @@
    (full-message-box :initform (make-message-box) :accessor level/full-message-box :type message-box)
    (small-message-box :initform (make-message-box) :accessor level/small-message-box :type message-box)
 
-   ))
+   (scenario-ended :initform nil :accessor level/scenario-ended :type boolean)
+   )) 
    
 (defun add-mob-to-level-list (level mob &optional (apply-gravity t))
 

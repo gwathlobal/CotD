@@ -108,25 +108,24 @@
                            unless (get-item-by-id item-id) do
                              (error (format nil "ITEM ID ~A AT (~A ~A) NIL, FAILED!!!" item-id x y)))))
                  ;; checking for inconsistences between actual number of angels on map and (total-angels *world*)
-                 (loop with result = 0
-                       for mob-id in (mob-id-list (level *world*))
-                       for mob = (get-mob-by-id mob-id)
-                       when (and (not (check-dead mob))
-                                 (and (mob-ability-p mob +mob-abil-angel+)
-                                      (not (mob-ability-p mob +mob-abil-animal+))))
-                         do
-                            (incf result)
-                            (loop for merged-id in (merged-id-list mob)
-                                  for merged-mob = (get-mob-by-id merged-id)
-                                  when (and (not (check-dead merged-mob))
-                                            (and (mob-ability-p merged-mob +mob-abil-angel+)
-                                                 (not (mob-ability-p merged-mob +mob-abil-animal+))))
-                                    do
-                                       (incf result))
-                       ;;finally (when (/= (total-angels (level *world*)) result)
-                       ;;          (error (format nil "FAILED!!! TOTAL ANGELS = ~A, ACTUAL ANGELS ALIVE = ~A" (total-angels *world*) result)))
-                       )
-                     
+                 ;(loop with result = 0
+                 ;      for mob-id in (mob-id-list (level *world*))
+                 ;      for mob = (get-mob-by-id mob-id)
+                 ;      when (and (not (check-dead mob))
+                 ;                (and (mob-ability-p mob +mob-abil-angel+)
+                 ;                     (not (mob-ability-p mob +mob-abil-animal+))))
+                 ;        do
+                 ;           (incf result)
+                 ;           (loop for merged-id in (merged-id-list mob)
+                 ;                 for merged-mob = (get-mob-by-id merged-id)
+                 ;                 when (and (not (check-dead merged-mob))
+                 ;                           (and (mob-ability-p merged-mob +mob-abil-angel+)
+                 ;                                (not (mob-ability-p merged-mob +mob-abil-animal+))))
+                 ;                   do
+                 ;                      (incf result))
+                 ;      ;;finally (when (/= (total-angels (level *world*)) result)
+                 ;      ;;          (error (format nil "FAILED!!! TOTAL ANGELS = ~A, ACTUAL ANGELS ALIVE = ~A" (total-angels *world*) result)))
+                 ;      )
                  )
 
                ))
@@ -583,48 +582,66 @@
     (setf random-number (random 100)))
   (game-state-post-scenario->campaign-map))
 
+(defmacro handle-errors-to-ui (&body body)
+  `(if *cotd-release*
+     (handler-case
+         (progn ,@body)
+       (t (c)
+         (setf *cotd-logging* :log-option-all)
+         (setf *cotd-log-level* :info)
+         (setup-log)
+         (log:error "~A" c)
+         (setf *current-window* (make-instance 'display-msg-window
+                                               :msg-line (format nil "ERROR: ~A" c)
+                                               :w (truncate (* *window-width* 2/3))
+                                               :prompt-line "[Esc] Exit"))
+         (make-output *current-window*)
+         (run-window *current-window*)
+         (return-from cotd-main nil)))
+     (progn ,@body)))
+
 (defun cotd-main () 
   (in-package :cotd)
   (setup-log)
   (log:info "Start program")
-  
+
   (sdl:with-init ()
-
-    (cotd-init)
-
-    (tagbody
-       (setf *quit-func* #'(lambda ()
-                             (when (and *game-manager*
-                                        *world*)
-                               (case (game-manager/game-state *game-manager*)
-                                 ((:game-state-custom-scenario) (save-game-to-disk :save-game-scenario :save-scenario))
-                                 ((:game-state-campaign-scenario) (save-game-to-disk :save-game-campaign :save-scenario))
-                                 ((:game-state-campaign-map :game-state-post-scenario) (save-game-to-disk :save-game-campaign :save-campaign))))
-                             
-                             (go quit-menu-tag)))
-       (setf *start-func* #'(lambda () (go start-game-tag)))
-       (game-state-init->menu)
-     start-game-tag
-       (loop while t do
-         (case (game-manager/game-state *game-manager*)
-           (:game-state-main-menu (progn
-                                    (stop-path-thread)
-                                    (with-slots (game-slot-id) *game-manager*
-                                      (setf game-slot-id nil))
-                                    (main-menu)))
-           (:game-state-custom-scenario (scenario-game-loop))
-           ((:game-state-campaign-map :game-state-campaign-init) (campaign-game-loop))
-           (:game-state-campaign-scenario (scenario-game-loop))
-           (:game-state-post-scenario (process-post-scenario))))
-     quit-menu-tag
-       (stop-path-thread))
-    (log:info "End program~%")
+    (handle-errors-to-ui
+      (progn
+          (cotd-init)
+          (tagbody
+             (setf *quit-func* #'(lambda ()
+                                   (when (and *game-manager*
+                                              *world*)
+                                     (case (game-manager/game-state *game-manager*)
+                                       ((:game-state-custom-scenario) (save-game-to-disk :save-game-scenario :save-scenario))
+                                       ((:game-state-campaign-scenario) (save-game-to-disk :save-game-campaign :save-scenario))
+                                       ((:game-state-campaign-map :game-state-post-scenario) (save-game-to-disk :save-game-campaign :save-campaign))))
+                                   
+                                   (go quit-menu-tag)))
+             (setf *start-func* #'(lambda () (go start-game-tag)))
+             (game-state-init->menu)
+           start-game-tag
+             (loop while t do
+               (case (game-manager/game-state *game-manager*)
+                 (:game-state-main-menu (progn
+                                          (stop-path-thread)
+                                          (with-slots (game-slot-id) *game-manager*
+                                            (setf game-slot-id nil))
+                                          (main-menu)))
+                 ((:game-state-custom-scenario :game-state-custom-scenario-end) (scenario-game-loop))
+                 ((:game-state-campaign-map :game-state-campaign-init) (campaign-game-loop))
+                 ((:game-state-campaign-scenario :game-state-campaign-scenario-end) (scenario-game-loop))
+                 (:game-state-post-scenario (process-post-scenario))))
+           quit-menu-tag
+             (stop-path-thread))
+          (log:info "End program~%")))
     nil))
 
 (defun setup-log ()
   (case *cotd-logging*
-    (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" *cotd-log-level*))
-    (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%d - %p (%c{1}) %m%n" *cotd-log-level*))
+    (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
+    (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
     (t (log:config :off))))
 
 #+clisp
@@ -664,7 +681,7 @@
   (cffi:use-foreign-library sdl)
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
-  (setf *cotd-logging* :log-option-none)
+  (setf *cotd-logging* :log-option-file)
   (setf *cotd-log-level* :info)
   
   (sdl:with-init ()  

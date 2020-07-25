@@ -42,30 +42,36 @@
                                                  :turns (player-game-time (level tmp-world))
                                                  :result-str tmp-final-str
                                                  :sector-name-str (name (world-sector (level tmp-world)))))
-    
-    (save-highscores-to-disk)
-    (dump-character-on-game-over (name *player*) tmp-score (player-game-time (level tmp-world)) (name (world-sector (level tmp-world)))
-                                 tmp-final-str (return-scenario-stats nil))
 
-    ;; increase world flesh points
-    (when (or (eq tmp-game-over-type :game-over-demons-won)
-              (eq tmp-game-over-type :game-over-satanists-won))
-      (when (null (getf tmp-mission-result :flesh-points))
-        (loop with sum = 0
-              for item-id in (item-id-list (level tmp-world))
-              for item = (get-item-by-id item-id)
-              when (item-ability-p item +item-abil-corpse+) do 
-                (incf sum (item-ability-p item +item-abil-corpse+))
-              finally (setf (getf tmp-mission-result :flesh-points) (truncate sum 40)))))
+    (if (null (level/scenario-ended (level tmp-world)))
+      (progn
+        (save-highscores-to-disk)
+        (dump-character-on-game-over (name *player*) tmp-score (player-game-time (level tmp-world)) (name (world-sector (level tmp-world)))
+                                     tmp-final-str (return-scenario-stats nil))
+        
+        ;; increase world flesh points
+        (when (or (eq tmp-game-over-type :game-over-demons-won)
+                  (eq tmp-game-over-type :game-over-satanists-won))
+          (when (null (getf tmp-mission-result :flesh-points))
+            (loop with sum = 0
+                  for item-id in (item-id-list (level tmp-world))
+                  for item = (get-item-by-id item-id)
+                  when (item-ability-p item +item-abil-corpse+) do 
+                    (incf sum (item-ability-p item +item-abil-corpse+))
+                  finally (setf (getf tmp-mission-result :flesh-points) (truncate sum 40)))))
+        
+        (setf (getf tmp-mission-result :mission-result) tmp-game-over-type)
+        
+        (setf (level/mission-result (level tmp-world)) tmp-mission-result)
+        
+        (add-message (format nil "~%"))
+        (add-message tmp-player-msg)
+        (add-message (format nil "~%Press any key...~%"))
+        (setf (level/scenario-ended (level tmp-world)) t))
+      (progn
+        ;; immediately reload highscores from disk to eliminate a duplicated entry created above
+        (load-highscores-from-disk)))
 
-    (setf (getf tmp-mission-result :mission-result) tmp-game-over-type)
-    
-    (setf (level/mission-result (level tmp-world)) tmp-mission-result)
-
-    (add-message (format nil "~%"))
-    (add-message tmp-player-msg)
-    (add-message (format nil "~%Press any key...~%"))
-    
     (setf *current-window* (make-instance 'cell-window))
     (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
     (make-output *current-window*)
